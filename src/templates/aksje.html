@@ -3,6 +3,7 @@
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_brikker.html" import brikker, retningspille -%}
 {% from "_perioder.html" import periodevalg with context -%}
+{% from "_investorboble.html" import investorboble -%}
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
 {#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
     (ECH8 i PR 2). #}
@@ -295,19 +296,6 @@
   </p>
   {% endif %}
 
-  {#- Story 10.5 (gruppens svar 19.10 kl. 16:03 og 19:49): lenken til
-      selskapets investorside, med navnet i lenketeksten. NewsWeb nevnes uten
-      lenke (designregler.md). I demoen er selskapet oppdiktet, så der står
-      en tekst i stedet. En aksje i en ekte base uten adresse får setningen
-      uten lenke (gjennomgangen, ECH5). #}
-  {% if eksempeltall %}
-    <p class="fotnote investorside">Børsmeldingene står på NewsWeb. {{ detalj.aksje.navn }} er oppdiktet og har ingen investorside. I den ekte versjonen står lenken til selskapets investorside her.</p>
-  {% elif investorside %}
-    <p class="fotnote investorside">Børsmeldingene står på NewsWeb og ofte også på <a href="{{ investorside }}" rel="noreferrer">investorsiden til {{ detalj.aksje.navn }}</a>.</p>
-  {% else %}
-    <p class="fotnote investorside">Børsmeldingene står på NewsWeb og ofte også på selskapets investorside.</p>
-  {% endif %}
-
   {#- Story 10.3: KI-teksten står under regelforklaringen, aldri før og
       aldri i stedet for den (FR-602). Bryteren er synlig for brukeren
       (FR-601), og med KI av er siden lik den var før 10.3, bortsett fra
@@ -422,6 +410,10 @@
       <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} har ingen dager med vurdering.</p>
     {% endif %}
   </section>
+
+  {#- Story 3.4h: boblen til investorsiden nederst, under «Signalet dag for
+      dag» (skissen aksjesiden-ki-paa.png). Den erstatter fotnoten fra 10.5. #}
+  {{ investorboble(detalj.aksje.symbol, detalj.aksje.navn, eksempeltall, investorside) }}
 
   {#- grafen bare med grafen og snittet, ga og maalt_mot bare med sjekkene
       (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser.

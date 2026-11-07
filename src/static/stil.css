@@ -23,6 +23,30 @@
 /* Story 8.0d, PR 2: de store overskriftene i optisk størrelse 72pt. */
 @font-face { font-family: "Newsreader 72"; font-weight: 500; font-style: normal; font-display: swap;
              src: url("/static/fonts/newsreader/Newsreader72pt-Medium.woff") format("woff"); }
+/* Story 3.4h: skriftene i navnene på sidene for selskapene i demoen
+   (docs/bilder/investorsider/LESMEG.md). Hele filer, bare komprimert til WOFF
+   (OFL-FAQ 2.2.1). Nettleseren laster en fil bare når en side bruker den, så
+   bare de sidene laster dem. */
+@font-face { font-family: "Inter Display"; font-weight: 200; font-style: normal; font-display: swap;
+             src: url("/static/fonts/inter-display/InterDisplay-ExtraLight.woff") format("woff"); }
+@font-face { font-family: "Inter Display"; font-weight: 700; font-style: normal; font-display: swap;
+             src: url("/static/fonts/inter-display/InterDisplay-Bold.woff") format("woff"); }
+@font-face { font-family: "Inter Display"; font-weight: 800; font-style: italic; font-display: swap;
+             src: url("/static/fonts/inter-display/InterDisplay-ExtraBoldItalic.woff") format("woff"); }
+@font-face { font-family: "Inter Display"; font-weight: 900; font-style: normal; font-display: swap;
+             src: url("/static/fonts/inter-display/InterDisplay-Black.woff") format("woff"); }
+@font-face { font-family: "Lora"; font-weight: 400; font-style: normal; font-display: swap;
+             src: url("/static/fonts/lora/Lora-Regular.woff") format("woff"); }
+@font-face { font-family: "Lora"; font-weight: 500; font-style: normal; font-display: swap;
+             src: url("/static/fonts/lora/Lora-Medium.woff") format("woff"); }
+@font-face { font-family: "Lora"; font-weight: 600; font-style: italic; font-display: swap;
+             src: url("/static/fonts/lora/Lora-SemiBoldItalic.woff") format("woff"); }
+@font-face { font-family: "Lora"; font-weight: 700; font-style: normal; font-display: swap;
+             src: url("/static/fonts/lora/Lora-Bold.woff") format("woff"); }
+@font-face { font-family: "Liberation Mono"; font-weight: 400; font-style: normal; font-display: swap;
+             src: url("/static/fonts/liberation-mono/LiberationMono-Regular.woff") format("woff"); }
+@font-face { font-family: "Liberation Mono"; font-weight: 700; font-style: normal; font-display: swap;
+             src: url("/static/fonts/liberation-mono/LiberationMono-Bold.woff") format("woff"); }
 
 /* Designregler §5: fargene med navn. */
 :root {
@@ -558,8 +582,9 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 /* Aksjesiden (aksje.html). */
 /* Story 8.0: like tydelig som lenken fra oversikten. Story 8.0d, PR 3:
    teksten er «Markedsoversikt», uten pil (del C). */
-:where(.side-aksje) a.tilbake { color: inherit; font-size: 0.9rem; text-decoration: underline; }
-:where(.side-aksje) a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 3.4h: lenken tilbake står også på sidene for selskapene i demoen. */
+a.tilbake { color: inherit; font-size: 0.9rem; text-decoration: underline; }
+a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 
 /* Story 8.16b: merket når siden viser en tidligere dag, med fargene til
    merkene over h1. */
@@ -1047,3 +1072,66 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
 :where(.side-oversikt) table.boersometertabell th.tall,
 :where(.side-oversikt) table.boersometertabell td.tall { text-align: right; }
+
+/* Story 3.4h: boblen til investorsiden nederst på aksjesiden, i begge
+   versjonene (skissen investorsiden-i-demoen.png). Teksten brytes i stedet
+   for å gå ut av siden på smal skjerm. */
+p.investorboble { margin: 2rem 0 0; }
+p.investorboble a { display: inline-block; max-width: 100%; box-sizing: border-box; padding: 10px 20px;
+                    border: 1.5px solid var(--blekk); border-radius: 22px; background: var(--hvit); color: var(--blekk);
+                    font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+p.investorboble a:hover { text-decoration: underline; }
+p.investorboble a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Story 3.4h: siden for et selskap i demoen, etter oppsettet i
+   docs/bilder/investorsider/LESMEG.md. Logoen er en sirkel på 116 px med 4 px
+   kant i blekk og en gul ring innenfor, navnet er 50 px, og tegningen står
+   venstrejustert rett under overskriften, 560 × 400 px. */
+:where(.side-demoselskap) header.selskap { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; margin: 20px 0 28px; }
+:where(.side-demoselskap) .selskapslogo { box-sizing: border-box; width: 116px; height: 116px; flex: none; border-radius: 50%;
+                                          border: 4px solid var(--blekk); background: var(--hvit); color: var(--blekk);
+                                          box-shadow: inset 0 0 0 6px var(--hvit), inset 0 0 0 9px var(--oransje);
+                                          display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+:where(.side-demoselskap) .selskapslogo svg.bransjesymbol { width: 26px; height: 26px; }
+:where(.side-demoselskap) .selskapslogo .symbol { font-size: 25px; line-height: 1; font-weight: var(--vekt); letter-spacing: var(--sperring); }
+:where(.side-demoselskap) .selskapsnavn { min-width: 0; }
+:where(.side-demoselskap) h1 { margin: 0; color: var(--blekk); font-size: clamp(26px, 8.5vw, 50px); line-height: 1.05;
+                               font-weight: var(--vekt); letter-spacing: var(--sperring); overflow-wrap: anywhere; }
+:where(.side-demoselskap) p.meta { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; color: var(--dempet); font-size: 1.05rem; }
+:where(.side-demoselskap) p.meta svg.bransjesymbol { width: 18px; height: 18px; flex: none; }
+:where(.side-demoselskap) .skrift-inter { font-family: "Inter Display", "IBM Plex Sans", sans-serif; }
+:where(.side-demoselskap) .skrift-lora { font-family: "Lora", Georgia, serif; }
+:where(.side-demoselskap) .skrift-mono { font-family: "Liberation Mono", monospace; }
+:where(.side-demoselskap) .skrift-plex { font-family: "IBM Plex Sans", sans-serif; }
+:where(.side-demoselskap) .skrift-newsreader { font-family: "Newsreader", Georgia, serif; }
+:where(.side-demoselskap) .skrift-newsreader-72 { font-family: "Newsreader 72", "Newsreader", Georgia, serif; }
+:where(.side-demoselskap) .kursiv { font-style: italic; }
+:where(.side-demoselskap) .store { text-transform: uppercase; }
+:where(.side-demoselskap) .kapiteler { font-variant: small-caps; }
+/* Feltet er 896 px, som i bobler.json, og boblen står i prosent av tegningen,
+   så den følger den. Halen tegnes over boblen, og den hvite flaten dekker
+   kanten der halen går ut. */
+:where(.side-demoselskap) .tegningsfelt { container-type: inline-size; max-width: 896px; }
+:where(.side-demoselskap) figure.tegningen { margin: 0; }
+:where(.side-demoselskap) .flate { position: relative; width: 560px; }
+:where(.side-demoselskap) .flate img { display: block; width: 560px; height: 400px; }
+:where(.side-demoselskap) p.boble { position: absolute; left: var(--venstre); top: var(--topp); width: var(--bredde); box-sizing: border-box;
+                                    margin: 0; padding: 14px 18px; background: var(--hvit); border: 3.5px solid var(--blekk); border-radius: 22px;
+                                    font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 22px; line-height: 1.25; color: var(--blekk); }
+:where(.side-demoselskap) svg.hale { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+:where(.side-demoselskap) .flate-hale { fill: var(--hvit); }
+:where(.side-demoselskap) .strek-hale { fill: none; stroke: var(--blekk); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+:where(.side-demoselskap) figcaption.ki-merke { display: inline-block; margin-top: 10px; padding: 3px 12px; border: 1px solid var(--strek);
+                                                border-radius: 999px; background: var(--hvit); color: var(--dempet); font-size: 0.85rem; }
+:where(.side-demoselskap) p.oppdiktet { margin: 20px 0 0; color: var(--tekst); }
+/* På smal skjerm: tegningen i full bredde, KI-merket rett under den og boblen
+   under KI-merket, uten hale. */
+@container (width < 896px) {
+  :where(.side-demoselskap) figure.tegningen { display: flex; flex-direction: column; align-items: flex-start; }
+  :where(.side-demoselskap) .flate { display: contents; }
+  :where(.side-demoselskap) .flate img { order: 1; width: 100%; max-width: 560px; height: auto; }
+  :where(.side-demoselskap) figcaption.ki-merke { order: 2; }
+  :where(.side-demoselskap) p.boble { order: 3; position: static; width: auto; max-width: 560px; margin-top: 16px; overflow-wrap: anywhere; }
+  :where(.side-demoselskap) svg.hale { display: none; }
+}

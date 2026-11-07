@@ -534,16 +534,18 @@ class TestRenLogikk:
 
 class TestSiden:
     def test_investorsiden_staar_rett_under_grafen_og_historikken_nederst(self, klient, base):
-        """Ville feilet hvis historikken kom mellom grafen og avsnittet om
-        investorsiden (10.5), eller ikke sto nederst (VG5)."""
+        """Ville feilet hvis historikken ikke sto nederst (VG5). Story 3.4h:
+        boblen til investorsiden står under historikken (skissen
+        aksjesiden-ki-paa.png), og ingen annen del står mellom dem eller
+        etter boblen. Navnet er fra 10.5, da avsnittet sto rett under grafen."""
         html = _side(klient, f"/aksje/{SYMBOL}")
         grafen = html.index("</figure>")
-        investorsiden = html.index('class="fotnote investorside"')
         historikken = html.index('id="signalet-dag-for-dag"')
-        assert grafen < investorsiden < historikken
-        mellom = html[grafen:investorsiden]
+        investorsiden = html.index('class="investorboble"')
+        assert grafen < historikken < investorsiden
+        mellom = html[html.index("</section>", historikken) : investorsiden]
         assert "<section" not in mellom and "<h2" not in mellom
-        etter = html[historikken:].split("</section>", 1)[1].split('<div id="hjelp-', 1)[0]
+        etter = html[investorsiden:].split('<div id="hjelp-', 1)[0]
         assert "<section" not in etter and "<h2" not in etter
 
     @pytest.mark.parametrize("adresse, dagen", [("", "fredag 09.10"), ("?dag=2026-10-06", "tirsdag 06.10")])

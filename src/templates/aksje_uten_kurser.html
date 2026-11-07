@@ -1,5 +1,6 @@
 {% extends "_ramme.html" %}
 {% from "_bransjer.html" import bransjesymbol -%}
+{% from "_investorboble.html" import investorboble -%}
 {#- Gruppens svar 23.10 kl. 09:24 (b): en aksje i lista uten en eneste kurs
     har en aksjeside som svarer 200, med navnet, bransjen og en beskjed, og
     uten graf og sjekker, slik FR-204 sier for en aksje uten gyldig signal.
@@ -24,4 +25,7 @@
     Det finnes ingen kurser for {{ aksje.navn }} ennå, så siden har ingen kursgraf og ingen sjekker.
     {% if eksempeltall %}I demoen mangler kursene med vilje.{% endif %}
   </p>
+
+  {#- Story 3.4h (spørsmål 5): boblen nederst, også uten kurser. #}
+  {{ investorboble(aksje.symbol, aksje.navn, eksempeltall, investorside) }}
 {% endblock %}

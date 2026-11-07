@@ -129,3 +129,58 @@ Investorsiden og aksjesiden med boblen ved 390 og 320 px: tegningen i full bredd
 - Skriftene lastes ned fra kildene de er utgitt fra, med lisensen lest før commit. Ingen skrift fra nettet når appen kjører.
 - Bygges på egen gren og flettes bare ferdig og grønn.
 - En mutant per del, med kopi før og sha256 mot HEAD etter.
+
+## 3.4h, bygget 07.11
+
+*Lagt til 2026-11-07, etter instruksjonene kl. 20:17 og 20:57 i `docs/ai-prompts/2026-11-07.md`:* 3.4h er bygget på grenen `3-4h-investorsidene-i-demoen`, med svaret kl. 10:33 (forslagene i spørsmål 1–10). De nye testene står i `tests/test_investorsidene_demo.py`. Testene for fotnoten fra 10.5 er skrevet om i `tests/test_investorsiden.py`, `tests/test_historikken.py` og `tests/test_funnene_8_2b.py`, og `tests/test_utseende.py` og `tests/test_docker.py` kjenner den nye siden, skriftene og avtrykkene.
+
+- **A, siden for hvert av de 15:** lenken tilbake, logoen, navnet i selskapets skrift, bransjen med «Demo Børs», tegningen 560 × 400 px, boblen, «Illustrasjon laget av KI» og teksten nederst fra svaret kl. 10:33. **Ville feilet hvis** en av de 15 manglet en side, lenken tilbake, KI-merket eller teksten nederst (`test_hvert_av_de_15_har_sin_side_i_demoen`, `test_ingen_kurs_prosent_eller_kjoep_og_salg`).
+- **B, ruta og malen:** `/investorside/<symbol>` i `src/app.py`, `src/templates/investorside.html` og `src/investorsider.py`, med skriften per selskap i `SKRIFTER` etter tabellen i `LESMEG.md`. **Ville feilet hvis** ruta svarte 200 i den ekte versjonen eller for en ukjent ticker, eller skriften var en annen enn i `LESMEG.md` (`test_ruta_svarer_404_i_den_ekte_versjonen`, `test_en_ukjent_ticker_gir_ingen_side`, `test_skriften_er_den_i_lesmeg`).
+- **C, boblen og halen:** plassen fra `bobler.json` i prosent av tegningen, og halen som en SVG med `aria-hidden="true"`. **Ville feilet hvis** slagordet bare fantes i en SVG, plassen ikke kom fra `bobler.json`, eller boblen dekket overskriften, KI-merket eller teksten nederst ved 1280 px, målt i Edge (`test_slagordet_er_vanlig_tekst_og_halen_pynt`, `test_boblen_ved_1280_px`).
+- **D, skriftene:** se under. **Ville feilet hvis** en skrift manglet lisensfil, rad i kildene eller `@font-face`, en WOFF-fil hadde metadata, en privat blokk eller en tabell som ikke stemte med sjekksummen, eller et snitt i `LESMEG.md` manglet (`test_hver_skrift_har_lisensen_raden_og_font_face`, `test_skriften_er_bare_komprimert`, `test_hvert_snitt_i_lesmeg_finnes_i_appen`).
+- **E, boblen nederst på aksjesiden:** makroen i `src/templates/_investorboble.html`, under «Signalet dag for dag» i `aksje.html` og nederst i `aksje_uten_kurser.html` (spørsmål 5). Fotnoten med klassen `investorside` er borte, og NewsWeb nevnes ikke på aksjesiden. **Ville feilet hvis** boblen i demoen hadde pil eller ny fane, boblen i den ekte versjonen åpnet i samme fane, en aksje uten adresse fikk en boble, eller «NewsWeb» sto på aksjesiden (`test_boblen_i_demoen`, `test_boblen_i_den_ekte_versjonen`, `test_uten_adresse_ingen_boble`).
+- **F, 390 og 320 px:** tegningen i full bredde og boblen under KI-merket, uten hale. **Ville feilet hvis** en av de 15 sidene eller boblen på aksjesiden med det lengste navnet rullet vannrett, målt i Edge (`test_smal_skjerm_uten_vannrett_rulling`, `test_boblen_paa_aksjesiden_ved_smal_skjerm`).
+- **G:** kopiene i `src/static/investorsider/` (`test_kopiene_er_byte_for_byte_de_godkjente`), `docs/hjelp.md` og steg 6 i «Demoen» i README-en (`test_hjelpen_sier_det_samme_som_sidene`). Bare `aksjesiden-brfe-demo.png` i `docs/appen/` er endret, 2258 px høyt (var 2300), fordi fotnoten mellom grafen og rammen er borte. De seks andre er byte for byte de samme, og avtrykkene i `tests/test_docker.py` er satt på nytt med en kommentar. U84 i `docs/ux-logg.md` får en datert linje når PR-en er flettet.
+
+**Skriftene.** Hele filer, pakket til WOFF 1.0 med bare zlib per tabell, uten WOFF-metadata og uten privat blokk (OFL-FAQ 2.2.1, lest 07.11). Kontrollert 07.11 i instruksjonen kl. 20:57, før settet ble kjørt: hver tabell i hver av de ti filene er byte for byte lik tabellen i TTF-fila i arkivet, og sha256 for arkivene er den i `docs/kilder-og-rettigheter.md`.
+- Inter Display 200, 700, 800 kursiv og 900: Inter 4.1, `Inter-4.1.zip` fra utgivelsen v4.1 hos rsms/inter, `extras/ttf/`. Lisensen er OFL 1.1, `LICENSE.txt` i zip-fila, uten reserverte navn.
+- Lora 400, 500, 600 kursiv og 700: Lora 3.021, `Lora.zip` fra utgivelsen v3.021 hos cyrealtype/Lora-Cyrillic, `ttf/`. Lisensen er OFL 1.1, `OFL.txt` lagt ved samme utgivelse, med det reserverte navnet «Lora».
+- Liberation Mono 400 og 700: Liberation 2.1.5, `liberation-fonts-ttf-2.1.5.tar.gz`, lenket fra utgivelsen 2.1.5 hos liberationfonts. Lisensen er OFL 1.1, `LICENSE` i arkivet, med de reserverte navnene «Liberation», «Arimo», «Tinos» og «Cousine».
+
+**Testene og mutantene.** Kjøringen kl. 20:43 ga 19 feilet: 17 fordi ruff og git ikke startet da minnet var nesten brukt opp (0xC0000142), og 2 som ventet fotnoten og ble rettet (stoppen kl. 20:53 i dagsfila). Hele settet ble kjørt alene på nytt før `ac0944f9`, 21:03:09–21:15:01 med 3,9 GB ledig av 15,7 GB: 4568 bestått, 24 hoppet over og 0 feilet. Én mutant per del på `ac0944f9`, med kopi før og sha256 mot HEAD etter: A (KI-merket), B (ruta i den ekte versjonen), C (toppen av boblen regnet mot bredden), D (vekten til Lora 700 i `@font-face`), E (ny fane i demoen), F (tegningen 560 px på smal skjerm) og G (en endret kopi av `brfe.svg`). Alle ble fanget, og hver fil var lik HEAD etterpå (med LF, som git lagrer den).
+
+### Gjennomgangen av 3.4h
+
+*Lagt til 2026-11-07:* Blind Hunter, Edge Case Hunter og Verification Gap gikk gjennom diffen mot main etter `5cb46117`, uten de 15 SVG-kopiene og de tre `OFL.txt`, som er kontrollert byte for byte mot kildene. Acceptance Auditor ble ikke kjørt, fordi instruksjonen ber om de tre. Det kom 16 funn fra Blind Hunter, 7 fra Edge Case Hunter og 2 fra Verification Gap, pluss ett annet funn, som er det samme som ECH7. Ingen er på høy. Rettingene er `72efb6e8`.
+
+| Funn | Hva | Dom | Utfall |
+|---|---|---|---|
+| VG1, BH4 | Boblen på en ekte aksje uten kurser (spørsmål 5) var ikke testet | middels | rettet: `test_boblen_i_den_ekte_versjonen_uten_kurser` |
+| VG2, BH5 | `/investorside/BRFE` med en ulesbar eller manglende demobase var ikke testet | middels | rettet: ruta er med i de to 503-testene og testen for en demobase som mangler, i `tests/test_demo.py` |
+| BH2 | Rammetestene i `tests/test_utseende.py` hentet ikke den nye siden | middels | rettet: «investorsiden i demoen» i `sidene`, og `side-demoselskap` i testen for klassen på `<body>` |
+| BH3 | Testen for skriftene sammenlignet bare med sjekksummen i samme fil, som et verktøy skriver på nytt | middels | rettet: sha256 for de ti filene som ble kontrollert mot kilden, i `KONTROLLERTE_SKRIFTFILER` |
+| BH8 | Testen for del G leste ikke README-en | lav | rettet: testen leser steg 6 i «Demoen» |
+| ECH5 | Testen for den ekte versjonen ga AttributeError uten boble | lav | rettet: `assert boble is not None` |
+| ECH6 | `DEMO_UTEN_KURSER` i `tests/test_investorsiden.py` var ubrukt | lav | rettet: fjernet |
+| BH14 | «før settet ble kjørt» var uklart | lav | rettet med denne raden: «før settet ble kjørt» betyr før kjøringen kl. 21:03, ikke kl. 20:43 |
+| ECH7, VG (annet funn) | Kommentaren om U66 i `aksje.html` sier at KI-teksten står etter lenken til investorsiden | lav | utsatt: `aksje.html` er med i avtrykket bak bildene i `docs/appen/`, så en kommentar tar alle bildene på nytt. Rettes neste gang malen endres (`issues.md`) |
+| BH16 | Kommentaren ved `_RUTER_MED_BASE` sier «merket», som også er merkingen i Min liste | lav | utsatt, som ECH7: `src/app.py` er med i avtrykket |
+| BH7 | Mutantene for 3.4h står ikke i vedlegget i `docs/kvalitetssikring.md` | lav | utsatt til etter flettingen, som for 8.20 (`fd1979b9`) |
+| BH15 | U84 og vedlegget har ingen eier etter flettingen | lav | rettet: står i `issues.md` |
+| BH6 | Tre tester i `tests/test_investorsiden.py` har navn fra 10.5 | lav | avvist: navnene står fordi `docs/kvalitetssikring.md` og spesifikasjonen for 10.5 viser til dem. Docstringene sier hva de tester nå, og 10.5 har en datert linje |
+| BH9 | `a.tilbake` er ikke lenger avgrenset til én side | lav | avvist: bare aksjesidene og sidene for selskapene bruker klassen, og en velger med to sider bryter regelen i `test_hver_side_har_klassen_reglene_er_avgrenset_med` (ECH5) om én side per del av velgerlista |
+| BH10 | «Tilbake til ‹navn›» glemmer perioden | lav | avvist: spesifikasjonen sier lenken går til aksjesiden, og boblen dit har heller ingen periode |
+| BH11 | Bredden der oppsettet skifter, rundt 928 px, er ikke testet | lav | avvist: over 896 px er flaten fast 560 px og feltet høyst 896 px, så boblen står i prosent av en flate som ikke endres |
+| BH13 | `_beskrivelse` gir `""` uten `<desc>` | lav | avvist: `test_hvert_av_de_15_har_sin_side_i_demoen` krever at `alt` er teksten i `<desc>` og ikke tom, og kopiene er låst til de godkjente filene |
+| ECH1 | Ruta åpner og migrerer den ekte basen før 404 | lav | avvist: alle rutene som leser basen, gjør det samme ved første forespørsel, og ruta skriver ingenting |
+| ECH2 | En låst ekte base gir 503, ikke 404 | lav | avvist: ruta må lese demomerket for å vite om basen er en demobase, og svarer som de andre sidene når basen ikke kan leses |
+| ECH4 | Et selskap uten rad i `bobler.json` eller `SKRIFTER` gir 500 | lav | avvist: `test_kopiene_er_byte_for_byte_de_godkjente` og `test_skriften_er_den_i_lesmeg` krever alle 15 |
+| BH1 | Diffen utelot 18 filer | falsk | bevisst: SVG-ene og lisensene er kontrollert byte for byte mot kildene |
+| BH12 | Kommentaren ved `HOEYDE_PAA_AKSJESIDEN` er utdatert | falsk | kommentarene der er historikk med «Var», og 3.4h har sin egen linje |
+| ECH3 | Boblen i demoen kan gå til en side som ikke finnes | falsk | demobasen har bare de 15 i tabellen `aksje` (`lag_demobase` i `src/demo.py`), og alle 15 har en side |
+
+**Testene og mutantene etter gjennomgangen.** Ledig minne var 2,8 GB av 15,7 GB, mindre enn ved stoppen kl. 20:53, så settet ble kjørt fil for fil før `72efb6e8`: 62 filer, 21:27:38–21:40:04, til sammen 4569 bestått, 24 hoppet over og 0 feilet. Ingen fil måtte kjøres på nytt. Fem mutanter på `72efb6e8`, med kopi før og sha256 mot HEAD etter: VG1 (boblen uten adresse i `aksje_uten_kurser.html`), VG2 (sjekken av `basefeil` i ruta), BH2 (klassen på `<body>`), BH3 (én byte i `Lora-Bold.woff`) og BH8 (steg 6 i README-en). Alle ble fanget, og hver fil var lik HEAD etterpå.
+
+## Spørsmål til gruppen før flettingen
+
+Ingen. Ingen funn på middels eller over står åpne.

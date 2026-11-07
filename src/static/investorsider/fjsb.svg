@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="fjsb-t fjsb-d">
+  <title id="fjsb-t">Fjellheim Sparebank</title>
+  <desc id="fjsb-d">En fjellhytte med en safedør som dør. Røyken fra pipa stiger som en eksponentialkurve, og en figur sitter på en benk med kaffe og ser på utsikten.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 214 L88 110 L138 160 L208 70 L288 170 L338 122 L412 214 Z" fill="#ECEAE4"/>
+    <path d="M208 70 L190 94 L204 90 L214 100 L226 92 Z M88 110 L76 126 L90 122 L100 130 Z" fill="#FFFFFF" stroke-width="2.5"/>
+    <path d="M8 272 V232 Q120 198 250 216 T412 224 V272 Z" fill="#E4F4EA"/>
+    <path d="M8 272H412" fill="none"/>
+    <rect x="246" y="128" width="13" height="26" fill="#D6D3CA"/>
+    <path d="M150 174 L215 126 L280 174 Z" fill="#13703C"/>
+    <rect x="160" y="172" width="110" height="60" fill="#B86E12"/>
+    <path d="M160 188 H270 M160 204 H270 M160 220 H270" fill="none" stroke-width="1.5"/>
+    <circle cx="194" cy="208" r="20" fill="#D6D3CA"/>
+    <circle cx="194" cy="208" r="11" fill="#ECEAE4" stroke-width="2.5"/>
+    <path d="M194 197 V219 M183 208 H205" fill="none" stroke-width="2.5"/>
+    <circle cx="194" cy="208" r="2.5" fill="#16181D" stroke="none"/>
+    <rect x="230" y="184" width="28" height="22" fill="#F8DE9C"/>
+    <path d="M244 184 V206 M230 195 H258" fill="none" stroke-width="2"/>
+    <path d="M252 126 C254 112 262 100 286 70 S330 22 366 12" fill="none" stroke="#70757D" stroke-width="4" stroke-dasharray="0.5 10"/>
+    <path d="M300 240 H360 M306 240 V254 M354 240 V254" fill="none"/>
+    <circle cx="324" cy="208" r="7.5" fill="#FFFFFF"/>
+    <path d="M324 215.5 L327 238 L342 238 L342 252 M325 224 L338 222" fill="none"/>
+    <rect x="337" y="214" width="9" height="9" rx="1.5" fill="#FFFFFF" stroke-width="2"/>
+    <path d="M341 211 q2 -5 0 -8" fill="none" stroke="#70757D" stroke-width="1.5"/>
+  </g>
+  <text x="336" y="40" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="16" fill="#5F646C">e<tspan baseline-shift="super" font-size="11">x</tspan></text>
+</svg>

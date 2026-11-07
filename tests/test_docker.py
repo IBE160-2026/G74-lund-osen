@@ -1175,7 +1175,9 @@ HOEYDE_PAA_BILDET = 1864
 # DevTools-protokollen og er byte for byte det samme.
 # Gjennomgangen av 8.20b: stil.css, hjelpetekster.py og app.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "35646ea218899c4af2951d6f42301c69dd07f13cd30667fd261369c14087b152"
+# Story 3.4h: skriftene for sidene i demoen i src/static/fonts/ og stil.css.
+# Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1227,6 +1229,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/migrering.py",
     # Story 8.3: porten for Min liste, som lagring_sqlite importerer.
     "src/minliste.py",
+    # Story 3.4h: app.py importerer sidene for selskapene i demoen.
+    "src/investorsider.py",
     *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
 )
 # Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:
@@ -1267,7 +1271,10 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # maalt i Edge uten vindu og rundet opp. Var 2261.
 # Story 8.20a: 2300, fordi fotnoten under summen og fotnotene etter grafen er
 # flyttet, og rammen har linja nederst. Maalt med DevTools-protokollen. Var 2345.
-HOEYDE_PAA_AKSJESIDEN = 2300
+# Story 3.4h: 2258, fordi fotnoten om NewsWeb mellom grafen og rammen er borte
+# (boblen står nederst). Bunnen av rammen er 2257,5 px, maalt med
+# DevTools-protokollen og rundet opp. Var 2300.
+HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1530,7 +1537,10 @@ HOEYDE_PAA_AKSJESIDEN = 2300
 # 2300 px hoeyt.
 # Gjennomgangen av 8.20b: stil.css, hjelpetekster.py og app.py. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "33ae3d2935eeca3246a948bd82d13b766b6eeee7e3797208e522299de8ee9ed6"
+# Story 3.4h: boblen nederst i stedet for fotnoten om NewsWeb (aksje.html og
+# _investorboble.html), investorsider.py, skriftene og stil.css. Bildet ble tatt paa
+# nytt og er 2258 px hoeyt.
+AVTRYKK_BAK_AKSJESIDEN = "7027a296c59d723af051423f5e9e71f015c5edc0d714b0ddd08f5699707d094a"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1624,12 +1634,14 @@ DE_NYE_BILDENE = {
 # Gjennomgangen av 8.20b: boersometer.html, stil.css, hjelpetekster.py og app.py. Alle
 # bildene ble tatt paa nytt. De to av børsometeret er nye (rammen og grensene i kortet);
 # de tre andre er byte for byte de samme.
+# Story 3.4h: skriftene for sidene i demoen i src/static/fonts/ og stil.css. Alle
+# bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "35646ea218899c4af2951d6f42301c69dd07f13cd30667fd261369c14087b152",
-    "docs/appen/boersometeret-demo.png": "0fc7d0d7eb9e4170821de100be8f39d38ccd65fcadffc7d7469df7fcdfda688a",
-    "docs/appen/min-liste-demo.png": "30f0311d3ee5b1eb7981479c74cb008ee9129ac33ea42d0e96ebafe48bfba3a3",
-    "docs/appen/oversikten-390-demo.png": "35646ea218899c4af2951d6f42301c69dd07f13cd30667fd261369c14087b152",
-    "docs/appen/boersometeret-390-demo.png": "0fc7d0d7eb9e4170821de100be8f39d38ccd65fcadffc7d7469df7fcdfda688a",
+    TOPPEN_AV_OVERSIKTEN: "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c",
+    "docs/appen/boersometeret-demo.png": "075d79618ba19a38f39e18a6f7b1b1b5dcc7973a8dc5e21b98df9fea8755677e",
+    "docs/appen/min-liste-demo.png": "45448a94576b91a3cf3df73966af83ab53736162c7a65730d71659204a1f0f77",
+    "docs/appen/oversikten-390-demo.png": "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c",
+    "docs/appen/boersometeret-390-demo.png": "075d79618ba19a38f39e18a6f7b1b1b5dcc7973a8dc5e21b98df9fea8755677e",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3640,8 +3652,10 @@ LENKENE_FOER_3_3H = {
 # «Mappestruktur» (regel 19). Var 6e34d0b2....
 # Story 8.20c (U75): steg 5 sier hva man gjoer med en konto hos EODHD fra
 # foer. Var 3bb398cd....
+# Story 3.4h (regel 19): steg 6 i «Demoen» sier at boblen nederst på aksjesiden
+# går til en side i appen. Var f124a92b....
 AVTRYKK_I_PILENE = {
-    "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
+    "Demoen": "a49a8d06bb28990eeed5c254fd46f2f9f09772dff7f8ced861088452d97933cf",
     "Den ekte versjonen": "c087d5b97500a0a7689a714c40f709f1ac8f3f5cd9b49918d90ed7083f753ad7",
     "Dokumentene": "7ba6eada43af3ebdfe55e420dd4dcf05be7b034275d53aa1ff6af5ddffbaafa2",
     "Mappestruktur": "0c6df769ca555da84d1d849881ca008014c4e941100ab942d257a309e277c70f",

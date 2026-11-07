@@ -120,8 +120,16 @@ class TestSkriftfilene:
             assert "SIL Open Font License, Version 1.1" in lisens, familie
 
     def test_bare_filene_som_brukes(self):
+        """Story 3.4h: skriftene i navnene på sidene for selskapene i demoen
+        har sine egne tester i test_investorsidene_demo.py."""
+        from test_investorsidene_demo import NYE_SKRIFTFILER
+
         filer = {p.relative_to(FONTS).as_posix() for p in FONTS.rglob("*") if p.is_file()}
-        assert filer == set(SKRIFTFILENE) | {"ibm-plex-sans/OFL.txt", "newsreader/OFL.txt"}
+        lisensene = {
+            f"{familie}/OFL.txt"
+            for familie in ("ibm-plex-sans", "newsreader", "inter-display", "lora", "liberation-mono")
+        }
+        assert filer == set(SKRIFTFILENE) | set(NYE_SKRIFTFILER) | lisensene
 
 
 # Sidene i alle tilstandene: den ekte versjonen med og uten kurser, demoen
@@ -235,6 +243,8 @@ def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     monkeypatch.setenv(app_modul.I_DEMO, "1")
     sider["oversikten i demoen"] = klient.get("/").data.decode("utf-8")
     sider["aksjesiden i demoen"] = klient.get("/aksje/BRFE").data.decode("utf-8")
+    # Story 3.4h (gjennomgangen, BH2): siden for et selskap i demoen.
+    sider["investorsiden i demoen"] = klient.get("/investorside/BRFE").data.decode("utf-8")
     # Story 8.3 (gjennomgangen, BH4, VG1, VG4): Min liste, også med «Alle» og
     # sortert, så rammetestene og lenkene prøves på den nye siden.
     sider["min liste i demoen"] = klient.get("/min-liste").data.decode("utf-8")
@@ -315,6 +325,8 @@ class TestRammen:
                     or href == "/boersometer"
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
+                    # Story 3.4h: boblen i demoen går til siden for selskapet.
+                    or (re.fullmatch(r"/investorside/[A-Z0-9]+", href) and 'class="eksempeltall"' in html)
                     # Story 3.3i (U51): den ekte versjonen i README-en, bare i demoen.
                     or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
@@ -940,7 +952,8 @@ class TestStilarket:
             assert len(treff) == 1 and treff[0] in brukt, (malfil.name, treff)
         # Story 8.6: børsometeret er den fjerde siden, og aksjesiden for en
         # aksje uten kurser den femte (gruppens svar 23.10 kl. 09:24, b).
-        assert sider == 5
+        # Story 3.4h: siden for et selskap i demoen er den sjette.
+        assert sider == 6
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,
@@ -962,7 +975,8 @@ class TestStilarket:
         """Ville feilet hvis en regel ble avgrenset til en side som ikke
         finnes, eller en side mistet klassen på <body>."""
         brukt = set(re.findall(r":where\(\.(side-[a-z]+)\)", STILARKET.read_text(encoding="utf-8")))
-        assert brukt == {"side-oversikt", "side-aksje", "side-feil"}
+        # Story 3.4h: sidene for selskapene i demoen har sin egen klasse.
+        assert brukt == {"side-oversikt", "side-aksje", "side-feil", "side-demoselskap"}
         # Gjennomgangen (ECH5): en avgrenset regel er avgrenset i hver del
         # av velgerlista, til samme side, så _stil i testene ser det
         # nettleseren gjør.
@@ -972,8 +986,10 @@ class TestStilarket:
                 sider = {m.group(0) for d in deler if (m := AVGRENSET.match(d))}
                 assert len(sider) == 1 and all(AVGRENSET.match(d) for d in deler), velger
         for navn, html in sidene.items():
-            assert re.search(r'<body class="side-(oversikt|aksje|feil)">', html), navn
+            assert re.search(r'<body class="side-(oversikt|aksje|feil|demoselskap)">', html), navn
         assert '<body class="side-feil">' in sidene["feilsiden"]
+        # Story 3.4h (gjennomgangen, BH2): siden for et selskap i demoen.
+        assert '<body class="side-demoselskap">' in sidene["investorsiden i demoen"]
         assert '<body class="side-aksje">' in sidene["aksjesiden"]
         assert '<body class="side-oversikt">' in sidene["oversikten"]
 

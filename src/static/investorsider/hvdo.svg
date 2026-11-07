@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="hvdo-t hvdo-d">
+  <title id="hvdo-t">Havdyp Olje</title>
+  <desc id="hvdo-d">En gul ubåt dypt i havet med en badeand på tårnet. I det midterste koøyet ser man en enda mindre ubåt.</desc>
+  <rect x="8" y="24" width="404" height="248" rx="16" fill="#E7EEFC"/>
+  <path d="M8 130 Q58 120 108 130 T208 130 T308 130 T412 130 V200 H8 Z" fill="#D4E1F7"/>
+  <path d="M8 200 Q58 190 108 200 T208 200 T308 200 T412 200 V256 Q412 272 396 272 H24 Q8 272 8 256 Z" fill="#BFD1F1"/>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8" y="24" width="404" height="248" rx="16" fill="none"/>
+    <path d="M10 254 Q80 240 150 252 T300 248 T410 254" fill="none"/>
+    <path d="M44 252 q-10 -20 0 -40 q10 -20 0 -40 M60 252 q8 -16 0 -30 q-8 -14 0 -28 M372 250 q-9 -18 0 -36 q9 -18 0 -36" fill="none" stroke="#13703C"/>
+    <path d="M232 204 V238" fill="none" stroke-width="2.5" stroke-dasharray="6 6"/>
+    <path d="M232 240 q-8 12 0 18 q8 -6 0 -18 Z" fill="#16181D"/>
+    <path d="M302 164 L330 146 V198 L302 180" fill="#F2B53A"/>
+    <rect x="118" y="140" width="190" height="64" rx="32" fill="#F2B53A"/>
+    <rect x="178" y="112" width="58" height="32" rx="8" fill="#F2B53A"/>
+    <path d="M228 112 V90 H242" fill="none"/>
+    <circle cx="150" cy="172" r="11" fill="#FFFFFF"/>
+    <circle cx="196" cy="172" r="11" fill="#FFFFFF"/>
+    <circle cx="242" cy="172" r="11" fill="#FFFFFF"/>
+    <rect x="188" y="169" width="16" height="8" rx="4" fill="#F2B53A" stroke-width="1.5"/>
+    <rect x="194" y="165" width="5" height="5" rx="1" fill="#F2B53A" stroke-width="1.5"/>
+    <ellipse cx="200" cy="104" rx="16" ry="9" fill="#F8DE9C"/>
+    <circle cx="212" cy="90" r="8" fill="#F8DE9C"/>
+    <path d="M219 89 l9 2 l-9 3 Z" fill="#B86E12" stroke-width="2"/>
+    <circle cx="214" cy="88" r="1.6" fill="#16181D" stroke="none"/>
+    <path d="M192 102 q8 6 14 0" fill="none" stroke-width="2"/>
+    <circle cx="160" cy="98" r="5" fill="#FFFFFF" stroke-width="2"/>
+    <circle cx="148" cy="76" r="7" fill="#FFFFFF" stroke-width="2"/>
+    <circle cx="160" cy="54" r="4" fill="#FFFFFF" stroke-width="2"/>
+  </g>
+</svg>

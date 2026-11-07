@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="troy-t troy-d">
+  <title id="troy-t">Tareøy Havbruk</title>
+  <desc id="troy-d">En hest laget av tare står på en flåte med hjul ved et oppdrettsanlegg. Et skjold med hake viser at den er sjekket og trygg.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 222 Q58 214 108 222 T208 222 T308 222 T412 222 V272 H8 Z" fill="#E7EEFC"/>
+    <ellipse cx="78" cy="242" rx="44" ry="10" fill="none" stroke-width="3"/>
+    <ellipse cx="78" cy="242" rx="30" ry="6" fill="none" stroke-width="2"/>
+    <ellipse cx="346" cy="246" rx="48" ry="11" fill="none" stroke-width="3"/>
+    <ellipse cx="346" cy="246" rx="32" ry="7" fill="none" stroke-width="2"/>
+    <rect x="146" y="206" width="132" height="12" fill="#B86E12"/>
+    <circle cx="166" cy="224" r="10" fill="#D6D3CA"/>
+    <circle cx="258" cy="224" r="10" fill="#D6D3CA"/>
+    <path d="M172 194 V206 M188 196 V206 M236 196 V206 M252 194 V206" fill="none" stroke-width="5"/>
+    <path d="M162 196 C158 170 186 160 226 162 C250 163 262 172 262 186 L262 196 Z" fill="#13703C"/>
+    <path d="M244 168 L256 128 L270 116 L298 122 L292 136 L276 136 L268 170 Z" fill="#13703C"/>
+    <path d="M176 182 q10 -8 20 0 t20 0 M180 172 q10 -8 20 0 t20 0 M206 188 q10 -6 18 0" fill="none" stroke="#7FD1A1" stroke-width="2.5"/>
+    <path d="M254 140 q-10 4 -6 14 M260 128 q-12 2 -10 12 M266 120 q-12 -2 -12 8" fill="none" stroke="#7FD1A1" stroke-width="2.5"/>
+    <path d="M162 186 q-16 6 -12 22" fill="none" stroke="#13703C" stroke-width="4"/>
+    <circle cx="282" cy="125" r="2" fill="#FFFFFF" stroke="none"/>
+    <path d="M330 72 C330 72 346 66 354 62 C362 66 378 72 378 72 V94 C378 108 366 116 354 120 C342 116 330 108 330 94 Z" fill="#E4F4EA"/>
+    <path d="M342 92 l8 8 l16 -18" fill="none" stroke="#13703C" stroke-width="4"/>
+  </g>
+</svg>
