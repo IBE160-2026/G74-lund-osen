@@ -3130,8 +3130,9 @@ class TestReadmeForNybegynnere:
         # Story 3.3f: 8 med docs/appen/. Story 3.5a: 9 med start/ og
         # .gitattributes. Story 3.4 (24.10): 10 med docs/bilder/investorsider/.
         # Story 3.5f: 15 med filene i rota. Gruppens svar 27.10 kl. 06:31:
-        # 16 med .logs/.
-        assert len(punkter) == 16, punkter
+        # 16 med .logs/. Instruksjonen 07.11 kl. 09:10: 17 med skissene i
+        # docs/skisser/2026-11-06/.
+        assert len(punkter) == 17, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
@@ -3146,8 +3147,9 @@ class TestReadmeForNybegynnere:
         # Story 3.5f: 30 med README.md, CLAUDE.md, pyproject.toml, uv.lock,
         # .env.example, .gitignore og .mailmap. Gruppens svar 27.10 kl. 06:31:
         # 31 med .logs/. Gruppens svar 05.11 kl. 12:14 og 12:20: 36 med de fem
-        # nye bildene i docs/appen/.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 36, lenker
+        # nye bildene i docs/appen/. Instruksjonen 07.11 kl. 09:10: 38 med
+        # docs/skisser/2026-11-06/ og LESMEG.md der, med hele stien.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 38, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -3561,11 +3563,13 @@ LENKENE_FOER_3_3H = {
 # «Dokumentene» (regel 19). Var 409a3f8b....
 # Gruppens svar 05.11 kl. 12:14 og 12:20: de fem nye bildene i docs/appen/ i
 # «Mappestruktur» (regel 19). Var 677fa094....
+# Instruksjonen 07.11 kl. 09:10: skissene i docs/skisser/2026-11-06/ i
+# «Mappestruktur» (regel 19). Var 6e34d0b2....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
     "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
     "Dokumentene": "7ba6eada43af3ebdfe55e420dd4dcf05be7b034275d53aa1ff6af5ddffbaafa2",
-    "Mappestruktur": "6e34d0b23d63e0cc73e13881c7b19ea037bb3b95e434f671a251c7838eddb31d",
+    "Mappestruktur": "0c6df769ca555da84d1d849881ca008014c4e941100ab942d257a309e277c70f",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye

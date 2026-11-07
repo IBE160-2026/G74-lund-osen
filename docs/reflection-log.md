@@ -3260,6 +3260,8 @@ Det vi lærte: å velge samme regning som resten av siden lukket rundene, mens h
 
 *Presisert 2026-11-07 (instruksjonen kl. 00:20 i `docs/ai-prompts/2026-11-07.md`):* kjøringen lørdag 07.11 kl. 22:15 bruker main fra midnatt, med promptversjon 4, men lager ingen KI-tekster. Lørdag er børsdagen den skal hente 06.11 (`innevaerende_boersdag` i `src/boersdag.py`), og loggen for kveldsjobben 06.11 viser at sjekken ga FERDIG for 06.11 kl. 22:45, 23:15 og 23:45. Da gir `src/dagen_ferdig.py` kode 0 med FERDIG, og jobben starter verken Docker eller Ollama og setter `OSE_KI_TJENESTE` til `av` (`start/kveldshenting.ps1`). Det samme gjelder søndag 08.11. Tekstene for 06.11 ble laget med versjon 3, fordi jobben 06.11 sto på `894b55e5`, der `PROMPTVERSJON` er «3», før PR #113 (`374f1bdb`). De første tekstene med versjon 4 kommer dermed mandag 09.11, den neste børsdagen, når main fortsatt har versjon 4 ved midnatt og Docker og Ollama svarer.
 
+*Lagt til 2026-11-07:* etter gjennomgangen gikk vi gjennom skisser av aksjesiden og børsometeret med rådet fra kl. 21:15 til 23:55 og svarte underveis. Skissene og svarene står i [`docs/skisser/2026-11-06/`](skisser/2026-11-06/).
+
 ---
 
 # Joakims oppføringer

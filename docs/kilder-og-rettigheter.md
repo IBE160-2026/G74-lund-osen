@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-03T14:45
+updated: 2026-11-07T09:14
 ---
 
 # Kilder og rettigheter
@@ -37,6 +37,7 @@ blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 | Euronext, handelskalenderen | Stengte dager (punkt 3) | Som Euronext over | PDF lest av et menneske 2026-09-27, aldri hentet av programmet. Se seksjonen Handelskalenderen. |
 | Alpha Vantage | — (forkastet som hovedkilde) | Ikke kontrollert | Testet mot Oslo Børs, men symbolene var ikke pålitelige nok. Brukt i tidlige tester på gull og sølv. |
 | Tegningene til investorsidene i demoen | Logoen og tegningen for hvert av de 15 oppdiktede selskapene (story 3.4), i [`docs/bilder/investorsider/`](bilder/investorsider/) | Laget av KI i chatten 24.10.2026 | *Lagt til 2026-10-24:* godkjent av gruppen kl. 13:43. Forhåndsvisningene er tegnet med IBM Plex Sans, Newsreader, Inter Display, Lora og Liberation Mono, alle med OFL; de tre siste ligger ikke i repoet. |
+| Skissene etter gjennomgangen 06.11 | Forslag til aksjesiden, rammen «Signalet forklart», boblen til investorsiden og børsometeret, i [`docs/skisser/2026-11-06/`](skisser/2026-11-06/) | Laget av KI i chatten 06.11.2026 | *Lagt til 2026-11-07:* selskapene og tallene er oppdiktet, og ingen kurser er hentet fra en kilde. Investorsiden i skissene er forhåndsvisningen fra [`docs/bilder/investorsider/`](bilder/investorsider/). Skissene er ikke bygget. |
 
 Mediekilder vurdert til relevanseksperimentet står i egen seksjon lenger nede, ikke i tabellen over.
 
