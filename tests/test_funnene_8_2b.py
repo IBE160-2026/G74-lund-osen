@@ -7,7 +7,7 @@ flytter BASE_STI. Ingen nett og ingen henting.
 
 import re
 import shutil
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -402,22 +402,24 @@ def test_summen_under_sjekkene(klient):
     rad = re.search(r'<p class="sumrad">(.*?)</p>', html, flags=re.DOTALL).group(1)
     assert _synlig(rad) == "Sum 3 av 3 T -1 B -1 I -1 ↓Negativ", _synlig(rad)
     assert 'class="pille tre-av-tre"' in rad
-    assert html.index('class="sjekkort-rad"') < html.index('class="sumrad"') < html.index("Signalstyrken er hvor mange")
+    # Story 8.20a (del A): fotnoten under summen er flyttet, så summen står
+    # foran grafen.
+    assert html.index('class="sjekkort-rad"') < html.index('class="sumrad"') < html.index("<figure>")
 
 
 def test_historikken_er_en_kompakt_tabell(klient):
     """U68. Ville feilet uten kolonnenavnene, med summen under uka i stedet
-    for i en egen kolonne, uten «Velg dag» øverst, eller med ukedagen
-    borte for skjermleseren."""
+    for i en egen kolonne, eller med ukedagen borte for skjermleseren.
+    Story 8.20a (del B, spørsmål 6 i 8.20): «Velg dag» øverst er borte, og
+    datovelgeren står bare ved grafen."""
     html = _html(klient, "/aksje/BRFE")
     del_ = html.split('<section class="historikk"', 1)[1].split("</section>", 1)[0]
     hode = re.search(r'<div class="ukehode" aria-hidden="true">(.*?)</div>', del_).group(1)
     assert re.findall(r"<span>([^<]*)</span>", hode) == ["Uke", "Man", "Tir", "Ons", "Tor", "Fre", "Uka"]
     assert "grid-column: 7" in _regel(".ukesum")
-    topp = del_.split('<div class="historikktopp">', 1)[1].split("</form>", 1)[0]
+    topp = del_.split('<div class="historikktopp">', 1)[1].split("</div>", 1)[0]
     assert "Signalet dag for dag" in topp
-    assert '<form class="dagvalg" method="get" action="/aksje/BRFE#signalet-dag-for-dag">' in topp
-    assert 'name="dag"' in topp and ">Velg dag</button>" in topp
+    assert "<form" not in del_ and 'name="dag"' not in del_
     assert re.search(
         r'<a class="dato" href="/aksje/BRFE\?dag=2026-10-09"><span class="ukedag">fredag</span> 09\.10</a>', del_
     )
@@ -470,12 +472,19 @@ def test_min_liste_har_tittelen_med_antallet(klient):
 
 def test_velg_dag_i_historikken_godtar_bare_dager_siden_viser(klient):
     """BH1, ECH2. Ville feilet hvis feltet godtok seriens første dag, som
-    siden avviser, eller sendte til toppen av siden."""
+    siden avviser, eller sendte til toppen av siden.
+    Story 8.20a (del B, spørsmål 6 i 8.20): feltet i historikken er borte, så
+    testen gjelder feltet ved grafen, det eneste på siden, som sender til
+    grafen. Navnet står, fordi docs/kvalitetssikring.md viser til det."""
     html = _html(klient, "/aksje/VRDS")
-    skjema = html.split('<form class="dagvalg"', 1)[1].split("</form>", 1)[0]
-    velg = re.search(r'<input type="date" id="velg-dag"[^>]*min="([^"]+)"', html).group(1)
-    assert f'min="{velg}"' in skjema
-    assert 'action="/aksje/VRDS#signalet-dag-for-dag"' in skjema
+    assert html.count('type="date"') == 1
+    skjema = html.split('<nav class="periodevalg"', 1)[1].split("</form>", 1)[0]
+    velg = re.search(r'<input type="date" id="velg-dag"[^>]*min="([^"]+)"', skjema).group(1)
+    # Den første dagen feltet godtar, viser siden, og dagen før avvises.
+    assert 'class="periodebeskjed"' not in _html(klient, f"/aksje/VRDS?dag={velg}")
+    foer = (date.fromisoformat(velg) - timedelta(days=1)).isoformat()
+    assert 'class="periodebeskjed"' in _html(klient, f"/aksje/VRDS?dag={foer}")
+    assert 'action="/aksje/VRDS#kursgrafen"' in skjema
 
 
 def test_demogrunnen_ikke_for_siste_dag(klient, monkeypatch):
@@ -518,7 +527,6 @@ def test_de_nye_radene_brytes_paa_smal_skjerm():
         "p.sumrad",
         ".maanedspiler",
         ".historikktopp",
-        ".dagvalg",
         ".ki .ki-topp",
         ".soeyler .linjeforklaring",
     ):

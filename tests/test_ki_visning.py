@@ -195,7 +195,8 @@ class TestSiden:
         assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("Signalet forklart")
         assert html.index("Signalet forklart") < html.index("Signalet dag for dag")
         assert TEKST in html
-        assert "Laget av KI · gemma4:e4b, lokal." in html
+        # Story 8.20a (del D): modellen i en liten linje under teksten.
+        assert "Laget av KI." in html and '<p class="modell">Modell: gemma4:e4b, lokal</p>' in html
 
     def test_regelforklaringen_staar_alltid(self, klient, aksje):
         skriv_kirad(kirad(aksje))
@@ -370,7 +371,7 @@ class TestEtterGjennomgangen:
         symbol = next(r.emne.symbol for r in les_radene() if r.besto)
         html = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
         assert "Eksempeltall" in html
-        assert "Laget av KI · " in html and '<p class="ki-tekst">' in html
+        assert "Laget av KI." in html and '<p class="ki-tekst">' in html
         assert "Ingen KI-tekst for denne dagen" not in html
 
 

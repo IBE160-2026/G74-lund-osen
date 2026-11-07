@@ -56,7 +56,7 @@ from boersometer import (
 )
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
-from graf import bygg_graf
+from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
@@ -70,6 +70,7 @@ from ki_visning import (
     KIVisning,
     bygg_ki_visning,
     ki_paa,
+    ki_tekst,
     prikkede_tall,
 )
 from kilogg import Emne, UgyldigKIRad
@@ -120,9 +121,11 @@ from perioder import (
     SISTE,
     VELG,
     Valg,
+    dagen_i_feltet,
     foerste_kursdag,
     knappene,
     les_valg,
+    pilene,
     startdag,
 )
 from perioder import BOERSOMETERET as BOERSOMETER_VALG
@@ -200,10 +203,18 @@ app.jinja_env.filters["ukedag"] = ukedag
 app.jinja_env.filters["med_og"] = med_og
 # Story 8.2b, c (U67): tallene i en KI-tekst som vises, med prikket strek.
 app.jinja_env.filters["prikkede_tall"] = prikkede_tall
+# Story 8.20a (U88): og navnene paa sjekkene med fet skrift.
+app.jinja_env.filters["ki_tekst"] = ki_tekst
 # Story 2.7b: «oktober 2026» ved pilene i historikken.
 app.jinja_env.filters["maanedsnavn"] = maanedsnavn
 # Story 8.15: retningen et klikk på en kolonne gir.
 app.jinja_env.globals["neste_orden"] = neste_orden
+# Story 8.20a (del B): dagen i datofeltet og pilene ved den.
+app.jinja_env.globals["dagen_i_feltet"] = dagen_i_feltet
+app.jinja_env.globals["pilene"] = pilene
+# Story 8.20a (del C): størrelsen på lappen ved musepekeren i grafen.
+app.jinja_env.globals["lappbredde"] = LAPPBREDDE
+app.jinja_env.globals["lapphoyde"] = LAPPHOYDE
 
 
 def soeylestyrke(endring: float) -> str:

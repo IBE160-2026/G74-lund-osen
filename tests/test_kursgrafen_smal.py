@@ -58,9 +58,13 @@ def test_den_smale_grafen_har_det_samme_som_den_brede(aksjesiden, side):
     ):
         assert len(re.findall(teller, bred)) == len(re.findall(teller, smal)) > 0, teller
     # Gjennomgangen (VG2): dagen som er merket, på en side med en valgt dag.
+    # Story 8.20a (del C, U89): datoen i en lapp øverst på streken, og
+    # punktet nederst er borte.
     dagen = side("/aksje/BRFE?dag=2026-10-01")
-    for teller in (r'class="dagstrek"', r'class="dagpunkt"'):
+    for teller in (r'class="dagstrek"', r'class="daglapp"', r'class="daglapptekst"'):
         assert len(re.findall(teller, _svg(dagen, "graf"))) == len(re.findall(teller, _svg(dagen, "graf smal"))) == 1
+    # Story 8.20a (del C, U92): lappen ved musepekeren for hver dag i begge.
+    assert len(re.findall(r'<g class="musedag">', bred)) == len(re.findall(r'<g class="musedag">', smal)) > 0
     navn = lambda svg: sorted(re.findall(r'<text class="linjenavn (\w+)"[^>]*>([^<]*)</text>', svg))  # noqa: E731
     assert navn(bred) == navn(smal) and len(navn(smal)) == 3
     etikett = re.compile(r'aria-label="([^"]*)"')
@@ -102,7 +106,12 @@ const r = {synlige: svger.map((s) => s.getAttribute('class'))};
 const svg = svger[0];
 const b = svg.getBoundingClientRect();
 const skala = b.width / svg.viewBox.baseVal.width;
-const tekster = Array.from(svg.querySelectorAll('text')).filter((t) => t.textContent.trim());
+// Story 8.20a (del C): lappene ved musepekeren er skjult til musa er over
+// dagen, så de telles ikke med den synlige teksten. De sjekkes for seg under.
+const tekster = Array.from(svg.querySelectorAll('text')).filter((t) => t.textContent.trim() && !t.closest('.lapp'));
+r.lappUtenfor = Array.from(svg.querySelectorAll('.lappramme')).filter((t) => { const tb = t.getBoundingClientRect();
+  return tb.left < b.left - 0.5 || tb.right > b.right + 0.5 || tb.top < b.top - 0.5 || tb.bottom > b.bottom + 0.5; }).length;
+r.lappSkjult = Array.from(svg.querySelectorAll('.lapp')).every((g) => getComputedStyle(g).visibility === 'hidden');
 r.grafskrift = Math.min(...tekster.map((t) => parseFloat(getComputedStyle(t).fontSize) * skala));
 r.utenfor = tekster.filter((t) => { const tb = t.getBoundingClientRect();
   return tb.left < b.left - 0.5 || tb.right > b.right + 0.5 || tb.top < b.top - 0.5 || tb.bottom > b.bottom + 0.5; })
@@ -160,5 +169,8 @@ def test_teksten_i_grafen_i_nettleseren(side, tmp_path, adresse, bredde):
     r = _kjoer(side(adresse), tmp_path, bredde, MAAL)
     assert r["synlige"] == (["graf"] if bredde == 1280 else ["graf smal"]), r
     assert r["utenfor"] == [] and r["overlapp"] == [] and r["rulling"] is False, r
+    # Story 8.20a (del C): lappen ved musepekeren står inne i grafen, og er
+    # skjult til musa er over dagen.
+    assert r["lappUtenfor"] == 0 and r["lappSkjult"] is True, r
     if bredde == 390:
         assert r["grafskrift"] >= r["ellers"] > 0, r

@@ -135,6 +135,34 @@ class Forklaring:
     y: float
 
 
+# Story 8.20a (del C, gruppens svar 07.11 kl. 10:33, U92): lappen med
+# verdiene ved musepekeren, i appens stil som i skissen aksjesiden-ki-paa.png,
+# med CSS og uten skript. Hver dag faar et felt over hele hoeyden, like bredt
+# som avstanden mellom to dager, og lappen vises naar musa er over feltet.
+# LAPPBREDDE og LAPPHOYDE er lappen med dato, kurs og snitt, og LAPPLUFT
+# avstanden fra punktet.
+LAPPBREDDE = 132
+LAPPHOYDE = 58
+LAPPLUFT = 10
+
+
+@dataclass(frozen=True)
+class Dag:
+    """En dag i grafen, med feltet musa treffer og der lappen staar.
+    y_snitt og snitt er None foer snittet har nok historikk."""
+
+    dato: date
+    x: float
+    y: float
+    kurs: float
+    snitt: float | None
+    y_snitt: float | None
+    felt_x: float
+    felt_bredde: float
+    lapp_x: float
+    lapp_y: float
+
+
 @dataclass(frozen=True)
 class Graf:
     bredde: int
@@ -166,6 +194,8 @@ class Graf:
     # Gjennomgangen av 8.2c (BH7, ECH4): et eget felt, ikke utledet av feltet
     # til hoeyre, saa klassen i malen ikke avhenger av maalene.
     smal: bool = False
+    # Story 8.20a (del C): dagene med lappen ved musepekeren.
+    dager: tuple[Dag, ...] = ()
 
     # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
     # rutenettet og merkene etter.
@@ -417,6 +447,38 @@ def _forklaringen(linjer: tuple[tuple[str, str], ...], hoyde: int) -> tuple[Fork
     return tuple(Forklaring(klasse, foerste + FORKLARINGSLINJE * i) for i, klasse in enumerate(klasser))
 
 
+def _dagene(punkter: tuple[Punkt, ...], lav, hoy, bredde, hoyde, hoeyre, bunn) -> tuple[Dag, ...]:
+    """Story 8.20a (del C): feltet og lappen for hver dag. Feltet gaar
+    halvveis til dagen foer og etter, og lappen staar til hoeyre for punktet,
+    eller til venstre naar den ellers gaar ut over tegneflaten, og aldri over
+    eller under den."""
+    antall = len(punkter)
+    steg = (bredde - VENSTRE - hoeyre) / (antall - 1)
+    hoeyrekant = bredde - hoeyre
+    dager = []
+    for i, p in enumerate(punkter):
+        x = _x(i, antall, bredde, hoeyre)
+        y = _y(p.kurs, lav, hoy, hoyde, bunn)
+        venstre = max(VENSTRE, x - steg / 2)
+        lapp_x = x + LAPPLUFT if x + LAPPLUFT + LAPPBREDDE <= hoeyrekant else x - LAPPLUFT - LAPPBREDDE
+        lapp_y = min(max(MARG_Y, y + LAPPLUFT), hoyde - bunn - LAPPHOYDE)
+        dager.append(
+            Dag(
+                dato=p.dato,
+                x=x,
+                y=y,
+                kurs=p.kurs,
+                snitt=p.ma50,
+                y_snitt=_y(p.ma50, lav, hoy, hoyde, bunn) if p.ma50 is not None else None,
+                felt_x=venstre,
+                felt_bredde=min(hoeyrekant, x + steg / 2) - venstre,
+                lapp_x=max(VENSTRE, lapp_x),
+                lapp_y=lapp_y,
+            )
+        )
+    return tuple(dager)
+
+
 def bygg_graf(
     punkter: tuple[Punkt, ...],
     bredde: int = BREDDE,
@@ -487,4 +549,5 @@ def bygg_graf(
         bunnfelt=bunn,
         forklaring=forklaring,
         smal=smal,
+        dager=_dagene(punkter, lav, hoy, bredde, hoyde, hoeyre, bunn),
     )

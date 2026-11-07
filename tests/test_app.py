@@ -477,6 +477,9 @@ class TestAksjedetalj:
         html = svar.data.decode("utf-8")
 
         assert svar.status_code == 200
+        # Story 8.20a (del C): lappen ved musepekeren i grafen har kursen for
+        # hver dag, ogsaa den siste, saa grafen telles ikke med.
+        html = re.sub(r'<g class="musefelt".*?</svg>', "</svg>", html, flags=re.S)
         assert html.count("123,45") == 1, "sluttkursen skal staa noeyaktig ett sted"
         assert '<span class="verdi">123,45</span>' in html, "sluttkursen vises ikke"
         assert "kunne ikke regnes" in html, "siden sier ikke at signalet mangler"
@@ -1110,7 +1113,9 @@ class TestStory80:
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         styrke = {rad[0]: rad[3] for rad in tabell.rader}
 
-        assert styrke["Equinor"] == "2 av 3 T +1 B +1 I 0 skiller seg ut"
+        # Story 8.20a (del J): det skjulte merket sier «skilte seg ut», som
+        # overskriften i tabellen.
+        assert styrke["Equinor"] == "2 av 3 T +1 B +1 I 0 skilte seg ut"
         assert styrke["DNB Bank"] == "1 av 3 T 0 B +1 I 0"
 
     def test_fortsatt_noeyaktig_fem_kolonner(self, klient, monkeypatch):
@@ -1212,8 +1217,8 @@ class TestStory80:
         # enn siden og viser datoen sin under navnet.
         styrke = {rad[0].split(" siste kurs ")[0]: rad[3] for rad in tabell.rader}
 
-        assert "skiller seg ut" in styrke["Equinor"]
-        assert "skiller seg ut" not in styrke["DNB Bank"]
+        assert "skilte seg ut" in styrke["Equinor"]
+        assert "skilte seg ut" not in styrke["DNB Bank"]
 
     def test_manglende_signal_forklares_med_aa(self, klient, monkeypatch):
         """NFR-05: grunnen vises i begge skjermbildene."""
@@ -1648,9 +1653,12 @@ class TestStory80c:
         synlig. Ville feilet med «summen av tallene uten fortegn»."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert "Signalstyrken er hvor mange sjekker som slo ut: 2 av 3 ga utslag." in html
-        assert "Ga noen +1 og noen -1, er retningen Blandet." in html
-        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in html
+        # Story 8.20a (del A og D, spørsmål 3 og 4 i 8.20): fotnoten under
+        # summen er flyttet til vinduene, og forbeholdet står nederst i rammen
+        # «Signalet forklart». Ville fortsatt feilet uten forbeholdet.
+        assert "Summen teller sjekkene som slo ut, uten vekting." in html
+        assert "noen +1 og noen -1." in html
+        assert "og sier ikke om du bør kjøpe eller selge." in html
         assert "summen av tallene" not in html
 
     # Del c: linja nederst og linja over tabellen.
@@ -1917,7 +1925,7 @@ class TestStory80e:
         _lagret("EQNR", 0.0, 1, -1, 0)
         html = klient.get("/").data.decode("utf-8")
         rad = _rader_per_selskap(html)["Equinor"]
-        assert rad[3] == "2 av 3 T +1 B -1 I 0 skiller seg ut"
+        assert rad[3] == "2 av 3 T +1 B -1 I 0 skilte seg ut"
         # VG1 i gjennomgangen: navnet staar ved bokstaven.
         for bokstav, navn in (("T", "trend"), ("B", "bevegelse"), ("I", "interesse")):
             assert f'<abbr title="{navn}">{bokstav}</abbr>' in html
@@ -2714,7 +2722,7 @@ class TestStory80dAksjesiden:
         # med tykkelsen og ikke fargen.
         # Story 2.9c (gjennomgangen, ECH8): uten indeks sier etiketten det til slutt.
         assert re.search(
-            r'aria-label="Kursutvikling for Equinor: den tykke linja er utbyttejustert kurs, '
+            r'aria-label="Kursutvikling for Equinor: den tykke linja er kursen justert for utbytte, '
             r'og den tynne er \d+-dagers snitt \(sjekk 1\)\. Hovedindeksen mangler for perioden"',
             html,
         )
@@ -3241,7 +3249,11 @@ class TestIndekslinjaPaaAksjesiden:
         )
         # Gjennomgangen (BH3, VG7): tre linjer, ikke «Begge linjene».
         assert "Begge linjene" not in tekst
-        assert "Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet om til samme skala." in tekst
+        # Story 8.20a (del J): «kursen justert for utbytte», som grafen.
+        assert (
+            "Kursen og snittet er tegnet på kursen justert for utbytte, og indeksen er regnet om til samme skala."
+            in tekst
+        )
         etikett = re.search(r'<svg class="graf"[^>]*aria-label="([^"]*)"', html).group(1)
         assert f"Den stiplede er hovedindeksen OSEBX, regnet om så den starter på aksjens kurs {start}" in etikett
         for ord_ in ("kjøp", "selg", "bør"):
@@ -3334,7 +3346,9 @@ class TestIndekslinjaPaaAksjesiden:
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         assert 'popovertarget="hjelp-graf"' in html
         vinduet = html.split('<div id="hjelp-graf"', 1)[1].split('<div id="hjelp-', 1)[0]
-        assert "Den stiplede linja:" in vinduet and "Kursgrafen:" not in vinduet
+        # Story 8.20a (del E): én tekst om grafen, og uten snittet sier den
+        # bare kurslinja.
+        assert "Den stiplede er hovedindeksen" in vinduet and "den tynne snittet" not in vinduet
 
     @pytest.mark.parametrize("metode", ["symboler", "serie"])
     def test_en_feil_i_porten_gir_grafen_uten_linja(self, klient, monkeypatch, metode):
@@ -3480,7 +3494,8 @@ class TestPeriodeneIKursgrafen:
             "6 mnd",
             "I år",
             "1 år",
-            "Velg dag",
+            # Story 8.20a (del B, spørsmål 5 i 8.20): «Vis dagen» ved datoen.
+            "Vis dagen",
         ]
         assert [href for href, _, _ in knappene] == [f"/aksje/EQNR?periode={p}#kursgrafen" for p in PERIODENE[:-1]] + [
             "skjema"
@@ -3544,9 +3559,11 @@ class TestPeriodeneIKursgrafen:
         toppen = _toppen(html)
         assert "Oslo Børs · 01.10" in toppen and "Ingen vurdering for 01.10: ikke vurdert." in toppen
         assert '<p class="dagen">' not in html
-        assert _valgt(html) == ["01.10"]
+        # Story 8.20a (del B): dagen står i feltet, og knappen heter «Vis dagen».
+        assert _valgt(html) == ["Vis dagen"] and 'required value="2026-10-01"' in html
         assert '<h2 id="kursgrafen">Kursutvikling, 6 måneder fram til torsdag 01.10 ' in html
-        assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
+        # Story 8.20a (del C, U89): datoen i en lapp øverst på streken, uten punktet.
+        assert 'class="dagstrek"' in html and 'class="daglapp"' in html and 'class="dagpunkt"' not in html
         assert _foerste_og_siste_dag(html) == "01.04 til 01.10"
 
     def test_velg_dag_viser_den_lagrede_vurderingen(self, klient):
@@ -3752,7 +3769,8 @@ class TestStory816bDagenPaaHeleSiden:
         assert "Signalstyrke ? 3 av 3 T +1 B -1 I +1" in toppen and "Retning ? ↔ Blandet" in toppen
         assert "Hvorfor signalet ble 3" in toppen
         # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» i alle tre kortene.
-        assert "Sjekk 2 Ga ? -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
+        # Story 8.20a (del E): «?» står ved navnet, ikke ved «Ga».
+        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
         assert "volum 7,00 × medianen" in toppen
         assert "skilte seg ut fredag" not in toppen and "Positiv" not in toppen
 
@@ -3809,7 +3827,8 @@ class TestStory816bDagenPaaHeleSiden:
         self._aksjen()
         html = klient.get("/aksje/EQNR?dag=2026-10-01").data.decode("utf-8")
         assert '<p class="dagen">' not in html
-        assert 'class="dagstrek"' in html and 'class="dagpunkt"' in html
+        # Story 8.20a (del C, U89): datoen i en lapp øverst på streken, uten punktet.
+        assert 'class="dagstrek"' in html and 'class="daglapp"' in html and 'class="dagpunkt"' not in html
         assert "Dagen er merket med en strek." in _synlig(html)
 
     @pytest.mark.parametrize("spoerring", ["", "?periode=siste", "?periode=1-uke", "?periode=3-mnd", "?periode=1-aar"])

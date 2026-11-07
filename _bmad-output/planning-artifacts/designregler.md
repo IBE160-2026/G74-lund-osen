@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-07T15:47
+updated: 2026-11-07T16:54
 ---
 
 # Designregler
@@ -31,8 +31,10 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 *Avgjort 2026-10-01, Marians beslutning, etter designtavla.*
 
 - Der man velger periode, er valget likt: samme knapper, samme rekkefølge, samme navn og samme utseende. Rekkefølgen er siste børsdag, 1 uke, 1 mnd, 3 mnd, 6 mnd, I år, 1 år og «Velg dag».
+  *Rettet 2026-11-07 (story 8.20a, spørsmål 5 i spesifikasjonen for 8.20, godtatt i svaret kl. 10:33):* det siste er datoen med «Vis dagen». Knappen heter alltid «Vis dagen», fordi datoen står i feltet, og den skjulte etiketten til feltet er «Dagen siden viser».
 - Den første knappen heter «I går» når siste børsdag i dataene var i går, og «I dag» når den er fra i dag. Ellers står ukedagen, for eksempel «Fredag» på en mandag. Knappen er valgt når siden åpnes. Unntaket er kursgrafen, som åpner med 6 mnd (FR-201).
 - «Velg dag» åpner en kalender, og dagen som er valgt, står på knappen. Signalet den dagen vises bare når vurderingen er lagret, ellers «– ikke lagret» (NFR-08).
+  *Rettet 2026-11-07 (story 8.20a, gruppens svar 06.11 kl. 22:24, 23:23, 23:30, 23:34 og 23:42, og 07.11 kl. 10:33):* datoen står i feltet, ikke på knappen. Feltet viser siste børsdag ved den første knappen og dagen som er valgt, og er tomt i en periode. Datoen står etter periodeknappene på samme linje, og er linja for smal, står den med pilene og «Vis dagen» på egen linje til venstre. Pilene for forrige og neste børsdag står bare når feltet viser en dag, og er grå ved første og siste dag feltet godtar. På aksjesiden står datovelgeren bare ved grafen (spørsmål 6).
   *Rettet 2026-10-03 (story 2.2b, Marians beslutning kl. 22:30):* en dag uten rad viser «– ikke vurdert», samme tekst som oversikten og aksjedetaljen. Har raden en grunn, står grunnen i stedet.
   *Presisert 2026-10-04 (gjennomgangen av 2.2b):* «ikke vurdert» gjelder en børsdag uten rad. En dag som ikke er børsdag, viser «– ikke børsdag», så de to tilstandene i FR-409 ikke slås sammen.
 - Startdagen for periodene følger én skriftlig regel, lik for alle, som skrives og testes før et periodevalg bygges (NFR-08).
@@ -108,12 +110,14 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Uten farger: retning, endring og sjekkene står alltid også som tekst, fortegn eller pil, og linjer og søyler kan leses av plassen over eller under null-linja.
 - Periodevalg, likt overalt: «I går», 1 uke, 1 mnd, 3 mnd, 6 mnd, I år, 1 år og «Velg dag». Var siste børsdag ikke i går, står ukedagen, for eksempel «Fredag» på en mandag. Grafen åpner med 6 mnd (FR-201).
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* den første knappen heter «I går», «I dag» eller ukedagen, som i §2.
+  *Rettet 2026-11-07 (story 8.20a):* det siste er datoen med «Vis dagen», som i §2.
 - Sammenligning: hver rad får en linje til for dagen du sammenligner med: sluttkursen, endringen siden da, og T, B og I den dagen, med T rett under T. Retningen står bare for i går. Kolonnehodet sier «i går», og datoen står i gult under.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* retningen står bare for siste børsdag. Kolonnehodet følger den første knappen i periodevalget (§2), og datoen står under, uten gult (§3).
 - U ved kursen: aksjen har betalt utbytte i perioden. Endringen er justert for utbytte, sluttkursen er ikke det, så de to stemmer ikke helt med hverandre (FR-101, FR-407).
 - Ikke vurdert: en dag uten lagret vurdering. Signalet regnes aldri ut på nytt av kursene i ettertid (designregler §2, story 2.7).
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* «Ikke vurdert: en børsdag uten lagret vurdering. Har raden en grunn, står grunnen, og en dag som ikke er børsdag, står som «ikke børsdag» (§2, FR-409). Signalet regnes aldri ut på nytt i ettertid (FR-101, story 2.7).»
 - KI-tekst: tekst fra språkmodellen, alltid merket «Laget av KI». Modellnavnet står i en liten linje under teksten (FR-602).
+  *Lagt til 2026-11-07 (story 8.20a, spørsmål 11 og 16 i spesifikasjonen for 8.20, og svaret kl. 12:32, 4):* på aksjesiden står «Laget av KI» over teksten og «Modell:» med navnet i en liten linje under. Navnet på hver sjekk står med fet skrift første gang det står i teksten.
 - Hjelp: faste tekster vi har skrevet og sjekket.
 - Gul strek: det viktigste på siden. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek og farge etter retning.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* det viktigste på siden merkes med fet skrift. I KI-teksten har tall som er sjekket mot grunnlaget, prikket strek i tekstfargen (svar 7). Gult betyr bare 3 av 3 (§3).

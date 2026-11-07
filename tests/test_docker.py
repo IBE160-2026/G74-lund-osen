@@ -1166,7 +1166,10 @@ HOEYDE_PAA_BILDET = 1864
 # DevTools-protokollen og er byte for byte det samme.
 # Gjennomgangen av 2.16: boersdag.py, markedsoversikt.py og tilstand.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "8d8cc12cf7dcf61d0c25e57ec4350b2bc3b86302673da8b750119d668a0016cb"
+# Story 8.20a: _perioder.html, perioder.py, app.py, index.html, stil.css og
+# hjelpetekster.py. Bildet ble tatt paa nytt med DevTools-protokollen, med
+# datoen, pilene og «Vis dagen» etter periodeknappene.
+AVTRYKK_BAK_BILDET = "4d36640d182b70ba2ca3217e9cf29c96b860cefee0a87fb5815f8d30dc0ae73e"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1256,7 +1259,9 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # Story 10.9, del C: rammen «Signalet forklart» har appens setninger først og
 # KI-teksten sist, saa bildet slutter ved bunnen av rammen (section.ki), 2344,5 px
 # maalt i Edge uten vindu og rundet opp. Var 2261.
-HOEYDE_PAA_AKSJESIDEN = 2345
+# Story 8.20a: 2300, fordi fotnoten under summen og fotnotene etter grafen er
+# flyttet, og rammen har linja nederst. Maalt med DevTools-protokollen. Var 2345.
+HOEYDE_PAA_AKSJESIDEN = 2300
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1510,7 +1515,9 @@ HOEYDE_PAA_AKSJESIDEN = 2345
 # byte det samme.
 # Gjennomgangen av 2.16: boersdag.py, markedsoversikt.py og tilstand.py. Bildet ble
 # tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "ebe07f0986e834b12d6d3e95304f5de7ee46ad935e18897cca1ca90c4d1eda14"
+# Story 8.20a: aksje.html, _perioder.html, graf.py, ki_visning.py, stil.css og
+# hjelpetekstene. Bildet ble tatt paa nytt og er 2300 px hoeyt.
+AVTRYKK_BAK_AKSJESIDEN = "3e7d0f15ff0ca7d9c516ce7831e8ac2907f08abb9b509684e1835eb408a590c2"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1539,7 +1546,8 @@ DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
     "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 1329, FILENE_BAK_BOERSOMETERET),
     "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 3524, MALENE_BAK_BILDET),
+    # Story 8.20a: 3509, med datoen og pilene på egen linje ved 390 px. Var 3524.
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 3509, MALENE_BAK_BILDET),
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 1687, FILENE_BAK_BOERSOMETERET),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
@@ -1586,12 +1594,16 @@ DE_NYE_BILDENE = {
 # byte for byte de samme, ogsaa ved 390 px.
 # Gjennomgangen av 2.16: boersdag.py, markedsoversikt.py og tilstand.py. Alle bildene
 # ble tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
+# Story 8.20a: _perioder.html, perioder.py, app.py, stil.css og hjelpetekster.py.
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Toppen av oversikten
+# er byte for byte den samme; de fire andre viser datoen, pilene og «Vis dagen».
+# Ved 390 px er bildet tatt med bredden 390 i protokollen, ikke med en iframe.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "8d8cc12cf7dcf61d0c25e57ec4350b2bc3b86302673da8b750119d668a0016cb",
-    "docs/appen/boersometeret-demo.png": "9d4d18de2e268c0aad585f2471e63afc592b01aa991548b1ab8302c369b35f91",
-    "docs/appen/min-liste-demo.png": "55823ee605df34ae9f0d1ad0bb315f9f952b89ffc00cae58f8e824c998f8fd84",
-    "docs/appen/oversikten-390-demo.png": "8d8cc12cf7dcf61d0c25e57ec4350b2bc3b86302673da8b750119d668a0016cb",
-    "docs/appen/boersometeret-390-demo.png": "9d4d18de2e268c0aad585f2471e63afc592b01aa991548b1ab8302c369b35f91",
+    TOPPEN_AV_OVERSIKTEN: "4d36640d182b70ba2ca3217e9cf29c96b860cefee0a87fb5815f8d30dc0ae73e",
+    "docs/appen/boersometeret-demo.png": "a8d5fcfd2b44771fc4c469c7f5ef3cb619637449092b0af971840f33b3d85ff8",
+    "docs/appen/min-liste-demo.png": "fb18e2e2e2449a2587f0b6485bdd8e277812ea1de60d9ca77d4cd4b72b310bd5",
+    "docs/appen/oversikten-390-demo.png": "4d36640d182b70ba2ca3217e9cf29c96b860cefee0a87fb5815f8d30dc0ae73e",
+    "docs/appen/boersometeret-390-demo.png": "a8d5fcfd2b44771fc4c469c7f5ef3cb619637449092b0af971840f33b3d85ff8",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2985,7 +2997,8 @@ class TestReadmeForNybegynnere:
             # Rådets funn 20.10: demoen viser kombinasjonene av de tre sjekkene.
             "alle 10 fargekombinasjonene av de tre sjekkene og ki-tekst laget med gemma",
             # Story 8.16: periodene i kursgrafen er flettet.
-            "periodene i kursgrafen med «velg dag»",
+            # Story 8.20a (del J): «Vis dagen» ved datoen.
+            "periodene i kursgrafen med «vis dagen»",
             # Story 8.3: Min liste er flettet.
             "min liste, med stjernen foran hvert selskap",
             # Story 8.6: børsometeret er flettet.

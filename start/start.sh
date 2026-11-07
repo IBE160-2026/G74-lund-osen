@@ -184,7 +184,8 @@ else
     if ! grep -q '^EODHD_API_KEY=[^[:space:]]' .env; then
         echo "Første gang trenger den ekte versjonen en nøkkel fra EODHD. Registreringssiden åpnes nå."
         # Forprøven 24.10 (funn 1–3): hvor nøkkelen står, og hvordan den limes inn.
-        echo "Lag en gratis konto. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre."
+        # BH10 i 2.16 (story 8.20a): også en konto fra før, som README-en (U75).
+        echo "Lag en gratis konto. Har du en konto hos EODHD fra før, logger du inn. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre."
         echo "Lim den inn her med Cmd+V. Den vises ikke mens du limer inn, men den kommer med."
         aapne "https://eodhd.com/register"
         read -r -s -p "Lim inn nøkkelen og trykk Enter: " noekkel

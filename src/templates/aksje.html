@@ -37,6 +37,7 @@
       siden viser. #}
   <p class="innledning">{% if detalj.sjekker %}Siden viser sjekkene for {{ detalj.aksje.navn }} med tallene bak, kursgrafen og det appen skrev om aksjen hver børsdag.{% else %}Siden viser kursgrafen for {{ detalj.aksje.navn }} og det appen skrev om aksjen hver børsdag.{% endif %}</p>
 
+  {%- set ringen = "tre-av-tre" if detalj.styrke == antall_sjekker else "to-av-tre" if detalj.styrke is not none and detalj.styrke >= parametre.terskel else "" %}
   <div class="sammendrag">
     <div class="noekkeltall">
       <span class="etikett">Sluttkurs {{ hjelpeknapp("hjelp-kurs", "Hjelp: sluttkurs") }}</span>
@@ -59,7 +60,9 @@
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>
-      <span class="verdi">{% if detalj.styrke is not none %}{{ detalj.styrke }} <span class="av">av {{ antall_sjekker }}</span>{% else %}–{% endif %}</span>
+      {#- Story 8.20a (del A, spørsmål 13 i 8.20): 2 av 3 med svart ring og 3
+          av 3 med gul, som i summen og tabellen i oversikten. #}
+      <span class="verdi">{% if detalj.styrke is not none %}<span class="styrken{% if ringen %} pille {{ ringen }}{% endif %}">{{ detalj.styrke }} <span class="av">av {{ antall_sjekker }}</span></span>{% else %}–{% endif %}</span>
       {% if detalj.sjekkbrikker %}{{ brikker(detalj.sjekkbrikker, stor=true) }}{% endif %}
     </div>
     <div class="noekkeltall">
@@ -79,18 +82,21 @@
   {% if detalj.sjekker %}
     {#- Svar 22: «?» ved navnet, ved «Ga»-pillen og ved «Målt mot». Gruppens
         svar 04.11 kl. 09:58: i alle tre kortene, ikke bare i det første, så
-        vinduene for Ga og Målt mot har tre knapper hver. #}
+        vinduene for Ga og Målt mot har tre knapper hver.
+        Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): ett «?» per kort,
+        ved navnet. «Ga» og «Målt mot» forklares i vinduet ved «Hvorfor
+        signalet ble …» (spørsmål 2 i 8.20). #}
     <div class="sjekkort-rad">
       {% for sjekk in detalj.sjekker %}
         <section class="sjekkort{% if sjekk.bidro %} bidro{% endif %}" aria-label="Sjekk {{ sjekk.nummer }}: {{ sjekk.navn }}">
           <div class="topp">
             <span>Sjekk {{ sjekk.nummer }}</span>
-            <span class="ga">Ga {{ hjelpeknapp("hjelp-ga", "Hjelp: ga") }}
+            <span class="ga">Ga
               <span class="resultat fortegn {{ sjekk.klasse }}">{{ sjekk.fortegn }} <span class="ord">{{ sjekk.ord }}</span></span></span>
           </div>
           <h3>{{ sjekk.navn }} {{ hjelpeknapp("hjelp-" ~ sjekk.navn|lower, "Hjelp: " ~ sjekk.navn|lower) }}</h3>
           <p class="maaler">{{ sjekk.maaler }}</p>
-          <p class="maalt">Målt mot {{ hjelpeknapp("hjelp-maalt", "Hjelp: målt mot") }}</p>
+          <p class="maalt">Målt mot</p>
           <p class="regnestykke">{{ sjekk.maaling }}</p>
           {% if sjekk.skala %}
             <div class="skala" aria-hidden="true">
@@ -110,12 +116,11 @@
     {#- Story 8.2b, c (U64): summen under sjekkene, med styrken, T, B og I og
         retningen. Gruppens svar 04.11 kl. 09:48: styrken først, som tabellen
         (8.0e). #}
-    <p class="sumrad"><span class="sumnavn">Sum</span> <span class="pille{% if detalj.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ detalj.styrke }} av {{ antall_sjekker }}</span> {{ brikker(detalj.sjekkbrikker) }} {{ retningspille(detalj.retning) }}</p>
-    <p class="fotnote">
-      Signalstyrken er hvor mange sjekker som slo ut: {{ detalj.bidragsytere|length }} av {{ antall_sjekker }} ga utslag.
-      Ga noen +1 og noen -1, er retningen {{ blandet }}.
-      Ingen vekting og ingen skjult formel.
-    </p>
+    {#- Story 8.20a (del A, svaret 06.11 kl. 22:25 og spørsmål 3 i 8.20):
+        fotnoten under summen er flyttet. «ingen vekting» står i vinduet ved
+        «Hvorfor signalet ble …», og blandet retning i vinduet for retningen.
+        2 av 3 har svart ring (spørsmål 13). #}
+    <p class="sumrad"><span class="sumnavn">Sum</span> <span class="pille{% if ringen %} {{ ringen }}{% endif %}">{{ detalj.styrke }} av {{ antall_sjekker }}</span> {{ brikker(detalj.sjekkbrikker) }} {{ retningspille(detalj.retning) }}</p>
   {% elif detalj.for_kort_serie %}
     <p class="mangler">
       Signalet kunne ikke regnes: Trenger {{ detalj.noedvendige_dager }} dager
@@ -133,8 +138,11 @@
     {% endif %}
   {% endif %}
 
-  {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises. #}
-  {%- set grafhjelp = (["grafen"] if graf and graf.har_ma50 and detalj.sjekker else []) + (["indekslinja"] if graf and graf.har_indeks else []) + (["perioden"] if graf else []) %}
+  {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises.
+      Story 8.20a (del E): én tekst om grafen, med snittet når det vises,
+      setningen om den stiplede linja bare med indeksen, og så streken og
+      knappene. #}
+  {%- set grafhjelp = ((["grafen"] if graf.har_ma50 and detalj.sjekker else ["grafen_uten_snitt"]) + (["indekslinja"] if graf.har_indeks else []) + ["perioden"]) if graf else [] %}
   {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
       perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}
@@ -157,12 +165,14 @@
           Story 8.2c: den samme grafen med egne mål på smal skjerm
           (graf_smal), med navnene i en forklaring under datoene.
           Stilarket viser den ene av dem, etter bredden på figuren. #}
-      {%- set linjenavn = {"kurs": "Utbyttejustert kurs", "snitt": parametre.ma_vindu ~ "-dagers snitt (sjekk 1)", "indeks": "Hovedindeksen"} %}
+      {#- Story 8.20a (del C, spørsmål 10 i 8.20, U90): «Kurs (justert for
+          utbytte)», som skissen. #}
+      {%- set linjenavn = {"kurs": "Kurs (justert for utbytte)", "snitt": parametre.ma_vindu ~ "-dagers snitt (sjekk 1)", "indeks": "Hovedindeksen"} %}
       {%- set linjeklasse = {"kurs": "kurslinje", "snitt": "ma50linje", "indeks": "indekslinje"} %}
       {#- Gjennomgangen av 8.2c (BH5): bare grafene som finnes. #}
       {% for g in (graf, graf_smal) if g %}
       <svg class="graf{% if g.smal %} smal{% endif %}" viewBox="0 0 {{ g.bredde }} {{ g.hoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er utbyttejustert kurs{% if g.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if g.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ g.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er kursen justert for utbytte{% if g.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if g.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ g.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}">
         {% for linje in g.rutenett %}
           {#- Story 8.2b, b (U41): tallene står i feltet til venstre, ikke
               inne i grafen. #}
@@ -193,9 +203,16 @@
           <polyline class="ma50linje" points="{{ g.ma50linje }}"></polyline>
         {% endif %}
         <polyline class="kurslinje" points="{{ g.kurslinje }}"></polyline>
-        {% if g.merket %}<line class="dagstrek" x1="{{ "%.1f"|format(g.merket.x) }}" y1="{{ g.topp }}" x2="{{ "%.1f"|format(g.merket.x) }}" y2="{{ g.bunn }}"></line>{% endif %}
+        {#- Story 8.20a (del C, spørsmål 9 i 8.20, U89): datoen i en svart lapp
+            øverst på streken, og uten punktet nederst. Lappen står innenfor
+            tegneflaten, også ved kanten. #}
+        {% if g.merket %}
+          {%- set lappx = [[g.merket.x - 22, g.venstre]|max, g.hoeyre - 44]|min %}
+          <line class="dagstrek" x1="{{ "%.1f"|format(g.merket.x) }}" y1="{{ g.topp + 18 }}" x2="{{ "%.1f"|format(g.merket.x) }}" y2="{{ g.bunn }}"></line>
+          <rect class="daglapp" x="{{ "%.1f"|format(lappx) }}" y="{{ g.topp }}" width="44" height="18" rx="4"></rect>
+          <text class="daglapptekst" text-anchor="middle" x="{{ "%.1f"|format(lappx + 22) }}" y="{{ g.topp + 13 }}">{{ dagen.dato|dato }}</text>
+        {% endif %}
         {% if g.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(g.siste.x) }}" cy="{{ "%.1f"|format(g.siste.y) }}" r="4.5"></circle>{% endif %}
-        {% if g.merket %}<circle class="dagpunkt" cx="{{ "%.1f"|format(g.merket.x) }}" cy="{{ "%.1f"|format(g.merket.y) }}" r="5.5"></circle>{% endif %}
         {#- Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved
             enden av linjene, og den stiplede linja har også navn. #}
         {% if g.kursnavn %}<text class="linjenavn kurs" x="{{ "%.1f"|format(g.kursnavn.x) }}" y="{{ "%.1f"|format(g.kursnavn.y) }}">{{ linjenavn.kurs }}</text>{% endif %}
@@ -207,6 +224,31 @@
           <line class="{{ linjeklasse[f.klasse] }}" x1="{{ g.venstre }}" y1="{{ f.y - 4 }}" x2="{{ g.venstre + 20 }}" y2="{{ f.y - 4 }}"></line>
           <text class="linjenavn {{ f.klasse }}" x="{{ g.venstre + 26 }}" y="{{ f.y }}">{{ linjenavn[f.klasse] }}</text>
         {% endfor %}
+        {#- Story 8.20a (del C, gruppens svar 07.11 kl. 10:33, U92): lappen
+            med verdiene ved musepekeren, i appens stil som i skissen, med CSS
+            og uten skript. Hver dag har et usynlig felt, og lappen vises straks
+            musa er over det, så den følger musa fra dag til dag. Tallene står
+            norsk (regel 21). Skjermleseren får tallene i kortene. #}
+        <g class="musefelt" aria-hidden="true">
+        {%- for d in g.dager %}
+          <g class="musedag">
+            <rect class="treff" x="{{ "%.1f"|format(d.felt_x) }}" y="{{ g.topp }}" width="{{ "%.1f"|format(d.felt_bredde) }}" height="{{ g.bunn - g.topp }}"></rect>
+            <g class="lapp">
+              <line class="lappstrek" x1="{{ "%.1f"|format(d.x) }}" y1="{{ g.topp }}" x2="{{ "%.1f"|format(d.x) }}" y2="{{ g.bunn }}"></line>
+              {% if d.y_snitt is not none %}<circle class="lapppunkt snitt" cx="{{ "%.1f"|format(d.x) }}" cy="{{ "%.1f"|format(d.y_snitt) }}" r="4"></circle>{% endif %}
+              <circle class="lapppunkt kurs" cx="{{ "%.1f"|format(d.x) }}" cy="{{ "%.1f"|format(d.y) }}" r="4"></circle>
+              <rect class="lappramme" x="{{ "%.1f"|format(d.lapp_x) }}" y="{{ "%.1f"|format(d.lapp_y) }}" width="{{ lappbredde }}" height="{{ lapphoyde if d.snitt is not none else lapphoyde - 16 }}" rx="6"></rect>
+              <text class="lappdato" x="{{ "%.1f"|format(d.lapp_x + 10) }}" y="{{ "%.1f"|format(d.lapp_y + 18) }}">{{ d.dato|ukedag }} {{ d.dato|dato }}</text>
+              <text class="lappnavn kurs" x="{{ "%.1f"|format(d.lapp_x + 10) }}" y="{{ "%.1f"|format(d.lapp_y + 34) }}">Kurs</text>
+              <text class="lapptall" text-anchor="end" x="{{ "%.1f"|format(d.lapp_x + lappbredde - 10) }}" y="{{ "%.1f"|format(d.lapp_y + 34) }}">{{ d.kurs|tall('kurs') }}</text>
+              {% if d.snitt is not none %}
+              <text class="lappnavn snitt" x="{{ "%.1f"|format(d.lapp_x + 10) }}" y="{{ "%.1f"|format(d.lapp_y + 50) }}">Snitt {{ parametre.ma_vindu }} dager</text>
+              <text class="lapptall" text-anchor="end" x="{{ "%.1f"|format(d.lapp_x + lappbredde - 10) }}" y="{{ "%.1f"|format(d.lapp_y + 50) }}">{{ d.snitt|tall('kurs') }}</text>
+              {% endif %}
+            </g>
+          </g>
+        {%- endfor %}
+        </g>
       </svg>
       {% endfor %}
 
@@ -217,11 +259,11 @@
         {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}
-        Kursen og snittet er tegnet på utbyttejustert kurs, og indeksen er regnet
-        om til samme skala.
+        Kursen og snittet er tegnet på kursen justert for utbytte, og indeksen er
+        regnet om til samme skala.
         {% else %}
-        Begge linjene er tegnet på utbyttejustert kurs, så de ligger på samme
-        skala.
+        Begge linjene er tegnet på kursen justert for utbytte, så de ligger på
+        samme skala.
         {% endif %}
         Sjekk 2 og 3 tegnes ikke — de står i kortene over.
         {% if graf.har_indeks %}
@@ -237,12 +279,16 @@
     <p class="mangler">For få kursdager til å tegne en graf.</p>
   {% endif %}
 
+  {#- Story 8.20a (del D, spørsmål 4 i 8.20): med rammen «Signalet forklart»
+      står fotnotene i linja nederst i rammen, ellers her som før. #}
+  {% if not detalj.sjekker %}
   <p class="fotnote">Signalstyrken sier ikke om du bør kjøpe eller selge.</p>
 
   <p class="fotnote">
     Signalet bygger bare på kurs og volum. Børsmeldinger og kommende
     finansielle hendelser er ikke med i denne versjonen.
   </p>
+  {% endif %}
 
   {#- Story 10.5 (gruppens svar 19.10 kl. 16:03 og 19:49): lenken til
       selskapets investorside, med navnet i lenketeksten. NewsWeb nevnes uten
@@ -295,14 +341,19 @@
       {% if samme_dag %}<p class="samme-dag">{{ samme_dag }}</p>{% endif %}
       {% if ki_vises %}
         <div class="ki-del">
+          {#- Story 8.20a (del D, spørsmål 11 i 8.20, U81): «Laget av KI» står,
+              og modellnavnet i en liten linje under teksten (designregler §4).
+              Navnene på sjekkene er fete (U88, svaret 07.11 kl. 12:32, 4). #}
           {% if ki.vist %}
-            <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
-            <p class="ki-tekst">{{ ki.tekst|prikkede_tall }}</p>
+            <p class="merke-ki">Laget av KI. Regelforklaringen over er det signalet bygger på.</p>
+            <p class="ki-tekst">{{ ki.tekst|ki_tekst }}</p>
+            <p class="modell">Modell: {{ ki.modell }}</p>
           {% else %}
             <p class="uten">{{ ki.grunn }}</p>
           {% endif %}
         </div>
       {% endif %}
+      <p class="grunnlaget">Signalet bygger bare på kurs og volum i sjekkene over, ikke på KI-teksten, og sier ikke om du bør kjøpe eller selge. Børsmeldinger og kommende finansielle hendelser er ikke med i denne versjonen.</p>
     </section>
   {% endif %}
 
@@ -312,16 +363,11 @@
       merkes som i oversikten, 2 av 3 ikke (designregler.md §3). #}
   <section class="historikk" id="signalet-dag-for-dag" aria-labelledby="historikk-tittel">
     {#- Story 8.2b, c (U68): «Velg dag» øverst til høyre i delen, til siden
-        for dagen, som en dag i tabellen. #}
+        for dagen, som en dag i tabellen.
+        Story 8.20a (del B, spørsmål 6 i 8.20): datovelgeren står bare ved
+        grafen. En dag i tabellen er fortsatt en lenke til siden for dagen. #}
     <div class="historikktopp">
       <h2><span id="historikk-tittel">Signalet dag for dag</span> {{ hjelpeknapp("hjelp-historikk", "Hjelp: signalet dag for dag") }}</h2>
-      {#- Gjennomgangen av 8.2b (BH1, ECH2): fra andre dag i serien, som
-          periodevalget, og tilbake til delen. #}
-      <form class="dagvalg" method="get" action="/aksje/{{ detalj.aksje.symbol }}#signalet-dag-for-dag">
-        <label class="skjult" for="velg-dag-historikk">Velg dag i historikken</label>
-        <input type="date" id="velg-dag-historikk" name="dag" required min="{{ foerste_valgbare.isoformat() }}" max="{{ siste_i_serien.isoformat() }}">
-        <button type="submit">Velg dag</button>
-      </form>
     </div>
     {#- Story 8.2b, b (U16): ingressen er kort, og resten står i hjelpen ved
         «?» (gjennomgangen, BH4: tallene teller terskelen, som oversikten). #}
@@ -377,16 +423,18 @@
       Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}
   {% if hentet %}{{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}{% endif %}
   {#- U5 i docs/ux-logg.md (2.7b): hjelpen sier dagen siden viser. #}
-  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs_aksje", "utbyttejustert"])], vist=(detalj.dato|ukedag) ~ " " ~ (detalj.dato|dato)) }}
+  {#- Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): høyst 60 ord i hvert
+      vindu på aksjesiden. Resten står i docs/hjelp.md. #}
+  {{ hjelpevindu("hjelp-kurs", "Sluttkurs", [("", ["sluttkurs_aksje"])], vist=(detalj.dato|ukedag) ~ " " ~ (detalj.dato|dato)) }}
   {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
   {% endif %}
-  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad"])]) }}
+  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad_kort"])]) }}
   {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
-    ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent_aksje", "skjevhet"]),
+    ("", ["retning_aksje", "positiv_aksje", "negativ_aksje", "blandet_aksje", "ingen_aksje", "ukjent_aksje", "oftere_positiv"]),
   ]) }}
-  {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["hvorfor_tre", "antall_dager"])]) }}
+  {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["sjekkene" if detalj.sjekker else "sjekkene_uten"])]) }}
   {{ hjelpevindu("hjelp-historikk", "Signalet dag for dag", [("", ["historikken"])]) }}
   {#- Story 10.9, del D: «?» ved rammen «Signalet forklart», som vises med
       sjekkene, også med KI av. #}
@@ -395,7 +443,5 @@
     {% for sjekk in detalj.sjekker %}
       {{ hjelpevindu("hjelp-" ~ sjekk.navn|lower, sjekk.navn, [("", [sjekk.navn|lower])]) }}
     {% endfor %}
-    {{ hjelpevindu("hjelp-ga", "Ga", [("", ["ga"])]) }}
-    {{ hjelpevindu("hjelp-maalt", "Målt mot", [("", ["maalt_mot", "grensene"])]) }}
   {% endif %}
 {% endblock %}

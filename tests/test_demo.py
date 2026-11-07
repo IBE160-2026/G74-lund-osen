@@ -358,7 +358,8 @@ class TestSidene:
         # Story 8.2a, d: grunnen for Varde Systemer har tallene, som aksjesiden.
         for tekst in (
             "Brattfjell Energi",
-            "skiller seg ut",
+            # Story 8.20a (del J): det skjulte merket sier «skilte seg ut».
+            "skilte seg ut",
             "for kort historikk: 30 av 51 dager",
             "Matfjord Merkevarer",
         ):
@@ -391,7 +392,8 @@ class TestSidene:
             # Story 8.0c: hvert «?» ved det det forklarer.
             ("/", ("hjelp-signalstyrke", "hjelp-retning"), ("signalstyrke", "ukjent")),
             ("/aksje/BRFE", ("hjelp-graf", "hjelp-trend", "hjelp-retning-aksje"), ("grafen", "trend", "ukjent_aksje")),
-            ("/aksje/VRDS", ("hjelp-sjekkene", "hjelp-retning-aksje"), ("antall_dager", "ukjent_aksje")),
+            # Story 8.20a (del E): dagene signalet trenger, i vinduet uten sjekker.
+            ("/aksje/VRDS", ("hjelp-sjekkene", "hjelp-retning-aksje"), ("sjekkene_uten", "ukjent_aksje")),
         ):
             html = klient.get(adresse).data.decode("utf-8")
             assert "Eksempeltall" in html, adresse
@@ -561,7 +563,8 @@ class TestStory80cIDemoen:
         assert re.search(r'<span class="pille[^"]*">\d av 3</span>', oversikt)
         assert '<tr class="utslag">' in oversikt
         assert re.search(r'<span class="ord">(positiv|negativ|ingen utslag)</span>', detalj)
-        assert "Signalstyrken sier ikke om du bør kjøpe eller selge." in detalj
+        # Story 8.20a (del D): forbeholdet står nederst i rammen «Signalet forklart».
+        assert "og sier ikke om du bør kjøpe eller selge." in detalj
         # Story 3.4b (gruppens svar 18.10 kl. 20:08): ordlista gjelder vår
         # tekst, ikke KI-teksten, til prompten faar den i versjon 3. Bare
         # avsnittet med modellens ord tas ut. «Laget av KI» og resten av
@@ -631,7 +634,7 @@ class TestStory80eIDemoen:
         vurdert = [rad[3] for rad in tabell.rader if rad[3][0].isdigit()]
         assert vurdert
         for celle in vurdert:
-            assert re.fullmatch(r"\d av 3 T (\+1|0|-1) B (\+1|0|-1) I (\+1|0|-1)( skiller seg ut)?", celle), celle
+            assert re.fullmatch(r"\d av 3 T (\+1|0|-1) B (\+1|0|-1) I (\+1|0|-1)( skilte seg ut)?", celle), celle
         assert "background: var(--fyll)" in _regel(_stil(html), ".pille.tre-av-tre")
         # BH5 og ECH1 i gjennomgangen: pillen med fyll staar ogsaa i demoen.
         assert '<span class="pille tre-av-tre">3 av 3</span>' in html
@@ -841,7 +844,8 @@ class TestIndekslinjaIDemoen:
         assert "Den stiplede linja er hovedindeksen DEMIX" in _synlig(html)
         # «?» forklarer linja.
         vinduet = html.split('<div id="hjelp-graf"', 1)[1].split('<div id="hjelp-', 1)[0]
-        assert "Den stiplede linja:" in vinduet
+        # Story 8.20a (del E): én setning om den stiplede linja.
+        assert "Den stiplede er hovedindeksen" in vinduet
 
 
 class TestKlokkeslettetSomDenEkte:

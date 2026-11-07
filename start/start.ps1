@@ -274,7 +274,8 @@ if ($Versjon -eq 'demo') {
     if (-not $harNoekkel) {
         Write-Host 'Første gang trenger den ekte versjonen en nøkkel fra EODHD. Registreringssiden åpnes nå.'
         # Forprøven 24.10 (funn 1–3): hvor nøkkelen står, og hvordan den limes inn.
-        Write-Host 'Lag en gratis konto. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre.'
+        # BH10 i 2.16 (story 8.20a): også en konto fra før, som README-en (U75).
+        Write-Host 'Lag en gratis konto. Har du en konto hos EODHD fra før, logger du inn. Nøkkelen står som «API token» under «Dashboard» hos EODHD, med kopiknappen til høyre.'
         Write-Host 'Lim den inn her med Ctrl+V eller et høyreklikk. Den vises som stjerner.'
         if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process 'https://eodhd.com/register' }
         $sikker = Read-Host 'Lim inn nøkkelen og trykk Enter' -AsSecureString

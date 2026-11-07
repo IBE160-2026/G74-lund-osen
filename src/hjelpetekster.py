@@ -21,7 +21,6 @@ skjevhet, og retningen forklares med +1 og -1 (FR-704, rettet 13.10).
 
 from dataclasses import dataclass
 
-from aksjedetalj import INGEN_UTSLAG
 from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING
 from signalberegning import (
     BLANDET,
@@ -272,22 +271,22 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         # U5 i docs/ux-logg.md (story 2.7b): paa aksjesiden er sluttkursen for
         # dagen siden viser, ogsaa en dag valgt med «Velg dag» (8.16b).
+        # Story 8.20a (del E og J): «Vis dagen», og teksten fra utkastet.
         "sluttkurs_aksje": Hjelpetekst(
             "Sluttkurs:",
             "kursen ved børsens stengning den dagen siden viser, uten utbyttejustering. "
-            "Dagen står under navnet øverst: siste børsdag i dataene, eller dagen som er valgt med «Velg dag».",
+            "Dagen står under navnet øverst: siste børsdag i dataene, eller dagen du valgte.",
             ((PRD, "| Sluttkurs | `close` for siste børsdag |"), (AKSJE_MAL, "{{ detalj.dato|dato }}")),
         ),
         # Story 2.7b: historikken nederst paa aksjesiden.
         "historikken": Hjelpetekst(
             "Signalet dag for dag:",
             # Story 8.2b, b (U16): det som er tatt ut av ingressen.
-            "det appen skrev om aksjen hver dag i måneden, eller hvorfor det mangler, lest fra basen og "
-            "aldri regnet på nytt. Tallene for uka og måneden teller dagene med signalstyrke "
-            f"{terskel} eller mer, som i oversikten, og {ANTALL_SJEKKER} av {ANTALL_SJEKKER} "
-            "er merket med strek og ring. "
-            "Pilene viser måneden før og etter, så langt kursserien går, og en dag med kurs viser "
-            "hele siden for den dagen, med målingene.",
+            # Story 8.20a (del E): hoeyst 60 ord. Pilene staar ved maaneden.
+            "det appen skrev om aksjen hver børsdag, lest fra basen og aldri regnet på nytt. "
+            f"Uka og måneden teller dagene med signalstyrke {terskel} eller mer, og "
+            f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} har ring. "
+            "Klikk på en dag med kurs for å se hele siden for den dagen.",
             (
                 (AKSJE_MAL, "Signalet dag for dag"),
                 (HISTORIKK, "Signalet regnes aldri her"),
@@ -299,8 +298,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "endring": Hjelpetekst(
             "Endring:",
             # Story 8.2b, b (U31): datoene står alltid på aksjesiden.
+            # Story 8.20a (del J): «kursen justert for utbytte», som grafen.
             "endringen i prosent fra forrige dag med kurs, regnet på "
-            "utbyttejustert kurs. På aksjesiden står de to dagene ved "
+            "kursen justert for utbytte. På aksjesiden står de to dagene ved "
             "endringen, med ukedag og dato.",
             (
                 (PRD, "| Endring | Endring i prosent, regnet på "),
@@ -308,15 +308,16 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (AKSJE_MAL, "fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til"),
             ),
         ),
+        # Story 8.20a (del J, spoersmaal 10 i 8.20): tittelen som i grafen.
         "utbyttejustert": Hjelpetekst(
-            "Utbyttejustert kurs:",
+            "Kurs justert for utbytte:",
             "kilden regner kursen om bakover ved hvert nytt utbytte, så et "
             "ordinært utbytte ikke ser ut som et kursfall. Endringen, de "
             f"{ANTALL_SJEKKER} sjekkene og kursgrafen bruker den.",
             (
                 (PRD, "#### FR-701"),
                 (SIGNALBEREGNING, "Kildens justerte kurs regnes om bakover ved hvert nytt"),
-                (AKSJE_MAL, "Begge linjene er tegnet på utbyttejustert kurs"),
+                (AKSJE_MAL, "Begge linjene er tegnet på kursen justert for utbytte"),
             ),
         ),
         "data_hentet": Hjelpetekst(
@@ -353,11 +354,26 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "signalstyrke": Hjelpetekst(
             "Signalstyrke:",
+            # Story 8.20a (del J): «Skilte seg ut», som oversikten sier.
             f"hvor mange av de {ANTALL_SJEKKER} sjekkene som slo ut, fra 0 til "
             f"{ANTALL_SJEKKER}. Både +1 og -1 teller, så en sjekk med +1 og en "
-            f"med -1 gir 2. En aksje med styrke {terskel} eller mer er merket "
-            f"«skiller seg ut» i oversikten.",
-            ((PRD, "#### FR-703 — Signalstyrke"), (PRD, "#### FR-705"), (SIGNALBEREGNING, "def finn_styrke(")),
+            f"med -1 gir 2. Med {terskel} eller mer står aksjen under «Skilte seg ut» i oversikten.",
+            (
+                (PRD, "#### FR-703 — Signalstyrke"),
+                (PRD, "#### FR-705"),
+                (SIGNALBEREGNING, "def finn_styrke("),
+                (INDEX_MAL, "Skilte seg ut <span"),
+            ),
+        ),
+        # Story 8.20a (del E): det siste i vinduet for signalstyrken paa
+        # aksjesiden, som ikke_raad i én setning.
+        "ikke_raad_kort": Hjelpetekst(
+            "",
+            "Signalet er ikke en spådom og ikke et råd.",
+            (
+                (PRD, "### NFR-06 — Løsningen gir ikke investeringsråd"),
+                (BEGRUNNELSER, "Om de sier noe om kursen videre, er ikke målt (FR-703)."),
+            ),
         ),
         "uten_styrke": Hjelpetekst(
             "",
@@ -399,16 +415,45 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"sjekkene ble regnet uten at noen slo ut.",
             ((PRD, "«Ukjent» er ikke en femte retning i FR-704"), (MARKEDSOVERSIKT, "UKJENT_RETNING")),
         ),
+        # Story 8.20a (del E): vinduet for retningen paa aksjesiden, med
+        # betingelsene kort, som i utkastet i spesifikasjonen for 8.20, og én
+        # setning om hvorfor retningen oftere er positiv (gruppens svar 07.11
+        # kl. 10:33, 2). Maalingen og grensene staar i docs/hjelp.md.
+        "retning_aksje": Hjelpetekst(
+            "Retning:",
+            "om de sjekkene som slo ut, ga +1 eller -1, ikke hvor kursen går videre.",
+            ((PRD, "#### FR-103"), (BEGRUNNELSER, "Om de sier noe om kursen videre, er ikke målt (FR-703).")),
+        ),
+        **{
+            noekkel: Hjelpetekst(
+                _retningstittel(retning),
+                betingelse,
+                ((PRD, "#### FR-704 — Retning"), (MARKEDSOVERSIKT, "_SYMBOL_OG_KLASSE")),
+            )
+            for noekkel, retning, betingelse in (
+                ("positiv_aksje", POSITIV, "alle ga +1."),
+                ("negativ_aksje", NEGATIV, "alle ga -1."),
+                ("blandet_aksje", BLANDET, "noen +1 og noen -1."),
+                ("ingen_aksje", INGEN, "ingen slo ut."),
+            )
+        },
         "ukjent_aksje": Hjelpetekst(
             f"{UKJENT_RETNING.symbol} {UKJENT_RETNING.tekst}:",
-            f"det finnes ingen vurdering for dagen, og grunnen står under "
-            f"«Hvorfor signalet ble ukjent». Det er ikke en femte retning: "
-            f"«{INGEN}» betyr at sjekkene ble regnet uten at noen slo ut.",
-            ((PRD, "«Ukjent» er ikke en femte retning i FR-704"), (AKSJE_MAL, "Hvorfor signalet ble")),
+            "ingen vurdering for dagen, og grunnen står under kortene.",
+            ((PRD, "«Ukjent» er ikke en femte retning i FR-704"), (AKSJE_MAL, '<p class="mangler">')),
+        ),
+        "oftere_positiv": Hjelpetekst(
+            "",
+            "Når kursene stiger, er retningen oftere positiv, fordi trenden kan vare i uker.",
+            (
+                (BEGRUNNELSER, "### Åpent punkt: skjevfordeling mot positiv retning"),
+                (BEGRUNNELSER, "Det er en tilstand, som kan vare i uker."),
+            ),
         ),
         "trend": Hjelpetekst(
             "Trend:",
-            f"ligger den utbyttejusterte kursen mer enn {sone} over eller "
+            # Story 8.20a (del J): «kursen justert for utbytte».
+            f"ligger kursen justert for utbytte mer enn {sone} over eller "
             f"under snittet av de siste {ma} børsdagene? Over gir +1, under "
             f"gir -1, og innenfor {sone} gir 0.",
             ((PRD, "#### FR-701"), (PRD, "#### FR-702"), (SIGNALBEREGNING, "def trend(")),
@@ -433,59 +478,54 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             f"en dag den falt, og 0 når kursen var uendret.",
             ((PRD, "#### FR-701"), (SIGNALBEREGNING, "def interesse(")),
         ),
-        "antall_dager": Hjelpetekst(
-            "",
-            f"Signalet trenger {dager} børsdager med kurser. Har aksjen færre, kan det ikke regnes.",
-            ((PRD, "Signalet krever 51 handelsdager"), (SIGNALBEREGNING, "def nodvendige_dager(")),
-        ),
-        "hvorfor_tre": Hjelpetekst(
-            f"Hvorfor disse {ANTALL_SJEKKER}:",
-            "hver sjekk ser på sin del av dataene: kursnivå, endring og volum, "
-            "med én regel og én grense hver. Da ser du hva som ga utslaget. "
-            "Sjekkene er valgt for å kunne forklares, ikke for å treffe "
-            "markedet.",
-            ((BEGRUNNELSER, "### Hvorfor akkurat disse tre sjekkene (FR-701)"),),
-        ),
-        "grensene": Hjelpetekst(
-            "Grensene:",
-            f"{_grensene(MAALTE_GRENSER)} ble "
-            f"kontrollert mot {MAALTE_AKSJER} aksjer på Oslo Børs over {MAALTE_BOERSDAGER} "
-            f"børsdager, {MAALT_PERIODE}, før de ble låst. Det var en kontroll "
-            f"av at de holder, ikke et søk etter verdiene som gir penest "
-            f"resultat.",
+        # Story 8.20a (del E, spoersmaal 2 i 8.20): «Ga», «Målt mot» og summen
+        # forklares i vinduet ved «Hvorfor signalet ble …». Teksten om
+        # grensene og maalingen staar i docs/hjelp.md, «Hvordan ble grensene
+        # valgt?», med hvorfor det er disse tre sjekkene.
+        "sjekkene": Hjelpetekst(
+            "Hvorfor signalet ble:",
+            f"{ANTALL_SJEKKER} sjekker, hver på sin del av dataene: kursnivå, endring og volum. "
+            "«Ga» er det sjekken ga: +1, 0 eller -1, og «Målt mot» er tallet sjekken ble avgjort av, "
+            "med prikken mot feltet der sjekken gir 0. Summen teller sjekkene som slo ut, uten vekting.",
             (
-                (MAALINGER, "### 7.4 Signaltesten mot 199 handelsdager"),
-                (MAALINGER, "## 9. De to `[FORELØPIG]`-vinduene, målt"),
-                (MAALINGER, "**Dette er en måling, ikke en optimalisering.**"),
+                (BEGRUNNELSER, "### Hvorfor akkurat disse tre sjekkene (FR-701)"),
+                (PRD, "#### FR-706"),
+                (AKSJE_MAL, '<span class="ga">Ga'),
+                (AKSJE_MAL, '<p class="maalt">Målt mot'),
+                (AKSJEDETALJ, "def bygg_skala("),
+                (SIGNALBEREGNING, "def finn_styrke("),
             ),
         ),
-        "skjevhet": Hjelpetekst(
-            "Hvorfor retningen oftere er positiv når kursene stiger:",
-            f"trend er en tilstand som kan vare i uker, mens bevegelse og "
-            f"interesse er hendelser som sjelden slår ut. Retningen blir derfor "
-            f"oftest trendens. I målingen over {MAALTE_BOERSDAGER} børsdager var "
-            f"{tall(ANDEL_POSITIV, 'andel')} av aksjedagene med utslag positive "
-            f"og {tall(ANDEL_NEGATIV, 'andel')} negative. Det beskriver "
-            f"perioden, ikke det som kommer.",
+        # Story 8.20a (del E): uten sjekker paa siden, naar signalet ikke
+        # kunne regnes, sier vinduet ikke «Ga» og «Målt mot», men hvor mange
+        # dager signalet trenger (gjennomgangen av 8.0b).
+        "sjekkene_uten": Hjelpetekst(
+            "Hvorfor signalet ble:",
+            f"{ANTALL_SJEKKER} sjekker, hver på sin del av dataene: kursnivå, endring og volum. "
+            f"Signalet trenger {dager} børsdager med kurser, og når det ikke kunne regnes, står grunnen "
+            "under overskriften.",
             (
-                (BEGRUNNELSER, "### Åpent punkt: skjevfordeling mot positiv retning"),
-                (BEGRUNNELSER, "Det er en tilstand, som kan vare i uker."),
-                (MAALINGER, "Målt over 199 dager er **60,0 % av aksjedagene med utslag positive**, mot 29,5 %"),
+                (BEGRUNNELSER, "### Hvorfor akkurat disse tre sjekkene (FR-701)"),
+                (PRD, "Signalet krever 51 handelsdager"),
+                (SIGNALBEREGNING, "def nodvendige_dager("),
+                (AKSJE_MAL, '<p class="mangler">'),
             ),
         ),
+        # Story 8.20a (del E): én tekst om grafen, med snittet bare naar det
+        # vises. Navnene staar ved linjene, saa teksten sier dem ikke.
         "grafen": Hjelpetekst(
-            "Kursgrafen:",
-            f"den tykke linja er utbyttejustert kurs, og den tynne er "
-            f"snittet av de siste {ma} børsdagene, som trendsjekken måler mot. "
-            # Story 8.2b, b (U41, U47): navnene står i feltet til høyre.
-            # Story 8.2c: på smal skjerm står de under grafen.
-            f"Navnene står til høyre, ved enden av linjene, og på smal skjerm under grafen. "
-            f"Sjekk 2 og 3 står i kortene over.",
+            "Kursutvikling:",
+            f"den tykke linja er kursen justert for utbytte, og den tynne snittet av de siste {ma} "
+            "børsdagene, som trenden måler mot.",
             (
-                (AKSJE_MAL, "Sjekk 2 og 3 tegnes ikke"),
+                (AKSJE_MAL, '"Kurs (justert for utbytte)"'),
                 (AKSJEDETALJ, "glidende_snitt(kurser, p.ma_vindu)"),
-                (GRAF, "def _forklaringen("),
             ),
+        ),
+        "grafen_uten_snitt": Hjelpetekst(
+            "Kursutvikling:",
+            "den tykke linja er kursen justert for utbytte.",
+            ((AKSJE_MAL, '"Kurs (justert for utbytte)"'),),
         ),
         # Story 8.17a: periodevalget i oversikten, med søylene og linja.
         "perioden_oversikten": Hjelpetekst(
@@ -533,12 +573,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             ),
         ),
         # Story 8.16: periodene i kursgrafen og regelen for startdagen.
+        # Story 8.20a (del E): regelen for startdagen staar i docs/hjelp.md,
+        # «Hva gjør knappene over hovedindeksen?», og vinduet sier streken,
+        # knappene og datoen.
         "perioden": Hjelpetekst(
-            "Periodene:",
-            "knappene over grafen velger hvor langt tilbake den går. Perioden starter på første "
-            "børsdag fra samme dato bakover etter kalenderen, og I år på årets første børsdag. "
-            "Den første knappen viser 6 måneder fram til siste børsdag med dagen merket, og med "
-            "«Velg dag» viser hele siden dagen du velger, med signalet som er lagret for den.",
+            "",
+            "Streken med datoen er dagen siden viser. Knappene velger hvor langt tilbake grafen går, "
+            "og datoen med «Vis dagen» viser hele siden for en dag.",
             (
                 (PERIODER, "def startdag("),
                 (PERIODE_MAL, 'class="periodevalg"'),
@@ -548,34 +589,14 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             ),
         ),
         # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
+        # Story 8.20a (del E): én setning. Resten staar under grafen.
         "indekslinja": Hjelpetekst(
-            "Den stiplede linja:",
-            "hovedindeksen, regnet om så den starter på aksjens kurs den første dagen "
-            "i grafen som indeksen har, og følger indeksens endring derfra. Ligger "
-            "aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra "
-            "startdagen til den dagen, og under den dårligere. Det sier ikke noe om "
-            "hva aksjen gjør videre.",
+            "",
+            "Den stiplede er hovedindeksen, regnet om så den starter på aksjens kurs.",
             (
                 (GRAF, "def indeksverdier("),
                 (GRAF, "start.kurs * indeks[p.dato] / indeks[start.dato]"),
                 (AKSJE_MAL, 'class="indekslinje"'),
-            ),
-        ),
-        "ga": Hjelpetekst(
-            "Ga:",
-            f"det hver sjekk ga: +1 {POSITIV.lower()}, -1 {NEGATIV.lower()} eller 0 {INGEN_UTSLAG}.",
-            ((PRD, "#### FR-706"), (AKSJE_MAL, '<span class="ga">Ga'), (AKSJEDETALJ, 'INGEN_UTSLAG = "ingen utslag"')),
-        ),
-        "maalt_mot": Hjelpetekst(
-            "Målt mot:",
-            "tallet sjekken ble avgjort av, og hva det ble målt mot. "
-            "Feltet under tallet viser hvor sjekken gir 0, og prikken er målingen.",
-            (
-                (PRD, "#### FR-706"),
-                (PRD, "se hva hvert fortegn ble målt mot"),
-                (AKSJE_MAL, '<p class="maalt">Målt mot'),
-                (AKSJE_MAL, '<div class="skala" aria-hidden="true">'),
-                (AKSJEDETALJ, "def bygg_skala("),
             ),
         ),
         # Story 10.9, del D (spoersmaal 10, svaret 07.11 kl. 08:58): hjelpen
@@ -598,7 +619,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (MOENSTRENE, "def lag_moenstrene("),
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "def kontroller("),
-                (AKSJE_MAL, "Laget av KI ·"),
+                (AKSJE_MAL, "Laget av KI."),
             ),
         ),
         "ikke_raad": Hjelpetekst(

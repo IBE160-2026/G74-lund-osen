@@ -260,6 +260,14 @@ nav.periodevalg input[type="date"] {
   font: inherit; font-size: 14px; padding: 0 8px; min-height: 36px; box-sizing: border-box; max-width: 100%;
   border: 1px solid var(--strek); border-radius: 8px; background: var(--kort); color: var(--blekk);
 }
+/* Story 8.20a (del B, gruppens svar 06.11 kl. 22:24, 23:23 og 23:30): datoen
+   med pilene og «Vis dagen» står etter periodeknappene, med litt luft. Er
+   linja for smal, står de sammen på egen linje til venstre. */
+nav.periodevalg li.datoen { margin-left: 10px; }
+nav.periodevalg .pil { width: 36px; padding: 0; font-size: 18px; font-weight: 600; }
+nav.periodevalg span.pil { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  min-height: 36px; border: 1px solid var(--strek); border-radius: 999px; color: var(--dempet-2); }
+@media (max-width: 760px) { nav.periodevalg li.datoen { margin-left: 0; } }
 .periodebeskjed { margin: 0 0 12px; color: var(--tekst); }
 nav.periodevalg .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -653,6 +661,11 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .ki .tall { text-decoration: underline dotted currentColor; text-decoration-thickness: 1.5px;
                                 text-underline-offset: 3px; }
 :where(.side-aksje) .ki .uten { color: var(--dempet); margin: 0; }
+/* Story 8.20a (del D, spørsmål 4 og 11 i 8.20): modellnavnet i en liten linje
+   under teksten, og linja om grunnlaget nederst i rammen. */
+:where(.side-aksje) .ki p.modell { color: var(--dempet); font-size: 12.5px; margin: 8px 0 0; }
+:where(.side-aksje) .ki p.grunnlaget { color: var(--dempet); font-size: 13px; margin: 14px 0 0; padding: 12px 0 0; border-top: 1px solid var(--strek); }
+:where(.side-aksje) .ki p.ki-tekst strong { font-weight: 700; color: var(--blekk); }
 /* Story 10.9, del C: appens setninger først i rammen, og KI-delen under en
    strek. */
 :where(.side-aksje) .ki p.dagene, :where(.side-aksje) .ki p.samme-dag { margin: 0 0 4px; font-size: 16px; line-height: 1.5; }
@@ -696,25 +709,38 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .mangler { color: var(--dempet); font-style: italic; }
 /* Story 8.16: dagen som er merket i grafen. Periodevalget står over. */
 :where(.side-aksje) .dagstrek { stroke: var(--blekk); stroke-width: 1.5; }
-:where(.side-aksje) .dagpunkt { fill: var(--hvit); stroke: var(--blekk); stroke-width: 2.5; }
+/* Story 8.20a (del C, spørsmål 9 i 8.20, U89): datoen i en svart lapp øverst
+   på streken. */
+:where(.side-aksje) .daglapp { fill: var(--blekk); }
+:where(.side-aksje) .daglapptekst { fill: var(--hvit); font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Story 8.20a (del C, gruppens svar 07.11 kl. 10:33, U92): lappen ved
+   musepekeren, hvit med kant som kortene, vises straks musa er over dagen.
+   Bare CSS, ingen overgang og intet skript. */
+:where(.side-aksje) .musefelt .treff { fill: transparent; pointer-events: all; }
+:where(.side-aksje) .musefelt .lapp { visibility: hidden; pointer-events: none; }
+:where(.side-aksje) .musefelt .musedag:hover .lapp { visibility: visible; }
+:where(.side-aksje) .lappstrek { stroke: var(--dempet-2); stroke-width: 1; }
+:where(.side-aksje) .lapppunkt { stroke: var(--hvit); stroke-width: 2; }
+:where(.side-aksje) .lapppunkt.kurs { fill: var(--kurs); }
+:where(.side-aksje) .lapppunkt.snitt { fill: var(--snitt); }
+:where(.side-aksje) .lappramme { fill: var(--kort); stroke: var(--strek-2); stroke-width: 1; }
+:where(.side-aksje) .lappdato { fill: var(--blekk); font-size: 12px; font-weight: 700; }
+:where(.side-aksje) .lappnavn { font-size: 12px; font-weight: 600; }
+:where(.side-aksje) .lappnavn.kurs { fill: var(--kurs); }
+:where(.side-aksje) .lappnavn.snitt { fill: var(--snitt); }
+:where(.side-aksje) .lapptall { fill: var(--blekk); font-size: 12px; font-variant-numeric: tabular-nums; }
 :where(.side-aksje) p.dagen { margin: 0 0 12px; }
 
 /* Story 2.7b: historikken, en uke per rad med mandag til fredag. 3 av 3 har
    pillen og streken fra oversikten (designregler §3), 2 av 3 merkes ikke.
    På smal skjerm står dagene under hverandre. */
 :where(.side-aksje) .historikk .ingress { margin: 0 0 12px; }
-/* Story 8.2b, c (U68): «Velg dag» øverst til høyre, og under på smal skjerm. */
+/* Story 8.2b, c (U68): «Velg dag» øverst til høyre, og under på smal skjerm.
+   Story 8.20a (del B, spørsmål 6 i 8.20): datovelgeren står bare ved grafen,
+   så toppen har bare overskriften. */
 :where(.side-aksje) .historikktopp { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
                                      gap: 8px 16px; margin: 60px 0 16px; }
 :where(.side-aksje) .historikktopp h2 { margin: 0; }
-:where(.side-aksje) .dagvalg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; }
-:where(.side-aksje) .dagvalg input[type="date"], :where(.side-aksje) .dagvalg button {
-  font: inherit; font-size: 14px; min-height: 36px; box-sizing: border-box; padding: 0 10px; max-width: 100%;
-  border: 1px solid var(--strek); border-radius: 999px; background: var(--kort); color: var(--blekk); }
-:where(.side-aksje) .dagvalg input[type="date"] { border-radius: 8px; }
-:where(.side-aksje) .dagvalg button { cursor: pointer; }
-:where(.side-aksje) .dagvalg .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-:where(.side-aksje) .dagvalg :focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 /* Story 8.2b, b og c (U44, U68): månedsvelgeren er én knapp med kant, med
    pilene på hver side, 44 px høye. */
 :where(.side-aksje) .maanedspiler { display: inline-flex; align-items: center; flex-wrap: wrap; max-width: 100%; box-sizing: border-box;
@@ -761,6 +787,13 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .sumrad .pille { white-space: nowrap; padding: 0.05rem 0.5rem; border-radius: 999px; font-weight: 700;
                                      border: 1.5px solid var(--strek-2); }
 :where(.side-aksje) .sumrad .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+/* Story 8.20a (del A, spørsmål 13 i 8.20): 2 av 3 med svart ring, i summen og
+   i kortet «Signalstyrke», som i tabellen i oversikten. 3 av 3 som før. */
+:where(.side-aksje) .sumrad .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
+:where(.side-aksje) .noekkeltall .styrken.pille { display: inline-block; padding: 0 12px; border-radius: 999px; white-space: nowrap; }
+:where(.side-aksje) .noekkeltall .styrken.to-av-tre { border: 2px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
+:where(.side-aksje) .noekkeltall .styrken.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+:where(.side-aksje) .noekkeltall .styrken.tre-av-tre .av { color: var(--hvit); }
 /* Story 8.2b, c (U62, U63): innledningen og forklaringen i kortet Retning. */
 :where(.side-aksje) p.innledning { max-width: 640px; font-size: 17px; line-height: 1.55; color: var(--tekst); margin: 0.4rem 0 24px; }
 :where(.side-aksje) .kursserien { margin: 0 0 12px; color: var(--dempet); font-size: 13.5px; }

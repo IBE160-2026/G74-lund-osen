@@ -464,7 +464,8 @@ def test_ki_delen_heter_navnet_kort_fortalt(klient):
     assert tittel.startswith('<span id="ki-tittel">Signalet forklart</span> ')
     assert "kort fortalt" not in html
     assert 'popovertarget="hjelp-ki"' in tittel
-    assert '<p class="merke-ki">Laget av KI · ' in ki
+    # Story 8.20a (del D): modellen står i en egen linje under teksten.
+    assert '<p class="merke-ki">Laget av KI.' in ki
     assert "Med KI-ens ord" not in html
     assert 'id="hjelp-ki"' in html
 

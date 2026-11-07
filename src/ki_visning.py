@@ -143,6 +143,32 @@ def prikkede_tall(tekst: str) -> Markup:
     return Markup("").join(deler)
 
 
+# Story 8.20a (U88, gruppens svar 07.11 kl. 12:32, 4): navnet paa hver sjekk
+# med fet skrift første gang det staar i teksten, som i skissen
+# aksjesiden-ki-paa.png. Ubestemt og bestemt form, med stor eller liten
+# forbokstav, som versjon 5 skriver dem («Trenden ga …»).
+SJEKKNAVN = re.compile(r"\b(trenden|trend|bevegelsen|bevegelse|interessen|interesse)\b", re.IGNORECASE)
+
+
+def ki_tekst(tekst: str) -> Markup:
+    """Teksten med tallene som i prikkede_tall og navnet paa hver sjekk i
+    <strong> første gang det staar. Ingenting i teksten endres: et navn som
+    staar inni et tall eller et ord, blir ikke fett."""
+    deler = []
+    forrige = 0
+    sett = set()
+    for treff in SJEKKNAVN.finditer(tekst):
+        sjekk = treff.group().lower()[:5]
+        if sjekk in sett:
+            continue
+        sett.add(sjekk)
+        deler.append(prikkede_tall(tekst[forrige : treff.start()]))
+        deler.append(Markup("<strong>") + escape(treff.group()) + Markup("</strong>"))
+        forrige = treff.end()
+    deler.append(prikkede_tall(tekst[forrige:]))
+    return Markup("").join(deler)
+
+
 def ki_paa(kapsel: str | None) -> bool:
     """Bryteren: paa naar kapselen mangler eller sier paa (FR-601)."""
     return kapsel != AV

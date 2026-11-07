@@ -242,7 +242,8 @@ class TestTallene:
         2, som i oversikten (gjennomgangen, BH4). Story 8.2b, b (U16): det
         står i hjelpen ved «?», ikke i ingressen."""
         html = _side(klient, f"/aksje/{SYMBOL}")
-        setning = "Tallene for uka og måneden teller dagene med signalstyrke 2 eller mer, som i oversikten"
+        # Story 8.20a (del E): høyst 60 ord i vinduet, med samme terskel.
+        setning = "Uka og måneden teller dagene med signalstyrke 2 eller mer"
         assert setning not in _tekst(_avsnittet(html))
         vinduet = html.split('<div id="hjelp-historikk"', 1)[1].split('<div id="hjelp-', 1)[0]
         assert setning in _tekst(vinduet)
