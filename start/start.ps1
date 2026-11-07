@@ -78,12 +78,58 @@ function Er-OseSignal([string]$Kommandolinje) {
         ($Kommandolinje -match '(^|\s)app:app(\s|$)')
 }
 
+# Gruppens svar 07.11 kl. 11:47: etter Windows-oppdateringen 29.10 melder
+# Windows tilstanden til en lytter feil av og til, også i netstat, og ofte
+# mangler raden der. Her kjennes lytteren på lokal port 8000 og fjernadressen
+# 0.0.0.0:0 eller [::]:0, uansett tilstand. netstat startes gjennom .NET med
+# full sti, fordi PowerShell ikke kjører en .exe når PATHEXT mangler.
+function Netstat-Lyttere {
+    $linjer = @()
+    try {
+        $start = New-Object System.Diagnostics.ProcessStartInfo((Join-Path $env:SystemRoot 'System32\NETSTAT.EXE'), '-ano')
+        $start.RedirectStandardOutput = $true
+        $start.UseShellExecute = $false
+        $start.CreateNoWindow = $true
+        $netstat = [System.Diagnostics.Process]::Start($start)
+        $linjer = @($netstat.StandardOutput.ReadToEnd() -split "`r?`n")
+        $netstat.WaitForExit()
+    } catch { }
+    Lyttere-I-Netstat $linjer
+}
+
+function Lyttere-I-Netstat([string[]]$Linjer) {
+    # Prosessene i linjene fra netstat -ano med lokal port 8000 og
+    # fjernadressen 0.0.0.0:0 eller [::]:0. Tilstanden leses ikke.
+    $ider = foreach ($linje in $Linjer) {
+        $deler = @("$linje".Trim() -split '\s+')
+        if ($deler.Count -ge 4 -and $deler[0] -eq 'TCP' -and $deler[1] -match ':8000$' -and
+            $deler[2] -match '^(0\.0\.0\.0|\[::\]):0$' -and $deler[-1] -match '^[1-9]\d*$') {
+            [int]$deler[-1]
+        }
+    }
+    @($ider | Select-Object -Unique)
+}
+
 function Lyttere {
     # Prosessene som lytter på port 8000, med navn og kommandolinje.
     $ider = @()
     try {
         $ider = @(Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction Stop | Select-Object -ExpandProperty OwningProcess -Unique)
     } catch { }
+    # Svaret 07.11 kl. 11:47: ser ikke Get-NetTCPConnection lytteren, spør
+    # netstat, opptil fem ganger med et halvt sekund imellom. Før netstat
+    # spørres Get-NetTCPConnection uten tilstand, etter raden med fjernport 0:
+    # 30 av 30 ganger 07.11, mot 0 og 4 av 30 for netstat (spørsmål 3 i
+    # spesifikasjonen for 2.16).
+    for ($i = 0; $ider.Count -eq 0 -and $i -lt 5; $i++) {
+        if ($i -gt 0) { Start-Sleep -Milliseconds 500 }
+        try {
+            $ider = @(Get-NetTCPConnection -LocalPort 8000 -ErrorAction Stop |
+                Where-Object { $_.RemotePort -eq 0 -and $_.RemoteAddress -in @([System.Net.IPAddress]::Any.ToString(), [System.Net.IPAddress]::IPv6Any.ToString()) -and $_.OwningProcess -gt 0 } |
+                Select-Object -ExpandProperty OwningProcess -Unique)
+        } catch { $ider = @() }
+        if ($ider.Count -eq 0) { $ider = @(Netstat-Lyttere) }
+    }
     foreach ($id in $ider) {
         $prosess = $null
         try { $prosess = Get-CimInstance Win32_Process -Filter "ProcessId=$id" -ErrorAction Stop } catch { }

@@ -724,6 +724,73 @@ def test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten(tmp_path, hvem):
         _stopp_lytteren(lytter)
 
 
+def _funksjonen_i_start_ps1(navn: str) -> str:
+    """Funksjonen navn i start.ps1, til foerste } paa egen linje."""
+    tekst = SKRIPTENE["start.ps1"].read_text(encoding="utf-8-sig").replace("\r\n", "\n")
+    start = re.search(rf"^function {re.escape(navn)}[ (]", tekst, re.MULTILINE).start()
+    return tekst[start : tekst.index("\n}\n", start) + 3]
+
+
+def _powershell(kommando: str) -> str:
+    systemrot = os.environ["SYSTEMROOT"]
+    powershell = Path(systemrot) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe"
+    svar = subprocess.run(
+        [str(powershell), "-NoProfile", "-NonInteractive", "-Command", kommando],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=120,
+    )
+    assert svar.returncode == 0, svar.stdout + svar.stderr
+    return svar.stdout.strip()
+
+
+# Story 2.16, gruppens svar 07.11 kl. 11:47: linjene fra netstat -ano 07.11,
+# med en lytter som Windows meldte som FIN_WAIT_1, og linjer som ikke er en
+# lytter paa port 8000.
+NETSTAT_LINJENE = [
+    "  Proto  Local Address          Foreign Address        State           PID",
+    "  TCP    127.0.0.1:8000         0.0.0.0:0              FIN_WAIT_1      21164",
+    "  TCP    127.0.0.1:8000         127.0.0.1:51000        ESTABLISHED     777",
+    "  TCP    127.0.0.1:51000        127.0.0.1:8000         ESTABLISHED     778",
+    "  TCP    127.0.0.1:18000        0.0.0.0:0              LISTENING       555",
+    "  TCP    [::]:8000              [::]:0                 LISTENING       666",
+    "  TCP    127.0.0.1:8000         0.0.0.0:0              LISTENING       0",
+    "  UDP    0.0.0.0:8000           *:*                                    888",
+]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
+def test_start_ps1_kjenner_lytteren_i_netstat_uansett_tilstand():
+    """Story 2.16, svaret 07.11 kl. 11:47. Ville feilet hvis linjene ble lest
+    etter tilstanden LISTENING (mutanten), saa lytteren med FIN_WAIT_1 ble
+    borte, eller hvis en tilkobling, en annen port, UDP eller prosess 0 ble
+    tatt med."""
+    linjene = "@(" + ", ".join(f"'{linje}'" for linje in NETSTAT_LINJENE) + ")"
+    ut = _powershell(_funksjonen_i_start_ps1("Lyttere-I-Netstat") + f"\n(Lyttere-I-Netstat {linjene}) -join ','")
+    assert ut == "21164,666"
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
+def test_start_ps1_finner_lytteren_naar_tilstanden_er_feil():
+    """Story 2.16, svaret 07.11 kl. 11:47. Get-NetTCPConnection gir ingenting
+    med -State Listen, men raden uten tilstand har fjernport 0, slik Windows
+    meldte lytteren 07.11. Ville feilet hvis Lyttere bare spurte med -State
+    Listen og netstat (mutanten), eller tok med tilkoblingen til porten."""
+    late = (
+        "function Get-NetTCPConnection { param($LocalPort, $State, $ErrorAction)\n"
+        "  if ($State) { return }\n"
+        "  [pscustomobject]@{ LocalPort = 8000; RemoteAddress = '0.0.0.0'; RemotePort = 0; OwningProcess = 4242 }\n"
+        "  [pscustomobject]@{ LocalPort = 8000; RemoteAddress = '127.0.0.1'; RemotePort = 51000; OwningProcess = 999 }\n"
+        "}\n"
+        "function Get-CimInstance { }\n"
+        "function Netstat-Lyttere { @() }\n"
+    )
+    ut = _powershell(late + _funksjonen_i_start_ps1("Lyttere") + "\n(Lyttere | ForEach-Object { $_.Id }) -join ','")
+    assert ut == "4242"
+
+
 def _lsof():
     return shutil.which("lsof") or ("/usr/sbin/lsof" if Path("/usr/sbin/lsof").exists() else None)
 
