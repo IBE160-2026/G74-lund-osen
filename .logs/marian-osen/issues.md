@@ -136,3 +136,5 @@
 - [x] 2026-11-07 [boerskalenderen-for-alle-aar](961-2026-11-07-15-21-55-boerskalenderen-for-alle-aar.md) — BH10: vinduet ved dobbeltklikket nevner ikke en konto hos EODHD fra før (utsatt til 3.4h eller 8.20a) (løst 2026-11-07: `5bc2689c` på grenen for 8.20a, PR #118)
 - [x] 2026-11-07 [aksjesiden-og-periodevalget-8-20a](960-2026-11-07-17-29-10-aksjesiden-og-periodevalget-8-20a.md) — PR #118 (8.20a) venter på flettingen; ingen funn på middels eller over er åpne (løst 2026-11-07: flettet i `427a1de2`)
 - [x] 2026-11-07 [aksjesiden-og-periodevalget-8-20a](960-2026-11-07-17-29-10-aksjesiden-og-periodevalget-8-20a.md) — de avviste lave funnene i triagen for 8.20a (blant annet BH9, lappen øverst på streken) kan tas opp med 8.20b (besvart 2026-11-07: BH9 tas med 8.20b etter instruksjonen kl. 18:04)
+- [ ] 2026-11-07 [boersometeret-8-20b](959-2026-11-07-19-38-11-boersometeret-8-20b.md) — PR #119 (8.20b) venter på gruppens svar på spørsmål 1: BH9, børsometeret ved 390 px er 3327 px høyt (middels, åpent etter regel 25)
+- [ ] 2026-11-07 [boersometeret-8-20b](959-2026-11-07-19-38-11-boersometeret-8-20b.md) — 3.4h bygges i natt, etter svaret kl. 17:36
