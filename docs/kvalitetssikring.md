@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-07T12:59
+updated: 2026-11-07T13:12
 ---
 
 # Kvalitetssikring
@@ -205,6 +205,8 @@ Windows. Grunnen står i skip-meldingen: «time.tzset finnes ikke her (Windows);
 TZ-testene kjoeres i CI». I CI på Linux kjører de (story 2.1, spinen AD-20).
 
 *Oppdatert 2026-10-17:* 17 hoppes over på Windows: de 16 over, og 1 i `tests/test_ingen_nettverk.py` med grunnen «AF_UNIX finnes ikke i Python paa Windows» (story 4.0, `dc43569`). Talt med `uv run pytest -rs` på grenen for story 9.1 17.10, med samme tester som `3699a16` (spesifikasjonen `S/spec-9-1-kvalitetssikringen-oppdateres.md`).
+
+*Oppdatert 2026-11-07:* 24 hoppes over på Windows, talt med `uv run pytest -rs` på `efc685f0` 07.11 kl. 13:00:40–13:11:44, alene og uten Ollama (4329 bestått, og bare de 7 porttestene for `start.ps1` feilet). 16 i `tests/test_fetch_prices.py` (14 og 2) med grunnen «time.tzset finnes ikke her (Windows); TZ-testene kjoeres i CI», som over. 1 i `tests/test_ingen_nettverk.py` med grunnen «AF_UNIX finnes ikke i Python paa Windows», som over. 7 i `tests/test_dobbeltklikk.py` med grunnen «krever bash, lsof og ps»: de 3 tilfellene av `test_start_sh_stopper_bare_den_andre_versjonen_paa_porten` (story 3.5d, `5e01a4f5`, PR #94) og de 4 av `test_start_sh_frigjoer_porten_rett_foer_webserveren` (story 3.5e, `dbfa0b97`, PR #100). De prøver `start.sh` og hopper over på Windows.
 
 ### Nettsperren
 
