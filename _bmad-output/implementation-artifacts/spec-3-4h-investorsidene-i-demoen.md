@@ -2,7 +2,7 @@
 title: 'Story 3.4h: Investorsidene i demoen, og boblen nederst på aksjesiden'
 type: 'feature'
 created: '2026-11-07'
-status: 'draft'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a8a4e725'
 context:
@@ -184,3 +184,5 @@ Investorsiden og aksjesiden med boblen ved 390 og 320 px: tegningen i full bredd
 ## Spørsmål til gruppen før flettingen
 
 Ingen. Ingen funn på middels eller over står åpne.
+
+*Lagt til 2026-11-07:* 3.4h er flettet med PR #120 i `7565651f` kl. 23:33, låst til head-en `c994f368` (main flettet inn), etter instruksjonen kl. 23:27 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42420820179) og på flettecommiten (run 42421144454), med 4562 bestått og 31 hoppet over i jobben `pytest` på flettecommiten. Hele settet lokalt på grenen: 4568 bestått, 24 hoppet over og 0 feilet før `ac0944f9`, og fil for fil 4569 bestått, 24 hoppet over og 0 feilet før `72efb6e8`. U84 har fått en datert linje i `docs/ux-logg.md`, og de 12 mutantene står i vedlegget i `docs/kvalitetssikring.md` (BH7).
