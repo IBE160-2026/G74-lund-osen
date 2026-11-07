@@ -304,7 +304,7 @@ Ingen funn på middels eller over står åpne, og det er ingen spørsmål til gr
 | VG4: ringen for 3 av 3 i tabellen en annen dag var ikke prøvd | middels | rettet: `test_ingen_ring_ved_3_av_3_en_annen_dag` |
 | BH3, ECH6, VG6: grensene under skalaen sto ikke ved overgangene | middels | rettet: ved 20, 40, 60 og 80 % |
 | BH8, ECH8: det verste kartet var ikke prøvd | middels | rettet med `test_det_verste_kartet_faar_plass` (10 aksjer i én bransje, MINSTE_VEKT mot STOERSTE_VEKT). Får kartet likevel ikke plass, står tabellen alene, som før (NFR-03) |
-| BH9: børsometeret ved 390 px er 3327 px høyt, mot 1687, fordi linja med antallet aldri skjules | middels | **åpent, spørsmål 1 til gruppen** (regel 25) |
+| BH9: børsometeret ved 390 px er 3327 px høyt, mot 1687, fordi linja med antallet aldri skjules | middels | lukket 2026-11-07 etter gruppens svar kl. 20:01 på spørsmål 1 (regel 25): slik det er |
 | BH12: regelen for cellene i tabellen ble slettet | middels | avvist: `:where(.side-oversikt) th, td` i `stil.css` gir venstrestilling, luft og strek, som på forsiden |
 | BH2, ECH1: «0 av 0» uten aksjer med endring | lav | rettet |
 | BH16: vinduet for periodene sa ikke at perioden slutter siste børsdag | lav | rettet, innenfor 60 ord |
@@ -327,6 +327,8 @@ Rettingene er i `2aba7d25`. CI var grønn på `54a7cc50` (run 42400409007).
 ## Spørsmål til gruppen før flettingen av 8.20b
 
 1. **BH9: børsometeret ved 390 px er 3327 px høyt (var 1687).** Linja med antallet og snittet skjules aldri (spørsmål 14 d), så hvert felt må være bredt nok til den, og på smal skjerm står bransjene mest under hverandre. *Forslag:* slik det er, fordi svaret var at linja aldri skjules. Alternativet er at snittet står på smal skjerm og antallet bare i tabellen.
+
+*Svar 2026-11-07 kl. 20:01 (gruppens svar):* forslaget i spørsmål 1 er godtatt. Børsometeret står som bygget, også 3327 px høyt ved 390 px, fordi linja med antallet og snittet under hver bransje aldri skjules (spørsmål 14 d). BH9 er dermed besvart og lukket (regel 25). Rådet anbefalte det. Koden er ikke endret. Svaret er ført etter instruksjonen kl. 20:03 i `docs/ai-prompts/2026-11-07.md`.
 
 ## Det som står igjen i 8.20 etter 8.20b
 
