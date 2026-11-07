@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-06T02:01
+updated: 2026-11-07T11:38
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -6044,3 +6044,93 @@ har ordlyden ordrett som siste setning, også YAR, som ble stoppet over. Hver
 tekst er lest mot grunnlaget: hver sjekk er beskrevet slik fortegnet er, eller
 ikke nevnt, og ingen nevner bransjen, børsen, antallet aksjer eller dagene.
 sha256 for `ose.db` var den samme før og etter.
+
+## 56. Prøvekjøringen av prompten versjon 5, for 06.11 (2026-11-07)
+
+**Metode.** Story 10.9 (spesifikasjonen `spec-10-9-ki-teksten-forklarer-det-siden-viser.md`,
+med gruppens svar 06.11 kl. 20:35, 20:38 og 22:05 og 07.11 kl. 08:58): prompten
+versjon 5 ber om én setning per sjekk, med en form for hvert fortegn som sier
+hva sjekken måler og hva den ga, og én setning om tre mønstre appen regner ut
+(`moenstrene.py`): hvor mange av de siste 20 børsdagene signalet hadde hver
+retning, hvor mange av de siste 5 børsdagene aksjen gikk samme vei som
+hovedindeksen, og hvor mange ganger retningen skiftet den siste måneden.
+Grunnlaget har antallene, og kontrollen (FR-603) leser formene for mønstrene med
+tallet ved feltet sitt, ordene om målingen mot fortegnet for sjekken, og stopper
+ord som sier at modellen fant et mønster selv. Prompten hadde avtrykket
+`94856d75…3a83` (`AVTRYKK["5"]`).
+
+Kjørt som §55, fra et skript utenfor repoet, med koden i worktreen for grenen:
+`data/db/ose.db` ble åpnet med `mode=ro`, og ingenting ble skrevet. Grunnlaget
+med mønstrene ble regnet på nytt fra basen med `_grunnlagene` i `ki_tekst.py`,
+den samme veien som kveldshentingen, fordi grunnlaget i `ki_logg` er fra versjon
+3. Dagen er siste børsdag i basen, 06.11, for de 15 aksjene med vurdering. Hvert
+grunnlag gikk gjennom `lag_ki_rad` med Gemma i Ollama (modellen, prompten og
+kontrollen) og så gjennom `bygg_ki_visning` med vurderingen fra basen (samsvaret
+i FR-602 og vakta). Tekstene står bare i scratchpad. Tiden per kall ble tatt med
+`time.monotonic()`. Ingen kall til EODHD utover kvotesjekken kl. 10:38. sha256
+for `data/db/ose.db` var den samme før og etter (`cf1aace4…7228`).
+
+Klassene er de tre fra spørsmål 9 i spesifikasjonen 10.9 (godtatt 07.11 kl.
+08:58): «forklarer sjekkene» (hver sjekk med vanlige ord), «forklarer mønstrene»
+(setningen om mønstrene er med og stemmer) og «usikker». En tekst kan ha begge
+de to første. Klassene er satt av Claude, ved å lese hver tekst ved siden av
+grunnlaget. Klassifiseringen er ikke gjort av en person.
+
+| | §54 rettet, versjon 4, 04.11 | §56, versjon 5, 06.11 |
+|---|---:|---:|
+| Kjørt | 18:29:56–18:30:23 | 11:03:53–11:04:15 |
+| Tekster | 15 | 15 |
+| Besto kontrollen | 15 | 15 |
+| Stoppet av kontrollen | 0 | 0 |
+| Modellen feilet | 0 | 0 |
+| Ville blitt vist (samsvar og vakta) | 15 | 15 |
+| Mønster 1 gitt (minst 10 vurderte av 20) | – | 15 |
+| Mønster 2 gitt (minst 3 av 5 kunne telles) | – | 15 |
+| Mønster 3 gitt (minst ett par på rad i måneden) | – | 15, ingen med «minst» |
+| forklarer sjekkene | – | 15 |
+| forklarer mønstrene | – | 15 |
+| usikker | – | 0 |
+| Klassene i versjon 4 (`spec-10-4-loggdelen.md`) | 0 gjentar, 15 sier mer | – |
+| Median tid per tekst | 0,93 s | 1,43 s |
+| Lengste kall | 14,08 s (kall nr. 1) | 2,18 s (kall nr. 1, Ollama startet kl. 11:00:10 og varmet opp av demotekstene) |
+
+§56: `maskinvare` `gpu` for alle 15, `gemma4:e4b` med `modell_id`
+`dc35e8d9c606`, og Ollama 0.35.1. Alle 15 radene har `promptversjon` 5.
+Hovedindeksen falt 06.11, og ordlyden var «samme vei» for 13 aksjer og «motsatt
+vei» for 2.
+
+**Resultat.** Alle 15 besto og ville blitt vist, og kontrollen stoppet ingen, så
+det er ingen grunner å føre. Alle 15 fikk alle tre mønstrene: basen har
+vurderinger for alle 20 børsdagene i vinduet, kurs og indeks for de siste 5, og
+alle børsdagene i måneden, så ingen fikk «minst». Hver tekst er lest mot
+grunnlaget: hver sjekk er beskrevet med formen for fortegnet, også ordene om
+målingen, alle tallene i setningen om mønstrene står ved riktig felt, og ingen
+gir råd, gjetter på en årsak, sier hva mønstrene betyr for kursen videre eller
+nevner bransjen, børsen eller antallet aksjer. Alle 15 er «forklarer sjekkene»
+og «forklarer mønstrene», mot «sier mer» for alle 15 i §54, der det nye bare var
+ordlyden om hovedindeksen.
+
+Formene i prompten er brukt nesten ordrett, så tekstene er like for aksjer med
+de samme fortegnene, og forskjellen ligger i tallene i mønstrene. Alle 15 har
+ordlyden om hovedindeksen som egen setning foran setningen om mønstrene, og
+setningen om mønstrene er én setning i alle 15. 11 skriver «siste» foran tallet
+20 med «vurderte», og 4 uten «siste». 1 tar ikke med vinduet på 5 børsdager
+etter dagene som kunne telles. Kontrollen godtar begge, fordi tallene står ved
+feltet sitt.
+
+**Demotekstene.** Den første versjonen av prompten ga eksempelet «…, så trenden
+ga …» for sjekkene, mot regelen fra versjon 2 om «fordi». Gemma skrev begge, og
+4 av 13 demotekster ble stoppet av kontrollen («så trenden ga et negativt utslag
+fordi trenden ikke ga utslag» med trend -1). To av dem som besto, sa noe om
+handelen som ikke stemte med fortegnet for interessen (at det ikke ble handlet
+mer enn vanlig med interessen -1, og at det ble handlet mer enn vanlig med
+interessen 0), fordi kontrollen ikke leste målingen.
+Prompten fikk derfor én form per sjekk og fortegn, med «fordi» etter utslaget,
+og kontrollen leser ordene om målingen mot fortegnet (del F). Demotekstene ble
+laget på nytt kl. 11:03 med avtrykket over: 13 av 13 besto, og hver setning om en
+sjekk stemmer med fortegnet. Det er demotekster, oppdiktede selskaper, og de
+står i `src/demo_ki_tekster.json`.
+
+Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15.
+Tellingen for 10.4 gjøres med klassene over etter de første fem kveldene med
+versjon 5 i driften (spørsmål 9), i en ny del av `spec-10-4-loggdelen.md`.

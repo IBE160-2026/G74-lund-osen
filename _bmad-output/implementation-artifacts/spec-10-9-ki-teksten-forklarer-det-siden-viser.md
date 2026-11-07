@@ -2,7 +2,7 @@
 title: 'Story 10.9: KI-teksten forklarer det siden viser, med promptversjon 5 og tre mønstre appen regner ut'
 type: 'feature'
 created: '2026-11-07'
-status: 'draft'
+status: 'in-review'
 route: 'dispatch'
 baseline_commit: 'c411cc5d'
 context:
@@ -122,3 +122,49 @@ Ny telling for 10.4 etter de første kveldene med versjon 5, med klassene i spø
 - Ingen tekst fra den ekte versjonen ordrett i sporede filer (regel 16).
 - Bygges på egen gren og flettes bare ferdig og grønn, før UX-rettingene fra 06.11 (svaret kl. 22:05).
 - En mutant per del, med kopi før og sha256 mot HEAD etter.
+
+## Bygget 07.11 (instruksjonen kl. 10:38)
+
+Bygget på grenen `10-9-ki-teksten-forklarer-det-siden-viser`, i worktreen `G74-lund-osen-10-9`, fra `7c55913d`. Koden er i `ba685331`. Ingen migrasjon: grunnlaget lagres som et JSON-objekt (`0005_ki_logg.sql`), og mønstrene regnes av lagrede rader.
+
+**Slått opp 07.11, og avvik fra delene over:**
+- *Del E, grunnen til versjon 5.* Delen sier at `ose.db` har tekster med versjon 4. Det stemmer ikke: `ki_logg` hadde bare `promptversjon` 3 til og med 06.11 (lest med `mode=ro` 07.11), og de første med versjon 4 kommer med hentingen 09.11 (Utført-linja kl. 00:27 07.11). Versjonen er likevel 5, fordi versjon 4 er flettet, og fra 26.10 gir enhver endring i prompten en ny versjon (svaret 25.10 kl. 20:54 b, i `ki_prompt.py`). Docstringen sier det.
+- *Del E, formene for sjekkene.* Prompten gir én form per sjekk og fortegn, med «fordi» etter utslaget, som regelen fra versjon 2. Den første versjonen ga ett eksempel med «så», og 4 av 13 demotekster ble stoppet fordi Gemma skrev begge (§56 i `malinger.md`).
+- *Del F, målingen.* Kontrollen leser også ordene om målingen («kursen ligger over snittet», «det ble ikke handlet mye mer enn vanlig») mot fortegnet (`_maalingene`). To demotekster i den første kjøringen besto med feil om handelen.
+- *Del F, mønstrene.* Formene i prompten leses med tallet ved feltet sitt, ikke bare som «et av tallene i mønstrene», og tas ut av teksten før resten av kontrollen leser den. Antallene er i `ANTALLENE`, som delen sier. Vinduet 5 er lovlig bare når grunnlaget har mønster 2, og et feltnavn eller en plassholder fra prompten i teksten stoppes.
+- *Del D.* Hjelpen er tre setninger og 60 ord med tittelen, telt med `\w+`. Nøkkelen er `signalet_forklart` i stedet for `ki_kort_fortalt`. At teksten ikke gir råd, står i `docs/hjelp.md` (spørsmål 10).
+- *Spørsmål 16 i 8.20* sier at de fete navnene på sjekkene i KI-teksten hører til 10.9. Denne spesifikasjonen har dem ikke, og de er ikke bygget. Spørsmål til gruppen under.
+- *Testnavn.* `test_ki_delen_heter_navnet_kort_fortalt` og `test_med_ki_av_staar_bare_bryteren` har fått nytt innhold etter del C, men navnet står, fordi `docs/kvalitetssikring.md` og spesifikasjonen 8.2b viser til det første.
+
+**Tester («Ville feilet hvis» i hver):** del A i `tests/test_ki_visning.py` (`TestSetningenOmDagene`, med `test_foerste_dag_i_rekka` og `test_aaret_staar_naar_datoen_er_fra_et_annet_aar`), delene B–H i den nye `tests/test_ki_teksten_forklarer.py`. Testen for 60 ord gjelder vinduet ved rammen; de andre vinduene rettes i 8.20a.
+
+**Hele settet,** alene og uten Ollama: kl. 11:14:27–11:24:19, 4295 bestått, 24 hoppet over, 7 feilet: 3 porttester for `start.ps1` og 4 som ventet den gamle rammen (`test_demoproeven.py`, `test_funnene_8_2b.py` to, og navnet i `test_kvalitetssikring.py`). De ble rettet, og settet kjørt på nytt kl. 11:25:27–11:35:29: 4297 bestått, 24 hoppet over, og bare 5 porttester for `start.ps1` feilet.
+
+## Mutantene
+
+Én per del, på `ba685331`, med kopi før og sha256 mot HEAD etter. Alle åtte ble fanget, og hver fil var lik HEAD etterpå.
+
+| Del | Mutant | Fanget av |
+|---|---|---|
+| A | `foerste_dag_i_rekka` går én børsdag for langt tilbake | 7 tester i `test_ki_visning.py` |
+| B | en dag med hull telles i mønster 2 | `test_en_dag_med_hull_telles_ikke` |
+| C | appens setninger tatt ut av rammen | 23 tester |
+| D | hjelpen ved rammen får en setning til | `test_hjelpen_ved_rammen_har_hoeyst_60_ord` |
+| E | linja om én setning per sjekk tatt ut av prompten | 3 tester, også `test_versjonen_foelger_teksten` |
+| F | tallet ved feltet sjekkes ikke i mønster 1 | 2 tester i `TestKontrollen` |
+| G | demotekstene med versjon 4 tilbake | `test_demotekstene_har_versjon_5_og_moenstrene` |
+| H | grunnlaget kontrollerer ikke mønstrene | 6 tester i `TestGrunnlaget` |
+
+## Demotekstene før og etter
+
+Laget på nytt med Gemma kl. 11:03 (13 av 13 besto). Tre av de 13, fra `src/demo_ki_tekster.json` (oppdiktede selskaper):
+
+- **BRFE** (alle tre negative). Før: «Signalet er Negativt fordi trenden ga et negativt utslag, bevegelsen ga et negativt utslag, og interessen ga et negativt utslag. Aksjen gikk samme vei som hovedindeksen.» Etter: «Trenden ga et negativt utslag fordi kursen ligger under snittet for de siste 50 børsdagene. Bevegelsen ga et negativt utslag fordi kursen falt mer i dag enn den vanligvis svinger de siste 20 dagene. Interessen ga et negativt utslag fordi det ble handlet mer enn vanlig på en dag kursen falt. Aksjen gikk samme vei som hovedindeksen. Av de 15 vurderte børsdagene var signalet positivt 10, negativt 2, blandet 2 og uten retning 1. Aksjen gikk samme vei som hovedindeksen 2 av de 5 dagene som kunne telles av de siste 5 børsdagene, og den siste måneden skiftet retningen minst 5 ganger.»
+- **SLVP** (retningen Ingen). Før: «Signalet har ingen retning fordi trenden ikke ga utslag, bevegelsen ikke ga utslag og interessen ikke ga utslag. Aksjen gikk motsatt vei av hovedindeksen.» Etter: «Trenden ga ikke utslag fordi kursen ligger nær snittet for de siste 50 børsdagene. Bevegelsen ga ikke utslag fordi dagens endring ikke var stor sammenlignet med de siste 20 dagene. Interessen ga ikke utslag fordi det ikke ble handlet mye mer enn vanlig. Signalet har ingen retning. Av de 15 vurderte børsdagene var signalet positivt 3, negativt 9, blandet 1 og uten retning 2. Aksjen gikk samme vei som hovedindeksen 3 av de 5 dagene som kunne telles av de siste 5 børsdagene, og den siste måneden skiftet retningen minst 8 ganger.»
+- **KVST** (alle tre positive). Før: «Signalet er Positivt fordi trenden ga et positivt utslag, bevegelsen ga et positivt utslag, og interessen ga et positivt utslag. Aksjen gikk motsatt vei av hovedindeksen.» Etter: «Trenden ga et positivt utslag fordi kursen ligger over snittet for de siste 50 børsdagene. Bevegelsen ga et positivt utslag fordi kursen steg mer i dag enn den vanligvis svinger de siste 20 dagene. Interessen ga et positivt utslag fordi det ble handlet mer enn vanlig på en dag kursen steg. Aksjen gikk motsatt vei av hovedindeksen. Av de 15 vurderte børsdagene var signalet positivt 3, negativt 5, blandet 1 og uten retning 6, aksjen gikk samme vei som hovedindeksen 1 av de 4 dagene som kunne telles av de siste 5 børsdagene, og den siste måneden skiftet retningen minst 11 ganger.»
+
+I demoen er alle mønster 3 «minst», fordi måneden før 09.10 begynner før vurderingene i demoen (21.09).
+
+**Bildet** av aksjesiden i `docs/appen/` er tatt på nytt, 1280 × 2345, til bunnen av rammen. De seks andre bildene ble tatt på nytt og er byte for byte de samme. Bildene ble tatt med DevTools-protokollen i Edge uten vindu (`Page.captureScreenshot`), som ga de seks byte for byte like.
+
+**Prøvekjøringen** står i §56 i `malinger.md`: 15 av 15 besto, alle med alle tre mønstrene.
