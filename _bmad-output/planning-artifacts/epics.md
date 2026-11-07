@@ -613,6 +613,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Lagt til 2026-11-07 (svaret kl. 10:33 under story 8.20):* rekkefølgen er 10.9, 8.20c, 8.20a, 3.4h og 8.20b, fordi README-prøven er et suksessmål i briefen. Det endrer rekkefølgen i linja over, der UX-rettingene kom samlet etter 10.9.
 
+*Avgjort 2026-11-07 kl. 17:36 (gruppens svar):* 8.20b bygges før 3.4h, så den blir ferdig før kl. 21:00, og 3.4h bygges i natt; brukertesten trenger 8.20a og 8.20b, ikke investorsidene. Det endrer rekkefølgen i svaret kl. 10:33 (spørsmål 21). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -4304,6 +4306,8 @@ NFR-08, `AD-10`
 *Lagt til 2026-11-07 (svaret kl. 12:32 under story 10.9, svar 4):* de fete navnene på sjekkene i KI-teksten (spørsmål 16) bygges i 8.20a, med resten av utseendet på aksjesiden; spesifikasjonen for 10.9 har dem ikke.
 
 *Lagt til 2026-11-07 (svaret kl. 15:34 under story 2.16, svar 2):* for spørsmål 18 står «utenfor børskalenderen, som begynner i 2026», ikke «som bare har 2026», fordi kalenderen fra 2.16 ikke har noe siste år. «ikke vurdert» står som før.
+
+*Avgjort 2026-11-07 kl. 17:36 (gruppens svar):* 8.20b bygges før 3.4h, så den blir ferdig før kl. 21:00, og 3.4h bygges i natt; brukertesten trenger 8.20a og 8.20b, ikke investorsidene. Det endrer rekkefølgen i svaret kl. 10:33 (spørsmål 21). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`.
 
 ---
 
