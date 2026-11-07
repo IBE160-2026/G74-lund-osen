@@ -265,3 +265,5 @@ Avtrykkene settes på nytt med en kommentar, som før.
 Rettingene er i `4cfdff78`. Hele settet alene før den, 17:16:51–17:25:03, med ledig minne 4,3 GB av 15,7 GB: 4440 bestått, 24 hoppet over og 0 feilet. Tre mutanter for rettingene, BH11, ECH2 og ECH3, ble fanget, og hver fil var lik HEAD etterpå. Bildene ble tatt på nytt og er byte for byte de samme, og avtrykkene er satt på nytt. CI var grønn på `32648845` (run 42389466402).
 
 Ingen funn på middels eller over står åpne, og det er ingen spørsmål til gruppen før flettingen utover avvisningene over.
+
+*Lagt til 2026-11-07:* 8.20a er flettet med PR #118 i `427a1de2` kl. 18:09, låst til head-en `8f740b7e` (main flettet inn), etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42394650968) og på flettecommiten (run 42394909599), med 4433 bestått og 31 hoppet over i jobben `pytest` begge gangene. Hele settet lokalt før `4cfdff78`: 4440 bestått, 24 hoppet over og 0 feilet. BH9 tas med 8.20b (instruksjonen kl. 18:04).

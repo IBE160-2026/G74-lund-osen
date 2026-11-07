@@ -4309,6 +4309,8 @@ NFR-08, `AD-10`
 
 *Avgjort 2026-11-07 kl. 17:36 (gruppens svar):* 8.20b bygges før 3.4h, så den blir ferdig før kl. 21:00, og 3.4h bygges i natt; brukertesten trenger 8.20a og 8.20b, ikke investorsidene. Det endrer rekkefølgen i svaret kl. 10:33 (spørsmål 21). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`.
 
+*Lagt til 2026-11-07:* 8.20a er flettet med PR #118 i `427a1de2` kl. 18:09, låst til head-en `8f740b7e` (main flettet inn), etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42394650968) og på flettecommiten (run 42394909599), med 4433 bestått og 31 hoppet over i jobben `pytest` begge gangene. Hele settet lokalt før `4cfdff78`: 4440 bestått, 24 hoppet over og 0 feilet. BH9 tas med 8.20b (instruksjonen kl. 18:04).
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
