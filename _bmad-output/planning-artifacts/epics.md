@@ -2497,6 +2497,8 @@ Oppsettet, de 15 tegningene, skriftene og plassen til snakkeboblene står i `doc
 
 *Avgjort 2026-11-06 kl. 23:51 (gruppens svar):* investorsidene med tegningene bygges i demoen, og lenken til investorsiden nederst på aksjesiden går dit i demoen, i samme fane og uten pil.
 
+*Avgjort 2026-11-07 kl. 08:57 (gruppens svar):* lenken til investorsiden er boblen nederst på aksjesiden i begge versjonene, og logoen står bare på demosiden. Det erstatter kortet «Mer om ‹navn›» fra svaret 24.10 kl. 15:21 over. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 09:10 i `docs/ai-prompts/2026-11-07.md`.
+
 ---
 
 ### Story 3.5: Start med dobbeltklikk
@@ -3235,6 +3237,8 @@ så KI-teksten bruker abonnementet jeg har.
 
 *Avgjort 2026-11-06 kl. 22:16 og 22:23 (gruppens svar):* KI-teksten står i rammen «Signalet forklart», med appens setninger først og bryteren fast øverst til høyre, både med KI på og av. Lenken til investorsiden står som en boble nederst, og NewsWeb nevnes ikke. Det endrer beslutningen 06.10 under story 10.5, der aksjedetaljen nevner NewsWeb uten lenke. Svarene og rådets anbefaling er ført etter instruksjonen kl. 00:20 i `docs/ai-prompts/2026-11-07.md`.
 
+*Svar 2026-11-07 kl. 08:58 (gruppens svar):* forslagene i spørsmål 1–10 i [`spec-10-9-ki-teksten-forklarer-det-siden-viser.md`](../implementation-artifacts/spec-10-9-ki-teksten-forklarer-det-siden-viser.md) er godtatt, med ordstillingen «minst siden ‹dato›» i spørsmål 2, ikke «siden minst ‹dato›» som i forslaget. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 09:10 i `docs/ai-prompts/2026-11-07.md`.
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
@@ -3503,6 +3507,8 @@ Som **bruker**, vil jeg se med en gang hvilke aksjer som skiller seg ut, lese hv
 *Lagt til 2026-10-13:* PR 2 flettet i `16e18d8`, PR #36. Begge PR-ene er flettet, og 8.0c er ferdig.
 
 *Avgjort 2026-11-06 kl. 23:07 (gruppens svar):* på aksjesiden ett «?» per kort og del, så «Ga» og «Målt mot» forklares ved «Hvorfor signalet ble …», og hvert hjelpevindu har høyst 60 ord. Det endrer regelen fra 13.10 over, om at hver tekst bak «?» har høyst 3 setninger. Rådet anbefalte begge.
+
+*Rettet 2026-11-07:* linja over sier feil om hvilken regel fra 13.10 svaret kl. 23:07 endrer. Svaret endrer regelen om at hvert «?» står ved det det forklarer (svar 6 i instruksjonen kl. 14:33 i `docs/ai-prompts/2026-10-13.md`, og punkt 6 i [`spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`](../implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md)): på aksjesiden står det nå ett «?» per kort og del. Grensen på 60 ord per hjelpevindu kommer i tillegg til regelen fra 13.10 over om høyst 3 setninger per tekst, som står.
 
 ### Story 8.0e: Oversikten fra designforslaget
 

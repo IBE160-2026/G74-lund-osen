@@ -14,6 +14,8 @@ context:
   - '{project-root}/docs/kilder-og-rettigheter.md'
 ---
 
+*Svar 2026-11-07 kl. 08:58 (gruppens svar):* forslagene i spørsmål 1–10 under er godtatt, med ordstillingen «minst siden ‹dato›» i spørsmål 2, ikke «siden minst ‹dato›» som i forslaget. Rådet anbefalte det. Svaret står også under story 10.9 i `epics.md`.
+
 Utkast, skrevet 07.11 i instruksjonen kl. 00:20 (`docs/ai-prompts/2026-11-07.md`). Ingenting bygges før gruppen har svart på spørsmålene under (regel 9).
 
 ## Spørsmål til gruppen før noe bygges
