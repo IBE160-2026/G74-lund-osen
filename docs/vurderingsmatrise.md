@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-07T13:00
+updated: 2026-11-07T23:49
 ---
 
 # Vurderingsmatrise for del 1
@@ -21,6 +21,22 @@ Status per kriterium for del 1 av mappen i IBE160 høsten 2026: hva vi leverer, 
 **Kilden for kriteriene:** «Sensorveiledning – Del 1» for IBE160 høsten 2026, som gruppen har fått. Den ligger ikke i repoet og er ikke lest i økta som laget matrisen, så ingenting her siteres fra den. Kriteriene og vektene står i instruksjonen 16.10 kl. 00:17 ([`ai-prompts/2026-10-16.md`](ai-prompts/2026-10-16.md)), og de samme sju med de samme vektene står i [tilbakemeldingen på briefen](../_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), del 2.
 
 «Hva vi leverer» bygger på [briefen v8](../_bmad-output/planning-artifacts/product-brief.md) (taggen `arbeidskrav-product-brief-v8`) og [PRD-en](../_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md).
+
+## Status 07.11.2026
+
+Tallene er talt 07.11 kl. 23:36 på `cb6513e4`, slik de ble talt 06.11: 116 flettede pull requests (`gh pr list --state merged`), 46 dagsfiler i `docs/ai-prompts/` og 652 Utført-linjer i dem (linjer som begynner med **Utført:**). Flettet etter tellingen 06.11: PR #116, story 10.9 (`03bd75c7`), PR #117, story 2.16 med 8.20c og porttestene (`a1c67c1a`), PR #118, 8.20a (`427a1de2`), PR #119, 8.20b (`8d89cf8c`), og PR #120, story 3.4h (`7565651f`). PR #117 og #119 stoppet før flettingen med et funn på middels som fulgte av et svar, til svarene kl. 15:34 og 20:01 (regel 25). Hele settet består nå lokalt uten feil: 4387 bestått, 24 hoppet over og 0 feilet på `485850ef`, etter at 2.16 rettet porttestene for `start.ps1`, og på grenen for 3.4h 4568 bestått, 24 hoppet over og 0 feilet før `ac0944f9` og fil for fil 4569 bestått, 24 hoppet over og 0 feilet før `72efb6e8`. CI var grønn på main etter `cb6513e4` (kjøring 42421409498). Storyene er ført som i [sprintstatusen](../_bmad-output/implementation-artifacts/sprint-status.yaml) på `cb6513e4`. Hver celle er sjekket mot main, og hvert testnavn finnes.
+
+| Kriterium (vekt) | Hva vi leverer | Bevis i repoet | Status | Neste tiltak |
+|---|---|---|---|---|
+| **Prosess og KI-styring** (30 %) | Som 06.11. Fem PR-er flettet på én dag, hver etter spesifikasjon med spørsmål, gruppens svar, gjennomgang med tre linser og mutanter. To stoppet før flettingen etter regel 25 | Som 06.11. [`ai-prompts/2026-11-07.md`](ai-prompts/2026-11-07.md). Svarene kl. 08:57, 08:58, 10:33, 15:34 og 20:01 under story 3.4h, 10.9, 8.20 og 2.16 i [epics.md](../_bmad-output/planning-artifacts/epics.md). Oppføringen for 07.11 i [refleksjonsloggen](reflection-log.md) | oppfylt | Holdes ved like: hver instruksjon lagres ordrett med Utført-linje (regel 18) og sesjonslogg (regel 24). Refleksjonsrapporten er ikke skrevet |
+| **Funksjonalitet og omfang** (20 %) | Som 06.11, og KI-teksten som forklarer det siden viser, med promptversjon 5 (10.9), børskalenderen for alle år (2.16), UX-rettingene etter gjennomgangen 06.11 (8.20) og investorsidene i demoen med boblen nederst på aksjesiden (3.4h) | Som 06.11. 10.9: PR #116 (`03bd75c7`) og `tests/test_ki_teksten_forklarer.py::test_demotekstene_har_versjon_5_og_moenstrene`. 2.16: PR #117 (`a1c67c1a`) og `tests/test_vurderingslager.py::TestDatoavvisning::test_2027_skrives`. 8.20: PR #118 (`427a1de2`) og #119 (`8d89cf8c`). 3.4h: PR #120 (`7565651f`) og `tests/test_investorsidene_demo.py::test_hvert_av_de_15_har_sin_side_i_demoen`. Story 10.9, 2.16, 8.20 og 3.4h er done i sprintstatusen | delvis | Story 3.4 (demoversjonen) står i review i sprintstatusen til README-prøven er tatt |
+| **Kvalitetssikring og testing** (15 %) | Som 06.11, og hele settet består nå lokalt uten feil, også porttestene for `start.ps1` | Som 06.11. Testtallene og CI over. Radene for 10.9, 2.16, 8.20 og 3.4h i §3, §5 og vedlegget i [kvalitetssikringen](kvalitetssikring.md). `tests/test_boersdag.py::TestStengteDager::test_regelen_stemmer_med_euronext` | delvis | Målingen av bidraget (story 10.4, in-progress) i del B av [brukertesten](brukertest.md), som ikke er tatt. Tellingen for 10.4 etter de første fem kveldene med versjon 5 i driften |
+| **Design og brukeropplevelse** (10 %) | Som 06.11, og U75–U102 fra gruppens gjennomgang 06.11 i [UX-loggen](ux-logg.md), rettet i 8.20c, 10.9, 8.20a, 8.20b og 3.4h. U77 fikk en datert linje i opplegget for brukertesten, og U91 og U96 er ikke endret, etter svaret kl. 10:33 | Som 06.11. Skissene i [`skisser/2026-11-06/`](skisser/2026-11-06/). De daterte linjene 07.11 nederst i [UX-loggen](ux-logg.md). `tests/test_aksjesiden_8_20a.py::TestToppenOgSummen::test_to_av_tre_har_svart_ring_i_summen_og_kortet` og `tests/test_boersometeret_8_20b.py::TestMaalMotBoersen::test_n_av_m_gikk_bedre_enn_indeksen` | delvis | Brukertesten (story 8.1, ready-for-dev) er ikke tatt, og 8.2 står som in-progress i sprintstatusen. De endelige bildene og videoen i [`appen/`](appen/) |
+| **Kodekvalitet og arkitektur** (10 %) | Som 06.11 | Som 06.11 | oppfylt | Gjennomgangen med tre linser og mutantene fortsetter for hver story |
+| **README og kjørbarhet** (10 %) | Som 06.11 | Som 06.11 | delvis | README-prøven på en ren maskin med ZIP-fila er ikke tatt, og story 3.4 står i review til den er tatt |
+| **Ryddighet i repoet** (5 %) | Som 06.11 | Som 06.11 | oppfylt | Holdes ved like med regel 19 |
+
+Står igjen før innleveringen: brukertesten (story 8.1 og del B for 10.4), tellingen for 10.4 etter fem kvelder med versjon 5, README-prøven på en ren maskin med ZIP-fila, de endelige bildene og videoen, og refleksjonsrapporten.
 
 ## Status 06.11.2026
 

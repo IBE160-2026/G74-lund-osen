@@ -3266,6 +3266,37 @@ Det vi lærte: å velge samme regning som resten av siden lukket rundene, mens h
 
 ---
 
+## 07.11.2026 – Fra skissene og svarene til fem flettede PR-er, og en økt som falt ut
+
+*Joakim og Marian.*
+
+Dagen begynte med skissene fra kvelden før. Vi gikk gjennom skisser av aksjesiden og børsometeret med rådet 06.11 fra kl. 21:15 til 23:55, og kl. 09:24 lå de i `docs/skisser/2026-11-06/` (`a536d8fd`). Kl. 08:57 avgjorde vi at lenken til investorsiden blir en boble nederst på aksjesiden i begge versjonene, og kl. 08:58 godtok vi forslagene i spesifikasjonen for 10.9, KI-teksten som forklarer det siden viser, med én ordstilling endret. Rådet anbefalte begge (`63615ce9`). Så skrev Claude Code spesifikasjonene for 8.20 med 21 spørsmål og for 3.4h med ti, og kl. 10:33 godtok vi forslagene i begge, slik rådet anbefalte (`7c55913d`).
+
+Etter det ble fem PR-er bygget og flettet: 10.9 med promptversjon 5 (#116, `03bd75c7`, kl. 12:55), 2.16 med børskalenderen for alle år, 8.20c og porttestene (#117, `a1c67c1a`, kl. 15:43), 8.20a med aksjesiden og periodevalget (#118, `427a1de2`, kl. 18:09), 8.20b med børsometeret (#119, `8d89cf8c`, kl. 20:08) og 3.4h med investorsidene i demoen og boblen (#120, `7565651f`, kl. 23:33). To av dem stoppet før flettingen med et funn på middels som fulgte av et svar (regel 25): BH1 og ECH1 i 2.16 til svaret kl. 15:34, og BH9 i 8.20b, børsometeret ved 390 px, til svaret kl. 20:01. Porttestene for `start.ps1`, som feilet om morgenen, gikk gjennom etter 2.16, og hele settet ga 4387 bestått, 24 hoppet over og 0 feilet på `485850ef`.
+
+**Utfordringer**
+
+1. **En innliming som allerede var utført.**
+   *Problem:* kl. 17:44 ble instruksjonen kl. 15:59 limt inn en gang til, tegn for tegn lik den første. Den var utført (Utført-linja kl. 17:29), og PR #118 sto åpen og ventet på oss. Natt til 07.11 var også innlimingen kl. 00:03 avkortet: sluttmarkøren og steg 6 manglet.
+   *Løsning:* begge stoppet uten endringer, kl. 17:44 i steg 0 og kl. 00:03 etter regel 1. Den avkortede ble limt inn hel kl. 00:04, og den doble står som en linje i dagsfila, ikke ført på nytt (`36215123`).
+   *KI sin rolle:* Claude Code sammenlignet blokkene maskinelt og stoppet. Steg 0 i instruksjonene fanget det, fordi de sier hva som skal være sant før noe gjøres.
+
+2. **Minnet tok slutt under testene.**
+   *Problem:* under 3.4h ga hele settet fra kl. 20:43 4549 bestått, 24 hoppet over og 19 feilet. 17 av dem var ikke feil i koden: ruff og git startet ikke, fordi minnet var nesten brukt opp (0xC0000142). De 2 andre ventet fotnoten som 3.4h fjernet, og ble rettet.
+   *Løsning:* settet ble kjørt alene på nytt kl. 21:03–21:15 med 3,9 GB ledig av 15,7 GB, og ga 4568 bestått, 24 hoppet over og 0 feilet. Etter gjennomgangen var det 2,8 GB ledig, så settet ble kjørt fil for fil, 62 filer, til sammen 4569 bestått, 24 hoppet over og 0 feilet.
+   *KI sin rolle:* Claude Code skilte feilene som kom av minnet, fra de to som var ekte, og instruksjonen kl. 20:57 ba om fil for fil ved for lite minne.
+
+3. **Økta falt ut.**
+   *Problem:* kl. 20:53, etter sluttmeldingen om kjøringen over, falt Claude Code ut før svaret, med endringene for 3.4h ikke committet i worktreen.
+   *Løsning:* instruksjonen kl. 20:57 fortsatte fra stoppen, med steg 0 som sjekket at steg 1 var pushet og at endringene sto i worktreen. Tallene fra økta som falt ut, ble slått opp i transkripsjonen og ført som en linje i dagsfila (`e9bead13`).
+   *KI sin rolle:* den nye økta hadde bare det repoet, dagsfila og transkripsjonen viste. Det var nok, fordi hver instruksjon og stopp står i dagsfila.
+
+Det samme gjaldt dokumenttestene tidligere på dagen: `beb944c1` ble pushet med to feilende dokumenttester, fordi skriptet for testene ikke stoppet ved feil, og radene for 10.9 ble ført i `91f72695`.
+
+Det vi lærte: steg 0 og sluttmarkøren stoppet begge innlimingene før noe ble gjort. Når hele settet feiler, må det sjekkes om feilene kommer fra koden eller fra maskinen, og fil for fil gir et svar også med lite minne. Og fordi hver instruksjon og hver stopp står i dagsfila, kunne en ny økt ta over midt i en story.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
