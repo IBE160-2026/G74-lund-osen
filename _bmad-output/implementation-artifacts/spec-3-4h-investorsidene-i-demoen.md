@@ -14,6 +14,8 @@ context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-10-5-investorsiden.md'
 ---
 
+*Svar 2026-11-07 kl. 10:33 (gruppens svar):* forslagene i spørsmål 1–10 under er godtatt, og teksten nederst på investorsiden blir «Oppdiktet selskap i demoen. I den ekte versjonen åpner lenken på aksjesiden selskapets egen investorside i en ny fane.», fordi kortet ble en boble 07.11 kl. 08:57. Rådet anbefalte begge. Svaret står også under story 3.4h i `epics.md`, ført etter instruksjonen kl. 10:38 i `docs/ai-prompts/2026-11-07.md`.
+
 Utkast, skrevet 07.11 i instruksjonen kl. 09:45 (`docs/ai-prompts/2026-11-07.md`). Ingenting bygges før gruppen har svart på spørsmålene under (regel 9).
 
 ## Spørsmål til gruppen før noe bygges

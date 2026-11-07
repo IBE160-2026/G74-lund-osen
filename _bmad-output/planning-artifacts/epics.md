@@ -611,6 +611,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Lagt til 2026-11-07 (svaret 06.11 kl. 22:05 under story 10.9):* rekkefølgen er story 10.9, KI-teksten forklarer det siden viser, så UX-rettingene fra gruppens gjennomgang 06.11 (U75–U102 i `docs/ux-logg.md`). Rådet anbefalte UX-rettingene først.
 
+*Lagt til 2026-11-07 (svaret kl. 10:33 under story 8.20):* rekkefølgen er 10.9, 8.20c, 8.20a, 3.4h og 8.20b, fordi README-prøven er et suksessmål i briefen. Det endrer rekkefølgen i linja over, der UX-rettingene kom samlet etter 10.9.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2499,6 +2501,8 @@ Oppsettet, de 15 tegningene, skriftene og plassen til snakkeboblene står i `doc
 
 *Avgjort 2026-11-07 kl. 08:57 (gruppens svar):* lenken til investorsiden er boblen nederst på aksjesiden i begge versjonene, og logoen står bare på demosiden. Det erstatter kortet «Mer om ‹navn›» fra svaret 24.10 kl. 15:21 over. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 09:10 i `docs/ai-prompts/2026-11-07.md`.
 
+*Svar 2026-11-07 kl. 10:33 (gruppens svar):* forslagene i spørsmål 1–10 i `spec-3-4h-investorsidene-i-demoen.md` er godtatt, og teksten nederst på investorsiden blir «Oppdiktet selskap i demoen. I den ekte versjonen åpner lenken på aksjesiden selskapets egen investorside i en ny fane.», fordi kortet ble en boble 07.11 kl. 08:57. Rådet anbefalte begge. Svaret er ført etter instruksjonen kl. 10:38 i `docs/ai-prompts/2026-11-07.md`.
+
 ---
 
 ### Story 3.5: Start med dobbeltklikk
@@ -4275,6 +4279,8 @@ NFR-08, `AD-10`
 *Avgjort 2026-11-06 kl. 22:57 (gruppens svar):* for én dag følger størrelsen på rutene volumet, som avgjort 22.10 kl. 23:19, og for en periode er de like store. Gult har to nyanser som i appen.
 
 *Avgjort 2026-11-06 kl. 23:34 og 23:42 (gruppens svar):* datofeltet viser dagen ved «I går» og ved en valgt dag, og er tomt i en periode, på alle sidene med datovelger. Rådet anbefalte det.
+
+*Svar 2026-11-07 kl. 10:33 (gruppens svar):* forslagene i spørsmål 1–21 i `spec-8-20-ux-rettingene-etter-gjennomgangen-06-11.md` er godtatt, med fire endringer. 7: pilene står bare når datofeltet viser en dag, og er borte i en periode. 12: verdiene ved musepekeren står i en lapp i appens stil, som i skissen `aksjesiden-ki-paa.png`, som vises straks og følger musa, med CSS og uten skript, ikke med `<title>`. 2: én kort setning om hvorfor retningen oftere er positiv blir i vinduet for retningen, under 60 ord, og målingen står i `docs/hjelp.md` med grensene. 21: rekkefølgen er 10.9, 8.20c, 8.20a, 3.4h og 8.20b, fordi README-prøven er et suksessmål i briefen («Kjørbar for andre» i `product-brief.md`). Svaret er ført etter instruksjonen kl. 10:38 i `docs/ai-prompts/2026-11-07.md`.
 
 ---
 
