@@ -138,3 +138,4 @@
 - [x] 2026-11-07 [aksjesiden-og-periodevalget-8-20a](960-2026-11-07-17-29-10-aksjesiden-og-periodevalget-8-20a.md) — de avviste lave funnene i triagen for 8.20a (blant annet BH9, lappen øverst på streken) kan tas opp med 8.20b (besvart 2026-11-07: BH9 tas med 8.20b etter instruksjonen kl. 18:04)
 - [x] 2026-11-07 [boersometeret-8-20b](959-2026-11-07-19-38-11-boersometeret-8-20b.md) — PR #119 (8.20b) venter på gruppens svar på spørsmål 1: BH9, børsometeret ved 390 px er 3327 px høyt (middels, åpent etter regel 25) (løst 2026-11-07: gruppens svar kl. 20:01, BH9 lukket i `3266e7b2`, flettet i `8d89cf8c`)
 - [ ] 2026-11-07 [boersometeret-8-20b](959-2026-11-07-19-38-11-boersometeret-8-20b.md) — 3.4h bygges i natt, etter svaret kl. 17:36
+- [ ] 2026-11-07 [boersometeret-8-20b](959-2026-11-07-19-38-11-boersometeret-8-20b.md) — vedlegget i `docs/kvalitetssikring.md` har ingen linje for de 29 mutantene i 8.20a og 8.20b (de står i spesifikasjonen for 8.20)
