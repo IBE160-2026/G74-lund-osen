@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-07T13:40
+updated: 2026-11-07T15:18
 ---
 
 # Kilder og rettigheter
@@ -1117,6 +1117,8 @@ Stengt i 2026, alle hverdager: 2026-01-01, 2026-04-02, 2026-04-03, 2026-04-06, 2
 Hodet i PDF-en sier «07 November 2026», men dokumentet er merket «© 2025». Datoene avhenger ikke av det.
 
 *Lagt til 2026-11-07 (gruppens svar kl. 11:05 og 11:10, story 2.16):* Euronexts kalender for 2027 (fila begynner med IF261106CADE, 06.11.2026) ble lastet ned for hånd, lest ut av rådet og sjekket av gruppen, SHA-256 199618806d085c381a373449588495e5ba11e6ea96d1c8d7f77361fc6f18035e. Programmet henter den aldri, og PDF-en committes ikke. Stengt i 2027, alle hverdager: 2027-01-01, 2027-03-25, 2027-03-26, 2027-03-29, 2027-05-06, 2027-05-17, 2027-12-24 og 2027-12-31. 2027-03-24 er halv handelsdag og regnes som børsdag. Med story 2.16 regner appen ut de stengte hverdagene for hvert år etter reglene Oslo Børs følger, med påsken regnet ut, og listene for 2026 og 2027 blir tester regelen må stemme med (avgjort kl. 11:05). Ingen henting og ingen API-kall.
+
+*Rettet 2026-11-07 (gjennomgangen av 2.16, VG4):* setningen over om at dagene for 2027 føres inn når Euronext publiserer dem, gjelder ikke lenger. Dagene for 2027 står over, og med 2.16 føres ingen dager inn for hånd.
 
 ---
 

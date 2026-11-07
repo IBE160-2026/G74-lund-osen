@@ -28,6 +28,7 @@ Hvert spørsmål har et forslag. Byggingen følger forslaget til gruppen har sva
 1. **Får kalenderen 2025?** To svar spriker. 30.10 kl. 10:45 (under 8.17, a): «Børskalenderen får ikke 2025». 07.11 kl. 11:05: «for hvert år». Ingen av dem opphever den andre uttrykkelig. *Forslag:* kalenderen dekker 2026 og hvert år etter, uten øvre grense (`FOERSTE_AAR = 2026` i `src/boersdag.py`), og 2025 står utenfor, som avgjort 30.10. Grunnen: regelen er sjekket mot Euronext for 2026 og 2027, og repoet har ingen liste for 2025. Hva som ville endret seg for 2025 i den ekte versjonen, står under «Slått opp». Sier gruppen ja til 2025, er endringen `FOERSTE_AAR = 2025` og testene som bruker 2025 som «utenfor».
 2. **Spørsmål 18 i 8.20 (U100): «ikke vurdert» og «utenfor børskalenderen».** Forslaget i 8.20 var «utenfor børskalenderen, som bare har 2026», med årene fra `DEKKEDE_AAR`. Med 2.16 har kalenderen ingen siste år, så den setningen stemmer ikke lenger. *Forslag:* begge tekstene står, fordi FR-409 skiller dem, og den andre sier året kalenderen begynner i, lest fra `FOERSTE_AAR`: «utenfor børskalenderen, som begynner i 2026». Den kan bare stå for en dag før 2026. «ikke vurdert» står uendret.
 3. **Porttestene: netstat alene finner ikke lytteren.** Målt 07.11 med en lytter på 127.0.0.1:8000 som sto hele tiden, 30 forsøk med 0,3 sekunder imellom, to ganger: `netstat -ano` hadde raden 0 og 4 ganger, `Get-NetTCPConnection -State Listen` 1 og 0 ganger, og `Get-NetTCPConnection` uten tilstand, med fjernport 0, 30 og 30 ganger. Windows melder tilstanden feil (`FinWait1`, 0 eller ingen), og netstat bygger på det samme. *Forslag:* `Lyttere` i `start/start.ps1` spør først som før, så `Get-NetTCPConnection` uten tilstand etter raden med fjernport 0 og fjernadresse 0.0.0.0 eller ::, og så netstat, som svaret sier, opptil fem ganger med et halvt sekund imellom. Med netstat alene feilet porttestene fortsatt.
+4. **Klokka langt fram i tid (BH1 og ECH1 i gjennomgangen, middels).** Uten øvre grense stopper ikke hentingen lenger når klokka på maskinen står i et år etter 2026. Står klokka for eksempel i 2031, bruker hentingen kallene og skriver vurderinger for en dag i 2031, som etter AD-7 ikke kan rettes. Før 2.16 stoppet hentingen for alle år etter 2026, men det var et vern ingen hadde bestemt, og innenfor 2026 fantes ikke vernet. Reglene er heller ikke sjekket mot Euronext etter 2027. *Forslag:* ingen øvre grense, som svaret kl. 11:05 sier, og ingen ny kontroll av klokka i denne storyen. Funnene står åpne til gruppen har svart (regel 25).
 
 ## Slått opp 07.11 på `5b1e2778` (regel 3)
 
@@ -36,6 +37,8 @@ Hvert spørsmål har et forslag. Byggingen følger forslaget til gruppen har sva
 **Stedene som bruker `DEKKEDE_AAR`:** `src/indeksdata.py` (`bare_boersdager`, porten for indeksen), `src/fetch_prices.py` (utskriften om dagene som ble tatt bort, og kommentaren om at modulen leses), og i kommentarer `src/graf.py` og `src/lagring_sqlite.py`. Testene: `test_boersdag.py`, `test_fetch_prices.py` (utskriften og årsskiftet), `test_indeks.py`. `STENGT` ble bare brukt i `boersdag.py`, i en kommentar i `perioder.py` og i testene.
 
 **Stedene som fanger `UtenforKalenderen`:** `aksjedetalj.boersdag_mellom` (gir True, så datoene står), `app._innevaerende` (gir None, så fotnoten om lagring ikke står) og utfallet for samme dag (siden uten setningen), `dagene.tell_dagene` («minst»), `fetch_prices.kjoer` (stopper med 0 kall før nøkkel og kvote, og første henting på dagtid sier nei), `graf._foerste_boersdag` (intet månedsmerke), `hovedindeks.forrige_boersdag` (None, ingen endring), `markedsoversikt.les_tilstand` («utenfor børskalenderen»), `moenstrene.boersdagene` og `skiftene` (færre dager, «minst»), `omsetning` (målingen stopper) og `perioder.foerste_boersdag_fra` (første hverdag). `tilstand.tilstand` og `SqliteVurderingslager.skriv` slipper den gjennom. Ingen av stedene endres: med 2.16 kan de bare nås for en dag før `FOERSTE_AAR`.
+
+*Rettet 2026-11-07 etter gjennomgangen (VG11):* lista over steder som slipper `UtenforKalenderen` gjennom, er ikke fullstendig. Også `dagen_ferdig.py`, `ki_tekst.py`, `kilogg_minne.py` og tre steder i `lagring_sqlite.py` gjør det. Alle kan bare nås for en dag før `FOERSTE_AAR`.
 
 **Hva som endres for 2025 i den ekte versjonen:** med forslaget i spørsmål 1 ingenting, fordi 2025 står utenfor som før. `data/db/ose.db` er ikke lest. Kom 2025 med, ville dette endret seg, etter koden over: indeksen ville fått dagene i 2025 ved neste henting (serien fra EODHD går ett år bakover), så perioden «1 år» får den stiplede linja før 02.01.2026 (U4); startdagen for en periode som begynner i 2025, ville tatt hensyn til helligdagene i stedet for å ta første hverdag; grafen ville fått månedsmerker for månedene i 2025; endringskortet ville slått opp helligdagene mellom to kursrader i 2025 i stedet for å vise datoene; endringen i hovedindeksen tidlig i januar 2026 ville blitt regnet mot 31.12.2025; en dag i 2025 i «Signalet dag for dag» ville stått som «ikke vurdert» eller «ikke børsdag» i stedet for «utenfor børskalenderen»; og rekkene og mønstrene ville gått inn i 2025 i stedet for å stoppe med «minst». Det skrives ingen vurderinger for 2025, fordi bare inneværende børsdag skrives (AD-7). Regelen er ikke sjekket mot en liste for 2025.
 
@@ -99,3 +102,33 @@ De sju porttestene som feilet lokalt siden 29.10, går gjennom fra `2b8db0d7`.
 | D | `Lyttere` uten spørsmålet uten tilstand | `test_start_ps1_finner_lytteren_naar_tilstanden_er_feil` |
 | D | netstat-linjene lest etter LISTENING | `test_start_ps1_kjenner_lytteren_i_netstat_uansett_tilstand` |
 | 8.20c | `debug=True`, setningen om kontoen borte, «utenfor børskalenderen» uten året, «Sammenlign med» | testene i avsnittet 8.20c i spesifikasjonen for 8.20 |
+
+*Rettet 2026-11-07 etter gjennomgangen (VG2):* `aksjedetalj.boersdag_mellom` gir `endring_med_datoer`, men ingen mal bruker det feltet etter 8.2b (`6f62f564`). Endringskortet viser alltid «fra … til …». Setningen om endringskortet under «Hva som endres for 2025» og «så datoene står» under «Slått opp» gjelder derfor ingenting brukeren ser. `test_nyttaar_2027_er_i_kalenderen` prøver funksjonen, ikke siden.
+
+## Gjennomgangen 07.11
+
+Blind Hunter, Edge Case Hunter og Verification Gap på `5b1e2778..6eeaf5b2`, etter hele settet, med 10, 8 og 11 funn. Ingen på høy. Rettet i `c140e607`, med hele settet kjørt alene før commiten kl. 15:04:00–15:15:27: 4387 bestått, 24 hoppet over, 0 feilet.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| BH1, ECH1 | middels | Uten øvre grense skrives vurderinger hvis klokka står langt fram i tid | **åpent**, spørsmål 4 (regel 25) |
+| VG1, BH6, ECH2 | middels | «utenfor børskalenderen» laget ved import, så den fulgte ikke `FOERSTE_AAR` | rettet: `utenfor_kalenderen()` leser året når teksten brukes, og en test flytter `FOERSTE_AAR` |
+| VG2 | middels | Påstandene om endringskortet stemte ikke: feltet brukes ikke i noen mal | rettet i spesifikasjonen (Rettet-linja over) og i docstringen i `tests/test_app.py`. Det ubrukte feltet er ikke tatt her |
+| VG3 | middels | Ingen test for månedsmerkene i 2027, og punktet i `deferred-work.md` sto åpent | rettet: `TestMaanedsmerkerI2027`, og en linje `resolved` i `deferred-work.md` |
+| BH2 | middels | En lytter med feil tilstand ble ikke sett når en annen var sett med `-State Listen` | rettet: raden uten tilstand tas alltid med, test `to_lyttere` |
+| BH7, ECH3 | lav | Cachen gikk forbi grensen | rettet: grensen sjekkes før `_regn_ut` |
+| BH4, ECH7 | lav | netstat uten tidsgrense | rettet: høyst 5 sekunder, så stoppes bare netstat. Kostnaden med fem runder står, fordi den bare kommer når porten svarer uten en lytter som kan ses |
+| BH9, VG10 | lav | Gjentakelsen, netstat til slutt, prosess 0 og :: var ikke testet | rettet: `test_start_ps1_lyttere_proever_alle_veiene` |
+| VG8 | lav | Meldingen om klokka var ikke testet | rettet |
+| VG9 | lav | Hjelpeknappen for U101 var ikke testet | rettet |
+| BH5, ECH5, VG5, ECH6, VG7 | lav | Kommentarer og docstrings om `debug=True`, `STENGT` og `DEKKEDE_AAR` | rettet |
+| VG4 | lav | Kildene sa at dagene for 2027 føres inn når Euronext publiserer dem | rettet med en Rettet-linje |
+| VG11 | lav | Lista over steder som slipper feilen gjennom, var ufullstendig | rettet med en Rettet-linje |
+| VG6 | lav | Planleggingsdokumentene og `sprint-status.yaml` nevner `DEKKEDE_AAR` og står som `backlog` | føres ved flettingen, med punkt 25 i PRD-en |
+| BH3 | lav | En rad med fjernport 0 regnes som lytter også når den virkelig lukkes | avvist: det er den tilstanden Windows feilaktig melder for lytteren, så den kan ikke skilles ut. Feilen kan bare gi en feil melding, aldri at et annet program stoppes |
+| BH8 | lav | Testen for januar 2027 fanger ikke 2.16 | avvist: står i «Slått opp» og i mutanttabellen. Testen er et vern |
+| BH10 | lav | Vinduet ved dobbeltklikket nevner ikke en konto fra før | utsatt: spørsmål 20 i 8.20 gjaldt README-en. Kan tas med 3.4h eller 8.20a |
+| ECH4 | lav | `foerste_boersdag_fra(date(9999, 12, 31))` gir `OverflowError` | avvist: kan ikke nås, fordi en dag etter i dag og etter siste kurs avvises |
+| ECH8 | lav | Prosess 4 (System) vises som et program uten kommandolinje | avvist her: fantes før, og stoppes aldri |
+
+**Mutantene for rettingene**, på `c140e607`, med kopi før og blob lik HEAD etter: bare én runde i `Lyttere` (fanget av `tredje_runde`), prosess 0 tatt med (`prosess_0_og_ipv6`), raden uten tilstand bare når ingen er sett (`to_lyttere`), året skrevet fast i teksten (`test_utenfor_boerskalenderen_foelger_foerste_aar`), og cachen rundt grensen (`test_grensen_gjelder_ogsaa_et_aar_som_er_regnet_ut`). Alle ble fanget.
