@@ -1161,9 +1161,10 @@ HOEYDE_PAA_BILDET = 1864
 # for byte det samme.
 # Gjennomgangen av 10.9: hjelpetekster.py. Bildet ble tatt paa nytt og er byte for
 # byte det samme.
-# Story 2.16: boersdag.py, markedsoversikt.py og perioder.py. Bildet ble tatt paa
-# nytt med DevTools-protokollen og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "2fdc44954870c9c25ea9e2ee4f10e5b6b5407b5171de5a3066a9876fda76cbc2"
+# Story 2.16 og 8.20c: boersdag.py, markedsoversikt.py, perioder.py, app.py,
+# index.html og hjelpetekster.py. Bildet ble tatt paa nytt med
+# DevTools-protokollen og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "72cdc9483c354d8fd55a359d4e0484e45ed7b87dcb22f25123f93b119408b709"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1502,9 +1503,10 @@ HOEYDE_PAA_AKSJESIDEN = 2345
 # som ga de seks andre bildene byte for byte like.
 # Gjennomgangen av 10.9: hjelpetekster.py og demotekstene. Bildet ble tatt paa nytt
 # og er byte for byte det samme.
-# Story 2.16: boersdag.py, markedsoversikt.py, perioder.py og graf.py. Bildet ble
-# tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "daeb6a62f8e86ebbf1f27c709e03b0a391c168c3e5be247d39ed6efe24cd38ae"
+# Story 2.16 og 8.20c: boersdag.py, markedsoversikt.py, perioder.py, graf.py,
+# app.py, index.html og hjelpetekster.py. Bildet ble tatt paa nytt og er byte for
+# byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "3f51ad314eec65e19da3737fa5b1894f7e77178f10ab36f88a82b3daef8adb64"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1574,14 +1576,16 @@ DE_NYE_BILDENE = {
 # bildene ble tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
 # Gjennomgangen av 10.9: hjelpetekster.py og demotekstene. Alle bildene ble tatt
 # paa nytt og er byte for byte de samme, ogsaa ved 390 px.
-# Story 2.16: boersdag.py, markedsoversikt.py, perioder.py og graf.py. Alle
-# bildene ble tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
+# Story 2.16 og 8.20c: boersdag.py, markedsoversikt.py, perioder.py, graf.py,
+# app.py, index.html og hjelpetekster.py. Alle bildene ble tatt paa nytt. Min
+# liste har «Sammenlign siste børsdag med» (U101) og samme hoeyde; de andre er
+# byte for byte de samme, ogsaa ved 390 px.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "2fdc44954870c9c25ea9e2ee4f10e5b6b5407b5171de5a3066a9876fda76cbc2",
-    "docs/appen/boersometeret-demo.png": "2fccda1c96ae8fbe858436116c9be4e172713b2c95056af88da83f4c60fa5d8b",
-    "docs/appen/min-liste-demo.png": "9e8861158e88670f9fe80efc72e2fc23c7d3f1476a6480571701ecd99076ef32",
-    "docs/appen/oversikten-390-demo.png": "2fdc44954870c9c25ea9e2ee4f10e5b6b5407b5171de5a3066a9876fda76cbc2",
-    "docs/appen/boersometeret-390-demo.png": "2fccda1c96ae8fbe858436116c9be4e172713b2c95056af88da83f4c60fa5d8b",
+    TOPPEN_AV_OVERSIKTEN: "72cdc9483c354d8fd55a359d4e0484e45ed7b87dcb22f25123f93b119408b709",
+    "docs/appen/boersometeret-demo.png": "15ad69689bda5c918a1dc7deba239ac82bdfc8f46d2f19fe53847ea0260bd3d6",
+    "docs/appen/min-liste-demo.png": "be9ed07050288f9f23efde6d0d827e7f67b9130fe7c86ed5115bcae81f8ff92f",
+    "docs/appen/oversikten-390-demo.png": "72cdc9483c354d8fd55a359d4e0484e45ed7b87dcb22f25123f93b119408b709",
+    "docs/appen/boersometeret-390-demo.png": "15ad69689bda5c918a1dc7deba239ac82bdfc8f46d2f19fe53847ea0260bd3d6",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3589,9 +3593,11 @@ LENKENE_FOER_3_3H = {
 # «Mappestruktur» (regel 19). Var 677fa094....
 # Instruksjonen 07.11 kl. 09:10: skissene i docs/skisser/2026-11-06/ i
 # «Mappestruktur» (regel 19). Var 6e34d0b2....
+# Story 8.20c (U75): steg 5 sier hva man gjoer med en konto hos EODHD fra
+# foer. Var 3bb398cd....
 AVTRYKK_I_PILENE = {
     "Demoen": "f124a92b1c64eeb0ea5e7141976ff85de68df49004a22d5874a4a257aaf89b55",
-    "Den ekte versjonen": "3bb398cd1be31a43abe09b7261456646b6dc03047e20f1aa57ab665a768cfd78",
+    "Den ekte versjonen": "c087d5b97500a0a7689a714c40f709f1ac8f3f5cd9b49918d90ed7083f753ad7",
     "Dokumentene": "7ba6eada43af3ebdfe55e420dd4dcf05be7b034275d53aa1ff6af5ddffbaafa2",
     "Mappestruktur": "0c6df769ca555da84d1d849881ca008014c4e941100ab942d257a309e277c70f",
 }
@@ -3613,13 +3619,14 @@ AVTRYKK_I_PILENE = {
 # gjelder Docker, som «steg 4 med Docker». Var 26143167.... Svarene 28.10
 # kl. 11:19 og 11:23 (e): tabellen er tatt ut av pila «Demoen og den ekte
 # versjonen» og står øverst, og pila til Docker lenker dit. Var d9bc0617...
-# og 44485fc5....
+# og 44485fc5.... Story 8.20c (U75): avsnittet om noekkelen i «Slik virker
+# dobbeltklikket» sier hva man gjoer med en konto fra foer. Var 9066cc12....
 AVTRYKK_I_KOM_I_GANG = {
     VELG_VEI_PIL: "aa69940997c10246503b38bad1da10dc53afea965745fefbd33e75eaea4e23b4",
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
     "Med Docker Desktop": "bed9f253f46f680c10ff969a60a0e2ce0508da9bcec668598c343994331c3453",
     "Uten Docker, med uv": "2efeb5262b38f15a7fa04bc9715e149cbd053c7c45c193c9e0c048bab02dfc13",
-    "Slik virker dobbeltklikket": "9066cc123fbc8efda0833fefdadec7f4f6fe039909f3bfaa498db2748b022d80",
+    "Slik virker dobbeltklikket": "d878f1a0717a772abb79edcbf8981f2bd46d2608b37586a67c457c46d0d931c5",
     "Står du fast?": "c75b3ea0c4d84655d313b1002cf5845f2321e140fd737a8ac9df20d0de68c2ea",
 }
 

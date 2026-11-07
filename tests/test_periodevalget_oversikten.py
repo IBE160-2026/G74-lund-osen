@@ -655,7 +655,7 @@ class TestAdressen:
         knappene, eller viste endringen for perioden øverst."""
         _basen()
         html = klient.get("/min-liste?vis=alle&periode=1-uke").data.decode("utf-8")
-        assert '<nav class="periodevalg" aria-label="Sammenlign med">' in html
+        assert '<nav class="periodevalg" aria-label="Sammenlign siste børsdag med">' in html
         assert "+11,11 %" in _rad(html, "EQNR")[1]
 
 

@@ -427,6 +427,15 @@ class TestSidene:
         hoved = kilde.split('if __name__ == "__main__":', 1)[1]
         assert hoved.index("les_flagg(sys.argv[1:])") < hoved.index("app.run(")
 
+    def test_webserveren_fra_kommandoen_har_ikke_debug(self):
+        """Story 8.20c (U76, spoersmaal 20 i 8.20): uv run python src/app.py
+        starter uten debug, som skriptene og Docker. Ville feilet hvis
+        src/app.py hadde debug=True (mutanten)."""
+        kilde = (SRC / "app.py").read_text(encoding="utf-8")
+        hoved = kilde.split('if __name__ == "__main__":', 1)[1]
+        assert "app.run(port=8000)" in hoved
+        assert "debug" not in hoved.replace("uten debug", "")
+
     def test_ulesbar_demobase_gir_503_med_navnet_og_kommandoen(self, klient, monkeypatch):
         """VG1: med bryteren og en demo.db som ikke kan leses, svarer begge
         sidene 503, nevner demo.db og viser kommandoen som lager den paa nytt."""
