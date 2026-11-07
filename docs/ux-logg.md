@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-07T09:12
+updated: 2026-11-07T09:13
 ---
 
 # UX-loggen
@@ -642,6 +642,8 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 *Lagt til 2026-10-26:* U28 tas i 8.0f (gruppens svar 24.10 kl. 11:31 og 11:34, under «Prioritering» og story 8.0b i `epics.md`): hjelpen står i ett fast felt i høyre kant på bred skjerm, og siden gir plass, så feltet ikke dekker det den forklarer. På smal skjerm åpnes den rett under «?». En knapp flytter feltet til venstre eller høyre, og feltet står åpent til «Lukk» eller Esc.
 
 *Lagt til 2026-11-07:* U75–U102 kommer fra gruppens gjennomgang 06.11 kl. 20:16–22:16, slik instruksjonen kl. 00:04 i `docs/ai-prompts/2026-11-07.md` fører dem. Notatene fra gjennomgangen ligger ikke i repoet, så «Funnet» sier ikke mer enn instruksjonen og det koden viser. Hvert funn er slått opp i koden 07.11, med beslutningen det går mot der den finnes. 20:29, 20:47, 20:58 og 21:09 ga to funn hver, 20:49 fire, og 20:33, 21:23 og 22:16 er ett funn (U84).
+
+*Lagt til 2026-11-07:* gruppens ord fra gjennomgangen 06.11, sendt til rådet i chatten, med skrivefeil rettet. U83, kl. 20:32: «må den stå der? er litt rart med masse små tekst under hver enkelt sak». U88, kl. 20:47: «KI litt kjedelig, ingen farge på knappene, generelt veldig lite visuelt». U89, kl. 20:49: «forstod ikke helt at den svarte stripen var dagen i dag». Radene står som før. Ordene er ført etter instruksjonen kl. 09:10 i `docs/ai-prompts/2026-11-07.md`.
 
 ## Status for funnene til 8.2, sjekket 03.11
 
