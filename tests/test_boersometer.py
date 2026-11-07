@@ -1329,7 +1329,10 @@ class TestFargetrinnene:
             r"<span>([^<]+)</span>", re.search(r'<span class="grenser".*?</span></span>', kortet, re.S).group(0)
         )
         assert grenser == ["-2\u00a0%", "-0,5\u00a0%", "+0,5\u00a0%", "+2\u00a0%"]
-        assert "Mørk ramme: 2 av 3 på siste børsdag. Gul ramme: 3 av 3." in kortet
+        # Gjennomgangen (BH15): gul ramme gjelder siste børsdag, også en annen dag.
+        assert "Mørk ramme: 2 av 3 på siste børsdag. Gul ramme: 3 av 3 på siste børsdag, også en annen dag." in kortet
+        # Gjennomgangen (VG5): vinduet for volumet kommer fra Parametre.
+        assert f"mot medianen for de {STANDARD.volum_vindu} børsdagene før" in kortet
         assert html.index('<section class="slik-leser"') < html.index('<section class="bransje"')
 
     def test_hjelpen_sier_det(self):
@@ -1501,8 +1504,8 @@ class TestKartet:
         ikke sa at Tab følger kartet (gruppens svar 26.10 kl. 13:00, a)."""
         from hjelpetekster import hjelpetekster
 
-        # Story 8.20b (U95): regelen står i docs/hjelp.md, ikke i vinduet.
-        assert hjelpetekster(STANDARD)["boersometeret"]
+        # Story 8.20b (U95): regelen står i docs/hjelp.md, ikke i vinduet (BH18).
+        assert "Tab" not in hjelpetekster(STANDARD)["boersometeret"].tekst
         assert "Med Tab går du gjennom kartet fra det største feltet" in _avsnittet()
         assert "tabellen har bransjene i fast rekkefølge" in _avsnittet()
 

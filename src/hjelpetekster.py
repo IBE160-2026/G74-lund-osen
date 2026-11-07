@@ -538,9 +538,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "perioden_boersometeret": Hjelpetekst(
             "Periodene:",
             # Story 8.20b (U95): teksten fra utkastet i spesifikasjonen for 8.20.
+            # Gjennomgangen (BH16): hvor perioden slutter, og at snittet følger den.
             "den første knappen viser siste børsdag, de andre endringen fra den første kursen i "
-            "perioden, og datoen med «Vis dagen» en dag du velger. Ved en periode er rutene like "
-            "store, fordi volumet mot vanlig gjelder én dag. Rammen er signalet siste børsdag.",
+            "perioden til siste børsdag, i fargen og snittet, og datoen med «Vis dagen» en dag du "
+            "velger. Ved en periode er rutene like store, fordi volumet mot vanlig gjelder én dag. "
+            "Rammen er signalet siste børsdag.",
             (
                 (BOERSOMETER, "def vekt("),
                 (MARKEDSOVERSIKT, "def periodeendring("),

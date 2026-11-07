@@ -45,16 +45,16 @@
       <h2 id="slik-leser">Slik leser du børsometeret</h2>
       <ul>
         <li><span class="symbolfelt fargefelt" aria-hidden="true"><span class="trinn-ned"></span><span class="trinn-lys-ned"></span><span class="trinn-lys-opp"></span><span class="trinn-opp"></span></span>
-          <span><strong>Fargen</strong>Endringen i perioden du har valgt. Rødt er ned og grønt er opp, og jo mørkere, jo større.
+          <span><strong>Fargen</strong> Endringen i perioden du har valgt. Rødt er ned og grønt er opp, og jo mørkere, jo større.
           <span class="skala" aria-hidden="true">{% for trinn, tekst in fargetrinn %}<span class="trinn-{{ trinn }}"></span>{% endfor %}</span>
           <span class="grenser" aria-hidden="true">{% for grense in skalagrenser %}<span>{{ grense }}</span>{% endfor %}</span>
           <span class="skjult">{% for trinn, tekst in fargetrinn %}{{ tekst }}{% if not loop.last %}, {% else %}.{% endif %} {% endfor %}</span></span></li>
         <li><span class="symbolfelt rammefelt" aria-hidden="true"><span class="proeve ramme-moerk"></span><span class="proeve ramme-gul"></span></span>
-          <span><strong>Rammen</strong>Mørk ramme: {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag. Gul ramme: {{ antall_sjekker }} av {{ antall_sjekker }}.</span></li>
+          <span><strong>Rammen</strong> Mørk ramme: {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag. Gul ramme: {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag, også en annen dag.</span></li>
         <li><span class="symbolfelt stoerrelsefelt" aria-hidden="true"><span></span><span></span><span></span></span>
-          <span><strong>Størrelsen</strong>Én dag: jo mer det ble handlet enn vanlig, mot medianen for de {{ volum_vindu }} børsdagene før, jo større rute. En periode: alle rutene er like store.</span></li>
+          <span><strong>Størrelsen</strong> Én dag: jo mer det ble handlet enn vanlig, mot medianen for de {{ volum_vindu }} børsdagene før, jo større rute. En periode: alle rutene er like store.</span></li>
         <li><span class="symbolfelt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3l14 8-6 2-3 6z"/></svg></span>
-          <span><strong>Ruta</strong>Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
+          <span><strong>Ruta</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
       </ul>
     </section>
     </div>
@@ -133,19 +133,22 @@
       <thead>
         <tr><th scope="col">Selskap</th><th scope="col" class="tall">Endring{% if periodestart %}, {{ periodenavn }}{% endif %}</th><th scope="col" class="tall">Volum mot vanlig{% if periodestart %}, {{ siste|dato }}{% endif %}</th><th scope="col" class="tall">Signalstyrke{% if periodestart %}, {{ siste|dato }}{% endif %}</th></tr>
       </thead>
+      {#- Gjennomgangen (BH11, ECH5): én tbody per bransje, som delene på
+          forsiden, så scope="rowgroup" gjelder radene i bransjen. ECH4:
+          båndet har klassen oevrige, som gir bakgrunnen og antallet i pille. #}
+      {%- for bransje in bransjer %}
       <tbody>
-        {%- for bransje in bransjer %}
-        <tr class="del"><th colspan="4" scope="rowgroup"><span class="bransjebaand">{{ bransjesymbol(bransje.navn) }}{{ bransje.navn }} <span class="antall">{{ bransje.antall }}</span>{% if bransje.snitt is not none %} <span class="bak">snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span></span>{% endif %}</span></th></tr>
+        <tr class="del oevrige"><th colspan="4" scope="rowgroup"><span class="bransjebaand">{{ bransjesymbol(bransje.navn) }}{{ bransje.navn }} <span class="antall">{{ bransje.antall }}</span>{% if bransje.snitt is not none %} <span class="bak">snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span></span>{% endif %}</span></th></tr>
         {%- for rute in bransje.ruter %}
         <tr{% if rute.ramme == "gul" %} class="gul"{% endif %}>
-          <td class="selskap"><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a><span class="linje">{{ rute.aksje.symbol }}</span></td>
+          <td class="selskap"><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a><span class="skjult">, </span><span class="linje">{{ rute.aksje.symbol }}</span></td>
           <td class="tall">{% if rute.endring is not none %}<span class="{{ fortegn(rute.endring) }}">{{ rute.endring|tall('endring') }}</span>{% if rute.fra %} <span class="fra">fra {{ rute.fra|dato }}</span>{% endif %}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
           <td class="tall">{% if rute.volumforhold is not none %}{{ rute.volum_vist }} <span class="volumord">({{ rute.volumord }})</span>{% else %}–{% endif %}</td>
           <td class="styrke tall">{% if rute.styrke is not none %}<span class="{% if rute.ramme == 'gul' and dagen == siste %}pille tre-av-tre{% elif rute.ramme == 'moerk' %}pille to-av-tre{% else %}styrketall{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% elif rute.uten_data %}Uten data{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
         </tr>
         {%- endfor %}
-        {%- endfor %}
       </tbody>
+      {%- endfor %}
     </table>
     </div>
     </details>

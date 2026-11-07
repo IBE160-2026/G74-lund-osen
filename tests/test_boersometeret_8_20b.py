@@ -10,6 +10,7 @@ test_hjelpefeltet.py, med siden skrevet til en midlertidig mappe.
 """
 
 import json
+import os
 import re
 import shutil
 from datetime import datetime, timezone
@@ -28,7 +29,10 @@ from test_hjelpefeltet import NETTLESER, _kjoer
 ROT = Path(__file__).resolve().parent.parent
 STIL = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
 ADRESSENE = ("/boersometer", "/boersometer?periode=1-uke", "/boersometer?periode=velg&dag=2026-10-01")
-nettleser = pytest.mark.skipif(NETTLESER is None, reason="ingen Edge eller Chrome å måle siden i")
+# Gjennomgangen (VG1): i CI feiler testene når nettleseren mangler, som i test_hjelpefeltet.py.
+nettleser = pytest.mark.skipif(
+    NETTLESER is None and not os.environ.get("CI"), reason="ingen Edge eller Chrome å måle siden i"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -160,11 +164,12 @@ class TestTabellen:
             "Signalstyrke",
         ]
         baand = re.findall(
-            r'<tr class="del"><th colspan="4" scope="rowgroup"><span class="bransjebaand">(<svg .*?</svg>)',
+            r'<tbody>\s*<tr class="del oevrige"><th colspan="4" scope="rowgroup"><span class="bransjebaand">(<svg .*?</svg>)',
             tabell,
             re.S,
         )
-        assert len(baand) == 8
+        # Gjennomgangen (BH11, ECH5): én tbody per bransje, og ECH4: båndet har bakgrunnen fra forsiden.
+        assert len(baand) == 8 and tabell.count("<tbody>") == 8
         gule = re.findall(r'<tr class="gul">\s*<td class="selskap"><a href="/aksje/([A-Z]+)"', tabell)
         assert sorted(gule) == ["BRFE", "KVST", "LKSV", "TRHF"]
         for symbol in gule:
@@ -172,6 +177,66 @@ class TestTabellen:
             assert '<span class="pille tre-av-tre">3 av 3</span>' in rad
         assert '<span class="pille to-av-tre">2 av 3</span>' in tabell
         assert "inset 4px 0 0 var(--oransje)" in _regel("tr.gul td:first-child")
+        assert "background: var(--baand-oevrige)" in _regel("tr.del.oevrige th")
+
+    def test_ingen_ring_ved_3_av_3_en_annen_dag(self, klient):
+        """Gjennomgangen (VG4): en annen dag har radene med gul ramme styrken
+        fra den dagen, uten ringen for 3 av 3. Ville feilet hvis «and dagen ==
+        siste» falt bort, så «1 av 3» fikk den oransje ringen."""
+        html = _side(klient, "/boersometer?periode=velg&dag=2026-10-01")
+        tabell = html.split('<table class="boersometertabell">', 1)[1].split("</table>", 1)[0]
+        rader = re.findall(r'<tr class="gul">(.*?)</tr>', tabell, re.S)
+        assert rader
+        for rad in rader:
+            assert "pille tre-av-tre" not in rad, rad
+
+
+# --- Del F: bransjeoverskriften (U97) ---------------------------------------------------
+
+
+def test_linja_i_overskriften_er_bransje_tillegg(klient, monkeypatch):
+    """Gjennomgangen (VG3, BH5): bredden på feltet regnes av Bransje.tillegg,
+    så teksten malen viser, må være den samme. Ville feilet med et annet
+    format på snittet, eller en annen tekst, i malen enn i Bransje.tillegg."""
+    bygde = []
+    ekte = app_modul.bygg_boersometer
+    monkeypatch.setattr(app_modul, "bygg_boersometer", lambda ruter: bygde.extend(ekte(ruter)) or bygde)
+    for adresse in ADRESSENE:
+        bygde.clear()
+        html = _side(klient, adresse)
+        vist = {
+            _synlig(navn): _synlig(linje)
+            for navn, linje in re.findall(
+                r'<span class="bransjenavn">([^<]+)</span></span></span>\s*<span class="tillegg">(.*?)</span></h2>',
+                html,
+                re.S,
+            )
+        }
+        assert len(vist) == 8 and vist == {b.navn: b.tillegg for b in bygde}, adresse
+
+
+def test_det_verste_kartet_faar_plass():
+    """Gjennomgangen (BH8, ECH8): mange aksjer i én bransje med lang linje, og
+    én aksje med MINSTE_VEKT mot resten med STOERSTE_VEKT. Ville feilet hvis
+    kartet ikke fant plass, så tabellen sto alene, eller et felt var smalere
+    enn linja med antallet og snittet."""
+    import boersometer as b
+    from kursdata import Aksje
+
+    ruter = [
+        b.Rute(
+            Aksje(f"A{i}", f"A{i}.OL", f"Aksje {i}", "Energi" if i < 10 else b.BRANSJER[i % 8]),
+            -12.34,
+            b.STOERSTE_VEKT if i else b.MINSTE_VEKT,
+            2,
+            None,
+        )
+        for i in range(15)
+    ]
+    kartet = b.kart(b.bygg_boersometer(ruter))
+    for flate in b.FLATENE:
+        for felt in kartet.felt:
+            assert felt.plass[flate.navn].b / 100 * flate.minste >= b.tilleggsbredde(felt.bransje) - 1e-9
 
 
 # --- Del E for børsometeret: høyst 60 ord (U95) og fotnoten (U102) -------------------
@@ -252,7 +317,8 @@ for (const p of document.querySelectorAll(".kart .rute .styrke.pille")) {
 }
 r.tillegg = Array.from(document.querySelectorAll(".kart section.bransje h2 .tillegg")).map((t) => {
   const b = t.getBoundingClientRect(), h = t.closest("h2").getBoundingClientRect();
-  return [t.scrollWidth <= t.clientWidth + 0.5, b.bottom <= h.bottom + 0.5, b.height > 0];
+  // Gjennomgangen (BH6): h2 klipper, så linja må stå innenfor h2 sidelengs også.
+  return [b.left >= h.left - 0.5 && b.right <= h.right + 0.5, b.bottom <= h.bottom + 0.5, b.height > 0];
 });
 ferdig(r);
 """
@@ -280,7 +346,8 @@ class TestINettleseren:
         assert t2 >= t1 + h1, r["kort"]
         assert r["rulling"] == 0
 
-    @pytest.mark.parametrize("bredde", [390, 1280])
+    # Gjennomgangen (VG2): også ved 320 px, der kartet er smalest mot skriften.
+    @pytest.mark.parametrize("bredde", [320, 390, 1280])
     @pytest.mark.parametrize("adresse", ["/boersometer", "/boersometer?periode=1-uke"])
     def test_pillene_like_store_og_inne_i_ruta(self, klient, tmp_path, bredde, adresse):
         """U94: «2 av 3» og «3 av 3» i samme størrelse i alle rutene, og aldri

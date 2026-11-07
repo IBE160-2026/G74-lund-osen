@@ -1017,7 +1017,14 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
    til kortet på oversikten, med skalaen for de fem trinnene og grensene under. */
 :where(.side-oversikt) .slik-leser .skala { display: flex; height: 10px; margin: 8px 0 2px; border-radius: 2px; overflow: hidden; }
 :where(.side-oversikt) .slik-leser .skala span { flex: 1; }
-:where(.side-oversikt) .slik-leser .grenser { display: flex; justify-content: space-around; font-size: 12px; font-variant-numeric: tabular-nums; }
+/* Gjennomgangen (BH3, ECH6, VG6): grensene står under overgangene mellom de fem
+   trinnene, ved 20, 40, 60 og 80 %. */
+:where(.side-oversikt) .slik-leser .grenser { display: block; position: relative; height: 16px; font-size: 12px; font-variant-numeric: tabular-nums; }
+:where(.side-oversikt) .slik-leser .grenser span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+:where(.side-oversikt) .slik-leser .grenser span:nth-child(1) { left: 20%; }
+:where(.side-oversikt) .slik-leser .grenser span:nth-child(2) { left: 40%; }
+:where(.side-oversikt) .slik-leser .grenser span:nth-child(3) { left: 60%; }
+:where(.side-oversikt) .slik-leser .grenser span:nth-child(4) { left: 80%; }
 :where(.side-oversikt) .fargefelt { display: grid; grid-template-columns: 9px 9px; gap: 3px; align-content: center; justify-content: center; }
 :where(.side-oversikt) .fargefelt span { width: 9px; height: 9px; border-radius: 2px; }
 :where(.side-oversikt) .rammefelt .proeve { display: inline-block; box-sizing: border-box; width: 13px; height: 13px; border-width: 3px; border-radius: 2px;

@@ -345,6 +345,19 @@ class TestGjennomgangen:
         rad = next(r for r in tabell.split("<tr>") if "Aker BP" in r)
         assert "+5,00 % fra 05.10" in _synlig(rad)
 
+    def test_en_kortere_serie_telles_ikke_mot_indeksen(self, klient):
+        """Gjennomgangen av 8.20b (BH1, ECH2): AKRBP begynner 05.10, så
+        endringen gjelder et annet tidsrom enn indeksen, og aksjen telles ikke
+        i «N av M gikk bedre enn indeksen». Ville feilet med AKRBP i M."""
+        _basen(med_indeks=True)
+        html = _side(klient, "/boersometer?periode=1-uke")
+        kortet = html.split('class="maal"')[1].split("</section>")[0]
+        m = int(re.search(r"<strong>\d+ av (\d+)</strong>", kortet).group(1))
+        tabell = html.split('<table class="boersometertabell">')[1]
+        med_fra = tabell.count('<span class="fra">fra ')
+        endringer = len(re.findall(r'<td class="tall"><span class="(?:opp|ned|null)">', tabell))
+        assert med_fra >= 1 and m == endringer - med_fra
+
     def test_linja_under_for_en_rad_med_eldre_dag(self, klient):
         """VG3: linja under går til radens egen siste dag, 08.10 for KOG,
         med 50 begge dagene, så 0,00 %. Ville feilet med «–» hvis sidens

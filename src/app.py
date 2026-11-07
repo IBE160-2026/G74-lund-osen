@@ -768,9 +768,12 @@ def boersometer():
     indeks = _indeksen_for_dagen(dagen) if periodestart is None else _indeksen_for_perioden(periodestart, siste)
     # Story 8.20b (spørsmål 14 b): «N av M gikk bedre enn indeksen» i kortet
     # «Mål mot børsen», med aksjene som har en endring, slik tallene vises
-    # (er_bedre, som oversikten).
-    med_endring = [rute for rute in ruter if rute.endring is not None]
-    bedre = sum(er_bedre(rute.endring, indeks) for rute in med_endring) if indeks is not None else None
+    # (er_bedre, som oversikten). Gjennomgangen (BH1, ECH2): en aksje med
+    # kortere serie i perioden («fra» en senere dag) telles ikke, fordi
+    # endringen gjelder et annet tidsrom enn indeksen. ECH1: uten aksjer å
+    # telle står ikke tallet.
+    med_endring = [rute for rute in ruter if rute.endring is not None and rute.fra is None]
+    bedre = sum(er_bedre(rute.endring, indeks) for rute in med_endring) if indeks is not None and med_endring else None
     return render_template(
         "boersometer.html",
         bransjer=bransjer,
