@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-05T10:26
+updated: 2026-11-07T12:50
 ---
 
 # Hjelp til «Kom i gang»
@@ -181,7 +181,7 @@ Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen
 
 Under grafen står rammen «Signalet forklart». Først skriver appen selv, også når KI-teksten er av, hvor lenge signalet har vært slik, med datoen for den første dagen i rekka, og hva hovedindeksen, bransjen og antallet aksjer i lista som steg og falt gjorde samme dag. Mangler børsdagen før rekka i basen, står «minst siden» den første dagen som er lagret, fordi dagen signalet skiftet ikke er kjent. Bransjen står bare når minst to aksjer i bransjen har en endring den dagen, og den regnes som snittet i børsometeret, av de aksjene. De to setningene er ikke laget av KI, og de sier ikke at dagen forklarer signalet.
 
-Med KI-teksten på kommer en tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket «Laget av KI» med navnet på modellen. Teksten har én setning for hver sjekk, som sier med vanlige ord hva sjekken måler og hva den ga, og én setning om tre mønstre appen har regnet ut av signalene og kursene som er lagret: hvor mange av de siste 20 børsdagene signalet var positivt, negativt, blandet og uten retning, hvor mange av de siste 5 børsdagene aksjen gikk samme vei som hovedindeksen, og hvor mange ganger retningen skiftet den siste måneden. En dag uten vurdering telles ikke. Med færre enn 10 vurderte dager av de 20, eller færre enn 3 av de 5 dagene som kunne telles, står ikke mønsteret, og mangler noen dager i måneden, står «minst» foran antallet skift. Mønstrene sier bare hva som har skjedd, ikke hva som vil skje.
+Med KI-teksten på kommer en tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket «Laget av KI» med navnet på modellen. Teksten har én setning for hver sjekk, som sier med vanlige ord hva sjekken måler og hva den ga, og en setning eller to om tre mønstre appen har regnet ut av signalene og kursene som er lagret: hvor mange av de siste 20 børsdagene signalet var positivt, negativt, blandet og uten retning, hvor mange av de siste 5 børsdagene aksjen gikk samme vei som hovedindeksen, og hvor mange ganger retningen skiftet den siste måneden. En dag uten vurdering telles ikke. Med færre enn 10 vurderte dager av de 20, eller færre enn 3 av de 5 dagene som kunne telles, står ikke mønsteret, og mangler noen dager i måneden, står «minst» foran antallet skift. Mønstrene sier bare hva som har skjedd, ikke hva som vil skje.
 
 Modellen fikk bare det appen har regnet ut: om hver av sjekkene ga +1, 0 eller -1, styrken og retningen, antallene i mønstrene, om aksjen selv steg, falt eller var uendret den dagen når det kan regnes, regnet mot forrige kurs, som endringen i tabellen, og når aksjens forrige kurs er fra forrige børsdag, også om hovedindeksen steg, falt eller var uendret, med en ferdig setning om aksjen gikk samme vei som hovedindeksen eller motsatt, og et merke når aksjen er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, og teksten som vises, gir ikke råd, finner ikke mønstre selv og sier ikke noe annet om hovedindeksen, bransjen, børsen eller antallet aksjer enn den ferdige setningen og mønstrene. «?» ved overskriften sier det kort. Det gjelder både demoen og den ekte versjonen.
 

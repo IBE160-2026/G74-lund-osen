@@ -187,6 +187,7 @@ Tre gjennomganger av `ba685331` og `f3729e38`, kjørt i parallell etter hele set
 - *BH7, rettet.* To linjer i prompten sa «under teksten», men appens setninger står nå over. Versjonen står som 5, fordi versjon 5 ikke er flettet og ingen tekst i `ose.db` har versjon 5, som i 10.2i. Avtrykket er `822dcd49…8dea`.
 - *VG2, VG5 og VG8, rettet.* Det mangler ikke lenger tester for tallet i mønster 3, for at en endring i styrken ikke er et skift (spørsmål 1), eller for en uendret eller manglende hovedindeks i mønster 2.
 - *VG4, åpent.* Hjelpen og del E sier «én setning om mønstrene». Kontrollen sjekker ikke antallet setninger. 6 av 13 demotekster deler mønstrene i to setninger, mens ingen av de 15 i prøvekjøringen gjør det. Spørsmål 1 under. Står åpent til gruppen har svart (regel 25).
+- *VG4, lukket 2026-11-07 etter gruppens svar kl. 12:32 (regel 25).* Svar 1: kontrollen stopper ikke en tekst som deler mønstrene i to setninger. Prompten ber fortsatt om én, og hjelpen sier nå «en setning eller to» (`docs/hjelp.md`). README-en sier ikke hvor mange setninger teksten har, og er ikke endret.
 - *VG6, avvist.* Funnet var at `_grunnlagene` bare var testet med mønster 2. Men `test_grunnlaget_stemmer_med_demodagen` sammenligner demoradene, som lages gjennom `_grunnlagene` i `lag_tekstene`, med `lag_moenstrene` for alle tre mønstrene. Mutant G viser at testen leser fila.
 
 **Lav**
@@ -197,6 +198,8 @@ Tre gjennomganger av `ba685331` og `f3729e38`, kjørt i parallell etter hele set
 **Etter rettingen:** hele settet ble kjørt alene kl. 11:55:32–12:06:37: 4330 bestått, 24 hoppet over, og bare 6 porttester for `start.ps1` feilet. Demotekstene og prøvekjøringen ble laget på nytt med avtrykket over (§56). Bildene ble tatt på nytt og er byte for byte de samme, og bare avtrykkene i `tests/test_docker.py` er endret. Mutantene ble kjørt på nytt på `c7159bb9`, med F oppdatert til den nye koden og F2 for bindeordene, «setningen om mønstrene sier mer enn formene»: alle ni ble fanget, med A 7, B 1, C 23, D 1, E 3, F 2, F2 4, G 1 og H 6 tester, og hver fil var lik HEAD etterpå.
 
 ## Spørsmål til gruppen før flettingen
+
+*Svar 2026-11-07 kl. 12:32 (gruppens svar):* forslagene i spørsmål 1–4 under er godtatt: 1) kontrollen stopper ikke en tekst som deler mønstrene i to setninger; prompten ber fortsatt om én, og hjelpen sier «en setning eller to» (VG4); 2) tellingene godtas bare i formene, ved feltet sitt, ikke i `ANTALLENE` (BH2, ECH5); 3) de faste formene for sjekkene står til tellingen for 10.4 etter fem kvelder med versjon 5, og tas opp igjen da; 4) de fete navnene på sjekkene bygges i 8.20a. Rådet anbefalte alle fire. Svaret er ført etter instruksjonen kl. 12:47 i `docs/ai-prompts/2026-11-07.md`.
 
 1. **VG4: én setning om mønstrene.** Skal kontrollen stoppe en tekst som deler mønstrene i to setninger? *Forslag:* nei. Kontrollen sjekker hver setning med en form for seg, så to setninger sier ikke mer enn én. Prompten ber fortsatt om én, og «én setning» i hjelpen endres til «en setning eller to». Med ja blir 6 av 13 demotekster stoppet slik de er nå.
 2. **BH2 og ECH5: tellingene i `ANTALLENE`.** Del F sa at antallene legges til `ANTALLENE`. Det gjorde tellingene til lovlige tall hvor som helst i teksten. *Forslag:* godta avviket. Tellingene leses bare i formene, ved feltet sitt.
