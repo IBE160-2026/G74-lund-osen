@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-05T19:50
+updated: 2026-11-07T13:40
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1188,6 +1188,9 @@ som aksjene. Daglig henting koster da 16 kall (NFR-01).
   som `kurs` (`AD-7`).
 - Bare børsdager lagres, i årene kalenderen dekker (`DEKKEDE_AAR` i
   `boersdag.py`), uten et fast årstall i koden.
+  *Lagt til 2026-11-07 (gruppens svar kl. 11:05, story 2.16):* appen skal regne ut de stengte
+  hverdagene for hvert år etter reglene Oslo Børs følger, med påsken regnet ut, så kalenderen
+  dekker alle år. Hvordan `DEKKEDE_AAR` endres, avgjøres i spesifikasjonen for 2.16.
 - Webserveren henter aldri indeksen (`AD-10`).
 - Feiler indekskallet, lagres og vurderes aksjene som vanlig. Indeksen føres i
   `feil` og får ingen ny sjanse (`AD-15`), og den gir aldri en rad i `vurdering`.
@@ -2110,6 +2113,8 @@ Mål kan nås på måter som ikke betyr noe. Disse leses sammen med tabellen ove
 *Lagt til 2026-11-03 (gruppens svar 02.11 kl. 22:15, spørsmål 1, 3 og 5):* 5b og 9 er flyttet til «Lukket» (spørsmål 3), og 6, 8, 11, 12 og 15 til «Utenfor v1» under (spørsmål 1), med teksten ordrett. 13, 21 og 25 står som før (svar B).
 
 *Lagt til 2026-11-03 (gruppens svar 02.11 kl. 22:15, spørsmål 4):* punkt 22: i stedet for én gjennomgang per epic tas én samlet `bmad-code-review` av v1-koden før README-prøven, eier Gruppen. Gjennomgangene per PR står som det de er (`docs/kvalitetssikring.md` §5).
+
+*Lagt til 2026-11-07 (gruppens svar kl. 11:05 og 11:10, story 2.16):* punkt 25: Euronexts kalender for 2027 (IF261106CADE, 06.11.2026) er lastet ned for hånd, lest ut av rådet og sjekket av gruppen: stengt 2027-01-01, 03-25, 03-26, 03-29, 05-06, 05-17, 12-24 og 12-31, og 2027-03-24 er halv handelsdag og regnes som børsdag. Dagene står i seksjonen Handelskalenderen i `docs/kilder-og-rettigheter.md`, med SHA-256. I stedet for å føre inn dagene for hvert år regner appen ut de stengte hverdagene etter reglene Oslo Børs følger, og listene for 2026 og 2027 blir tester regelen må stemme med (story 2.16). Punktet lukkes når 2.16 er flettet.
 
 ### Utenfor v1
 

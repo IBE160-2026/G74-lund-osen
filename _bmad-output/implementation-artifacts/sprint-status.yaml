@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 11-07-2026 12:56
+last_updated: 11-07-2026 13:40
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -88,6 +88,7 @@ development_status:
   2-12-velge-og-bytte-aksjer: backlog
   2-13-kommandoen-som-måler-omsetning: done
   2-14-eksdatoer-føres-inn-for-hånd: backlog
+  2-16-børskalenderen-for-alle-år: backlog
   epic-2-retrospective: optional
 
   epic-3: in-progress

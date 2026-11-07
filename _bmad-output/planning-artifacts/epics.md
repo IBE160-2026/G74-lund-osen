@@ -2079,6 +2079,16 @@ så appen kan vise dem uten en kilde vi ikke har.
 
 ---
 
+### Story 2.16: Børskalenderen for alle år
+
+*Lagt til 2026-11-07, etter instruksjonen kl. 13:35 i `docs/ai-prompts/2026-11-07.md`.* Nummeret 2.15 er gitt til «Utbytte fra EODHD» i endringsforslaget 13.10 (N1), så denne storyen får 2.16. Storyen gjelder punkt 25 i PRD-en: i dag dekker kalenderen i `src/boersdag.py` bare årene i `DEKKEDE_AAR`. Storyen har foreløpig bare gruppens svar, og resten skrives med spesifikasjonen.
+
+*Avgjort 2026-11-07 kl. 11:05 (gruppens svar):* appen regner ut de stengte hverdagene for hvert år etter reglene Oslo Børs følger: 1. januar, skjærtorsdag, langfredag, 2. påskedag, 1. mai, 17. mai, Kristi himmelfartsdag, 2. pinsedag, julaften, 1. og 2. juledag og nyttårsaften, med påsken regnet ut. Listene for 2026 og 2027 blir tester regelen må stemme med. Ingen henting og ingen API-kall. Rådet anbefalte det.
+
+*Sjekket 2026-11-07 kl. 11:10 (gruppens svar):* Euronexts kalender for 2027 (IF261106CADE, 06.11.2026), lastet ned for hånd, lest ut av rådet og sjekket av gruppen: stengt 2027-01-01, 03-25, 03-26, 03-29, 05-06, 05-17, 12-24 og 12-31, og 2027-03-24 er halv handelsdag og regnes som børsdag.
+
+---
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
