@@ -164,13 +164,21 @@ def _boersdag_eller_hverdag(dag: date) -> bool:
         return dag.weekday() < 5
 
 
-def pilene(dag: date | None, minst: date | None, maks: date | None) -> tuple[date | None, date | None]:
+def pilene(dag: date | None, minst: date | None, maks: date | None, kursdager=None) -> tuple[date | None, date | None]:
     """Forrige og neste boersdag fra dag, til pilene ved datoen - story 8.20a
     (spoersmaal 7 i 8.20, og svaret 07.11 kl. 10:33: bare naar feltet viser en
     dag). None for en pil som ville gaatt foer minst eller etter maks, foerste
-    og siste dag feltet godtar, og da er pila graa og ikke en lenke."""
+    og siste dag feltet godtar, og da er pila graa og ikke en lenke.
+
+    Gjennomgangen av 8.20a (ECH2): med kursdager, dagene siden har kurs
+    for, er pilene forrige og neste dag i den lista, fordi siden da viser
+    naermeste dag med kurs, og en pil til et hull ville gitt samme dag."""
     if dag is None:
         return None, None
+    if kursdager is not None:
+        foer = [d for d in kursdager if d < dag and (minst is None or d >= minst)]
+        etter = [d for d in kursdager if d > dag and (maks is None or d <= maks)]
+        return (max(foer) if foer else None, min(etter) if etter else None)
     forrige = dag - timedelta(days=1)
     while not _boersdag_eller_hverdag(forrige):
         forrige -= timedelta(days=1)

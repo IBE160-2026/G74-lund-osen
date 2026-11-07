@@ -104,6 +104,22 @@ class TestToppenOgSummen:
                 assert "to-av-tre" not in summen + kortet and "tre-av-tre" not in summen + kortet
         assert {2, 3} <= sett, (symbolene, sett)
 
+    def test_to_av_tre_har_ingen_ring_en_tidligere_dag(self, klient):
+        """Gjennomgangen av 8.20a (BH11, ECH1): designregler.md §3 merker 2 av 3
+        bare for siste børsdag. Ville feilet hvis en tidligere dag med 2 av 3
+        fikk svart ring."""
+        for symbol in sorted(set(re.findall(r'href="/aksje/([A-Z]+)"', _side(klient, "/")))):
+            historikken = _side(klient, f"/aksje/{symbol}").split('<section class="historikk"', 1)[1]
+            for dag, celle in re.findall(r'href="/aksje/[A-Z]+\?dag=([\d-]+)">(.*?)</li>', historikken, flags=re.S):
+                if '<span class="pille">2 av 3</span>' in celle:
+                    html = _side(klient, f"/aksje/{symbol}?dag={dag}")
+                    if 'class="tidligere-dag"' not in html:
+                        continue
+                    summen = html.split('<p class="sumrad">', 1)[1].split("</p>", 1)[0]
+                    assert '<span class="pille">2 av 3</span>' in summen and "to-av-tre" not in html
+                    return
+        pytest.fail("ingen tidligere dag med 2 av 3 i demoen")
+
     def test_ringen_har_stil(self):
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
         assert ":where(.side-aksje) .sumrad .pille.to-av-tre { border: 1.5px solid var(--blekk);" in stil
@@ -124,6 +140,10 @@ class TestDatoen:
         html = _side(klient, f"{side}{skille}periode={SISTE}")
         valget = _periodevalget(html)
         siste = _siste_dag(html)
+        # Gjennomgangen av 8.20a (BH5): siste børsdag fra kortene på
+        # aksjesiden, ikke bare max i det samme feltet.
+        meta = re.search(r'<p class="meta">[^<]*· (\d{2})\.(\d{2})', _side(klient, "/aksje/BRFE"))
+        assert (siste.day, siste.month) == (int(meta.group(1)), int(meta.group(2)))
         assert f'id="velg-dag" name="dag" required value="{siste.isoformat()}"' in valget
         # Neste er grå på siste dag, forrige er en lenke.
         assert re.search(
@@ -203,6 +223,23 @@ class TestPilene:
         børsen har stengt."""
         assert pilene(date(2026, 12, 28), None, None)[0] == date(2026, 12, 23)
 
+    def test_foer_2026_er_en_hverdag_en_boersdag(self):
+        """Gjennomgangen av 8.20a (VG1): børskalenderen begynner i 2026, og før
+        det er en hverdag en børsdag, som foerste_boersdag_fra. Ville feilet
+        med UtenforKalenderen, som ga en feilside for en dag ved nyttår."""
+        assert pilene(date(2026, 1, 2), None, None) == (date(2025, 12, 31), date(2026, 1, 5))
+        assert pilene(date(2025, 12, 15), None, None) == (date(2025, 12, 12), date(2025, 12, 16))
+
+    def test_med_kursdagene_hoppes_et_hull_over(self):
+        """Gjennomgangen av 8.20a (ECH2): børsometeret viser nærmeste dag med
+        kurs. Ville feilet hvis neste-pila gikk til hullet, som ga samme dag
+        tilbake, eller forbi siste dag feltet godtar."""
+        dagene = [date(2026, 10, 5), date(2026, 10, 7), date(2026, 10, 8)]
+        assert pilene(date(2026, 10, 5), None, None, dagene) == (None, date(2026, 10, 7))
+        assert pilene(date(2026, 10, 7), date(2026, 10, 6), date(2026, 10, 7), dagene) == (None, None)
+        mal = (ROT / "src" / "templates" / "boersometer.html").read_text(encoding="utf-8")
+        assert "kursdager=kursdager" in mal
+
     def test_dagen_i_feltet(self):
         siste, dag = date(2026, 10, 9), date(2026, 10, 1)
         assert dagen_i_feltet(SISTE, None, siste) == siste
@@ -245,6 +282,33 @@ class TestGrafen:
         dager = re.findall(r'<g class="musedag">', figuren)
         datoer = re.findall(r'<text class="lappdato"[^>]*>(\w+ \d{2}\.\d{2})</text>', figuren)
         assert len(dager) == len(datoer) > 100
+
+    def test_lappen_dekker_aldri_punktet(self):
+        """Gjennomgangen av 8.20a (ECH3): i den smale grafen får lappen ikke
+        plass ved siden av punktet midt i. Ville feilet hvis den ble skjøvet
+        inn over punktet den gjelder, eller ut av tegneflaten."""
+        from aksjedetalj import Punkt
+        from graf import LAPPBREDDE, LAPPHOYDE, MARG_Y, bygg_graf
+
+        punkter = tuple(Punkt(date(2026, 1, 5) + timedelta(days=i), 100.0 + (i % 7) * 3, None) for i in range(60))
+        for smal in (False, True):
+            g = bygg_graf(punkter, smal=smal)
+            for d in g.dager:
+                assert not (d.lapp_x <= d.x <= d.lapp_x + LAPPBREDDE and d.lapp_y <= d.y <= d.lapp_y + LAPPHOYDE), d
+                assert g.venstre <= d.lapp_x and d.lapp_x + LAPPBREDDE <= g.hoeyre + 0.01, d
+                assert MARG_Y <= d.lapp_y and d.lapp_y + LAPPHOYDE <= g.bunn + 0.01, d
+
+    def test_hjelpen_sier_snittet_og_streken_bare_naar_de_vises(self, klient):
+        """Gjennomgangen av 8.20a (ECH4, VG2, ECH5): en dag uten vurdering har
+        også snittlinja, og en periode har ingen strek. Ville feilet hvis
+        hjelpen ikke nevnte snittet en dag uten sjekker, eller nevnte streken
+        i en periode."""
+        tekster = hjelpetekster()
+        ikke_vurdert = _vinduene(_side(klient, "/aksje/BRFE?dag=2026-09-14"))["hjelp-graf"]
+        assert "den tynne snittet" in ikke_vurdert
+        assert tekster["streken"].tekst in ikke_vurdert
+        uke = _vinduene(_side(klient, "/aksje/BRFE?periode=1-uke"))["hjelp-graf"]
+        assert tekster["streken"].tekst not in uke and tekster["perioden"].tekst in uke
 
     def test_lappen_vises_bare_ved_musa(self):
         """Ville feilet hvis lappen var synlig uten musa, eller trengte et
@@ -366,6 +430,12 @@ class TestFeteNavn:
         assert "<strong>Trenden</strong>" in tekst and "<strong>Bevegelsen</strong>" in tekst
         assert "<strong>Interessen</strong>" in tekst and "og trenden igjen" in tekst
         assert '<span class="tall">1</span>' in tekst and "Interessant." in tekst
+
+    def test_sjekken_i_navnet(self):
+        """Gjennomgangen av 8.20a (ECH6): ville feilet hvis «trendsjekken» eller
+        «Bevegelse-sjekken» ikke ble fett, eller bare en del av ordet."""
+        tekst = str(ki_tekst("Trendsjekken ga 1. Bevegelse-sjekken ga 0."))
+        assert "<strong>Trendsjekken</strong>" in tekst and "<strong>Bevegelse-sjekken</strong>" in tekst
 
     def test_teksten_escapes(self):
         assert "&lt;b&gt;" in str(ki_tekst("Trend <b> & 3"))

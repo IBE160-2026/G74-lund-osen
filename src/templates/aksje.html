@@ -37,7 +37,9 @@
       siden viser. #}
   <p class="innledning">{% if detalj.sjekker %}Siden viser sjekkene for {{ detalj.aksje.navn }} med tallene bak, kursgrafen og det appen skrev om aksjen hver børsdag.{% else %}Siden viser kursgrafen for {{ detalj.aksje.navn }} og det appen skrev om aksjen hver børsdag.{% endif %}</p>
 
-  {%- set ringen = "tre-av-tre" if detalj.styrke == antall_sjekker else "to-av-tre" if detalj.styrke is not none and detalj.styrke >= parametre.terskel else "" %}
+  {#- Gjennomgangen av 8.20a (BH11, ECH1): 2 av 3 merkes bare for siste
+      børsdag (designregler §3), som overskriften over. #}
+  {%- set ringen = "tre-av-tre" if detalj.styrke == antall_sjekker else "to-av-tre" if detalj.styrke is not none and detalj.styrke >= parametre.terskel and not tidligere_dag else "" %}
   <div class="sammendrag">
     <div class="noekkeltall">
       <span class="etikett">Sluttkurs {{ hjelpeknapp("hjelp-kurs", "Hjelp: sluttkurs") }}</span>
@@ -117,7 +119,7 @@
         retningen. Gruppens svar 04.11 kl. 09:48: styrken først, som tabellen
         (8.0e). #}
     {#- Story 8.20a (del A, svaret 06.11 kl. 22:25 og spørsmål 3 i 8.20):
-        fotnoten under summen er flyttet. «ingen vekting» står i vinduet ved
+        fotnoten under summen er flyttet. «uten vekting» står i vinduet ved
         «Hvorfor signalet ble …», og blandet retning i vinduet for retningen.
         2 av 3 har svart ring (spørsmål 13). #}
     <p class="sumrad"><span class="sumnavn">Sum</span> <span class="pille{% if ringen %} {{ ringen }}{% endif %}">{{ detalj.styrke }} av {{ antall_sjekker }}</span> {{ brikker(detalj.sjekkbrikker) }} {{ retningspille(detalj.retning) }}</p>
@@ -141,8 +143,9 @@
   {#- Story 2.9c: hjelpen forklarer også den stiplede linja når den vises.
       Story 8.20a (del E): én tekst om grafen, med snittet når det vises,
       setningen om den stiplede linja bare med indeksen, og så streken og
-      knappene. #}
-  {%- set grafhjelp = ((["grafen"] if graf.har_ma50 and detalj.sjekker else ["grafen_uten_snitt"]) + (["indekslinja"] if graf.har_indeks else []) + ["perioden"]) if graf else [] %}
+      knappene. Gjennomgangen av 8.20a: snittet når grafen tegner det, også
+      en dag uten sjekker (ECH4, VG2), og streken bare når den vises (ECH5). #}
+  {%- set grafhjelp = ((["grafen"] if graf.har_ma50 else ["grafen_uten_snitt"]) + (["indekslinja"] if graf.har_indeks else []) + (["streken"] if graf.merket else []) + ["perioden"]) if graf else [] %}
   {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
       perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}

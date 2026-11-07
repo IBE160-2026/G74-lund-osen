@@ -439,6 +439,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         },
         "ukjent_aksje": Hjelpetekst(
             f"{UKJENT_RETNING.symbol} {UKJENT_RETNING.tekst}:",
+            # Gjennomgangen av 8.20a (BH1): at det ikke er en femte retning, staar i
+            # docs/hjelp.md, «Hvorfor står det «ikke vurdert»?», fordi vinduet har 60 ord.
             "ingen vurdering for dagen, og grunnen står under kortene.",
             ((PRD, "«Ukjent» er ikke en femte retning i FR-704"), (AKSJE_MAL, '<p class="mangler">')),
         ),
@@ -578,8 +580,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # knappene og datoen.
         "perioden": Hjelpetekst(
             "",
-            "Streken med datoen er dagen siden viser. Knappene velger hvor langt tilbake grafen går, "
-            "og datoen med «Vis dagen» viser hele siden for en dag.",
+            # Gjennomgangen av 8.20a (ECH5): streken staar for seg. At en dag viser
+            # signalet som er lagret for den, staar i docs/hjelp.md (BH1).
+            "Knappene velger hvor langt tilbake grafen går, og datoen med «Vis dagen» viser hele siden for en dag.",
             (
                 (PERIODER, "def startdag("),
                 (PERIODE_MAL, 'class="periodevalg"'),
@@ -588,10 +591,19 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (AKSJE_MAL, 'class="tidligere-dag"'),
             ),
         ),
+        # Gjennomgangen av 8.20a (ECH5): streken med datoen, bare naar grafen
+        # har den, det vil si ved den foerste knappen og en valgt dag.
+        "streken": Hjelpetekst(
+            "",
+            "Streken med datoen er dagen siden viser.",
+            ((AKSJE_MAL, 'class="dagstrek"'), (AKSJE_MAL, 'class="daglapp"')),
+        ),
         # Story 2.9c: hovedindeksen som stiplet linje i kursgrafen.
         # Story 8.20a (del E): én setning. Resten staar under grafen.
         "indekslinja": Hjelpetekst(
             "",
+            # Gjennomgangen av 8.20a (BH1): forbeholdet fra den lange teksten staar i
+            # docs/hjelp.md, fordi vinduet har 60 ord.
             "Den stiplede er hovedindeksen, regnet om så den starter på aksjens kurs.",
             (
                 (GRAF, "def indeksverdier("),

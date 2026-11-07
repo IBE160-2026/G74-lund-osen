@@ -335,7 +335,9 @@ class TestSidene:
                 return super().tekst(noekkel)
 
         monkeypatch.setattr(app_modul, "Hjelp", Opptak)
-        for adresse in SIDENE:
+        # Gjennomgangen av 8.20a (ECH5): teksten om streken står bare når
+        # grafen har en dag merket, som ved den første knappen.
+        for adresse in SIDENE + ("/aksje/BRFE?periode=siste",):
             _side(klient, adresse)
         assert bedt_om == set(hjelpetekster())
 

@@ -112,6 +112,15 @@ const tekster = Array.from(svg.querySelectorAll('text')).filter((t) => t.textCon
 r.lappUtenfor = Array.from(svg.querySelectorAll('.lappramme')).filter((t) => { const tb = t.getBoundingClientRect();
   return tb.left < b.left - 0.5 || tb.right > b.right + 0.5 || tb.top < b.top - 0.5 || tb.bottom > b.bottom + 0.5; }).length;
 r.lappSkjult = Array.from(svg.querySelectorAll('.lapp')).every((g) => getComputedStyle(g).visibility === 'hidden');
+// Gjennomgangen av 8.20a (ECH8): navnet og tallet på samme linje i lappen
+// overlapper ikke, og står inne i rammen.
+r.lappOverlapp = [];
+for (const g of svg.querySelectorAll('.lapp')) {
+  const ramme = g.querySelector('.lappramme').getBoundingClientRect();
+  const navn = Array.from(g.querySelectorAll('.lappnavn')), tall = Array.from(g.querySelectorAll('.lapptall'));
+  navn.forEach((n, i) => { const a = n.getBoundingClientRect(), c = tall[i].getBoundingClientRect();
+    if (a.right > c.left - 2 || c.right > ramme.right + 0.5 || a.left < ramme.left - 0.5) r.lappOverlapp.push(n.textContent + '/' + tall[i].textContent); });
+}
 r.grafskrift = Math.min(...tekster.map((t) => parseFloat(getComputedStyle(t).fontSize) * skala));
 r.utenfor = tekster.filter((t) => { const tb = t.getBoundingClientRect();
   return tb.left < b.left - 0.5 || tb.right > b.right + 0.5 || tb.top < b.top - 0.5 || tb.bottom > b.bottom + 0.5; })
@@ -171,6 +180,6 @@ def test_teksten_i_grafen_i_nettleseren(side, tmp_path, adresse, bredde):
     assert r["utenfor"] == [] and r["overlapp"] == [] and r["rulling"] is False, r
     # Story 8.20a (del C): lappen ved musepekeren står inne i grafen, og er
     # skjult til musa er over dagen.
-    assert r["lappUtenfor"] == 0 and r["lappSkjult"] is True, r
+    assert r["lappUtenfor"] == 0 and r["lappSkjult"] is True and r["lappOverlapp"] == [], r
     if bredde == 390:
         assert r["grafskrift"] >= r["ellers"] > 0, r

@@ -18,11 +18,16 @@
     «Vis dagen». Feltet viser siste børsdag ved den første knappen og dagen
     som er valgt, og er tomt i en periode. Pilene for forrige og neste
     børsdag står bare når feltet viser en dag, og er grå ved første og siste
-    dag feltet godtar. -#}
+    dag feltet godtar.
 
-{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None, ekstra=()) -%}
+    Gjennomgangen av 8.20a (ECH2): kursdager er dagene siden har kurs for,
+    når siden viser nærmeste dag med kurs i stedet for dagen som er valgt,
+    som børsometeret. Da går pilene til forrige og neste dag med kurs, så
+    de ikke står fast ved et hull. -#}
+
+{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None, ekstra=(), kursdager=None) -%}
 {%- set i_feltet = dagen_i_feltet(valgt, dag, maks) %}
-{%- set forrige, neste = pilene(i_feltet, minst, maks) %}
+{%- set forrige, neste = pilene(i_feltet, minst, maks, kursdager) %}
 {%- set foran %}{{ adresse }}?{% for felt, verdi in ekstra %}{{ felt }}={{ verdi }}&amp;{% endfor %}{% endset %}
 <nav class="periodevalg" aria-label="{{ etikett }}">
   <ul>

@@ -147,7 +147,12 @@ def prikkede_tall(tekst: str) -> Markup:
 # med fet skrift første gang det staar i teksten, som i skissen
 # aksjesiden-ki-paa.png. Ubestemt og bestemt form, med stor eller liten
 # forbokstav, som versjon 5 skriver dem («Trenden ga …»).
-SJEKKNAVN = re.compile(r"\b(trenden|trend|bevegelsen|bevegelse|interessen|interesse)\b", re.IGNORECASE)
+# Gjennomgangen av 8.20a (ECH6): ogsaa «trendsjekken» og «trend-sjekken», som
+# kontrollen godtar, hele ordet.
+SJEKKNAVN = re.compile(
+    r"\b(?:trend(?:en)?|bevegelsen?|interessen?)(?:-?sjekken)?(?![\w-])",
+    re.IGNORECASE,
+)
 
 
 def ki_tekst(tekst: str) -> Markup:

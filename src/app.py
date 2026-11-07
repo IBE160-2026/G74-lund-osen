@@ -775,6 +775,8 @@ def boersometer():
         dagen=dagen,
         siste=siste,
         foerste=datoer[0],
+        # Gjennomgangen av 8.20a (ECH2): pilene ved datoen går til dagene med kurs.
+        kursdager=datoer,
         # Gjennomgangen 26.10 (ECH4): datoen når børsdagen før er mer enn 6 dager før.
         dagen_foer=vis_dagen_foer(dagen_foer(datoer, dagen), dagen, i_dag.year),
         volum_vindu=STANDARD.volum_vindu,

@@ -141,7 +141,9 @@ class Forklaring:
 # som avstanden mellom to dager, og lappen vises naar musa er over feltet.
 # LAPPBREDDE og LAPPHOYDE er lappen med dato, kurs og snitt, og LAPPLUFT
 # avstanden fra punktet.
-LAPPBREDDE = 132
+# Gjennomgangen av 8.20a (ECH8): bred nok til «Snitt 50 dager» og et tall med
+# tusenskille, som «1 234,56», i 12 px. Var 132.
+LAPPBREDDE = 176
 LAPPHOYDE = 58
 LAPPLUFT = 10
 
@@ -451,7 +453,9 @@ def _dagene(punkter: tuple[Punkt, ...], lav, hoy, bredde, hoyde, hoeyre, bunn) -
     """Story 8.20a (del C): feltet og lappen for hver dag. Feltet gaar
     halvveis til dagen foer og etter, og lappen staar til hoeyre for punktet,
     eller til venstre naar den ellers gaar ut over tegneflaten, og aldri over
-    eller under den."""
+    eller under den. Gjennomgangen av 8.20a (ECH3): faar den ikke plass paa
+    noen av sidene, som i den smale grafen, staar den over eller under
+    punktet, saa den aldri dekker punktet den gjelder."""
     antall = len(punkter)
     steg = (bredde - VENSTRE - hoeyre) / (antall - 1)
     hoeyrekant = bredde - hoeyre
@@ -460,8 +464,17 @@ def _dagene(punkter: tuple[Punkt, ...], lav, hoy, bredde, hoyde, hoeyre, bunn) -
         x = _x(i, antall, bredde, hoeyre)
         y = _y(p.kurs, lav, hoy, hoyde, bunn)
         venstre = max(VENSTRE, x - steg / 2)
-        lapp_x = x + LAPPLUFT if x + LAPPLUFT + LAPPBREDDE <= hoeyrekant else x - LAPPLUFT - LAPPBREDDE
-        lapp_y = min(max(MARG_Y, y + LAPPLUFT), hoyde - bunn - LAPPHOYDE)
+        bunnkant = hoyde - bunn
+        if x + LAPPLUFT + LAPPBREDDE <= hoeyrekant:
+            lapp_x = x + LAPPLUFT
+            lapp_y = min(max(MARG_Y, y + LAPPLUFT), bunnkant - LAPPHOYDE)
+        elif x - LAPPLUFT - LAPPBREDDE >= VENSTRE:
+            lapp_x = x - LAPPLUFT - LAPPBREDDE
+            lapp_y = min(max(MARG_Y, y + LAPPLUFT), bunnkant - LAPPHOYDE)
+        else:
+            lapp_x = min(max(VENSTRE, x - LAPPBREDDE / 2), hoeyrekant - LAPPBREDDE)
+            under = y + LAPPLUFT
+            lapp_y = under if under + LAPPHOYDE <= bunnkant else y - LAPPLUFT - LAPPHOYDE
         dager.append(
             Dag(
                 dato=p.dato,
@@ -472,7 +485,7 @@ def _dagene(punkter: tuple[Punkt, ...], lav, hoy, bredde, hoyde, hoeyre, bunn) -
                 y_snitt=_y(p.ma50, lav, hoy, hoyde, bunn) if p.ma50 is not None else None,
                 felt_x=venstre,
                 felt_bredde=min(hoeyrekant, x + steg / 2) - venstre,
-                lapp_x=max(VENSTRE, lapp_x),
+                lapp_x=lapp_x,
                 lapp_y=lapp_y,
             )
         )
