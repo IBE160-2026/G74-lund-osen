@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-07T13:40
+updated: 2026-11-07T15:39
 ---
 
 # Kvalitetssikring
@@ -264,6 +264,8 @@ til basen (story 2.1b). `tests/test_tidssone.py` avviser `date.today(`,
 *Avgjort 2026-10-29 kl. 21:02 (gruppens svar):* etter Windows-oppdateringen 29.10 feiler de 7 tilfellene av `test_start_ps1_stopper_bare_den_andre_versjonen_paa_porten` og `test_start_ps1_frigjoer_porten_rett_foer_webserveren` i `tests/test_dobbeltklikk.py` lokalt, også på main og etter omstart, fordi `Get-NetTCPConnection` ikke ser en lytter på 127.0.0.1:8000 som `Listen`. Til feilen er rettet, avgjør CI dem: hele settet lokalt regnes som grønt når bare disse 7 feiler, og CI må være grønn på head-en. Feilen undersøkes mandag.
 
 *Avgjort 2026-11-07 kl. 11:47 (gruppens svar):* porttestene rettes i samme PR: start.ps1 finner lytteren på port 8000 med netstat når Get-NetTCPConnection ikke ser den. Rådet anbefalte det.
+
+*Lagt til 2026-11-07 (svaret kl. 15:34 under story 2.16 i `epics.md`, svar 3):* `Lyttere` i `start/start.ps1` spør først som før, så `Get-NetTCPConnection` uten tilstand etter raden med fjernport 0, og så netstat, fordi netstat alene så lytteren 0 og 4 av 30 ganger.
 
 *Avgjort 2026-10-25 kl. 20:16 (gruppens svar):* ingen sperre før push. Regelen står i hver instruksjon, og CI fanger feil.
 
