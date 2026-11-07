@@ -172,54 +172,27 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             ),
         ),
         # Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret.
+        # Story 8.20b (U95, svaret 06.11 kl. 23:07): høyst 60 ord i vinduet,
+        # og resten i docs/hjelp.md, «Hva viser børsometeret?».
         "boersometeret": Hjelpetekst(
             "Børsometer:",
-            # Story 8.6b, c: fem trinn.
-            "én rute per aksje, ordnet etter bransje, med endringen fra børsdagen før som farge i fem "
-            "trinn, som «Hva fargene betyr» under rutene viser. "
-            # Story 8.6b, d: arealet i kartet.
-            "Arealet av ruta følger volumet mot vanlig, men ruta blir ikke større over 3 ganger vanlig volum eller "
-            # Gruppens svar 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell».
-            "mindre under halvparten, og tabellen bak «Se tallene som tabell» har tallet; "
-            # Gruppens svar 26.10 kl. 13:00 (a): Tab følger kartet.
-            "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem. "
-            "Rammen er gul ved 3 av 3 på siste børsdag, også når du velger en annen dag, og "
-            "mørk ved 2 av 3 bare på siste børsdag, "
-            # Gruppens svar 04.11 kl. 22:23, 1: store ruter som i designforslaget.
-            # Gjennomgangen av svarene 05.11 kl. 14:29 (ECH2): bare fra 1079 px.
-            "i et vindu fra 1079 px har de største rutene symbolet og styrken øverst, selskapsnavnet under, kuttet med «…» når "
-            "det er for langt, og endringen i stor skrift nederst, med merket og grunnen mellom der de får plass, "
-            # Gruppens svar 05.11 kl. 14:29, 1.
-            "og merket i stedet for navnet når det ikke får plass under navnet, "
-            # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken i rutene.
-            "og styrken står i rutene som har plass, som i tabellen, "
-            # Gruppens svar 04.11 kl. 20:53 og 20:56, 1.
-            "en annen dag i en rute med gul ramme bare der merket «3 av 3 siste børsdag» også får plass, "
-            # Gruppens svar 04.11 kl. 20:53 og 20:56, 2.
-            "mens en rute med kurs, men uten styrke, sier «ikke vurdert» der, "
-            "med grunnen under når hele grunnen får plass, "
-            # Gruppens svar 05.11 kl. 09:34, 1: fotnoten for en annen grunn.
-            "og er grunnen en annen enn at signalet ikke er lagret, som for kort kurshistorikk, "
-            "sier en fotnote under kartet at grunnen står i tabellen og på aksjesiden; overskriften har "
-            "snittet av endringen for aksjene i bransjen som har kurs, og «1 aksje» der det er én, "
-            # Gruppens svar 26.10 kl. 13:00 (b): bare navnet når feltet er smalt.
-            "eller bare navnet når feltet er smalt, "
-            # Story 8.6b, b: linja «Mål mot børsen».
-            "og linja «Mål mot børsen» har endringen i hovedindeksen den dagen.",
+            "én rute per aksje, samlet etter bransje. Fargen er endringen, i fem trinn. "
+            "Klikk på en rute for å se aksjen.",
             (
                 (PRD, "#### FR-106 — Børsometeret"),
-                (BOERSOMETER, "def vekt("),
-                (BOERSOMETER, "def rekkefoelge("),
-                (BOERSOMETER, "MINSTE_VEKT = 0.5"),
-                (BOERSOMETER, "STOERSTE_VEKT = 3.0"),
-                (BOERSOMETER, "def snitt("),
-                (BOERSOMETER, "def indeks_for_dagen("),
                 (BOERSOMETER, "def fargetrinn("),
-                (BOERSOMETER, "def styrkelinje("),
-                (BOERSOMETER, "def storplass("),
-                (BOERSOMETER, "def ikke_vurdert_plass("),
-                (BOERSOMETER, "def grunnplass("),
-                (BOERSOMETER, "def annen_grunn("),
+                (BOERSOMETER, "def bygg_boersometer("),
+            ),
+        ),
+        # Story 8.20b (svaret 06.11 kl. 22:57): størrelsen og rammen.
+        "boersometeret_ruta": Hjelpetekst(
+            "",
+            "For én dag følger størrelsen volumet mot vanlig, og for en periode er rutene like store. "
+            f"Gul ramme er {ANTALL_SJEKKER} av {ANTALL_SJEKKER} og mørk {ANTALL_SJEKKER - 1} av "
+            f"{ANTALL_SJEKKER}, begge siste børsdag.",
+            (
+                (BOERSOMETER, "def vekt("),
+                (BOERSOMETER, "def ramme("),
             ),
         ),
         # Story 2.9 (FR-104): delen over tabellen.
@@ -564,14 +537,17 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.17b: periodevalget i børsometeret (gruppens svar 23.10 kl. 12:35, b).
         "perioden_boersometeret": Hjelpetekst(
             "Periodene:",
-            "knappene viser siste børsdag, endringen fra den første kursen i perioden til siste "
-            "børsdag, eller en dag du velger. Ved en periode er rutene like store, fordi volumet mot "
-            "vanlig gjelder én dag, og fargen og snittet er endringen for perioden. Rammen er signalet "
-            "siste børsdag.",
+            # Story 8.20b (U95): teksten fra utkastet i spesifikasjonen for 8.20.
+            # Gjennomgangen (BH16): hvor perioden slutter, og at snittet følger den.
+            "den første knappen viser siste børsdag, de andre endringen fra den første kursen i "
+            "perioden til siste børsdag, i fargen og snittet, og datoen med «Vis dagen» en dag du "
+            "velger. Ved en periode er rutene like store, fordi volumet mot vanlig gjelder én dag. "
+            "Rammen er signalet siste børsdag.",
             (
                 (BOERSOMETER, "def vekt("),
                 (MARKEDSOVERSIKT, "def periodeendring("),
                 (APP, "def _periodestart("),
+                (PERIODE_MAL, 'class="periodevalg"'),
             ),
         ),
         # Story 8.16: periodene i kursgrafen og regelen for startdagen.

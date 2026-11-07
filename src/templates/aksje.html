@@ -208,12 +208,14 @@
         <polyline class="kurslinje" points="{{ g.kurslinje }}"></polyline>
         {#- Story 8.20a (del C, spørsmål 9 i 8.20, U89): datoen i en svart lapp
             øverst på streken, og uten punktet nederst. Lappen står innenfor
-            tegneflaten, også ved kanten. #}
+            grafen sidelengs, også ved kanten. Story 8.20b (BH9): lappen står
+            over tegneflaten (MARG_Y i graf.py), så den aldri dekker kurslinja. #}
         {% if g.merket %}
           {%- set lappx = [[g.merket.x - 22, g.venstre]|max, g.hoeyre - 44]|min %}
-          <line class="dagstrek" x1="{{ "%.1f"|format(g.merket.x) }}" y1="{{ g.topp + 18 }}" x2="{{ "%.1f"|format(g.merket.x) }}" y2="{{ g.bunn }}"></line>
-          <rect class="daglapp" x="{{ "%.1f"|format(lappx) }}" y="{{ g.topp }}" width="44" height="18" rx="4"></rect>
-          <text class="daglapptekst" text-anchor="middle" x="{{ "%.1f"|format(lappx + 22) }}" y="{{ g.topp + 13 }}">{{ dagen.dato|dato }}</text>
+          {%- set lappy = g.topp - 22 %}
+          <line class="dagstrek" x1="{{ "%.1f"|format(g.merket.x) }}" y1="{{ lappy + 18 }}" x2="{{ "%.1f"|format(g.merket.x) }}" y2="{{ g.bunn }}"></line>
+          <rect class="daglapp" x="{{ "%.1f"|format(lappx) }}" y="{{ lappy }}" width="44" height="18" rx="4"></rect>
+          <text class="daglapptekst" text-anchor="middle" x="{{ "%.1f"|format(lappx + 22) }}" y="{{ lappy + 13 }}">{{ dagen.dato|dato }}</text>
         {% endif %}
         {% if g.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(g.siste.x) }}" cy="{{ "%.1f"|format(g.siste.y) }}" r="4.5"></circle>{% endif %}
         {#- Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved

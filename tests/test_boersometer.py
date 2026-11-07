@@ -320,6 +320,30 @@ def _lenker(html: str) -> list[str]:
     return re.findall(r'<a class="rute [^"]*" href="/aksje/([A-Z0-9]+)(?:\?dag=[0-9-]+)?"', html)
 
 
+def _tabellrader(html: str) -> list[tuple[str, str, str, str, str]]:
+    """Story 8.20b (U93): symbolet, navnet, endringen, volumet og styrken i
+    hver rad i tabellen, uten tagger. Bare vanlige mellomrom slås sammen, så
+    det harde mellomrommet foran % står (regel 21)."""
+    tabell = html.split('<table class="boersometertabell">', 1)[1].split("</table>", 1)[0]
+    ut = []
+    for rad in re.findall(r'<tr(?: class="gul")?>\s*(<td class="selskap">.*?)</tr>', tabell, re.S):
+        celler = [
+            re.sub(r"[ \t\r\n]+", " ", re.sub(r"<[^>]+>", " ", celle)).strip()
+            for celle in re.findall(r"<td[^>]*>(.*?)</td>", rad, re.S)
+        ]
+        symbol = re.search(r'href="/aksje/([A-Z0-9]+)', rad).group(1)
+        navn = re.search(r'href="/aksje/[^"]+">([^<]+)</a>', rad).group(1)
+        ut.append((symbol, navn, celler[1], celler[2], celler[3]))
+    return ut
+
+
+def _avsnittet() -> str:
+    """«Hva viser børsometeret?» i docs/hjelp.md, som har teksten som gikk ut
+    av vinduet i 8.20b."""
+    hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    return hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+
+
 def _tall(tekst: str) -> float:
     return float(tekst.replace(",", ".").replace("\u00a0%", "").replace("\u2212", "-"))
 
@@ -358,13 +382,12 @@ class TestSiden:
         assert abs(float(vist.replace(",", ".").replace(" %", "")) - sum(endringer) / 4) <= 0.006
 
     def test_1_aksje_der_bransjen_har_en(self, klient):
-        """Ville feilet med «1 aksjer», eller uten merket. Gruppens svar
-        26.10 kl. 13:00 (b): antallet står i tabellen, ikke i overskriften."""
+        """Ville feilet med «1 aksjer», eller uten merket. Story 8.20b (U97,
+        spørsmål 14 d): antallet står også i overskriften, under navnet."""
         html = _side(klient)
         overskrifter = _overskrifter(html)
         assert overskrifter["Industri"].endswith("1 aksje")
-        assert "aksjer" not in overskrifter["Energi"]
-        assert "Energi (4 aksjer, snitt" in html
+        assert "4 aksjer · snitt" in overskrifter["Energi"]
         assert not any(t.endswith("1 aksjer") for t in overskrifter.values())
 
     def test_antallet_telles_fra_lista(self, klient):
@@ -408,8 +431,7 @@ class TestSiden:
         STOERSTE_VEKT. Ville feilet hvis arealet ikke fulgte volumforholdet i
         tabellen (mutant 2, arealet uten vekten)."""
         html = _side(klient)
-        tabell = html.split('<table class="boersometertabell">')[1]
-        rader = re.findall(r'href="/aksje/([A-Z0-9]+)">.*?</td>\s*<td>[^<]*</td>\s*<td>([^<]*)</td>', tabell, re.S)
+        rader = [(symbol, volum) for symbol, _navn, _endring, volum, _styrke in _tabellrader(html)]
         assert len(rader) == 15
         vekter = {}
         for symbol, volum in rader:
@@ -537,18 +559,8 @@ class TestSiden:
         """Gjennomgangen (VG5): ville feilet hvis endringen eller styrken i
         tabellen var en annen enn i ruta."""
         html = _side(klient)
-        tabell = html.split('<table class="boersometertabell">')[1]
-        rader = re.findall(
-            r"<tr>\s*<td>[^<]*</td>\s*<td>(?:<a [^>]*>)?([^<]+)(?:</a>)?</td>\s*<td>([^<]*)</td>\s*<td>[^<]*</td>\s*<td>([^<]*)</td>",
-            tabell,
-        )
+        rader = _tabellrader(html)
         assert len(rader) == 15
-        navn_til_symbol = {
-            f"{n}": s
-            for s, n in re.findall(
-                r'<span class="ticker">([A-Z0-9]+)</span>.*?<span class="skjult">, ([^,<]+)', html, re.S
-            )
-        }
         endringer = dict(
             re.findall(r'<span class="ticker">([A-Z0-9]+)</span>\s*<span class="endring">([^<]+)</span>', html)
         )
@@ -561,8 +573,7 @@ class TestSiden:
             )
         )
         assert 'class="merke"' not in html
-        for navn, endring, styrke in rader:
-            symbol = navn_til_symbol[navn]
+        for symbol, _navn, endring, _volum, styrke in rader:
             assert endringer[symbol] == endring, symbol
             if re.fullmatch(r"\d av 3", styrke):
                 assert styrker[symbol] == styrke, symbol
@@ -591,7 +602,9 @@ class TestSiden:
             '<div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">'
             in html
         )
-        assert "<caption>Børsometeret 09.10 som tabell</caption>" in html and html.count('scope="col"') >= 5
+        # Story 8.20b (U93): fire kolonner, og bransjen i et bånd over radene.
+        assert "<caption>Børsometeret 09.10 som tabell</caption>" in html and html.count('scope="col"') == 4
+        assert html.count('scope="rowgroup"') == 8
         assert '<span class="skjult">, Brattfjell Energi, volum høyt</span>' in html
 
     def test_tabellen_er_lukket_bak_se_tallene_som_tabell(self, klient):
@@ -608,8 +621,9 @@ class TestSiden:
             assert '<table class="boersometertabell">' in tallene[0] and "</table>" in tallene[0]
             assert html.count('<table class="boersometertabell">') == 1
             assert "fotnote" not in tallene[0]
-            # Kartet og «Hva fargene betyr» står over, utenfor details.
-            assert html.index('<section class="fargene"') < html.index('<details class="tallene">')
+            # Kartet står over, utenfor details. Story 8.20b: «Hva fargene
+            # betyr» er kortet «Slik leser du børsometeret» øverst.
+            assert html.index('<div class="kart"') < html.index('<details class="tallene">')
         fotnote = _side(klient, "/boersometer?dag=2026-09-18")
         assert _fotnoten(fotnote) and fotnote.index("</details>") < fotnote.index('<p class="fotnote">')
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
@@ -846,7 +860,8 @@ class TestSvaretKl0924:
         from hjelpetekster import hjelpetekster
 
         tekster = hjelpetekster(STANDARD)
-        assert "også når du velger en annen dag" in tekster["boersometeret"].tekst
+        # Story 8.20b: teksten om rammen står i docs/hjelp.md.
+        assert "også når du velger en annen dag" in _avsnittet()
         assert "med lenke til aksjesiden" in tekster["uten_data"].tekst
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "også en dag uten vurdering" in hjelp
@@ -982,10 +997,11 @@ class TestFotnotenEtterStartdagen:
 
 # --- Story 8.6b: børsometeret som tavla ------------------------------------
 
+# Story 8.20b (U98): én tekst for en dag og en periode, som skissen.
 FORKLARINGEN = (
-    "Hver rute er en aksje, samlet etter bransje. Fargen viser endringen fra børsdagen før, og jo større ruta "
-    "er, jo mer ble aksjen omsatt sammenlignet med vanlig. Klikk på en rute for å se aksjen. Bildet viser hva "
-    "som skjedde, ikke hva du bør kjøpe eller selge."
+    "Hver rute er en aksje, samlet etter bransje. Fargen viser endringen i perioden du velger, og rammen viser "
+    "signalet siste børsdag. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør "
+    "kjøpe eller selge."
 )
 
 
@@ -1002,12 +1018,20 @@ class TestForklaringen:
         assert FORKLARINGEN in _side(klient, "/boersometer?dag=2026-09-18")
 
 
-def _maal(html: str) -> list[str]:
-    """Punktene i linja «Mål mot børsen», uten taggene. Bare vanlige
-    mellomrom slås sammen, så det harde mellomrommet foran % står (regel 21)."""
-    linja = re.search(r'<section class="maal".*?</section>', html, re.S).group(0)
-    punkter = re.findall(r"<li>(.*?)</li>", linja, re.S)
-    return [re.sub(r"[ \t\r\n]+", " ", re.sub(r"<[^>]+>", "", li)).strip() for li in punkter]
+def _maal(html: str) -> dict[str, str]:
+    """Kortet «Mål mot børsen» (story 8.20b): tallet for hovedindeksen, når
+    det gjelder, og setningen under, uten taggene. Bare vanlige mellomrom
+    slås sammen, så det harde mellomrommet foran % står (regel 21)."""
+    kortet = re.search(r'<section class="maal".*?</section>', html, re.S).group(0)
+
+    def tekst(moenster: str) -> str:
+        return re.sub(r"[ \t\r\n]+", " ", re.sub(r"<[^>]+>", "", re.search(moenster, kortet, re.S).group(1))).strip()
+
+    return {
+        "indeks": tekst(r'<span class="indeksendring[^"]*">(.*?)</span>'),
+        "naar": tekst(r'<span class="naar">(.*?)</span>'),
+        "bedre": tekst(r'<p class="bedre">(.*?)</p>'),
+    }
 
 
 def _demoindeksen() -> list[Kursrad]:
@@ -1022,17 +1046,16 @@ def _demoindeksen() -> list[Kursrad]:
 class TestLinjaMotBoersen:
     """8.6b, b (avgjørelsen 24.10 kl. 11:54)."""
 
-    def test_de_tre_punktene(self, klient):
-        """09.10 er en fredag, og børsdagen før er torsdag. Ville feilet med
-        en annen ukedag, et annet vindu enn de 20 børsdagene før, eller uten
-        hovedindeksen."""
-        punkter = _maal(_side(klient))
-        assert STANDARD.volum_vindu == 20
-        assert punkter[:2] == ["Farge · endring fra torsdag", "Størrelse · volum mot medianen for de 20 børsdagene før"]
-        assert punkter[2].startswith("Hovedindeksen · ")
-        assert len(punkter) == 3
+    def test_kortet_sier_fargen_og_stoerrelsen(self, klient):
+        """09.10 er en fredag, og børsdagen før er torsdag. Story 8.20b
+        (spørsmål 14 b): kortet har hovedindeksen, dagen og setningen om
+        fargen og størrelsen. Ville feilet med en annen ukedag, uten
+        hovedindeksen, eller med teksten for en periode en dag."""
+        kortet = _maal(_side(klient))
+        assert kortet["naar"] == "fredag 09.10"
+        assert "Fargen i rutene under er endringen fra torsdag, og jo mer det ble handlet enn vanlig" in kortet["bedre"]
         # Mandag 05.10: børsdagen før er fredag.
-        assert _maal(_side(klient, "/boersometer?dag=2026-10-05"))[0] == "Farge · endring fra fredag"
+        assert "endringen fra fredag," in _maal(_side(klient, "/boersometer?dag=2026-10-05"))["bedre"]
 
     @pytest.mark.parametrize("dag", [None, "2026-10-08", "2026-09-18"])
     def test_tallet_i_linja_er_endringen_den_dagen(self, klient, dag):
@@ -1043,7 +1066,7 @@ class TestLinjaMotBoersen:
         dagen = date.fromisoformat(dag) if dag else date(2026, 10, 9)
         endring = indeks_for_dagen(_demoindeksen(), dagen)
         assert endring is not None
-        assert _maal(html)[2] == f"Hovedindeksen · {tall(endring, 'endring')}"
+        assert _maal(html)["indeks"] == tall(endring, "endring")
         vist = avrundet(endring, "endring")
         farge = "opp" if vist > 0 else "ned" if vist < 0 else "null"
         assert f'<span class="indeksendring {farge}">{tall(endring, "endring")}</span>' in html
@@ -1052,7 +1075,7 @@ class TestLinjaMotBoersen:
     def test_tallene_er_ulike_dag_for_dag(self, klient):
         """Ville feilet hvis linja viste samme tall for hver dag, som når den
         bare hadde siste børsdag."""
-        tallene = {_maal(_side(klient, f"/boersometer?dag=2026-10-0{d}"))[2] for d in (5, 6, 7, 8, 9)}
+        tallene = {_maal(_side(klient, f"/boersometer?dag=2026-10-0{d}"))["indeks"] for d in (5, 6, 7, 8, 9)}
         assert len(tallene) > 1
 
     def test_strek_naar_indeksen_mangler_dagen(self, klient):
@@ -1064,9 +1087,9 @@ class TestLinjaMotBoersen:
             tilkobling.commit()
         finally:
             tilkobling.close()
-        assert _maal(_side(klient, "/boersometer?dag=2026-10-08"))[2] == "Hovedindeksen · –"
+        assert _maal(_side(klient, "/boersometer?dag=2026-10-08"))["indeks"] == "–"
         # 09.10 mangler nå børsdagen før, og har heller ingen endring.
-        assert _maal(_side(klient))[2] == "Hovedindeksen · –"
+        assert _maal(_side(klient))["indeks"] == "–"
 
     def test_strek_uten_indeks_i_basen(self, klient):
         """Ville feilet med en feilside når basen ikke har en indeks."""
@@ -1077,7 +1100,7 @@ class TestLinjaMotBoersen:
             tilkobling.commit()
         finally:
             tilkobling.close()
-        assert _maal(_side(klient))[2] == "Hovedindeksen · –"
+        assert _maal(_side(klient))["indeks"] == "–"
 
     def test_strek_naar_indeksen_ikke_kan_leses(self, klient, monkeypatch):
         """NFR-03: ville feilet med en feilside når indeksen ikke kan leses."""
@@ -1087,7 +1110,7 @@ class TestLinjaMotBoersen:
 
         monkeypatch.setattr(SqliteIndekslager, "symboler", feil)
         html = _side(klient)
-        assert _maal(html)[2] == "Hovedindeksen · –" and '<section class="bransje"' in html
+        assert _maal(html)["indeks"] == "–" and '<section class="bransje"' in html
 
     def test_ingen_soeyler_paa_boersometeret(self, klient):
         """Søylene og _hovedindeks.html er tatt ut av børsometeret, ikke av
@@ -1127,22 +1150,22 @@ class TestLinjaMotBoersen:
         """Gjennomgangen 26.10 (ECH4): ville feilet hvis siden skrev ukedagen
         når børsdagen før er 10 dager før dagen som vises."""
         monkeypatch.setattr(app_modul, "dagen_foer", lambda datoer, dag: date(2026, 9, 29))
-        assert _maal(_side(klient))[0] == "Farge · endring fra 29.09"
+        assert "endringen fra 29.09," in _maal(_side(klient))["bedre"]
 
     def test_foerste_dag_uten_dag_foer(self, klient):
         """Ville feilet med en tom ukedag den første dagen med kurs."""
-        assert _maal(_side(klient, "/boersometer?dag=1990-01-01"))[0] == "Farge · endring fra børsdagen før"
+        assert "endringen fra børsdagen før," in _maal(_side(klient, "/boersometer?dag=1990-01-01"))["bedre"]
 
     def test_hjelpen_sier_det(self):
         """Regel 19: ville feilet hvis hjelpen i appen eller docs/hjelp.md
         ikke nevnte linja, eller sa at søylene sto på børsometeret."""
         from hjelpetekster import hjelpetekster
 
-        tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
-        assert "linja «Mål mot børsen» har endringen i hovedindeksen den dagen" in tekst
-        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
-        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
-        assert "Linja «Mål mot børsen»" in avsnitt and "Søylene står bare på oversikten." in avsnitt
+        # Story 8.20b (U95): vinduet har høyst 60 ord, og resten står i docs/hjelp.md.
+        assert "Mål mot børsen" not in hjelpetekster(STANDARD)["boersometeret"].tekst
+        avsnitt = _avsnittet()
+        assert "«Mål mot børsen» har endringen i hovedindeksen den dagen" in avsnitt
+        assert "Søylene står bare på oversikten." in avsnitt
 
 
 def _rot(stil: str) -> dict[str, str]:
@@ -1282,34 +1305,43 @@ class TestFargetrinnene:
         avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
         assert "fra 0,5 % til under 2 %" in avsnitt and "fra 0,5 til" not in avsnitt
 
-    def test_hva_fargene_betyr(self, klient):
-        """Under rutene, med de fem trinnene fra fall til stigning og de to
-        rammene. Ville feilet hvis forklaringen manglet, sto over rutene, eller
-        hadde et annet tall enn grensene."""
+    def test_slik_leser_du_boersometeret(self, klient):
+        """Story 8.20b (U99, spørsmål 14 a): kortet «Slik leser du
+        børsometeret» over rutene erstatter «Hva fargene betyr», med fargen,
+        rammen, størrelsen og ruta, og de fem trinnene for skjermleseren.
+        Ville feilet hvis kortet manglet, sto under rutene, «Hva fargene
+        betyr» sto igjen, eller et tall var et annet enn grensene."""
         html = _side(klient)
-        del_ = re.search(r'<section class="fargene".*?</section>', html, re.S).group(0)
-        assert "<h2" in del_ and "Hva fargene betyr</h2>" in del_
-        punkter = re.findall(r'<li><span class="proeve ([a-z-]+)" aria-hidden="true"></span>([^<]+)</li>', del_)
-        assert punkter == [
-            ("trinn-ned", "Ned 2 % eller mer"),
-            ("trinn-lys-ned", "Ned fra 0,5 % til under 2 %"),
-            ("trinn-noeytral", "Under ±0,5 %"),
-            ("trinn-lys-opp", "Opp fra 0,5 % til under 2 %"),
-            ("trinn-opp", "Opp 2 % eller mer"),
-            ("ramme-moerk", "Mørk ramme: 2 av 3 på siste børsdag"),
-            ("ramme-gul", "Gul ramme: 3 av 3 på siste børsdag"),
-        ]
-        assert html.rindex('<section class="bransje"') < html.index('<section class="fargene"')
-        assert html.index('<section class="fargene"') < html.index('<table class="boersometertabell">')
+        assert '<section class="fargene"' not in html and "Hva fargene betyr" not in html
+        kortet = re.search(r'<section class="slik-leser".*?</section>', html, re.S).group(0)
+        assert '<h2 id="slik-leser">Slik leser du børsometeret</h2>' in kortet
+        assert re.findall(r"<strong>([^<]+)</strong>", kortet) == ["Fargen", "Rammen", "Størrelsen", "Ruta"]
+        skjult = re.search(r'<span class="skjult">(.*?)</span>', kortet, re.S).group(1)
+        for tekst in (
+            "Ned 2\u00a0% eller mer",
+            "Ned fra 0,5\u00a0% til under 2\u00a0%",
+            "Under ±0,5\u00a0%",
+            "Opp fra 0,5\u00a0% til under 2\u00a0%",
+            "Opp 2\u00a0% eller mer",
+        ):
+            assert tekst in skjult, tekst
+        grenser = re.findall(
+            r"<span>([^<]+)</span>", re.search(r'<span class="grenser".*?</span></span>', kortet, re.S).group(0)
+        )
+        assert grenser == ["-2\u00a0%", "-0,5\u00a0%", "+0,5\u00a0%", "+2\u00a0%"]
+        # Gjennomgangen (BH15): gul ramme gjelder siste børsdag, også en annen dag.
+        assert "Mørk ramme: 2 av 3 på siste børsdag. Gul ramme: 3 av 3 på siste børsdag, også en annen dag." in kortet
+        # Gjennomgangen (VG5): vinduet for volumet kommer fra Parametre.
+        assert f"mot medianen for de {STANDARD.volum_vindu} børsdagene før" in kortet
+        assert html.index('<section class="slik-leser"') < html.index('<section class="bransje"')
 
     def test_hjelpen_sier_det(self):
         """Regel 19: ville feilet hvis hjelpen sa to farger, eller manglet
         trinnene og rammen."""
         from hjelpetekster import hjelpetekster
 
-        assert "som farge i fem trinn" in hjelpetekster(STANDARD)["boersometeret"].tekst
-        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
-        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        assert "Fargen er endringen, i fem trinn." in hjelpetekster(STANDARD)["boersometeret"].tekst
+        avsnitt = _avsnittet()
         assert "Fargen har fem trinn" in avsnitt and "Grønn rute steg og rød falt" not in avsnitt
         assert "Rammen er tykk med en hvit linje innenfor" in avsnitt
 
@@ -1459,7 +1491,10 @@ class TestKartet:
                     assert all(a >= b * 0.999 for a, b in zip(ruter, ruter[1:], strict=False)), (adresse, navn, ruter)
             i_kartet = list(_overskrifter(html))
             tabell = html.split('<table class="boersometertabell">', 1)[1]
-            i_tabellen = list(dict.fromkeys(re.findall(r"<tr>\s*<td>([A-ZÆØÅa-zæøå]+)", tabell)))
+            # Story 8.20b (U93): bransjen står i båndet over radene.
+            i_tabellen = re.findall(
+                r'<span class="bransjebaand">(?:<svg .*?</svg>)?([A-ZÆØÅa-zæøå]+) <span class="antall">', tabell, re.S
+            )
             assert sorted(i_kartet) == sorted(i_tabellen)
             assert i_tabellen == sorted(i_tabellen, key=BRANSJER.index)
             assert i_kartet != i_tabellen, "demoen skal vise at kartet ikke følger §4"
@@ -1469,12 +1504,10 @@ class TestKartet:
         ikke sa at Tab følger kartet (gruppens svar 26.10 kl. 13:00, a)."""
         from hjelpetekster import hjelpetekster
 
-        tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
-        assert "med Tab går du fra det største feltet og den største ruta, slik kartet legger dem." in tekst
-        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
-        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
-        assert "Med Tab går du gjennom kartet fra det største feltet" in avsnitt
-        assert "tabellen har bransjene i fast rekkefølge" in avsnitt
+        # Story 8.20b (U95): regelen står i docs/hjelp.md, ikke i vinduet (BH18).
+        assert "Tab" not in hjelpetekster(STANDARD)["boersometeret"].tekst
+        assert "Med Tab går du gjennom kartet fra det største feltet" in _avsnittet()
+        assert "tabellen har bransjene i fast rekkefølge" in _avsnittet()
 
     def test_ingen_plass_er_negativ(self):
         """Gjennomgangen 26.10 (ECH): ville feilet med y = -2,6e-14 for den
@@ -1798,50 +1831,57 @@ class TestKartet:
         assert re.search(r"min-width: (\d+)px", regel)
         assert _side(klient).count('<span class="bransjenavn">') == 8
 
-    def test_overskriften_er_navnet_og_snittet_eller_1_aksje(self, klient):
-        """Gruppens svar 26.10 kl. 13:00 (b): som på tavla, navnet og
-        «snitt» med tallet, eller «1 aksje» ved én aksje. Ville feilet med
-        antallet i overskriften, uten «snitt», med snittet ved én aksje,
-        eller med tillegget foran navnet."""
-        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08"):
+    def test_overskriften_er_navnet_og_under_antallet_og_snittet(self, klient):
+        """Story 8.20b (U97, spørsmål 14 d): symbolet og navnet, og under dem
+        antallet og snittet, eller «1 aksje», som skissen. Det endrer svaret
+        26.10 kl. 13:00 (b). Ville feilet uten antallet, med snittet ved én
+        aksje, med en annen tekst enn Bransje.tillegg, eller med linja foran
+        navnet."""
+        for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?periode=1-uke"):
             html = _side(klient, adresse)
-            kartet = html.split('<div class="kart"', 1)[1].split('<section class="fargene"', 1)[0]
+            kartet = html.split('<div class="kart"', 1)[1].split('<details class="tallene"', 1)[0]
             h2 = re.findall(r"<h2 id=\"bransje-\d+\">(.*?)</h2>", kartet, re.S)
             assert len(h2) == 8
             for innhold in h2:
                 linje = re.fullmatch(
-                    r'<span class="linje"><span class="navnet"><svg [^>]*>.*?</svg><span class="bransjenavn">([^<]+)</span></span>\s*(.*)</span>',
+                    r'<span class="linje"><span class="navnet"><svg [^>]*>.*?</svg><span class="bransjenavn">([^<]+)</span></span></span>\s*<span class="tillegg">(.*)</span>',
                     innhold,
                     re.S,
                 )
                 assert linje, innhold
                 navn, tillegg = linje.groups()
-                rader = re.findall(rf"<td>{navn} \((\d+) aksjer?", html)
-                assert len(rader) == 1, (navn, rader)
-                if rader[0] == "1":
-                    assert tillegg == '<span class="tillegg">1 aksje</span>', tillegg
+                antall = re.search(rf'{navn} <span class="antall">(\d+)</span>', html).group(1)
+                if antall == "1":
+                    assert tillegg == "1 aksje", tillegg
                 else:
                     assert re.fullmatch(
-                        r'<span class="tillegg">snitt <span class="snitt (opp|ned|null)">[^<]+</span></span>', tillegg
+                        rf'{antall} aksjer · snitt <span class="snitt (opp|ned|null)">[^<]+</span>', tillegg
                     ), tillegg
 
-    def test_tillegget_skjules_for_oeyet_foer_navnet_kuttes(self):
-        """Gruppens svar 26.10 kl. 13:00 (b): får ikke snittet eller «1 aksje»
-        plass, brytes det til en linje som skjules av overflow, under en
-        row-gap høyere enn linja. Navnet står først og kuttes med «…» først
-        når det står alene. Ville feilet uten flex-wrap, med display: none,
-        som skjuler tillegget for skjermleseren, eller med en row-gap som lot
-        linje to synes."""
+    def test_linja_med_antallet_skjules_aldri(self):
+        """Story 8.20b (U97): linja med antallet og snittet står under navnet
+        og skjules aldri, og hvert felt er bredt nok til den ved den minste
+        bredden flaten brukes på. Ville feilet med linja ved siden av navnet,
+        med display: none, eller med et felt smalere enn linja."""
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
+        h2 = re.search(r"\.kart section\.bransje h2 \{([^}]*)\}", stil).group(1)
+        assert "flex-direction: column" in h2
         linje = re.search(r"\.kart section\.bransje h2 \.linje \{([^}]*)\}", stil).group(1)
-        assert "flex-wrap: wrap" in linje and "overflow: hidden" in linje and "min-width: 0" in linje
-        hoeyde = int(re.search(r"(?<![-\w])height: (\d+)px", linje).group(1))
-        assert int(re.search(r"row-gap: (\d+)px", linje).group(1)) > hoeyde
+        assert "flex-wrap" not in linje and "overflow: hidden" in linje and "min-width: 0" in linje
         tillegg = re.search(r"\.kart section\.bransje h2 \.tillegg \{([^}]*)\}", stil).group(1)
         assert "display: none" not in tillegg and "flex: none" in tillegg
+        assert f"font-size: {boersometer.TILLEGGSKRIFT}px" in tillegg
         navnet = re.search(r"\.kart section\.bransje h2 \.navnet \{([^}]*)\}", stil).group(1)
         assert "min-width: 0" in navnet and "max-width: 100%" in navnet
         assert "display: none" not in stil.split(".kart section.bransje h2", 1)[1].split("ul.ruter", 1)[0]
+        rng = random.Random(7)
+        for _ in range(30):
+            forhold = [rng.lognormvariate(0, 0.8) for _ in range(15)]
+            k = kart(bygg_boersometer(_ruter_med(forhold, [BRANSJER[i % 8] for i in range(15)])))
+            for flate in (BRED, SMAL):
+                for felt in k.felt:
+                    synlig = felt.plass[flate.navn].b / 100 * flate.minste
+                    assert synlig >= boersometer.tilleggsbredde(felt.bransje) - 1e-9, (flate.navn, felt.bransje.navn)
 
     def test_overskriften_har_plass_til_linja(self):
         """Gjennomgangen 26.10 (BH): OVERSKRIFT er 24 px ved bredden flaten
@@ -1849,8 +1889,12 @@ class TestKartet:
         i stil.css ble høyere enn overskriften ved den minste bredden flaten
         brukes på."""
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
-        linje = re.search(r"\.kart section\.bransje h2 \.linje \{([^}]*)\}", stil).group(1)
-        hoeyde = int(re.search(r"(?<![-\w])height: (\d+)px", linje).group(1))
+        # Story 8.20b (U97): to linjer, navnet og antallet, med 2 px mellom.
+        hoeyde = 2
+        for del_ in ("linje", "tillegg"):
+            regel = re.search(rf"\.kart section\.bransje h2 \.{del_} \{{([^}}]*)\}}", stil).group(1)
+            hoeyde += int(re.search(r"(?<![-\w])height: (\d+)px", regel).group(1))
+        assert "gap: 2px" in re.search(r"\.kart section\.bransje h2 \{([^}]*)\}", stil).group(1)
         for flate in (BRED, SMAL):
             assert OVERSKRIFT * flate.minste / flate.bredde >= hoeyde, (flate.navn, hoeyde)
 
@@ -1883,11 +1927,11 @@ class TestKartet:
         står i tabellen (gruppens svar 26.10 kl. 13:00, b)."""
         from hjelpetekster import hjelpetekster
 
-        assert "eller bare navnet når feltet er smalt" in hjelpetekster(STANDARD)["boersometeret"].tekst
-        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
-        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
-        assert "eller «1 aksje» der det er én; antallet står i tabellen" in avsnitt
-        assert "Er feltet for smalt, står bare navnet" in avsnitt
+        # Story 8.20b (U97): antallet og snittet står alltid, under navnet.
+        assert "bare navnet" not in hjelpetekster(STANDARD)["boersometeret"].tekst
+        avsnitt = _avsnittet()
+        assert "under dem antallet aksjer og snittet" in avsnitt and "Den linja står alltid" in avsnitt
+        assert "Er feltet for smalt, står bare navnet" not in avsnitt
 
     def test_det_som_ikke_faar_plass_leses_av_skjermleseren(self):
         """Teksten som ikke får plass, skjules bare for øyet. Ville feilet med
@@ -1904,12 +1948,10 @@ class TestKartet:
         sa grensene for vekten (gruppens svar 26.10 kl. 08:43, b)."""
         from hjelpetekster import hjelpetekster
 
-        tekst = hjelpetekster(STANDARD)["boersometeret"].tekst
-        assert "Arealet av ruta følger volumet mot vanlig" in tekst and "1,5 ganger" not in tekst
-        assert "ikke større over 3 ganger vanlig volum eller mindre under halvparten" in tekst
-        assert "tabellen bak «Se tallene som tabell» har tallet" in tekst
-        hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
-        avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
+        # Story 8.20b (U95): vinduet sier størrelsen kort, og grensene står i docs/hjelp.md.
+        tekst = hjelpetekster(STANDARD)["boersometeret_ruta"].tekst
+        assert "For én dag følger størrelsen volumet mot vanlig" in tekst and "1,5 ganger" not in tekst
+        avsnitt = _avsnittet()
         assert "Rutene er et fylt kart" in avsnitt
         assert "ikke større over tre ganger vanlig volum eller mindre under halvparten" in avsnitt
         assert "tabellen under har det faktiske tallet" in avsnitt

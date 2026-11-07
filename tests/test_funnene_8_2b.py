@@ -645,14 +645,17 @@ def test_en_annen_dag_er_styrken_tekst_og_merket_star(klient):
 
 def test_skriften_og_rammen_i_boersometeret():
     """Svarene kl. 10:01 og 10:04. Ville feilet med teksten i rutene eller ved
-    bransjenavnene under 14 px, «Mål mot børsen» eller «Hva fargene betyr»
-    under 16 px, eller uten rammen rundt bransjen."""
+    bransjenavnene under 14 px, «Mål mot børsen» under 16 px, eller uten
+    rammen rundt bransjen. Story 8.20b: «Mål mot børsen» er et kort med
+    overskriften i 24 px, og «Hva fargene betyr» er kortet «Slik leser du
+    børsometeret», i stilen fra oversikten."""
     assert "font-size: 14px" in re.search(r"side-oversikt\) \.rute \{([^}]*)\}", STIL).group(1)
     for velger in (".rute .merke", ".rute .styrke", ".rute .tekst"):
         assert "font-size: 14px" in _regel(velger), velger
     assert "font-size: 14px" in re.search(r"\.kart section\.bransje h2 \{([^}]*)\}", STIL).group(1)
-    for velger in ("section.maal", "section.maal h2", "section.fargene", "section.fargene h2"):
-        assert "font-size: 16px" in _regel(velger), velger
+    assert "font-size: 16px" in _regel("section.maal")
+    assert "font-size: 24px" in _regel("section.maal h2")
+    assert "section.fargene" not in STIL
     assert any(
         "box-shadow: inset 0 0 0 1px var(--strek-2)" in r
         for r in re.findall(r"\.kart section\.bransje \{([^}]*)\}", STIL)
@@ -891,15 +894,16 @@ def test_gul_rute_en_annen_dag_uten_plass_til_merket_viser_ikke_styrken(klient):
 
 
 def test_vrds_viser_ikke_vurdert_ved_1280_px(klient):
-    """Svar 2: VRDS i demoen har kurs, men ingen styrke, og er 105 × 166 px
-    ved 1280 px, målt i Edge, på nivå 2 i kartet på 1008 px. Ville feilet
-    uten «ikke vurdert» på linja der styrken ellers står, eller uten klassen
-    som lar linja stå på nivå 2."""
+    """Svar 2: VRDS i demoen har kurs, men ingen styrke. Story 8.20b (U97):
+    med to linjer i bransjeoverskriften er feltet lavere, og VRDS har plass
+    til «ikke vurdert» på nivå 2 i den smale flaten, ikke lenger ved 1280 px.
+    Ville feilet uten «ikke vurdert» på linja der styrken ellers står, eller
+    uten klassen som lar linja stå på nivå 2."""
     html = _html(klient, "/boersometer")
     klasser, rute = re.search(
         r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">VRDS</span>(.*?)</a>', html, re.S
     ).groups()
-    assert "nivaa-bredest-2" in klasser.split() and "styrke-bredest" in klasser.split(), klasser
+    assert "nivaa-smal-2" in klasser.split() and "styrke-smal" in klasser.split(), klasser
     assert re.search(
         r'<span class="endring">[^<]*</span>\s*<span class="skjult">, </span>'
         r'<span class="styrke ikke-vurdert">ikke vurdert</span>',
@@ -1035,15 +1039,21 @@ def test_grunnplass():
 def test_grunnen_staar_paa_nivaa_3_bare_med_plass(klient):
     """Gjennomgangen av svar 2 (ECH1): på nivå 3 skjuler stilen grunnen for
     øyet uten klassen grunn-N, i alle fire spennene. VRDS 01.10 er 132 × 199 px
-    ved 1280 px og har plass. Ville feilet uten regelen, eller hvis VRDS
-    mistet grunnen ved 1280 px."""
+    ved 1280 px og har plass. Story 8.20b (U97): med to linjer i
+    bransjeoverskriften står VRDS ikke lenger på nivå 3. Ville feilet uten
+    regelen, eller hvis ingen rute med grunn på nivå 3 hadde plass til den."""
     for klasse in ("bredest", "bred", "smal", "smalest"):
         assert f".rute.nivaa-{klasse}-3:not(.grunn-{klasse}) > .tekst" in STIL, klasse
-    klasser = re.search(
-        r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">VRDS</span>',
-        _html(klient, "/boersometer?periode=velg&dag=2026-10-01"),
-    ).group(1)
-    assert "nivaa-bredest-3" in klasser.split() and "grunn-bredest" in klasser.split(), klasser
+    # Story 8.20b (U97): VRDS 01.10 står ikke lenger på nivå 3, så testen
+    # leter etter en rute med grunn på nivå 3 en av de første dagene i demoen.
+    med_grunn = []
+    for dag in ("2026-09-21", "2026-09-22", "2026-09-23", "2026-10-01"):
+        html = _html(klient, f"/boersometer?periode=velg&dag={dag}")
+        for klasser in re.findall(r'<a class="rute ([^"]*)"[^>]*>(?:(?!</a>).)*<span class="tekst">', html, re.S):
+            klasser = klasser.split()
+            nivaa_3 = [k[6:-2] for k in klasser if k.startswith("nivaa-") and k.endswith("-3")]
+            med_grunn += [f"grunn-{klasse}" in klasser for klasse in nivaa_3]
+    assert med_grunn and any(med_grunn), med_grunn
 
 
 # --- Gruppens svar 05.11 kl. 09:34 --------------------------------------------
@@ -1092,14 +1102,17 @@ def test_fotnoten_for_en_annen_grunn_staar_med_vrds_i_demoen(klient):
 
 
 def test_fotnoten_for_en_annen_grunn_foelger_ruta_som_viser_det(klient):
-    """Gjennomgangen (ECH1): VRDS viser «ikke vurdert» for øyet bare i den
-    bredeste klassen (nivå 2 med styrke-bredest), så fotnoten har bare
-    vis-bredest, og stilen skjuler den for øyet i de andre klassene, med de
-    samme grensene som rutene. Ville feilet hvis fotnoten sto for øyet ved
-    390 px, der VRDS bare viser symbolet, eller uten reglene i stil.css."""
+    """Gjennomgangen (ECH1): VRDS viser «ikke vurdert» for øyet bare i én
+    klasse, og fotnoten har bare den, og stilen skjuler den for øyet i de
+    andre klassene, med de samme grensene som rutene. Story 8.20b (U97): med
+    to linjer i bransjeoverskriften er det den smale flaten (styrke-smal),
+    ikke lenger den bredeste. Ville feilet hvis fotnoten sto for øyet der
+    VRDS bare viser symbolet, eller uten reglene i stil.css."""
     html = _html(klient, "/boersometer")
     klasser = re.search(r'<div class="annen-grunn([^"]*)">', html).group(1).split()
-    assert klasser == ["vis-bredest"], klasser
+    vrds = re.search(r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">VRDS</span>', html).group(1).split()
+    assert klasser == [f"vis-{k.removeprefix('styrke-')}" for k in vrds if k.startswith("styrke-")], (klasser, vrds)
+    assert klasser == ["vis-smal"], klasser
     assert ":where(.side-oversikt) .annen-grunn { container-type: inline-size; }" in STIL
     for klasse in ("bredest", "bred", "smal", "smalest"):
         assert f":where(.side-oversikt) .annen-grunn:not(.vis-{klasse}) > .fotnote {{ position: absolute;" in STIL
@@ -1153,14 +1166,15 @@ def test_begge_fotnotene_naar_begge_grunnene_finnes(klient, monkeypatch):
 
 
 def test_hjelpen_og_hjelp_md_sier_det_samme_om_fotnoten():
-    """Svar 1: hjelpen ved «?» i børsometeret og docs/hjelp.md sier at
-    «ikke vurdert» kan ha en annen grunn, at en fotnote under kartet sier
-    det, og at grunnen står i tabellen og på aksjesiden; hjelp.md også at
-    begge fotnotene kan stå. Ville feilet hvis en av dem manglet en av
-    delene (gjennomgangen, VG2)."""
+    """Svar 1: docs/hjelp.md sier at «ikke vurdert» kan ha en annen grunn,
+    at en fotnote under kartet sier det, og at grunnen står i tabellen og på
+    aksjesiden, og også at begge fotnotene kan stå. Story 8.20b (U102):
+    fotnoten står, og hjelpen ved «?» sier det ikke lenger. Ville feilet hvis
+    hjelp.md manglet en av delene (gjennomgangen, VG2), eller vinduet
+    gjentok fotnoten."""
     deler = ("som for kort kurshistorikk", "fotnote under kartet", "tabellen og på aksjesiden")
-    tekst = hjelpetekster()["boersometeret"].tekst
-    assert all(del_ in tekst for del_ in deler), tekst
+    vinduet = hjelpetekster()["boersometeret"].tekst + hjelpetekster()["boersometeret_ruta"].tekst
+    assert not any(del_ in vinduet for del_ in deler), vinduet
     hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
     avsnitt = hjelp.split("### Hvorfor står det «ikke vurdert»?")[1].split("\n#")[0]
     assert all(del_ in avsnitt for del_ in deler) and "står begge fotnotene" in avsnitt

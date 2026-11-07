@@ -246,11 +246,14 @@ def test_navnet_staar_bare_med_navn_klassen():
 
 
 def test_lksv_18_09_viser_merket_i_stedet_for_navnet(klient):
-    """Gruppens svar 05.11 kl. 14:29, 1, i demoen ved 1280 px: LKSV 18.09 er
-    stor, med merket og styrken, men uten navn-bredest. Ville feilet hvis
-    ruta var stor uten merket, eller hadde både navnet og merket."""
-    html = _html(klient, "/boersometer?periode=velg&dag=2026-09-18")
-    klasser = re.search(r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">LKSV</span>', html).group(1).split()
+    """Gruppens svar 05.11 kl. 14:29, 1, i demoen ved 1280 px: en gul rute en
+    annen dag er stor, med merket og styrken, men uten navn-bredest. Story
+    8.20b (U97): med to linjer i bransjeoverskriften er LKSV 18.09 ikke
+    lenger stor, og BRFE 06.10 er dagen i demoen som viser det. Navnet på
+    testen står, fordi docs/kvalitetssikring.md viser til det. Ville feilet
+    hvis ruta var stor uten merket, eller hadde både navnet og merket."""
+    html = _html(klient, "/boersometer?periode=velg&dag=2026-10-06")
+    klasser = re.search(r'<a class="rute ([^"]*)"[^>]*>\s*<span class="ticker">BRFE</span>', html).group(1).split()
     assert {"nivaa-bredest-4", "merke-bredest", "styrke-bredest"} <= set(klasser), klasser
     assert "navn-bredest" not in klasser, klasser
 

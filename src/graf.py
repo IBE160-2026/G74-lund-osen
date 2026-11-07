@@ -37,7 +37,10 @@ from perioder import ANNENHVER_MAANED, DAGER, MAANEDSNAVN, UKER
 
 BREDDE = 720
 HOYDE = 260
-MARG_Y = 12
+# Story 8.20b (BH9 i gjennomgangen av 8.20a): lappen med datoen på streken
+# er 18 px høy og står over tegneflaten, 4 px over den (aksje.html), så den
+# aldri dekker toppen av kurslinja. Tegneflaten begynner derfor ved 26, ikke 12.
+MARG_Y = 26
 # Story 8.2b, b (U41, U47): feltene rundt tegneflaten. VENSTRE har plass til
 # tallene ved rutenettet («2 000» i 12 px), HOEYRE til det lengste navnet,
 # «50-dagers snitt (sjekk 1)», og BUNN til datoene og maanedsnavnene. MARG_X

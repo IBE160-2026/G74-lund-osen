@@ -23,15 +23,42 @@
   <h1 class="overskrift">Børsometer {{ hjelpeknapp("hjelp-boersometer", "Hjelp: børsometeret") }}</h1>
   {% if bransjer %}
     <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ dagen|ukedag }} {{ dagen|dato }} · {{ antall_ord(antall_aksjer, "aksje", "aksjer") }} i {{ antall_ord(bransjer|length, "bransje", "bransjer") }}</p>
-    {#- Story 8.6b, a (avgjørelsen 24.10 kl. 11:54): forklaringen øverst, som på tavla. #}
-    {#- Story 8.17b (gruppens svar 23.10 kl. 12:35, b): ved en periode er
-        fargen endringen for perioden, og rutene er like store, fordi volumet
-        mot vanlig gjelder én dag. Siden sier det. #}
-    {% if periodestart %}
-    <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen for {{ periodenavn }}, fra {{ periodestart|dato }} til {{ siste|dato }}, og rutene er like store, fordi volumet mot vanlig gjelder én dag. Rammen er signalet siste børsdag. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
-    {% else %}
-    <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen fra børsdagen før, og jo større ruta er, jo mer ble aksjen omsatt sammenlignet med vanlig. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
-    {% endif %}
+    {#- Story 8.6b, a (avgjørelsen 24.10 kl. 11:54): forklaringen øverst, som på tavla.
+        Story 8.20b (U98): én tekst for en dag og en periode, som skissen, og
+        det som er ulikt, står i kortet «Mål mot børsen». #}
+    <p class="innledning">Hver rute er en aksje, samlet etter bransje. Fargen viser endringen i perioden du velger, og rammen viser signalet siste børsdag. Klikk på en rute for å se aksjen. Bildet viser hva som skjedde, ikke hva du bør kjøpe eller selge.</p>
+    {#- Story 8.6b, b (avgjørelsen 24.10 kl. 11:54): søylene står bare på
+        oversikten, og hovedindeksen står som et tall for dagen som vises,
+        med fortegn og farge etter tallet slik det vises, eller «–».
+        Story 8.20b (spørsmål 14 a, b og 15): «Mål mot børsen» er et kort med
+        «N av M gikk bedre enn indeksen», og «Slik leser du børsometeret»
+        står ved siden av, like høyt, fra 1056 px. Kortet erstatter «Hva
+        fargene betyr» under rutene. Kortene står over periodeknappene, som i
+        skissene. #}
+    <div class="kortene">
+    <section class="maal" aria-labelledby="maal-tittel">
+      <h2 id="maal-tittel">Mål mot børsen</h2>
+      <p class="indekslinje"><span class="indeksnavn">Hovedindeksen</span> {% if indeksendring is not none %}<span class="indeksendring {{ fortegn(indeksendring) }}">{{ indeksendring|tall('endring') }}</span>{% else %}<span class="indeksendring">–</span>{% endif %} <span class="naar">{% if periodestart %}{{ periodenavn }}, fra {{ periodestart|dato }} til {{ siste|dato }}{% else %}{{ dagen|ukedag }} {{ dagen|dato }}{% endif %}</span></p>
+      <p class="bedre">{% if bedre is not none %}<strong>{{ bedre }} av {{ med_endring }}</strong> gikk bedre enn indeksen. {% endif %}{% if periodestart %}Fargen i rutene under er endringen for {{ periodenavn }}, og rutene er like store, fordi volumet mot vanlig gjelder én dag.{% else %}Fargen i rutene under er endringen fra {{ dagen_foer }}, og jo mer det ble handlet enn vanlig, jo større rute.{% endif %}</p>
+    </section>
+    <section class="slik-leser" aria-labelledby="slik-leser">
+      <h2 id="slik-leser">Slik leser du børsometeret</h2>
+      <ul>
+        <li><span class="symbolfelt fargefelt" aria-hidden="true"><span class="trinn-ned"></span><span class="trinn-lys-ned"></span><span class="trinn-lys-opp"></span><span class="trinn-opp"></span></span>
+          <span><strong>Fargen</strong> Endringen i perioden du har valgt. Rødt er ned og grønt er opp, og jo mørkere, jo større.
+          <span class="skala" aria-hidden="true">{% for trinn, tekst in fargetrinn %}<span class="trinn-{{ trinn }}"></span>{% endfor %}</span>
+          <span class="grenser" aria-hidden="true">{% for grense in skalagrenser %}<span>{{ grense }}</span>{% endfor %}</span>
+          <span class="skjult">{% for trinn, tekst in fargetrinn %}{{ tekst }}{% if not loop.last %}, {% else %}.{% endif %} {% endfor %}</span></span></li>
+        <li><span class="symbolfelt rammefelt" aria-hidden="true"><span class="proeve ramme-moerk"></span><span class="proeve ramme-gul"></span></span>
+          <span><strong>Rammen</strong> Mørk ramme: {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag. Gul ramme: {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag, også en annen dag.</span></li>
+        <li><span class="symbolfelt stoerrelsefelt" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span><strong>Størrelsen</strong> Én dag: jo mer det ble handlet enn vanlig, mot medianen for de {{ volum_vindu }} børsdagene før, jo større rute. En periode: alle rutene er like store.</span></li>
+        <li><span class="symbolfelt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3l14 8-6 2-3 6z"/></svg></span>
+          <span><strong>Ruta</strong> Klikk for å se sjekkene, tallene bak og kursgrafen.</span></li>
+      </ul>
+    </section>
+    </div>
+
     {#- Story 8.17b: periodevalget fra 8.16, som i oversikten og Min liste
         (designregler §2), i stedet for skjemaet for «Velg dag» fra 8.6. En
         dag uten kurs gir fortsatt børsdagen før. #}
@@ -43,22 +70,6 @@
     {% elif valgt and valgt != dagen %}<p class="forklaring">{{ valgt|dato }} har ingen kurs, så siden viser børsdagen før, {{ dagen|dato }}.</p>{% endif %}
     {% if dagen != siste %}<p class="forklaring">Gul ramme betyr 3 av 3 på siste børsdag, {{ siste|dato }}.</p>{% endif %}
 
-    {#- Story 8.6b, b (avgjørelsen 24.10 kl. 11:54): søylene står bare på
-        oversikten, og hovedindeksen står som et tall for dagen som vises,
-        med fortegn og farge etter tallet slik det vises, eller «–». #}
-    <section class="maal" aria-labelledby="maal-tittel">
-      <h2 id="maal-tittel">Mål mot børsen</h2>
-      <ul>
-        {% if periodestart %}
-        <li>Farge · endring for {{ periodenavn }}, fra {{ periodestart|dato }}</li>
-        <li>Størrelse · like store ruter: volumet mot vanlig gjelder én dag</li>
-        {% else %}
-        <li>Farge · endring fra {{ dagen_foer }}</li>
-        <li>Størrelse · volum mot medianen for de {{ volum_vindu }} børsdagene før</li>
-        {% endif %}
-        <li>Hovedindeksen · {% if indeksendring is not none %}<span class="indeksendring {{ fortegn(indeksendring) }}">{{ indeksendring|tall('endring') }}</span>{% else %}–{% endif %}</li>
-      </ul>
-    </section>
 
     {#- Story 8.6b, d: rutene som et fylt kart i to nivåer, regnet i
         boersometer.kart: bransjene som felt etter summen av vektene, og
@@ -70,13 +81,12 @@
     {%- for felt in kart.felt %}
       {%- set bransje = felt.bransje %}
       <section class="bransje" aria-labelledby="bransje-{{ loop.index }}" style="{{ plass_stil(felt.plass) }}{% for navn, topp in felt.topp.items() %} --topp-{{ navn }}: {{ '%.3f'|format(topp) }}%;{% endfor %}">
-        {#- Gruppens svar 26.10 kl. 13:00 (b): som på tavla, navnet og «snitt»
-            med tallet, eller «1 aksje»; antallet står i tabellen. Er feltet for
-            smalt, brytes tillegget til en linje stilen skjuler for øyet, før
-            navnet kuttes med «…». #}
-        <h2 id="bransje-{{ loop.index }}"><span class="linje"><span class="navnet">{{ bransjesymbol(bransje.navn) }}<span class="bransjenavn">{{ bransje.navn }}</span></span>
-          {%- if bransje.antall == 1 %} <span class="tillegg">1 aksje</span>
-          {%- elif bransje.snitt is not none %} <span class="tillegg">snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span></span>{% endif %}</span></h2>
+        {#- Story 8.20b (U97, spørsmål 14 d): symbolet og navnet, og under dem
+            antallet og snittet, som skissen. Linja skjules aldri: hvert felt
+            er bredt nok til den (tilleggsbredde i boersometer.py), og teksten
+            er Bransje.tillegg. Det endrer svaret 26.10 kl. 13:00 (b). #}
+        <h2 id="bransje-{{ loop.index }}"><span class="linje"><span class="navnet">{{ bransjesymbol(bransje.navn) }}<span class="bransjenavn">{{ bransje.navn }}</span></span></span>
+          <span class="tillegg">{{ antall_ord(bransje.antall, "aksje", "aksjer") }}{% if bransje.antall > 1 and bransje.snitt is not none %} · snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span>{% endif %}</span></h2>
         <ul class="ruter">
           {%- for kartrute in felt.ruter %}
           {%- set rute = kartrute.rute %}
@@ -106,18 +116,6 @@
     {%- endfor %}
     </div>
 
-    {#- Story 8.6b, c: de fem trinnene og de to rammene under rutene. #}
-    <section class="fargene" aria-labelledby="fargene-tittel">
-      <h2 id="fargene-tittel">Hva fargene betyr</h2>
-      <ul>
-        {%- for trinn, tekst in fargetrinn %}
-        <li><span class="proeve trinn-{{ trinn }}" aria-hidden="true"></span>{{ tekst }}</li>
-        {%- endfor %}
-        <li><span class="proeve ramme-moerk" aria-hidden="true"></span>Mørk ramme: {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag</li>
-        <li><span class="proeve ramme-gul" aria-hidden="true"></span>Gul ramme: {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag</li>
-      </ul>
-    </section>
-
     {#- Gruppens svar 26.10 kl. 15:21 (f): tabellen er lukket som standard, bak
         «Se tallene som tabell». Skjermleseren finner knappen, og tabellen har
         fortsatt rekkefølgen i designregler §4 (svaret kl. 13:00, a). Står
@@ -128,22 +126,29 @@
     <div class="tabellboks boersometerboks" role="region" aria-label="Børsometeret som tabell" tabindex="0">
     <table class="boersometertabell">
       <caption>Børsometeret {% if periodestart %}for {{ periodenavn }}, fra {{ periodestart|dato }} til {{ siste|dato }},{% else %}{{ dagen|dato }}{% endif %} som tabell</caption>
+      {#- Story 8.20b (U93, spørsmål 14 c): som tabellen på forsiden, med
+          kolonneraden i blekk, et bånd per bransje med symbolet, antallet og
+          snittet, streken i --oransje ved 3 av 3 siste børsdag, og styrken i
+          ringen fra forsiden. #}
       <thead>
-        <tr><th scope="col">Bransje</th><th scope="col">Selskap</th><th scope="col">Endring{% if periodestart %}, {{ periodenavn }}{% endif %}</th><th scope="col">Volum mot vanlig{% if periodestart %}, {{ siste|dato }}{% endif %}</th><th scope="col">Signalstyrke{% if periodestart %}, {{ siste|dato }}{% endif %}</th></tr>
+        <tr><th scope="col">Selskap</th><th scope="col" class="tall">Endring{% if periodestart %}, {{ periodenavn }}{% endif %}</th><th scope="col" class="tall">Volum mot vanlig{% if periodestart %}, {{ siste|dato }}{% endif %}</th><th scope="col" class="tall">Signalstyrke{% if periodestart %}, {{ siste|dato }}{% endif %}</th></tr>
       </thead>
+      {#- Gjennomgangen (BH11, ECH5): én tbody per bransje, som delene på
+          forsiden, så scope="rowgroup" gjelder radene i bransjen. ECH4:
+          båndet har klassen oevrige, som gir bakgrunnen og antallet i pille. #}
+      {%- for bransje in bransjer %}
       <tbody>
-        {%- for bransje in bransjer %}
+        <tr class="del oevrige"><th colspan="4" scope="rowgroup"><span class="bransjebaand">{{ bransjesymbol(bransje.navn) }}{{ bransje.navn }} <span class="antall">{{ bransje.antall }}</span>{% if bransje.snitt is not none %} <span class="bak">snitt <span class="snitt {{ fortegn(bransje.snitt) }}">{{ bransje.snitt|tall('endring') }}</span></span>{% endif %}</span></th></tr>
         {%- for rute in bransje.ruter %}
-        <tr>
-          <td>{{ bransje.navn }}{% if loop.first %} ({{ antall_ord(bransje.antall, "aksje", "aksjer") }}{% if bransje.snitt is not none %}, snitt {{ bransje.snitt|tall('endring') }}{% endif %}){% endif %}</td>
-          <td><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a></td>
-          <td>{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% if rute.fra %} fra {{ rute.fra|dato }}{% endif %}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
-          <td>{% if rute.volumforhold is not none %}{{ rute.volum_vist }} ({{ rute.volumord }}){% else %}–{% endif %}</td>
-          <td>{% if rute.styrke is not none %}{{ rute.styrke }} av {{ antall_sjekker }}{% elif rute.uten_data %}Uten data{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
+        <tr{% if rute.ramme == "gul" %} class="gul"{% endif %}>
+          <td class="selskap"><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a><span class="skjult">, </span><span class="linje">{{ rute.aksje.symbol }}</span></td>
+          <td class="tall">{% if rute.endring is not none %}<span class="{{ fortegn(rute.endring) }}">{{ rute.endring|tall('endring') }}</span>{% if rute.fra %} <span class="fra">fra {{ rute.fra|dato }}</span>{% endif %}{% elif rute.uten_data %}Uten data{% else %}–{% endif %}</td>
+          <td class="tall">{% if rute.volumforhold is not none %}{{ rute.volum_vist }} <span class="volumord">({{ rute.volumord }})</span>{% else %}–{% endif %}</td>
+          <td class="styrke tall">{% if rute.styrke is not none %}<span class="{% if rute.ramme == 'gul' and dagen == siste %}pille tre-av-tre{% elif rute.ramme == 'moerk' %}pille to-av-tre{% else %}styrketall{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% elif rute.uten_data %}Uten data{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
         </tr>
         {%- endfor %}
-        {%- endfor %}
       </tbody>
+      {%- endfor %}
     </table>
     </div>
     </details>
@@ -169,7 +174,7 @@
       Ingen kurser i basen ennå. Hent dem med <code>{{ hentekommando }}</code>.
     </p>
   {% endif %}
-  {{ hjelpevindu("hjelp-boersometer", "Børsometer", [("", ["boersometeret"])]) }}
+  {{ hjelpevindu("hjelp-boersometer", "Børsometer", [("", ["boersometeret", "boersometeret_ruta"])]) }}
   {#- Story 8.17b: periodevalget. #}
   {% if bransjer %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_boersometeret"])]) }}{% endif %}
 {% endblock %}

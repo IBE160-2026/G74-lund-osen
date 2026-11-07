@@ -165,6 +165,15 @@ class Bransje:
     def snitt(self) -> float | None:
         return snitt(self.ruter)
 
+    @property
+    def tillegg(self) -> str:
+        """Linja under navnet i kartet (story 8.20b, U97): antallet og
+        snittet, som i boersometer.html, og bare antallet uten snitt."""
+        antall = f"{self.antall} {'aksje' if self.antall == 1 else 'aksjer'}"
+        if self.antall == 1 or self.snitt is None:
+            return antall
+        return f"{antall} · snitt {tall(self.snitt, 'endring')}"
+
 
 def stoerrelse(volumforhold: float | None, p: Parametre = STANDARD) -> str:
     """Tre trinn: under 1, fra 1 til og med volumfaktor, og over volumfaktor,
@@ -203,7 +212,7 @@ def _noeyaktig(grense: float) -> int:
 
 
 def trinnforklaringer() -> list[tuple[str, str]]:
-    """Trinnene til «Hva fargene betyr», fra størst fall til størst
+    """Trinnene til kortet «Slik leser du børsometeret» (story 8.20b), fra størst fall til størst
     stigning, med tallene fra grensene (regel 21). Begge grensene er
     prosent, så begge formateres som «grense» (gjennomgangen 26.10, BH7),
     med så mange desimaler at grensen står nøyaktig (ECH)."""
@@ -215,6 +224,14 @@ def trinnforklaringer() -> list[tuple[str, str]]:
         (LYS_OPP, f"Opp fra {lys} til under {sterk}"),
         (STERK_OPP, f"Opp {sterk} eller mer"),
     ]
+
+
+def skalagrenser() -> list[str]:
+    """Grensene under skalaen i kortet «Slik leser du børsometeret» (story
+    8.20b, U99), fra størst fall til størst stigning, med tallene fra
+    grensene som i trinnforklaringer (regel 21)."""
+    lys, sterk = tall(GRENSE_LYS, "grense", desimaler=_noeyaktig(GRENSE_LYS)), tall(GRENSE_STERK, "grense")
+    return [f"-{sterk}", f"-{lys}", f"+{lys}", f"+{sterk}"]
 
 
 def vis_volumforhold(volumforhold: float, p: Parametre = STANDARD) -> str:
@@ -352,9 +369,11 @@ STOERSTE_VEKT = 3.0
 MINSTE_RUTE = 44
 KANT = 2
 # Overskriften i feltet, i px ved bredden flaten regnes ved (Flate.bredde).
-# Den krymper med kartet: ved 288 px er den 24 × 288/358 ≈ 19,3 px, og linja
-# i den er 16 px (gjennomgangen 26.10, BH, og test_overskriften_har_plass_til_linja).
-OVERSKRIFT = 24
+# Den krymper med kartet: ved 288 px er den 40 × 288/358 ≈ 32,2 px, og de to
+# linjene i den er 16 og 14 px (gjennomgangen 26.10, BH, og
+# test_overskriften_har_plass_til_linja). Story 8.20b (U97, spørsmål 14 d):
+# antallet og snittet står på linje to og skjules aldri.
+OVERSKRIFT = 40
 # Gruppens svar 26.10 kl. 13:00 (b): navnet forsvinner aldri helt. Et felt er
 # minst så bredt, ved den minste bredden flaten brukes på, at overskriften har
 # plass til INNRYKK på hver side, symbolet, mellomrommet og MINSTE_NAVN, som er
@@ -364,6 +383,18 @@ SYMBOL = 14
 MELLOMROM = 4
 MINSTE_NAVN = 24
 MINSTE_FELT = 2 * INNRYKK + SYMBOL + MELLOMROM + MINSTE_NAVN
+# Story 8.20b (U97): linja med antallet og snittet er 12 px, og hvert felt er
+# minst så bredt at hele linja står, med TILLEGG_EM per tegn. Tallene har
+# like brede sifre, og 0,55 em er over det bredeste tegnet i linja målt i Edge.
+TILLEGGSKRIFT = 12
+TILLEGG_EM = 0.55
+
+
+def tilleggsbredde(bransje: "Bransje") -> float:
+    """Bredden feltet må ha for linja med antallet og snittet (U97)."""
+    return 2 * INNRYKK + TILLEGG_EM * TILLEGGSKRIFT * len(bransje.tillegg)
+
+
 # Høyden økes med 2 % til hver rute er stor nok og hvert felt minst
 # MINSTE_FELT bredt. Grunnen er målt 26.10 med MINSTE_FELT (gjennomgangen,
 # BH10): med 1,02 ble kartet under 2 % høyere enn nødvendig for 95 av 100
@@ -753,17 +784,20 @@ def styrkelinje(rute: Rute, b: float, h: float) -> bool:
     return styrkeplass(b, h)
 
 
-def _legg_ut(bransjer: list[Bransje], bredde: float, hoeyde: float, minste_felt: float = 0.0) -> list | None:
+def _legg_ut(
+    bransjer: list[Bransje], bredde: float, hoeyde: float, minste_felt: float = 0.0, skala: float = 1.0
+) -> list | None:
     """Feltene og rutene i px, eller None når en rute er mindre enn
     MINSTE_RUTE med KANT på hver side, et felt ikke har plass under
-    overskriften, eller et felt er smalere enn minste_felt."""
+    overskriften, eller et felt er smalere enn minste_felt eller enn linja
+    med antallet og snittet ganger skala (story 8.20b, U97)."""
     minst = MINSTE_RUTE + 2 * KANT
     feltbredde = max(minst, minste_felt)
     feltvekter = [sum(vekt(r) for r in bransje.ruter) for bransje in bransjer]
     ut = []
     for bransje, felt in zip(bransjer, squarify(feltvekter, 0, 0, bredde, hoeyde, feltbredde), strict=True):
         fx, fy, fb, fh = felt
-        if fh - OVERSKRIFT < minst or fb < feltbredde:
+        if fh - OVERSKRIFT < minst or fb < max(feltbredde, tilleggsbredde(bransje) * skala):
             return None
         ruter = squarify([vekt(r) for r in bransje.ruter], fx, fy + OVERSKRIFT, fb, fh - OVERSKRIFT, minst)
         if any(rb < minst or rh < minst for _, _, rb, rh in ruter):
@@ -781,7 +815,8 @@ def kart(bransjer: list[Bransje], flatene: tuple[Flate, ...] = FLATENE) -> Kart:
         hoeyde = flate.bredde * flate.forhold
         for _ in range(MEST_VEKST):
             # MINSTE_FELT gjelder ved den minste bredden flaten brukes på.
-            utlagt = _legg_ut(bransjer, flate.bredde, hoeyde, MINSTE_FELT * flate.bredde / flate.minste)
+            skala = flate.bredde / flate.minste
+            utlagt = _legg_ut(bransjer, flate.bredde, hoeyde, MINSTE_FELT * skala, skala)
             if utlagt is not None:
                 break
             hoeyde *= VEKST

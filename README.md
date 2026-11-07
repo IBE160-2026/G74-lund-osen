@@ -19,7 +19,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 *Aksjesiden for BRFE i demoen, med grafen og rammen «Signalet forklart», med setningene om dagene og om samme dag først og KI-teksten under, med oppdiktede tall («Eksempeltall»).*
 
 ![Børsometeret i demoen, et kart med én rute per aksje etter bransje, farget etter endringen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-demo.png)
-*Børsometeret i demoen, der de største rutene har navnet og endringen i stor skrift, med oppdiktede tall («Eksempeltall»).*
+*Børsometeret i demoen, med kortene «Mål mot børsen» og «Slik leser du børsometeret» øverst, antallet og snittet under hver bransje, og navnet og endringen i stor skrift i de største rutene, med oppdiktede tall («Eksempeltall»).*
 
 ![Min liste i demoen, med de fem aksjene som har stjerne, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/min-liste-demo.png)
 *Min liste i demoen, med aksjene som har stjerne, med oppdiktede tall («Eksempeltall»).*
