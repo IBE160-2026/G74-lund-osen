@@ -48,6 +48,7 @@ from boersometer import (
     dagen_foer,
     indeks_for_dagen,
     kart,
+    skalagrenser,
     trinnforklaringer,
     vis_dagen_foer,
 )
@@ -59,7 +60,7 @@ from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
-from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, valgt_indeks
+from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from ki_visning import (
     AV,
     INGEN_I_DEMOEN,
@@ -764,6 +765,12 @@ def boersometer():
     # «ikke vurdert» av en annen grunn, ved siden av den gamle, regnet av
     # rutene i kartet (gjennomgangen, ECH1).
     annen_grunn = annen_grunn_i_kartet(kartet)
+    indeks = _indeksen_for_dagen(dagen) if periodestart is None else _indeksen_for_perioden(periodestart, siste)
+    # Story 8.20b (spørsmål 14 b): «N av M gikk bedre enn indeksen» i kortet
+    # «Mål mot børsen», med aksjene som har en endring, slik tallene vises
+    # (er_bedre, som oversikten).
+    med_endring = [rute for rute in ruter if rute.endring is not None]
+    bedre = sum(er_bedre(rute.endring, indeks) for rute in med_endring) if indeks is not None else None
     return render_template(
         "boersometer.html",
         bransjer=bransjer,
@@ -780,10 +787,11 @@ def boersometer():
         # Gjennomgangen 26.10 (ECH4): datoen når børsdagen før er mer enn 6 dager før.
         dagen_foer=vis_dagen_foer(dagen_foer(datoer, dagen), dagen, i_dag.year),
         volum_vindu=STANDARD.volum_vindu,
-        indeksendring=_indeksen_for_dagen(dagen)
-        if periodestart is None
-        else _indeksen_for_perioden(periodestart, siste),
+        indeksendring=indeks,
+        bedre=bedre,
+        med_endring=len(med_endring),
         fargetrinn=trinnforklaringer(),
+        skalagrenser=skalagrenser(),
         # Story 8.17b: periodevalget, og perioden i adressen.
         valg=valg,
         knapper=knappene(siste, i_dag),

@@ -259,13 +259,13 @@ class TestRutene:
         klasse, tall = rute.search(perioden).groups()
         assert tall == "+37,50 %" and "trinn-opp" in klasse
         assert rute.search(siste).group(2) == "+11,11 %"
-        maal = [
-            " ".join(_synlig(li).split())
-            for li in re.findall(r"<li>(.*?)</li>", perioden.split('class="maal"')[1].split("</section>")[0], re.S)
-        ]
-        assert maal[0] == "Farge · endring for 1 uke, fra 02.10"
-        assert maal[1] == "Størrelse · like store ruter: volumet mot vanlig gjelder én dag"
-        assert "volum mot medianen" in siste and "like store ruter" not in siste
+        # Story 8.20b (spørsmål 14 b): kortet «Mål mot børsen» sier perioden
+        # og at rutene er like store, og for én dag at størrelsen følger volumet.
+        maal = " ".join(_synlig(perioden.split('class="maal"')[1].split("</section>")[0]).split())
+        assert "1 uke, fra 02.10 til" in maal
+        assert "endringen for 1 uke, og rutene er like store, fordi volumet mot vanlig gjelder én dag" in maal
+        en_dag = " ".join(_synlig(siste.split('class="maal"')[1].split("</section>")[0]).split())
+        assert "jo mer det ble handlet enn vanlig, jo større rute" in en_dag and "like store" not in en_dag
 
     def test_rammen_er_signalet_siste_boersdag_ved_en_periode(self, klient):
         """§3: gult ved 3 av 3 siste børsdag og mørk ved 2 av 3, også ved en
@@ -328,14 +328,13 @@ class TestGjennomgangen:
         _basen(med_indeks=True)
 
         def maal(adresse):
+            # Story 8.20b: tallet for hovedindeksen i kortet «Mål mot børsen».
             seksjon = _side(klient, adresse).split('class="maal"')[1].split("</section>")[0]
-            return [
-                re.sub(r"[ \t\r\n]+", " ", _synlig(li)).strip() for li in re.findall(r"<li>(.*?)</li>", seksjon, re.S)
-            ]
+            return _synlig(re.search(r'<span class="indeksendring[^"]*">(.*?)</span>', seksjon).group(1)).strip()
 
-        assert maal("/boersometer?periode=1-uke")[2] == "Hovedindeksen · +10,00 %"
-        assert maal("/boersometer")[2] == "Hovedindeksen · 0,00 %"
-        assert maal("/boersometer?periode=1-mnd")[2] == "Hovedindeksen · –"
+        assert maal("/boersometer?periode=1-uke") == "+10,00 %"
+        assert maal("/boersometer") == "0,00 %"
+        assert maal("/boersometer?periode=1-mnd") == "–"
 
     def test_en_kortere_serie_i_boersometeret(self, klient):
         """VG2: AKRBP begynner mandag 05.10, så ruta har +5,00 %, og tabellen
