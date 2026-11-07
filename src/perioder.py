@@ -80,7 +80,7 @@ def startdag(periode: str, siste: date) -> date:
     if periode in MAANEDER:
         return foerste_boersdag_fra(maaneder_tilbake(siste, MAANEDER[periode]))
     if periode == I_AAR:
-        # 1. januar er alltid stengt (STENGT), ogsaa utenfor kalenderen.
+        # 1. januar er alltid stengt (stengte_dager), ogsaa utenfor kalenderen.
         return foerste_boersdag_fra(date(siste.year, 1, 2))
     if periode in (SISTE, VELG):
         return startdag(SEKS_MND, siste)

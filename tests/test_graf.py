@@ -146,9 +146,19 @@ class TestMaanedsmerker:
         assert bygg_graf(ps).maanedsmerker == ()
 
     def test_utenfor_kalenderen_gir_ingen_merker(self):
-        """boersdag dekker bare 2026. En maaned utenfor kan ikke avgjoeres."""
+        """boersdag dekker fra 2026 (FOERSTE_AAR). En maaned foer kan ikke
+        avgjoeres."""
         ps = tuple(Punkt(dato=date(2025, 12, 1) + timedelta(days=i), kurs=100.0, ma50=None) for i in range(20))
         assert bygg_graf(ps).maanedsmerker == ()
+
+
+class TestMaanedsmerkerI2027:
+    def test_januar_og_februar_2027_faar_merke(self):
+        """Story 2.16 (gjennomgangen, VG3): 04.01 og 01.02.2027 er foerste
+        boersdag i maaneden. Ville feilet hvis kalenderen sluttet i 2026, som
+        foer 2.16: da manglet merkene fra januar 2027."""
+        ps = boersdagspunkter(date(2026, 12, 14), date(2027, 2, 10))
+        assert [m.navn for m in bygg_graf(ps).maanedsmerker] == ["januar", "februar"]
 
 
 class TestMaanedsmerkerEtterGjennomgangen:

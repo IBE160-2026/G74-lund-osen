@@ -203,3 +203,13 @@ Avtrykkene settes på nytt med en kommentar, som før.
 - Ingen tall fra den ekte versjonen i sporede filer (regel 16). Tallene i skissene er oppdiktet.
 - Bygges på egen gren etter 10.9, og flettes bare ferdig og grønn.
 - En mutant per del, med kopi før og sha256 mot HEAD etter.
+
+## 8.20c, bygget 07.11
+
+*Lagt til 2026-11-07, etter instruksjonen kl. 13:35 i `docs/ai-prompts/2026-11-07.md`:* 8.20c er bygget i samme PR som story 2.16 og porttestene, på grenen `2-16-boerskalenderen-for-alle-aar`, i rekkefølgen fra svar 21 (10.9, 8.20c, 8.20a, 3.4h og 8.20b). Den har del I og ordene i U100 og U101 fra del H. U88 i del H hører til 8.20a og 8.20b (spørsmål 16), og står.
+
+- **U76 (del I, spørsmål 20):** `app.run(port=8000)` under `__main__` i `src/app.py`, uten debug. **Ville feilet hvis** `src/app.py` hadde `debug=True` (`TestDemoflagget::test_webserveren_fra_kommandoen_har_ikke_debug` i `tests/test_demo.py`).
+- **U75 (del I, spørsmål 20):** steg 5 i «Den ekte versjonen» og avsnittet om nøkkelen i «Slik virker dobbeltklikket» har «Har du en konto hos EODHD fra før, logger du inn og kopierer «API token» under «Dashboard».» **Ville feilet hvis** en av dem bare sa at man lager en gratis bruker (`test_readme_sier_hva_man_gjoer_med_en_konto_fra_foer` i `tests/test_readme.py`). Avtrykkene av de to pilene i `tests/test_docker.py` er satt på nytt.
+- **U100 (del H, spørsmål 18):** avgjøres i spesifikasjonen for 2.16, spørsmål 2, fordi forslaget her («som bare har 2026») ikke stemmer når kalenderen ikke har noe siste år. Byggingen følger forslaget der: «utenfor børskalenderen, som begynner i 2026», med året fra `FOERSTE_AAR`. **Ville feilet hvis** året var borte eller skrevet fast (`test_utenfor_boerskalenderen_gir_tekst_ikke_feil` i `tests/test_markedsoversikt.py`, og testen for tilstandene i `tests/test_historikken.py`).
+- **U101 (del H, spørsmål 19):** periodevalget i Min liste heter «Sammenlign siste børsdag med», i overskriften, i navnet på valget, i «?» og vinduet, i hjelpeteksten `sammenlign_med` med kilden, og i `docs/hjelp.md`. **Ville feilet hvis** det gamle navnet sto igjen på siden eller i hjelpen (`TestTilgjengelig::test_skjermleseren_hoerer_hva_linja_under_gjelder` i `tests/test_periodevalget_min_liste_boersometer.py`). Kommentarene som viser til beslutningen 08.10 med det gamle navnet, står som historikk.
+- **Bildene (del K):** `min-liste-demo.png` er tatt på nytt, med samme høyde. De seks andre er tatt på nytt og er byte for byte de samme.

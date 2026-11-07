@@ -427,6 +427,15 @@ class TestSidene:
         hoved = kilde.split('if __name__ == "__main__":', 1)[1]
         assert hoved.index("les_flagg(sys.argv[1:])") < hoved.index("app.run(")
 
+    def test_webserveren_fra_kommandoen_har_ikke_debug(self):
+        """Story 8.20c (U76, spoersmaal 20 i 8.20): uv run python src/app.py
+        starter uten debug, som skriptene og Docker. Ville feilet hvis
+        src/app.py hadde debug=True (mutanten)."""
+        kilde = (SRC / "app.py").read_text(encoding="utf-8")
+        hoved = kilde.split('if __name__ == "__main__":', 1)[1]
+        assert "app.run(port=8000)" in hoved
+        assert "debug" not in hoved.replace("uten debug", "")
+
     def test_ulesbar_demobase_gir_503_med_navnet_og_kommandoen(self, klient, monkeypatch):
         """VG1: med bryteren og en demo.db som ikke kan leses, svarer begge
         sidene 503, nevner demo.db og viser kommandoen som lager den paa nytt."""
@@ -1143,3 +1152,31 @@ class TestFotnotenIDemoen:
         Ville feilet hvis året aldri sto, slik det var etter VG2."""
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
         assert app_modul.demo_startdag() == "mandag 21.09.2026"
+
+
+# Story 2.16: sidene i demoen med klokka i januar 2027.
+SIDENE_I_DEMOEN = ["/", "/min-liste", "/boersometer", "/aksje/BRFE", "/aksje/BRFE?periode=iaar", "/?periode=iaar"]
+
+
+class TestDemoenIJanuar2027:
+    @pytest.mark.parametrize("side", SIDENE_I_DEMOEN)
+    def test_siden_er_lik_bortsett_fra_aaret(self, klient, monkeypatch, demobase, side):
+        """Story 2.16: demoen ser lik ut med klokka i januar 2027. Det eneste
+        som skiller, er året bak datoene i 2026 (story 8.0c). Ville feilet hvis
+        en side feilet i 2027, eller viste noe annet enn årstallet. Demoen slår
+        ikke opp dager etter 09.10.2026, så den var lik også før 2.16 (prøvd
+        07.11 med kalenderen bare for 2026)."""
+        import re
+
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        sidene = {}
+        for naa in (
+            datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc),
+            datetime(2027, 1, 15, 12, 0, tzinfo=timezone.utc),
+        ):
+            monkeypatch.setattr(app_modul, "naa", lambda naa=naa: naa)
+            svar = klient.get(side)
+            assert svar.status_code == 200, (side, naa)
+            sidene[naa.year] = svar.data.decode("utf-8")
+        assert re.search(r"\d\d\.\d\d\.2026", sidene[2027])
+        assert re.sub(r"(\d\d\.\d\d)\.2026", lambda m: m.group(1), sidene[2027]) == sidene[2026]

@@ -146,9 +146,9 @@
         åpnes (designregler §2). Radene er siste børsdag, og linja under
         hver rad er dagen man sammenligner med. #}
     {% if valg and vist_tabell %}
-      <h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign med</h2>
+      <h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign siste børsdag med</h2>
       {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
-      <div class="periodehode">{{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign med") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign med", ekstra=[("vis", "alle")] if alle else []) }}</div>
+      <div class="periodehode">{{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign siste børsdag med") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign siste børsdag med", ekstra=[("vis", "alle")] if alle else []) }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Øverst i hver rad står siste børsdag, {{ siste_dag|ukedag }} {{ siste_dag|dato }}. Linja under er {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen den dagen, endringen derfra til siste børsdag og signalet som er lagret for dagen.</p>
@@ -347,7 +347,7 @@
     {#- Story 8.17a: periodevalget over søylene og tabellen. #}
     {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
     {#- Story 8.17b: «Sammenlign med» i Min liste. #}
-    {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign med", [("", ["sammenlign_med"])]) }}{% endif %}
+    {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign siste børsdag med", [("", ["sammenlign_med"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}

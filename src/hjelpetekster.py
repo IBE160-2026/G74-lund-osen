@@ -504,9 +504,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (INDEX_MAL, "Periode for oversikten"),
             ),
         ),
-        # Story 8.17b: «Sammenlign med» i Min liste (beslutningen 08.10 kl. 21:48).
+        # Story 8.17b: «Sammenlign med» i Min liste (beslutningen 08.10 kl. 21:48),
+        # «Sammenlign siste børsdag med» fra 8.20c (U101, spørsmål 19 i 8.20).
         "sammenlign_med": Hjelpetekst(
-            "Sammenlign med:",
+            "Sammenlign siste børsdag med:",
             "knappene er de samme som i oversikten, og øverst i hver rad står alltid siste børsdag. "
             "Med en periode eller en dag du velger, står en linje under hver rad med sluttkursen den "
             "første dagen i perioden eller dagen du valgte, endringen derfra til siste børsdag og "
@@ -515,7 +516,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             (
                 (MARKEDSOVERSIKT, "def bygg_sammenligning("),
                 (APP, "def _periodestart("),
-                (INDEX_MAL, '"Sammenlign med"'),
+                (INDEX_MAL, '"Sammenlign siste børsdag med"'),
             ),
         ),
         # Story 8.17b: periodevalget i børsometeret (gruppens svar 23.10 kl. 12:35, b).

@@ -1429,4 +1429,6 @@ if __name__ == "__main__":
     # Story 3.4: --demo setter bryteren, saa kommandoen er lik i PowerShell
     # og i bash.
     les_flagg(sys.argv[1:])
-    app.run(debug=True, port=8000)
+    # Story 8.20c (U76, spoersmaal 20 i 8.20): uten debug, som skriptene og
+    # Docker, som starter waitress.
+    app.run(port=8000)

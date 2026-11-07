@@ -17,6 +17,7 @@ from dataclasses import dataclass, replace
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
+import boersdag
 from boersdag import UtenforKalenderen
 from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
@@ -74,7 +75,16 @@ GRUNNTEKST: dict[Grunn, str] = {
 }
 IKKE_VURDERT = "ikke vurdert"
 IKKE_BOERSDAG = "ikke børsdag"
-UTENFOR_KALENDEREN = "utenfor børskalenderen"
+
+
+def utenfor_kalenderen() -> str:
+    """Story 2.16, spoersmaal 2 i spesifikasjonen (spoersmaal 18 i 8.20, U100):
+    med aaret kalenderen begynner i, lest fra boersdag.py naar teksten brukes,
+    saa teksten sier hva som skiller den fra «ikke vurdert» og foelger
+    FOERSTE_AAR (gjennomgangen, VG1)."""
+    return f"utenfor børskalenderen, som begynner i {boersdag.FOERSTE_AAR}"
+
+
 # Datoen til nyeste kurs er etter dagens dato. Skjer bare med en klokke eller
 # en kilde som tar feil, og vises da i stedet for en feilside.
 ETTER_I_DAG = "datoen er etter i dag"
@@ -93,7 +103,7 @@ def les_tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> t
     try:
         utfall = tilstand(innhold, dato, idag)
     except UtenforKalenderen:
-        return None, UTENFOR_KALENDEREN
+        return None, utenfor_kalenderen()
     if utfall.art is Art.SVAR:
         return utfall, None
     if utfall.art is Art.GRUNN:

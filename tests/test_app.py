@@ -2621,7 +2621,8 @@ class TestStory80dAksjesiden:
 
     def test_endringen_med_datoene_naar_kalenderen_ikke_dekker_dagene(self, klient, monkeypatch):
         """Svar 29: kan boersdag.py ikke avgjøre det (UtenforKalenderen),
-        står datoene, og siden feiler ikke. 01.01.2027 er ikke i kalenderen."""
+        står datoene, og siden feiler ikke. Story 2.16: 2027 er i kalenderen, og
+        endringen viser «fra … til …» uansett (gjennomgangen, VG2)."""
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2027, 1, 5, 12, 0, tzinfo=timezone.utc))
         monter(monkeypatch, snapshot({"EQNR": _med_siste(date(2026, 12, 30), date(2027, 1, 4))}))
         assert _endringsforklaring(klient, "EQNR") == "fra onsdag 30.12.2026 til mandag 04.01"
@@ -4084,7 +4085,7 @@ class TestFotnotenForInnevaerendeBoersdag:
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
     def test_siste_boersdag_foer_en_helligdag(self, klient, monkeypatch, adresse):
         """114 rader slutter onsdag 23.12, og klokka er julaften torsdag 24.12,
-        da børsen er stengt (STENGT i boersdag.py). Ville feilet hvis
+        da børsen er stengt (stengte_dager i boersdag.py). Ville feilet hvis
         setningen ikke fulgte kalenderen over en helligdag."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 113 + [110.0])}), vurdert=False)
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 12, 24, 12, 0, tzinfo=timezone.utc))
@@ -4094,7 +4095,7 @@ class TestFotnotenForInnevaerendeBoersdag:
     @pytest.mark.parametrize("adresse", ["/", "/aksje/EQNR"])
     def test_ingen_setning_naar_kalenderen_ikke_dekker_dagen(self, klient, monkeypatch, adresse):
         """Fredagen lest lørdag, men kalenderen reiser UtenforKalenderen, som
-        for en dag i et år DEKKEDE_AAR ikke har. Da kan lagringen heller ikke
+        for en dag før FOERSTE_AAR. Da kan lagringen heller ikke
         skrive. Ville feilet hvis siden ga feil, eller setningen sto likevel
         (gjennomgangen 23.10 kveld, BH3 og VG1)."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 59 + [110.0])}), vurdert=False)

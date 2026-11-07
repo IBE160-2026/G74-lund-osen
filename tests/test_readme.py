@@ -17,6 +17,22 @@ LENKE = re.compile(r"\]\(([^)\s]+)\)")
 UTENFOR = ("http://", "https://", "mailto:", "#")
 
 
+# Story 8.20c (U75, spørsmål 20 i 8.20): med ordene README-en allerede bruker.
+KONTO_FRA_FOER = "Har du en konto hos EODHD fra før, logger du inn og kopierer «API token» under «Dashboard»."
+
+
+def test_readme_sier_hva_man_gjoer_med_en_konto_fra_foer():
+    """Ville feilet hvis steg 5 eller avsnittet om nøkkelen ved
+    dobbeltklikket bare sa at man lager en gratis bruker (mutanten)."""
+    tekst = (ROT / "README.md").read_text(encoding="utf-8")
+    steg_5 = next(linje for linje in tekst.splitlines() if linje.startswith("5. **Hent en nøkkel.**"))
+    noekkelen = next(
+        linje for linje in tekst.splitlines() if linje.startswith("Den ekte versjonen spør etter nøkkelen")
+    )
+    assert KONTO_FRA_FOER in steg_5
+    assert KONTO_FRA_FOER in noekkelen
+
+
 def test_hver_lenke_i_readme_peker_paa_noe_som_finnes():
     tekst = (ROT / "README.md").read_text(encoding="utf-8")
 

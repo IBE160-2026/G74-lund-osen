@@ -131,13 +131,18 @@ class TestKalenderen:
         "dag, idag",
         [
             (date(2025, 12, 31), IDAG),
-            (date(2027, 1, 4), date(2027, 1, 5)),
+            (date(2025, 6, 2), date(2025, 6, 3)),
         ],
-        ids=["2025", "2027"],
+        ids=["2025-12", "2025-06"],
     )
     def test_ingen_rad_utenfor_lista_reiser(self, dag, idag):
         with pytest.raises(UtenforKalenderen):
             tilstand(None, dag, idag)
+
+    def test_ingen_rad_i_2027_er_ikke_kjoert(self):
+        """Story 2.16: kalenderen dekker 2027. Ville feilet hvis den sluttet
+        i 2026, som før 2.16: da reiste en dag i 2027."""
+        assert tilstand(None, date(2027, 1, 4), date(2027, 1, 5)).art is Art.IKKE_KJOERT
 
 
 class TestTyper:
@@ -188,7 +193,7 @@ class TestGjennomLageret:
 
     def test_helligdag_uten_rad_er_ikke_boersdag(self, tilkobling):
         """BH9: les avviser ikke en dag som ikke er boersdag, og tilstand
-        skiller den fra et hull ogsaa naar dagen er en hverdag i STENGT."""
+        skiller den fra et hull ogsaa naar dagen er en hverdag i stengte_dager."""
         lager = SqliteVurderingslager(tilkobling, lambda: datetime(2026, 9, 25, 18, tzinfo=timezone.utc))
         langfredag = date(2026, 4, 3)
         assert tilstand(lager.les("EQNR", langfredag), langfredag, IDAG) == Tilstand(Art.IKKE_BOERSDAG)

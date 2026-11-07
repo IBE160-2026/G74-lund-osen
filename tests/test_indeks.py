@@ -181,7 +181,7 @@ class TestPorten:
         assert lager.sist_hentet("OSEBX") == senere
 
     def test_en_loerdag_og_en_helligdag_lagres_ikke(self, lager):
-        """Bare børsdager i DEKKEDE_AAR. Ville feilet hvis lørdagen eller
+        """Bare børsdager fra FOERSTE_AAR. Ville feilet hvis lørdagen eller
         juledagen ble lagret."""
         assert not er_boersdag(LOERDAG) and not er_boersdag(JULEDAG)
         lager.erstatt_serie("OSEBX", [rad(FREDAG), rad(LOERDAG), rad(JULEDAG)], HENTET)
@@ -278,10 +278,10 @@ class TestPorten:
         assert lageret.sist_hentet("OSEBX") == HENTET
 
     def test_bare_boersdager_leser_aarene_fra_kalenderen(self, monkeypatch):
-        """Året leses fra DEKKEDE_AAR når serien skrives. Ville feilet hvis
-        koden hadde 2026 fast: med bare 2025 i kalenderens år er fredagen
+        """Året leses fra FOERSTE_AAR når serien skrives (story 2.16). Ville
+        feilet hvis koden hadde 2026 fast: med kalenderen fra 2027 er fredagen
         16.10.2026 ikke med."""
-        monkeypatch.setattr(boersdag, "DEKKEDE_AAR", frozenset({2025}))
+        monkeypatch.setattr(boersdag, "FOERSTE_AAR", 2027)
         assert bare_boersdager([rad(FREDAG)]) == []
 
     def test_ingen_aarstall_i_koden(self):

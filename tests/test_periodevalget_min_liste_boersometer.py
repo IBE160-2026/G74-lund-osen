@@ -12,6 +12,7 @@ siste børsdag.
 
 import re
 from datetime import date, datetime
+from pathlib import Path
 
 import pytest
 
@@ -280,8 +281,16 @@ class TestTilgjengelig:
         skjermleseren bare fikk tallene."""
         _basen()
         html = _side(klient, "/min-liste?vis=alle&periode=velg&dag=2026-10-07")
-        assert '<h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign med</h2>' in html
-        assert '<nav class="periodevalg" aria-label="Sammenlign med">' in html
+        assert '<h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign siste børsdag med</h2>' in html
+        assert '<nav class="periodevalg" aria-label="Sammenlign siste børsdag med">' in html
+        # Story 8.20c (U101, spørsmål 19 i 8.20). Ville feilet hvis det gamle
+        # navnet sto igjen på siden eller i hjelpen.
+        assert "Sammenlign med" not in _synlig(html)
+        assert 'aria-label="Hjelp: sammenlign siste børsdag med"' in html
+        assert 'sammenlign med"' not in html.lower()
+        assert "«Sammenlign med»" not in (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(
+            encoding="utf-8"
+        )
         assert '<span class="skjult">Equinor, sammenlignet med </span>onsdag 07.10' in html
         assert '<span class="skjult"> til siste børsdag</span>' in html
         assert "Linja under er onsdag 07.10" in _synlig(html)

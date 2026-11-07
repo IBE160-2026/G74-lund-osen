@@ -163,6 +163,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
   summary: Kursgrafen får ikke månedsmerker for måneder utenfor børskalenderen. Den dekker bare 2026 (`boersdag.DEKKEDE_AAR`), så fra januar 2027 mangler merket for inneværende måned.
   evidence: BH3, BH4 og ECH4 i gjennomgangen av PR #36 (13.10). Beslutning 13 sier «etter `er_boersdag`». Rettes når stengte dager for 2027 føres inn (kommentaren i `boersdag.py`), eller med første punkt i måneden som merke. Ikke rettet nå.
+  resolved: Løst i story 2.16 (PR #117, 07.11): kalenderen dekker hvert år fra 2026, og `TestMaanedsmerkerI2027` i `tests/test_graf.py` viser merkene for januar og februar 2027.
 - source_spec: `_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md`
   summary: Månedsmerkene kan overlappe når et langt hull gjør to måneder til naboer i serien, og navnene står uten år når serien går over et årsskifte.
   evidence: ECH3 og BH6 i gjennomgangen av PR #36 (13.10). Kan tas i 8.0d sammen med utseendet. Ikke rettet nå.
