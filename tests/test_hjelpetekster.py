@@ -443,8 +443,9 @@ class TestSidene:
                 "hjelp-sjekkene": ["hvorfor_tre", "antall_dager"],
                 # Story 2.7b: historikken nederst på siden.
                 "hjelp-historikk": ["historikken"],
-                # Gruppens svar 04.11 kl. 22:23, 3: «?» ved KI-delen.
-                "hjelp-ki": ["ki_kort_fortalt"],
+                # Gruppens svar 04.11 kl. 22:23, 3: «?» ved KI-delen. Story
+                # 10.9, del D: ved rammen «Signalet forklart».
+                "hjelp-ki": ["signalet_forklart"],
                 "hjelp-trend": ["trend"],
                 "hjelp-bevegelse": ["bevegelse"],
                 "hjelp-interesse": ["interesse"],

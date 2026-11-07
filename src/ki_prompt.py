@@ -122,15 +122,30 @@ Versjon 4, gjennomgangen av svarene (BH8, ECH5): linja om hovedindeksen sa
 teksten kan nevne den naar feltet er der. Den sier naa at feltet er med for
 ordlyden, og linja om aksjen har forbeholdet om at feltet kan mangle.
 Versjonen staar som 4, av samme grunn som over.
+
+Versjon 5 (story 10.9, gruppens svar 06.11 kl. 20:35, 20:38 og 22:05, og
+07.11 kl. 08:58): KI-teksten gjentok bare navnene paa sjekkene (U82 i
+docs/ux-logg.md). Reglene ber om én setning per sjekk, i rekkefoelgen trend,
+bevegelse og interesse, som sier med vanlige ord hva sjekken maaler og hva
+den ga, med én form for hvert fortegn og «fordi» etter utslaget, som
+regelen fra versjon 2, og saa én setning om de tre moenstrene appen har regnet ut
+(moenstrene.py), med tallene fra opplysningene og formene under. Modellen
+finner aldri moenstre selv, og sier ikke hva de betyr for kursen videre.
+Ordlyden om hovedindeksen staar som i versjon 4, og setningen om moenstrene
+er det eneste andre stedet teksten kan nevne hovedindeksen. Alle andre regler
+staar. Versjonen er 5, fordi versjon 4 er flettet, og fra hentingen 26.10 gir
+enhver endring i prompten en ny versjon (versjon 3 over). ose.db hadde ingen
+tekst med versjon 4 da versjon 5 ble laget (lest 07.11): de foerste kommer med
+hentingen 09.11.
 """
 
 import json
 from collections.abc import Mapping
 
-PROMPTVERSJON = "4"
+PROMPTVERSJON = "5"
 
 REGLER = """Du skriver en kort forklaring på norsk av et regelbasert signal for én aksje på Oslo Børs.
-Forklaringen skal være lett å forstå for en som ikke kjenner reglene. Skriv to eller tre hele setninger.
+Forklaringen skal være lett å forstå for en som ikke kjenner reglene. Skriv én hel setning for hver sjekk, og så én setning om mønstrene når de står i opplysningene.
 
 Signalet bygger på tre sjekker. Hver gir et positivt utslag, et negativt utslag eller ikke noe utslag:
 - trend: om kursen ligger over eller under snittet for de siste 50 børsdagene.
@@ -143,7 +158,16 @@ Opplysningene sier også hvordan dagen var:
 - hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret i dag. Feltet er med for ordlyden under, og teksten nevner hovedindeksen bare med den.
 - aksjen: om aksjen selv steg, falt eller var uendret i dag. Mangler feltet, skal du ikke si noe om hvordan aksjen gikk.
 
+Opplysningene kan også ha tre mønstre appen har regnet ut av signalene som er lagret. Et mønster mangler når det er for få dager:
+- siste_20_vurdert, siste_20_positiv, siste_20_negativ, siste_20_blandet og siste_20_ingen: hvor mange av de siste 20 børsdagene signalet ble vurdert, og hvor mange av dem retningen var Positiv, Negativ, Blandet og Ingen.
+- siste_5_kunne_telles og siste_5_samme_vei: hvor mange av de siste 5 børsdagene som kunne telles, og hvor mange av dem aksjen gikk samme vei som hovedindeksen.
+- siste_måned_skift: hvor mange ganger retningen skiftet den siste måneden. Står siste_måned_merke med «minst», mangler noen dager, og antallet er det minste det kan være.
+
 Regler for teksten:
+- Skriv én setning for hver sjekk, i rekkefølgen trend, bevegelse og interesse. Si med vanlige ord hva sjekken måler og hva den ga, med formen for fortegnet i opplysningene:
+  - trend 1: «Trenden ga et positivt utslag fordi kursen ligger over snittet for de siste 50 børsdagene.» -1: «Trenden ga et negativt utslag fordi kursen ligger under snittet for de siste 50 børsdagene.» 0: «Trenden ga ikke utslag fordi kursen ligger nær snittet for de siste 50 børsdagene.»
+  - bevegelse 1: «Bevegelsen ga et positivt utslag fordi kursen steg mer i dag enn den vanligvis svinger de siste 20 dagene.» -1: «Bevegelsen ga et negativt utslag fordi kursen falt mer i dag enn den vanligvis svinger de siste 20 dagene.» 0: «Bevegelsen ga ikke utslag fordi dagens endring ikke var stor sammenlignet med de siste 20 dagene.»
+  - interesse 1: «Interessen ga et positivt utslag fordi det ble handlet mer enn vanlig på en dag kursen steg.» -1: «Interessen ga et negativt utslag fordi det ble handlet mer enn vanlig på en dag kursen falt.» 0: «Interessen ga ikke utslag fordi det ikke ble handlet mye mer enn vanlig.»
 - Beskriv hver sjekk slik fortegnet står i opplysningene: et positivt utslag, et negativt utslag eller ikke noe utslag. Ikke si at en sjekk ga utslag når den ikke ga det, eller at den ga et annet utslag enn det som står.
 - Når du sier noe om én sjekk, bruk navnet på sjekken, for eksempel «interessen ga ikke utslag». Skriv «ingen sjekk» bare når styrken er 0.
 - Når du nevner flere sjekker, ta dem i rekkefølgen trend, bevegelse og interesse.
@@ -151,6 +175,9 @@ Regler for teksten:
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
 - Om hovedindeksen kan teksten bare bruke setningen etter «Ordlyden om hovedindeksen:» under opplysningene, ordrett og som en egen setning, eller ikke si noe om hovedindeksen. Står det ingen ordlyd, skal teksten ikke si noe om hovedindeksen.
+- Setningen om mønstrene kan likevel si hvor mange dager aksjen gikk samme vei som hovedindeksen, med formen under.
+- Etter sjekkene kommer én setning om mønstrene, med bare de mønstrene som står i opplysningene, og med tallene derfra. Bruk disse formene, sett inn tallene for feltene i ‹ ›, og sett formene sammen med komma og «og»: «av de ‹siste_20_vurdert› vurderte børsdagene av de siste 20 var signalet positivt ‹siste_20_positiv›, negativt ‹siste_20_negativ›, blandet ‹siste_20_blandet› og uten retning ‹siste_20_ingen›», «aksjen gikk samme vei som hovedindeksen ‹siste_5_samme_vei› av de ‹siste_5_kunne_telles› dagene som kunne telles av de siste 5 børsdagene» og «den siste måneden skiftet retningen ‹siste_måned_skift› ganger». Med siste_måned_merke skriver du «minst» foran tallet. Er alle 20 vurdert, skriver du «av de siste 20 børsdagene var signalet …». Skriv aldri navnet på et felt eller tegnene ‹ › i teksten. Står ingen mønstre i opplysningene, skriver du ingen setning om dem.
+- Mønstrene sier bare hva som har skjedd. Ikke si hva de betyr for kursen videre, ikke sammenlign tallene med hverandre, og ikke finn mønstre selv. Ikke bruk ordene «mønster», «tendens», «pleier», «gjentar seg» eller «oftere».
 - Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. Appen skriver det selv under teksten.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
 - Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.

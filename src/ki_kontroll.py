@@ -81,6 +81,26 @@ den grunnlaget gir, stoppes, saa byttede retninger ikke bestaar. Regelens
 vinduer («de siste 50 børsdagene») og merket om aksjene grensene er maalt paa
 staar som foer.
 
+Story 10.9, del F (gruppens svar 06.11 kl. 20:38 og 22:05, og 07.11 kl.
+08:58): setningen om moenstrene. Formene prompten gir (versjon 5) leses med
+tallet ved feltet sitt: «positivt 6» mot siste_20_positiv, «3 av de 4
+dagene som kunne telles» mot siste_5_samme_vei og siste_5_kunne_telles, og
+«skiftet retningen minst 2 ganger» mot siste_måned_skift og merket. En form
+med feil tall stoppes, og en form som stemmer, tas ut foer resten av
+kontrollen leser teksten, saa «ganger», «måneden» og hovedindeksen bare er
+lov der. Uten moensteret i grunnlaget leses ikke formen, og ordene stoppes
+som foer. Ord som sier at modellen fant et moenster selv, som «tendens»,
+«pleier» og «oftere», stoppes alltid, under punkt 4. Antallene i moenstrene
+er i ANTALLENE (ki_grunnlag.py).
+
+Story 10.9, del F: setningene om sjekkene sier ogsaa hva sjekken maaler
+(versjon 5), og det skal stemme med fortegnet: «kursen ligger over
+snittet» bare med trend 1, «kursen falt mer i dag enn den vanligvis
+svinger» bare med bevegelse -1, «det ble ikke handlet mye mer enn vanlig»
+bare med interesse 0, og «på en dag kursen steg» bare med interesse 1
+(_maalingene). Proeven av demotekstene 07.11 fant «Det ble ikke handlet mer
+enn vanlig, fordi interessen ga et negativt utslag», som besto foer dette.
+
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
 et ord ikke slipper gjennom fordi det er skrevet med andre tegn.
@@ -91,14 +111,17 @@ import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from ki_grunnlag import ANTALLENE
+from ki_grunnlag import ANTALLENE, MOENSTER_1, MOENSTER_2, MOENSTER_3, MOENSTER_3_MERKE
 from ki_prompt import ordlyd_om_hovedindeksen
+from moenstrene import VINDU_RETNINGEN, VINDU_SAMME_VEI
 from signalberegning import MA_VINDU, TERSKEL, VOLATILITET_VINDU, VOLUM_VINDU
 
 ANTALL_SJEKKER = 3
 
-# Regelens faste tall (punkt 2).
-FASTE_TALL = frozenset({ANTALL_SJEKKER, MA_VINDU, VOLATILITET_VINDU, VOLUM_VINDU, TERSKEL})
+# Regelens faste tall (punkt 2). Story 10.9: vinduet for moenster 1 er 20,
+# som VOLATILITET_VINDU, og vinduet for moenster 2, 5, er lovlig bare naar
+# grunnlaget har moensteret (kontroller).
+FASTE_TALL = frozenset({ANTALL_SJEKKER, MA_VINDU, VOLATILITET_VINDU, VOLUM_VINDU, TERSKEL, VINDU_RETNINGEN})
 
 TALLORD = {
     "null": 0,
@@ -516,6 +539,100 @@ _IKKE_NEKTET = frozenset(("noe", "et", "også et"))
 ANTALLORD = {**TALLORD, "en": 1, "én": 1, "ett": 1, "ingen": 0}
 
 
+# Story 10.9: et antall i formene for moenstrene, med siffer eller ord.
+_N = r"(\d{1,6}|" + "|".join(sorted(ANTALLORD, key=len, reverse=True)) + r")(?![\w-])"
+_DAGENE_ORD = r"(?:børs|handels)?dag(?:ene|er)?"
+_M_VURDERT = re.compile(r"(?<![\w-])(?:av\s+)?(?:de\s+)?" + _N + r"\s+vurderte\s+" + _DAGENE_ORD, re.IGNORECASE)
+_M_VINDUET = re.compile(
+    r"(?<![\w-])(?:av\s+)?(?:de\s+)?siste\s+(?:20|tjue|tyve)(?:\s+" + _DAGENE_ORD + r")?(?![\w-])", re.IGNORECASE
+)
+_M_RETNING = re.compile(
+    r"(?<![\w-])(positiv|negativ|blandet|uten\s+retning|ingen\s+retning)(?:t|e)?\s+(?:i\s+)?"
+    + _N
+    + r"(?:\s+(?:av\s+dem|ganger|dager|børsdager))?",
+    re.IGNORECASE,
+)
+_M_SAMME_VEI = re.compile(
+    r"(?<![\w-])(?:aksjen\s+)?(?:gikk|har\s+gått)\s+samme\s+vei\s+som\s+hovedindeksen\s+"
+    + _N
+    + r"\s+av\s+(?:de\s+)?"
+    + _N
+    + r"\s+"
+    + _DAGENE_ORD
+    + r"(?:\s+som\s+kunne\s+telles)?(?:\s*,?\s*av\s+de\s+siste\s+(?:5|fem)\s+"
+    + _DAGENE_ORD
+    + r")?",
+    re.IGNORECASE,
+)
+_MAANEDEN = r"(?:i\s+)?den\s+siste\s+måneden"
+_M_SKIFT = re.compile(
+    r"(?<![\w-])(?:" + _MAANEDEN + r"\s+)?(?:har\s+)?(?:retningen\s+)?(?:har\s+)?skiftet\s+(?:retning(?:en)?\s+)?"
+    r"(minst\s+)?" + _N + r"\s+gang(?:er)?(?:\s+" + _MAANEDEN + r")?(?![\w-])",
+    re.IGNORECASE,
+)
+_M_MAANEDEN = re.compile(r"(?<![\w-])" + _MAANEDEN + r"(?![\w-])", re.IGNORECASE)
+_RETNINGSFELTET = {
+    "positiv": "siste_20_positiv",
+    "negativ": "siste_20_negativ",
+    "blandet": "siste_20_blandet",
+    "uten retning": "siste_20_ingen",
+    "ingen retning": "siste_20_ingen",
+}
+# Et feltnavn eller en plassholder fra formene i prompten (versjon 5), som
+# «siste_20_positiv» eller «‹siste_måned_skift›», er ikke et tall modellen
+# satte inn.
+_FELTNAVN = re.compile(r"[‹›]|(?<![\w-])\w+_\w+(?![\w-])")
+# Ord som sier at modellen fant et moenster selv (del F), under punkt 4.
+_EGET_MOENSTER = re.compile(
+    r"(?<![\w-])(?:mønster\w*|tendens\w*|pleie[rd]?|gjentar\s+seg|oftere|sjeldnere|som\s+regel)(?![\w-])",
+    re.IGNORECASE,
+)
+
+
+def _moenstrene(tekst: str, grunnlag: Mapping[str, object]) -> tuple[str, list[str]]:
+    """Story 10.9: formene for moenstrene som grunnlaget har, med tallet ved
+    feltet sitt. Gir teksten uten formene og grunnene. En form med feil tall
+    gir en grunn, og tas ogsaa ut, saa den ikke gir to grunner."""
+    tekst = re.sub(r"\s+", " ", tekst)
+    grunner = [f"1: feltnavnet «{treff.group(0)}» i teksten" for treff in _FELTNAVN.finditer(tekst)]
+
+    def ut(moenster: re.Pattern[str], sjekk) -> None:
+        nonlocal tekst
+
+        def bytt(treff: re.Match[str]) -> str:
+            if (grunn := sjekk(treff)) is not None:
+                grunner.append(f"1: mønsteret «{treff.group(0).strip()}», {grunn}")
+            return " "
+
+        tekst = moenster.sub(bytt, tekst)
+
+    def lik(felt: str, ord_: str) -> str | None:
+        return None if _antall(ord_) == grunnlag[felt] else f"grunnlaget sier {felt} {grunnlag[felt]}"
+
+    if MOENSTER_2[0] in grunnlag:
+        ut(_M_SAMME_VEI, lambda m: lik("siste_5_samme_vei", m.group(1)) or lik("siste_5_kunne_telles", m.group(2)))
+    if MOENSTER_3[0] in grunnlag:
+        minst = MOENSTER_3_MERKE in grunnlag
+
+        def skift(m: re.Match[str]) -> str | None:
+            if bool(m.group(1)) != minst:
+                return "«minst» bare med siste_måned_merke, og da alltid"
+            return lik("siste_måned_skift", m.group(2))
+
+        ut(_M_SKIFT, skift)
+        ut(_M_MAANEDEN, lambda m: None)
+    if MOENSTER_1[0] in grunnlag:
+        vurdert = len(_M_VURDERT.findall(tekst))
+        ut(_M_VURDERT, lambda m: lik("siste_20_vurdert", m.group(1)))
+        retninger = len(_M_RETNING.findall(tekst))
+        ut(_M_RETNING, lambda m: lik(_RETNINGSFELTET[" ".join(m.group(1).lower().split())], m.group(2)))
+        ut(_M_VINDUET, lambda m: None)
+        # Spoersmaal 3: setningen sier hvor mange dager som er vurdert.
+        if retninger and not vurdert and grunnlag["siste_20_vurdert"] != 20:
+            grunner.append("1: mønsteret uten antallet vurderte dager, grunnlaget sier siste_20_vurdert")
+    return tekst, grunner
+
+
 def _antall(ord_: str) -> int | None:
     ord_ = ord_.lower()
     if ord_.isdecimal() and len(ord_) <= _LENGSTE_TALL:
@@ -568,6 +685,61 @@ def _en_sjekk(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
                 grunner.append(f"1: sjekken {navn} «{sagt}», grunnlaget sier ingenting")
             elif not _stemmer(verdi, nei, fortegn):
                 grunner.append(f"1: sjekken {navn} «{sagt}», grunnlaget sier {verdi}")
+    return grunner
+
+
+# Story 10.9, del F: ordene om maalingen, mot fortegnet for sjekken.
+_TREND_MAALT = re.compile(
+    r"(?<![\w-])kursen\s+(?:ligger|lå|er|var)\s+(?P<ikke>ikke\s+)?(?:(?:langt|klart|godt|litt|så\s+langt)\s+)?"
+    r"(?P<hvor>over|under|nær|rundt|tett\s+på)(?:\s+eller\s+(?:over|under))?\s+(?:det\s+)?snittet",
+    re.IGNORECASE,
+)
+_BEVEGELSE_MAALT = re.compile(
+    r"(?<![\w-])kursen\s+(?P<vei>steg|falt)\s+(?:\w+\s+){0,2}?mer\s+(?:i\s+dag\s+)?enn\s+(?:den\s+)?vanlig",
+    re.IGNORECASE,
+)
+_ENDRINGEN_MAALT = re.compile(
+    r"(?<![\w-])(?:dagens\s+endring|endringen\s+i\s+dag)\s+(?P<ikke1>ikke\s+)?(?:var|er)\s+(?P<ikke2>ikke\s+)?"
+    r"(?:(?:så|veldig|svært|særlig)\s+)?(?P<hvor>stor|liten)",
+    re.IGNORECASE,
+)
+_INTERESSEN_MAALT = re.compile(
+    r"(?<![\w-])(?P<ikke1>ikke\s+)?ble\s+(?P<ikke2>ikke\s+)?handlet\s+(?:(?:mye|litt|klart)\s+)?mer\s+enn\s+vanlig"
+    r"(?:\s+på\s+en\s+dag\s+kursen\s+(?P<vei>steg|falt))?",
+    re.IGNORECASE,
+)
+
+
+def _maalingene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
+    """Story 10.9, del F: det teksten sier om maalingen bak hver sjekk, mot
+    fortegnet i grunnlaget. Formene er de i prompten (versjon 5), og ord som
+    ligger naer. Det som ikke er i lista, slipper gjennom (FR-603 er grov)."""
+    tekst = re.sub(r"\s+", " ", tekst)
+    sagt: list[tuple[str, re.Match[str], set[int]]] = []
+    for treff in _TREND_MAALT.finditer(tekst):
+        hvor = treff["hvor"].lower()
+        if treff["ikke"]:
+            ventet = {0}
+        else:
+            ventet = {1} if hvor == "over" else {-1} if hvor == "under" else {0}
+        sagt.append(("trend", treff, ventet))
+    for treff in _BEVEGELSE_MAALT.finditer(tekst):
+        sagt.append(("bevegelse", treff, {1} if treff["vei"].lower() == "steg" else {-1}))
+    for treff in _ENDRINGEN_MAALT.finditer(tekst):
+        stor = treff["hvor"].lower() == "stor" and not (treff["ikke1"] or treff["ikke2"])
+        sagt.append(("bevegelse", treff, {1, -1} if stor else {0}))
+    for treff in _INTERESSEN_MAALT.finditer(tekst):
+        if treff["ikke1"] or treff["ikke2"]:
+            ventet = {0}
+        elif treff["vei"]:
+            ventet = {1} if treff["vei"].lower() == "steg" else {-1}
+        else:
+            ventet = {1, -1}
+        sagt.append(("interesse", treff, ventet))
+    grunner = []
+    for navn, treff, ventet in sagt:
+        if grunnlag.get(navn) not in ventet:
+            grunner.append(f"1: målingen for {navn} «{treff.group(0).strip()}», grunnlaget sier {grunnlag.get(navn)}")
     return grunner
 
 
@@ -740,6 +912,8 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
         raise TypeError("retning i grunnlaget maa vaere en tekst")
     tekst = normaliser(tekst)
     grunner: list[str] = []
+    # Story 10.9: formene for moenstrene leses og tas ut foerst.
+    tekst, grunner = _moenstrene(tekst, grunnlag)
 
     # 1. Retning og styrke, der teksten sier dem.
     for moenster in _RETNING_UTSAGN:
@@ -772,9 +946,12 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
     grunner += _om_dagen(tekst, grunnlag)
     grunner += _dagene(tekst)
     grunner += _en_sjekk(tekst, grunnlag)
+    grunner += _maalingene(tekst, grunnlag)
 
     # 2. Tallene.
     lovlige = FASTE_TALL | {grunnlag[navn] for navn in ANTALLENE if type(grunnlag.get(navn)) is int}
+    if MOENSTER_2[0] in grunnlag:
+        lovlige |= {VINDU_SAMME_VEI}
     for treff in _SIFFER.finditer(tekst):
         tall = treff.group(0)
         if "," in tall or "." in tall or len(tall) > _LENGSTE_TALL or int(tall) not in lovlige:
@@ -794,5 +971,7 @@ def kontroller(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar:
     # 4. Gjetning og aarsaker utenfor grunnlaget.
     for treff in _GJETNING.finditer(tekst):
         grunner.append(f"4: «{treff.group(0)}»")
+    for treff in _EGET_MOENSTER.finditer(tekst):
+        grunner.append(f"4: «{treff.group(0)}», modellen finner ikke mønstre selv")
 
     return Kontrollsvar(besto=not grunner, grunner=tuple(grunner))

@@ -452,14 +452,17 @@ def test_lenken_er_halvfet():
 
 
 def test_ki_delen_heter_navnet_kort_fortalt(klient):
-    """Svar 3: overskriften er «<navnet> kort fortalt» med «?», og «Laget av
-    KI» står som før. Ville feilet med «Med KI-ens ord», uten navnet, uten
-    «?» eller uten merket."""
+    """Svar 3: overskriften har «?», og «Laget av KI» står som før. Story
+    10.9, del C (gruppens svar 06.11 kl. 22:23): rammen heter «Signalet
+    forklart» og erstatter «<navnet> kort fortalt». Navnet på testen står,
+    fordi docs/kvalitetssikring.md og spesifikasjonen 8.2b viser til det.
+    Ville feilet med «kort fortalt», uten «?» eller uten merket."""
     html = _html(klient, "/aksje/BRFE")
     ki = html.split('<section class="ki"', 1)[1].split("</section>", 1)[0]
     assert 'aria-labelledby="ki-tittel"' in ki.split(">", 1)[0]
     tittel = ki.split("<h2>", 1)[1].split("</h2>", 1)[0]
-    assert tittel.startswith('<span id="ki-tittel">Brattfjell Energi kort fortalt</span> ')
+    assert tittel.startswith('<span id="ki-tittel">Signalet forklart</span> ')
+    assert "kort fortalt" not in html
     assert 'popovertarget="hjelp-ki"' in tittel
     assert '<p class="merke-ki">Laget av KI · ' in ki
     assert "Med KI-ens ord" not in html
@@ -475,18 +478,19 @@ def test_overskriften_er_i_newsreader():
 
 def test_hjelpen_ved_ki_delen():
     """Svar 3: hjelpen sier hva teksten er, hva modellen fikk, slått opp i
-    ki_grunnlag.py, at tallene med prikket strek er sjekket, og at den ikke
-    gir råd. Ville feilet hvis en av de fire delene manglet, eller hjelpen
-    sa at modellen fikk kurser."""
+    ki_grunnlag.py, og at tallene med prikket strek er sjekket. Story 10.9,
+    del D (spørsmål 10): bare det, og at teksten ikke gir råd, står i
+    docs/hjelp.md. Ville feilet hvis en av delene manglet, eller hjelpen sa
+    at modellen fikk kurser."""
     from hjelpetekster import KI_GRUNNLAG, hjelpetekster
 
-    tekst = hjelpetekster()["ki_kort_fortalt"]
-    for del_ in ("skrevet av en språkmodell", "«Laget av KI»", "Modellen fikk bare", "prikket strek er sjekket"):
+    tekst = hjelpetekster()["signalet_forklart"]
+    for del_ in ("en språkmodell", "«Laget av KI»", "bare fikk det appen har regnet ut", "prikket strek er sjekket"):
         assert del_ in tekst.tekst, del_
-    assert "gir ikke råd" in tekst.tekst and "ingen kurser, prosenter eller volumer" in tekst.tekst
+    assert "aldri kurser, prosenter eller volumer" in tekst.tekst
     assert any(fil == KI_GRUNNLAG for fil, _ in tekst.kilder)
     hjelp = (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(encoding="utf-8")
-    avsnitt = hjelp.split("### Hva er «kort fortalt» på aksjesiden?")[1].split("\n#")[0]
+    avsnitt = hjelp.split("### Hva er «Signalet forklart» på aksjesiden?")[1].split("\n#")[0]
     assert "prikket strek er sjekket" in avsnitt and "gir ikke råd" in avsnitt
 
 

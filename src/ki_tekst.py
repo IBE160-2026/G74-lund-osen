@@ -35,6 +35,10 @@ Story 10.2e: grunnlaget faar dagen (lag_dagsbilde i ki_grunnlag.py), med
 kursene, indeksen og de lagrede vurderingene fra basen. Bare fortegn og
 antall sendes.
 
+Story 10.9: grunnlaget faar ogsaa de tre moenstrene (moenstrene.py), regnet
+av de samme radene og kursene. Det er antall dager, og ingen kurs eller
+prosent sendes.
+
 velg_modell leser OSE_KI_TJENESTE og OSE_KI_OLLAMA_URL (svar 5 og 8):
 «av» gir ingen modell, og uten variabelen gjelder «lokal» (FR-608). Det er
 én tjeneste per kjoering, uten stille overgang til en annen.
@@ -71,6 +75,7 @@ from ki_openai import OpenAIModell
 from kilogg import Emne, IkkeInnevaerendeBoersdag, KIRad
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_sqlite import SqliteIndekslager, SqliteKILogg, SqliteKurslager, SqliteVurderingslager, aapne_base
+from moenstrene import lag_moenstrene
 from vurderingsdata import Vurdering
 
 AV = "av"
@@ -196,7 +201,9 @@ def _grunnlagene(
     for aksje, vurdering in mangler:
         tidligere = vurderinger.les_periode(aksje.symbol, date.min, dato)
         dagen = lag_dagsbilde(aksje, dato, vurdering, tidligere, lista, serier, indeksserie)
-        grunnlagene[aksje.symbol] = ki_grunnlag(vurdering, utenfor_maalingen=False, dagen=dagen)
+        # Story 10.9: de tre moenstrene, av de samme radene og kursene.
+        moenstrene = lag_moenstrene(dato, vurdering, tidligere, serier.get(aksje.symbol, []), indeksserie)
+        grunnlagene[aksje.symbol] = ki_grunnlag(vurdering, utenfor_maalingen=False, dagen=dagen, moenstrene=moenstrene)
     return grunnlagene
 
 

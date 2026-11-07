@@ -33,6 +33,17 @@ INGEN = {"trend": 0, "bevegelse": 0, "interesse": 0, "styrke": 0, "retning": "In
 EN_POSITIV = {"trend": 1, "bevegelse": 0, "interesse": 0, "styrke": 1, "retning": "Positiv"}
 TRE_POSITIVE = {"trend": 1, "bevegelse": 1, "interesse": 1, "styrke": 3, "retning": "Positiv"}
 REGELEN = "Trenden ga +1 og interessen -1."
+# Story 10.9: de tre moenstrene i et grunnlag, som ki_grunnlag gir dem.
+MOENSTRENE = {
+    "siste_20_vurdert": 14,
+    "siste_20_positiv": 6,
+    "siste_20_negativ": 5,
+    "siste_20_blandet": 2,
+    "siste_20_ingen": 1,
+    "siste_5_kunne_telles": 4,
+    "siste_5_samme_vei": 3,
+    "siste_måned_skift": 2,
+}
 GOD_TEKST = (
     "Kursen ligger over snittet for de siste 50 dagene, men det ble handlet mye på en dag "
     "kursen falt. To av de tre sjekkene ga utslag, i hver sin retning, så retningen er blandet."
@@ -74,6 +85,9 @@ AVTRYKK = {
     # Gjennomgangen av svarene (BH8, ECH5): linjene om hovedindeksen og aksjen.
     # Versjonen staar som 4. Var a864e4c3....
     "4": "ec084a5215ac05389e96d63ecb21c826a326caecabc59f8d2bbc7cf7d526e251",
+    # Story 10.9: én setning per sjekk og én om moenstrene. Teksten til
+    # versjon 4 staar i src/ki_prompt.py paa 7c55913d.
+    "5": "94856d75cc5d0765370368a1f94f89f9addf83a39e6d7c28ba07c4ee1f4e3a83",
 }
 
 
@@ -184,10 +198,19 @@ class TestPrompten:
         10.2e). Ville feilet hvis versjonen ikke var 4, eller avtrykket for
         versjon 4 var det samme som for versjon 3. At en endret prompt faar ny
         versjon, fanger test_versjonen_foelger_teksten (gjennomgangen, BH12,
-        ECH7)."""
-        assert PROMPTVERSJON == "4"
+        ECH7). Story 10.9: versjon 5 er gjeldende, og avtrykket for versjon 4
+        staar."""
         assert AVTRYKK["4"] == "ec084a5215ac05389e96d63ecb21c826a326caecabc59f8d2bbc7cf7d526e251"
         assert AVTRYKK["4"] != AVTRYKK["3"]
+
+    def test_versjon_5(self):
+        """Story 10.9, del E: versjon 4 er flettet, og enhver endring gir
+        ny versjon (svaret 25.10 kl. 20:54 b), saa den nye prompten er versjon 5. Ville feilet hvis prompten fikk en annen tekst
+        uten ny versjon, eller avtrykket for versjon 5 var det samme som for
+        versjon 4 (FR-605)."""
+        assert PROMPTVERSJON == "5"
+        assert AVTRYKK["5"] == "94856d75cc5d0765370368a1f94f89f9addf83a39e6d7c28ba07c4ee1f4e3a83"
+        assert AVTRYKK["5"] != AVTRYKK["4"]
 
     def test_modellen_skriver_ikke_om_dagen(self):
         """Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36 (BH6, BH7):
@@ -351,9 +374,10 @@ class TestPrompten:
         """Gruppens svar 25.10 kl. 00:51 (malinger.md §46): modellen faar ikke
         dagene. Erstatter testene fra 21:49 og 23:23 om «minst» og ordlyden.
         Ville feilet hvis reglene forklarte dagene, hadde «minst», eller ikke
-        sa at teksten ikke nevner hvor lenge signalet har vart."""
+        sa at teksten ikke nevner hvor lenge signalet har vart. Story 10.9:
+        «minst» staar bare ved moenster 3, skiftene den siste maaneden."""
         assert not any(linje.startswith(("- dager", "- dager_merke")) for linje in REGLER.splitlines())
-        assert "minst" not in (REGLER + UTENFOR).lower()
+        assert all("minst" not in linje.lower() or "siste_måned" in linje for linje in (REGLER + UTENFOR).splitlines())
         assert "Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang." in REGLER
 
     def test_grunnen_er_at_siden_sier_hvor_lenge_signalet_har_vart(self):
@@ -441,9 +465,10 @@ class TestPrompten:
 
     def test_prompten_har_ingen_tall_kontrollen_stopper(self):
         """Gjennomgangen (BH1, BH2): gjentar modellen prompten, skal den ikke
-        stoppes av punkt 2."""
+        stoppes av punkt 2. Story 10.9: med moenstrene i grunnlaget, fordi
+        vinduet 5 i linja om moenster 2 bare er lovlig da."""
         for styrke, retning in ((0, "Ingen"), (1, "Positiv"), (2, "Blandet"), (3, "Positiv")):
-            grunnlag = {**BLANDET, "styrke": styrke, "retning": retning}
+            grunnlag = {**BLANDET, "styrke": styrke, "retning": retning, **MOENSTRENE}
             del_av_prompten = REGLER.split("Regler for teksten:")[0].replace(
                 "I opplysningene under står 1 for positivt utslag, -1 for negativt og 0 for ikke noe utslag.", ""
             )
@@ -1597,7 +1622,9 @@ class TestDageneStoppes:
         23:23 eller «minst», eller ikke sa at teksten ikke nevner dagene."""
         for grunnlag in (BLANDET, DAGEN_UTEN_DAGENE):
             prompt = lag_prompt(grunnlag)
-            assert "Ordlyden for dagene" not in prompt and "minst" not in prompt.lower()
+            assert "Ordlyden for dagene" not in prompt
+            # Story 10.9: «minst» bare ved moenster 3.
+            assert all("minst" not in linje.lower() or "siste_måned" in linje for linje in prompt.splitlines())
             assert "- dager" not in prompt and '"dager' not in prompt
         blokk = REGLER.split("Regler for teksten:", 1)[1].split("\n\n", 1)[0].splitlines()
         assert any(linje.startswith("- Ikke si hvor lenge signalet har vart") for linje in blokk)
@@ -1700,7 +1727,9 @@ class TestOmDagen:
     @pytest.mark.parametrize(
         "tekst",
         [
-            "Kursen ligger under snittet for de siste 50 børsdagene.",
+            # Story 10.9, del F: «over», fordi trend er 1 i grunnlaget og
+            # kontrollen naa leser maalingen.
+            "Kursen ligger over snittet for de siste 50 børsdagene.",
             "Bevegelsen måles mot de siste 20 børsdagene.",
             "Se endringen i tabellen.",
             UTENFOR.strip(),

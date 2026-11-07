@@ -34,6 +34,13 @@ fortsatt som i tabellen, men samme_periode sier om aksjens forrige rad er
 forrige boersdag, den dagen hovedindeksen regnes mot. Bare da faar grunnlaget
 hovedindeksen, og dermed ordlyden om aksjen gikk samme vei (ki_grunnlag.py),
 saa teksten aldri sammenligner to ulike perioder.
+
+Story 10.9, del A (gruppens svar 06.11 kl. 20:35, og spoersmaal 2 med
+svaret 07.11 kl. 08:58): setningen om dagene faar datoen for den foerste
+dagen i rekka (foerste_dag_i_rekka), vist som de andre datoene paa siden.
+Med «minst» er dagen foer rekka ikke lagret, saa datoen signalet skiftet er
+ukjent, og setningen sier «minst siden» den foerste lagrede dagen i rekka,
+uten antallet. Appen skriver setningen, og modellen faar ikke datoen.
 """
 
 from collections.abc import Mapping
@@ -45,7 +52,7 @@ from hovedindeks import forrige_boersdag as indeksens_forrige_boersdag
 from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent
-from tallformat import avrundet, tall
+from tallformat import avrundet, dato, tall, ukedag
 from vurderingsdata import Grunn, Vurdering
 
 # Story 10.2e: retningen paa hovedindeksen og bransjen.
@@ -58,16 +65,16 @@ MINST_I_BRANSJEN = 2
 # Uten «for første gang», fordi tellingen gjelder dagene paa rad (gruppens
 # svar 25.10 kl. 12:12 a), gjennomgangen kl. 11, BH2, ECH7).
 DAGENE_EN = "Signalet ble slik i dag."
-DAGENE_PAA_RAD = "Signalet har vært slik i {dager} børsdager på rad."
-DAGENE_MINST_EN = "Signalet har vært slik i minst 1 børsdag."
-DAGENE_MINST = "Signalet har vært slik i minst {dager} børsdager."
+# Story 10.9, del A: med datoen for den foerste dagen i rekka. Med «minst»
+# staar datoen uten antallet (spoersmaal 2, svaret 07.11 kl. 08:58).
+DAGENE_PAA_RAD = "Signalet har vært slik i {dager} børsdager på rad, siden {fra}."
+DAGENE_MINST = "Signalet har vært slik minst siden {fra}."
 # For en dag som ikke er i dag passer ikke «i dag» eller «har vært»: en dag
 # valgt med «Velg dag», og siste boersdag i helga eller foer kveldshentingen
 # (svarene kl. 12:12 c) og 12:19 d), gjennomgangen kl. 11, BH1, BH5).
 DAGENE_EN_ANNEN = "Signalet ble slik denne dagen."
-DAGENE_PAA_RAD_ANNEN = "Denne dagen hadde signalet vært slik i {dager} børsdager på rad."
-DAGENE_MINST_EN_ANNEN = "Denne dagen hadde signalet vært slik i minst 1 børsdag."
-DAGENE_MINST_ANNEN = "Denne dagen hadde signalet vært slik i minst {dager} børsdager."
+DAGENE_PAA_RAD_ANNEN = "Denne dagen hadde signalet vært slik i {dager} børsdager på rad, siden {fra}."
+DAGENE_MINST_ANNEN = "Denne dagen hadde signalet vært slik minst siden {fra}."
 
 
 def tell_dagene(dag: date, vurdering: Vurdering, tidligere: Mapping[date, Vurdering | Grunn]) -> tuple[int, bool]:
@@ -94,18 +101,34 @@ def tell_dagene(dag: date, vurdering: Vurdering, tidligere: Mapping[date, Vurder
         dager += 1
 
 
-def setning_om_dagene(dager: int, minst: bool, annen_dag: bool = False) -> str:
-    """Setningen under KI-teksten. minst er True naar dagene foer ikke er
-    lagret, saa antallet er det minste det kan vaere. annen_dag er True naar
-    dagen siden viser, ikke er i dag. Tallet vises etter regel 21
-    (tallformat.tall)."""
+def foerste_dag_i_rekka(dag: date, dager: int) -> date:
+    """Story 10.9, del A: den foerste boersdagen i rekka paa dager boersdager
+    til og med dag, som tell_dagene teller dem. Med «minst» er det den
+    foerste lagrede dagen i rekka, ikke dagen signalet skiftet."""
     if type(dager) is not int or dager < 1:
         raise ValueError("dager maa vaere et heltall fra 1")
+    fra = dag
+    for _ in range(dager - 1):
+        fra = forrige_boersdag(fra)
+    return fra
+
+
+def setning_om_dagene(dager: int, minst: bool, annen_dag: bool = False, *, fra: date, i_aar: int) -> str:
+    """Setningen i rammen «Signalet forklart». minst er True naar dagene
+    foer ikke er lagret, saa antallet er det minste det kan vaere. annen_dag
+    er True naar dagen siden viser, ikke er i dag. fra er den foerste dagen i
+    rekka (foerste_dag_i_rekka), vist med ukedagen og datoen som ellers paa
+    siden, med aaret bare naar det er et annet enn i_aar. Tallet vises etter
+    regel 21 (tallformat.tall)."""
+    if type(dager) is not int or dager < 1:
+        raise ValueError("dager maa vaere et heltall fra 1")
+    fra_tekst = f"{ukedag(fra)} {dato(fra, i_aar)}"
     if minst:
-        en, flere = (DAGENE_MINST_EN_ANNEN, DAGENE_MINST_ANNEN) if annen_dag else (DAGENE_MINST_EN, DAGENE_MINST)
-    else:
-        en, flere = (DAGENE_EN_ANNEN, DAGENE_PAA_RAD_ANNEN) if annen_dag else (DAGENE_EN, DAGENE_PAA_RAD)
-    return en if dager == 1 else flere.format(dager=tall(dager, "heltall"))
+        return (DAGENE_MINST_ANNEN if annen_dag else DAGENE_MINST).format(fra=fra_tekst)
+    if dager == 1:
+        return DAGENE_EN_ANNEN if annen_dag else DAGENE_EN
+    flere = DAGENE_PAA_RAD_ANNEN if annen_dag else DAGENE_PAA_RAD
+    return flere.format(dager=tall(dager, "heltall"), fra=fra_tekst)
 
 
 @dataclass(frozen=True)

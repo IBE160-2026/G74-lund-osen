@@ -192,8 +192,8 @@ class TestSiden:
         Story 8.2b, c (U66): etter grafen og foer historikken."""
         skriv_kirad(kirad(aksje))
         html = side(klient)
-        assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("kort fortalt")
-        assert html.index("kort fortalt") < html.index("Signalet dag for dag")
+        assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("Signalet forklart")
+        assert html.index("Signalet forklart") < html.index("Signalet dag for dag")
         assert TEKST in html
         assert "Laget av KI · gemma4:e4b, lokal." in html
 
@@ -591,30 +591,58 @@ class TestSetningenOmDagene:
     @pytest.mark.parametrize(
         "dager, minst, annen, setning",
         [
-            # I dag (svaret kl. 12:12 a).
+            # I dag (svaret kl. 12:12 a). Story 10.9, del A: med datoen for
+            # den foerste dagen i rekka, og med «minst» bare «minst siden»
+            # (spoersmaal 2, svaret 07.11 kl. 08:58).
             (1, False, False, "Signalet ble slik i dag."),
-            (4, False, False, "Signalet har vært slik i 4 børsdager på rad."),
-            (12, True, False, "Signalet har vært slik i minst 12 børsdager."),
-            (1, True, False, "Signalet har vært slik i minst 1 børsdag."),
-            (1234, False, False, "Signalet har vært slik i 1 234 børsdager på rad."),
-            # Gjennomgangen, VG5: regel 21 ogsaa i «minst».
-            (1234, True, False, "Signalet har vært slik i minst 1 234 børsdager."),
+            (4, False, False, "Signalet har vært slik i 4 børsdager på rad, siden tirsdag 03.11."),
+            (12, True, False, "Signalet har vært slik minst siden tirsdag 03.11."),
+            (1, True, False, "Signalet har vært slik minst siden tirsdag 03.11."),
+            (1234, False, False, "Signalet har vært slik i 1 234 børsdager på rad, siden tirsdag 03.11."),
+            (1234, True, False, "Signalet har vært slik minst siden tirsdag 03.11."),
             # En dag som ikke er i dag (svarene kl. 12:12 a) og c) og 12:19 d).
             (1, False, True, "Signalet ble slik denne dagen."),
-            (4, False, True, "Denne dagen hadde signalet vært slik i 4 børsdager på rad."),
-            (12, True, True, "Denne dagen hadde signalet vært slik i minst 12 børsdager."),
-            (1, True, True, "Denne dagen hadde signalet vært slik i minst 1 børsdag."),
-            (1234, False, True, "Denne dagen hadde signalet vært slik i 1 234 børsdager på rad."),
-            (1234, True, True, "Denne dagen hadde signalet vært slik i minst 1 234 børsdager."),
+            (4, False, True, "Denne dagen hadde signalet vært slik i 4 børsdager på rad, siden tirsdag 03.11."),
+            (12, True, True, "Denne dagen hadde signalet vært slik minst siden tirsdag 03.11."),
+            (1, True, True, "Denne dagen hadde signalet vært slik minst siden tirsdag 03.11."),
+            (1234, False, True, "Denne dagen hadde signalet vært slik i 1 234 børsdager på rad, siden tirsdag 03.11."),
+            (1234, True, True, "Denne dagen hadde signalet vært slik minst siden tirsdag 03.11."),
         ],
     )
     def test_setningen(self, dager, minst, annen, setning):
         """Ville feilet hvis setningen ikke fulgte gruppens ordlyd for 1 dag,
         flere dager og minst, ogsaa entall, i dag og en annen dag, eller
-        tallet ikke fulgte regel 21."""
+        tallet ikke fulgte regel 21. Story 10.9, del A: ville ogsaa feilet
+        hvis datoen manglet, eller «minst» sto med et antall eller som
+        «siden minst»."""
         from dagene import setning_om_dagene
 
-        assert setning_om_dagene(dager, minst, annen_dag=annen) == setning
+        assert setning_om_dagene(dager, minst, annen_dag=annen, fra=date(2026, 11, 3), i_aar=2026) == setning
+
+    def test_aaret_staar_naar_datoen_er_fra_et_annet_aar(self):
+        """Story 10.9, del A: datoen vises som de andre paa siden
+        (tallformat.dato). Ville feilet hvis aaret manglet for en dag i fjor."""
+        from dagene import setning_om_dagene
+
+        setning = setning_om_dagene(3, False, fra=date(2025, 12, 30), i_aar=2026)
+        assert setning == "Signalet har vært slik i 3 børsdager på rad, siden tirsdag 30.12.2025."
+
+    @pytest.mark.parametrize(
+        "dag, dager, fra",
+        [
+            (date(2026, 11, 5), 1, date(2026, 11, 5)),
+            (date(2026, 11, 5), 4, date(2026, 11, 2)),
+            # Over helga: fredag 30.10 til torsdag 05.11 er fem boersdager.
+            (date(2026, 11, 5), 5, date(2026, 10, 30)),
+        ],
+    )
+    def test_foerste_dag_i_rekka(self, dag, dager, fra):
+        """Story 10.9, del A: den foerste boersdagen i rekka, som tell_dagene
+        teller. Ville feilet hvis datoen var dagen foer rekka, eller helga
+        ble talt med."""
+        from dagene import foerste_dag_i_rekka
+
+        assert foerste_dag_i_rekka(dag, dager) == fra
 
     @pytest.mark.parametrize("annen", [False, True])
     @pytest.mark.parametrize("minst", [False, True])
@@ -626,7 +654,7 @@ class TestSetningenOmDagene:
         vært». Ville feilet hvis en av setningene sa noe av det."""
         from dagene import setning_om_dagene
 
-        setning = setning_om_dagene(dager, minst, annen_dag=annen)
+        setning = setning_om_dagene(dager, minst, annen_dag=annen, fra=date(2026, 11, 3), i_aar=2026)
         assert "første gang" not in setning
         if annen:
             assert "Signalet har vært" not in setning and "denne dagen" in setning.lower()
@@ -640,21 +668,23 @@ class TestSetningenOmDagene:
         from dagene import setning_om_dagene
 
         with pytest.raises(ValueError):
-            setning_om_dagene(dager, False)
+            setning_om_dagene(dager, False, fra=date(2026, 11, 3), i_aar=2026)
 
-    def test_flere_dager_paa_siden_rett_under_ki_teksten(self, klient, aksje):
+    def test_flere_dager_paa_siden_foerst_i_rammen(self, klient, aksje):
         """Fire boersdager med samme retning og styrke, og en annen foer.
-        Ville feilet hvis setningen manglet, sto et annet sted enn rett
-        under KI-teksten, eller tellingen ikke leste basen."""
+        Ville feilet hvis setningen manglet, eller tellingen ikke leste
+        basen. Story 10.9, del C: ville ogsaa feilet hvis KI-teksten sto foer
+        appens setninger i rammen «Signalet forklart»."""
         for dato in (date(2026, 10, 28), date(2026, 10, 29), date(2026, 10, 30)):
             skriv_vurdering("EQNR", dato, VURDERING)
         skriv_vurdering("EQNR", date(2026, 10, 27), ANNEN)
         skriv_kirad(kirad(aksje))
         html = side(klient)
-        setning = '<p class="dagene">Signalet har vært slik i 4 børsdager på rad.</p>'
+        setning = '<p class="dagene">Signalet har vært slik i 4 børsdager på rad, siden onsdag 28.10.</p>'
         assert setning in html
-        # Story 8.2b, c (U46): bryteren står øverst i rammen.
-        assert html.index("kort fortalt") < html.index("ki-bryter") < html.index(TEKST) < html.index(setning)
+        # Story 8.2b, c (U46): bryteren står øverst i rammen. Story 10.9:
+        # appens setninger før KI-teksten.
+        assert html.index("Signalet forklart") < html.index("ki-bryter") < html.index(setning) < html.index(TEKST)
 
     def test_en_dag_paa_siden(self, klient, aksje):
         """Ville feilet hvis en annen vurdering dagen foer ikke ga «Signalet
@@ -665,7 +695,7 @@ class TestSetningenOmDagene:
     def test_minst_paa_siden(self, klient, aksje):
         """Uten rad for boersdagen foer er antallet det minste det kan vaere.
         Ville feilet hvis siden sa et eksakt antall."""
-        assert '<p class="dagene">Signalet har vært slik i minst 1 børsdag.</p>' in side(klient)
+        assert '<p class="dagene">Signalet har vært slik minst siden lørdag 31.10.</p>' in side(klient)
 
     @pytest.mark.parametrize(
         "kapsel, endret",
@@ -709,7 +739,10 @@ class TestSetningenOmDagene:
             skriv_vurdering("EQNR", dato, VURDERING)
         skriv_vurdering("EQNR", date(2026, 10, 27), ANNEN)
         html = klient.get("/aksje/EQNR?dag=2026-10-30").get_data(as_text=True)
-        assert '<p class="dagene">Denne dagen hadde signalet vært slik i 3 børsdager på rad.</p>' in html
+        assert (
+            '<p class="dagene">Denne dagen hadde signalet vært slik i 3 børsdager på rad, siden onsdag 28.10.</p>'
+            in html
+        )
 
     def test_siste_dag_som_ikke_er_i_dag(self, klient, aksje, monkeypatch):
         """Gjennomgangen, BH1, ECH6, VG1: i helga og foer kveldshentingen er
@@ -725,7 +758,7 @@ class TestSetningenOmDagene:
         slik i minst» om siste boersdag foer kveldshentingen (gjennomgangen
         kl. 13, BH6)."""
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 11, 2, 12, 0).astimezone())
-        assert '<p class="dagene">Denne dagen hadde signalet vært slik i minst 1 børsdag.</p>' in side(klient)
+        assert '<p class="dagene">Denne dagen hadde signalet vært slik minst siden lørdag 31.10.</p>' in side(klient)
 
     @pytest.mark.parametrize(
         "naa, setning",
@@ -866,12 +899,13 @@ class TestSetningenOmSammeDag:
         """Ville feilet hvis setningen manglet, sto et annet sted enn rett
         under setningen om dagene, eller ikke var regnet av lag_dagsbilde med
         lista, kursene og indeksen i basen. EQNR og AKRBP har samme kurs hver
-        dag, og basen har ingen indeks, saa hovedindeksen mangler."""
+        dag, og basen har ingen indeks, saa hovedindeksen mangler. Story
+        10.9, del C: begge setningene foer KI-teksten i rammen."""
         skriv_kirad(kirad(aksje))
         html = side(klient)
         setning = '<p class="samme-dag">Samme dag var bransjen uendret i snitt.</p>'
         assert setning in html
-        assert html.index(TEKST) < html.index('<p class="dagene">') < html.index(setning)
+        assert html.index('<p class="dagene">') < html.index(setning) < html.index(TEKST)
         assert "hovedindeksen" not in setning
 
     @pytest.mark.parametrize("kapsel", ["av", None])

@@ -27,8 +27,10 @@ from ki_kontroll import kontroller
 from ki_modell import Modellsvar
 from ki_prompt import PROMPTVERSJON
 from ki_tekst import regeltekst
+from ki_visning import prikkede_tall
 from kilogg import AKSJE, LOKAL, MASKINVARE
 from lagring_sqlite import SqliteIndekslager, SqliteKILogg, SqliteKurslager, SqliteVurderingslager, demo_sti
+from moenstrene import lag_moenstrene
 from vurderingsdata import Vurdering
 
 SRC = Path(demo_ki.__file__).resolve().parent
@@ -78,15 +80,25 @@ def dagene(uten_ki, vurderingene):
         serier = {a.symbol: kurser.serie(a.symbol) for a in lista}
         indekser = SqliteIndekslager(tilkobling)
         indeks = indekser.serie(valgt_indeks(indekser.symboler()))
+        # Story 10.9: ogsaa de tre moenstrene, av de samme radene og kursene.
         return {
-            a.symbol: lag_dagsbilde(
-                a,
-                demo.SLUTTDATO,
-                vurderingene[a.symbol],
-                lager.les_periode(a.symbol, date.min, demo.SLUTTDATO),
-                lista,
-                serier,
-                indeks,
+            a.symbol: (
+                lag_dagsbilde(
+                    a,
+                    demo.SLUTTDATO,
+                    vurderingene[a.symbol],
+                    lager.les_periode(a.symbol, date.min, demo.SLUTTDATO),
+                    lista,
+                    serier,
+                    indeks,
+                ),
+                lag_moenstrene(
+                    demo.SLUTTDATO,
+                    vurderingene[a.symbol],
+                    lager.les_periode(a.symbol, date.min, demo.SLUTTDATO),
+                    serier[a.symbol],
+                    indeks,
+                ),
             )
             for a in lista
             if isinstance(vurderingene[a.symbol], Vurdering)
@@ -108,13 +120,14 @@ class TestFila:
         paa siste demodag. Ville feilet hvis demoen endret seg og tekstene ble
         staaende: da forklarer KI en annen dag enn siden viser, og testen er
         roed til tekstene lages paa nytt (uv run python src/demo_ki.py).
-        Story 10.2e: ogsaa dagen fra versjon 3."""
+        Story 10.2e: ogsaa dagen fra versjon 3. Story 10.9: og moenstrene."""
         assert radene
         for rad in radene:
             assert rad.emne.slag == AKSJE and rad.emne.dato == demo.SLUTTDATO, rad.emne
             vurdering = vurderingene[rad.emne.symbol]
             assert isinstance(vurdering, Vurdering), rad.emne.symbol
-            ventet = ki_grunnlag(vurdering, utenfor_maalingen=False, dagen=dagene[rad.emne.symbol])
+            dagen, moenstrene = dagene[rad.emne.symbol]
+            ventet = ki_grunnlag(vurdering, utenfor_maalingen=False, dagen=dagen, moenstrene=moenstrene)
             assert json.loads(rad.grunnlag_som_json()) == dict(ventet), rad.emne.symbol
             assert rad.regelen == regeltekst(vurdering), rad.emne.symbol
 
@@ -311,7 +324,7 @@ class TestAksjesiden:
         rad = next(r for r in radene if r.besto)
         side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
         assert "Eksempeltall" in side
-        assert f'<p class="ki-tekst">{escape(rad.tekst)}</p>' in side
+        assert f'<p class="ki-tekst">{prikkede_tall(rad.tekst)}</p>' in side
         assert f"Laget av KI · {rad.modell}, {rad.tjeneste}." in side
 
     def test_en_tekst_som_ikke_besto_vises_ikke(self, klient, radene, monkeypatch):
@@ -341,7 +354,7 @@ class TestAksjesiden:
         demo.lag_demobase(demo_sti(), skriv=lambda _: None)
         side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
         assert "<script>x</script>" not in side
-        assert f'<p class="ki-tekst">{escape(farlig)}</p>' in side
+        assert f'<p class="ki-tekst">{prikkede_tall(farlig)}</p>' in side
 
     def test_knappen_skjuler_og_viser_teksten(self, klient, radene):
         """FR-601: «Skjul KI-teksten» tar teksten bort, og «Vis KI-teksten»
@@ -349,7 +362,7 @@ class TestAksjesiden:
         demo.lag_demobase(demo_sti(), skriv=lambda _: None)
         rad = next(r for r in radene if r.besto)
         adresse = f"/aksje/{rad.emne.symbol}"
-        tekst = f'<p class="ki-tekst">{escape(rad.tekst)}</p>'
+        tekst = f'<p class="ki-tekst">{prikkede_tall(rad.tekst)}</p>'
         paa = klient.get(adresse).data.decode("utf-8")
         # Story 8.2b, c (U33): bryteren, med «På» og «Av».
         assert tekst in paa and 'role="switch" aria-checked="true"' in paa
@@ -371,7 +384,7 @@ class TestAksjesiden:
         demo.lag_demobase(demo_sti(), skriv=lambda _: None)
         assert radene
         for rad in radene:
-            bildet = dagene[rad.emne.symbol]
+            bildet, _ = dagene[rad.emne.symbol]
             side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
             assert f'<p class="samme-dag">{escape(setning_om_samme_dag(bildet))}</p>' in side, rad.emne.symbol
             assert rad.grunnlag.get("hovedindeksen") == bildet.hovedindeksen, rad.emne.symbol
@@ -390,7 +403,7 @@ class TestAksjesiden:
         alene = {a.symbol for a in demo.DEMOUNIVERS if antall[a.sektor] < 2}
         assert alene == {"VRDS", "SGNT", "MTFJ"}
         assert "BRFE" in dagene and alene & set(dagene)
-        for symbol, bildet in dagene.items():
+        for symbol, (bildet, _) in dagene.items():
             side = klient.get(f"/aksje/{symbol}").data.decode("utf-8")
             samme_dag = re.search(r'<p class="samme-dag">([^<]*)</p>', side)
             assert samme_dag, symbol
