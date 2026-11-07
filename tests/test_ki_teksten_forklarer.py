@@ -110,6 +110,19 @@ class TestSammeVei:
         indeksen[dager[-1]] = indeksen[dager[-2]] - 5
         assert samme_vei(DAGEN, _serie(aksjen), _serie(indeksen)) == (4, 3)
 
+    def test_en_dag_der_hovedindeksen_var_uendret_eller_mangler_telles_ikke(self):
+        """Spørsmål 4 (gjennomgangen, VG8): ville feilet hvis en dag med
+        uendret hovedindeks, eller uten rad i indeksen, ble talt."""
+        dager = DAGENE[-6:]
+        aksjen = _serie(_stigende(dager))
+        uendret = _stigende(dager, 1000.0)
+        uendret[dager[2]] = uendret[dager[1]]
+        assert samme_vei(DAGEN, aksjen, _serie(uendret)) == (4, 4)
+        # Uten rad i indeksen 04.11 kan verken 04.11 eller 05.11 regnes.
+        mangler = _stigende(dager, 1000.0)
+        del mangler[dager[4]]
+        assert samme_vei(DAGEN, aksjen, _serie(mangler)) == (3, 3)
+
     def test_faerre_enn_tre_gir_ikke_moensteret(self):
         """Ville feilet hvis mønsteret ble gitt med to dager som kunne
         telles, eller uten hovedindeksen."""
@@ -136,6 +149,15 @@ class TestSkiftene:
         radene[date(2026, 10, 20)] = Grunn.KURS_IKKE_FRA_DAGEN
         radene[date(2026, 10, 21)] = _v("Negativ")
         assert skiftene(DAGEN, radene) == (1, True)
+
+    def test_bare_retningen_telles_ikke_styrken(self):
+        """Spørsmål 1 og 5 (gjennomgangen, VG5): mønster 3 teller skift i
+        retningen. Positiv med styrke 1 og så styrke 2 er ikke et skift. Ville
+        feilet hvis en endring i styrken ble talt."""
+        sterkere = Vurdering(**{**_v("Positiv").__dict__, "bevegelse": 1, "styrke": 2})
+        radene = {d: _v("Positiv") for d in DAGENE}
+        radene[date(2026, 10, 20)] = sterkere
+        assert skiftene(DAGEN, radene) == (0, False)
 
     def test_uten_to_vurderte_dager_paa_rad_gis_ikke_moensteret(self):
         """Ville feilet hvis mønsteret ble gitt uten et eneste par."""
@@ -290,6 +312,94 @@ class TestKontrollen:
         """Ville feilet hvis «ganger» og «måneden» besto utenfor formen."""
         assert not kontroller(SJEKKENE + "Retningen har vært den samme i 2 ganger denne måneden.", grunnlag).besto
 
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            # ECH1: en retning for hele signalet ved et tall som er en telling.
+            "Signalet er positivt i to av tre sjekker.",
+            # ECH2, ECH3, BH3: vinduet og måneden utenfor setningen om mønstrene.
+            "Signalet har vært negativt de siste 20 børsdagene.",
+            "Retningen har ikke skiftet den siste måneden.",
+            "Den siste måneden har kursen ligget over snittet.",
+            # ECH4, ECH6, ECH12: mer enn formene i setningen om mønstrene.
+            "Av de 14 vurderte børsdagene var 5 positive og 6 negative.",
+            "Av de 14 vurderte børsdagene var signalet oftest positivt.",
+            "Av de 14 vurderte børsdagene var signalet positivt 6, flere enn negativt 5.",
+            "Det stemmer ikke at aksjen gikk samme vei som hovedindeksen 3 av de 4 dagene som kunne telles.",
+            # ECH5, BH2: en telling er ikke et lovlig tall utenfor formene.
+            "Kursen ligger 14 over snittet.",
+            # ECH7: skiftene uten «den siste måneden».
+            "Retningen skiftet minst 2 ganger i dag.",
+            # VG2: tallet i mønster 3.
+            "Den siste måneden skiftet retningen minst 7 ganger.",
+            # BH4, VG3: bøyningene og ord om hvor ofte.
+            "Aksjen pleide å stige etter slike dager.",
+            "Mønstrene viser at signalet er positivt.",
+            "Signalet er vanligvis positivt.",
+            "Signalet har stort sett vært positivt.",
+            "Retningen skifter hyppig.",
+        ],
+    )
+    def test_funnene_fra_gjennomgangen_stoppes(self, grunnlag, tekst):
+        """Gjennomgangen av 10.9 (ECH1-ECH7, ECH12, BH2-BH4, VG2, VG3): ville
+        feilet hvis formene ble tatt ut utenfor setningen om mønstrene, eller
+        noe mer enn formene sto i den setningen."""
+        assert not kontroller(SJEKKENE + tekst, grunnlag).besto, tekst
+
+    def test_formene_med_minst_foer_verbet_og_markdown_bestaar(self, grunnlag):
+        """ECH10, ECH11: ville feilet hvis «minst» foran verbet eller fet skrift
+        med __ ble stoppet."""
+        tekst = MOENSTERSETNINGEN.replace("skiftet retningen minst 2 ganger", "har retningen minst skiftet 2 ganger")
+        assert kontroller(SJEKKENE.replace("så trenden", "så __trenden__") + tekst, grunnlag).besto
+
+    def test_mønster_3_uten_moensteret_i_grunnlaget_stoppes(self):
+        """BH10, VG7: med bare faste tall i setningen. Ville feilet hvis formen
+        besto når grunnlaget ikke har mønster 3."""
+        grunnlag = ki_grunnlag(_v("Positiv"), utenfor_maalingen=False)
+        assert not kontroller(SJEKKENE + "Den siste måneden skiftet retningen 3 ganger.", grunnlag).besto
+        assert not kontroller(SJEKKENE + "Aksjen gikk samme vei som hovedindeksen 3 av de 3 dagene.", grunnlag).besto
+
+
+class TestMaalingen:
+    """Del F, gjennomgangen (VG1, BH1, BH5, BH6, ECH8, ECH9): ordene om
+    målingen mot fortegnet for sjekken."""
+
+    GRUNNLAG = {"trend": 1, "bevegelse": -1, "interesse": 0, "styrke": 2, "retning": "Blandet"}
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Det ble ikke handlet mye mer enn vanlig.",
+            "Kursen ligger over snittet for de siste 50 børsdagene.",
+            "Kursen falt mer i dag enn den vanligvis svinger de siste 20 dagene.",
+            "Kursen ligger ikke under snittet.",
+            "Kursen ligger ikke nær snittet.",
+            "Trenden måler om kursen ligger over eller under snittet for de siste 50 børsdagene.",
+            "Kursen steg ikke mer enn vanlig.",
+        ],
+    )
+    def test_det_som_stemmer_bestaar(self, tekst):
+        """Ville feilet hvis en sann setning om målingen ble stoppet."""
+        svar = kontroller(tekst, self.GRUNNLAG)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Det ble handlet mer enn vanlig på en dag kursen falt.",
+            "Kursen ligger under snittet for de siste 50 børsdagene.",
+            "Kursen ligger nær snittet.",
+            "Kursen steg mer i dag enn den vanligvis svinger.",
+            "Kursen falt ikke mer enn vanlig.",
+            "Dagens endring var ikke stor.",
+            "Dagens endring var liten.",
+        ],
+    )
+    def test_det_som_strider_mot_fortegnet_stoppes(self, tekst):
+        """Ville feilet hvis kontrollen ikke leste målingen, som i den første
+        kjøringen av demotekstene (§56), eller ikke leste «ikke»."""
+        assert not kontroller(tekst, self.GRUNNLAG).besto, tekst
+
 
 # --- Del C og D: rammen «Signalet forklart» og hjelpen ved den ---------------------
 
@@ -339,6 +449,8 @@ class TestRammen:
         uten KI-tekst. Ville feilet hvis bare bryteren sto, som før."""
         rammen = _rammen(klient, "av")
         assert '<p class="dagene">' in rammen and 'class="ki-tekst"' not in rammen
+        # Gjennomgangen (VG11): også setningen om samme dag.
+        assert '<p class="samme-dag">' in rammen
 
     def test_appens_setninger_foer_ki_teksten(self, klient):
         """Del C: ville feilet hvis KI-teksten sto før appens setninger."""

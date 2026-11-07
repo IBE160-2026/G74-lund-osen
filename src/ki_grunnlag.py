@@ -56,8 +56,10 @@ Story 10.9 (gruppens svar 06.11 kl. 20:38 og 22:05, og 07.11 kl. 08:58):
 grunnlaget faar antallene i de tre moenstrene appen regner ut
 (moenstrene.py), naar de gis. Det er antall dager, regnet av vaare lagrede
 vurderinger og av retningen aksjen og hovedindeksen gikk, saa det holder seg
-innenfor beslutningen 04.10 (del H i spesifikasjonen). Antallene legges til
-ANTALLENE, saa kontrollen i FR-603 godtar dem i setningen om moenstrene.
+innenfor beslutningen 04.10 (del H i spesifikasjonen). Del F sier at antallene
+legges til ANTALLENE. Etter gjennomgangen (BH2, ECH5) er de ikke der: da var de
+lovlige tall hvor som helst i teksten. Kontrollen i FR-603 leser dem bare i
+formene i setningen om moenstrene, ved feltet sitt.
 """
 
 from types import MappingProxyType
@@ -90,7 +92,9 @@ DAGFELTENE = ("hovedindeksen", "aksjen")
 VALGFRIE = frozenset(("merke", *DAGFELTENE))
 # Antallene i grunnlaget. Kontrollen i FR-603 godtar bare disse og regelens
 # faste tall (punkt 2). Fortegnene er ikke antall. Story 10.2i: bare styrken.
-# Story 10.9 (del F): ogsaa antallene i moenstrene, satt under.
+# Story 10.9: antallene i moenstrene er ikke her. Kontrollen leser dem bare i
+# formene for moenstrene, ved feltet sitt (gjennomgangen, BH2, ECH5).
+ANTALLENE = ("styrke",)
 
 # Story 10.9: feltene med de tre moenstrene. Hvert moenster er med helt eller
 # ikke i det hele tatt. Navnene sier vinduet, og ikke «mønster», som
@@ -101,7 +105,6 @@ MOENSTER_3 = ("siste_måned_skift",)
 MOENSTER_3_MERKE = "siste_måned_merke"
 MOENSTERANTALLENE = (*MOENSTER_1, *MOENSTER_2, *MOENSTER_3)
 VALGFRIE = VALGFRIE | frozenset((*MOENSTERANTALLENE, MOENSTER_3_MERKE))
-ANTALLENE = ("styrke", *MOENSTERANTALLENE)
 
 
 def _heltall(verdi) -> bool:
@@ -195,7 +198,7 @@ def _kontroller_moenstrene(grunnlag: dict[str, object]) -> None:
             raise ValueError(f"moensteret med {felter[0]} maa ha alle feltene sine")
     for navn in MOENSTERANTALLENE:
         if navn in grunnlag and (not _heltall(grunnlag[navn]) or grunnlag[navn] < 0):
-            raise ValueError(f"{navn} maa vaere et heltall fra 0, fikk {type(grunnlag[navn]).__name__}")
+            raise ValueError(f"{navn} maa vaere et heltall fra 0")
     if MOENSTER_1[0] in grunnlag:
         vurdert, *antall = (grunnlag[navn] for navn in MOENSTER_1)
         if not MINST_VURDERTE <= vurdert <= VINDU_RETNINGEN or sum(antall) != vurdert:
@@ -204,6 +207,9 @@ def _kontroller_moenstrene(grunnlag: dict[str, object]) -> None:
         telt, samme = (grunnlag[navn] for navn in MOENSTER_2)
         if not MINST_TELT <= telt <= VINDU_SAMME_VEI or samme > telt:
             raise ValueError("moenster 2 maa ha 3 til 5 dager som kunne telles, og ikke flere samme vei")
+    # Gjennomgangen (BH11): maaneden har hoeyst 23 boersdager, saa hoeyst 22 skift.
+    if MOENSTER_3[0] in grunnlag and grunnlag[MOENSTER_3[0]] > 22:
+        raise ValueError("siste_måned_skift kan ikke vaere flere enn 22")
     if MOENSTER_3_MERKE in grunnlag and (MOENSTER_3[0] not in grunnlag or grunnlag[MOENSTER_3_MERKE] != MINST):
         raise ValueError("siste_måned_merke kan bare vaere «minst», og bare med siste_måned_skift")
 

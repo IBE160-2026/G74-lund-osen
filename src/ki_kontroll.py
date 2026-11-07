@@ -90,8 +90,10 @@ med feil tall stoppes, og en form som stemmer, tas ut foer resten av
 kontrollen leser teksten, saa «ganger», «måneden» og hovedindeksen bare er
 lov der. Uten moensteret i grunnlaget leses ikke formen, og ordene stoppes
 som foer. Ord som sier at modellen fant et moenster selv, som «tendens»,
-«pleier» og «oftere», stoppes alltid, under punkt 4. Antallene i moenstrene
-er i ANTALLENE (ki_grunnlag.py).
+«pleier» og «oftere», stoppes alltid, under punkt 4. Gjennomgangen av 10.9:
+formene leses bare i setningen om moenstrene, og resten av den setningen kan
+bare vaere bindeord (_moenstrene). Antallene er ikke i ANTALLENE, saa de er
+ikke lovlige tall andre steder (BH2, ECH5).
 
 Story 10.9, del F: setningene om sjekkene sier ogsaa hva sjekken maaler
 (versjon 5), og det skal stemme med fortegnet: «kursen ligger over
@@ -565,12 +567,26 @@ _M_SAMME_VEI = re.compile(
     re.IGNORECASE,
 )
 _MAANEDEN = r"(?:i\s+)?den\s+siste\s+måneden"
+# Gjennomgangen (ECH7): formen gjelder bare med «den siste måneden», foer eller
+# etter. Gjennomgangen (ECH10): «minst» kan staa foer eller etter verbet.
 _M_SKIFT = re.compile(
-    r"(?<![\w-])(?:" + _MAANEDEN + r"\s+)?(?:har\s+)?(?:retningen\s+)?(?:har\s+)?skiftet\s+(?:retning(?:en)?\s+)?"
-    r"(minst\s+)?" + _N + r"\s+gang(?:er)?(?:\s+" + _MAANEDEN + r")?(?![\w-])",
+    r"(?<![\w-])(?:(?P<foer>" + _MAANEDEN + r")\s+)?(?:har\s+)?(?:retningen\s+)?(?:har\s+)?(?P<minst1>minst\s+)?"
+    r"skiftet\s+(?:retning(?:en)?\s+)?(?P<minst2>minst\s+)?"
+    + _N
+    + r"\s+gang(?:er)?(?:\s+(?P<etter>"
+    + _MAANEDEN
+    + r"))?"
+    r"(?![\w-])",
     re.IGNORECASE,
 )
-_M_MAANEDEN = re.compile(r"(?<![\w-])" + _MAANEDEN + r"(?![\w-])", re.IGNORECASE)
+# Gjennomgangen (ECH1-ECH3, ECH5-ECH7, ECH12, BH2, BH3): formene leses og tas
+# ut bare i setningen om moenstrene, kjent paa en hel form, og resten av den
+# setningen kan bare vaere ordene som binder formene sammen.
+_M_ALLE_VURDERT = re.compile(
+    r"(?<![\w-])av\s+de\s+siste\s+(?:20|tjue|tyve)\s+" + _DAGENE_ORD + r"\s+var\s+signalet(?![\w-])", re.IGNORECASE
+)
+_ANKRENE = (_M_VURDERT, _M_SAMME_VEI, _M_SKIFT, _M_ALLE_VURDERT)
+_BINDEORD = frozenset(("av", "de", "siste", "var", "signalet", "og"))
 _RETNINGSFELTET = {
     "positiv": "siste_20_positiv",
     "negativ": "siste_20_negativ",
@@ -581,56 +597,85 @@ _RETNINGSFELTET = {
 # Et feltnavn eller en plassholder fra formene i prompten (versjon 5), som
 # «siste_20_positiv» eller «‹siste_måned_skift›», er ikke et tall modellen
 # satte inn.
-_FELTNAVN = re.compile(r"[‹›]|(?<![\w-])\w+_\w+(?![\w-])")
+# Gjennomgangen (ECH11): ikke markdown som «__Trenden__».
+_FELTNAVN = re.compile(r"[‹›]|(?<![\w-])[a-zæøå0-9]+(?:_[a-zæøå0-9]+)+(?![\w-])", re.IGNORECASE)
 # Ord som sier at modellen fant et moenster selv (del F), under punkt 4.
+# Gjennomgangen (BH4, VG3, ECH6): ogsaa boeyningene og ord om hvor ofte.
+# «vanligvis» alene er lov, fordi formen for bevegelsen bruker det.
 _EGET_MOENSTER = re.compile(
-    r"(?<![\w-])(?:mønster\w*|tendens\w*|pleie[rd]?|gjentar\s+seg|oftere|sjeldnere|som\s+regel)(?![\w-])",
+    r"(?<![\w-])(?:mønst(?:er|re)\w*|tendens\w*|pleie[rd]?|pleide|gjentar\s+seg|gjentok\s+seg|gjentatt\w*"
+    r"|oftere|oftest|ofte|sjeldnere|sjeldnest|sjelden|hyppig\w*|som\s+regel|stort\s+sett|for\s+det\s+meste"
+    r"|vanligvis\s+(?:vært\s+)?(?:positiv|negativ|blandet)\w*)(?![\w-])",
     re.IGNORECASE,
 )
 
 
 def _moenstrene(tekst: str, grunnlag: Mapping[str, object]) -> tuple[str, list[str]]:
     """Story 10.9: formene for moenstrene som grunnlaget har, med tallet ved
-    feltet sitt. Gir teksten uten formene og grunnene. En form med feil tall
-    gir en grunn, og tas ogsaa ut, saa den ikke gir to grunner."""
+    feltet sitt. Gir teksten uten setningen om moenstrene, og grunnene.
+
+    Gjennomgangen av 10.9: bare en setning med en hel form (_ANKRENE) er
+    setningen om moenstrene, og bare der leses og tas formene ut. Det som er
+    igjen av den setningen, kan bare vaere bindeordene (_BINDEORD), saa en
+    paastand ved siden av formene stoppes. Formene for et moenster grunnlaget
+    ikke har, tas ikke ut, og stoppes som resten. Andre setninger leses av
+    resten av kontrollen som foer, ogsaa «de siste 20 børsdagene» og «den
+    siste måneden» (ECH2, ECH3)."""
     tekst = re.sub(r"\s+", " ", tekst)
     grunner = [f"1: feltnavnet «{treff.group(0)}» i teksten" for treff in _FELTNAVN.finditer(tekst)]
-
-    def ut(moenster: re.Pattern[str], sjekk) -> None:
-        nonlocal tekst
-
-        def bytt(treff: re.Match[str]) -> str:
-            if (grunn := sjekk(treff)) is not None:
-                grunner.append(f"1: mønsteret «{treff.group(0).strip()}», {grunn}")
-            return " "
-
-        tekst = moenster.sub(bytt, tekst)
+    if not any(felter[0] in grunnlag for felter in (MOENSTER_1, MOENSTER_2, MOENSTER_3)):
+        return tekst, grunner
 
     def lik(felt: str, ord_: str) -> str | None:
         return None if _antall(ord_) == grunnlag[felt] else f"grunnlaget sier {felt} {grunnlag[felt]}"
 
-    if MOENSTER_2[0] in grunnlag:
-        ut(_M_SAMME_VEI, lambda m: lik("siste_5_samme_vei", m.group(1)) or lik("siste_5_kunne_telles", m.group(2)))
-    if MOENSTER_3[0] in grunnlag:
-        minst = MOENSTER_3_MERKE in grunnlag
+    def skift(m: re.Match[str]) -> str | None:
+        if not (m["foer"] or m["etter"]):
+            return "uten «den siste måneden»"
+        if bool(m["minst1"] or m["minst2"]) != (MOENSTER_3_MERKE in grunnlag):
+            return "«minst» bare med siste_måned_merke, og da alltid"
+        return lik("siste_måned_skift", m.group(4))
 
-        def skift(m: re.Match[str]) -> str | None:
-            if bool(m.group(1)) != minst:
-                return "«minst» bare med siste_måned_merke, og da alltid"
-            return lik("siste_måned_skift", m.group(2))
-
-        ut(_M_SKIFT, skift)
-        ut(_M_MAANEDEN, lambda m: None)
-    if MOENSTER_1[0] in grunnlag:
-        vurdert = len(_M_VURDERT.findall(tekst))
-        ut(_M_VURDERT, lambda m: lik("siste_20_vurdert", m.group(1)))
-        retninger = len(_M_RETNING.findall(tekst))
-        ut(_M_RETNING, lambda m: lik(_RETNINGSFELTET[" ".join(m.group(1).lower().split())], m.group(2)))
-        ut(_M_VINDUET, lambda m: None)
+    formene: list[tuple[str, re.Pattern[str], object]] = [
+        (
+            MOENSTER_2[0],
+            _M_SAMME_VEI,
+            lambda m: lik("siste_5_samme_vei", m.group(1)) or lik("siste_5_kunne_telles", m.group(2)),
+        ),
+        (MOENSTER_3[0], _M_SKIFT, skift),
+        (MOENSTER_1[0], _M_VURDERT, lambda m: lik("siste_20_vurdert", m.group(1))),
+        (MOENSTER_1[0], _M_RETNING, lambda m: lik(_RETNINGSFELTET[" ".join(m.group(1).lower().split())], m.group(2))),
+        (
+            MOENSTER_1[0],
+            _M_ALLE_VURDERT,
+            lambda m: None if grunnlag["siste_20_vurdert"] == 20 else "ikke alle 20 er vurdert",
+        ),
+        (MOENSTER_1[0], _M_VINDUET, lambda m: None),
+    ]
+    ut: list[str] = []
+    for setning in re.split(r"(?<=[.!?])\s+", tekst):
+        if not any(anker.search(setning) for anker in _ANKRENE):
+            ut.append(setning)
+            continue
+        rest = setning
+        retninger = vurdert = 0
+        for felt, moenster, sjekk in formene:
+            if felt not in grunnlag:
+                continue
+            for treff in moenster.finditer(rest):
+                if (grunn := sjekk(treff)) is not None:
+                    grunner.append(f"1: mønsteret «{treff.group(0).strip()}», {grunn}")
+                retninger += moenster is _M_RETNING
+                vurdert += moenster in (_M_VURDERT, _M_ALLE_VURDERT)
+            rest = moenster.sub(" ", rest)
         # Spoersmaal 3: setningen sier hvor mange dager som er vurdert.
-        if retninger and not vurdert and grunnlag["siste_20_vurdert"] != 20:
+        if retninger and not vurdert:
             grunner.append("1: mønsteret uten antallet vurderte dager, grunnlaget sier siste_20_vurdert")
-    return tekst, grunner
+        ekstra = [ord_ for ord_ in re.findall(r"[^\W_]+", rest.lower()) if ord_ not in _BINDEORD]
+        if ekstra:
+            grunner.append(f"1: setningen om mønstrene sier mer enn formene: «{' '.join(ekstra)}»")
+        ut.append(" ")
+    return " ".join(ut), grunner
 
 
 def _antall(ord_: str) -> int | None:
@@ -691,11 +736,12 @@ def _en_sjekk(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
 # Story 10.9, del F: ordene om maalingen, mot fortegnet for sjekken.
 _TREND_MAALT = re.compile(
     r"(?<![\w-])kursen\s+(?:ligger|lå|er|var)\s+(?P<ikke>ikke\s+)?(?:(?:langt|klart|godt|litt|så\s+langt)\s+)?"
-    r"(?P<hvor>over|under|nær|rundt|tett\s+på)(?:\s+eller\s+(?:over|under))?\s+(?:det\s+)?snittet",
+    r"(?P<hvor>over|under|nær|rundt|tett\s+på)(?P<eller>\s+eller\s+(?:over|under))?\s+(?:det\s+)?snittet",
     re.IGNORECASE,
 )
 _BEVEGELSE_MAALT = re.compile(
-    r"(?<![\w-])kursen\s+(?P<vei>steg|falt)\s+(?:\w+\s+){0,2}?mer\s+(?:i\s+dag\s+)?enn\s+(?:den\s+)?vanlig",
+    r"(?<![\w-])kursen\s+(?P<vei>steg|falt)\s+(?P<ikke>ikke\s+)?(?:(?!ikke\b)\w+\s+){0,2}?mer\s+(?:i\s+dag\s+)?enn\s+"
+    r"(?:den\s+)?vanlig",
     re.IGNORECASE,
 )
 _ENDRINGEN_MAALT = re.compile(
@@ -716,17 +762,26 @@ def _maalingene(tekst: str, grunnlag: Mapping[str, object]) -> list[str]:
     ligger naer. Det som ikke er i lista, slipper gjennom (FR-603 er grov)."""
     tekst = re.sub(r"\s+", " ", tekst)
     sagt: list[tuple[str, re.Match[str], set[int]]] = []
+    # Gjennomgangen (BH1, BH5, BH6, ECH8, ECH9): «ikke» snur utsagnet, og
+    # «over eller under» uten «ikke» sier ingenting om fortegnet.
     for treff in _TREND_MAALT.finditer(tekst):
-        hvor = treff["hvor"].lower()
-        if treff["ikke"]:
+        hvor, ikke = treff["hvor"].lower(), bool(treff["ikke"])
+        if treff["eller"]:
+            if not ikke:
+                continue
             ventet = {0}
+        elif hvor == "over":
+            ventet = {0, -1} if ikke else {1}
+        elif hvor == "under":
+            ventet = {0, 1} if ikke else {-1}
         else:
-            ventet = {1} if hvor == "over" else {-1} if hvor == "under" else {0}
+            ventet = {1, -1} if ikke else {0}
         sagt.append(("trend", treff, ventet))
     for treff in _BEVEGELSE_MAALT.finditer(tekst):
-        sagt.append(("bevegelse", treff, {1} if treff["vei"].lower() == "steg" else {-1}))
+        vei = 1 if treff["vei"].lower() == "steg" else -1
+        sagt.append(("bevegelse", treff, {0, -vei} if treff["ikke"] else {vei}))
     for treff in _ENDRINGEN_MAALT.finditer(tekst):
-        stor = treff["hvor"].lower() == "stor" and not (treff["ikke1"] or treff["ikke2"])
+        stor = (treff["hvor"].lower() == "stor") != bool(treff["ikke1"] or treff["ikke2"])
         sagt.append(("bevegelse", treff, {1, -1} if stor else {0}))
     for treff in _INTERESSEN_MAALT.finditer(tekst):
         if treff["ikke1"] or treff["ikke2"]:

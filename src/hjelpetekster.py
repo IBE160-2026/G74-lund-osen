@@ -593,7 +593,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (DAGENE, "def setning_om_samme_dag("),
                 (KI_GRUNNLAG, "def ki_grunnlag("),
                 (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
-                (KI_GRUNNLAG, 'ANTALLENE = ("styrke", *MOENSTERANTALLENE)'),
+                (KI_GRUNNLAG, 'ANTALLENE = ("styrke",)'),
                 (MOENSTRENE, "def lag_moenstrene("),
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "def kontroller("),

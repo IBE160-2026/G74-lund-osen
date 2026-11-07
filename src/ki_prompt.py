@@ -137,6 +137,12 @@ staar. Versjonen er 5, fordi versjon 4 er flettet, og fra hentingen 26.10 gir
 enhver endring i prompten en ny versjon (versjon 3 over). ose.db hadde ingen
 tekst med versjon 4 da versjon 5 ble laget (lest 07.11): de foerste kommer med
 hentingen 09.11.
+
+Versjon 5, gjennomgangen av 10.9 (BH7): appens setninger staar over teksten i
+rammen «Signalet forklart», saa to linjer i reglene sier «over teksten», ikke
+«under». Versjonen staar som 5, fordi versjon 5 ikke er flettet og ingen tekst
+i ose.db har versjon 5, som i 10.2i. Avtrykket, demotekstene og
+proevekjoeringen (malinger.md §56) er laget paa nytt.
 """
 
 import json
@@ -178,9 +184,9 @@ Regler for teksten:
 - Setningen om mønstrene kan likevel si hvor mange dager aksjen gikk samme vei som hovedindeksen, med formen under.
 - Etter sjekkene kommer én setning om mønstrene, med bare de mønstrene som står i opplysningene, og med tallene derfra. Bruk disse formene, sett inn tallene for feltene i ‹ ›, og sett formene sammen med komma og «og»: «av de ‹siste_20_vurdert› vurderte børsdagene av de siste 20 var signalet positivt ‹siste_20_positiv›, negativt ‹siste_20_negativ›, blandet ‹siste_20_blandet› og uten retning ‹siste_20_ingen›», «aksjen gikk samme vei som hovedindeksen ‹siste_5_samme_vei› av de ‹siste_5_kunne_telles› dagene som kunne telles av de siste 5 børsdagene» og «den siste måneden skiftet retningen ‹siste_måned_skift› ganger». Med siste_måned_merke skriver du «minst» foran tallet. Er alle 20 vurdert, skriver du «av de siste 20 børsdagene var signalet …». Skriv aldri navnet på et felt eller tegnene ‹ › i teksten. Står ingen mønstre i opplysningene, skriver du ingen setning om dem.
 - Mønstrene sier bare hva som har skjedd. Ikke si hva de betyr for kursen videre, ikke sammenlign tallene med hverandre, og ikke finn mønstre selv. Ikke bruk ordene «mønster», «tendens», «pleier», «gjentar seg» eller «oftere».
-- Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. Appen skriver det selv under teksten.
+- Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. Appen skriver det selv over teksten.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
-- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier under teksten hvor lenge signalet har vart.
+- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier over teksten hvor lenge signalet har vart.
 - Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
 - Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at en sjekk ikke ga utslag.
 - Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».

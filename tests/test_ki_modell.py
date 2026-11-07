@@ -85,9 +85,11 @@ AVTRYKK = {
     # Gjennomgangen av svarene (BH8, ECH5): linjene om hovedindeksen og aksjen.
     # Versjonen staar som 4. Var a864e4c3....
     "4": "ec084a5215ac05389e96d63ecb21c826a326caecabc59f8d2bbc7cf7d526e251",
-    # Story 10.9: én setning per sjekk og én om moenstrene. Teksten til
+    # Story 10.9: én setning per sjekk og én om moenstrene. Gjennomgangen av
+    # 10.9 (BH7): «over teksten», og versjonen staar som 5. Var 94856d75....
+    # Teksten til
     # versjon 4 staar i src/ki_prompt.py paa 7c55913d.
-    "5": "94856d75cc5d0765370368a1f94f89f9addf83a39e6d7c28ba07c4ee1f4e3a83",
+    "5": "822dcd4981bfeb515b8ba470a2b8e29bc7a0982f3a8807050ba406bea46d8dea",
 }
 
 
@@ -195,8 +197,8 @@ class TestPrompten:
 
     def test_versjon_4(self):
         """Story 10.2i, gruppens svar 5.11 kl. 16:05 (var versjon 3 fra
-        10.2e). Ville feilet hvis versjonen ikke var 4, eller avtrykket for
-        versjon 4 var det samme som for versjon 3. At en endret prompt faar ny
+        10.2e). Ville feilet hvis avtrykket for versjon 4 ble endret, eller var
+        det samme som for versjon 3. At versjonen er 5, sjekker test_versjon_5. At en endret prompt faar ny
         versjon, fanger test_versjonen_foelger_teksten (gjennomgangen, BH12,
         ECH7). Story 10.9: versjon 5 er gjeldende, og avtrykket for versjon 4
         staar."""
@@ -209,7 +211,7 @@ class TestPrompten:
         uten ny versjon, eller avtrykket for versjon 5 var det samme som for
         versjon 4 (FR-605)."""
         assert PROMPTVERSJON == "5"
-        assert AVTRYKK["5"] == "94856d75cc5d0765370368a1f94f89f9addf83a39e6d7c28ba07c4ee1f4e3a83"
+        assert AVTRYKK["5"] == "822dcd4981bfeb515b8ba470a2b8e29bc7a0982f3a8807050ba406bea46d8dea"
         assert AVTRYKK["5"] != AVTRYKK["4"]
 
     def test_modellen_skriver_ikke_om_dagen(self):
@@ -305,7 +307,7 @@ class TestPrompten:
         )
         ikke = (
             "- Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. "
-            "Appen skriver det selv under teksten."
+            "Appen skriver det selv over teksten."
         )
         assert reglene.count(ordrett) == 1 and reglene.count(ikke) == 1
         assert ordrett in lag_prompt(BLANDET) and ikke in lag_prompt(BLANDET)
@@ -388,13 +390,14 @@ class TestPrompten:
         linjer = [linje for linje in REGLER.splitlines() if linje.startswith("- Ikke si hvor lenge signalet har vart")]
         assert linjer == [
             "- Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. "
-            "Siden sier under teksten hvor lenge signalet har vart."
+            "Siden sier over teksten hvor lenge signalet har vart."
         ]
         assert "Siden sier det under teksten" not in REGLER + UTENFOR
         # Gjennomgangen (ECH3, ECH4, BH14): grunnen staar bare én gang, ogsaa
         # i en omskrevet form, og den kommer med i prompten til modellen.
         assert (REGLER + UTENFOR).count("Siden sier") == 1
-        assert "Siden sier under teksten hvor lenge signalet har vart." in lag_prompt(BLANDET)
+        # Story 10.9 (BH7): over teksten, i rammen «Signalet forklart».
+        assert "Siden sier over teksten hvor lenge signalet har vart." in lag_prompt(BLANDET)
 
     def test_retningen_ingen_skrives_som_ingen_retning(self):
         """Story 10.2g, gruppens svar 25.10 kl. 19:54 og 19:56 b): modellen
