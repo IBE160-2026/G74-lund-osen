@@ -82,13 +82,17 @@ class TestToppenOgSummen:
 
     def test_to_av_tre_har_svart_ring_i_summen_og_kortet(self, klient):
         """Del A (spørsmål 13): ville feilet hvis 2 av 3 sto uten ring i
-        summen eller i kortet «Signalstyrke», eller 3 av 3 fikk svart ring."""
-        for symbol in ("BRFE", "HVBK", "MRKL", "NRDL", "TRGF", "VERK", "DATA", "HAVB", "FJST"):
+        summen eller i kortet «Signalstyrke», eller 3 av 3 fikk svart ring.
+        Alle aksjene i demoen, og minst én med 2 av 3 og én med 3 av 3."""
+        sett = set()
+        symbolene = sorted(set(re.findall(r'href="/aksje/([A-Z]+)"', _side(klient, "/"))))
+        for symbol in symbolene:
             html = klient.get(f"/aksje/{symbol}").get_data(as_text=True)
             if '<p class="sumrad">' not in html:
                 continue
             summen = html.split('<p class="sumrad">', 1)[1].split("</p>", 1)[0]
             styrke = int(re.search(r'<span class="pille[^"]*">(\d) av 3</span>', summen).group(1))
+            sett.add(styrke)
             kortet = html.split('<span class="etikett">Signalstyrke', 1)[1].split("</div>", 1)[0]
             if styrke == 2:
                 assert '<span class="pille to-av-tre">2 av 3</span>' in summen
@@ -98,6 +102,7 @@ class TestToppenOgSummen:
                 assert 'class="styrken pille tre-av-tre"' in kortet
             else:
                 assert "to-av-tre" not in summen + kortet and "tre-av-tre" not in summen + kortet
+        assert {2, 3} <= sett, (symbolene, sett)
 
     def test_ringen_har_stil(self):
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
