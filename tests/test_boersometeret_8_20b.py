@@ -224,8 +224,11 @@ def test_lappen_med_datoen_staar_over_tegneflaten(klient):
     """BH9: lappen med datoen øverst på streken står over tegneflaten, så den
     aldri dekker toppen av kurslinja. Ville feilet med lappen inne i
     tegneflaten, som i 8.20a, eller med kurslinja over MARG_Y."""
-    html = _side(klient, "/aksje/BRFE")
+    # Streken står ved den første knappen og en valgt dag, ikke ved 6 mnd,
+    # som siden åpner med (mutanten for BH9 overlevde med den adressen).
+    html = _side(klient, "/aksje/BRFE?periode=siste")
     figuren = html.split("<figure>", 1)[1].split("</figure>", 1)[0]
+    assert figuren.count('<rect class="daglapp"') == 2  # den brede og den smale grafen
     for y in re.findall(r'<rect class="daglapp" x="[\d.]+" y="([\d.-]+)" width="44" height="18"', figuren):
         assert 0 <= float(y) and float(y) + 18 < MARG_Y
     for linje in re.findall(r'<polyline class="kurslinje" points="([^"]+)"', figuren):
