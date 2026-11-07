@@ -23,6 +23,8 @@ Skrevet og bygget 07.11 i instruksjonen kl. 13:35 (`docs/ai-prompts/2026-11-07.m
 
 ## Spørsmål til gruppen før flettingen
 
+*Svar 2026-11-07 kl. 15:34 (gruppens svar):* forslagene i spørsmål 1–4 under er godtatt: 1) kalenderen dekker 2026 og hvert år etter, og 2025 står utenfor, som avgjort 30.10 kl. 10:45; svaret kl. 11:05 gjaldt årene framover; 2) for en dag utenfor kalenderen står «utenfor børskalenderen, som begynner i 2026», og «ikke vurdert» står som før (spørsmål 18 i 8.20); 3) `Lyttere` i `start/start.ps1` spør først som før, så `Get-NetTCPConnection` uten tilstand etter raden med fjernport 0, og så netstat, fordi netstat alene så lytteren 0 og 4 av 30 ganger; 4) ingen øvre grense og ingen ny kontroll av klokka, og risikoen ved en klokke langt fram i tid er godtatt (BH1, ECH1). Rådet anbefalte alle fire. Svaret står også under story 2.16 i `epics.md` (`c183a07f`).
+
 Hvert spørsmål har et forslag. Byggingen følger forslaget til gruppen har svart.
 
 1. **Får kalenderen 2025?** To svar spriker. 30.10 kl. 10:45 (under 8.17, a): «Børskalenderen får ikke 2025». 07.11 kl. 11:05: «for hvert år». Ingen av dem opphever den andre uttrykkelig. *Forslag:* kalenderen dekker 2026 og hvert år etter, uten øvre grense (`FOERSTE_AAR = 2026` i `src/boersdag.py`), og 2025 står utenfor, som avgjort 30.10. Grunnen: regelen er sjekket mot Euronext for 2026 og 2027, og repoet har ingen liste for 2025. Hva som ville endret seg for 2025 i den ekte versjonen, står under «Slått opp». Sier gruppen ja til 2025, er endringen `FOERSTE_AAR = 2025` og testene som bruker 2025 som «utenfor».
@@ -130,5 +132,7 @@ Blind Hunter, Edge Case Hunter og Verification Gap på `5b1e2778..6eeaf5b2`, ett
 | BH10 | lav | Vinduet ved dobbeltklikket nevner ikke en konto fra før | utsatt: spørsmål 20 i 8.20 gjaldt README-en. Kan tas med 3.4h eller 8.20a |
 | ECH4 | lav | `foerste_boersdag_fra(date(9999, 12, 31))` gir `OverflowError` | avvist: kan ikke nås, fordi en dag etter i dag og etter siste kurs avvises |
 | ECH8 | lav | Prosess 4 (System) vises som et program uten kommandolinje | avvist her: fantes før, og stoppes aldri |
+
+*BH1 og ECH1, lukket 2026-11-07 etter gruppens svar kl. 15:34 (regel 25).* Svar 4: ingen øvre grense og ingen ny kontroll av klokka, og risikoen ved en klokke langt fram i tid er godtatt. Koden er ikke endret.
 
 **Mutantene for rettingene**, på `c140e607`, med kopi før og blob lik HEAD etter: bare én runde i `Lyttere` (fanget av `tredje_runde`), prosess 0 tatt med (`prosess_0_og_ipv6`), raden uten tilstand bare når ingen er sett (`to_lyttere`), året skrevet fast i teksten (`test_utenfor_boerskalenderen_foelger_foerste_aar`), og cachen rundt grensen (`test_grensen_gjelder_ogsaa_et_aar_som_er_regnet_ut`). Alle ble fanget.
