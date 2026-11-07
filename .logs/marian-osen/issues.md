@@ -127,3 +127,5 @@
 - [ ] 2026-11-07 [svarene-07-11-og-skissene](964-2026-11-07-09-24-29-svarene-07-11-og-skissene.md) — 7 tester i `tests/test_dobbeltklikk.py` (porten 8000 i `start.ps1`) feiler også på HEAD; årsaken er ikke funnet
 - [ ] 2026-11-07 [svarene-07-11-og-skissene](964-2026-11-07-09-24-29-svarene-07-11-og-skissene.md) — U75–U102 står fortsatt som «Ikke avgjort», utenom U77, U82 og U84
 - [ ] 2026-11-07 [svarene-07-11-og-skissene](964-2026-11-07-09-24-29-svarene-07-11-og-skissene.md) — ønskene og rådets forslag i `docs/skisser/2026-11-06/LESMEG.md` avgjøres i spesifikasjonen for UX-rettingene
+- [ ] 2026-11-07 [spesifikasjonene-for-8-20-og-3-4h](963-2026-11-07-09-59-55-spesifikasjonene-for-8-20-og-3-4h.md) — 21 spørsmål øverst i `spec-8-20-ux-rettingene-etter-gjennomgangen-06-11.md` må besvares før 8.20 bygges
+- [ ] 2026-11-07 [spesifikasjonene-for-8-20-og-3-4h](963-2026-11-07-09-59-55-spesifikasjonene-for-8-20-og-3-4h.md) — ti spørsmål øverst i `spec-3-4h-investorsidene-i-demoen.md` må besvares før 3.4h bygges
