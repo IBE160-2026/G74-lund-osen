@@ -191,7 +191,8 @@ class TestAdressen:
         assert 'name="tilbake" value="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
         assert "periode=1-uke&amp;sorter=endring" in html
         dag = _side(klient, "/min-liste?vis=alle&periode=velg&dag=2026-10-07")
-        assert 'aria-current="true">07.10</button>' in dag
+        # Story 8.20a (del B): dagen står i feltet, og knappen heter «Vis dagen».
+        assert 'required value="2026-10-07"' in dag and 'aria-current="true">Vis dagen</button>' in dag
         assert app_modul.tilbake_etter_merking("/min-liste?periode=velg&dag=2026-10-07") == (
             "/min-liste?periode=velg&dag=2026-10-07"
         )
@@ -211,7 +212,8 @@ class TestAdressen:
         assert '<a href="/boersometer?periode=1-uke" aria-current="true">1 uke</a>' in html
         assert 'aria-current="true">Fredag</a>' in _side(klient, "/boersometer")
         dag = _side(klient, "/boersometer?periode=velg&dag=2026-10-07")
-        assert 'aria-current="true">07.10</button>' in dag
+        # Story 8.20a (del B): dagen står i feltet, og knappen heter «Vis dagen».
+        assert 'required value="2026-10-07"' in dag and 'aria-current="true">Vis dagen</button>' in dag
         assert "Mandag" not in dag.split('class="meta"', 1)[1].split("</p>", 1)[0]
         assert "onsdag 07.10" in dag.split('class="meta"', 1)[1].split("</p>", 1)[0]
 

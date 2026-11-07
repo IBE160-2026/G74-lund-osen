@@ -27,7 +27,7 @@ from ki_kontroll import kontroller
 from ki_modell import Modellsvar
 from ki_prompt import PROMPTVERSJON
 from ki_tekst import regeltekst
-from ki_visning import prikkede_tall
+from ki_visning import ki_tekst
 from kilogg import AKSJE, LOKAL, MASKINVARE
 from lagring_sqlite import SqliteIndekslager, SqliteKILogg, SqliteKurslager, SqliteVurderingslager, demo_sti
 from moenstrene import lag_moenstrene
@@ -324,8 +324,11 @@ class TestAksjesiden:
         rad = next(r for r in radene if r.besto)
         side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
         assert "Eksempeltall" in side
-        assert f'<p class="ki-tekst">{prikkede_tall(rad.tekst)}</p>' in side
-        assert f"Laget av KI · {rad.modell}, {rad.tjeneste}." in side
+        assert f'<p class="ki-tekst">{ki_tekst(rad.tekst)}</p>' in side
+        # Story 8.20a (del D, spørsmål 11 i 8.20): «Laget av KI» over teksten og
+        # modellen i en liten linje under, og navnene på sjekkene fete (U88).
+        assert "Laget av KI." in side
+        assert f'<p class="modell">Modell: {rad.modell}, {rad.tjeneste}</p>' in side
 
     def test_en_tekst_som_ikke_besto_vises_ikke(self, klient, radene, monkeypatch):
         """FR-604 (gjennomgangen, BH10 og ECH2): lages tekstene paa nytt, og
@@ -354,7 +357,7 @@ class TestAksjesiden:
         demo.lag_demobase(demo_sti(), skriv=lambda _: None)
         side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
         assert "<script>x</script>" not in side
-        assert f'<p class="ki-tekst">{prikkede_tall(farlig)}</p>' in side
+        assert f'<p class="ki-tekst">{ki_tekst(farlig)}</p>' in side
 
     def test_knappen_skjuler_og_viser_teksten(self, klient, radene):
         """FR-601: «Skjul KI-teksten» tar teksten bort, og «Vis KI-teksten»
@@ -362,7 +365,7 @@ class TestAksjesiden:
         demo.lag_demobase(demo_sti(), skriv=lambda _: None)
         rad = next(r for r in radene if r.besto)
         adresse = f"/aksje/{rad.emne.symbol}"
-        tekst = f'<p class="ki-tekst">{prikkede_tall(rad.tekst)}</p>'
+        tekst = f'<p class="ki-tekst">{ki_tekst(rad.tekst)}</p>'
         paa = klient.get(adresse).data.decode("utf-8")
         # Story 8.2b, c (U33): bryteren, med «På» og «Av».
         assert tekst in paa and 'role="switch" aria-checked="true"' in paa

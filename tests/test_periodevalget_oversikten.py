@@ -673,9 +673,11 @@ class TestTilgjengelig:
         de gjelder: linja over tabellen sier det med ord."""
         _basen()
         html = klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8")
-        assert '<label class="skjult" for="velg-dag">Velg dag</label>' in html
+        # Story 8.20a (del B, spørsmål 5 i 8.20): etiketten sier hva feltet
+        # viser, og dagen står i feltet.
+        assert '<label class="skjult" for="velg-dag">Dagen siden viser</label>' in html
         assert "Tabellen viser onsdag 07.10" in _synlig(html)
-        assert 'aria-current="true">07.10</button>' in html
+        assert 'required value="2026-10-07"' in html and 'aria-current="true">Vis dagen</button>' in html
 
 
 # Gruppens svar 30.10 kl. 10:45 (VG1): 390 px prøvd i en nettleser uten

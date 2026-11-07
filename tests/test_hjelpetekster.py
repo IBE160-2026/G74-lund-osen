@@ -14,7 +14,17 @@ import pytest
 import app as app_modul
 import demo
 import lagring_sqlite
-from hjelpetekster import MAALTE_GRENSER, Hjelp, hjelpetekster
+from hjelpetekster import (
+    ANDEL_NEGATIV,
+    ANDEL_POSITIV,
+    MAALT_PERIODE,
+    MAALTE_AKSJER,
+    MAALTE_BOERSDAGER,
+    MAALTE_GRENSER,
+    Hjelp,
+    _grensene,
+    hjelpetekster,
+)
 from markedsoversikt import RETNINGSVISNING
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, interesse, trend
 from tallformat import HARDT_MELLOMROM as NB
@@ -24,13 +34,14 @@ from test_app import _stil, _uten_hjelpeskriptet
 ROT = Path(__file__).resolve().parent.parent
 
 # Tallene med dagens parametre, slik de staar i tekstene.
+# Story 8.20a (del E): «styrke 2 eller mer» er «Med 2 eller mer».
 STANDARDTALL = (
     f"mer enn 2{NB}%",
     "de siste 50 børsdagene",
     "de 20 børsdagene før",
     "1,5 ganger",
     "trenger 51 børsdager",
-    "styrke 2 eller mer",
+    "Med 2 eller mer",
 )
 
 ANDRE = Parametre(
@@ -56,8 +67,7 @@ class TestTalleneFraParametre:
     def test_andre_parametre_gir_andre_tall(self):
         """Kontrollpunktet: tallene hentes fra Parametre. Ville feilet hvis
         50 dager eller 1,5 ganger var skrevet fast i en tekst."""
-        # grensene sier hva som ble maalt, og staar for seg (TestGrensene).
-        alt = _alt(hjelpetekster(ANDRE), uten=("grensene",))
+        alt = _alt(hjelpetekster(ANDRE))
         for tekst in STANDARDTALL:
             assert tekst not in alt, tekst
         for tekst in (
@@ -68,7 +78,7 @@ class TestTalleneFraParametre:
             "de 25 børsdagene før",
             "2,5 ganger",
             "trenger 41 børsdager",
-            "styrke 3 eller mer",
+            "Med 3 eller mer",
         ):
             assert tekst in alt, tekst
 
@@ -106,12 +116,22 @@ class TestGrensene:
             assert getattr(STANDARD, felt) == getattr(MAALTE_GRENSER, felt), felt
 
     def test_teksten_om_maalingen_nevner_de_maalte_grensene(self):
+        """Story 8.20a (del E, gruppens svar 07.11 kl. 10:33, 2): målingen og
+        grensene står i docs/hjelp.md, «Hvordan ble grensene valgt?», og ikke
+        i et vindu. Ville feilet hvis teksten der nevnte andre grenser enn de
+        som ble målt (MAALTE_GRENSER), eller andre andeler enn i målingen."""
+        hjelpen = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        avsnitt = hjelpen.split("### Hvordan ble grensene valgt?", 1)[1].split("\n### ", 1)[0]
+        avsnitt = avsnitt.replace(NB, " ")
         forventet = (
-            f"2{NB}%, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 "
-            f"ble kontrollert mot 15 aksjer på Oslo Børs over 199 børsdager"
-        )
-        assert forventet in hjelpetekster()["grensene"].tekst
-        assert forventet in hjelpetekster(ANDRE)["grensene"].tekst
+            f"{_grensene(MAALTE_GRENSER)} ble kontrollert mot {MAALTE_AKSJER} aksjer på Oslo Børs "
+            f"over {MAALTE_BOERSDAGER} børsdager, {MAALT_PERIODE}"
+        ).replace(NB, " ")
+        assert forventet.startswith("2 %, 1,5 ganger, de to vinduene på 20 børsdager og terskelen 2 ")
+        assert forventet in avsnitt
+        for andel in (ANDEL_POSITIV, ANDEL_NEGATIV):
+            assert tall(andel, "andel").replace(NB, " ") in avsnitt, andel
+        assert "trenger 51 børsdager" in avsnitt
 
 
 def _serie(siste: float, n: int = 22) -> list[float]:
@@ -157,7 +177,7 @@ class TestTekstenSierDetKodenGjoer:
         tekst = hjelpetekster()["endring"]
         assert (tekst.tittel, tekst.tekst) == (
             "Endring:",
-            "endringen i prosent fra forrige dag med kurs, regnet på utbyttejustert kurs. "
+            "endringen i prosent fra forrige dag med kurs, regnet på kursen justert for utbytte. "
             "På aksjesiden står de to dagene ved endringen, med ukedag og dato.",
         )
 
@@ -315,7 +335,9 @@ class TestSidene:
                 return super().tekst(noekkel)
 
         monkeypatch.setattr(app_modul, "Hjelp", Opptak)
-        for adresse in SIDENE:
+        # Gjennomgangen av 8.20a (ECH5): teksten om streken står bare når
+        # grafen har en dag merket, som ved den første knappen.
+        for adresse in SIDENE + ("/aksje/BRFE?periode=siste",):
             _side(klient, adresse)
         assert bedt_om == set(hjelpetekster())
 
@@ -358,9 +380,6 @@ class TestSidene:
             ('<span class="etikett">Retning ', "hjelp-retning-aksje"),
             ('<span class="etikett">Endring ', "hjelp-endring"),
             ('<h2 id="kursgrafen">Kursutvikling, 6 måneder ', "hjelp-graf"),
-            # Story 8.0d, PR 3 (svar 22): i sjekkortene.
-            ('<span class="ga">Ga ', "hjelp-ga"),
-            ('<p class="maalt">Målt mot ', "hjelp-maalt"),
             ("<h3>Trend ", "hjelp-trend"),
             ("<h3>Bevegelse ", "hjelp-bevegelse"),
             ("<h3>Interesse ", "hjelp-interesse"),
@@ -373,14 +392,15 @@ class TestSidene:
         # vinduene for Ga og Målt mot har én knapp i hvert sjekkort, under.
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
-        # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» og «Målt mot» i alle
-        # tre sjekkortene, som punkt 22 i 8.0d. Her sto én knapp per vindu,
-        # i det første kortet. Ville feilet med knappen bare i det første.
+        # Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): ett «?» per kort,
+        # ved navnet, og ingen ved «Ga» eller «Målt mot». Rettet fra svaret
+        # 04.11 kl. 09:58, der de sto i alle tre kortene. Ville feilet med et
+        # «?» ved «Ga» eller «Målt mot».
         kortene = re.findall(r'<section class="sjekkort[^"]*"[^>]*>(.*?)</section>', detalj, flags=re.DOTALL)
         assert len(kortene) == 3
-        for vindu in ("hjelp-ga", "hjelp-maalt"):
-            assert detalj.count(f'class="hjelpeknapp" popovertarget="{vindu}"') == 3, vindu
-            assert all(f'popovertarget="{vindu}"' in kort for kort in kortene), vindu
+        for kort in kortene:
+            assert kort.count('class="hjelpeknapp"') == 1, kort
+        assert "hjelp-ga" not in detalj and "hjelp-maalt" not in detalj
 
     def test_hvert_vindu_har_bare_sine_tekster(self, klient, base):
         """Den nye delen 2: vinduene og tekstene i dem, i rekkefoelge. «Ikke et
@@ -425,22 +445,24 @@ class TestSidene:
                 # og endringen er et eget nøkkeltall.
                 "hjelp-hentet": ["data_hentet_aksje"],
                 # U5 (story 2.7b): sluttkursen for dagen siden viser.
-                "hjelp-kurs": ["sluttkurs_aksje", "utbyttejustert"],
+                # Story 8.20a (del E): høyst 60 ord i hvert vindu, med
+                # tekstene fra utkastet i spesifikasjonen for 8.20.
+                "hjelp-kurs": ["sluttkurs_aksje"],
                 "hjelp-endring": ["endring", "utbyttejustert"],
                 # Story 2.9c: den stiplede linja, når basen har indeksen.
                 # Story 8.16: periodene i samme vindu som grafen.
                 "hjelp-graf": ["grafen", "indekslinja", "perioden"],
-                "hjelp-styrke": ["signalstyrke", "ikke_raad"],
+                "hjelp-styrke": ["signalstyrke", "ikke_raad_kort"],
                 "hjelp-retning-aksje": [
-                    "retning",
-                    "positiv",
-                    "negativ",
-                    "blandet",
-                    "ingen",
+                    "retning_aksje",
+                    "positiv_aksje",
+                    "negativ_aksje",
+                    "blandet_aksje",
+                    "ingen_aksje",
                     "ukjent_aksje",
-                    "skjevhet",
+                    "oftere_positiv",
                 ],
-                "hjelp-sjekkene": ["hvorfor_tre", "antall_dager"],
+                "hjelp-sjekkene": ["sjekkene"],
                 # Story 2.7b: historikken nederst på siden.
                 "hjelp-historikk": ["historikken"],
                 # Gruppens svar 04.11 kl. 22:23, 3: «?» ved KI-delen. Story
@@ -449,8 +471,6 @@ class TestSidene:
                 "hjelp-trend": ["trend"],
                 "hjelp-bevegelse": ["bevegelse"],
                 "hjelp-interesse": ["interesse"],
-                "hjelp-ga": ["ga"],
-                "hjelp-maalt": ["maalt_mot", "grensene"],
             },
         }
         for adresse, vinduer in forventet.items():
@@ -520,13 +540,19 @@ class TestSidene:
     def test_grafen_og_tabellen_forklares_bare_naar_de_vises(self, klient, base):
         """Gjennomgangen av 8.0b: VRDS har for kort serie til signal og
         snitt, saa hjelpen forklarer verken den stiplede linja eller
-        kolonnene Ga og Maalt mot."""
+        kolonnene Ga og Maalt mot.
+        Story 8.20a (del E): Ga og Målt mot står i teksten om sjekkene, og
+        grafen uten snitt har sin egen tekst."""
+        from markupsafe import escape
+
         tekster = hjelpetekster()
         brfe = _side(klient, "/aksje/BRFE")
         vrds = _side(klient, "/aksje/VRDS")
-        for noekkel in ("grafen", "ga", "maalt_mot"):
-            assert tekster[noekkel].tekst in brfe, noekkel
-            assert tekster[noekkel].tekst not in vrds, noekkel
+        for noekkel in ("grafen", "sjekkene"):
+            assert str(escape(tekster[noekkel].tekst)) in brfe, noekkel
+            assert str(escape(tekster[noekkel].tekst)) not in vrds, noekkel
+        assert tekster["grafen_uten_snitt"].tekst in vrds
+        assert tekster["sjekkene_uten"].tekst in vrds
 
     def test_tom_base_har_ingen_hjelp(self, klient):
         """Story 8.0c: uten kurser er det ingen tabell og ingen tall aa
@@ -558,7 +584,9 @@ class TestSnittetIGrafen:
 
 # Story 8.0c: hoeyst 3 setninger per tekst, og ordene ordlista har valgt bort
 # (designregler.md §4, rettet 13.10).
-UNNTAK_LENGDE = {"grensene", "skjevhet"}
+# Story 8.20a (del E): grensene og skjevhet står i docs/hjelp.md, så ingen
+# tekst har unntak lenger.
+UNNTAK_LENGDE = set()
 VALGT_BORT = (
     r"peker opp",
     r"peker ned",

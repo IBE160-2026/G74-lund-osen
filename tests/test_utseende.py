@@ -538,7 +538,8 @@ class TestOversikten:
         assert 'class="tabellboks"' not in aksje
         # Story 8.0d, PR 3: aksjesiden har sjekkort og ingen kolonnerad, og
         # «?» ved Ga står i det første kortet med den svarte sirkelen.
-        assert "<thead>" not in aksje and 'popovertarget="hjelp-ga"' in aksje
+        # Story 8.20a (del E): «?» står ved navnet i kortet, ikke ved Ga.
+        assert "<thead>" not in aksje and 'popovertarget="hjelp-trend"' in aksje
         stripa = _stripa(sidene["oversikten"])
         assert 'popovertarget="hjelp-hentet"' in stripa
 
@@ -672,7 +673,7 @@ class TestOversikten:
             html,
         )
         assert ut and ut.group(2) == f"signalstyrke {terskel} eller mer"
-        assert int(ut.group(1)) == html.count('<span class="merke skjult">skiller seg ut</span>')
+        assert int(ut.group(1)) == html.count('<span class="merke skjult">skilte seg ut</span>')
         oevrige = re.search(
             r'<tr class="del oevrige"><th[^>]*>Øvrige aksjer <span class="antall">\d+</span>'
             r' <span class="bak">([^<]+)</span>',

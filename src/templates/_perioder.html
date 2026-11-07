@@ -4,33 +4,62 @@
     skjema, uten skript og uten noe fra nettet.
 
     knapper er (kode, navn) fra perioder.knappene(), valgt er koden som
-    vises, adresse er siden lenkene går til, og dag er dagen for «Velg dag».
+    vises, adresse er siden lenkene går til, og dag er dagen som er valgt.
     Den valgte knappen har aria-current, og fokus er synlig.
 
     Story 8.2a, a (U36): med anker går lenkene og skjemaet dit, så siden
     holder plassen. Et skjema med GET beholder ankeret i action.
 
     Story 8.17b: ekstra er (navn, verdi) som følger med i lenkene og
-    skjemaet, som vis=alle i Min liste. -#}
+    skjemaet, som vis=alle i Min liste.
 
-{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None, ekstra=()) -%}
+    Story 8.20a (del B, gruppens svar 06.11 kl. 22:24, 23:23, 23:30, 23:34
+    og 23:42, og 07.11 kl. 10:33): datoen står etter periodeknappene, med
+    «Vis dagen». Feltet viser siste børsdag ved den første knappen og dagen
+    som er valgt, og er tomt i en periode. Pilene for forrige og neste
+    børsdag står bare når feltet viser en dag, og er grå ved første og siste
+    dag feltet godtar.
+
+    Gjennomgangen av 8.20a (ECH2): kursdager er dagene siden har kurs for,
+    når siden viser nærmeste dag med kurs i stedet for dagen som er valgt,
+    som børsometeret. Da går pilene til forrige og neste dag med kurs, så
+    de ikke står fast ved et hull. -#}
+
+{% macro periodevalg(knapper, valgt, adresse, dag=None, minst=None, maks=None, etikett="Periode", anker=None, ekstra=(), kursdager=None) -%}
+{%- set i_feltet = dagen_i_feltet(valgt, dag, maks) %}
+{%- set forrige, neste = pilene(i_feltet, minst, maks, kursdager) %}
+{%- set foran %}{{ adresse }}?{% for felt, verdi in ekstra %}{{ felt }}={{ verdi }}&amp;{% endfor %}{% endset %}
 <nav class="periodevalg" aria-label="{{ etikett }}">
   <ul>
     {%- for kode, navn in knapper %}
-    <li><a href="{{ adresse }}?{% for felt, verdi in ekstra %}{{ felt }}={{ verdi }}&amp;{% endfor %}periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
+    <li><a href="{{ foran }}periode={{ kode }}{% if anker %}#{{ anker }}{% endif %}"{% if kode == valgt %} aria-current="true"{% endif %}>{{ navn }}</a></li>
     {%- endfor %}
-    <li>
+    <li class="datoen">
       <form method="get" action="{{ adresse }}{% if anker %}#{{ anker }}{% endif %}">
         {%- for felt, verdi in ekstra %}
         <input type="hidden" name="{{ felt }}" value="{{ verdi }}">
         {%- endfor %}
         <input type="hidden" name="periode" value="velg">
-        <label class="skjult" for="velg-dag">Velg dag</label>
+        {%- if i_feltet %}
+        {%- if forrige %}
+        <a class="pil" href="{{ foran }}periode=velg&amp;dag={{ forrige.isoformat() }}{% if anker %}#{{ anker }}{% endif %}" aria-label="Forrige børsdag, {{ forrige|ukedag }} {{ forrige|dato }}">‹</a>
+        {%- else %}
+        <span class="pil av" aria-hidden="true">‹</span>
+        {%- endif %}
+        {%- endif %}
+        <label class="skjult" for="velg-dag">Dagen siden viser</label>
         <input type="date" id="velg-dag" name="dag" required
-               {%- if dag %} value="{{ dag.isoformat() }}"{% endif %}
+               {%- if i_feltet %} value="{{ i_feltet.isoformat() }}"{% endif %}
                {%- if minst %} min="{{ minst.isoformat() }}"{% endif %}
                {%- if maks %} max="{{ maks.isoformat() }}"{% endif %}>
-        <button type="submit"{% if valgt == "velg" %} aria-current="true"{% endif %}>{% if valgt == "velg" and dag %}{{ dag|dato }}{% else %}Velg dag{% endif %}</button>
+        {%- if i_feltet %}
+        {%- if neste %}
+        <a class="pil" href="{{ foran }}periode=velg&amp;dag={{ neste.isoformat() }}{% if anker %}#{{ anker }}{% endif %}" aria-label="Neste børsdag, {{ neste|ukedag }} {{ neste|dato }}">›</a>
+        {%- else %}
+        <span class="pil av" aria-hidden="true">›</span>
+        {%- endif %}
+        {%- endif %}
+        <button type="submit"{% if valgt == "velg" %} aria-current="true"{% endif %}>Vis dagen</button>
       </form>
     </li>
   </ul>

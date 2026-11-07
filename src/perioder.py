@@ -32,8 +32,9 @@ VELG = "velg"
 
 PERIODENE = (SISTE, EN_UKE, EN_MND, TRE_MND, SEKS_MND, I_AAR, ETT_AAR, VELG)
 
-# Navnet paa knappen. Den foerste heter etter dagen (foerste_knapp), og
-# «Velg dag» viser dagen naar den er valgt.
+# Navnet paa knappen. Den foerste heter etter dagen (foerste_knapp).
+# Story 8.20a (spoersmaal 5 i 8.20): knappen ved datoen heter alltid «Vis
+# dagen», fordi datoen staar i feltet (gruppens svar 06.11 kl. 23:34 og 23:42).
 NAVN = {
     EN_UKE: "1 uke",
     EN_MND: "1 mnd",
@@ -41,7 +42,7 @@ NAVN = {
     SEKS_MND: "6 mnd",
     I_AAR: "I år",
     ETT_AAR: "1 år",
-    VELG: "Velg dag",
+    VELG: "Vis dagen",
 }
 
 # Maaneder bakover for periodene som regnes i maaneder.
@@ -139,8 +140,55 @@ def foerste_knapp(siste: date, idag: date) -> str:
 
 
 def knappene(siste: date, idag: date) -> tuple[tuple[str, str], ...]:
-    """(kode, navn) for knappene foran «Velg dag», i rekkefoelgen i §2."""
+    """(kode, navn) for knappene foran datoen, i rekkefoelgen i §2."""
     return ((SISTE, foerste_knapp(siste, idag)),) + tuple((kode, NAVN[kode]) for kode in PERIODENE[1:-1])
+
+
+def dagen_i_feltet(periode: str, dag: date | None, siste: date | None) -> date | None:
+    """Dagen datofeltet viser - story 8.20a (gruppens svar 06.11 kl. 23:34 og
+    23:42): siste boersdag ved den foerste knappen, dagen som er valgt, og
+    ingen dag i en periode, saa feltet er tomt."""
+    if periode == SISTE:
+        return siste
+    if periode == VELG:
+        return dag
+    return None
+
+
+def _boersdag_eller_hverdag(dag: date) -> bool:
+    """Som foerste_boersdag_fra: utenfor boerskalenderen er en hverdag en
+    boersdag."""
+    try:
+        return er_boersdag(dag)
+    except UtenforKalenderen:
+        return dag.weekday() < 5
+
+
+def pilene(dag: date | None, minst: date | None, maks: date | None, kursdager=None) -> tuple[date | None, date | None]:
+    """Forrige og neste boersdag fra dag, til pilene ved datoen - story 8.20a
+    (spoersmaal 7 i 8.20, og svaret 07.11 kl. 10:33: bare naar feltet viser en
+    dag). None for en pil som ville gaatt foer minst eller etter maks, foerste
+    og siste dag feltet godtar, og da er pila graa og ikke en lenke.
+
+    Gjennomgangen av 8.20a (ECH2): med kursdager, dagene siden har kurs
+    for, er pilene forrige og neste dag i den lista, fordi siden da viser
+    naermeste dag med kurs, og en pil til et hull ville gitt samme dag."""
+    if dag is None:
+        return None, None
+    if kursdager is not None:
+        foer = [d for d in kursdager if d < dag and (minst is None or d >= minst)]
+        etter = [d for d in kursdager if d > dag and (maks is None or d <= maks)]
+        return (max(foer) if foer else None, min(etter) if etter else None)
+    forrige = dag - timedelta(days=1)
+    while not _boersdag_eller_hverdag(forrige):
+        forrige -= timedelta(days=1)
+    neste = dag + timedelta(days=1)
+    while not _boersdag_eller_hverdag(neste):
+        neste += timedelta(days=1)
+    return (
+        forrige if minst is None or forrige >= minst else None,
+        neste if maks is None or neste <= maks else None,
+    )
 
 
 @dataclass(frozen=True)
