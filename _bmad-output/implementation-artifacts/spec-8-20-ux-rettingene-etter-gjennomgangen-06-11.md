@@ -267,3 +267,67 @@ Rettingene er i `4cfdff78`. Hele settet alene før den, 17:16:51–17:25:03, med
 Ingen funn på middels eller over står åpne, og det er ingen spørsmål til gruppen før flettingen utover avvisningene over.
 
 *Lagt til 2026-11-07:* 8.20a er flettet med PR #118 i `427a1de2` kl. 18:09, låst til head-en `8f740b7e` (main flettet inn), etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42394650968) og på flettecommiten (run 42394909599), med 4433 bestått og 31 hoppet over i jobben `pytest` begge gangene. Hele settet lokalt før `4cfdff78`: 4440 bestått, 24 hoppet over og 0 feilet. BH9 tas med 8.20b (instruksjonen kl. 18:04).
+
+## 8.20b, bygget 07.11
+
+*Lagt til 2026-11-07, etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`:* 8.20b er bygget på grenen `8-20b-boersometeret`, PR #119, etter svaret kl. 17:36 (8.20b før 3.4h). Den har del F, det som hører til børsometeret i E, H (U88), J og K, og BH9 fra 8.20a. Testene som er nye, står i `tests/test_boersometeret_8_20b.py`. Testene for det gamle børsometeret er rettet i `tests/test_boersometer.py`, `tests/test_funnene_8_2b.py`, `tests/test_periodevalget_min_liste_boersometer.py` og `tests/test_designforslaget.py`.
+
+- **F, innledningen (U98):** én tekst for en dag og en periode, som skissen. **Ville feilet hvis** innledningen byttet tekst ved en periode eller en valgt dag (`TestInnledningen`).
+- **F, «Mål mot børsen» (spørsmål 14 b):** et kort med hovedindeksen, dagen eller perioden og «N av M gikk bedre enn indeksen», regnet med `er_bedre` som oversikten, av rutene med en endring og uten kortere serie (BH1). Setningen under sier hva fargen og størrelsen måler, ulikt for en dag og en periode. **Ville feilet hvis** M var alle 15 når noen mangler endring, eller lik telte som bedre (`TestMaalMotBoersen`).
+- **F, «Slik leser du børsometeret» (U99, spørsmål 14 a):** fargen med skalaen og grensene, rammen, størrelsen og ruta, i stilen fra kortet på oversikten. Kortet erstatter «Hva fargene betyr». **Ville feilet hvis** kortet manglet, sto under rutene, eller et tall var et annet enn grensene (`TestFargetrinnene::test_slik_leser_du_boersometeret`).
+- **F, kortene (spørsmål 15):** side om side og like høye fra 1056 px, og under hverandre smalere, over periodeknappene som i skissene. Skissen har «Slik leser du» ved siden av overskriften; her står begge kortene under innledningen, fordi kravet er at de er like høye. **Ville feilet hvis** kortene sto under hverandre ved 1056 px eller hadde ulik høyde (`TestINettleseren::test_kortene_side_om_side_og_like_hoeye`, målt i Edge).
+- **F, bransjene (U97, spørsmål 14 d):** symbolet og navnet, og under dem antallet og snittet, for eksempel «4 aksjer · snitt -2,48 %», eller «1 aksje». Linja skjules aldri: `OVERSKRIFT` er 40 px, og hvert felt er minst så bredt som linja (`tilleggsbredde`, `TILLEGG_EM` 0,55). Det endrer svaret 26.10 kl. 13:00 (b). **Ville feilet hvis** linja manglet, var en annen tekst enn `Bransje.tillegg`, eller et felt var smalere enn den (`test_overskriften_er_navnet_og_under_antallet_og_snittet`, `test_linja_med_antallet_skjules_aldri`, `test_linja_i_overskriften_er_bransje_tillegg`, og linja målt i Edge ved 320, 390 og 1280 px).
+- **F, rutene (U94):** «2 av 3» og «3 av 3» er 14 px i alle rutene og står inne i ruta. **Ville feilet hvis** en pille hadde en annen størrelse eller sto utenfor ruta ved 320, 390 eller 1280 px (`TestINettleseren::test_pillene_like_store_og_inne_i_ruta`).
+- **F, tabellen (U93, spørsmål 14 c):** som på forsiden: kolonneraden i blekk, et bånd per bransje i sin egen `tbody` med symbolet, antallet og snittet, oransje strek ved 3 av 3 siste børsdag og styrken i ring. **Ville feilet hvis** bransjen var en egen kolonne, båndet eller streken manglet, eller ringen sto ved 3 av 3 en annen dag (`TestTabellen`).
+- **F, størrelsen og gult (svaret 06.11 kl. 22:57):** for én dag følger arealet volumet, og for en periode er rutene like store, som før (8.17b). Rammen ved 3 av 3 er `--gul-symbol` og ringen `--oransje`. **Ville feilet hvis** rutene var like store en dag eller fulgte volumet i en periode, eller begge hadde samme nyanse (`TestStoerrelsenOgGult`).
+- **E (U95 for børsometeret, U102):** vinduet «Børsometer» har `boersometeret` og `boersometeret_ruta`, og «Periodene» `perioden_boersometeret`, høyst 60 ord hver. Resten av teksten om børsometeret står i `docs/hjelp.md`, «Hva viser børsometeret?». Fotnoten om en annen grunn står, og vinduet sier det ikke lenger. **Ville feilet hvis** et vindu hadde mer enn 60 ord ved en dag, en periode eller en valgt dag, eller vinduet gjentok fotnoten (`TestHjelpevinduene`).
+- **H (U88 for børsometeret):** det skissene viser: kortene, bransjeoverskriftene og tabellen. Ingen ny farge.
+- **J:** «Hva fargene betyr» er borte fra hjelpen, README-en, hjelpetekstene og malene. **Ville feilet hvis** det gamle navnet sto igjen (`test_hva_fargene_betyr_staar_ikke_igjen`).
+- **BH9 fra 8.20a:** lappen med datoen står over tegneflaten i kursgrafen. `MARG_Y` er 26 (var 12), og lappen står 4 px over tegneflaten. **Ville feilet hvis** lappen sto inne i tegneflaten eller kurslinja over `MARG_Y` (`test_lappen_med_datoen_staar_over_tegneflaten`).
+- **K:** bildene er tatt med DevTools-protokollen i Edge uten vindu, som i 8.20a. `boersometeret-demo.png` er 1682 px (var 1329), `boersometeret-390-demo.png` 3327 px (var 1687) og `aksjesiden-brfe-demo.png` er ny med samme høyde (2300 px). De fire andre er byte for byte de samme. Ved 1280, 1056, 390 og 320 px ruller ikke børsometeret vannrett. README-en har ny bildetekst. Avtrykkene i `tests/test_docker.py` er satt på nytt med en kommentar.
+- **Følger av U97 i demoen:** feltene er lavere med to linjer i overskriften. VRDS viser «ikke vurdert» i den smale flaten, ikke lenger ved 1280 px, og fotnoten for en annen grunn følger det (`vis-smal`). LKSV 18.09 er ikke lenger stor, så testen for merket i stedet for navnet bruker BRFE 06.10 og har beholdt navnet sitt, fordi `docs/kvalitetssikring.md` viser til det.
+
+**Testene og mutantene.** Hele settet ble kjørt alene før hver commit med kode eller tester, med ledig minne 4,0–4,3 GB av 15,7 GB. Første kjøring (18:37:51–18:46:12) ga 1 feilet, `test_lksv_18_09_viser_merket_i_stedet_for_navnet`, fordi LKSV 18.09 var mindre (se over). Etter rettingen: 4464 bestått før `d95dcc43` (18:55:26–19:04:08) og `54a7cc50` (19:06:58–19:15:15), og 4470 før `2aba7d25` (19:24:20–19:32:39), med 24 hoppet over og 0 feilet hver gang. Én mutant per del på `d95dcc43`, med kopi før og sha256 mot HEAD etter: U98, spørsmål 14 b, U99, U97, U94, U93, størrelsen, spørsmål 15, E, J, U102 og BH9. Alle ble fanget, BH9 først etter `54a7cc50`, fordi testen åpnet aksjesiden med 6 mnd, der streken ikke står. Seks mutanter for rettingene på `2aba7d25` (BH1, BH11, ECH4, BH15, VG3 og VG4) ble fanget. Hver fil var lik HEAD etterpå.
+
+### Gjennomgangen av 8.20b
+
+*Lagt til 2026-11-07:* gjennomgangen gikk på diffen `main...54a7cc50` uten bildene, etter at hele settet var kjørt. Blind Hunter ga 20 funn (BH1–BH20), Edge Case Hunter 8 (ECH1–ECH8) og Verification Gap 6 (VG1–VG6). Hvert funn er sjekket i koden. Ingen er satt til høy.
+
+| Funn | Grad | Utfall |
+|---|---|---|
+| BH1, ECH2: en aksje med kortere serie i en periode ble sammenlignet med indeksen over hele perioden | middels | rettet: telles ikke i M (`test_en_kortere_serie_telles_ikke_mot_indeksen`) |
+| BH11, ECH5: alle bransjene i én `tbody`, så `scope="rowgroup"` gjaldt hele tabellen | middels | rettet: én `tbody` per bransje, som delene på forsiden |
+| ECH4: båndet i tabellen hadde ingen bakgrunn, og antallet var hvitt på lys bunn | middels | rettet: klassen `oevrige` fra forsiden |
+| BH15: «Gul ramme: 3 av 3.» sa ikke siste børsdag | middels | rettet: «på siste børsdag, også en annen dag» |
+| BH5, VG3: malen bygde linja selv, og ingen test sammenlignet den med `Bransje.tillegg` | middels | rettet med testen `test_linja_i_overskriften_er_bransje_tillegg`; malen står, fordi snittet skal ha fargen |
+| BH6: nettlesertesten sjekket ikke om linja ble kuttet sidelengs | middels | rettet: linja må stå innenfor h2 |
+| VG4: ringen for 3 av 3 i tabellen en annen dag var ikke prøvd | middels | rettet: `test_ingen_ring_ved_3_av_3_en_annen_dag` |
+| BH3, ECH6, VG6: grensene under skalaen sto ikke ved overgangene | middels | rettet: ved 20, 40, 60 og 80 % |
+| BH8, ECH8: det verste kartet var ikke prøvd | middels | rettet med `test_det_verste_kartet_faar_plass` (10 aksjer i én bransje, MINSTE_VEKT mot STOERSTE_VEKT). Får kartet likevel ikke plass, står tabellen alene, som før (NFR-03) |
+| BH9: børsometeret ved 390 px er 3327 px høyt, mot 1687, fordi linja med antallet aldri skjules | middels | **åpent, spørsmål 1 til gruppen** (regel 25) |
+| BH12: regelen for cellene i tabellen ble slettet | middels | avvist: `:where(.side-oversikt) th, td` i `stil.css` gir venstrestilling, luft og strek, som på forsiden |
+| BH2, ECH1: «0 av 0» uten aksjer med endring | lav | rettet |
+| BH16: vinduet for periodene sa ikke at perioden slutter siste børsdag | lav | rettet, innenfor 60 ord |
+| BH14: navnet og symbolet sto inntil hverandre for skjermleseren | lav | rettet: skjult komma, og mellomrom etter titlene i kortet |
+| BH18: en påstand i testen var alltid sann | lav | rettet |
+| BH20: hjelpen sa ikke at ringen og endringen fra børsdagen før gjelder en dag | lav | rettet i `docs/hjelp.md` |
+| VG1: nettlesertestene ble hoppet over i CI uten nettleser | lav | rettet: vernet fra `test_hjelpefeltet.py` |
+| VG2: linja ble ikke målt ved 320 px | lav | rettet |
+| VG5: vinduet for volumet i kortet var ikke prøvd | lav | rettet |
+| BH4: grensene i skalaen var ikke formatert som i `trinnforklaringer` | lav | avvist: `trinnforklaringer` formaterer den sterke grensen på samme måte, uten `_noeyaktig` |
+| BH7, ECH7: `TILLEGG_EM` er et anslag, og en annen skrift kan gi en bredere linje | lav | avvist: skriftene ligger i appen, og linja er målt i Edge ved 320, 390 og 1280 px |
+| BH10: testene for VRDS og LKSV følger utlegningen i demoen | lav | avvist: kravet er prøvd med konstruerte ruter i testene for nivåene, og demoen viser det; endringen står over |
+| BH13: båndet har antallet uten «aksjer», og snittet også ved én aksje | lav | avvist: som båndene på forsiden |
+| BH17: `MARG_Y` er større også uten lapp | lav | avvist: samme tegneflate med og uten dag, så grafen ikke hopper mellom knappene |
+| BH19: kildene `def ramme(` og `class="periodevalg"` | lav | ikke en feil: begge finnes, og `TestKildene` slår dem opp |
+| ECH3: M i børsometeret er ikke M i oversikten | lav | ikke en feil: børsometeret teller aksjene med en endring for dagen eller perioden, og sier det i `docs/hjelp.md` |
+
+Rettingene er i `2aba7d25`. CI var grønn på `54a7cc50` (run 42400409007).
+
+## Spørsmål til gruppen før flettingen av 8.20b
+
+1. **BH9: børsometeret ved 390 px er 3327 px høyt (var 1687).** Linja med antallet og snittet skjules aldri (spørsmål 14 d), så hvert felt må være bredt nok til den, og på smal skjerm står bransjene mest under hverandre. *Forslag:* slik det er, fordi svaret var at linja aldri skjules. Alternativet er at snittet står på smal skjerm og antallet bare i tabellen.
+
+## Det som står igjen i 8.20 etter 8.20b
+
+*Lagt til 2026-11-07:* boblen til investorsiden nederst på aksjesiden (del D og U84) bygges i 3.4h i natt, etter svaret kl. 17:36. Ellers står ingenting i 8.20 igjen.
