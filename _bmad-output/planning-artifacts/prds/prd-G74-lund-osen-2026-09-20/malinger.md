@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-07T11:38
+updated: 2026-11-07T12:10
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -6134,3 +6134,25 @@ står i `src/demo_ki_tekster.json`.
 Det er én kjøring, for én dag, med samme retning på hovedindeksen for alle 15.
 Tellingen for 10.4 gjøres med klassene over etter de første fem kveldene med
 versjon 5 i driften (spørsmål 9), i en ny del av `spec-10-4-loggdelen.md`.
+
+**Kjørt på nytt etter gjennomgangen av 10.9.** Gjennomgangen fant at
+kontrollen tok ut mønsterformene overalt i teksten, så usanne utsagn om
+retningen, dagene og måneden besto (ECH1–ECH3), og at to linjer i prompten sa
+«under teksten» om det som nå står over (BH7). Formene leses nå bare i
+setningen om mønstrene, og resten av den setningen kan bare være bindeord.
+Tellingene er ikke lovlige tall andre steder. Versjonen står som 5, fordi
+versjon 5 ikke er flettet og ingen tekst i `ose.db` har versjon 5. Prompten
+hadde avtrykket `822dcd49…8dea` (commit `c7159bb9`). Kjørt på samme måte som
+over, kl. 11:52:53–11:53:15, etter at Ollama ble startet kl. 11:52:03 og
+demotekstene var laget: 15 besto, 0 ble stoppet, modellen feilet for 0, og alle
+15 ville blitt vist. Median 1,48 s per tekst og lengste kall 1,64 s (kall nr.
+14). Alle 15 radene har `promptversjon` 5, `maskinvare` `gpu`, `gemma4:e4b`
+med `modell_id` `dc35e8d9c606` og Ollama 0.35.1, og alle fikk alle tre
+mønstrene. Tekstene er de samme som over, utenom ett ord om vinduet: 10 skriver
+«siste» foran tallet 20 med «vurderte», og 5 uten. 2 tar ikke med vinduet på 5
+børsdager. Klassene: 15 «forklarer sjekkene», 15 «forklarer mønstrene» og 0
+usikre. Hver tekst er lest mot grunnlaget på nytt, og alle tallene står ved
+riktig felt. sha256 for `ose.db` var den samme før og etter (`cf1aace4…7228`).
+Demotekstene ble laget på nytt kl. 11:52 med det samme avtrykket: 13 av 13
+besto, men 6 av 13 deler mønstrene i to setninger (VG4, et spørsmål til
+gruppen i spesifikasjonen 10.9).

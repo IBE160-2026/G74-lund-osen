@@ -168,3 +168,37 @@ I demoen er alle mønster 3 «minst», fordi måneden før 09.10 begynner før v
 **Bildet** av aksjesiden i `docs/appen/` er tatt på nytt, 1280 × 2345, til bunnen av rammen. De seks andre bildene ble tatt på nytt og er byte for byte de samme. Bildene ble tatt med DevTools-protokollen i Edge uten vindu (`Page.captureScreenshot`), som ga de seks byte for byte like.
 
 **Prøvekjøringen** står i §56 i `malinger.md`: 15 av 15 besto, alle med alle tre mønstrene.
+
+## Gjennomgangen 07.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Tre gjennomganger av `ba685331` og `f3729e38`, kjørt i parallell etter hele settet: Blind Hunter med bare diffen, Edge Case Hunter og Verification Gap med repoet. Edge Case Hunter og Verification Gap kjørte snutter og enkeltfiler, ikke hele settet. Rettingene er i `c7159bb9`. Hvert eksempel fra gjennomgangene er prøvd på nytt med `kontroller` etter rettingen, og tekstene fra prøvekjøringen (15) og demoen (13) består fortsatt.
+
+**Høy**
+- *ECH1, ECH2, ECH3 og BH3, rettet.* Mønsterformene ble tatt ut overalt i teksten, før retnings-, dag- og månedskontrollen leste den. Da besto «Signalet er positivt i to av tre sjekker.» med retningen Negativ, og «… de siste 20 børsdagene» og «… den siste måneden» besto, selv om de ble stoppet før 10.9. Nå leses formene bare i setningen om mønstrene, som kjennes igjen på en hel form (`_ANKRENE`). Andre setninger leses som før.
+- *BH2 og ECH5, rettet.* Tellingene lå i `ANTALLENE`, som del F sa, og var dermed lovlige tall hvor som helst. «Kursen ligger 14 over snittet.» besto. Nå er tellingene ikke i `ANTALLENE`, og de leses bare i formene, ved feltet sitt. Det er et avvik fra del F (spørsmål 2 under).
+- *BH1 og ECH8, rettet.* «Kursen steg ikke mer …» ble lest som at kursen steg mer. Nå leses «ikke».
+- *VG1, rettet.* Ingen test viste at ordene om målingen stoppes når de strider mot fortegnet. Det gjør `TestMaalingen` nå.
+
+**Middels**
+- *ECH4, ECH6, ECH12 og VG3, rettet.* I setningen om mønstrene besto byttede tall foran ordet, sammenligninger som «oftest positivt» og «færre enn», og «Det stemmer ikke at …». Nå kan resten av den setningen bare være bindeordene «av», «de», «siste», «var», «signalet» og «og». Alt annet stoppes (`_BINDEORD`).
+- *ECH7, rettet.* Formen for skiftene ble godtatt uten «den siste måneden». Nå kreves den.
+- *BH4 og VG3, rettet.* Ordlista for mønstre modellen finner selv har fått «mønstre», «pleide», «gjentok seg», «oftest», «ofte», «hyppig», «stort sett», «for det meste» og «vanligvis positivt».
+- *BH5 og BH6, rettet.* «Kursen ligger ikke nær snittet» og «Dagens endring var ikke liten» ble lest med feil fortegn.
+- *BH7, rettet.* To linjer i prompten sa «under teksten», men appens setninger står nå over. Versjonen står som 5, fordi versjon 5 ikke er flettet og ingen tekst i `ose.db` har versjon 5, som i 10.2i. Avtrykket er `822dcd49…8dea`.
+- *VG2, VG5 og VG8, rettet.* Det mangler ikke lenger tester for tallet i mønster 3, for at en endring i styrken ikke er et skift (spørsmål 1), eller for en uendret eller manglende hovedindeks i mønster 2.
+- *VG4, åpent.* Hjelpen og del E sier «én setning om mønstrene». Kontrollen sjekker ikke antallet setninger. 6 av 13 demotekster deler mønstrene i to setninger, mens ingen av de 15 i prøvekjøringen gjør det. Spørsmål 1 under. Står åpent til gruppen har svart (regel 25).
+- *VG6, avvist.* Funnet var at `_grunnlagene` bare var testet med mønster 2. Men `test_grunnlaget_stemmer_med_demodagen` sammenligner demoradene, som lages gjennom `_grunnlagene` i `lag_tekstene`, med `lag_moenstrene` for alle tre mønstrene. Mutant G viser at testen leser fila.
+
+**Lav**
+- *Rettet:* ECH9 («over eller under» sier ingenting om fortegnet), ECH10 («minst» foran verbet), ECH11 (markdown med `__`), BH10 og VG7 (formen uten mønsteret i grunnlaget), BH11 (høyst 22 skift, og feilmeldingen) og BH12 (docstringen i `test_versjon_4`). VG11 er rettet delvis: med KI av sjekkes også `p.samme-dag`. At bryteren står til høyre, avgjøres av CSS-en og er ikke testet; det godtas som lavt.
+- *Avvist:* BH8, fordi lørdag 31.10 i testene kommer fra testdataene, og vurderinger skrives bare for børsdager. BH9, fordi Verification Gap telte vinduet med testens egen splitt og fikk tittelen og teksten, 60 ord.
+- *Ført:* BH13. Porttestene for `start.ps1` feilet 3, 5 og 6 ganger i de tre kjøringene av settet. De er ustabile, men de er de eneste som feilet. VG9: testen for 60 ord gjelder vinduet ved rammen, etter instruksjonen kl. 10:38, og de andre vinduene rettes i 8.20a. VG10: tellingen for 10.4 med klassene i spørsmål 9 gjøres etter de første fem kveldene med versjon 5, og står som åpent punkt i `issues.md`.
+
+**Etter rettingen:** hele settet ble kjørt alene kl. 11:55:32–12:06:37: 4330 bestått, 24 hoppet over, og bare 6 porttester for `start.ps1` feilet. Demotekstene og prøvekjøringen ble laget på nytt med avtrykket over (§56). Bildene ble tatt på nytt og er byte for byte de samme, og bare avtrykkene i `tests/test_docker.py` er endret. Mutantene ble kjørt på nytt på `c7159bb9`, med F oppdatert til den nye koden og F2 for bindeordene, «setningen om mønstrene sier mer enn formene»: alle ni ble fanget, med A 7, B 1, C 23, D 1, E 3, F 2, F2 4, G 1 og H 6 tester, og hver fil var lik HEAD etterpå.
+
+## Spørsmål til gruppen før flettingen
+
+1. **VG4: én setning om mønstrene.** Skal kontrollen stoppe en tekst som deler mønstrene i to setninger? *Forslag:* nei. Kontrollen sjekker hver setning med en form for seg, så to setninger sier ikke mer enn én. Prompten ber fortsatt om én, og «én setning» i hjelpen endres til «en setning eller to». Med ja blir 6 av 13 demotekster stoppet slik de er nå.
+2. **BH2 og ECH5: tellingene i `ANTALLENE`.** Del F sa at antallene legges til `ANTALLENE`. Det gjorde tellingene til lovlige tall hvor som helst i teksten. *Forslag:* godta avviket. Tellingene leses bare i formene, ved feltet sitt.
+3. **Formene for sjekkene.** Prompten gir én fast form per sjekk og fortegn, fordi én form med «så» ga 4 av 13 stoppede tekster og to feil om handelen (§56). Tekstene blir derfor nesten like for aksjer med de samme fortegnene, og det nye ligger i mønstrene. *Forslag:* behold formene til tellingen for 10.4 etter fem kvelder, og ta det opp igjen da.
+4. **Spørsmål 16 i 8.20: de fete navnene på sjekkene i KI-teksten.** Spørsmålet sier at de hører til 10.9, men spesifikasjonen for 10.9 har dem ikke. *Forslag:* bygg dem i 8.20a, med resten av utseendet på aksjesiden.
