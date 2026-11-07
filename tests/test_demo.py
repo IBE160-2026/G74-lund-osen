@@ -341,6 +341,8 @@ class TestSidene:
         assert not demo_sti().exists()
         assert "Eksempeltall" not in html
         assert klient.get("/aksje/BRFE").status_code == 404
+        # Story 3.4h (gjennomgangen, VG2): siden for selskapet også.
+        assert klient.get("/investorside/BRFE").status_code == 404
 
     def test_bryteren_med_demobase_viser_eksempeltall(self, klient, monkeypatch, demobase):
         monkeypatch.setenv(app_modul.I_DEMO, "1")
@@ -445,7 +447,8 @@ class TestSidene:
         sti = demo_sti()
         sti.parent.mkdir(parents=True, exist_ok=True)
         sti.write_bytes(b"ikke en sqlite-base" * 10)
-        for rute in ("/", "/aksje/BRFE"):
+        # Story 3.4h (gjennomgangen, VG2): siden for selskapet i demoen også.
+        for rute in ("/", "/aksje/BRFE", "/investorside/BRFE"):
             svar = klient.get(rute)
             html = svar.data.decode("utf-8")
             assert svar.status_code == 503, rute
@@ -463,7 +466,8 @@ class TestSidene:
         sti = demo_sti()
         sti.parent.mkdir(parents=True, exist_ok=True)
         sti.write_bytes(b"ikke en sqlite-base" * 10)
-        for rute in ("/", "/aksje/BRFE"):
+        # Story 3.4h (gjennomgangen, VG2): siden for selskapet i demoen også.
+        for rute in ("/", "/aksje/BRFE", "/investorside/BRFE"):
             svar = klient.get(rute)
             html = svar.data.decode("utf-8")
             assert svar.status_code == 503, rute

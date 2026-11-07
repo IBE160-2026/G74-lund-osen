@@ -12,6 +12,7 @@ import os
 import re
 import struct
 import zlib
+from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -19,10 +20,12 @@ import pytest
 
 import demo
 import investorsider
+import lagring_sqlite
 from investorsider import BREDDE, HOYDE, SKRIFTER, Skrift
 from kursdata import AKSJEUNIVERS, INVESTORSIDER
+from lagring_sqlite import SqliteKurslager, aapne_base
 from test_hjelpefeltet import NETTLESER, _kjoer
-from test_investorsiden import demoklient, demomal, ekte_base, fast_klokke, klient  # noqa: F401
+from test_investorsiden import RADENE, demoklient, demomal, ekte_base, fast_klokke, klient  # noqa: F401
 
 ROT = Path(__file__).resolve().parent.parent
 GODKJENT = ROT / "docs" / "bilder" / "investorsider"
@@ -332,14 +335,34 @@ def _sjekksum(data: bytes) -> int:
     return sum(struct.unpack(f">{len(data) // 4}I", data)) & 0xFFFFFFFF
 
 
+# Gjennomgangen av 3.4h (BH3): sjekksummen i WOFF-fila skrives på nytt av et
+# verktøy som kutter eller endrer skriften, så den alene viser ikke at fila er
+# den samme. Filene ble kontrollert 07.11 tabell for tabell mot TTF-filene i
+# kildearkivene (spesifikasjonen, «Skriftene»), og sha256 for de kontrollerte
+# filene står her.
+KONTROLLERTE_SKRIFTFILER = {
+    "inter-display/InterDisplay-Black.woff": "938eff658d35bc8502d078897dfe5a642b36432d7c01c5b112b92164434960dd",
+    "inter-display/InterDisplay-Bold.woff": "5748ee2c61b02afb06931ad098343b91b2be4fc92026de3f9fa5679f22451f5d",
+    "inter-display/InterDisplay-ExtraBoldItalic.woff": "9e0072ec1d466914071aeb9421d32949b4cc8a58a7c2d615826d17fd08ad6ebd",
+    "inter-display/InterDisplay-ExtraLight.woff": "7f48b9e2f9cea703dbf17d88e8722ff9aa4f62a5f919b8500a3f2c91db64b6af",
+    "lora/Lora-Bold.woff": "474d215e3e9cc5ff5d278594dbdf31f01d34cff0be81d2af8232bfd078f4f08b",
+    "lora/Lora-Medium.woff": "53aa828e82c94ad3773f6c4698a032c54dc3d328cc272c0ec34ccda6fbd129ae",
+    "lora/Lora-Regular.woff": "41187a1a52141e0c94a588835bfb5fc215ee45a8a144448683caca8b44554b2f",
+    "lora/Lora-SemiBoldItalic.woff": "54efd3e95ec2c9c779728a7f8cb879b78cf086b252dd139f52c4649b3ef26475",
+    "liberation-mono/LiberationMono-Bold.woff": "a73f276d05da760764fede1f47388382f69daf558c0e96462838653c703e0ca5",
+    "liberation-mono/LiberationMono-Regular.woff": "6690a1fef4524bdd1ee0f3388af7342969275f993f830e867a6717eecfee3de7",
+}
+
+
 @pytest.mark.parametrize("fil", sorted(NYE_SKRIFTFILER))
 def test_skriften_er_bare_komprimert(fil):
     """Del D og OFL-FAQ 2.2.1: en WOFF-fil regnes ikke som en endret
     versjon når fontdataene er uendret utenom komprimeringen og
     WOFF-metadata er utelatt. Ville feilet hvis fila hadde metadata eller en
-    privat blokk, eller en tabell ikke lenger stemte med sjekksummen fra
-    skriften den ble pakket fra."""
+    privat blokk, en tabell ikke stemte med sjekksummen i fila, eller fila
+    ikke var den som ble kontrollert mot kilden 07.11 (BH3)."""
     data = (FONTS / fil).read_bytes()
+    assert hashlib.sha256(data).hexdigest() == KONTROLLERTE_SKRIFTFILER[fil], fil
     meta, metalengde, _, privat, privatlengde = struct.unpack(">IIIII", data[24:44])
     assert (meta, metalengde, privat, privatlengde) == (0, 0, 0, 0)
     for tag, sjekk, raa in _woff_tabeller(data):
@@ -437,6 +460,8 @@ def test_boblen_i_den_ekte_versjonen(klient, aksje):  # noqa: F811
     for sti in (f"/aksje/{aksje.symbol}", f"/aksje/{aksje.symbol}?dag=2026-10-15"):
         html = klient.get(sti).get_data(as_text=True)
         boble = _boblen(html)
+        # Gjennomgangen (ECH5): en melding, ikke AttributeError.
+        assert boble is not None, sti
         lenke = boble.lenker[0]
         assert lenke["href"] == INVESTORSIDER[aksje.symbol], sti
         assert lenke["target"] == "_blank" and lenke["rel"] == "noreferrer", lenke
@@ -457,6 +482,30 @@ def test_uten_adresse_ingen_boble(klient, monkeypatch):  # noqa: F811
     html = klient.get("/aksje/EQNR").get_data(as_text=True)
     assert _boblen(html) is None
     assert "investorsiden til" not in html.lower()
+
+
+def test_boblen_i_den_ekte_versjonen_uten_kurser(klient):  # noqa: F811
+    """Spørsmål 5, gjennomgangen (VG1, BH4). Ville feilet hvis en aksje i den
+    ekte versjonen med adresse, men uten en eneste kurs, ikke fikk boblen
+    nederst, eller boblen der åpnet i samme fane."""
+    tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+    try:
+        lager = SqliteKurslager(tilkobling)
+        for aksje in AKSJEUNIVERS:
+            if aksje.symbol != "DNB":
+                lager.erstatt_serie(aksje.symbol, RADENE, datetime(2026, 11, 1, tzinfo=timezone.utc))
+    finally:
+        tilkobling.close()
+    svar = klient.get("/aksje/DNB")
+    html = svar.get_data(as_text=True)
+    assert svar.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in html
+    boble = _boblen(html)
+    assert boble is not None
+    lenke = boble.lenker[0]
+    assert lenke["href"] == INVESTORSIDER["DNB"]
+    assert lenke["target"] == "_blank" and lenke["rel"] == "noreferrer", lenke
+    assert boble.attr["pil"]["aria-hidden"] == "true"
+    assert "newsweb" not in html.lower()
 
 
 BOBLEN_SMAL = r"""
@@ -483,8 +532,13 @@ def test_boblen_paa_aksjesiden_ved_smal_skjerm(klient, ekte_base, tmp_path, bred
 def test_hjelpen_sier_det_samme_som_sidene():
     """Del G og regel 19. Ville feilet hvis docs/hjelp.md fortsatt sa at
     lenken står under kursgrafen eller at demoselskapene ikke har en side,
-    eller ikke nevnte siden i demoen og den nye fanen."""
+    eller ikke nevnte siden i demoen og den nye fanen, eller steg 6 i
+    «Demoen» i README-en ikke sa at boblen går til en side i appen
+    (gjennomgangen, BH8)."""
     hjelp = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
     svar = hjelp.split("### Hvor finner jeg børsmeldingene?", 1)[1].split("\n### ", 1)[0]
     assert "Under kursgrafen" not in svar and "har ingen investorside" not in svar
     assert "«Investorsiden til ‹navn›»" in svar and "ny fane" in svar and "tegning laget av KI" in svar
+    readme = (ROT / "README.md").read_text(encoding="utf-8")
+    steg6 = next(linje for linje in readme.splitlines() if linje.startswith("6. **Åpne http://127.0.0.1:8000**"))
+    assert "boblen «Investorsiden til ‹navn›»" in steg6 and "en side i appen" in steg6 and "laget av KI" in steg6

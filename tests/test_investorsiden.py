@@ -35,10 +35,6 @@ from vurderingsdata import Vurdering
 ROT = Path(__file__).resolve().parent.parent
 EPICS = ROT / "_bmad-output" / "planning-artifacts" / "epics.md"
 EURONEXT = ("newsweb.oslobors.no", "oslobors.no", "live.euronext.com")
-# Demoselskapet uten kurser (U3 i docs/ux-logg.md). Siden svarer 200 med en
-# beskjed og uten graf, og dermed uten avsnittet om investorsiden (gruppens
-# svar 23.10 kl. 09:24, b; før 404).
-DEMO_UTEN_KURSER = {"MTFJ"}
 # 61 kursdager, saa det er nok til en vurdering, og en dag midt i serien.
 RADENE = [
     Kursrad(dato=date(2026, 9, 1) + timedelta(days=i), slutt=100.0 + i % 7, justert_slutt=100.0 + i % 7, volum=1000)

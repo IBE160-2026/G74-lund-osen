@@ -243,6 +243,8 @@ def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     monkeypatch.setenv(app_modul.I_DEMO, "1")
     sider["oversikten i demoen"] = klient.get("/").data.decode("utf-8")
     sider["aksjesiden i demoen"] = klient.get("/aksje/BRFE").data.decode("utf-8")
+    # Story 3.4h (gjennomgangen, BH2): siden for et selskap i demoen.
+    sider["investorsiden i demoen"] = klient.get("/investorside/BRFE").data.decode("utf-8")
     # Story 8.3 (gjennomgangen, BH4, VG1, VG4): Min liste, også med «Alle» og
     # sortert, så rammetestene og lenkene prøves på den nye siden.
     sider["min liste i demoen"] = klient.get("/min-liste").data.decode("utf-8")
@@ -984,8 +986,10 @@ class TestStilarket:
                 sider = {m.group(0) for d in deler if (m := AVGRENSET.match(d))}
                 assert len(sider) == 1 and all(AVGRENSET.match(d) for d in deler), velger
         for navn, html in sidene.items():
-            assert re.search(r'<body class="side-(oversikt|aksje|feil)">', html), navn
+            assert re.search(r'<body class="side-(oversikt|aksje|feil|demoselskap)">', html), navn
         assert '<body class="side-feil">' in sidene["feilsiden"]
+        # Story 3.4h (gjennomgangen, BH2): siden for et selskap i demoen.
+        assert '<body class="side-demoselskap">' in sidene["investorsiden i demoen"]
         assert '<body class="side-aksje">' in sidene["aksjesiden"]
         assert '<body class="side-oversikt">' in sidene["oversikten"]
 
