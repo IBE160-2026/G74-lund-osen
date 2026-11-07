@@ -1164,7 +1164,9 @@ HOEYDE_PAA_BILDET = 1864
 # Story 2.16 og 8.20c: boersdag.py, markedsoversikt.py, perioder.py, app.py,
 # index.html og hjelpetekster.py. Bildet ble tatt paa nytt med
 # DevTools-protokollen og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "72cdc9483c354d8fd55a359d4e0484e45ed7b87dcb22f25123f93b119408b709"
+# Gjennomgangen av 2.16: boersdag.py, markedsoversikt.py og tilstand.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "8d8cc12cf7dcf61d0c25e57ec4350b2bc3b86302673da8b750119d668a0016cb"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1506,7 +1508,9 @@ HOEYDE_PAA_AKSJESIDEN = 2345
 # Story 2.16 og 8.20c: boersdag.py, markedsoversikt.py, perioder.py, graf.py,
 # app.py, index.html og hjelpetekster.py. Bildet ble tatt paa nytt og er byte for
 # byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "3f51ad314eec65e19da3737fa5b1894f7e77178f10ab36f88a82b3daef8adb64"
+# Gjennomgangen av 2.16: boersdag.py, markedsoversikt.py og tilstand.py. Bildet ble
+# tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "ebe07f0986e834b12d6d3e95304f5de7ee46ad935e18897cca1ca90c4d1eda14"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1580,12 +1584,14 @@ DE_NYE_BILDENE = {
 # app.py, index.html og hjelpetekster.py. Alle bildene ble tatt paa nytt. Min
 # liste har «Sammenlign siste børsdag med» (U101) og samme hoeyde; de andre er
 # byte for byte de samme, ogsaa ved 390 px.
+# Gjennomgangen av 2.16: boersdag.py, markedsoversikt.py og tilstand.py. Alle bildene
+# ble tatt paa nytt og er byte for byte de samme, ogsaa ved 390 px.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "72cdc9483c354d8fd55a359d4e0484e45ed7b87dcb22f25123f93b119408b709",
-    "docs/appen/boersometeret-demo.png": "15ad69689bda5c918a1dc7deba239ac82bdfc8f46d2f19fe53847ea0260bd3d6",
-    "docs/appen/min-liste-demo.png": "be9ed07050288f9f23efde6d0d827e7f67b9130fe7c86ed5115bcae81f8ff92f",
-    "docs/appen/oversikten-390-demo.png": "72cdc9483c354d8fd55a359d4e0484e45ed7b87dcb22f25123f93b119408b709",
-    "docs/appen/boersometeret-390-demo.png": "15ad69689bda5c918a1dc7deba239ac82bdfc8f46d2f19fe53847ea0260bd3d6",
+    TOPPEN_AV_OVERSIKTEN: "8d8cc12cf7dcf61d0c25e57ec4350b2bc3b86302673da8b750119d668a0016cb",
+    "docs/appen/boersometeret-demo.png": "9d4d18de2e268c0aad585f2471e63afc592b01aa991548b1ab8302c369b35f91",
+    "docs/appen/min-liste-demo.png": "55823ee605df34ae9f0d1ad0bb315f9f952b89ffc00cae58f8e824c998f8fd84",
+    "docs/appen/oversikten-390-demo.png": "8d8cc12cf7dcf61d0c25e57ec4350b2bc3b86302673da8b750119d668a0016cb",
+    "docs/appen/boersometeret-390-demo.png": "9d4d18de2e268c0aad585f2471e63afc592b01aa991548b1ab8302c369b35f91",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

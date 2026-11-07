@@ -1,7 +1,7 @@
 """Story 8.16: regelen for startdagen i designregler.md §2 - FR-201, NFR-08.
 
 Faste datoer rundt helger, helligdager og nyttaar. Stengte dager i 2026 fra
-boersdag.STENGT: 01.01, 02.04, 03.04, 06.04, 01.05, 14.05, 25.05, 24.12,
+boersdag.stengte_dager(2026): 01.01, 02.04, 03.04, 06.04, 01.05, 14.05, 25.05, 24.12,
 25.12 og 31.12.
 """
 

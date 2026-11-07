@@ -63,7 +63,6 @@ def paaskedag(aar: int) -> date:
     return date(aar, maaned, dag + 1)
 
 
-@cache
 def stengte_dager(aar: int) -> frozenset[date]:
     """Hverdagene Oslo Boers er stengt i aar - story 2.16.
 
@@ -76,6 +75,14 @@ def stengte_dager(aar: int) -> frozenset[date]:
     """
     if not dekker(aar):
         raise UtenforKalenderen(f"{aar}: børskalenderen begynner i {FOERSTE_AAR}")
+    return _regn_ut(aar)
+
+
+@cache
+def _regn_ut(aar: int) -> frozenset[date]:
+    """Dagene etter reglene, uten grensen. Grensen sjekkes foer cachen, saa
+    et flyttet FOERSTE_AAR gjelder ogsaa et aar som er regnet ut foer
+    (gjennomgangen, BH7 og ECH3)."""
     paaske = paaskedag(aar)
     dager = {
         date(aar, 1, 1),

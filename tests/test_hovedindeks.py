@@ -61,7 +61,7 @@ class TestEndringen:
 
     def test_forrige_boersdag_utenfor_kalenderen_gir_ingen_endring(self):
         """2. januar 2026 er foerste boersdag i aaret, og 2025 ligger utenfor
-        DEKKEDE_AAR."""
+        FOERSTE_AAR."""
         assert forrige_boersdag(date(2026, 1, 2)) is None
         assert indeksendring([rad(date(2025, 12, 30), 1000.0), rad(date(2026, 1, 2), 1010.0)]) is None
 

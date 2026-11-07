@@ -181,7 +181,7 @@ class TestPorten:
         assert lager.sist_hentet("OSEBX") == senere
 
     def test_en_loerdag_og_en_helligdag_lagres_ikke(self, lager):
-        """Bare børsdager i DEKKEDE_AAR. Ville feilet hvis lørdagen eller
+        """Bare børsdager fra FOERSTE_AAR. Ville feilet hvis lørdagen eller
         juledagen ble lagret."""
         assert not er_boersdag(LOERDAG) and not er_boersdag(JULEDAG)
         lager.erstatt_serie("OSEBX", [rad(FREDAG), rad(LOERDAG), rad(JULEDAG)], HENTET)

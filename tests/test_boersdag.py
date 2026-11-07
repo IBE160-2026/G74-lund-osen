@@ -242,6 +242,14 @@ class TestStengteDager:
             assert all(dag.year == aar and dag.weekday() < 5 for dag in stengte_dager(aar)), aar
         assert date(2027, 5, 1) not in stengte_dager(2027)
 
+    def test_grensen_gjelder_ogsaa_et_aar_som_er_regnet_ut(self, monkeypatch):
+        """Gjennomgangen av 2.16 (BH7, ECH3). Ville feilet hvis cachen ga
+        lista for 2026 etter at FOERSTE_AAR er flyttet til 2027."""
+        stengte_dager(2026)
+        monkeypatch.setattr(boersdag, "FOERSTE_AAR", 2027)
+        with pytest.raises(UtenforKalenderen):
+            stengte_dager(2026)
+
     def test_aar_foer_kalenderen_reiser(self):
         with pytest.raises(UtenforKalenderen, match=f"begynner i {FOERSTE_AAR}"):
             stengte_dager(FOERSTE_AAR - 1)

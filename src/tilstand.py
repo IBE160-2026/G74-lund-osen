@@ -56,7 +56,7 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilst
     Typene kontrolleres foerst, saa feil innhold alltid gir TypeError.
     Deretter datoen: en dato etter idag reiser ogsaa naar raden finnes. Finnes
     raden, er utfallet raden, uten oppslag i kalenderen. Mangler den, avgjoer
-    er_boersdag, og en dag utenfor lista reiser UtenforKalenderen i stedet for
+    er_boersdag, og en dag foer FOERSTE_AAR reiser UtenforKalenderen i stedet for
     aa gjette.
 
     IKKE_KJOERT er ikke et endelig hull saa lenge dato er inneveerende

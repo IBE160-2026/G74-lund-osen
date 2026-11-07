@@ -286,6 +286,8 @@ class TestTilgjengelig:
         # Story 8.20c (U101, spørsmål 19 i 8.20). Ville feilet hvis det gamle
         # navnet sto igjen på siden eller i hjelpen.
         assert "Sammenlign med" not in _synlig(html)
+        assert 'aria-label="Hjelp: sammenlign siste børsdag med"' in html
+        assert 'sammenlign med"' not in html.lower()
         assert "«Sammenlign med»" not in (Path(__file__).resolve().parent.parent / "docs" / "hjelp.md").read_text(
             encoding="utf-8"
         )

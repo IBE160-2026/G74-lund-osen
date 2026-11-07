@@ -1756,7 +1756,9 @@ class TestVurderingenISammeKjoering:
         assert kall == []
         assert not base.exists()
         assert not raa.exists() or list(raa.iterdir()) == []
-        assert any("2025-12-15" in l and "begynner i 2026" in l and "0 kall" in l for l in linjer)
+        assert any(
+            "2025-12-15" in l and "begynner i 2026" in l and "Sjekk klokka" in l and "0 kall" in l for l in linjer
+        )
 
 
 # Story 2.3: boersdagskontrollen foer kvoten brukes. Rekkefoelgen foer foerste

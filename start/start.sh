@@ -5,7 +5,8 @@
 # som macOS har.
 #
 # Webserveren startes med waitress bare på 127.0.0.1:8000, aldri med debug,
-# og aldri med src/app.py som skript (den har debug=True). Nøkkelen vises
+# og aldri med src/app.py som skript, som var med debug=True til 8.20c
+# (U76) og bruker Flasks egen server. Nøkkelen vises
 # aldri og skrives bare til .env.
 #
 # OSE_START_SVAR_JA=1 svarer ja på spørsmålet om uv og venter ikke på Enter

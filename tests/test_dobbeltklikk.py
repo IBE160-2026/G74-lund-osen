@@ -136,7 +136,7 @@ def test_webserveren_har_8_traader_i_skriptene_readme_og_dockerfile():
 @pytest.mark.parametrize("navn", [*SKRIPTENE, *STARTFILENE])
 def test_aldri_debug_eller_down_v(navn):
     """Ville feilet hvis et skript slo paa debug, for eksempel med
-    FLASK_DEBUG eller src/app.py som skript, som har debug=True (M3), eller
+    FLASK_DEBUG eller src/app.py som skript, som hadde debug=True til 8.20c (M3), eller
     kjoerte docker compose down -v, som sletter basen."""
     sti = SKRIPTENE.get(navn, ROT / navn)
     kode = "\n".join(_kode(sti)).lower()
@@ -789,6 +789,46 @@ def test_start_ps1_finner_lytteren_naar_tilstanden_er_feil():
     )
     ut = _powershell(late + _funksjonen_i_start_ps1("Lyttere") + "\n(Lyttere | ForEach-Object { $_.Id }) -join ','")
     assert ut == "4242"
+
+
+# Gjennomgangen av 2.16 (VG10, BH9, BH2): Get-NetTCPConnection som en
+# PowerShell-funksjon. $Listen og $Uten er prosessene den gir med og uten
+# -State Listen, og $Fra er runden raden uten tilstand foerst kommer i.
+GNTC_LATE = (
+    "$script:runde = 0\n"
+    "function Get-NetTCPConnection { param($LocalPort, $State, $ErrorAction)\n"
+    "  if ($State) { foreach ($p in $Listen) { [pscustomobject]@{ OwningProcess = $p } }; return }\n"
+    "  $script:runde++\n"
+    "  if ($script:runde -lt $Fra) { return }\n"
+    "  foreach ($rad in $Uten) { [pscustomobject]@{ LocalPort = 8000; RemoteAddress = $rad[0]; RemotePort = $rad[1]; OwningProcess = $rad[2] } }\n"
+    "}\n"
+    "function Get-CimInstance { }\n"
+)
+
+
+def _lyttere_med(listen: str, uten: str, fra: int, netstat: str) -> str:
+    late = f"$Listen = @({listen})\n$Uten = @({uten})\n$Fra = {fra}\n" + GNTC_LATE
+    late += f"function Netstat-Lyttere {{ @({netstat}) }}\n"
+    return _powershell(late + _funksjonen_i_start_ps1("Lyttere") + "\n(Lyttere | ForEach-Object { $_.Id }) -join ','")
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="krever Windows PowerShell")
+@pytest.mark.parametrize(
+    ("listen", "uten", "fra", "netstat", "ventet"),
+    [
+        ("", ",@('0.0.0.0', 0, 4242)", 3, "", "4242"),
+        ("", "", 1, "4243", "4243"),
+        ("", "@('0.0.0.0', 0, 0), @('::', 0, 4244), @('127.0.0.1', 51000, 999)", 1, "", "4244"),
+        ("111", "@('0.0.0.0', 0, 111), @('0.0.0.0', 0, 222)", 1, "", "111,222"),
+    ],
+    ids=["tredje_runde", "bare_netstat", "prosess_0_og_ipv6", "to_lyttere"],
+)
+def test_start_ps1_lyttere_proever_alle_veiene(listen, uten, fra, netstat, ventet):
+    """Gjennomgangen av 2.16 (VG10, BH9, BH2). Ville feilet hvis Lyttere ga
+    opp etter foerste runde, ikke spurte netstat til slutt, tok med prosess 0
+    eller en tilkobling, ikke kjente igjen ::, eller ikke fant en lytter med
+    feil tilstand ved siden av en som er sett med -State Listen."""
+    assert _lyttere_med(listen, uten, fra, netstat) == ventet
 
 
 def _lsof():
