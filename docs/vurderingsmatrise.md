@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-07T00:26
+updated: 2026-11-07T13:00
 ---
 
 # Vurderingsmatrise for del 1
@@ -37,6 +37,8 @@ Tallene er talt 06.11 kl. 20:13 på `c2c77cb7`, slik de ble talt 05.11: 111 flet
 | **Ryddighet i repoet** (5 %) | Som 05.11 | Som 05.11 | oppfylt | Holdes ved like med regel 19 |
 
 *Presisert 2026-11-07 (instruksjonen kl. 00:20 i `docs/ai-prompts/2026-11-07.md`):* kjøringen lørdag 07.11 kl. 22:15 bruker main fra midnatt, med promptversjon 4, men lager ingen KI-tekster. Lørdag er børsdagen den skal hente 06.11 (`innevaerende_boersdag` i `src/boersdag.py`), og loggen for kveldsjobben 06.11 viser at sjekken ga FERDIG for 06.11 kl. 22:45, 23:15 og 23:45. Da gir `src/dagen_ferdig.py` kode 0 med FERDIG, og jobben starter verken Docker eller Ollama og setter `OSE_KI_TJENESTE` til `av` (`start/kveldshenting.ps1`). Det samme gjelder søndag 08.11. Tekstene for 06.11 ble laget med versjon 3, fordi jobben 06.11 sto på `894b55e5`, der `PROMPTVERSJON` er «3», før PR #113 (`374f1bdb`). De første tekstene med versjon 4 kommer dermed mandag 09.11, den neste børsdagen, når main fortsatt har versjon 4 ved midnatt og Docker og Ollama svarer.
+
+*Lagt til 2026-11-07 (instruksjonen kl. 12:47 i `docs/ai-prompts/2026-11-07.md`):* vi flettet PR #116 med promptversjon 5 i `03bd75c7` 07.11 kl. 12:55. README-en sier at jobben flytter arbeidskopien til commiten main hadde ved midnatt, så det som flettes en dag, går først neste kveld. Kjøringen lørdag 07.11 bruker derfor versjon 4, og kjøringen søndag 08.11 versjon 5. Begge gjelder børsdagen 06.11, slik helgekveldene 31.10 og 01.11 gjaldt fredagen 30.10 i loggene for kveldsjobben. Loggen 06.11 viser FERDIG for 06.11 fra kl. 22:45, og loggene 31.10 og 01.11 viser at jobben ikke lager tekstene på nytt når de finnes («15 rader sto fra før og er ikke laget på nytt»). Versjon 4 lager dermed ingen tekster i driften. De første tekstene med versjon 5 kommer mandag 09.11, når jobben går den kvelden; README-en sier at en kveld PC-en er av eller ingen er logget inn, hentes det ikke senere. Det retter linja over, som ventet versjon 4 mandag 09.11.
 
 ## Status 05.11.2026
 
