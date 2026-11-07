@@ -1,0 +1,15 @@
+{#- Story 3.4h (svaret 07.11 kl. 08:57 og spørsmål 3–5 i spesifikasjonen):
+    lenken til investorsiden er en boble nederst på aksjesiden i begge
+    versjonene, uten logo, og NewsWeb nevnes ikke (svarene 06.11 kl. 22:16
+    og 22:23). I demoen går den til siden for selskapet i appen, i samme fane
+    og uten pil (svaret 06.11 kl. 23:51). I den ekte versjonen åpnes
+    selskapets side i en ny fane (svaret 24.10 kl. 11:48), og pila er pynt
+    med en skjult tekst. Uten adresse står ingen boble. Siden henter
+    ingenting fra adressen (AD-2). -#}
+{% macro investorboble(symbol, navn, demo, adresse) -%}
+{% if demo %}
+  <p class="investorboble"><a href="/investorside/{{ symbol }}">Investorsiden til {{ navn }}</a></p>
+{% elif adresse %}
+  <p class="investorboble"><a href="{{ adresse }}" target="_blank" rel="noreferrer">Investorsiden til {{ navn }}<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a></p>
+{% endif %}
+{%- endmacro %}

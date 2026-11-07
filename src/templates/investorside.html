@@ -1,0 +1,47 @@
+{% extends "_ramme.html" %}
+{% from "_bransjer.html" import bransjesymbol -%}
+{#- Story 3.4h: siden for et oppdiktet selskap i demoen, etter oppsettet i
+    docs/bilder/investorsider/LESMEG.md og gruppens svar 24.10 kl. 11:58–13:43.
+    Lenken tilbake øverst, logoen med bransjesymbolet og symbolet i
+    selskapets skrift, navnet (alltid med stor forbokstav i HTML-en, svaret
+    kl. 13:03), tegningen på samme sted på alle sidene, boblen nær den som
+    snakker, «Illustrasjon laget av KI» rett under tegningen og teksten
+    nederst fra svaret 07.11 kl. 10:33. Ikke vannmerke, og ingen kurs, endring
+    eller tekst om kjøp og salg (NFR-06).
+
+    Boblen er vanlig tekst, og halen er pynt (spørsmål 6 og 7). Plassen står i
+    bobler.json, i prosent av tegningen. På smal skjerm står boblen under
+    tegningen, uten hale, etter KI-merket. -#}
+{% block tittel %}{{ side.navn }} — OSE Signal{% endblock %}
+{% block side %}side-demoselskap{% endblock %}
+
+{% block innhold %}
+  <a class="tilbake" href="/aksje/{{ side.symbol }}">Tilbake til {{ side.navn }}</a>
+
+  <header class="selskap">
+    <div class="selskapslogo {{ side.klasser }}" style="{{ side.stil }}" aria-hidden="true">
+      {{ bransjesymbol(side.bransje) }}
+      <span class="symbol">{{ side.symbol }}</span>
+    </div>
+    <div class="selskapsnavn">
+      <h1 class="{{ side.klasser }}" style="{{ side.stil }}">{{ side.navn }}</h1>
+      <p class="meta">{{ bransjesymbol(side.bransje) }}{{ side.bransje }} · Demo Børs</p>
+    </div>
+  </header>
+
+  <div class="tegningsfelt">
+    <figure class="tegningen">
+      <div class="flate">
+        <img src="{{ side.tegning }}" width="560" height="400" alt="{{ side.beskrivelse }}">
+        <p class="boble" style="{{ side.boblestil }}">{{ side.slagord }}</p>
+        <svg class="hale" viewBox="0 0 560 400" aria-hidden="true" focusable="false">
+          <polygon class="flate-hale" points="{{ side.flate }}"/>
+          <polyline class="strek-hale" points="{{ side.strek }}"/>
+        </svg>
+      </div>
+      <figcaption class="ki-merke">Illustrasjon laget av KI</figcaption>
+    </figure>
+  </div>
+
+  <p class="oppdiktet">Oppdiktet selskap i demoen. I den ekte versjonen åpner lenken på aksjesiden selskapets egen investorside i en ny fane.</p>
+{% endblock %}

@@ -61,6 +61,7 @@ from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
+from investorsider import demoside
 from ki_visning import (
     AV,
     INGEN_I_DEMOEN,
@@ -262,7 +263,9 @@ def _migrer_en_gang(sti: Path) -> None:
 
 # Rutene som leser basen. Andre forespoersler (404, statiske filer) roerer den
 # ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
-_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk", "boersometer"}
+# Story 3.4h: siden for et selskap i demoen leser merket i basen, så den
+# bare finnes i demoen.
+_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk", "boersometer", "demoselskap"}
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
@@ -1123,7 +1126,14 @@ def aksjedetalj(symbol: str):
         # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
         # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
         # henting.
-        return render_template("aksje_uten_kurser.html", aksje=post.aksje, hentet=None, aktiv="aksje")
+        # Story 3.4h (spørsmål 5): boblen nederst også her.
+        return render_template(
+            "aksje_uten_kurser.html",
+            aksje=post.aksje,
+            hentet=None,
+            aktiv="aksje",
+            investorside=investorside(post.aksje.symbol),
+        )
     # Gjennomgangen, BH10: dagen leses én gang, saa alt i svaret gjelder samme dag.
     i_dag = idag()
     valg = les_valg(request.args.get("periode"), request.args.get("dag"), rader[0].dato, i_dag, rader[-1].dato)
@@ -1226,6 +1236,23 @@ def aksjedetalj(symbol: str):
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
     svar.vary.add("Cookie")
     return svar
+
+
+@app.route("/investorside/<symbol>")
+def demoselskap(symbol: str):
+    """Story 3.4h: siden for et av de 15 oppdiktede selskapene, med logoen,
+    tegningen laget av KI og boblen. Bare i demoen (spørsmål 1): i den ekte
+    versjonen går boblen på aksjesiden til selskapets egen side, og ruta
+    svarer 404. Et symbol utenfor de 15 gir 404."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler") or not g.get("eksempeltall"):
+        abort(404)
+    side = demoside(normaliser_symbol(symbol))
+    if side is None:
+        abort(404)
+    # Spørsmål 9: stripa som på aksjesiden, uten en fylt knapp.
+    return render_template("investorside.html", side=side, aktiv="aksje")
 
 
 def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:

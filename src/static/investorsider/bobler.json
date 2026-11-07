@@ -1,0 +1,650 @@
+{
+ "om": "Snakkeboblen og halen på investorsidene i demoen. Piksler fra tegningens øvre venstre hjørne; tegningen er 560 x 400 px og feltet den står i er 896 px bredt. Boblen: IBM Plex Sans 600, 22 px, linjehøyde 1,25, innvendig avstand 14 px 18 px, kant 3,5 px. Halen tegnes over boblen: 'flate' er hvit uten kant, 'strek' er kanten (3,5 px, Blekk #16181D).",
+ "selskaper": {
+  "BRFE": {
+   "slagord": "Potensiell energi: vi har mye av den.",
+   "boble": {
+    "venstre": 448,
+    "topp": 28,
+    "bredde": 300,
+    "hoyde": 89
+   },
+   "tupp": [
+    458,
+    142
+   ],
+   "hale": {
+    "flate": [
+     [
+      472,
+      111
+     ],
+     [
+      458,
+      142
+     ],
+     [
+      500,
+      111
+     ]
+    ],
+    "strek": [
+     [
+      472,
+      115.3
+     ],
+     [
+      458,
+      142
+     ],
+     [
+      500,
+      115.3
+     ]
+    ]
+   }
+  },
+  "LKSV": {
+   "slagord": "Svømmer oppstrøms, som en god pull request.",
+   "boble": {
+    "venstre": 24,
+    "topp": 8,
+    "bredde": 300,
+    "hoyde": 89
+   },
+   "tupp": [
+    300,
+    128
+   ],
+   "hale": {
+    "flate": [
+     [
+      272,
+      91
+     ],
+     [
+      300,
+      128
+     ],
+     [
+      300,
+      91
+     ]
+    ],
+    "strek": [
+     [
+      272,
+      95.3
+     ],
+     [
+      300,
+      128
+     ],
+     [
+      300,
+      95.3
+     ]
+    ]
+   }
+  },
+  "HVDO": {
+   "slagord": "Dypere enn rekursjon uten stoppbetingelse.",
+   "boble": {
+    "venstre": 332,
+    "topp": 56,
+    "bredde": 300,
+    "hoyde": 89
+   },
+   "tupp": [
+    296,
+    104
+   ],
+   "hale": {
+    "flate": [
+     [
+      338,
+      78
+     ],
+     [
+      296,
+      104
+     ],
+     [
+      338,
+      106
+     ]
+    ],
+    "strek": [
+     [
+      333.8,
+      78
+     ],
+     [
+      296,
+      104
+     ],
+     [
+      333.8,
+      106
+     ]
+    ]
+   }
+  },
+  "NLYS": {
+   "slagord": "Grønt lys lenge før RGB.",
+   "boble": {
+    "venstre": 524,
+    "topp": 184,
+    "bredde": 280,
+    "hoyde": 89
+   },
+   "tupp": [
+    486,
+    230
+   ],
+   "hale": {
+    "flate": [
+     [
+      530,
+      206
+     ],
+     [
+      486,
+      230
+     ],
+     [
+      530,
+      234
+     ]
+    ],
+    "strek": [
+     [
+      525.8,
+      206
+     ],
+     [
+      486,
+      230
+     ],
+     [
+      525.8,
+      234
+     ]
+    ]
+   }
+  },
+  "SLVP": {
+   "slagord": "Hver dråpe teller. Vi teller fra 0.",
+   "boble": {
+    "venstre": 288,
+    "topp": 48,
+    "bredde": 300,
+    "hoyde": 89
+   },
+   "tupp": [
+    352,
+    170
+   ],
+   "hale": {
+    "flate": [
+     [
+      351.2,
+      131
+     ],
+     [
+      352,
+      170
+     ],
+     [
+      379.2,
+      131
+     ]
+    ],
+    "strek": [
+     [
+      351.2,
+      135.3
+     ],
+     [
+      352,
+      170
+     ],
+     [
+      379.2,
+      135.3
+     ]
+    ]
+   }
+  },
+  "FJSB": {
+   "slagord": "Renters rente, med utsikt.",
+   "boble": {
+    "venstre": 404,
+    "topp": 150,
+    "bredde": 320,
+    "hoyde": 62
+   },
+   "tupp": [
+    442,
+    266
+   ],
+   "hale": {
+    "flate": [
+     [
+      449.6,
+      206
+     ],
+     [
+      442,
+      266
+     ],
+     [
+      477.6,
+      206
+     ]
+    ],
+    "strek": [
+     [
+      449.6,
+      210.3
+     ],
+     [
+      442,
+      266
+     ],
+     [
+      477.6,
+      210.3
+     ]
+    ]
+   }
+  },
+  "TRHF": {
+   "slagord": "Vi har backup av backupen.",
+   "boble": {
+    "venstre": 180,
+    "topp": 4,
+    "bredde": 340,
+    "hoyde": 62
+   },
+   "tupp": [
+    202,
+    104
+   ],
+   "hale": {
+    "flate": [
+     [
+      204,
+      60
+     ],
+     [
+      202,
+      104
+     ],
+     [
+      232,
+      60
+     ]
+    ],
+    "strek": [
+     [
+      204,
+      64.3
+     ],
+     [
+      202,
+      104
+     ],
+     [
+      232,
+      64.3
+     ]
+    ]
+   }
+  },
+  "VRDS": {
+   "slagord": "Nylig notert: stabelen er ny, men den står.",
+   "boble": {
+    "venstre": 420,
+    "topp": 56,
+    "bredde": 300,
+    "hoyde": 89
+   },
+   "tupp": [
+    434,
+    170
+   ],
+   "hale": {
+    "flate": [
+     [
+      444,
+      139
+     ],
+     [
+      434,
+      170
+     ],
+     [
+      472,
+      139
+     ]
+    ],
+    "strek": [
+     [
+      444,
+      143.3
+     ],
+     [
+      434,
+      170
+     ],
+     [
+      472,
+      143.3
+     ]
+    ]
+   }
+  },
+  "KVST": {
+   "slagord": "Grunnleggende stabil. pH 7.",
+   "boble": {
+    "venstre": 396,
+    "topp": 100,
+    "bredde": 340,
+    "hoyde": 62
+   },
+   "tupp": [
+    418,
+    192
+   ],
+   "hale": {
+    "flate": [
+     [
+      420,
+      156
+     ],
+     [
+      418,
+      192
+     ],
+     [
+      448,
+      156
+     ]
+    ],
+    "strek": [
+     [
+      420,
+      160.3
+     ],
+     [
+      418,
+      192
+     ],
+     [
+      448,
+      160.3
+     ]
+    ]
+   }
+  },
+  "JGRD": {
+   "slagord": "Laster … 99 % grønt.",
+   "boble": {
+    "venstre": 128,
+    "topp": 68,
+    "bredde": 300,
+    "hoyde": 62
+   },
+   "tupp": [
+    406,
+    160
+   ],
+   "hale": {
+    "flate": [
+     [
+      376,
+      124
+     ],
+     [
+      406,
+      160
+     ],
+     [
+      404,
+      124
+     ]
+    ],
+    "strek": [
+     [
+      376,
+      128.3
+     ],
+     [
+      406,
+      160
+     ],
+     [
+      404,
+      128.3
+     ]
+    ]
+   }
+  },
+  "BLGT": {
+   "slagord": "Vi rir på sinusbølgen.",
+   "boble": {
+    "venstre": 316,
+    "topp": 36,
+    "bredde": 300,
+    "hoyde": 62
+   },
+   "tupp": [
+    338,
+    128
+   ],
+   "hale": {
+    "flate": [
+     [
+      340,
+      92
+     ],
+     [
+      338,
+      128
+     ],
+     [
+      368,
+      92
+     ]
+    ],
+    "strek": [
+     [
+      340,
+      96.3
+     ],
+     [
+      338,
+      128
+     ],
+     [
+      368,
+      96.3
+     ]
+    ]
+   }
+  },
+  "LSTF": {
+   "slagord": "Perfekt stablet, hver gang.",
+   "boble": {
+    "venstre": 512,
+    "topp": 24,
+    "bredde": 320,
+    "hoyde": 62
+   },
+   "tupp": [
+    522,
+    112
+   ],
+   "hale": {
+    "flate": [
+     [
+      536,
+      80
+     ],
+     [
+      522,
+      112
+     ],
+     [
+      564,
+      80
+     ]
+    ],
+    "strek": [
+     [
+      536,
+      84.3
+     ],
+     [
+      522,
+      112
+     ],
+     [
+      564,
+      84.3
+     ]
+    ]
+   }
+  },
+  "SGNT": {
+   "slagord": "Fem streker, null buffering.",
+   "boble": {
+    "venstre": 316,
+    "topp": 24,
+    "bredde": 320,
+    "hoyde": 62
+   },
+   "tupp": [
+    318,
+    118
+   ],
+   "hale": {
+    "flate": [
+     [
+      340,
+      80
+     ],
+     [
+      318,
+      118
+     ],
+     [
+      368,
+      80
+     ]
+    ],
+    "strek": [
+     [
+      340,
+      84.3
+     ],
+     [
+      318,
+      118
+     ],
+     [
+      368,
+      84.3
+     ]
+    ]
+   }
+  },
+  "TROY": {
+   "slagord": "Ikke en trojaner. Bare tare.",
+   "boble": {
+    "venstre": 84,
+    "topp": 68,
+    "bredde": 320,
+    "hoyde": 62
+   },
+   "tupp": [
+    392,
+    152
+   ],
+   "hale": {
+    "flate": [
+     [
+      352,
+      124
+     ],
+     [
+      392,
+      152
+     ],
+     [
+      380,
+      124
+     ]
+    ],
+    "strek": [
+     [
+      352,
+      128.3
+     ],
+     [
+      392,
+      152
+     ],
+     [
+      380,
+      128.3
+     ]
+    ]
+   }
+  },
+  "MTFJ": {
+   "slagord": "404: Varene ble ikke funnet.",
+   "boble": {
+    "venstre": 416,
+    "topp": 0,
+    "bredde": 340,
+    "hoyde": 62
+   },
+   "tupp": [
+    430,
+    88
+   ],
+   "hale": {
+    "flate": [
+     [
+      440,
+      56
+     ],
+     [
+      430,
+      88
+     ],
+     [
+      468,
+      56
+     ]
+    ],
+    "strek": [
+     [
+      440,
+      60.3
+     ],
+     [
+      430,
+      88
+     ],
+     [
+      468,
+      60.3
+     ]
+    ]
+   }
+  }
+ }
+}

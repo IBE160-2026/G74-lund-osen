@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="kvst-t kvst-d">
+  <title id="kvst-t">Kvitstein Mineral</title>
+  <desc id="kvst-d">En hvit stein med nerdebriller og et smil holder en pH-strimmel som viser 7. Bak står en pH-skala med pilen på 7.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 262 H412" fill="none"/>
+    <rect x="30" y="34" width="34" height="16" fill="#B42318"/>
+    <rect x="64" y="34" width="34" height="16" fill="#B86E12"/>
+    <rect x="98" y="34" width="34" height="16" fill="#F2B53A"/>
+    <rect x="132" y="34" width="34" height="16" fill="#7FD1A1"/>
+    <rect x="166" y="34" width="34" height="16" fill="#1F4E8C"/>
+    <rect x="200" y="34" width="34" height="16" fill="#6A46A0"/>
+    <path d="M149 60 l-7 10 h14 Z" fill="#16181D" stroke-width="2"/>
+    <path d="M150 258 C136 210 160 150 230 142 C302 134 358 168 362 220 C366 246 352 258 330 258 Z" fill="#FFFFFF"/>
+    <path d="M190 238 q20 8 40 2 M300 236 q14 6 28 0" fill="none" stroke="#CFCABD" stroke-width="2.5"/>
+    <rect x="206" y="180" width="34" height="24" rx="6" fill="#FFFFFF" stroke-width="4.5"/>
+    <rect x="252" y="180" width="34" height="24" rx="6" fill="#FFFFFF" stroke-width="4.5"/>
+    <path d="M240 191 h12" fill="none" stroke-width="4.5"/>
+    <rect x="242" y="186" width="8" height="10" fill="#FFFFFF" stroke-width="2"/>
+    <circle cx="223" cy="192" r="2.6" fill="#16181D" stroke="none"/>
+    <circle cx="269" cy="192" r="2.6" fill="#16181D" stroke="none"/>
+    <path d="M232 222 q14 10 28 0" fill="none" stroke-width="3"/>
+    <path d="M340 206 L374 182" fill="none"/>
+    <rect x="370" y="150" width="11" height="36" rx="2" fill="#FFFFFF" transform="rotate(14 375 168)"/>
+    <rect x="370" y="170" width="11" height="16" fill="#7FD1A1" stroke="none" transform="rotate(14 375 168)"/>
+    <path d="M70 262 l8 -18 l8 18 M84 262 l6 -12 l6 12 M346 262 l7 -16 l7 16" fill="#F0EBF8" stroke-width="2.5"/>
+  </g>
+  <text x="145" y="86" font-family="'DejaVu Sans Mono', Menlo, Consolas, monospace" font-size="14" fill="#16181D">7</text>
+</svg>

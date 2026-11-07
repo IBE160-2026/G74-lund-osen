@@ -315,11 +315,13 @@ def test_maanedspilene_er_knapper_med_kant(klient):
 
 
 def test_ki_teksten_staar_etter_grafen_foer_historikken(klient):
-    """U66. Ville feilet med KI-teksten før grafen, eller etter historikken."""
+    """U66. Ville feilet med KI-teksten før grafen, eller etter historikken.
+    Story 3.4h: boblen til investorsiden står nederst, etter historikken, og
+    ikke lenger mellom grafen og KI-teksten."""
     html = _html(klient, "/aksje/BRFE")
     assert html.index("Hvorfor signalet ble") < html.index('<svg class="graf"') < html.index('<section class="ki"')
     assert html.index('<section class="ki"') < html.index('<section class="historikk"')
-    assert html.index('class="fotnote investorside"') < html.index('<section class="ki"')
+    assert html.index('<section class="historikk"') < html.index('class="investorboble"')
 
 
 def test_bryteren_staar_i_rammen_som_en_bryter(klient):

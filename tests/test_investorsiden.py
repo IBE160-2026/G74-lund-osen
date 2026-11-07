@@ -1,5 +1,12 @@
 """Story 10.5: lenken til selskapets investorside i aksjedetaljen.
 
+Story 3.4h: lenken er en boble nederst på aksjesiden i begge versjonene, og
+NewsWeb nevnes ikke (svarene 06.11 kl. 22:16 og 22:23 og 07.11 kl. 08:57). I
+demoen går den til siden for selskapet i appen, og i den ekte versjonen
+åpnes selskapets side i en ny fane. Uten adresse står ingen boble. Testene
+under har navnene fra 10.5, fordi docs/kvalitetssikring.md og spesifikasjonen
+for 10.5 viser til dem, og docstringene sier hva de prøver nå.
+
 Adressene er de gruppen godkjente 19.10 kl. 16:03, med de tre norske sidene
 fra svaret kl. 19:49 (under story 10.5 i epics.md). Appen lenker aldri til
 Euronexts nettsteder (rettingen 06.10), og ingen kode henter fra adressene
@@ -90,7 +97,7 @@ def demoklient(klient, demomal, monkeypatch):
 
 class _Lenker(HTMLParser):
     """Hver adresse i href, src og action på siden, og lenkene og teksten i
-    avsnittet med klassen investorside."""
+    avsnittet med klassen investorboble (story 3.4h, før investorside)."""
 
     def __init__(self):
         super().__init__()
@@ -108,7 +115,7 @@ class _Lenker(HTMLParser):
             self.i_lenken = True
             self.lenker.append((a["href"], ""))
             self.attributter.append(a)
-        if tag == "p" and "investorside" in (a.get("class") or "").split():
+        if tag == "p" and "investorboble" in (a.get("class") or "").split():
             self.i_avsnittet = True
 
     def handle_endtag(self, tag):
@@ -135,11 +142,10 @@ def _tekst(sider: _Lenker) -> str:
     return " ".join("".join(sider.avsnittet).split())
 
 
-def _demotekst(navn: str) -> str:
-    return (
-        f"Børsmeldingene står på NewsWeb. {navn} er oppdiktet og har ingen investorside. "
-        "I den ekte versjonen står lenken til selskapets investorside her."
-    )
+def _ekte_tekst(navn: str) -> str:
+    """Story 3.4h: teksten i boblen i den ekte versjonen, med pila og den
+    skjulte teksten."""
+    return f"Investorsiden til {navn} ↗ (åpnes i en ny fane)"
 
 
 def _adressene_i_epics() -> dict[str, str]:
@@ -184,7 +190,8 @@ def test_lenken_paa_siden_gaar_til_aksjen_siden_viser(klient, aksje):
     """Ville feilet hvis lenken gikk til en annen aksje enn den siden viser,
     manglet navnet i lenketeksten, lenket til NewsWeb, manglet på siden med
     en vurdering eller med «Velg dag» (gjennomgangen, ECH2 og ECH3), eller
-    åpnet i en ny fane eller sendte adressen til appen videre (ECH7)."""
+    sendte adressen til appen videre (ECH7). Story 3.4h: boblen åpnes i en
+    ny fane (svaret 24.10 kl. 11:48), og NewsWeb står ikke i den."""
     for sti in (f"/aksje/{aksje.symbol}", f"/aksje/{aksje.symbol}?periode=velg&dag={VALGT_DAG.isoformat()}"):
         svar = klient.get(sti)
         assert svar.status_code == 200, sti
@@ -192,9 +199,11 @@ def test_lenken_paa_siden_gaar_til_aksjen_siden_viser(klient, aksje):
         # Siste dag har vurderingen, så siden har kortene og sjekkene.
         assert ("periode=velg" in sti) or 'class="sjekkort' in html, sti
         sider = _les(html)
-        assert sider.lenker == [(INVESTORSIDER[aksje.symbol], f"investorsiden til {aksje.navn}")], sti
-        assert sider.attributter[0].get("rel") == "noreferrer" and "target" not in sider.attributter[0], sti
-        assert _tekst(sider) == f"Børsmeldingene står på NewsWeb og ofte også på investorsiden til {aksje.navn}.", sti
+        assert [(href, " ".join(tekst.split())) for href, tekst in sider.lenker] == [
+            (INVESTORSIDER[aksje.symbol], _ekte_tekst(aksje.navn))
+        ], sti
+        assert sider.attributter[0].get("rel") == "noreferrer" and sider.attributter[0].get("target") == "_blank", sti
+        assert _tekst(sider) == _ekte_tekst(aksje.navn), sti
         for symbol, adresse in INVESTORSIDER.items():
             if symbol != aksje.symbol:
                 assert adresse not in html, (sti, symbol)
@@ -202,55 +211,60 @@ def test_lenken_paa_siden_gaar_til_aksjen_siden_viser(klient, aksje):
 
 @pytest.mark.usefixtures("ekte_base")
 def test_en_ekte_aksje_uten_adresse_faar_setningen_uten_lenke(klient, monkeypatch):
-    """Gjennomgangen, ECH5. Ville feilet hvis en aksje i den ekte versjonen
-    uten adresse fikk demoteksten om et oppdiktet selskap, en lenke, eller
-    ingen setning om børsmeldingene."""
+    """Gjennomgangen, ECH5. Story 3.4h (spørsmål 3): uten adresse står ingen
+    boble, fordi en boble som ikke kan klikkes, ser ut som en feil. Ville
+    feilet hvis en aksje i den ekte versjonen uten adresse fikk en boble,
+    en lenke, demoteksten eller setningen om NewsWeb fra før."""
     monkeypatch.delitem(kursdata.INVESTORSIDER, "EQNR")
-    sider = _les(klient.get("/aksje/EQNR").get_data(as_text=True))
-    assert sider.lenker == []
-    assert _tekst(sider) == "Børsmeldingene står på NewsWeb og ofte også på selskapets investorside."
+    html = klient.get("/aksje/EQNR").get_data(as_text=True)
+    sider = _les(html)
+    assert sider.lenker == [] and _tekst(sider) == ""
+    assert 'class="investorboble"' not in html and "newsweb" not in html.lower()
 
 
 def test_demoen_viser_teksten_og_ingen_lenke(demoklient):
-    """Svaret kl. 19:49. Ville feilet hvis et demoselskap viste en lenke til
-    en investorside, eller ikke sa at selskapet er oppdiktet og at lenken
-    står her i den ekte versjonen (gjennomgangen, BH9 og VG8: alle)."""
+    """Svaret kl. 19:49. Story 3.4h (svaret 06.11 kl. 23:51): i demoen går
+    boblen til siden for selskapet i appen, i samme fane og uten pil, også
+    for MTFJ uten kurser (spørsmål 5). Ville feilet hvis et demoselskap viste
+    en lenke ut av appen, til en ekte investorside, i en ny fane eller med
+    pil, eller manglet boblen (gjennomgangen, BH9 og VG8: alle)."""
     for aksje in demo.DEMOUNIVERS:
         svar = demoklient.get(f"/aksje/{aksje.symbol}")
-        if aksje.symbol in DEMO_UTEN_KURSER:
-            assert svar.status_code == 200
-            assert _les(svar.get_data(as_text=True)).lenker == []
-            continue
         assert svar.status_code == 200, aksje.symbol
         html = svar.get_data(as_text=True)
         assert "Eksempeltall" in html
         sider = _les(html)
-        assert sider.lenker == [], aksje.symbol
-        assert _tekst(sider) == _demotekst(aksje.navn), aksje.symbol
+        assert sider.lenker == [(f"/investorside/{aksje.symbol}", f"Investorsiden til {aksje.navn}")], aksje.symbol
+        assert "target" not in sider.attributter[0] and "↗" not in _tekst(sider), aksje.symbol
+        assert demoklient.get(sider.lenker[0][0]).status_code == 200, aksje.symbol
         for adresse in INVESTORSIDER.values():
             assert adresse not in html
 
 
 def test_en_demobase_der_den_ekte_skal_ligge_viser_demoteksten(klient, demomal):
     """Gjennomgangen, ECH4. En demobase i stedet for den ekte basen, uten
-    bryteren, viser «Eksempeltall» og demoteksten. Ville feilet hvis
-    teksten fulgte bryteren og ikke merket."""
+    bryteren, viser «Eksempeltall» og boblen til siden i appen (story 3.4h),
+    og siden finnes. Ville feilet hvis boblen fulgte bryteren og ikke
+    merket."""
     Path(lagring_sqlite.BASE_STI).parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(demomal, lagring_sqlite.BASE_STI)
     html = klient.get("/aksje/KVST").get_data(as_text=True)
     assert "Eksempeltall" in html
     sider = _les(html)
-    assert sider.lenker == []
-    assert _tekst(sider) == _demotekst("Kvitstein Mineral")
+    assert sider.lenker == [("/investorside/KVST", "Investorsiden til Kvitstein Mineral")]
+    assert klient.get("/investorside/KVST").status_code == 200
 
 
 def test_navnet_escapes_i_avsnittet():
-    """Gjennomgangen, ECH6. Ville feilet hvis navnet i avsnittet ble vist
-    uten escaping (|safe), så et navn med & eller < ga feil HTML."""
-    mal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
-    avsnittet = mal.split("Story 10.5", 1)[1].split("{% endif %}", 1)[0]
-    assert "detalj.aksje.navn" in avsnittet
-    assert "|safe" not in avsnittet and "autoescape" not in mal
+    """Gjennomgangen, ECH6. Story 3.4h: boblen står i _investorboble.html.
+    Ville feilet hvis navnet i boblen ble vist uten escaping (|safe), så et
+    navn med & eller < ga feil HTML."""
+    mal = (ROT / "src" / "templates" / "_investorboble.html").read_text(encoding="utf-8")
+    boblen = mal.split("{% macro investorboble", 1)[1]
+    assert boblen.count("{{ navn }}") == 2
+    assert "|safe" not in boblen and "autoescape" not in mal
+    for fil in ("aksje.html", "aksje_uten_kurser.html"):
+        assert "autoescape" not in (ROT / "src" / "templates" / fil).read_text(encoding="utf-8")
 
 
 def _lenker_til_euronext(adresser) -> list[str]:
@@ -311,9 +325,14 @@ def test_ingen_kode_i_src_kaller_adressene():
             assert not re.search(r"\b(?:INVESTORSIDER|investorside)\b", tekst), navn
     app_tekst = (ROT / "src" / "app.py").read_text(encoding="utf-8")
     bruk = re.findall(r"^.*\b(?:INVESTORSIDER|investorside)\b.*$", app_tekst, re.MULTILINE)
+    # Story 3.4h: oppslaget også for aksjesiden uten kurser, og ruta og malen
+    # for siden i demoen, som ikke bruker adressene.
     assert [b.strip() for b in bruk if not b.strip().startswith("#")] == [
         "from kursdata import Kursleser, investorside",
         "investorside=investorside(post.aksje.symbol),",
+        "investorside=investorside(post.aksje.symbol),",
+        '@app.route("/investorside/<symbol>")',
+        'return render_template("investorside.html", side=side, aktiv="aksje")',
     ], bruk
     # kursdata.py: bare standardbiblioteket uten nett, og tabellen brukes
     # bare i oppslaget.

@@ -134,7 +134,7 @@ Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versj
 docker compose up --build demo
 ```
 
-6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.», med en lenke til den ekte versjonen. Klikk på et selskapsnavn for å se en aksje.
+6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.», med en lenke til den ekte versjonen. Klikk på et selskapsnavn for å se en aksje. Nederst på aksjesiden går boblen «Investorsiden til ‹navn›» til en side i appen med en tegning laget av KI, fordi selskapene er oppdiktet.
 7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne i PowerShell-vinduet fra steg 4. Det er klart når det står at containerne er fjernet (Removed).
 
 ```

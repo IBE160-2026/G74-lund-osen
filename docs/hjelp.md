@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-07T19:24
+updated: 2026-11-07T20:35
 ---
 
 # Hjelp til «Kom i gang»
@@ -227,7 +227,7 @@ Nei. Porten er bare åpen på maskinen selv (127.0.0.1). Appen kan ikke nås fra
 
 ### Hvor finner jeg børsmeldingene?
 
-Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskapets investorside. Under kursgrafen på aksjesiden står en lenke til investorsiden for aksjen siden viser. Appen henter ingenting derfra. I demoen er selskapene oppdiktet og har ingen investorside, så der står det i stedet at lenken står der i den ekte versjonen.
+Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskapets investorside. Nederst på aksjesiden står boblen «Investorsiden til ‹navn›». I den ekte versjonen åpner den selskapets egen investorside i en ny fane, og appen henter ingenting derfra. Har appen ingen adresse til selskapet, står det ingen boble. I demoen er selskapene oppdiktet, så boblen går til en side i appen, i samme fane, med logoen og en tegning laget av KI. Lenken øverst på den siden tar deg tilbake til aksjen.
 
 ### Kan KI-teksten lages uten grafikkort?
 

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="jgrd-t jgrd-d">
+  <title id="jgrd-t">Jordgrøde Gjødsel</title>
+  <desc id="jgrd-d">En spire med et smilende knopphode vokser opp av en lastelinje som står på 99 prosent. Ved siden av står en sekk merket NPK.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 262 H412" fill="none"/>
+    <path d="M92 228 L98 172 Q120 164 142 172 L148 228 Z" fill="#F8DE9C"/>
+    <path d="M100 172 q20 -12 40 0" fill="none" stroke-width="2.5"/>
+    <rect x="60" y="228" width="320" height="30" rx="15" fill="#FFFFFF"/>
+    <rect x="65" y="233" width="306" height="20" rx="10" fill="#7FD1A1" stroke="none"/>
+    <path d="M300 228 C296 200 308 180 296 152" fill="none"/>
+    <path d="M298 200 C270 190 262 174 270 164 C284 170 296 182 298 200 Z" fill="#13703C"/>
+    <path d="M302 182 C326 174 336 158 330 148 C314 152 304 166 302 182 Z" fill="#7FD1A1"/>
+    <circle cx="296" cy="140" r="15" fill="#F2B53A"/>
+    <circle cx="291" cy="137" r="1.8" fill="#16181D" stroke="none"/>
+    <circle cx="301" cy="137" r="1.8" fill="#16181D" stroke="none"/>
+    <path d="M290 145 q6 5 12 0" fill="none" stroke-width="2.5"/>
+  </g>
+  <text x="104" y="207" font-family="'DejaVu Sans', Arial, sans-serif" font-weight="700" font-size="14" fill="#16181D">NPK</text>
+  <text x="330" y="249" font-family="'DejaVu Sans', Arial, sans-serif" font-weight="700" font-size="13" fill="#16181D">99 %</text>
+</svg>
