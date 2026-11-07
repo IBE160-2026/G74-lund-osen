@@ -51,11 +51,21 @@ med bare naar aksjen er regnet over den samme dagen (Dagsbilde.samme_periode),
 fordi feltet bare er med for ordlyden om aksjen gikk samme vei
 (ordlyd_om_hovedindeksen i ki_prompt.py). Paa en dag med hull faar grunnlaget
 aksjen, men ikke hovedindeksen, og dermed ingen ordlyd.
+
+Story 10.9 (gruppens svar 06.11 kl. 20:38 og 22:05, og 07.11 kl. 08:58):
+grunnlaget faar antallene i de tre moenstrene appen regner ut
+(moenstrene.py), naar de gis. Det er antall dager, regnet av vaare lagrede
+vurderinger og av retningen aksjen og hovedindeksen gikk, saa det holder seg
+innenfor beslutningen 04.10 (del H i spesifikasjonen). Del F sier at antallene
+legges til ANTALLENE. Etter gjennomgangen (BH2, ECH5) er de ikke der: da var de
+lovlige tall hvor som helst i teksten. Kontrollen i FR-603 leser dem bare i
+formene i setningen om moenstrene, ved feltet sitt.
 """
 
 from types import MappingProxyType
 
 from dagene import BEVEGELSER, FALT, STEG, UENDRET, Dagsbilde, bevegelse, lag_dagsbilde
+from moenstrene import MINST, MINST_TELT, MINST_VURDERTE, VINDU_RETNINGEN, VINDU_SAMME_VEI, Moenstrene
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, Signal, finn_retning, finn_styrke
 from vurderingsdata import Vurdering
 
@@ -82,7 +92,19 @@ DAGFELTENE = ("hovedindeksen", "aksjen")
 VALGFRIE = frozenset(("merke", *DAGFELTENE))
 # Antallene i grunnlaget. Kontrollen i FR-603 godtar bare disse og regelens
 # faste tall (punkt 2). Fortegnene er ikke antall. Story 10.2i: bare styrken.
+# Story 10.9: antallene i moenstrene er ikke her. Kontrollen leser dem bare i
+# formene for moenstrene, ved feltet sitt (gjennomgangen, BH2, ECH5).
 ANTALLENE = ("styrke",)
+
+# Story 10.9: feltene med de tre moenstrene. Hvert moenster er med helt eller
+# ikke i det hele tatt. Navnene sier vinduet, og ikke «mønster», som
+# kontrollen stopper i teksten.
+MOENSTER_1 = ("siste_20_vurdert", "siste_20_positiv", "siste_20_negativ", "siste_20_blandet", "siste_20_ingen")
+MOENSTER_2 = ("siste_5_kunne_telles", "siste_5_samme_vei")
+MOENSTER_3 = ("siste_måned_skift",)
+MOENSTER_3_MERKE = "siste_måned_merke"
+MOENSTERANTALLENE = (*MOENSTER_1, *MOENSTER_2, *MOENSTER_3)
+VALGFRIE = VALGFRIE | frozenset((*MOENSTERANTALLENE, MOENSTER_3_MERKE))
 
 
 def _heltall(verdi) -> bool:
@@ -90,7 +112,11 @@ def _heltall(verdi) -> bool:
 
 
 def ki_grunnlag(
-    kilde: Signal | Vurdering, *, utenfor_maalingen: bool, dagen: Dagsbilde | None = None
+    kilde: Signal | Vurdering,
+    *,
+    utenfor_maalingen: bool,
+    dagen: Dagsbilde | None = None,
+    moenstrene: Moenstrene | None = None,
 ) -> MappingProxyType:
     """Fortegnene, styrken og retningen, og med dagen hovedindeksen og aksjen.
 
@@ -103,6 +129,8 @@ def ki_grunnlag(
         raise TypeError("utenfor_maalingen maa vaere True eller False")
     if dagen is not None and not isinstance(dagen, Dagsbilde):
         raise TypeError(f"dagen maa vaere et Dagsbilde, fikk {type(dagen).__name__}")
+    if moenstrene is not None and not isinstance(moenstrene, Moenstrene):
+        raise TypeError(f"moenstrene maa vaere Moenstrene, fikk {type(moenstrene).__name__}")
     if isinstance(kilde, Signal):
         navn = [sjekk.navn for sjekk in kilde.sjekker]
         if navn != [s.capitalize() for s in SJEKKENE]:
@@ -125,6 +153,17 @@ def ki_grunnlag(
                 continue
             if getattr(dagen, felt) is not None:
                 grunnlag[felt] = getattr(dagen, felt)
+    if moenstrene is not None:
+        # Story 10.9: bare moenstrene som gis (moenstrene.py).
+        if moenstrene.retningene is not None:
+            grunnlag.update(zip(MOENSTER_1, moenstrene.retningene))
+        if moenstrene.samme_vei is not None:
+            grunnlag.update(zip(MOENSTER_2, moenstrene.samme_vei))
+        if moenstrene.skiftene is not None:
+            skift, minst = moenstrene.skiftene
+            grunnlag[MOENSTER_3[0]] = skift
+            if minst:
+                grunnlag[MOENSTER_3_MERKE] = MINST
     _kontroller(grunnlag)
     if isinstance(kilde, Signal):
         _samsvar(kilde)
@@ -147,6 +186,32 @@ def _kontroller(grunnlag: dict[str, object]) -> None:
     for navn in DAGFELTENE:
         if navn in grunnlag and (type(grunnlag[navn]) is not str or grunnlag[navn] not in BEVEGELSER):
             raise ValueError(f"{navn} maa vaere en av {BEVEGELSER}")
+    _kontroller_moenstrene(grunnlag)
+
+
+def _kontroller_moenstrene(grunnlag: dict[str, object]) -> None:
+    """Story 10.9: hvert moenster helt eller ikke, bare heltall fra 0, og
+    antallene innenfor vinduet og grensene i spoersmaal 3 og 4."""
+    for felter in (MOENSTER_1, MOENSTER_2, MOENSTER_3):
+        med = [navn in grunnlag for navn in felter]
+        if any(med) and not all(med):
+            raise ValueError(f"moensteret med {felter[0]} maa ha alle feltene sine")
+    for navn in MOENSTERANTALLENE:
+        if navn in grunnlag and (not _heltall(grunnlag[navn]) or grunnlag[navn] < 0):
+            raise ValueError(f"{navn} maa vaere et heltall fra 0")
+    if MOENSTER_1[0] in grunnlag:
+        vurdert, *antall = (grunnlag[navn] for navn in MOENSTER_1)
+        if not MINST_VURDERTE <= vurdert <= VINDU_RETNINGEN or sum(antall) != vurdert:
+            raise ValueError("moenster 1 maa ha 10 til 20 vurderte dager, fordelt paa de fire retningene")
+    if MOENSTER_2[0] in grunnlag:
+        telt, samme = (grunnlag[navn] for navn in MOENSTER_2)
+        if not MINST_TELT <= telt <= VINDU_SAMME_VEI or samme > telt:
+            raise ValueError("moenster 2 maa ha 3 til 5 dager som kunne telles, og ikke flere samme vei")
+    # Gjennomgangen (BH11): maaneden har hoeyst 23 boersdager, saa hoeyst 22 skift.
+    if MOENSTER_3[0] in grunnlag and grunnlag[MOENSTER_3[0]] > 22:
+        raise ValueError("siste_måned_skift kan ikke vaere flere enn 22")
+    if MOENSTER_3_MERKE in grunnlag and (MOENSTER_3[0] not in grunnlag or grunnlag[MOENSTER_3_MERKE] != MINST):
+        raise ValueError("siste_måned_merke kan bare vaere «minst», og bare med siste_måned_skift")
 
 
 def _samsvar(signal: Signal) -> None:

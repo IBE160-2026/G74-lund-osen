@@ -58,6 +58,7 @@ KI_GRUNNLAG = "src/ki_grunnlag.py"
 DAGENE = "src/dagene.py"
 KI_KONTROLL = "src/ki_kontroll.py"
 KI_VISNING = "src/ki_visning.py"
+MOENSTRENE = "src/moenstrene.py"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -576,37 +577,26 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (AKSJEDETALJ, "def bygg_skala("),
             ),
         ),
-        # Gruppens svar 04.11 kl. 22:23, 3: hva teksten er, hva modellen fikk
-        # (ki_grunnlag.py), at tallene med prikket strek er sjekket, og at
-        # den ikke gir råd.
-        "ki_kort_fortalt": Hjelpetekst(
-            "Kort fortalt:",
-            "en kort tekst om signalet for aksjen den dagen, skrevet av en språkmodell og merket "
-            "«Laget av KI» med navnet på modellen. Modellen fikk bare det appen har regnet ut: om hver "
-            "av sjekkene ga +1, 0 eller -1, styrken og retningen, om aksjen selv steg, "
-            "falt eller var uendret den dagen når det kan regnes, regnet mot forrige kurs, som endringen i tabellen, "
-            "og når aksjens forrige kurs er fra forrige børsdag, også om hovedindeksen steg, falt eller var uendret, "
-            "med en ferdig setning om aksjen gikk samme vei som "
-            "hovedindeksen eller motsatt, og et merke når aksjen "
-            "er utenfor de 15 grensene er målt på, men ingen kurser, prosenter eller volumer. Tallene med prikket strek er sjekket mot det før teksten vises, "
-            "og teksten som vises, gir ikke råd og sier ikke noe annet om hovedindeksen, bransjen, børsen "
-            "eller antallet aksjer enn den ferdige setningen.",
+        # Story 10.9, del D (spoersmaal 10, svaret 07.11 kl. 08:58): hjelpen
+        # ved rammen «Signalet forklart» sier bare hva teksten er, hva
+        # modellen fikk, og at tallene er sjekket, i hoeyst 60 ord med
+        # tittelen (svaret 06.11 kl. 23:07). Resten staar i docs/hjelp.md.
+        # Erstatter «kort fortalt» fra svaret 04.11 kl. 22:23, 3.
+        "signalet_forklart": Hjelpetekst(
+            "",
+            "Først skriver appen hvor lenge signalet har vært slik og hva hovedindeksen, bransjen og lista "
+            "gjorde samme dag. Med KI på kommer en tekst fra en språkmodell, merket «Laget av KI», som bare "
+            "fikk det appen har regnet ut, som sjekkene og antall dager, aldri kurser, prosenter eller "
+            "volumer. Tallene med prikket strek er sjekket før teksten vises.",
             (
+                (DAGENE, "def setning_om_dagene("),
+                (DAGENE, "def setning_om_samme_dag("),
                 (KI_GRUNNLAG, "def ki_grunnlag("),
                 (KI_GRUNNLAG, "kurser, volumer, prosenter eller forholdstall, og ingen maalinger"),
                 (KI_GRUNNLAG, 'ANTALLENE = ("styrke",)'),
-                (KI_GRUNNLAG, 'DAGFELTENE = ("hovedindeksen", "aksjen")'),
-                # Gruppens svar 6.11 kl. 09:55, 1: aksjen som endringen i tabellen.
-                (MARKEDSOVERSIKT, "def endring_i_prosent("),
-                (DAGENE, "aksjen=bevegelse(_endringen("),
-                # Gruppens svar 6.11 kl. 11:15, 2: ordlyden bare over samme periode.
-                (DAGENE, "return til[-2] == indeksens_forrige_boersdag(dag)"),
-                (KI_GRUNNLAG, 'if felt == "hovedindeksen" and not dagen.samme_periode:'),
-                (KI_GRUNNLAG, 'UTENFOR_MAALINGEN = "Utenfor målingen"'),
-                (KI_GRUNNLAG, "fortegnet for hver av de"),
+                (MOENSTRENE, "def lag_moenstrene("),
                 (KI_VISNING, "def prikkede_tall("),
-                (KI_KONTROLL, "3. Raad."),
-                (KI_KONTROLL, "def _om_dagen("),
+                (KI_KONTROLL, "def kontroller("),
                 (AKSJE_MAL, "Laget av KI ·"),
             ),
         ),

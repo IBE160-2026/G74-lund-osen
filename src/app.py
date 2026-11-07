@@ -54,7 +54,7 @@ from boersometer import (
 from boersometer import (
     med_perioden as rute_med_perioden,
 )
-from dagene import lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
+from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
@@ -1247,7 +1247,10 @@ def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -
         app.logger.warning("Dagen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         lista, serier = None, None
     dager, minst = tell_dagene(detalj.dato, detalj.vurdering, tidligere)
-    dagene = setning_om_dagene(dager, minst, annen_dag=annen_dag)
+    # Story 10.9, del A: med datoen for den foerste dagen i rekka. tell_dagene
+    # har alt gaatt de samme dagene bakover, saa kalenderen dekker dem.
+    fra = foerste_dag_i_rekka(detalj.dato, dager)
+    dagene = setning_om_dagene(dager, minst, annen_dag=annen_dag, fra=fra, i_aar=idag().year)
     if lista is None:
         return dagene, None
     # Gjennomgangen (BH9, BH10, ECH12): en feil i utregningen av dagen, som en

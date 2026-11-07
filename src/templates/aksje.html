@@ -271,44 +271,39 @@
       i blekk, ikke gul (spørsmål 5 i spesifikasjonen). Rammen er et kort
       som de andre, og tallene i teksten har prikket strek (designregler §4).
       Med KI av står bare bryteren, som før. #}
+  {#- Story 10.9, del C (gruppens svar 06.11 kl. 22:16 og 22:23): rammen
+      «Signalet forklart» erstatter «‹navn› kort fortalt». Appens setninger
+      står først, så KI-teksten med merket. Bryteren står fast øverst til
+      høyre i rammen, både med KI på og av, og med KI av står rammen med
+      appens setninger og bryteren. Det endrer linja om at bare bryteren står
+      med KI av (8.2b). Regelforklaringen står over, som før (FR-602). #}
   {% if detalj.sjekker %}
     {% set ki_vises = ki_er_paa and ki %}
-    {%- macro ki_bryter() %}
-    <form class="ki-bryter"{% if not ki_vises %} id="{{ ki_anker }}"{% endif %} method="post" action="/ki">
-      <input type="hidden" name="til" value="{{ ki_til }}">
-      <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
-      <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
-    </form>
-    {%- endmacro %}
-    {% if ki_vises %}
-      {#- Gruppens svar 04.11 kl. 22:23, 3: delen heter «<navnet> kort
-          fortalt», i Newsreader som de andre overskriftene, med «?» som sier
-          hva teksten er og hva modellen fikk. «Laget av KI» står som før. #}
-      <section class="ki" id="{{ ki_anker }}" aria-labelledby="ki-tittel">
-        <div class="ki-topp">
-          <h2><span id="ki-tittel">{{ detalj.aksje.navn }} kort fortalt</span> {{ hjelpeknapp("hjelp-ki", "Hjelp: kort fortalt") }}</h2>
-          {{ ki_bryter() }}
+    <section class="ki" id="{{ ki_anker }}" aria-labelledby="ki-tittel">
+      <div class="ki-topp">
+        <h2><span id="ki-tittel">Signalet forklart</span> {{ hjelpeknapp("hjelp-ki", "Hjelp: signalet forklart") }}</h2>
+        <form class="ki-bryter" method="post" action="/ki">
+          <input type="hidden" name="til" value="{{ ki_til }}">
+          <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
+          <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
+        </form>
+      </div>
+      {#- Gruppens svar 25.10 kl. 00:51 og 5.11 kl. 19:13 og 23:36: appen
+          skriver dagene og hva hovedindeksen, bransjen og antallene gjorde
+          samme dag, også når KI er av eller teksten er stoppet. #}
+      {% if dagene %}<p class="dagene">{{ dagene }}</p>{% endif %}
+      {% if samme_dag %}<p class="samme-dag">{{ samme_dag }}</p>{% endif %}
+      {% if ki_vises %}
+        <div class="ki-del">
+          {% if ki.vist %}
+            <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
+            <p class="ki-tekst">{{ ki.tekst|prikkede_tall }}</p>
+          {% else %}
+            <p class="uten">{{ ki.grunn }}</p>
+          {% endif %}
         </div>
-        {% if ki.vist %}
-          <p class="merke-ki">Laget av KI · {{ ki.modell }}. Regelforklaringen over er det signalet bygger på.</p>
-          <p class="ki-tekst">{{ ki.tekst|prikkede_tall }}</p>
-        {% else %}
-          <p class="uten">{{ ki.grunn }}</p>
-        {% endif %}
-      </section>
-    {% endif %}
-    {#- Gruppens svar 25.10 kl. 00:51: appen skriver dagene, rett under
-        KI-teksten, også når KI er av eller teksten er stoppet. #}
-    {% if dagene %}
-      <p class="dagene">{{ dagene }}</p>
-    {% endif %}
-    {#- Gruppens svar 5.11 kl. 19:13 og 23:36: appen skriver hva hovedindeksen,
-        bransjen og antallene gjorde samme dag, for seg selv under teksten som
-        setningen om dagene, og modellen skriver ikke om dagen. #}
-    {% if samme_dag %}
-      <p class="samme-dag">{{ samme_dag }}</p>
-    {% endif %}
-    {% if not ki_vises %}{{ ki_bryter() }}{% endif %}
+      {% endif %}
+    </section>
   {% endif %}
 
   {#- Story 2.7b (avgjørelsen 2026-10-21 under story 2.7): historikken, en
@@ -393,8 +388,9 @@
   ]) }}
   {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["hvorfor_tre", "antall_dager"])]) }}
   {{ hjelpevindu("hjelp-historikk", "Signalet dag for dag", [("", ["historikken"])]) }}
-  {#- Gruppens svar 04.11 kl. 22:23, 3: «?» ved KI-delen, bare når den vises. #}
-  {% if detalj.sjekker and ki_er_paa and ki %}{{ hjelpevindu("hjelp-ki", "Kort fortalt", [("", ["ki_kort_fortalt"])]) }}{% endif %}
+  {#- Story 10.9, del D: «?» ved rammen «Signalet forklart», som vises med
+      sjekkene, også med KI av. #}
+  {% if detalj.sjekker %}{{ hjelpevindu("hjelp-ki", "Signalet forklart", [("", ["signalet_forklart"])]) }}{% endif %}
   {% if detalj.sjekker %}
     {% for sjekk in detalj.sjekker %}
       {{ hjelpevindu("hjelp-" ~ sjekk.navn|lower, sjekk.navn, [("", [sjekk.navn|lower])]) }}

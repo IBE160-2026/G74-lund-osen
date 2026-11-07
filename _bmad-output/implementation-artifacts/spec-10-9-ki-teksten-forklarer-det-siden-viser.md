@@ -2,7 +2,7 @@
 title: 'Story 10.9: KI-teksten forklarer det siden viser, med promptversjon 5 og tre mønstre appen regner ut'
 type: 'feature'
 created: '2026-11-07'
-status: 'draft'
+status: 'in-review'
 route: 'dispatch'
 baseline_commit: 'c411cc5d'
 context:
@@ -122,3 +122,86 @@ Ny telling for 10.4 etter de første kveldene med versjon 5, med klassene i spø
 - Ingen tekst fra den ekte versjonen ordrett i sporede filer (regel 16).
 - Bygges på egen gren og flettes bare ferdig og grønn, før UX-rettingene fra 06.11 (svaret kl. 22:05).
 - En mutant per del, med kopi før og sha256 mot HEAD etter.
+
+## Bygget 07.11 (instruksjonen kl. 10:38)
+
+Bygget på grenen `10-9-ki-teksten-forklarer-det-siden-viser`, i worktreen `G74-lund-osen-10-9`, fra `7c55913d`. Koden er i `ba685331`. Ingen migrasjon: grunnlaget lagres som et JSON-objekt (`0005_ki_logg.sql`), og mønstrene regnes av lagrede rader.
+
+**Slått opp 07.11, og avvik fra delene over:**
+- *Del E, grunnen til versjon 5.* Delen sier at `ose.db` har tekster med versjon 4. Det stemmer ikke: `ki_logg` hadde bare `promptversjon` 3 til og med 06.11 (lest med `mode=ro` 07.11), og de første med versjon 4 kommer med hentingen 09.11 (Utført-linja kl. 00:27 07.11). Versjonen er likevel 5, fordi versjon 4 er flettet, og fra 26.10 gir enhver endring i prompten en ny versjon (svaret 25.10 kl. 20:54 b, i `ki_prompt.py`). Docstringen sier det.
+- *Del E, formene for sjekkene.* Prompten gir én form per sjekk og fortegn, med «fordi» etter utslaget, som regelen fra versjon 2. Den første versjonen ga ett eksempel med «så», og 4 av 13 demotekster ble stoppet fordi Gemma skrev begge (§56 i `malinger.md`).
+- *Del F, målingen.* Kontrollen leser også ordene om målingen («kursen ligger over snittet», «det ble ikke handlet mye mer enn vanlig») mot fortegnet (`_maalingene`). To demotekster i den første kjøringen besto med feil om handelen.
+- *Del F, mønstrene.* Formene i prompten leses med tallet ved feltet sitt, ikke bare som «et av tallene i mønstrene», og tas ut av teksten før resten av kontrollen leser den. Antallene er i `ANTALLENE`, som delen sier. Vinduet 5 er lovlig bare når grunnlaget har mønster 2, og et feltnavn eller en plassholder fra prompten i teksten stoppes.
+- *Del D.* Hjelpen er tre setninger og 60 ord med tittelen, telt med `\w+`. Nøkkelen er `signalet_forklart` i stedet for `ki_kort_fortalt`. At teksten ikke gir råd, står i `docs/hjelp.md` (spørsmål 10).
+- *Spørsmål 16 i 8.20* sier at de fete navnene på sjekkene i KI-teksten hører til 10.9. Denne spesifikasjonen har dem ikke, og de er ikke bygget. Spørsmål til gruppen under.
+- *Testnavn.* `test_ki_delen_heter_navnet_kort_fortalt` og `test_med_ki_av_staar_bare_bryteren` har fått nytt innhold etter del C, men navnet står, fordi `docs/kvalitetssikring.md` og spesifikasjonen 8.2b viser til det første.
+
+**Tester («Ville feilet hvis» i hver):** del A i `tests/test_ki_visning.py` (`TestSetningenOmDagene`, med `test_foerste_dag_i_rekka` og `test_aaret_staar_naar_datoen_er_fra_et_annet_aar`), delene B–H i den nye `tests/test_ki_teksten_forklarer.py`. Testen for 60 ord gjelder vinduet ved rammen; de andre vinduene rettes i 8.20a.
+
+**Hele settet,** alene og uten Ollama: kl. 11:14:27–11:24:19, 4295 bestått, 24 hoppet over, 7 feilet: 3 porttester for `start.ps1` og 4 som ventet den gamle rammen (`test_demoproeven.py`, `test_funnene_8_2b.py` to, og navnet i `test_kvalitetssikring.py`). De ble rettet, og settet kjørt på nytt kl. 11:25:27–11:35:29: 4297 bestått, 24 hoppet over, og bare 5 porttester for `start.ps1` feilet.
+
+## Mutantene
+
+Én per del, på `ba685331`, med kopi før og sha256 mot HEAD etter. Alle åtte ble fanget, og hver fil var lik HEAD etterpå.
+
+| Del | Mutant | Fanget av |
+|---|---|---|
+| A | `foerste_dag_i_rekka` går én børsdag for langt tilbake | 7 tester i `test_ki_visning.py` |
+| B | en dag med hull telles i mønster 2 | `test_en_dag_med_hull_telles_ikke` |
+| C | appens setninger tatt ut av rammen | 23 tester |
+| D | hjelpen ved rammen får en setning til | `test_hjelpen_ved_rammen_har_hoeyst_60_ord` |
+| E | linja om én setning per sjekk tatt ut av prompten | 3 tester, også `test_versjonen_foelger_teksten` |
+| F | tallet ved feltet sjekkes ikke i mønster 1 | 2 tester i `TestKontrollen` |
+| G | demotekstene med versjon 4 tilbake | `test_demotekstene_har_versjon_5_og_moenstrene` |
+| H | grunnlaget kontrollerer ikke mønstrene | 6 tester i `TestGrunnlaget` |
+
+## Demotekstene før og etter
+
+Laget på nytt med Gemma kl. 11:03 (13 av 13 besto). Tre av de 13, fra `src/demo_ki_tekster.json` (oppdiktede selskaper):
+
+- **BRFE** (alle tre negative). Før: «Signalet er Negativt fordi trenden ga et negativt utslag, bevegelsen ga et negativt utslag, og interessen ga et negativt utslag. Aksjen gikk samme vei som hovedindeksen.» Etter: «Trenden ga et negativt utslag fordi kursen ligger under snittet for de siste 50 børsdagene. Bevegelsen ga et negativt utslag fordi kursen falt mer i dag enn den vanligvis svinger de siste 20 dagene. Interessen ga et negativt utslag fordi det ble handlet mer enn vanlig på en dag kursen falt. Aksjen gikk samme vei som hovedindeksen. Av de 15 vurderte børsdagene var signalet positivt 10, negativt 2, blandet 2 og uten retning 1. Aksjen gikk samme vei som hovedindeksen 2 av de 5 dagene som kunne telles av de siste 5 børsdagene, og den siste måneden skiftet retningen minst 5 ganger.»
+- **SLVP** (retningen Ingen). Før: «Signalet har ingen retning fordi trenden ikke ga utslag, bevegelsen ikke ga utslag og interessen ikke ga utslag. Aksjen gikk motsatt vei av hovedindeksen.» Etter: «Trenden ga ikke utslag fordi kursen ligger nær snittet for de siste 50 børsdagene. Bevegelsen ga ikke utslag fordi dagens endring ikke var stor sammenlignet med de siste 20 dagene. Interessen ga ikke utslag fordi det ikke ble handlet mye mer enn vanlig. Signalet har ingen retning. Av de 15 vurderte børsdagene var signalet positivt 3, negativt 9, blandet 1 og uten retning 2. Aksjen gikk samme vei som hovedindeksen 3 av de 5 dagene som kunne telles av de siste 5 børsdagene, og den siste måneden skiftet retningen minst 8 ganger.»
+- **KVST** (alle tre positive). Før: «Signalet er Positivt fordi trenden ga et positivt utslag, bevegelsen ga et positivt utslag, og interessen ga et positivt utslag. Aksjen gikk motsatt vei av hovedindeksen.» Etter: «Trenden ga et positivt utslag fordi kursen ligger over snittet for de siste 50 børsdagene. Bevegelsen ga et positivt utslag fordi kursen steg mer i dag enn den vanligvis svinger de siste 20 dagene. Interessen ga et positivt utslag fordi det ble handlet mer enn vanlig på en dag kursen steg. Aksjen gikk motsatt vei av hovedindeksen. Av de 15 vurderte børsdagene var signalet positivt 3, negativt 5, blandet 1 og uten retning 6, aksjen gikk samme vei som hovedindeksen 1 av de 4 dagene som kunne telles av de siste 5 børsdagene, og den siste måneden skiftet retningen minst 11 ganger.»
+
+I demoen er alle mønster 3 «minst», fordi måneden før 09.10 begynner før vurderingene i demoen (21.09).
+
+**Bildet** av aksjesiden i `docs/appen/` er tatt på nytt, 1280 × 2345, til bunnen av rammen. De seks andre bildene ble tatt på nytt og er byte for byte de samme. Bildene ble tatt med DevTools-protokollen i Edge uten vindu (`Page.captureScreenshot`), som ga de seks byte for byte like.
+
+**Prøvekjøringen** står i §56 i `malinger.md`: 15 av 15 besto, alle med alle tre mønstrene.
+
+## Gjennomgangen 07.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Tre gjennomganger av `ba685331` og `f3729e38`, kjørt i parallell etter hele settet: Blind Hunter med bare diffen, Edge Case Hunter og Verification Gap med repoet. Edge Case Hunter og Verification Gap kjørte snutter og enkeltfiler, ikke hele settet. Rettingene er i `c7159bb9`. Hvert eksempel fra gjennomgangene er prøvd på nytt med `kontroller` etter rettingen, og tekstene fra prøvekjøringen (15) og demoen (13) består fortsatt.
+
+**Høy**
+- *ECH1, ECH2, ECH3 og BH3, rettet.* Mønsterformene ble tatt ut overalt i teksten, før retnings-, dag- og månedskontrollen leste den. Da besto «Signalet er positivt i to av tre sjekker.» med retningen Negativ, og «… de siste 20 børsdagene» og «… den siste måneden» besto, selv om de ble stoppet før 10.9. Nå leses formene bare i setningen om mønstrene, som kjennes igjen på en hel form (`_ANKRENE`). Andre setninger leses som før.
+- *BH2 og ECH5, rettet.* Tellingene lå i `ANTALLENE`, som del F sa, og var dermed lovlige tall hvor som helst. «Kursen ligger 14 over snittet.» besto. Nå er tellingene ikke i `ANTALLENE`, og de leses bare i formene, ved feltet sitt. Det er et avvik fra del F (spørsmål 2 under).
+- *BH1 og ECH8, rettet.* «Kursen steg ikke mer …» ble lest som at kursen steg mer. Nå leses «ikke».
+- *VG1, rettet.* Ingen test viste at ordene om målingen stoppes når de strider mot fortegnet. Det gjør `TestMaalingen` nå.
+
+**Middels**
+- *ECH4, ECH6, ECH12 og VG3, rettet.* I setningen om mønstrene besto byttede tall foran ordet, sammenligninger som «oftest positivt» og «færre enn», og «Det stemmer ikke at …». Nå kan resten av den setningen bare være bindeordene «av», «de», «siste», «var», «signalet» og «og». Alt annet stoppes (`_BINDEORD`).
+- *ECH7, rettet.* Formen for skiftene ble godtatt uten «den siste måneden». Nå kreves den.
+- *BH4 og VG3, rettet.* Ordlista for mønstre modellen finner selv har fått «mønstre», «pleide», «gjentok seg», «oftest», «ofte», «hyppig», «stort sett», «for det meste» og «vanligvis positivt».
+- *BH5 og BH6, rettet.* «Kursen ligger ikke nær snittet» og «Dagens endring var ikke liten» ble lest med feil fortegn.
+- *BH7, rettet.* To linjer i prompten sa «under teksten», men appens setninger står nå over. Versjonen står som 5, fordi versjon 5 ikke er flettet og ingen tekst i `ose.db` har versjon 5, som i 10.2i. Avtrykket er `822dcd49…8dea`.
+- *VG2, VG5 og VG8, rettet.* Det mangler ikke lenger tester for tallet i mønster 3, for at en endring i styrken ikke er et skift (spørsmål 1), eller for en uendret eller manglende hovedindeks i mønster 2.
+- *VG4, åpent.* Hjelpen og del E sier «én setning om mønstrene». Kontrollen sjekker ikke antallet setninger. 6 av 13 demotekster deler mønstrene i to setninger, mens ingen av de 15 i prøvekjøringen gjør det. Spørsmål 1 under. Står åpent til gruppen har svart (regel 25).
+- *VG4, lukket 2026-11-07 etter gruppens svar kl. 12:32 (regel 25).* Svar 1: kontrollen stopper ikke en tekst som deler mønstrene i to setninger. Prompten ber fortsatt om én, og hjelpen sier nå «en setning eller to» (`docs/hjelp.md`). README-en sier ikke hvor mange setninger teksten har, og er ikke endret.
+- *VG6, avvist.* Funnet var at `_grunnlagene` bare var testet med mønster 2. Men `test_grunnlaget_stemmer_med_demodagen` sammenligner demoradene, som lages gjennom `_grunnlagene` i `lag_tekstene`, med `lag_moenstrene` for alle tre mønstrene. Mutant G viser at testen leser fila.
+
+**Lav**
+- *Rettet:* ECH9 («over eller under» sier ingenting om fortegnet), ECH10 («minst» foran verbet), ECH11 (markdown med `__`), BH10 og VG7 (formen uten mønsteret i grunnlaget), BH11 (høyst 22 skift, og feilmeldingen) og BH12 (docstringen i `test_versjon_4`). VG11 er rettet delvis: med KI av sjekkes også `p.samme-dag`. At bryteren står til høyre, avgjøres av CSS-en og er ikke testet; det godtas som lavt.
+- *Avvist:* BH8, fordi lørdag 31.10 i testene kommer fra testdataene, og vurderinger skrives bare for børsdager. BH9, fordi Verification Gap telte vinduet med testens egen splitt og fikk tittelen og teksten, 60 ord.
+- *Ført:* BH13. Porttestene for `start.ps1` feilet 3, 5 og 6 ganger i de tre kjøringene av settet. De er ustabile, men de er de eneste som feilet. VG9: testen for 60 ord gjelder vinduet ved rammen, etter instruksjonen kl. 10:38, og de andre vinduene rettes i 8.20a. VG10: tellingen for 10.4 med klassene i spørsmål 9 gjøres etter de første fem kveldene med versjon 5, og står som åpent punkt i `issues.md`.
+
+**Etter rettingen:** hele settet ble kjørt alene kl. 11:55:32–12:06:37: 4330 bestått, 24 hoppet over, og bare 6 porttester for `start.ps1` feilet. Demotekstene og prøvekjøringen ble laget på nytt med avtrykket over (§56). Bildene ble tatt på nytt og er byte for byte de samme, og bare avtrykkene i `tests/test_docker.py` er endret. Mutantene ble kjørt på nytt på `c7159bb9`, med F oppdatert til den nye koden og F2 for bindeordene, «setningen om mønstrene sier mer enn formene»: alle ni ble fanget, med A 7, B 1, C 23, D 1, E 3, F 2, F2 4, G 1 og H 6 tester, og hver fil var lik HEAD etterpå.
+
+## Spørsmål til gruppen før flettingen
+
+*Svar 2026-11-07 kl. 12:32 (gruppens svar):* forslagene i spørsmål 1–4 under er godtatt: 1) kontrollen stopper ikke en tekst som deler mønstrene i to setninger; prompten ber fortsatt om én, og hjelpen sier «en setning eller to» (VG4); 2) tellingene godtas bare i formene, ved feltet sitt, ikke i `ANTALLENE` (BH2, ECH5); 3) de faste formene for sjekkene står til tellingen for 10.4 etter fem kvelder med versjon 5, og tas opp igjen da; 4) de fete navnene på sjekkene bygges i 8.20a. Rådet anbefalte alle fire. Svaret er ført etter instruksjonen kl. 12:47 i `docs/ai-prompts/2026-11-07.md`.
+
+1. **VG4: én setning om mønstrene.** Skal kontrollen stoppe en tekst som deler mønstrene i to setninger? *Forslag:* nei. Kontrollen sjekker hver setning med en form for seg, så to setninger sier ikke mer enn én. Prompten ber fortsatt om én, og «én setning» i hjelpen endres til «en setning eller to». Med ja blir 6 av 13 demotekster stoppet slik de er nå.
+2. **BH2 og ECH5: tellingene i `ANTALLENE`.** Del F sa at antallene legges til `ANTALLENE`. Det gjorde tellingene til lovlige tall hvor som helst i teksten. *Forslag:* godta avviket. Tellingene leses bare i formene, ved feltet sitt.
+3. **Formene for sjekkene.** Prompten gir én fast form per sjekk og fortegn, fordi én form med «så» ga 4 av 13 stoppede tekster og to feil om handelen (§56). Tekstene blir derfor nesten like for aksjer med de samme fortegnene, og det nye ligger i mønstrene. *Forslag:* behold formene til tellingen for 10.4 etter fem kvelder, og ta det opp igjen da.
+4. **Spørsmål 16 i 8.20: de fete navnene på sjekkene i KI-teksten.** Spørsmålet sier at de hører til 10.9, men spesifikasjonen for 10.9 har dem ikke. *Forslag:* bygg dem i 8.20a, med resten av utseendet på aksjesiden.

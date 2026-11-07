@@ -653,6 +653,10 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-aksje) .ki .tall { text-decoration: underline dotted currentColor; text-decoration-thickness: 1.5px;
                                 text-underline-offset: 3px; }
 :where(.side-aksje) .ki .uten { color: var(--dempet); margin: 0; }
+/* Story 10.9, del C: appens setninger først i rammen, og KI-delen under en
+   strek. */
+:where(.side-aksje) .ki p.dagene, :where(.side-aksje) .ki p.samme-dag { margin: 0 0 4px; font-size: 16px; line-height: 1.5; }
+:where(.side-aksje) .ki .ki-del { margin: 12px 0 0; padding: 12px 0 0; border-top: 1px solid var(--strek); }
 :where(.side-aksje) .ki-bryter { margin: 10px 0 0; }
 :where(.side-aksje) .ki .ki-bryter { margin: 0; }
 :where(.side-aksje) .ki-bryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;

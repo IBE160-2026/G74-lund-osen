@@ -328,7 +328,8 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
     html = _html(klient, "/aksje/BRFE")
     ki = html.split('<section class="ki"', 1)[1].split("</section>", 1)[0]
     topp = ki.split('<div class="ki-topp">', 1)[1].split("</form>", 1)[0]
-    assert "kort fortalt</span>" in topp and 'role="switch" aria-checked="true"' in topp
+    # Story 10.9, del C: rammen heter «Signalet forklart».
+    assert "Signalet forklart</span>" in topp and 'role="switch" aria-checked="true"' in topp
     assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
     assert html.count('class="ki-bryter"') == 1
     # Gjennomgangen (VG1): gult heter også oransje og baand-ut i stilen.
@@ -342,13 +343,16 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
 
 
 def test_med_ki_av_staar_bare_bryteren(klient):
-    """U33 og svaret 25.10 kl. 00:51 (VG11): med KI av er siden lik den var
-    før 10.3, bortsett fra bryteren og setningen om dagene. Ville feilet
-    hvis rammen eller tittelen sto med KI av."""
+    """U33 og svaret 25.10 kl. 00:51 (VG11): med KI av står bryteren og
+    setningen om dagene. Story 10.9, del C (gruppens svar 06.11 kl. 22:23):
+    rammen «Signalet forklart» står også med KI av, med appens setninger og
+    bryteren fast øverst, uten KI-tekst. Navnet på testen står fra 8.2b.
+    Ville feilet hvis KI-teksten sto med KI av, eller rammen manglet."""
     klient.set_cookie(app_modul.KAPSEL, "av")
     html = _html(klient, "/aksje/BRFE")
-    assert '<section class="ki"' not in html and "kort fortalt" not in html
-    assert re.search(rf'<form class="ki-bryter" id="{app_modul.KI_ANKER}"[^>]*>', html)
+    ki = html.split(f'<section class="ki" id="{app_modul.KI_ANKER}"', 1)[1].split("</section>", 1)[0]
+    assert "Signalet forklart</span>" in ki and '<p class="dagene">' in ki and 'class="ki-tekst"' not in ki
+    assert re.search(r'<form class="ki-bryter"[^>]*>', ki)
     assert 'role="switch" aria-checked="false"' in html and '<span class="verdi" aria-hidden="true">Av</span>' in html
 
 

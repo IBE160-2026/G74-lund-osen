@@ -96,7 +96,11 @@ class TestSteget:
         Alle 15 seriene og indeksen stiger siste dag (serie_med_utslag).
         Gruppens svar 25.10 kl. 00:51: dagene er ikke med. Story 10.2i
         (svarene 5.11 kl. 19:13 og 23:36): aksjen selv, og ikke bransjen og
-        antallene. Ville ogsaa feilet hvis de kom med."""
+        antallene. Ville ogsaa feilet hvis de kom med. Story 10.9: moenster
+        2, fordi seriene og indeksen har kurs de siste boersdagene, men ikke
+        moenster 1 og 3, fordi basen bare har vurderingen for tirsdag. Ville
+        feilet hvis steget ikke ga grunnlaget moenstrene, eller ga et moenster
+        med for faa dager."""
         raa, base = stier
         kjoer(raa, base, FalskModell())
         vurdering = vurderingene(base, TIRSDAG)["EQNR"][0]
@@ -109,6 +113,8 @@ class TestSteget:
             "retning": vurdering.retning,
             "hovedindeksen": "steg",
             "aksjen": "steg",
+            "siste_5_kunne_telles": 4,
+            "siste_5_samme_vei": 4,
         }
         assert rad.regelen == regeltekst(vurdering)
 

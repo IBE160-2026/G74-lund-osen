@@ -98,7 +98,8 @@ def test_ankeret_for_ki_teksten_finnes_med_bryteren_av_og_paa(klient):
     assert re.search(rf'<section class="ki" id="{app_modul.KI_ANKER}"', paa)
     klient.set_cookie(app_modul.KAPSEL, app_modul.AV)
     av = _html(klient, "/aksje/KVST")
-    assert re.search(rf'<form class="ki-bryter" id="{app_modul.KI_ANKER}"', av)
+    # Story 10.9, del C: rammen står også med KI av, med ankeret.
+    assert re.search(rf'<section class="ki" id="{app_modul.KI_ANKER}"', av)
     for html in (av, paa):
         assert html.count(f'id="{app_modul.KI_ANKER}"') == 1
 
