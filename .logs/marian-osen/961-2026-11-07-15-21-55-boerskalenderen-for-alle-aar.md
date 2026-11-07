@@ -41,3 +41,26 @@ Instruksjonen kl. 13:35 07.11: story 2.16 «Børskalenderen for alle år», 8.20
 - PR #117 venter på gruppens svar på spørsmål 1–4 i spesifikasjonen for 2.16: 2025 i kalenderen, teksten i U100, rekkefølgen i porten, og klokka langt fram i tid. BH1 og ECH1 (middels) står åpne til gruppen har svart (regel 25).
 - Ved flettingen (VG6): datert linje ved `DEKKEDE_AAR` i `epics.md`, `designregler.md` og PRD-en, punkt 25 lukket, 2-16 til `done` i `sprint-status.yaml`, og radene for 2.16 i `docs/kvalitetssikring.md`.
 - BH10, utsatt: vinduet ved dobbeltklikket nevner ikke en konto hos EODHD fra før. Kan tas med 3.4h eller 8.20a.
+
+## 2026-11-07 kl. 15:56 — Marian Osen
+
+### Oppgave
+Instruksjonen kl. 15:37 07.11: PR #117 (story 2.16, 8.20c og porttestene) gjøres ferdig etter gruppens svar kl. 15:34 på spørsmål 1–4 og flettes, med punktet for flettingen (VG6) på main etterpå.
+
+### Plan
+- Steg 0 og kvotesjekken (regel 15), og instruksjonen i dagsfila.
+- Svaret under 2.16 og 8.20 i `epics.md` og under avgjørelsen kl. 11:47 i kvalitetssikringen.
+- Main inn i grenen, svaret i spesifikasjonen og BH1 og ECH1 lukket, CI, så squash-fletting låst til head-en.
+- VG6 på main, CI, og hele settet én gang alene.
+
+### Resultat
+- Kvoten kl. 15:37 (14:37 GMT): `apiRequestsDate` 2026-11-06, så 0 brukt og 20 igjen 07.11 i GMT, `extraLimit` 463. Ingen andre kall. `src/fetch_prices.py` er ikke kjørt, og `data/db/ose.db`, oppgaven, worktreen `G74-lund-osen-jobb` og `_privat/` er ikke rørt. Ingen demobase ble laget.
+- Main: `0abdfc7d` (instruksjonen) og `c183a07f` (svaret under 2.16, svar 2 under 8.20 og svar 3 i kvalitetssikringen).
+- Grenen: `2f17c77e` (main flettet inn) og `20571270` (svaret øverst i spesifikasjonen, BH1 og ECH1 lukket etter regel 25). Bare dokumenter: dokumenttestene ga 258 bestått. CI grønn på head-en (run 42382704962).
+- PR #117 squash-flettet i `a1c67c1a` kl. 15:43, låst til `20571270`. Grenen er slettet på GitHub, og worktreen `G74-lund-osen-2-16` er fjernet. CI grønn på flettecommiten (run 42382919357).
+- `485850ef`: VG6, punkt 25 lukket, 2.16 done, radene for 2.16 i kvalitetssikringen, 8.20c flettet i spesifikasjonen for 8.20, Ferdig-linja under 2.16 og to punkter krysset av. CI grønn (run 42383252158).
+- Hele settet alene på `485850ef`, 15:47:56–15:56:09, ledig minne 4,3 GB av 15,7 GB: 4387 bestått, 24 hoppet over og 0 feilet, også porttestene. Punktene om porttestene fra 29.10 og 07.11 i `issues.md` er derfor krysset av.
+
+### Åpne punkter
+- BH10 (utsatt til 3.4h eller 8.20a) står fortsatt åpent i `issues.md`.
+
