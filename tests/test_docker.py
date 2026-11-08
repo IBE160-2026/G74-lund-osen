@@ -1655,6 +1655,16 @@ SLIK_TAS_AKSJESIDEN = (
 # over periodeknappene, som står 632 px ned.
 FILENE_BAK_BOERSOMETERET = (*FILENE_BAK_AKSJESIDEN, "src/boersometer.py", "src/templates/boersometer.html")
 FILENE_BAK_MIN_LISTE = (*FILENE_BAK_AKSJESIDEN, "src/templates/index.html")
+# Gruppens ønske 08.11 kl. 23:59 (story 3.4h): investorsiden for BRFE i demoen,
+# med tegningen og boblen. demo.py gir navnene (DEMOUNIVERS).
+FILENE_BAK_INVESTORSIDEN = (
+    "src/app.py",
+    "src/demo.py",
+    "src/investorsider.py",
+    "src/templates/investorside.html",
+    "src/static/investorsider/brfe.svg",
+    "src/static/investorsider/bobler.json",
+)
 TOPPEN_AV_OVERSIKTEN = "docs/appen/oversikten-topp-demo.png"
 DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
@@ -1668,6 +1678,8 @@ DE_NYE_BILDENE = {
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 3327, FILENE_BAK_BOERSOMETERET),
+    # Gruppens ønske 08.11 kl. 23:59: investorsiden for BRFE, 948 px, hele siden.
+    "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 948, FILENE_BAK_INVESTORSIDEN),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1749,6 +1761,7 @@ AVTRYKK_BAK_DE_NYE_BILDENE = {
     "docs/appen/min-liste-demo.png": "bf4afee04419d7e011d34ce0a4f63f6b8e7e5968cf1e94c0b64b602c4c7c22df",
     "docs/appen/oversikten-390-demo.png": "c9b078b09c70d419543807b8b579860ddcbd1cb4a9f75a74e32ea912e58fdb4b",
     "docs/appen/boersometeret-390-demo.png": "f1a8772f949daebe13851ba9b01d4254d46a6b12e792791791e5ee6de2a2e4d9",
+    "docs/appen/investorsiden-brfe-demo.png": "7d9e8c68d59249b4ab16208d2f17256217260e0672fa82c5a2f9ab20fdd2b360",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
