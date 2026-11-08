@@ -117,3 +117,5 @@ På `4594dfa2` sju (A, A2, B, B2, C, C2 og D), alle fanget. På `db9e4ab9`, ette
 ## Bygget og ikke flettet
 
 Grenen `2-11-lista-leses-fra-basen` er ikke flettet. Gruppen går gjennom spørsmålene over før flettingen, og 6 og 7 er middels funn som står åpne (regel 25). 2.12 bygger på grenen.
+
+*Svar 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–7 er godtatt, og rådet anbefalte alt. ECH6 (spørsmål 6, middels) lukkes som avgjort av gruppen: en aksje som kommer inn igjen, får `ut` nullstilt, og en egen tabell med periodene venter til det trengs. BH3, ECH3 og VG3 (spørsmål 7, middels) lukkes som avgjort av gruppen: hentingen går videre med de 15 når basen ikke kan leses, som før 2.11 (AD-6). Graden på funnene er ikke endret (regel 25). Med det står ingen funn på middels eller over åpne. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
