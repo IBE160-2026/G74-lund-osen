@@ -72,3 +72,5 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 ## Bygget og ikke flettet
 
 Grenen `8-10b-vis-ki-tekst` er ikke flettet. Den bygger på 8.10 (PR #125), og flettes etter 2.11, 2.12 og 8.10. Flettes 10.6 (PR #122) også, må `_boersdagen` bruke `_ki_er_paa()` (BH3, ECH3).
+
+*Svar 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spørsmål 1–3 er godtatt, og rådet anbefalte det. BH3 og ECH3 (middels) rettes nå som 10.6 er flettet: `_boersdagen` bruker `_ki_er_paa()`, med en test. Svaret er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
