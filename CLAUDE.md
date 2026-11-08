@@ -155,6 +155,11 @@ et sitat som ikke fantes».
     30.09 under AD-3). En gren med en ny migrasjon bygges i en egen worktree,
     fordi appen som kjører fra repo-mappa, lastes på nytt ved en checkout og
     kunne migrert basen.
+    *Lagt til 2026-11-08 (gruppens svar kl. 11:57, instruksjonen kl. 14:05):*
+    prøvekjøringer på en gren kan lese `data/db/ose.db`, med `mode=ro` eller
+    som en kopi i en midlertidig mappe som slettes etterpå, og skriver aldri
+    i den. sha256 for basen er den samme før og etter. Brukt første gang i
+    §57 i `malinger.md` (story 10.6).
 23. **ruff før en commit.** `uv run ruff check --fix` og så `uv run ruff format`
     før hver commit som endrer `src/` eller `tests/`. Reglene står i `pyproject.toml`
     og er bare de som finner feil eller rot: pyflakes, importene og bugbear.
