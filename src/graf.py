@@ -180,6 +180,9 @@ class Signaldag:
     retning: str
     styrke: int
     alle: bool
+    # Gjennomgangen (BH5, ECH3): radien etter avstanden mellom dagene, så
+    # prikkene ikke blir et bånd over kurslinja i lange perioder.
+    r: float = 4.0
 
 
 @dataclass(frozen=True)
@@ -561,6 +564,10 @@ def bygg_graf(
         punktet = Navn(_x(i, len(punkter), bredde, hoeyre), _y(punkter[i].kurs, lav, hoy, hoyde, bunn))
     # Story 8.8: signal er {dato: (styrke, retning)} for dagene som skilte seg
     # ut, lest fra vurdering (les_periode). Bare dager grafen har, får en prikk.
+    avstand = (
+        abs(_x(1, len(punkter), bredde, hoeyre) - _x(0, len(punkter), bredde, hoeyre)) if len(punkter) > 1 else 8.0
+    )
+    radius = min(4.0, max(2.0, avstand / 2))
     signaldager = tuple(
         Signaldag(
             dato=d,
@@ -569,6 +576,7 @@ def bygg_graf(
             retning=signal[d][1],
             styrke=signal[d][0],
             alle=signal[d][0] >= alle,
+            r=radius + (1.0 if signal[d][0] >= alle else 0.0),
         )
         for i, d in enumerate(datoene)
         if signal and d in signal

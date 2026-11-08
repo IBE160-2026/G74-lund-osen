@@ -1142,3 +1142,5 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .signaldag.negativ { fill: var(--ned); }
 :where(.side-aksje) .signaldag.blandet { fill: var(--blandet); }
 :where(.side-aksje) .signaldag.alle { stroke: var(--gul-symbol); stroke-width: 2.5; }
+:where(.side-aksje) figcaption .skjult { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
+                                         clip: rect(0 0 0 0); white-space: nowrap; }

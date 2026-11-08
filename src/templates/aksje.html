@@ -207,13 +207,6 @@
           <polyline class="ma50linje" points="{{ g.ma50linje }}"></polyline>
         {% endif %}
         <polyline class="kurslinje" points="{{ g.kurslinje }}"></polyline>
-        {#- Story 8.8 (FR-206): en prikk på kurslinja for hver dag aksjen
-            skilte seg ut, i fargen for retningen, med gul ring ved 3 av 3.
-            Lest fra vurdering, aldri regnet. Skjermleseren får dagene i
-            teksten under grafen. #}
-        {% for s in g.signaldager %}
-          <circle class="signaldag {{ s.retning|lower }}{% if s.alle %} alle{% endif %}" cx="{{ "%.1f"|format(s.x) }}" cy="{{ "%.1f"|format(s.y) }}" r="{{ 5 if s.alle else 4 }}"></circle>
-        {% endfor %}
         {#- Story 8.20a (del C, spørsmål 9 i 8.20, U89): datoen i en svart lapp
             øverst på streken, og uten punktet nederst. Lappen står innenfor
             grafen sidelengs, også ved kanten. Story 8.20b (BH9): lappen står
@@ -226,6 +219,18 @@
           <text class="daglapptekst" text-anchor="middle" x="{{ "%.1f"|format(lappx + 22) }}" y="{{ lappy + 13 }}">{{ dagen.dato|dato }}</text>
         {% endif %}
         {% if g.siste %}<circle class="sistepunkt" cx="{{ "%.1f"|format(g.siste.x) }}" cy="{{ "%.1f"|format(g.siste.y) }}" r="4.5"></circle>{% endif %}
+        {#- Story 8.8 (FR-206): en prikk på kurslinja for hver dag aksjen
+            skilte seg ut, lest fra vurdering og aldri regnet. Gjennomgangen
+            (ECH2): tegnet etter siste-punktet og streken, så de ikke dekker
+            den. Gjennomgangen (BH2, ECH7): retningen har også en form,
+            rund for positiv, firkant for negativ og rute for blandet, og
+            gul ring ved 3 av 3. Skjermleseren får dagene under grafen. #}
+        {% for s in g.signaldager %}
+          {%- set klasse = "signaldag " ~ s.retning|lower ~ (" alle" if s.alle else "") %}
+          {% if s.retning == "Negativ" %}<rect class="{{ klasse }}" x="{{ "%.1f"|format(s.x - s.r) }}" y="{{ "%.1f"|format(s.y - s.r) }}" width="{{ "%.1f"|format(2 * s.r) }}" height="{{ "%.1f"|format(2 * s.r) }}"></rect>
+          {%- elif s.retning == "Blandet" %}<polygon class="{{ klasse }}" points="{{ "%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f"|format(s.x, s.y - s.r * 1.3, s.x + s.r * 1.3, s.y, s.x, s.y + s.r * 1.3, s.x - s.r * 1.3, s.y) }}"></polygon>
+          {%- else %}<circle class="{{ klasse }}" cx="{{ "%.1f"|format(s.x) }}" cy="{{ "%.1f"|format(s.y) }}" r="{{ "%.1f"|format(s.r) }}"></circle>{% endif %}
+        {% endfor %}
         {#- Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved
             enden av linjene, og den stiplede linja har også navn. #}
         {% if g.kursnavn %}<text class="linjenavn kurs" x="{{ "%.1f"|format(g.kursnavn.x) }}" y="{{ "%.1f"|format(g.kursnavn.y) }}">{{ linjenavn.kurs }}</text>{% endif %}
@@ -270,7 +275,11 @@
         {#- FR-201: 1 år, og de andre periodene, viser bare det serien har. #}
         {% if kort_serie %}Kursserien begynner {{ serien_begynner|dato }}, så grafen viser bare det den har.{% endif %}
         {#- Story 8.8: datoen markeringene starter, og hvor mange dager. #}
-        {% if signal_fra %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}.{% if graf.signaldager %} <span class="skjult">Dagene i grafen: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}){% if not loop.last %}, {% endif %}{% endfor %}.</span>{% else %} Ingen dager i perioden.{% endif %}{% endif %}
+        {#- Gjennomgangen (BH4, BH6, ECH4): antallet står, lista over dagene
+            bare for skjermleser og bare opptil 31, og en startdato etter
+            grafen sies for seg. #}
+        {% if signal_fra and signal_fra > graf.siste_dato %}Signalet er lagret fra {{ signal_fra|dato }}, etter den siste dagen i grafen, så grafen har ingen prikker.
+        {% elif signal_fra %}{% set n = graf.signaldager|length %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}. {% if n %}Rund prikk er positiv, firkant negativ og rute blandet. {{ n }} {{ "dag" if n == 1 else "dager" }} i grafen{% if n <= 31 %}<span class="skjult">: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}){% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}.{% else %}Ingen av dagene i grafen hadde signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% endif %}
         {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}

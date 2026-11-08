@@ -179,7 +179,7 @@ Nederst på aksjesiden står «Signalet dag for dag»: det appen skrev om aksjen
 
 ### Hva er prikkene på kurslinja?
 
-Prikkene på kurslinja i kursgrafen på aksjesiden viser dagene aksjen skilte seg ut, med signalstyrke 2 eller mer, som i oversikten. Fargen er retningen den dagen: grønn for positiv, rød for negativ og lilla for blandet, og en gul ring betyr 3 av 3. Prikkene er det appen lagret den kvelden, ikke regnet på nytt av kursene. En dag uten signal, med en grunn eller som ikke er børsdag, har ingen prikk, og heller ikke en dag med styrke 0 eller 1. Under grafen står datoen signalet begynte å bli lagret, og før den er det ingen prikker. I demoen begynner de mandag 21. september 2026.
+Prikkene på kurslinja i kursgrafen på aksjesiden viser dagene aksjen skilte seg ut, med signalstyrke 2 eller mer, som i oversikten. Fargen og formen er retningen den dagen: en grønn rund prikk for positiv, en rød firkant for negativ og en lilla rute for blandet, og en gul ring betyr 3 av 3. Under grafen står hvor mange slike dager grafen har. Prikkene er det appen lagret den kvelden, ikke regnet på nytt av kursene. En dag uten signal, med en grunn eller som ikke er børsdag, har ingen prikk, og heller ikke en dag med styrke 0 eller 1. Under grafen står datoen den første raden for aksjen ble lagret, med signal eller med en grunn, og før den er det ingen prikker. I demoen begynner de mandag 21. september 2026.
 
 ### Hva er «Signalet forklart» på aksjesiden?
 
