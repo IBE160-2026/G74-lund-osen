@@ -686,7 +686,8 @@ def boersometer():
             **felles,
         )
     oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
-    poster = oversiktsleser.oversikt()
+    # Story 2.11 (gjennomgangen, BH1, ECH1): aksjene i lista i dag.
+    poster = oversiktsleser.oversikt(idag())
     serier = {post.aksje.symbol: leser.serie(post.aksje.symbol) for post in poster}
     datoer = sorted({rad.dato for serie in serier.values() for rad in serie})
     if not datoer:
@@ -878,7 +879,8 @@ def _tabellsiden(aktiv: str):
         )
 
     oversiktsleser = _leser_eller_basefeil(hent_oversiktsleser)
-    poster = oversiktsleser.oversikt()
+    # Story 2.11 (gjennomgangen, BH1, ECH1): aksjene i lista i dag.
+    poster = oversiktsleser.oversikt(idag())
     i_dag = idag()
     rader = bygg_oversikt(poster, i_dag, STANDARD, _dager_i_serien(leser, poster))
     # Story 8.15: linja om 3 av 3 og «N av M» bruker rader, som står i
@@ -921,17 +923,20 @@ def _tabellsiden(aktiv: str):
             for rad in rader
         ]
     elif valg is not None and valg.periode == VELG:
+        # Story 2.11 (gjennomgangen, BH2): aksjene i lista den valgte dagen,
+        # også en som er tatt ut siden.
+        poster_dagen = oversiktsleser.oversikt(valg.dag)
         vist = sorter_fr102(
             [
                 bygg_rad_for_dag(
                     post,
-                    serier.get(post.aksje.symbol, []),
+                    serier[post.aksje.symbol] if post.aksje.symbol in serier else leser.serie(post.aksje.symbol),
                     valg.dag,
                     oversiktsleser.vurdering(post.aksje.symbol, valg.dag),
                     i_dag,
                     post.aksje.symbol in tre_av_tre,
                 )
-                for post in poster
+                for post in poster_dagen
                 if post.nyeste is not None
             ]
         )
@@ -1157,11 +1162,11 @@ def aksjedetalj(symbol: str):
     if valg.periode == VELG:
         innhold = oversiktsleser.vurdering(post.aksje.symbol, slutt)
         detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt, dag=slutt, innhold=innhold)
-        dagen = bygg_dagen(rader, slutt, innhold, i_dag)
+        dagen = bygg_dagen(rader, slutt, innhold, i_dag, post.ut)
     else:
         detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt)
         if valg.periode == SISTE:
-            dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag)
+            dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag, post.ut)
     if detalj is None:
         abort(404)
 
@@ -1269,7 +1274,7 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     maaned, beskjed = les_maaned(request.args.get(PARAMETER), dagen, rader[0].dato, rader[-1].dato)
     lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
     radene = lager.les_periode(post.aksje.symbol, *perioden(maaned))
-    return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed)
+    return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed, ut=post.ut)
 
 
 def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -> tuple[str | None, str | None]:
@@ -1299,7 +1304,8 @@ def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -
     except (sqlite3.Error, ValueError, RuntimeError):
         indeksserie = None
     try:
-        lista = tuple(p.aksje for p in oversiktsleser.oversikt())
+        # Story 2.11 (gjennomgangen, ECH5): lista den dagen, som grunnlaget.
+        lista = tuple(p.aksje for p in oversiktsleser.oversikt(detalj.dato))
         serier = {aksje.symbol: leser.serie(aksje.symbol) for aksje in lista}
     except (sqlite3.Error, ValueError, RuntimeError) as feil:
         app.logger.warning("Dagen kunne ikke leses: %s: %s", type(feil).__name__, feil)

@@ -931,7 +931,7 @@ class TestSetningenOmSammeDag:
         """Ville feilet hvis siden feilet, eller skrev antall den ikke har
         lest, naar lista ikke kan leses. Setningen om dagene staar."""
 
-        def feiler(self):
+        def feiler(self, dag=None):
             raise sqlite3.OperationalError("database is locked")
 
         monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", feiler)

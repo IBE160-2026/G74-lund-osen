@@ -401,7 +401,7 @@ class TestSiden:
         """Lista fra porten kortes til de 4 første. Ville feilet med et fast
         antall bransjer (mutant 3) eller aksjer."""
         hele = SqliteOversiktsleser.oversikt
-        monkeypatch.setattr(SqliteOversiktsleser, "oversikt", lambda self: hele(self)[:4])
+        monkeypatch.setattr(SqliteOversiktsleser, "oversikt", lambda self, dag=None: hele(self, dag)[:4])
         html = _side(klient)
         bransjer = {post.aksje.sektor for post in hele(SqliteOversiktsleser(sqlite3.connect(demo_sti())))[:4]}
         assert len(_ruter(html)) == 4
@@ -662,7 +662,7 @@ class TestSiden:
     def test_bøyningen_i_linja_over(self, klient, monkeypatch):
         """Gjennomgangen (BH8): ville feilet med «1 aksjer i 1 bransjer»."""
         hele = SqliteOversiktsleser.oversikt
-        monkeypatch.setattr(SqliteOversiktsleser, "oversikt", lambda self: hele(self)[:1])
+        monkeypatch.setattr(SqliteOversiktsleser, "oversikt", lambda self, dag=None: hele(self, dag)[:1])
         assert "1 aksje i 1 bransje</p>" in _side(klient)
 
 

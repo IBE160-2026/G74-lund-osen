@@ -30,6 +30,8 @@ class Art(StrEnum):
     GRUNN = "grunn"  # rad med grunn (punkt 24)
     IKKE_KJOERT = "ikke_kjoert"  # ingen rad, og dagen var boersdag
     IKKE_BOERSDAG = "ikke_boersdag"  # ingen rad, og dagen var ikke boersdag
+    # Story 2.11: ingen rad, og aksjen var tatt ut av lista den dagen.
+    IKKE_I_LISTA = "ikke_i_lista"
 
 
 @dataclass(frozen=True)
@@ -45,7 +47,7 @@ def _kontroller_dag(navn: str, verdi) -> None:
         raise TypeError(f"{navn} maa vaere datetime.date, fikk {verdi!r}")
 
 
-def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilstand:
+def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date, ut: date | None = None) -> Tilstand:
     """Tilstanden for det Vurderingslager.les ga for dato, sett fra idag.
 
     idag er dagens dato i Oslo (boersdag.norsk_dato). Grensen er dagens dato og
@@ -79,6 +81,12 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> Tilst
         return Tilstand(Art.SVAR, innhold)
     if isinstance(innhold, Grunn):
         return Tilstand(Art.GRUNN, innhold)
+    # Story 2.11: ut er den foerste dagen aksjen ikke er i lista. En boersdag
+    # uten rad fra og med den er «ikke i lista», ikke en dag vi ikke kjoerte.
+    if ut is not None:
+        _kontroller_dag("ut", ut)
+        if dato >= ut and er_boersdag(dato):
+            return Tilstand(Art.IKKE_I_LISTA)
     if er_boersdag(dato):
         return Tilstand(Art.IKKE_KJOERT)
     return Tilstand(Art.IKKE_BOERSDAG)

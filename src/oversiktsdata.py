@@ -41,13 +41,15 @@ class Oversiktspost:
     forrige: Kursrad | None
     hentet: datetime | None
     innhold: Vurdering | Grunn | None
+    # Story 2.11: den foerste dagen aksjen ikke er i lista, None naar den er i lista.
+    ut: date | None = None
 
 
 @runtime_checkable
 class Oversiktsleser(Protocol):
     """Porten for oversikten. Bare lesemetoder, og en test holder det slik."""
 
-    def oversikt(self) -> list[Oversiktspost]:
+    def oversikt(self, dag: date | None = None) -> list[Oversiktspost]:
         """En post per aksje i aksje, i rowid-rekkefoelge."""
 
     def post(self, symbol: str) -> Oversiktspost | None:

@@ -362,7 +362,8 @@ def bygg_detalj(
         har_kurs = bool(serie) and serie[-1].dato == dag
         sluttkurs = float(serie[-1].slutt) if har_kurs else None
 
-    utfall, tekst = les_tilstand(innhold, dato, idag)
+    # Story 2.11: «ikke i lista» etter at aksjen gikk ut.
+    utfall, tekst = les_tilstand(innhold, dato, idag, post.ut)
     sjekker: tuple[SjekkVisning, ...] = ()
     if utfall is not None and utfall.art is Art.SVAR:
         sjekker = tuple(
@@ -428,10 +429,12 @@ class Dagen:
         return RETNINGSVISNING.get(self.vurdering.retning, UKJENT_RETNING)
 
 
-def bygg_dagen(rader: list[Kursrad], dag: date, innhold: Vurdering | Grunn | None, idag: date) -> Dagen:
+def bygg_dagen(
+    rader: list[Kursrad], dag: date, innhold: Vurdering | Grunn | None, idag: date, ut: date | None = None
+) -> Dagen:
     """Dagen med endringen fra kursserien og den lagrede raden i vurdering.
     Endringen er None naar serien ikke har dagen eller dagen foer."""
     foer = [rad for rad in rader if rad.dato <= dag]
     endring = endring_i_prosent(foer) if foer and foer[-1].dato == dag else None
-    tilstand_, tekst = les_tilstand(innhold, dag, idag)
+    tilstand_, tekst = les_tilstand(innhold, dag, idag, ut)
     return Dagen(dato=dag, endring=endring, tilstand=tilstand_, tekst=tekst)

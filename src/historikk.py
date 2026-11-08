@@ -183,13 +183,17 @@ def _dag(
     rader: dict[date, Vurdering | Grunn],
     idag: date,
     terskel: int,
+    ut: date | None = None,
 ) -> Dag:
     innhold = rader.get(dato)
-    if (dato > siste or dato < foerste) and innhold is None:
+    # Story 2.11: etter at aksjen gikk ut, har den ingen kurser, men dagene
+    # til og med i dag sier «ikke i lista», ikke ingenting.
+    tatt_ut = ut is not None and ut <= dato <= idag
+    if (dato > siste or dato < foerste) and innhold is None and not tatt_ut:
         return Dag(dato, None, None, tom=True, lenke=False, skilte_seg_ut=False)
-    tilstand_, tekst = les_tilstand(innhold, dato, idag)
-    ut = isinstance(innhold, Vurdering) and innhold.styrke >= terskel
-    return Dag(dato, tilstand_, tekst, tom=False, lenke=dato in kursdager and dato > foerste, skilte_seg_ut=ut)
+    tilstand_, tekst = les_tilstand(innhold, dato, idag, ut)
+    skilte = isinstance(innhold, Vurdering) and innhold.styrke >= terskel
+    return Dag(dato, tilstand_, tekst, tom=False, lenke=dato in kursdager and dato > foerste, skilte_seg_ut=skilte)
 
 
 def bygg_maaned(
@@ -199,6 +203,7 @@ def bygg_maaned(
     idag: date,
     terskel: int,
     beskjed: str | None = None,
+    ut: date | None = None,
 ) -> Maaned:
     """Maaneden med ukene, dagene og tallene.
 
@@ -212,7 +217,7 @@ def bygg_maaned(
     mandag = maaned - timedelta(days=maaned.weekday())
     while mandag <= slutt:
         dager = tuple(
-            _dag(dato, kursdager, foerste, siste, rader, idag, terskel) if dato.month == maaned.month else None
+            _dag(dato, kursdager, foerste, siste, rader, idag, terskel, ut) if dato.month == maaned.month else None
             for dato in (mandag + timedelta(days=i) for i in range(HVERDAGER))
         )
         if any(dag is not None for dag in dager):
