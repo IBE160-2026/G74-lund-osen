@@ -468,7 +468,7 @@ _OVERSIKT = (
     + ", ".join(f"f.{k}" for k in _KURSFELT.split(", "))
     + ", "
     + ", ".join(f"v.{k}" for k in VURDERINGSKOLONNER)
-    + ", v.grunn "
+    + ", v.grunn, a.ut "
     "FROM aksje a "
     "LEFT JOIN kursserie ks ON ks.symbol = a.symbol "
     "LEFT JOIN kurs n ON n.symbol = a.symbol "
@@ -498,7 +498,9 @@ class SqliteOversiktsleser:
         self._tilkobling = tilkobling
 
     def oversikt(self) -> list[Oversiktspost]:
-        return [_post(rad) for rad in self._tilkobling.execute(_OVERSIKT + "ORDER BY a.rowid")]
+        """Aksjene i lista. Story 2.11: en aksje som er tatt ut (ut er satt),
+        er ikke med; post gir den fortsatt, til aksjesiden."""
+        return [_post(rad) for rad in self._tilkobling.execute(_OVERSIKT + "WHERE a.ut IS NULL ORDER BY a.rowid")]
 
     def post(self, symbol: str) -> Oversiktspost | None:
         rad = self._tilkobling.execute(_OVERSIKT + "WHERE a.symbol = ?", (symbol,)).fetchone()
@@ -520,7 +522,7 @@ def _post(rad) -> Oversiktspost:
     symbol, ticker, navn, sektor, hentet = rad[:5]
     nyeste = _kursrad(*rad[5:9])
     forrige = _kursrad(*rad[9:13])
-    *felt, grunn = rad[13:]
+    *felt, grunn, ut = rad[13:]
     har_rad = grunn is not None or felt[0] is not None
     return Oversiktspost(
         aksje=Aksje(symbol, ticker, navn, sektor),
@@ -528,6 +530,24 @@ def _post(rad) -> Oversiktspost:
         forrige=forrige,
         hentet=datetime.fromisoformat(hentet) if hentet is not None else None,
         innhold=_innhold(felt, grunn) if har_rad else None,
+        ut=date.fromisoformat(ut) if ut is not None else None,
+    )
+
+
+def les_lista(tilkobling: sqlite3.Connection, dato: date, *, godta_en_versjon_bak: bool = False) -> tuple[Aksje, ...]:
+    """Aksjene i lista paa dato - story 2.11, FR-412, AD-21.
+
+    En aksje er i lista naar inn er NULL eller ikke etter dato, og ut er NULL
+    eller etter dato. Rekkefoelgen er rowid, som i oversikten. Bare lesing."""
+    _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
+    dag = dato.isoformat()
+    return tuple(
+        Aksje(*rad)
+        for rad in tilkobling.execute(
+            "SELECT symbol, ticker, navn, sektor FROM aksje "
+            "WHERE (inn IS NULL OR inn <= ?) AND (ut IS NULL OR ut > ?) ORDER BY rowid",
+            (dag, dag),
+        )
     )
 
 

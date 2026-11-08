@@ -361,6 +361,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (MARKEDSOVERSIKT, "def grunn_med_tall("),
                 (MARKEDSOVERSIKT, 'IKKE_VURDERT = "ikke vurdert"'),
                 (MARKEDSOVERSIKT, 'IKKE_BOERSDAG = "ikke børsdag"'),
+                # Story 2.11: «ikke i lista» etter at aksjen gikk ut.
+                (MARKEDSOVERSIKT, 'IKKE_I_LISTA = "ikke i lista"'),
             ),
         ),
         "retning": Hjelpetekst(

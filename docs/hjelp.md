@@ -195,6 +195,10 @@ Retningen er oftere positiv når kursene stiger. Trend er en tilstand som kan va
 
 Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor. Retningen står da som «– Ukjent», som ikke er en femte retning: «– Ingen» betyr at sjekkene ble regnet uten at noen slo ut. I børsometeret kan «ikke vurdert» i en rute også ha en annen grunn, som for kort kurshistorikk. Når en slik rute viser «ikke vurdert», sier en egen fotnote under kartet at grunnen står i tabellen og på aksjesiden, og har kartet begge slags ruter, står begge fotnotene. I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med `--les-inn`. Er dagen siste børsdag, også når siden leses i helga eller på en helligdag, sier fotnoten i tillegg at signalet for den dagen fortsatt kan lagres hvis hentingen kjøres ferdig før neste børsdag. I demoen sier fotnoten for en dag før 21.09 at vurderingene starter mandag 21.09, slik den ekte versjonen har signal fra første henting. En dag fra 21.09 uten vurdering får den ekte teksten, også i demoen.
 
+### Hva betyr «ikke i lista»?
+
+Appen henter og vurderer bare aksjene som er i lista. Lista står i basen, med datoen hver aksje kom inn og gikk ut. En aksje som er tatt ut, står ikke lenger i oversikten, Min liste eller børsometeret, men aksjesiden viser den fortsatt, med kursene og signalet som er lagret. For en børsdag etter at aksjen gikk ut står «ikke i lista», ikke «ikke vurdert», fordi appen ikke skulle vurdere den den dagen. Det som alt er lagret, slettes aldri.
+
 ## Den ekte versjonen
 
 ### Hva med nøkkelen?

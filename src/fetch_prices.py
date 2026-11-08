@@ -111,7 +111,7 @@ from lagring_fil import (
     SnapshotLeser,
     _hentet_fra_tekst,
 )
-from lagring_sqlite import SqliteIndekslager, SqliteKurslager, SqliteVurderingslager, aapne_base
+from lagring_sqlite import SqliteIndekslager, SqliteKurslager, SqliteVurderingslager, aapne_base, les_lista
 from migrering import MigrasjonsFeil
 from signalberegning import vurder
 from vurderingsdata import Grunn
@@ -774,6 +774,36 @@ def _aapne_for_sjekken(base_sti: Path) -> sqlite3.Connection:
     return tilkobling
 
 
+def lista_fra_basen(base_sti: Path, dato: date) -> tuple[Aksje, ...]:
+    """Aksjene i lista paa dato, fra aksje i basen - story 2.11.
+
+    Basen aapnes som i sjekkene foer foerste kall (_aapne_for_sjekken): uten
+    migrering og skrivebeskyttet. En base en versjon bak, foer 0009, har ikke
+    inn og ut, og da er lista alle aksjene i aksje, som foer 2.11. Finnes
+    basen ikke, eller kan den ikke leses, er lista AKSJEUNIVERS, som 0003
+    legger inn i en ny base."""
+    if not base_sti.exists():
+        return AKSJEUNIVERS
+    try:
+        tilkobling = _aapne_for_sjekken(base_sti)
+    except BASEFEIL:
+        return AKSJEUNIVERS
+    try:
+        kolonner = {rad[1] for rad in tilkobling.execute("PRAGMA table_info(aksje)")}
+        if "ut" in kolonner:
+            lista = les_lista(tilkobling, dato, godta_en_versjon_bak=True)
+        else:
+            lista = tuple(
+                Aksje(*rad)
+                for rad in tilkobling.execute("SELECT symbol, ticker, navn, sektor FROM aksje ORDER BY rowid")
+            )
+    except BASEFEIL:
+        return AKSJEUNIVERS
+    finally:
+        tilkobling.close()
+    return lista or AKSJEUNIVERS
+
+
 def manglende_i_basen(base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS) -> list[str]:
     """Aksjene i lista som ikke har en kurs for dato i basen - story 2.3.
 
@@ -854,7 +884,7 @@ def kjoer(
     *,
     uten_tidskontroll: bool = False,
     les_kvote: Callable[[str], object],
-    lista: tuple[Aksje, ...] = AKSJEUNIVERS,
+    lista: tuple[Aksje, ...] | None = None,
     modell: Modell | None = None,
 ) -> Path | None:
     """En henting. Returnerer fila som ble skrevet, eller None hvis
@@ -991,6 +1021,12 @@ def kjoer(
                 "dagens kurs ennå, skrives fila likevel under dagens dato, og "
                 "kveldens henting stopper da ved filvakten med 0 kall."
             )
+
+    # Story 2.11 (FR-412): lista er aksjene i lista i basen paa boersdagen,
+    # og AKSJEUNIVERS bare naar basen ikke finnes ennaa eller ikke kan leses,
+    # som foer. En aksje som er tatt ut, hentes ikke (AD-21).
+    if lista is None:
+        lista = lista_fra_basen(base_sti, dato)
 
     # Basen (FR-402): har den boersdagen for alle aksjene, er det ingenting aa hente.
     try:

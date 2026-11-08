@@ -41,6 +41,8 @@ class Oversiktspost:
     forrige: Kursrad | None
     hentet: datetime | None
     innhold: Vurdering | Grunn | None
+    # Story 2.11: den foerste dagen aksjen ikke er i lista, None naar den er i lista.
+    ut: date | None = None
 
 
 @runtime_checkable

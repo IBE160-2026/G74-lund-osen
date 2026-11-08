@@ -1150,11 +1150,11 @@ def aksjedetalj(symbol: str):
     if valg.periode == VELG:
         innhold = oversiktsleser.vurdering(post.aksje.symbol, slutt)
         detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt, dag=slutt, innhold=innhold)
-        dagen = bygg_dagen(rader, slutt, innhold, i_dag)
+        dagen = bygg_dagen(rader, slutt, innhold, i_dag, post.ut)
     else:
         detalj = bygg_detalj(post, rader, i_dag, STANDARD, start=start, slutt=slutt)
         if valg.periode == SISTE:
-            dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag)
+            dagen = bygg_dagen(rader, slutt, oversiktsleser.vurdering(post.aksje.symbol, slutt), i_dag, post.ut)
     if detalj is None:
         abort(404)
 
@@ -1262,7 +1262,7 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     maaned, beskjed = les_maaned(request.args.get(PARAMETER), dagen, rader[0].dato, rader[-1].dato)
     lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
     radene = lager.les_periode(post.aksje.symbol, *perioden(maaned))
-    return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed)
+    return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed, ut=post.ut)
 
 
 def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -> tuple[str | None, str | None]:

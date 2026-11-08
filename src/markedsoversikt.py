@@ -75,6 +75,8 @@ GRUNNTEKST: dict[Grunn, str] = {
 }
 IKKE_VURDERT = "ikke vurdert"
 IKKE_BOERSDAG = "ikke børsdag"
+# Story 2.11: en dag etter at aksjen gikk ut av lista.
+IKKE_I_LISTA = "ikke i lista"
 
 
 def utenfor_kalenderen() -> str:
@@ -90,7 +92,9 @@ def utenfor_kalenderen() -> str:
 ETTER_I_DAG = "datoen er etter i dag"
 
 
-def les_tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> tuple[Tilstand | None, str | None]:
+def les_tilstand(
+    innhold: Vurdering | Grunn | None, dato: date, idag: date, ut: date | None = None
+) -> tuple[Tilstand | None, str | None]:
     """Tilstanden for raden, og teksten som vises under «–».
 
     Teksten er None bare for en vurdering, ogsaa med styrke 0. En dato
@@ -101,7 +105,7 @@ def les_tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> t
     if dato > idag:
         return None, ETTER_I_DAG
     try:
-        utfall = tilstand(innhold, dato, idag)
+        utfall = tilstand(innhold, dato, idag, ut)
     except UtenforKalenderen:
         return None, utenfor_kalenderen()
     if utfall.art is Art.SVAR:
@@ -110,6 +114,8 @@ def les_tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date) -> t
         return utfall, GRUNNTEKST[utfall.innhold]
     if utfall.art is Art.IKKE_KJOERT:
         return utfall, IKKE_VURDERT
+    if utfall.art is Art.IKKE_I_LISTA:
+        return utfall, IKKE_I_LISTA
     return utfall, IKKE_BOERSDAG
 
 
