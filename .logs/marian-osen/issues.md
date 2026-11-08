@@ -161,3 +161,4 @@
 - [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Mandag 09.11: `uv run python src/fetch_prices.py --les-boerslista` én gang før aksjer kan velges (2.12)
 - [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Konflikt i `index.html` mellom 10.6 og 2.12 ved flettingen: «Dine egne aksjer» før «Børsdagen kort fortalt»
 - [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Spørsmål 11 i 2.12: hentingen måler ikke omsetningen for en ny aksje
+- [ ] 2026-11-08 [story-8-10-innstillinger](951-2026-11-08-19-20-18-story-8-10-innstillinger.md) — PR #125 (8.10) er ikke flettet; den flettes etter PR #123 og #124
