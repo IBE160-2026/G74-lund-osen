@@ -207,6 +207,13 @@
           <polyline class="ma50linje" points="{{ g.ma50linje }}"></polyline>
         {% endif %}
         <polyline class="kurslinje" points="{{ g.kurslinje }}"></polyline>
+        {#- Story 8.8 (FR-206): en prikk på kurslinja for hver dag aksjen
+            skilte seg ut, i fargen for retningen, med gul ring ved 3 av 3.
+            Lest fra vurdering, aldri regnet. Skjermleseren får dagene i
+            teksten under grafen. #}
+        {% for s in g.signaldager %}
+          <circle class="signaldag {{ s.retning|lower }}{% if s.alle %} alle{% endif %}" cx="{{ "%.1f"|format(s.x) }}" cy="{{ "%.1f"|format(s.y) }}" r="{{ 5 if s.alle else 4 }}"></circle>
+        {% endfor %}
         {#- Story 8.20a (del C, spørsmål 9 i 8.20, U89): datoen i en svart lapp
             øverst på streken, og uten punktet nederst. Lappen står innenfor
             grafen sidelengs, også ved kanten. Story 8.20b (BH9): lappen står
@@ -262,6 +269,8 @@
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
         {#- FR-201: 1 år, og de andre periodene, viser bare det serien har. #}
         {% if kort_serie %}Kursserien begynner {{ serien_begynner|dato }}, så grafen viser bare det den har.{% endif %}
+        {#- Story 8.8: datoen markeringene starter, og hvor mange dager. #}
+        {% if signal_fra %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}.{% if graf.signaldager %} <span class="skjult">Dagene i grafen: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}){% if not loop.last %}, {% endif %}{% endfor %}.</span>{% else %} Ingen dager i perioden.{% endif %}{% endif %}
         {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}

@@ -1231,7 +1231,10 @@ HOEYDE_PAA_BILDET = 1864
 # og er byte for byte det samme.
 # Story 3.4h: skriftene for sidene i demoen i src/static/fonts/ og stil.css.
 # Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c"
+# Story 8.8: prikkene for signaldagene i kursgrafen (aksje.html, graf.py, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden er ny og 2294 px hoey;
+# de andre er byte for byte de samme.
+AVTRYKK_BAK_BILDET = "ba52b76e0e670bca5080872e575dc331c65892ec98a352e9a08fcf11f2d7158a"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1328,7 +1331,8 @@ IKKE_BAK_AKSJESIDEN = {"src/lagring_fil.py", "src/eodhd.py", "src/boersometer.py
 # Story 3.4h: 2258, fordi fotnoten om NewsWeb mellom grafen og rammen er borte
 # (boblen står nederst). Bunnen av rammen er 2257,5 px, maalt med
 # DevTools-protokollen og rundet opp. Var 2300.
-HOEYDE_PAA_AKSJESIDEN = 2258
+# Story 8.8: 2294, fordi teksten under grafen har en linje om prikkene og dagene. Var 2258.
+HOEYDE_PAA_AKSJESIDEN = 2294
 # Story 2.3, kl. 22 fra 20.10: stripa sier kl. 22.15 igjen, ikke 21.15.
 # Story 10.5: lenken til investorsiden står under grafen, ved 1980 px målt i
 # Edge uten vindu, så bildet, som slutter ved bunnen av grafen (1872 px), ble
@@ -1594,7 +1598,10 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 3.4h: boblen nederst i stedet for fotnoten om NewsWeb (aksje.html og
 # _investorboble.html), investorsider.py, skriftene og stil.css. Bildet ble tatt paa
 # nytt og er 2258 px hoeyt.
-AVTRYKK_BAK_AKSJESIDEN = "7027a296c59d723af051423f5e9e71f015c5edc0d714b0ddd08f5699707d094a"
+# Story 8.8: prikkene for signaldagene i kursgrafen (aksje.html, graf.py, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden er ny og 2294 px hoey;
+# de andre er byte for byte de samme.
+AVTRYKK_BAK_AKSJESIDEN = "c4c1ec375c8bdcb917688ff5b33bbcefb7dedcc4a1f2a3fb1870c00a4786fcfe"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1690,12 +1697,15 @@ DE_NYE_BILDENE = {
 # de tre andre er byte for byte de samme.
 # Story 3.4h: skriftene for sidene i demoen i src/static/fonts/ og stil.css. Alle
 # bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# Story 8.8: prikkene for signaldagene i kursgrafen (aksje.html, graf.py, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden er ny og 2294 px hoey;
+# de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c",
-    "docs/appen/boersometeret-demo.png": "075d79618ba19a38f39e18a6f7b1b1b5dcc7973a8dc5e21b98df9fea8755677e",
-    "docs/appen/min-liste-demo.png": "45448a94576b91a3cf3df73966af83ab53736162c7a65730d71659204a1f0f77",
-    "docs/appen/oversikten-390-demo.png": "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c",
-    "docs/appen/boersometeret-390-demo.png": "075d79618ba19a38f39e18a6f7b1b1b5dcc7973a8dc5e21b98df9fea8755677e",
+    TOPPEN_AV_OVERSIKTEN: "ba52b76e0e670bca5080872e575dc331c65892ec98a352e9a08fcf11f2d7158a",
+    "docs/appen/boersometeret-demo.png": "9d255dd50142d84b53761ab85a9fb03f616d54aa4bb423dcd37c50c1973cb271",
+    "docs/appen/min-liste-demo.png": "6193cf50a7c5a5a685975daa7769ef5f316739c16dac5d22450b768894f2a18b",
+    "docs/appen/oversikten-390-demo.png": "ba52b76e0e670bca5080872e575dc331c65892ec98a352e9a08fcf11f2d7158a",
+    "docs/appen/boersometeret-390-demo.png": "9d255dd50142d84b53761ab85a9fb03f616d54aa4bb423dcd37c50c1973cb271",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

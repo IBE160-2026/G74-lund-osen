@@ -1135,3 +1135,10 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
   :where(.side-demoselskap) p.boble { order: 3; position: static; width: auto; max-width: 560px; margin-top: 16px; overflow-wrap: anywhere; }
   :where(.side-demoselskap) svg.hale { display: none; }
 }
+/* Story 8.8 (FR-206): signaldagene i kursgrafen, i fargen for retningen
+   (designregler §3), og gul ring ved 3 av 3. */
+:where(.side-aksje) .signaldag { stroke: var(--kort); stroke-width: 1.5; }
+:where(.side-aksje) .signaldag.positiv { fill: var(--opp); }
+:where(.side-aksje) .signaldag.negativ { fill: var(--ned); }
+:where(.side-aksje) .signaldag.blandet { fill: var(--blandet); }
+:where(.side-aksje) .signaldag.alle { stroke: var(--gul-symbol); stroke-width: 2.5; }
