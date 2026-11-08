@@ -489,7 +489,8 @@ class TestForhaandssjekken:
         assert (
             f"Ingen KI-tekst for børsdagen 2026-09-22 ennå: {grunn}. Ingen rader er skrevet i "
             f"KI-loggen, og 15 aksjer venter på teksten. {hva}, se «Den lokale modellen» i "
-            f"README-en, og kjør samme kommando igjen før midnatt. Det gir 0 kall til EODHD."
+            # Story 3.5i: delen staar i docs/installasjon.md.
+            f"docs/installasjon.md, og kjør samme kommando igjen før midnatt. Det gir 0 kall til EODHD."
         ) in ut
 
     def test_samme_kveld_etter_at_ollama_er_startet(self, stier):

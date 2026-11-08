@@ -22,6 +22,7 @@ import app as app_modul
 import lagring_fil
 import lagring_sqlite
 from boersdag import UtenforKalenderen
+from dokumentene import installasjonen
 from kursdata import Kursleser, Kursrad
 from lagring_fil import SnapshotKilde, SnapshotLeser
 from lagring_sqlite import SqliteKurslager, aapne_base
@@ -602,8 +603,9 @@ class TestBasenIWebserveren:
 
     def test_kommandoen_paa_den_tomme_siden_staar_i_readme(self):
         """Story 3.3: den tomme siden og README viser samme kommando, fra
-        konstanten. Ville feilet hvis malen hadde sin egen kommando (M12)."""
-        readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
+        konstanten. Ville feilet hvis malen hadde sin egen kommando (M12).
+        Story 3.5i: kommandoene staar i docs/installasjon.md."""
+        readme = installasjonen()
         mal = (Path(app_modul.__file__).parent / "templates" / "index.html").read_text(encoding="utf-8")
 
         assert app_modul.HENTEKOMMANDO in readme

@@ -17,6 +17,7 @@ import pytest
 
 import app as app_modul
 import demo
+from dokumentene import installasjonen
 from hjelpetekster import hjelpetekster
 from ki_visning import KAPSEL, ki_tekst
 from lagring_sqlite import demo_sti
@@ -473,6 +474,8 @@ def test_de_gamle_ordene_staar_ikke_igjen(klient):
             ("hjelpetekster", tekster),
             ("hjelp.md", hjelpen),
             ("README.md", readme),
+            # Story 3.5i: og det som er flyttet til docs/installasjon.md.
+            ("installasjon.md", installasjonen()),
             ("sidene", sidene),
         ):
             assert ord_ not in tekst, (ord_, navn)

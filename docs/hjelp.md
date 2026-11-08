@@ -2,12 +2,12 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-07T20:35
+updated: 2026-11-08T11:57
 ---
 
 # Hjelp til «Kom i gang»
 
-Spørsmål og svar til «Kom i gang» i [README-en](../README.md), sortert etter steget de hører til. De vanligste står også i README-en, under «Står du fast?». Dobbeltklikket står først, som i README-en. Stegene 1–4 hører til «Med Docker Desktop» og er felles for begge versjonene der, og demoen står før den ekte versjonen.
+Spørsmål og svar til «Kom i gang» i [README-en](../README.md) og til [installasjonen](installasjon.md), sortert etter steget de hører til. De vanligste står også i installasjonen, under «Står du fast?». Dobbeltklikket står først, som i README-en. Stegene 1–4 hører til «Med Docker Desktop» og er felles for begge versjonene der, og demoen står før den ekte versjonen.
 
 ## Start med dobbeltklikk
 
@@ -25,7 +25,7 @@ Windows viser ofte `Start demoen.cmd` uten filendelsen og `Start demoen.command`
 
 ### Windows advarer mot fila.
 
-Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Slik virker dobbeltklikket» i [README-en](../README.md#slik-virker-dobbeltklikket).
+Første gang kan Windows advare mot `Start demoen.cmd` eller `Start den ekte versjonen.cmd`, fordi fila er lastet ned fra nettet. Advarselen heter «Windows beskyttet PC-en». Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja. Mer står under «Slik virker dobbeltklikket» i [installasjonen](installasjon.md#slik-virker-dobbeltklikket).
 
 ### Mac sier at fila ikke kan åpnes.
 
@@ -115,7 +115,7 @@ Et terminalvindu, der du skriver kommandoer i stedet for å klikke. Windows: gå
 
 Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger PowerShell.
 
-Kopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og trykk Enter.
+Kopier kommandoen med ikonet til høyre i den grå boksen i installasjonen. Ikonet synes først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og trykk Enter.
 
 ## Steg 4: mappa
 
@@ -211,7 +211,7 @@ Hent etter kl. 22 og før midnatt på en børsdag. Første gang, når basen er t
 
 ### Kan hentingen gå av seg selv hver kveld?
 
-Ja, på Windows, med en jobb i Oppgaveplanlegging. Den går hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45, fra en egen arbeidskopi på commiten main hadde ved midnatt, og henter uten KI-tekst hvis Docker Desktop eller Ollama ikke svarer. Er børsdagen alt ferdig, med kursene og vurderingene for de 15 aksjene, hovedindeksen og KI-tekstene, startes verken Docker Desktop eller Ollama, og hentingen og målingen går som før, uten KI-tekst. Mangler noe, eller feiler sjekken, går kjøringen som før. Loggen står i `data/logg/kveldshenting-<dato>.log`. Slik slås den på og av, med `start\legg-inn-kveldshentingen.ps1` og `start\ta-bort-kveldshentingen.ps1`: [Hentingen hver kveld](../README.md#hentingen-hver-kveld) i README-en. Slå den av før du henter for hånd samme kveld, eller vent til den er ferdig, så to hentinger ikke går samtidig. Etter hentingen måler jobben omsetningen for de neste aksjene i lista over Oslo Børs med `--maal-omsetning`, med kallene som er igjen av dagens, også i helgene. Den bruker aldri bonuskvoten og venter til hentingen har kursene for alle aksjene. Startes den kl. 23:45 eller senere, som i jobbens siste kjøring, går den likevel, med kallene som er igjen, og sier hvor mange av de 15 som mangler kursen.
+Ja, på Windows, med en jobb i Oppgaveplanlegging. Den går hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45, fra en egen arbeidskopi på commiten main hadde ved midnatt, og henter uten KI-tekst hvis Docker Desktop eller Ollama ikke svarer. Er børsdagen alt ferdig, med kursene og vurderingene for de 15 aksjene, hovedindeksen og KI-tekstene, startes verken Docker Desktop eller Ollama, og hentingen og målingen går som før, uten KI-tekst. Mangler noe, eller feiler sjekken, går kjøringen som før. Loggen står i `data/logg/kveldshenting-<dato>.log`. Slik slås den på og av, med `start\legg-inn-kveldshentingen.ps1` og `start\ta-bort-kveldshentingen.ps1`: [Hentingen hver kveld](installasjon.md#hentingen-hver-kveld) i installasjonen. Slå den av før du henter for hånd samme kveld, eller vent til den er ferdig, så to hentinger ikke går samtidig. Etter hentingen måler jobben omsetningen for de neste aksjene i lista over Oslo Børs med `--maal-omsetning`, med kallene som er igjen av dagens, også i helgene. Den bruker aldri bonuskvoten og venter til hentingen har kursene for alle aksjene. Startes den kl. 23:45 eller senere, som i jobbens siste kjøring, går den likevel, med kallene som er igjen, og sier hvor mange av de 15 som mangler kursen.
 
 ### Oversikten er tom.
 
@@ -231,7 +231,7 @@ Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskap
 
 ### Kan KI-teksten lages uten grafikkort?
 
-Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENESTE=gemini`, `anthropic` eller `openai` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`, `OSE_KI_ANTHROPIC_NOKKEL=` eller `OSE_KI_OPENAI_NOKKEL=`. Da sendes grunnlaget for hver aksje til tjenesten du har valgt, og det kan koste hos dem. Del aldri nøkkelen, og bruk ikke en konto der du har sagt ja til at tjenesten trener på innholdet. Mangler nøkkelen, eller har den tegn som ikke kan sendes, skrives ingen rader, og utskriften sier hvilken variabel det gjelder: legg den inn og hent igjen samme kveld, før midnatt. Feiler tjenesten, for eksempel fordi nøkkelen er feil, blir det ingen KI-tekst for noen av aksjene den dagen, heller ikke om du retter det og henter igjen samme kveld. Hentingen går ikke over til en annen tjeneste. Mer står under «Egen nøkkel til Gemini, Anthropic eller OpenAI» i [README-en](../README.md).
+Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENESTE=gemini`, `anthropic` eller `openai` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`, `OSE_KI_ANTHROPIC_NOKKEL=` eller `OSE_KI_OPENAI_NOKKEL=`. Da sendes grunnlaget for hver aksje til tjenesten du har valgt, og det kan koste hos dem. Del aldri nøkkelen, og bruk ikke en konto der du har sagt ja til at tjenesten trener på innholdet. Mangler nøkkelen, eller har den tegn som ikke kan sendes, skrives ingen rader, og utskriften sier hvilken variabel det gjelder: legg den inn og hent igjen samme kveld, før midnatt. Feiler tjenesten, for eksempel fordi nøkkelen er feil, blir det ingen KI-tekst for noen av aksjene den dagen, heller ikke om du retter det og henter igjen samme kveld. Hentingen går ikke over til en annen tjeneste. Mer står under «Egen nøkkel til Gemini, Anthropic eller OpenAI» i [installasjonen](installasjon.md).
 
 ## Når appen kjører, eller ikke
 
@@ -269,7 +269,7 @@ Docker Hub begrenser hvor ofte samme IP-adresse kan laste ned uten innlogging. P
 
 ### «port is already allocated», «address already in use» eller «ports are not available».
 
-Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). «Mer for den som vil» står i [README-en](../README.md).
+Noe annet bruker port 8000. Kjører den andre versjonen, stopper du den først (se «Bytte mellom demoen og den ekte versjonen» under «Mer for den som vil»). «Mer for den som vil» står i [installasjonen](installasjon.md).
 
 ## Stopp
 
