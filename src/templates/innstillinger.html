@@ -1,0 +1,23 @@
+{% extends "_ramme.html" %}
+{#- Story 8.10 (FR-110, utdraget 08.11 §4): «Innstillinger» med «Vis hjelp».
+    Et skjema per valg, som virker uten skript. Skjemaet skriver bare
+    tabellen innstilling (AD-3), og ingenting hentes (AD-10). Tekstene står
+    ordrett fra utdraget. #}
+{% block tittel %}Innstillinger — OSE Signal{% endblock %}
+{% block side %}side-oversikt{% endblock %}
+{% block innhold %}
+<section class="innstillinger" aria-labelledby="innstillinger-tittel">
+  <h1 class="overskrift" id="innstillinger-tittel">Innstillinger</h1>
+  {% if not kan_lagres %}<p class="feil">Valgene kan ikke lagres før basen finnes. Hent kursene, eller start demoen, først.</p>{% endif %}
+  <div class="valg">
+    <h2>Hjelp</h2>
+    <form method="post" action="/innstillinger">
+      <input type="hidden" name="navn" value="vis_hjelp">
+      <input type="hidden" name="til" value="{{ 'av' if valgene.vis_hjelp else 'paa' }}">
+      <button type="submit" class="innstillingsbryter" role="switch" aria-checked="{{ 'true' if valgene.vis_hjelp else 'false' }}"{% if not kan_lagres %} disabled{% endif %}><span class="spor" aria-hidden="true"></span><span class="navn">Vis hjelp</span> <span class="verdi" aria-hidden="true">{{ 'På' if valgene.vis_hjelp else 'Av' }}</span></button>
+    </form>
+    <p>Faste forklaringer som vi har skrevet og sjekket: hva tallene, bokstavene og fargene betyr. Lik for alle aksjer hver dag, og uten KI.</p>
+  </div>
+  <p class="nederst">Valgene gjelder alle sidene og lagres på denne maskinen.</p>
+</section>
+{% endblock %}

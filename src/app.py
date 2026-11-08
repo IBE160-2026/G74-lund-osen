@@ -37,6 +37,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
+import innstillinger
 import lagring_sqlite
 import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
@@ -275,6 +276,9 @@ _RUTER_MED_BASE = {
     "demoselskap",
     # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
     "folg_side",
+    # Story 8.10: «Innstillinger».
+    "innstillinger_side",
+    "lagre_innstilling",
     "folg",
     "fjern_egen",
     "angre",
@@ -284,7 +288,7 @@ _RUTER_MED_BASE = {
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
-_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre"))
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "lagre_innstilling"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -465,6 +469,16 @@ def _utenfor_maalingen():
         return {"utenfor": {}}
     egne = _egne()
     return {"utenfor": egne["utenfor_tekst"] if egne else {}}
+
+
+@app.context_processor
+def _innstillingene():
+    """Story 8.10 (FR-110): valgene i «Innstillinger», på hver side. Bare
+    lesing. Uten basen er alt på."""
+    return {
+        "valgene": innstillinger.les(g.get("tilkobling")),
+        "vis_hjelp": innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_HJELP],
+    }
 
 
 @app.context_processor
@@ -1721,6 +1735,37 @@ def angre():
     except (ValueError, valg.UgyldigValg):
         abort(400)
     return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
+
+
+# --- Story 8.10: «Innstillinger» -----------------------------------------
+
+
+@app.route("/innstillinger")
+def innstillinger_side():
+    """«Innstillinger» med «Vis hjelp» (FR-110, utdraget 08.11 §4). Bare lesing."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    return render_template(
+        "innstillinger.html",
+        aktiv="innstillinger",
+        kan_lagres=innstillinger.har_tabellen(g.get("tilkobling")),
+    )
+
+
+@app.post("/innstillinger")
+def lagre_innstilling():
+    """Lagrer ett valg i tabellen innstilling, og sender tilbake til siden.
+    Webserveren skriver bare den tabellen her (AD-3)."""
+    _samme_side()
+    tilkobling = g.get("tilkobling")
+    if not innstillinger.har_tabellen(tilkobling):
+        abort(404)
+    navn = request.form.get("navn", "")
+    til = request.form.get("til")
+    if navn not in innstillinger.NAVNENE or til not in (PAA, AV):
+        abort(400)
+    innstillinger.sett(tilkobling, navn, til == PAA)
+    return redirect("/innstillinger", code=303)
 
 
 if __name__ == "__main__":

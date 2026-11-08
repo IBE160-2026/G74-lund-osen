@@ -1006,6 +1006,8 @@ MALENE_BAK_BILDET = (
     "src/perioder.py",
     # Story 2.12: «Dine egne aksjer» og merkene i tabellen.
     "src/valg.py",
+    # Story 8.10: «Vis hjelp» i Innstillinger.
+    "src/innstillinger.py",
 )
 # Story 8.0f: ogsaa hjelpeskriptet (.js), som lastes paa begge sidene.
 SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
@@ -1242,7 +1244,10 @@ HOEYDE_PAA_BILDET = 1864
 # bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
 # nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
 # liste» er nytt.
-AVTRYKK_BAK_BILDET = "93766fa372075be951646c2b93122cd604d927cb4ee47e0eb0e65be9ff5099e8"
+# Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
+# app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
+# og alle viser knappen; hoeydene er de samme.
+AVTRYKK_BAK_BILDET = "e71b2f171a573fa215c0fc6af19f15f859a1591eb9b1a2a293c6485a6061e381"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1274,6 +1279,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/demo_ki_tekster.json",
     # Story 2.12: å velge og bytte aksjer.
     "src/valg.py",
+    # Story 8.10: «Vis hjelp» i Innstillinger.
+    "src/innstillinger.py",
     "src/markedsoversikt.py",
     "src/oversiktsdata.py",
     "src/hovedindeks.py",
@@ -1616,7 +1623,10 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
 # nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
 # liste» er nytt.
-AVTRYKK_BAK_AKSJESIDEN = "0d2c3bd5bd9d8e2e9e05f92c415ee34bb16eb8e022c67eb331241e5c7dd3671d"
+# Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
+# app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
+# og alle viser knappen; hoeydene er de samme.
+AVTRYKK_BAK_AKSJESIDEN = "196d60ead2ca1215e1f38044b16063c99383fb4c314947e974bedafdf685e55f"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1725,13 +1735,16 @@ DE_NYE_BILDENE = {
 # bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
 # nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
 # liste» er nytt.
+# Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
+# app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
+# og alle viser knappen; hoeydene er de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "93766fa372075be951646c2b93122cd604d927cb4ee47e0eb0e65be9ff5099e8",
-    "docs/appen/boersometeret-demo.png": "619809840cfde3670e43e20247d7596aa00dec39ffdbc7851580702b9f45aa1f",
-    "docs/appen/min-liste-demo.png": "20b40c05c0f6c853fcc21f694158a5ebbc1e8b0c363442a73a64e01eb5e804d5",
-    "docs/appen/oversikten-390-demo.png": "93766fa372075be951646c2b93122cd604d927cb4ee47e0eb0e65be9ff5099e8",
-    "docs/appen/boersometeret-390-demo.png": "619809840cfde3670e43e20247d7596aa00dec39ffdbc7851580702b9f45aa1f",
-    "docs/appen/din-egen-liste-demo.png": "20b40c05c0f6c853fcc21f694158a5ebbc1e8b0c363442a73a64e01eb5e804d5",
+    TOPPEN_AV_OVERSIKTEN: "e71b2f171a573fa215c0fc6af19f15f859a1591eb9b1a2a293c6485a6061e381",
+    "docs/appen/boersometeret-demo.png": "4749027a721418a4265e3cc56577d607861c811895feff7fcd5c9ea75eb54c72",
+    "docs/appen/min-liste-demo.png": "db0b060a7d80c0f50e1a68e8c93ddf014508df4c452782b5e4232991cedfbcd7",
+    "docs/appen/oversikten-390-demo.png": "e71b2f171a573fa215c0fc6af19f15f859a1591eb9b1a2a293c6485a6061e381",
+    "docs/appen/boersometeret-390-demo.png": "4749027a721418a4265e3cc56577d607861c811895feff7fcd5c9ea75eb54c72",
+    "docs/appen/din-egen-liste-demo.png": "db0b060a7d80c0f50e1a68e8c93ddf014508df4c452782b5e4232991cedfbcd7",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

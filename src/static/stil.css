@@ -1174,3 +1174,18 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
 :where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
                                     color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
+/* Story 8.10 (utdraget 08.11 §4): «Innstillinger», med en bryter per valg. */
+:where(.side-oversikt) .innstillinger { max-width: 720px; }
+:where(.side-oversikt) .innstillinger .valg { margin: 16px 0; padding: 18px 20px; background: var(--kort); border: 1px solid var(--strek);
+                                              border-radius: 16px; }
+:where(.side-oversikt) .innstillinger h2 { margin: 0 0 10px; font-size: 20px; }
+:where(.side-oversikt) .innstillinger .nederst { color: var(--dempet); }
+:where(.side-oversikt) .innstillingsbryter { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
+                                             font: inherit; font-weight: 600; border: 1px solid var(--strek-2); border-radius: 999px;
+                                             background: var(--kort); color: var(--blekk); cursor: pointer; }
+:where(.side-oversikt) .innstillingsbryter .spor { position: relative; width: 36px; height: 20px; border-radius: 999px; background: var(--strek-2); }
+:where(.side-oversikt) .innstillingsbryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+                                                          border-radius: 50%; background: var(--hvit); }
+:where(.side-oversikt) .innstillingsbryter[aria-checked="true"] .spor { background: var(--blekk); }
+:where(.side-oversikt) .innstillingsbryter[aria-checked="true"] .spor::after { left: 18px; }
+:where(.side-oversikt) .innstillingsbryter .verdi { color: var(--dempet); font-weight: 400; }

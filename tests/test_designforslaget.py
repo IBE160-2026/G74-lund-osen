@@ -518,7 +518,8 @@ def test_hver_menyknapp_har_sitt_ikon(klient, sti, navn, del_):
     knapp = re.search(r'<a class="sideknapp"[^>]*>(<svg class="ikon"[^>]*>.*?</svg>)' + navn + "</a>", meny)
     assert knapp, navn
     assert 'aria-hidden="true" focusable="false"' in knapp.group(1) and del_ in knapp.group(1)
-    assert len(re.findall(r'<svg class="ikon"', meny)) == 3
+    # Story 8.10: og tannhjulet for «Innstillinger», den fjerde knappen.
+    assert len(re.findall(r'<svg class="ikon"', meny)) == 4
 
 
 def test_ikonene_er_16_px_med_strek_2_i_tekstfargen():

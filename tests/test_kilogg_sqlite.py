@@ -87,7 +87,7 @@ class TestMigrasjonen:
     def test_0005_lager_ki_logg(self, base):
         """Tabellen lages av en nummerert migrasjon (AD-16). Basen staar paa 9
         etter 0009 (story 2.11)."""
-        assert versjon(base) == 10
+        assert versjon(base) == 11
         assert base.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'ki_logg'").fetchone()
         assert (MIGRASJONSKATALOG / "0005_ki_logg.sql").is_file()
 
@@ -110,7 +110,7 @@ class TestMigrasjonen:
             assert migrer(tilkobling, til_0004) == 4
             with pytest.raises(RuntimeError):
                 SqliteKILogg(tilkobling, klokke)
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 10
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 11
             assert SqliteKILogg(tilkobling, klokke).les_alle() == []
         finally:
             tilkobling.close()

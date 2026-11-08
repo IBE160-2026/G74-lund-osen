@@ -367,16 +367,20 @@ class TestSidene:
             # Gruppens svar 04.11 kl. 22:23, 4: ikonene står foran navnet.
             stripa = re.sub(r'<svg class="ikon".*?</svg>', "", stripa, flags=re.S)
             assert re.findall(r'class="sideknapp" href="[^"]*" aria-current="page">([^<]+)<', stripa) == [fylt]
-            assert stripa.count('class="sideknapp"') == 3
+            assert stripa.count('class="sideknapp"') == 4  # Story 8.10: og «Innstillinger».
         aksjesiden = demo.get("/aksje/KVST").data.decode("utf-8")
         stripa = aksjesiden.split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
+        assert (
+            stripa.count('class="sideknapp"') == 4
+        )  # Story 8.10: og «Innstillinger». and 'aria-current="page"' not in stripa
         # Aksjesiden beholder veien tilbake.
         assert '<a class="tilbake" href="/">Markedsoversikt</a>' in aksjesiden
         # Gjennomgangen 23.10 (BH8): også siden for en aksje uten kurser.
         uten = demo.get("/aksje/MTFJ").data.decode("utf-8")
         stripa = uten.split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 3 and 'aria-current="page"' not in stripa
+        assert (
+            stripa.count('class="sideknapp"') == 4
+        )  # Story 8.10: og «Innstillinger». and 'aria-current="page"' not in stripa
         assert '<a class="tilbake" href="/">Markedsoversikt</a>' in uten
 
     def test_knapperaden_ogsaa_paa_feilsiden(self, demo):
@@ -385,7 +389,7 @@ class TestSidene:
         svar = demo.get("/min-liste")
         assert svar.status_code == 503
         stripa = svar.data.decode("utf-8").split("</header>", 1)[0]
-        assert stripa.count('class="sideknapp"') == 3
+        assert stripa.count('class="sideknapp"') == 4  # Story 8.10: og «Innstillinger».
 
     def test_stjernen_er_en_knapp_med_aria_pressed_og_navnet(self, demo):
         """Ville feilet hvis stjernen bare var et tegn, eller skjermleseren
