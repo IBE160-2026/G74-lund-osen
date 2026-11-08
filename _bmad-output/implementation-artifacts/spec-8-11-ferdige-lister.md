@@ -82,3 +82,5 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 ## Bygget og ikke flettet
 
 Grenen `8-11-ferdige-lister` er ikke flettet. Den bygger på 2.12 (PR #124) og flettes etter den. Gruppen må sjekke bransjene i `BRANSJE` først (spørsmål 1).
+
+*Svar 2026-11-08 kl. 22:01, 22:03 og 22:06 (gruppens svar):* bransjen Claude Code foreslo for hver av de 88 aksjene er godtatt (spørsmål 1, kl. 22:01). Kl. 22:03 tok gruppen rådets råd for sju: VOIM blir Energi, NOSN, NTG og MVW blir Industri, PLCAN blir Shipping, NORTH blir Finans, og SCOIN tas ut, fordi selskapet er under avvikling. Kl. 22:06: forslagene i spørsmål 2, 4, 5 og 6 er godtatt, og story 8.11b tar de 15 inn i bransjelistene. Rådet anbefalte alt fra kl. 22:03. Bransjene er sjekket av gruppen, og merket «usikker» tas bort. VG6 (middels) rettes med tester av valideringen i `bruk_liste`. Svaret er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
