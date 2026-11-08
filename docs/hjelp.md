@@ -197,7 +197,7 @@ Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en f
 
 ### Hva er «Innstillinger»?
 
-Knappen «Innstillinger» står øverst på alle sidene, etter «Min liste». Der slår du «Vis hjelp» av og på: hjelpen er de faste forklaringene bak «?», som vi har skrevet og sjekket, om hva tallene, bokstavene og fargene betyr. Med hjelpen av står ingen «?» på noen side. Valgene gjelder alle sidene og lagres på denne maskinen, i basen, så de huskes neste gang. Det er ingen innlogging. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter.
+Knappen «Innstillinger» står øverst på alle sidene, etter «Min liste». Der slår du «Vis hjelp» av og på: hjelpen er de faste forklaringene bak «?», som vi har skrevet og sjekket, om hva tallene, bokstavene og fargene betyr. Med hjelpen av står ingen «?» på noen side. Der slår du også «Vis KI-tekst» av og på. Det er det samme valget som bryteren ved hver KI-tekst, så de viser alltid det samme, og et trykk på det ene stedet endrer det andre. Valgene gjelder alle sidene og lagres på denne maskinen, i basen, så de huskes neste gang. Det er ingen innlogging. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter.
 
 ### Hvordan følger jeg andre aksjer?
 

@@ -12,8 +12,8 @@ VIS_HJELP = "vis_hjelp"
 # Story 8.10b: KI-teksten, i samme tabell.
 VIS_KI_TEKST = "vis_ki_tekst"
 NAVNENE = (VIS_HJELP, VIS_KI_TEKST)
-# Valgene siden «Innstillinger» viser og kan lagre.
-PAA_SIDEN = (VIS_HJELP,)
+# Valgene siden «Innstillinger» viser og kan lagre. Story 8.10b: også KI-teksten.
+PAA_SIDEN = (VIS_HJELP, VIS_KI_TEKST)
 
 
 def har_tabellen(tilkobling: sqlite3.Connection | None) -> bool:
@@ -40,6 +40,17 @@ def les(tilkobling: sqlite3.Connection | None) -> dict[str, bool]:
     except sqlite3.Error:
         pass
     return valgene
+
+
+def les_rader(tilkobling: sqlite3.Connection | None) -> dict[str, bool]:
+    """Bare valgene som har en rad. Story 8.10b: uten raden for KI-teksten
+    leses informasjonskapselen fra før (spørsmål 1 i 8.10b)."""
+    if not har_tabellen(tilkobling):
+        return {}
+    try:
+        return {navn: verdi == 1 for navn, verdi in tilkobling.execute("SELECT navn, verdi FROM innstilling")}
+    except sqlite3.Error:
+        return {}
 
 
 def sett(tilkobling: sqlite3.Connection, navn: str, paa: bool) -> None:

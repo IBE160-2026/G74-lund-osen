@@ -174,10 +174,11 @@ class TestEtterGjennomgangen:
         for ord_ in ("requests", "urlopen", "hent_", "fetch_prices", "eodhd"):
             assert ord_ not in kilde, ord_
 
-    @pytest.mark.parametrize("data", [{"navn": "vis_ki_tekst", "til": "av"}, {"navn": "vis_hjelp", "til": "x"}])
+    # Story 8.10b: «Vis KI-tekst» lagres nå, så bare et ukjent navn og en
+    # ukjent verdi avvises.
+    @pytest.mark.parametrize("data", [{"navn": "noe", "til": "av"}, {"navn": "vis_hjelp", "til": "x"}])
     def test_et_avvist_valg_endrer_ingenting(self, klient, data):
-        """BH7, ECH3, BH8: ville feilet hvis 8.10 lagret «Vis KI-tekst», eller
-        et avvist valg endret noe."""
+        """BH7, ECH3, BH8: ville feilet hvis et avvist valg endret noe."""
         assert klient.post("/innstillinger", data=data).status_code == 400
         assert (
             klient.post(

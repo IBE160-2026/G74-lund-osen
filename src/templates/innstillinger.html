@@ -19,6 +19,17 @@
     </form>
     <p>Faste forklaringer som vi har skrevet og sjekket: hva tallene, bokstavene og fargene betyr. Lik for alle aksjer hver dag, og uten KI.</p>
   </div>
+  {#- Story 8.10b (utdraget 08.11 §4): «Vis KI-tekst», samme valg som
+      bryteren ved hver KI-tekst (FR-601). #}
+  <div class="valg">
+    <h2>KI-tekst</h2>
+    <form method="post" action="/innstillinger">
+      <input type="hidden" name="navn" value="vis_ki_tekst">
+      <input type="hidden" name="til" value="{{ 'av' if ki_er_paa else 'paa' }}">
+      <button type="submit" class="innstillingsbryter" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"{% if not kan_lagres %} disabled{% endif %}><span class="spor" aria-hidden="true"></span><span class="navn">Vis KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
+    </form>
+    <p>Noen setninger om dagen og om hver aksje, skrevet av en språkmodell når kursene hentes. Merket «Laget av KI». Hver KI-tekst har også sin egen bryter.</p>
+  </div>
   <p class="nederst">Valgene gjelder alle sidene og lagres på denne maskinen.</p>
 </section>
 {% endblock %}

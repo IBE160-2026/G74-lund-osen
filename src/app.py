@@ -279,6 +279,8 @@ _RUTER_MED_BASE = {
     # Story 8.10: «Innstillinger».
     "innstillinger_side",
     "lagre_innstilling",
+    # Story 8.10b: bryteren ved KI-teksten skriver valget i basen.
+    "ki_bryter",
     "folg",
     "fjern_egen",
     "angre",
@@ -288,7 +290,7 @@ _RUTER_MED_BASE = {
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
-_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "lagre_innstilling"))
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "lagre_innstilling", "ki_bryter"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -1207,7 +1209,7 @@ def aksjedetalj(symbol: str):
 
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
-    ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ki_er_paa = _ki_er_paa()
     ki = _ki_visning(post, detalj, rader[-1].dato) if ki_er_paa and detalj.sjekker else None
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
     # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
@@ -1416,6 +1418,9 @@ def ki_bryter():
     if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
         abort(403)
     til = AV if request.form.get("til") == AV else PAA
+    # Story 8.10b (FR-110, FR-601): valget i basen, som Innstillinger viser,
+    # så de to aldri viser hver sin verdi. Kapselen skrives fortsatt.
+    _lagre_ki(til)
     tilbake = request.form.get("tilbake", "/")
     if _TILBAKE.fullmatch(tilbake):
         tilbake += f"#{KI_ANKER}"
@@ -1738,6 +1743,24 @@ def angre():
 # --- Story 8.10: «Innstillinger» -----------------------------------------
 
 
+def _ki_er_paa() -> bool:
+    """Story 8.10b: KI-teksten er på når raden i innstilling sier det. Uten
+    raden (en base fra før 8.10b, eller ingen base) gjelder kapselen fra
+    bryteren, som før, så valget ikke går tapt (spørsmål 1)."""
+    rader = innstillinger.les_rader(g.get("tilkobling"))
+    if innstillinger.VIS_KI_TEKST in rader:
+        return rader[innstillinger.VIS_KI_TEKST]
+    return ki_paa(request.cookies.get(KAPSEL))
+
+
+def _lagre_ki(til: str) -> None:
+    """Valget i basen når den har tabellen. Bryteren og Innstillinger
+    skriver begge her (FR-110)."""
+    tilkobling = g.get("tilkobling")
+    if innstillinger.har_tabellen(tilkobling):
+        innstillinger.sett(tilkobling, innstillinger.VIS_KI_TEKST, til == PAA)
+
+
 @app.route("/innstillinger")
 def innstillinger_side():
     """«Innstillinger» med «Vis hjelp» (FR-110, utdraget 08.11 §4). Bare lesing."""
@@ -1747,6 +1770,8 @@ def innstillinger_side():
         "innstillinger.html",
         aktiv="innstillinger",
         kan_lagres=innstillinger.har_tabellen(g.get("tilkobling")),
+        # Story 8.10b: samme verdi som bryteren ved KI-teksten.
+        ki_er_paa=_ki_er_paa(),
     )
 
 
@@ -1767,7 +1792,11 @@ def lagre_innstilling():
     if navn not in innstillinger.PAA_SIDEN or til not in (PAA, AV):
         abort(400)
     innstillinger.sett(tilkobling, navn, til == PAA)
-    return redirect("/innstillinger", code=303)
+    svar = redirect("/innstillinger", code=303)
+    if navn == innstillinger.VIS_KI_TEKST:
+        # Story 8.10b: kapselen også, som bryteren ved teksten.
+        svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)
+    return svar
 
 
 if __name__ == "__main__":
