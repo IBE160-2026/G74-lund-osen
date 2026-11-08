@@ -26,3 +26,5 @@ Laget av rådet i chatten 06.11.2026 kl. 21:15–23:55, etter gruppens gjennomga
 - Forslag fra rådet: merket U for utbytte og verdiene ved musepekeren i grafen, piler for forrige og neste børsdag ved datoen, «2 av 3» med svart ring også på aksjesiden, og datovelgeren bare ved grafen på aksjesiden.
 
 Hver av dem avgjøres i spesifikasjonen for UX-rettingene før noe bygges.
+
+*Lagt til 2026-11-08:* skissene ble bygget 07.11: aksjesiden i story 8.20a (PR #118, `427a1de2`), børsometeret i 8.20b (PR #119, `8d89cf8c`) og investorsidene i demoen med boblen i 3.4h (PR #120, `7565651f`). Setningen over om at skissene ikke er bygget, gjaldt da de ble lagt inn.
