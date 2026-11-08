@@ -2576,6 +2576,8 @@ Oppsettet, de 15 tegningene, skriftene og plassen til snakkeboblene står i `doc
 
 *Lagt til 2026-11-07:* 3.4h er flettet med PR #120 i `7565651f` kl. 23:33, låst til head-en `c994f368` (main flettet inn), etter instruksjonen kl. 23:27 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42420820179) og på flettecommiten (run 42421144454), med 4562 bestått og 31 hoppet over i jobben `pytest` på flettecommiten. Hele settet lokalt på grenen: 4568 bestått, 24 hoppet over og 0 feilet før `ac0944f9`, og fil for fil 4569 bestått, 24 hoppet over og 0 feilet før `72efb6e8`. Story 3.4h er done.
 
+*Ønske 2026-11-08 kl. 23:59 (gruppens ønske):* README-en mangler et bilde av investorsiden i demoen, den man kommer til fra aksjesiden. Bildet tas som de andre i `docs/appen/` og står under «Bilder av appen (demoen)». Ønsket er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
+
 ---
 
 ### Story 3.5: Start med dobbeltklikk
