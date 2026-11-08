@@ -75,3 +75,11 @@ Tre gjennomganger av `f87c29ea`, i parallell etter hele settet og mutantene: Bli
 - *Ført:* BH7 og VG12 («i kveld» står også når ønsket er laget etter kveldens henting eller i helga), BH8 (ingen CSRF-token utover Origin, som stjernen i Min liste), ECH8 (delene står ikke før første henting, når tabellen er tom), VG7 (en ticker uten rader står i lista til kvelden etter), VG9 og VG10 (testene for NFR-06 og demoen er smale).
 
 - **Etter gjennomgangen:** hele settet alene kl. 17:39:18–17:49:44: 4646 bestått, 24 hoppet over og 0 feilet. Alle bildene ble tatt på nytt og er byte for byte de samme som før rettingene.
+
+## Mutantene
+
+På `f87c29ea` åtte (A–H), alle fanget. På `1f936f3a`, etter gjennomgangen, tolv: A 2, A2 1 (angre sjekker ikke taket), A3 1 (hentingen tar inn mer enn 18), B 1, C 4, D 1 (en aksje med rader samme dag får ut samme dag), E 1, F 1, G 1, H 1, I 1 (et bytte angres bare halvveis) og J 1 («Utenfor målingen» mangler i tabellen) test. Alle ble fanget, og hver fil var lik HEAD etterpå (kopi før, sha256 mot HEAD etter).
+
+## Bygget og ikke flettet
+
+Grenen `2-12-velge-og-bytte-aksjer` er ikke flettet. Den bygger på 2.11 (PR #123), som flettes først. Gruppen går gjennom spørsmålene før flettingen, og BH6/ECH5 står åpent som spørsmål 6 i 2.11 (regel 25). Mandag kjøres `uv run python src/fetch_prices.py --les-boerslista` én gang før aksjer kan velges. `index.html` får en konflikt med 10.6 (PR #122), fordi begge legger en del under tabellen; rekkefølgen er «Dine egne aksjer» og så «Børsdagen kort fortalt» (§11 i utdraget 13.10).
