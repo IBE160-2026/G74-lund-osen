@@ -1181,3 +1181,4 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .ferdig-liste summary { cursor: pointer; display: flex; align-items: center; gap: 6px; }
 :where(.side-oversikt) .ferdig-liste summary .bransjesymbol { width: 16px; height: 16px; flex: none; }
 :where(.side-oversikt) .ferdig-liste ol { margin: 8px 0; padding-left: 24px; }
+:where(.side-oversikt) .ferdig-liste .foer-knappen { margin: 4px 0 8px; color: var(--dempet); }

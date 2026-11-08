@@ -1247,7 +1247,7 @@ HOEYDE_PAA_BILDET = 1864
 # Story 8.11: filteret på signalet og de ferdige listene (index.html, _egne.html, app.py og stil.css).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
 # liste» er nye; de andre er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "5982f91625893d13ebb52810b2a93746d9ad929a1e75b748a071605cd1157713"
+AVTRYKK_BAK_BILDET = "e6f94a97442436616e794b9734a8b5a3def7340dde10d7c361538a53d9be9de6"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1626,7 +1626,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 8.11: filteret på signalet og de ferdige listene (index.html, _egne.html, app.py og stil.css).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
 # liste» er nye; de andre er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "6da1a35390ea56cbac3ac8abc2035e2a8d7316aedf82639f40b3fbc89d8dffd2"
+AVTRYKK_BAK_AKSJESIDEN = "302a4caf3d92822a5492907fb3c1fcb78397e39e7d8e03c048bafb21b5b11330"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1659,15 +1659,15 @@ DE_NYE_BILDENE = {
     "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
     # Story 8.20a: 3509, med datoen og pilene på egen linje ved 390 px. Var 3524.
     # Story 2.12: 3797, med «Dine egne aksjer» under tabellen.
-    # Story 8.11: 3865, med filteret på signalet over tabellen.
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 3865, MALENE_BAK_BILDET),
+    # Story 8.11: 3917, med filteret på signalet og forbeholdet over tabellen.
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 3917, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 3327, FILENE_BAK_BOERSOMETERET),
     # Story 2.12: «Din egen liste» i Min liste, bare delen (id-en
     # din-egen-liste), klippet ut med 16 px over og under.
-    # Story 8.11: 1196, med «Start fra en ferdig liste» nederst.
-    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1196, FILENE_BAK_MIN_LISTE),
+    # Story 8.11: 1216, med «Start fra en ferdig liste» nederst.
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1216, FILENE_BAK_MIN_LISTE),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1741,12 +1741,12 @@ DE_NYE_BILDENE = {
 # Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
 # liste» er nye; de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "5982f91625893d13ebb52810b2a93746d9ad929a1e75b748a071605cd1157713",
-    "docs/appen/boersometeret-demo.png": "2173f0b462c12aa0b07c67e32353d8732c4e6f3220f26324cd6a9985022cc1df",
-    "docs/appen/min-liste-demo.png": "bbb76f6e67d6c405345fb04e5ebf3ac239a6136c1ac2f3499b9cd312827615a3",
-    "docs/appen/oversikten-390-demo.png": "5982f91625893d13ebb52810b2a93746d9ad929a1e75b748a071605cd1157713",
-    "docs/appen/boersometeret-390-demo.png": "2173f0b462c12aa0b07c67e32353d8732c4e6f3220f26324cd6a9985022cc1df",
-    "docs/appen/din-egen-liste-demo.png": "bbb76f6e67d6c405345fb04e5ebf3ac239a6136c1ac2f3499b9cd312827615a3",
+    TOPPEN_AV_OVERSIKTEN: "e6f94a97442436616e794b9734a8b5a3def7340dde10d7c361538a53d9be9de6",
+    "docs/appen/boersometeret-demo.png": "830bf75a9033b33758667a691149a90e41607414a5bcb762b9399d0c712fb102",
+    "docs/appen/min-liste-demo.png": "d58f85090603ceaa861ce41a610189f68fb02b52b3573620e163e400580435f3",
+    "docs/appen/oversikten-390-demo.png": "e6f94a97442436616e794b9734a8b5a3def7340dde10d7c361538a53d9be9de6",
+    "docs/appen/boersometeret-390-demo.png": "830bf75a9033b33758667a691149a90e41607414a5bcb762b9399d0c712fb102",
+    "docs/appen/din-egen-liste-demo.png": "d58f85090603ceaa861ce41a610189f68fb02b52b3573620e163e400580435f3",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

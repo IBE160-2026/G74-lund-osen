@@ -57,3 +57,23 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 
 «Hva er de ferdige listene og filteret?» i `docs/hjelp.md`, bildeteksten i README-en og bildet av «Din egen liste» (regel 19).
 - **Hele settet alene:** først 2 feilet (to tester kjente ikke filterlenkene, som beholder resten av adressen), så kl. 20:51:24–21:01:51: 4658 bestått, 24 hoppet over og 0 feilet.
+
+## Mutantene
+
+På `713a5fd6` fem: A (en ferdig liste får 19) 1, B (en aksje målt med feil er med) 1, C (`bruk_liste` skriver ikke fjern) 1 og D (filteret slipper inn 2 av 3) 2 tester. E (filteret uten teksten om råd) OVERLEVDE, fordi testen bare så etter en del av setningen, som også står et annet sted på siden. Testen sjekker nå hele setningen. Hver fil var lik HEAD etterpå.
+
+## Gjennomgangen 08.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 15 funn, Edge Case Hunter 11 og Verification Gap 11.
+
+**Høy, rettet**
+- *ECH1, VG1:* filteret endret overskriften og innledningen: «1 av 15 aksjer skilte seg ut» med filteret, mot 7 uten. Nå regnes overskriften, innledningen og om tabellen vises, av lista før filteret (`test_overskriften_endres_ikke_av_filteret`).
+- *VG2:* at filteret bare virker innenfor lista som vises, var ikke dekket, fordi begge med 3 av 3 i demoen er merket. Nå prøves det med de merkede tatt bort (`test_min_liste_viser_bare_de_merkede`).
+
+**Middels**
+- *Rettet:* ECH2 og VG8 (Min liste sa «Ingen aksjer i Min liste ennå» med et filter ingen passet), ECH3 (med «Velg dag» kunne tabellen forsvinne uten forklaring; nå står «Ingen av aksjene her fikk det.» når filteret ikke gir noen rader), BH3 og ECH4 (over knappen står nå hvor mange aksjer som fjernes, og hjelpen sier at også de 15 fjernes), BH4 og ECH11 (hjelpen sa «Appen foreslår aldri hvilke aksjer du bør følge»; nå sier den at listene er ordnet etter omsetning og ikke er et råd, og forbeholdet står under filterknappene før et klikk), VG3 (siste måling og bare `boersliste`), VG4 (`test_filteret_med_sortering`), VG5 (ønskene etter POST sjekkes), VG7 (knappene, `aria-current` og adressen), BH9.
+- *Ikke reelle:* BH1 (hentingen kan ikke gi 19, fordi `ta_i_bruk` sjekker taket når hver aksje tas inn og avviser ønsket), BH2 (`_laas()` ruller tilbake ved unntak; ECH prøvde det), BH5 (bildet er nytt; diffen var uten `docs/appen`).
+- *Ført:* VG6 (valideringen i `bruk_liste` for duplikater, bransje og `boersliste` prøves bare gjennom ruta).
+
+**Lav, ført:** BH6 og ECH8 (hver aksje rangeres etter sin egen siste måling), BH7 (duplikater kan ikke oppstå: begge tabellene har primærnøkkel), BH8 og ECH5 (lista regnes på nytt ved POST), BH10 og ECH10 (filteret forsvinner ved sortering og perioder; hjelpen sier det nå), BH11 (rettet: «med retning positiv»), BH12 (`assert` i modulen, demokodene i samme ordbok, og NORSE og HKY som Forbruk; gruppen sjekker bransjene, spørsmål 1), BH13, BH14, BH15 (Origin som de andre skjemaene), ECH6, ECH7 (bransjen fra den ferdige lista erstatter et ventende valg), ECH9, VG9, VG10 (rettet: demoen har Kraft og Eiendom), VG11.
+- **Etter gjennomgangen:** hele settet alene kl. 21:19:15–21:29:21: 4664 bestått, 24 hoppet over og 0 feilet. Bildene av oversikten, Min liste, oversikten ved 390 px og «Din egen liste» er tatt på nytt.

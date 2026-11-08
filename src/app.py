@@ -1000,6 +1000,11 @@ def _tabellsiden(aktiv: str):
     # lista som vises, og etter at radene er delt eller sortert, så
     # rekkefølgen fortsatt er FR-102. Bare 3 av 3 i retningen som er valgt.
     signalfilter = _signalfilteret()
+    # Gjennomgangen (ECH1, ECH2, ECH3): overskriften, innledningen og om
+    # tabellen vises, regnes av lista før filteret, så filteret bare skjuler
+    # rader og aldri endrer det siden sier.
+    overskrift_ut = skilte_seg_ut
+    foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
     if signalfilter is not None:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if _passer(rad, signalfilter)]
         oevrige = [rad for rad in oevrige if _passer(rad, signalfilter)]
@@ -1068,6 +1073,9 @@ def _tabellsiden(aktiv: str):
         # Story 8.11: filteret på signalet, og lenkene til det.
         signalfilter=signalfilter,
         filterlenker=_filterlenkene(signalfilter),
+        overskrift_ut=overskrift_ut,
+        foer_filter=foer_filter,
+        filter_tomt=signalfilter is not None and not (skilte_seg_ut or oevrige or sortert),
         **felles,
     )
 

@@ -70,13 +70,16 @@
   {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. #}
   {% if egne.ferdige %}
   <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Hver ferdige liste er de opptil {{ egne.tak }} aksjene i en bransje som ble omsatt for mest da omsetningen sist ble målt. Bare målte aksjer er med. Velger du en, blir den lista di ved neste henting, og ønskene som venter, forsvinner.</p>
+  <p>Hver ferdige liste er de opptil {{ egne.tak }} aksjene i en bransje som ble omsatt for mest da omsetningen sist ble målt. Bare målte aksjer er med. Listene er ordnet etter omsetning, ikke etter signalet, og er ikke et råd om hva du bør følge. Velger du en, blir den hele lista di ved neste henting: alle de andre aksjene i lista fjernes, og ønskene som venter, forsvinner.</p>
   {% for bransje, aksjene in egne.ferdige.items() %}
     <details class="ferdig-liste">
       <summary>{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></summary>
       <ol>
         {% for a in aksjene %}<li><span class="navn">{{ a.navn }}</span> <span class="linje">{{ a.symbol }}</span>{% if a.symbol in egne.ferdige_utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}</li>{% endfor %}
       </ol>
+      {%- set ut = egne.lista|rejectattr("symbol", "in", aksjene|map(attribute="symbol")|list)|list|length %}
+      {#- Gjennomgangen (BH3): hva knappen gjør, før den trykkes. #}
+      <p class="foer-knappen">Lista di blir disse {{ aksjene|length }} aksjene ved neste henting{% if ut %}, og {{ ut }} {{ "aksje" if ut == 1 else "aksjer" }} som er i lista nå, fjernes{% endif %}.</p>
       <form method="post" action="/ferdig-liste"><input type="hidden" name="bransje" value="{{ bransje }}"><button type="submit" class="knapp">Bruk denne lista</button></form>
     </details>
   {% endfor %}

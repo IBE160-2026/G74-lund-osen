@@ -105,9 +105,19 @@ class TestSiden:
         side = klient.get("/min-liste").data.decode("utf-8")
         assert "Start fra en ferdig liste" in side
         assert re.search(r"Kraft <span class=\"antall\">2</span>", side) and "Helse <span" not in side
-        assert side.count("Utenfor målingen</span>") >= 1
+        ferdig = side.split('id="ferdige-lister"', 1)[1]
+        # Gjennomgangen (BH9): merket står ved NYB, som er under 32 MNOK, og ikke ved NYA.
+        assert re.search(r"NYB</span> <span class=\"utenformerke\">Utenfor målingen", ferdig)
+        assert not re.search(r"NYA</span> <span class=\"utenformerke\">", ferdig)
+        # BH3: hva knappen gjør, før den trykkes.
+        assert "Lista di blir disse 2 aksjene ved neste henting, og 15 aksjer som er i lista nå, fjernes." in ferdig
+        assert "er ikke et råd om hva du bør følge" in ferdig
         svar = klient.post("/ferdig-liste", data={"bransje": "Kraft"})
         assert svar.status_code == 303
+        t = sqlite3.connect(lagring_sqlite.BASE_STI)
+        oensker = t.execute("SELECT handling, symbol FROM oenske WHERE tatt_i_bruk IS NULL ORDER BY id").fetchall()
+        t.close()
+        assert [s for h, s in oensker if h == "folg"] == ["NYA", "NYB"] and len(oensker) == 17
         assert klient.post("/ferdig-liste", data={"bransje": "Helse"}).status_code == 400
         assert (
             klient.post("/ferdig-liste", data={"bransje": "Kraft"}, headers={"Origin": "https://annen.no"}).status_code
@@ -162,17 +172,96 @@ class TestFilteret:
         assert ventet, "demobasen skal ha minst én"
         filtrert = side.get(f"/?signal={retning}").data.decode("utf-8")
         assert _symbolene(filtrert) == [s for s in alle if s in ventet]
-        assert "er ikke et råd om å kjøpe eller selge" in filtrert
+        assert (
+            f"Bare aksjene som fikk 3 av 3 med retning {retning}. Filteret viser hva sjekkene ga, og er ikke et "
+            "råd om å kjøpe eller selge." in filtrert
+        )
+
+    def test_filteret_med_sortering(self, demoklient):
+        """Gjennomgangen (BH9): ville feilet hvis filteret ikke gjaldt den
+        sorterte lista, eller endret rekkefølgen i den."""
+        side, base = demoklient
+        sortert = _symbolene(side.get("/?sorter=endring&orden=synkende").data.decode("utf-8"))
+        filtrert = _symbolene(side.get("/?sorter=endring&orden=synkende&signal=negativ").data.decode("utf-8"))
+        assert filtrert and filtrert == [s for s in sortert if s in set(filtrert)]
+        assert set(filtrert) == set(_symbolene(side.get("/?signal=negativ").data.decode("utf-8")))
 
     def test_bare_innenfor_lista_som_vises(self, demoklient):
         """Ville feilet hvis filteret i Min liste viste aksjer som ikke er merket."""
         side, _ = demoklient
-        merket = set(_symbolene(side.get("/min-liste").data.decode("utf-8")))
-        assert set(_symbolene(side.get("/min-liste?signal=negativ").data.decode("utf-8"))) <= merket
-        assert set(_symbolene(side.get("/min-liste?signal=positiv").data.decode("utf-8"))) <= merket
+        merket = _symbolene(side.get("/min-liste").data.decode("utf-8"))
+        alle_negative = set(_symbolene(side.get("/?signal=negativ").data.decode("utf-8")))
+        # BH9: nøyaktig de merkede blant dem med 3 av 3 negativ, i samme rekkefølge.
+        assert _symbolene(side.get("/min-liste?signal=negativ").data.decode("utf-8")) == [
+            s for s in merket if s in alle_negative
+        ]
+        assert set(_symbolene(side.get("/min-liste?signal=positiv").data.decode("utf-8"))) <= set(merket)
 
     def test_en_annen_verdi_filtrerer_ikke(self, demoklient):
         side, _ = demoklient
         assert _symbolene(side.get("/?signal=kjop").data.decode("utf-8")) == _symbolene(
             side.get("/").data.decode("utf-8")
         )
+
+
+def _h1(side: str) -> str:
+    return re.sub(r"<[^>]+>", "", side.split("<h1", 1)[1].split("</h1>", 1)[0]).split(">", 1)[1].strip()
+
+
+class TestEtterGjennomgangen:
+    def test_overskriften_endres_ikke_av_filteret(self, demoklient):
+        """ECH1, VG1: ville feilet hvis filteret endret «N av M skilte seg ut»."""
+        side, _ = demoklient
+        for sti in ("/", "/min-liste"):
+            uten = side.get(sti).data.decode("utf-8")
+            for retning in ("positiv", "negativ"):
+                med = side.get(f"{sti}?signal={retning}").data.decode("utf-8")
+                assert _h1(med) == _h1(uten), (sti, retning)
+
+    def test_min_liste_viser_bare_de_merkede(self, demoklient):
+        """VG2, ECH2: ville feilet hvis filteret i Min liste viste en aksje
+        som ikke er merket, eller sa at lista er tom."""
+        side, base = demoklient
+        negative = _symbolene(side.get("/?signal=negativ").data.decode("utf-8"))
+        t = sqlite3.connect(base)
+        with t:
+            t.execute("DELETE FROM min_liste WHERE symbol IN (%s)" % ",".join("?" * len(negative)), negative)
+        t.close()
+        min_liste = side.get("/min-liste?signal=negativ").data.decode("utf-8")
+        assert _symbolene(min_liste) == []
+        assert "Ingen av aksjene her fikk det." in min_liste
+        assert "Ingen aksjer i Min liste ennå" not in min_liste
+
+    def test_knappene_og_lenkene(self, demoklient):
+        """VG7: ville feilet hvis knappene fikk andre ord, eller lenkene mistet
+        resten av adressen."""
+        side, _ = demoklient
+        html = side.get("/min-liste?sorter=endring&orden=synkende&signal=positiv").data.decode("utf-8")
+        nav = html.split('<nav class="signalfilter"', 1)[1].split("</nav>", 1)[0]
+        assert re.findall(r">([^<]+)</a>", nav) == ["Alle", "3 av 3 positiv", "3 av 3 negativ"]
+        assert 'href="/min-liste?sorter=endring&amp;orden=synkende&amp;signal=positiv" aria-current="true"' in nav
+        assert 'href="/min-liste?sorter=endring&amp;orden=synkende">Alle' in nav
+
+    def test_demoen_har_kraft_og_eiendom(self, demoklient):
+        """VG10: hjelpen og README-en sier det."""
+        side, _ = demoklient
+        html = side.get("/min-liste").data.decode("utf-8").split('id="ferdige-lister"', 1)[1]
+        assert re.findall(r"</svg>(\w+) <span class=\"antall\">", html) == ["Eiendom", "Kraft"]
+
+
+def test_bare_siste_maaling_og_bare_boerslista(tmp_path, monkeypatch):
+    """VG3: ville feilet hvis en eldre måling ble brukt når den siste har
+    feil, eller en aksje som ikke står i lista over Oslo Børs, kom med."""
+    base = tmp_path / "ose.db"
+    med_boersen(base, NITTEN[:2])
+    monkeypatch.setattr(ferdige_lister, "BRANSJE", {"T01": "Kraft", "T02": "Kraft", "T99": "Kraft"})
+    maal(base, [("T01", 5e6), ("T02", 6e6), ("T99", 7e6)])
+    t = sqlite3.connect(base)
+    with t:
+        t.execute(
+            "INSERT INTO omsetning (symbol, maalt, fra, til, handelsdager, dager_uten_volum, rader_uten_tall, "
+            "median_omsetning, feil) VALUES ('T02', '2026-10-29T20:00:00+00:00', '2026-07-29', '2026-10-29', 0, 0, "
+            "0, NULL, 'ingen kurser')"
+        )
+    t.close()
+    assert [a.symbol for a in ferdige_lister.lister(aapne_base(base))["Kraft"]] == ["T01"]
