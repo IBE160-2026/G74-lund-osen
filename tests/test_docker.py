@@ -1004,6 +1004,10 @@ MALENE_BAK_BILDET = (
     "src/templates/index.html",
     # Story 8.17a: periodevalget over søylene og tabellen.
     "src/perioder.py",
+    # Story 10.6: «Børsdagen kort fortalt» under tabellen, med grunnlaget som
+    # siden regner og demoteksten om dagen.
+    "src/dagsgrunnlag.py",
+    "src/demo_ki_dagen.json",
 )
 # Story 8.0f: ogsaa hjelpeskriptet (.js), som lastes paa begge sidene.
 SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
@@ -1231,7 +1235,11 @@ HOEYDE_PAA_BILDET = 1864
 # og er byte for byte det samme.
 # Story 3.4h: skriftene for sidene i demoen i src/static/fonts/ og stil.css.
 # Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c"
+# Story 10.6: «Børsdagen kort fortalt» (index.html, app.py, ki_visning.py, hjelpetekster.py,
+# stil.css, dagsgrunnlag.py og demo_ki_dagen.json). Alle bildene ble tatt paa nytt med
+# DevTools-protokollen. Bare oversikten ved 390 px er ny (3832 px hoey); de andre er byte for
+# byte de samme.
+AVTRYKK_BAK_BILDET = "ab28beb2d9706b85bf63147fbb970ec1e81d84e18241dac1dde4b83472a295a4"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1261,6 +1269,9 @@ FILENE_BAK_AKSJESIDEN = (
     "src/demo.py",
     "src/demo_ki.py",
     "src/demo_ki_tekster.json",
+    # Story 10.6: teksten om dagen i demoen, og grunnlaget webserveren regner.
+    "src/demo_ki_dagen.json",
+    "src/dagsgrunnlag.py",
     "src/markedsoversikt.py",
     "src/oversiktsdata.py",
     "src/hovedindeks.py",
@@ -1594,7 +1605,11 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 3.4h: boblen nederst i stedet for fotnoten om NewsWeb (aksje.html og
 # _investorboble.html), investorsider.py, skriftene og stil.css. Bildet ble tatt paa
 # nytt og er 2258 px hoeyt.
-AVTRYKK_BAK_AKSJESIDEN = "7027a296c59d723af051423f5e9e71f015c5edc0d714b0ddd08f5699707d094a"
+# Story 10.6: «Børsdagen kort fortalt» (index.html, app.py, ki_visning.py, hjelpetekster.py,
+# stil.css, dagsgrunnlag.py og demo_ki_dagen.json). Alle bildene ble tatt paa nytt med
+# DevTools-protokollen. Bare oversikten ved 390 px er ny (3832 px hoey); de andre er byte for
+# byte de samme.
+AVTRYKK_BAK_AKSJESIDEN = "d97a8b72c3b7b00d31dcd729d14fc7669832053dbd107fbe7f641d872ede8987"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1626,7 +1641,8 @@ DE_NYE_BILDENE = {
     "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 1682, FILENE_BAK_BOERSOMETERET),
     "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
     # Story 8.20a: 3509, med datoen og pilene på egen linje ved 390 px. Var 3524.
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 3509, MALENE_BAK_BILDET),
+    # Story 10.6: 3832, med «Børsdagen kort fortalt» under tabellen.
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 3832, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 3327, FILENE_BAK_BOERSOMETERET),
@@ -1690,12 +1706,16 @@ DE_NYE_BILDENE = {
 # de tre andre er byte for byte de samme.
 # Story 3.4h: skriftene for sidene i demoen i src/static/fonts/ og stil.css. Alle
 # bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# Story 10.6: «Børsdagen kort fortalt» (index.html, app.py, ki_visning.py, hjelpetekster.py,
+# stil.css, dagsgrunnlag.py og demo_ki_dagen.json). Alle bildene ble tatt paa nytt med
+# DevTools-protokollen. Bare oversikten ved 390 px er ny (3832 px hoey); de andre er byte for
+# byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c",
-    "docs/appen/boersometeret-demo.png": "075d79618ba19a38f39e18a6f7b1b1b5dcc7973a8dc5e21b98df9fea8755677e",
-    "docs/appen/min-liste-demo.png": "45448a94576b91a3cf3df73966af83ab53736162c7a65730d71659204a1f0f77",
-    "docs/appen/oversikten-390-demo.png": "b0282c3d4f3e1382087ba3ae158cc6dabfc5eb882bbdee34148c81d4c048398c",
-    "docs/appen/boersometeret-390-demo.png": "075d79618ba19a38f39e18a6f7b1b1b5dcc7973a8dc5e21b98df9fea8755677e",
+    TOPPEN_AV_OVERSIKTEN: "ab28beb2d9706b85bf63147fbb970ec1e81d84e18241dac1dde4b83472a295a4",
+    "docs/appen/boersometeret-demo.png": "ccbaa5b56b86e3e20b13a7033f45ff52d578849c7108fab6a853ad7c99b42bce",
+    "docs/appen/min-liste-demo.png": "2ad22e4a57fd7adf1bdce530ae0f71a0ed6ce8585f1dde4238a30725cf427db5",
+    "docs/appen/oversikten-390-demo.png": "ab28beb2d9706b85bf63147fbb970ec1e81d84e18241dac1dde4b83472a295a4",
+    "docs/appen/boersometeret-390-demo.png": "ccbaa5b56b86e3e20b13a7033f45ff52d578849c7108fab6a853ad7c99b42bce",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

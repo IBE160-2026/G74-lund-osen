@@ -56,6 +56,7 @@ from boersometer import (
     med_perioden as rute_med_perioden,
 )
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
+from dagsgrunnlag import dagsgrunnlag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
@@ -64,12 +65,16 @@ from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_in
 from investorsider import demoside
 from ki_visning import (
     AV,
+    DAGEN_AV,
+    DAGEN_UTEN,
     INGEN_I_DEMOEN,
     INGEN_RAD,
     KAPSEL,
     PAA,
+    PERIODEN_UTEN,
     UKJENT,
     KIVisning,
+    bygg_dagsvisning,
     bygg_ki_visning,
     ki_paa,
     ki_tekst,
@@ -1017,6 +1022,8 @@ def _tabellsiden(aktiv: str):
         siste_dag=sidens_siste(rader),
         periodeledd=ledd,
         standard_adresse=side_adresse(sti, None, alle, ledd),
+        # Story 10.6: «Børsdagen kort fortalt», bare paa oversikten.
+        boersdagen=None if i_lista else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd),
         **felles,
     )
 
@@ -1344,12 +1351,56 @@ def _ki_visning(post, detalj, siste: date) -> KIVisning:
     return visning
 
 
+def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste: date | None, oversiktsleser, ledd):
+    """«Børsdagen kort fortalt» - story 10.6, FR-607, FR-601.
+
+    Teksten er raden i KI-loggen for dagen tabellen viser, og vises bare naar
+    grunnlaget i raden er det samme som grunnlaget regnet her av det siden
+    viser: vurderingene som er lagret, kursene og hovedindeksen, for aksjene
+    i lista (dagsgrunnlag.py). Webserveren leser bare (AD-10). En periode har
+    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det."""
+    er_paa = ki_paa(request.cookies.get(KAPSEL))
+    bryter = {
+        "er_paa": er_paa,
+        "til": AV if er_paa else PAA,
+        "tilbake": "/" + ("?" + "&".join(ledd) if ledd else ""),
+    }
+    if not er_paa:
+        return {**bryter, "uten": DAGEN_AV}
+    if valg is not None and valg.periode not in (SISTE, VELG):
+        return {**bryter, "uten": PERIODEN_UTEN}
+    dag = valg.dag if valg is not None and valg.periode == VELG else siste
+    if dag is None:
+        return {**bryter, "uten": DAGEN_UTEN}
+    try:
+        rad = SqliteKILogg(g.tilkobling, naa).les(Emne.dagen(dag))
+        if rad is None:
+            return {**bryter, "uten": DAGEN_UTEN}
+        lager = SqliteIndekslager(g.tilkobling)
+        symboler = lager.symboler()
+        indeksserie = lager.serie(valgt_indeks(symboler)) if symboler else None
+        lista = tuple(post.aksje for post in poster)
+        vurderinger = {a.symbol: oversiktsleser.vurdering(a.symbol, dag) for a in lista}
+        grunnlag = dagsgrunnlag(dag, lista, vurderinger, serier, indeksserie)
+    except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError) as feil:
+        app.logger.warning("Teksten om dagen kunne ikke leses: %s: %s", type(feil).__name__, feil)
+        return {**bryter, "uten": DAGEN_UTEN}
+    visning = bygg_dagsvisning(rad, grunnlag)
+    if not visning.vist:
+        return {**bryter, "uten": DAGEN_UTEN}
+    return {**bryter, "tekst": visning.tekst, "modell": visning.modell}
+
+
 # Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa
 # en adresse med tabulator eller linjeskift, som nettleseren ellers ville
 # lest som en annen side (gjennomgangen, BH1, ECH).
 # Story 8.16b: med en valgt dag ogsaa ?dag= og en dato. Datoen leses paa nytt
 # av les_valg, saa en dag som ikke kan vises, gir 6 mnd og en beskjed.
 _TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}(\?dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?")
+# Story 10.6: ogsaa oversikten, med perioden eller dagen (periodeledd), til
+# «Børsdagen kort fortalt».
+_TILBAKE_OVERSIKTEN = re.compile(r"/(\?periode=[a-z0-9\-]{1,10}(&dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?)?")
+BOERSDAGEN_ANKER = "boersdagen-kort-fortalt"
 # Story 8.2a, a (U35, U36, gruppens svar 24.10 kl. 11:21): knappene som
 # endrer noe paa aksjesiden, holder plassen, som pilene i historikken.
 # Periodeknappene og «Velg dag» gaar til kursgrafen, og bryteren til
@@ -1371,6 +1422,8 @@ def ki_bryter():
     tilbake = request.form.get("tilbake", "/")
     if _TILBAKE.fullmatch(tilbake):
         tilbake += f"#{KI_ANKER}"
+    elif _TILBAKE_OVERSIKTEN.fullmatch(tilbake):
+        tilbake += f"#{BOERSDAGEN_ANKER}"
     else:
         tilbake = "/"
     svar = redirect(tilbake, code=303)
