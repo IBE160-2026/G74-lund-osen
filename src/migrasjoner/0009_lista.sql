@@ -4,7 +4,8 @@
 -- naar den gikk ut (ut). ut er den foerste dagen aksjen ikke er i lista,
 -- saa hentingen dagen foer er den siste for den. NULL i inn betyr at aksjen
 -- er med fra foerste henting, og NULL i ut at den er i lista. Datoene er
--- tekst paa formen AAAA-MM-DD, som dato i kurs og vurdering.
+-- tekst paa formen AAAA-MM-DD, som dato i kurs og vurdering, og bare datoer
+-- som finnes (date(x) IS x, gjennomgangen BH8, ECH7).
 --
 -- De femten som staar, faar den foerste raden sin i vurdering som inn: den
 -- dagen appen begynte aa foelge dem. Kursene gaar et aar lenger tilbake,
@@ -19,9 +20,9 @@
 -- nye rader og endringer; de femten har alle en av de 13. Ingen tabell eller
 -- trigger som finnes, endres.
 
-ALTER TABLE aksje ADD COLUMN inn TEXT CHECK (inn IS NULL OR inn GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]');
+ALTER TABLE aksje ADD COLUMN inn TEXT CHECK (inn IS NULL OR date(inn) IS inn);
 ALTER TABLE aksje ADD COLUMN ut TEXT CHECK (
-    ut IS NULL OR (ut GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND (inn IS NULL OR inn < ut))
+    ut IS NULL OR (date(ut) IS ut AND (inn IS NULL OR inn < ut))
 );
 
 UPDATE aksje SET inn = (SELECT MIN(dato) FROM vurdering WHERE vurdering.symbol = aksje.symbol);

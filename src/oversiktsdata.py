@@ -49,7 +49,7 @@ class Oversiktspost:
 class Oversiktsleser(Protocol):
     """Porten for oversikten. Bare lesemetoder, og en test holder det slik."""
 
-    def oversikt(self) -> list[Oversiktspost]:
+    def oversikt(self, dag: date | None = None) -> list[Oversiktspost]:
         """En post per aksje i aksje, i rowid-rekkefoelge."""
 
     def post(self, symbol: str) -> Oversiktspost | None:

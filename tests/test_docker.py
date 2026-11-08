@@ -1233,8 +1233,9 @@ HOEYDE_PAA_BILDET = 1864
 # Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
 # Story 2.11: lista fra basen og «ikke i lista» (app.py, lagring_sqlite.py, oversiktsdata.py,
 # markedsoversikt.py, aksjedetalj.py, historikk.py, tilstand.py, hjelpetekster.py og 0009).
-# Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "b2e4cdab28dbaf843e70d7a8406e88dc84c9a32a76a2c86deb1d6a06afb460a3"
+# Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme,
+# ogsaa etter gjennomgangen.
+AVTRYKK_BAK_BILDET = "e5f749d3bfe51e0c619d873da2ffb974c837772932cddce0341e60cc581f6ed2"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1599,8 +1600,9 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # nytt og er 2258 px hoeyt.
 # Story 2.11: lista fra basen og «ikke i lista» (app.py, lagring_sqlite.py, oversiktsdata.py,
 # markedsoversikt.py, aksjedetalj.py, historikk.py, tilstand.py, hjelpetekster.py og 0009).
-# Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "b1a93cd1dbae9782b3e4f4ea518478bdb869ebae6a9282f980d8fd96cc8d0f21"
+# Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme,
+# ogsaa etter gjennomgangen.
+AVTRYKK_BAK_AKSJESIDEN = "f88a060ed4e12bbbc25df95ffd5c1d0c12692a103dac37c4c1ad4709dbacc70d"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1698,13 +1700,14 @@ DE_NYE_BILDENE = {
 # bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
 # Story 2.11: lista fra basen og «ikke i lista» (app.py, lagring_sqlite.py, oversiktsdata.py,
 # markedsoversikt.py, aksjedetalj.py, historikk.py, tilstand.py, hjelpetekster.py og 0009).
-# Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme,
+# ogsaa etter gjennomgangen.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "b2e4cdab28dbaf843e70d7a8406e88dc84c9a32a76a2c86deb1d6a06afb460a3",
-    "docs/appen/boersometeret-demo.png": "98761c0407d166f71448b531f1e5d7d274273a203d6f97555ef326252a66da28",
-    "docs/appen/min-liste-demo.png": "e43ee899d56ad5b6e47b959b822923ea4246395e0eb738d6a714fd292157f8de",
-    "docs/appen/oversikten-390-demo.png": "b2e4cdab28dbaf843e70d7a8406e88dc84c9a32a76a2c86deb1d6a06afb460a3",
-    "docs/appen/boersometeret-390-demo.png": "98761c0407d166f71448b531f1e5d7d274273a203d6f97555ef326252a66da28",
+    TOPPEN_AV_OVERSIKTEN: "e5f749d3bfe51e0c619d873da2ffb974c837772932cddce0341e60cc581f6ed2",
+    "docs/appen/boersometeret-demo.png": "934410fe758f67a36133454abe6c5e6dab8762024261a47941ba61ff6a09c4fc",
+    "docs/appen/min-liste-demo.png": "f4b32b85a9b02a6e92932f6c8fa25cfab87087eb249a28fbaa5af3450198e17b",
+    "docs/appen/oversikten-390-demo.png": "e5f749d3bfe51e0c619d873da2ffb974c837772932cddce0341e60cc581f6ed2",
+    "docs/appen/boersometeret-390-demo.png": "934410fe758f67a36133454abe6c5e6dab8762024261a47941ba61ff6a09c4fc",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

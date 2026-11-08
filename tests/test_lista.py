@@ -181,10 +181,15 @@ class TestLista:
         tilkobling = sqlite3.connect(base)
         try:
             migrer(tilkobling, til_versjon(tmp_path, 8))
+            # Gjennomgangen (BH4, VG5): en aksje til, saa testen skiller «alle
+            # aksjene i aksje» fra de 15 i AKSJEUNIVERS.
+            tilkobling.execute("INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'NY.OL', 'Ny', 'Kraft')")
+            tilkobling.commit()
         finally:
             tilkobling.close()
         foer = base.read_bytes()
-        assert fp.lista_fra_basen(base, TIRSDAG_22_09) == AKSJEUNIVERS
+        lista = fp.lista_fra_basen(base, TIRSDAG_22_09)
+        assert lista[:15] == AKSJEUNIVERS and [a.symbol for a in lista[15:]] == ["NY"]
         assert base.read_bytes() == foer
 
 
@@ -230,8 +235,13 @@ class TestTattUt:
         aksje = klient.get("/aksje/DNB?dag=2026-09-22")
         assert aksje.status_code == 200 and "DNB Bank" in aksje.data.decode("utf-8")
         historikk = klient.get("/aksje/DNB?maaned=2026-09").data.decode("utf-8")
-        assert IKKE_I_LISTA in historikk
-        assert "DNB Bank" not in klient.get("/").data.decode("utf-8")
+        # Gjennomgangen (BH5): i cellen i historikken, ikke bare i hjelpen.
+        assert f'<span class="tilstand">– {IKKE_I_LISTA}</span>' in historikk
+        # Gjennomgangen (BH6, BH7, VG2): ikke på oversikten, i Min liste
+        # eller i børsometeret, og sidene svarer 200.
+        for adresse in ("/", "/min-liste?vis=alle", "/boersometer"):
+            svar = klient.get(adresse)
+            assert svar.status_code == 200 and "DNB Bank" not in svar.data.decode("utf-8"), adresse
 
 
 def test_atten_i_basen_er_atten_i_lista(stier):
@@ -243,3 +253,65 @@ def test_atten_i_basen_er_atten_i_lista(stier):
         assert les_lista(tilkobling, TIRSDAG_22_09) == ATTEN
     finally:
         tilkobling.close()
+
+
+class TestEtterGjennomgangen:
+    """Funnene fra gjennomgangen av 2.11."""
+
+    def test_oversikten_foelger_regelen_i_les_lista(self, tmp_path):
+        """BH1, ECH1, ECH2, VG2: ville feilet hvis en aksje med ut fram i tid
+        forsvant fra oversikten, eller en med inn fram i tid sto der."""
+        base = tmp_path / "ose.db"
+        sett(base, "DNB", ut="2026-11-10")
+        sett(base, "KOG", inn="2026-11-20")
+        tilkobling = aapne_base(base)
+        try:
+            symboler = [p.aksje.symbol for p in SqliteOversiktsleser(tilkobling).oversikt(date(2026, 11, 9))]
+            assert "DNB" in symboler and "KOG" not in symboler
+            assert symboler == [a.symbol for a in les_lista(tilkobling, date(2026, 11, 9))]
+        finally:
+            tilkobling.close()
+
+    def test_en_tom_liste_henter_ingenting(self, stier):
+        """BH3, ECH3, VG3: ville feilet hvis en tom liste ble til de 15."""
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        for aksje in AKSJEUNIVERS:
+            sett(base, aksje.symbol, ut="2026-09-23")
+        fil, kall, ut = kjoer_23(raa, base, OEYEBLIKK_22_09 + timedelta(days=1))
+        assert fil is None and kall == [] and "Lista i basen er tom" in ut
+
+    def test_morgensjekken_bruker_lista_i_basen(self, stier):
+        """VG1, ECH4 (høy): ville feilet hvis sjekken før steg 3 i
+        kveldsjobben ventet på en aksje som er tatt ut, og aldri sa FERDIG."""
+        import dagen_ferdig
+
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        sett(base, "DNB", ut="2026-09-22")
+        _, mangler = dagen_ferdig.mangler_for_dagen(base, OEYEBLIKK_22_09)
+        assert not any("DNB" in m for m in mangler)
+
+    def test_en_dato_som_ikke_finnes_avvises(self, tmp_path):
+        """BH8, ECH7: ville feilet hvis basen godtok 2026-13-45."""
+        tilkobling = sqlite3.connect(tmp_path / "ose.db")
+        try:
+            migrer(tilkobling, MIGRASJONSKATALOG)
+            with pytest.raises(sqlite3.IntegrityError):
+                tilkobling.execute("UPDATE aksje SET ut = '2026-13-45' WHERE symbol = 'EQNR'")
+        finally:
+            tilkobling.close()
+
+    def test_en_aksje_som_er_tatt_ut_kan_ikke_merkes(self, tmp_path):
+        """VG7: ville feilet hvis Min liste godtok en aksje som er tatt ut."""
+        from lagring_sqlite import SqliteMinlistelager
+        from minliste import UkjentAksje
+
+        base = tmp_path / "ose.db"
+        sett(base, "DNB", ut="2026-09-23")
+        tilkobling = aapne_base(base)
+        try:
+            with pytest.raises(UkjentAksje):
+                SqliteMinlistelager(tilkobling).merk("DNB")
+        finally:
+            tilkobling.close()

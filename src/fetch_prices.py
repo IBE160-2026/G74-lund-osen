@@ -780,8 +780,13 @@ def lista_fra_basen(base_sti: Path, dato: date) -> tuple[Aksje, ...]:
     Basen aapnes som i sjekkene foer foerste kall (_aapne_for_sjekken): uten
     migrering og skrivebeskyttet. En base en versjon bak, foer 0009, har ikke
     inn og ut, og da er lista alle aksjene i aksje, som foer 2.11. Finnes
-    basen ikke, eller kan den ikke leses, er lista AKSJEUNIVERS, som 0003
-    legger inn i en ny base."""
+    basen ikke, er lista AKSJEUNIVERS, som 0003 legger inn i en ny base.
+
+    Gjennomgangen (BH3, ECH3, VG3): en tom liste er tom, og ikke de 15. Kan
+    basen ikke leses, er lista AKSJEUNIVERS, som foer 2.11: da henter
+    hentingen og skriver fila foerst (AD-6), og basen kan heller ikke
+    skrives, saa ingen vurdering lagres for en aksje som er tatt ut
+    (TestBasenAvgjoer og TestHentingenSkriverBasen)."""
     if not base_sti.exists():
         return AKSJEUNIVERS
     try:
@@ -801,7 +806,7 @@ def lista_fra_basen(base_sti: Path, dato: date) -> tuple[Aksje, ...]:
         return AKSJEUNIVERS
     finally:
         tilkobling.close()
-    return lista or AKSJEUNIVERS
+    return lista
 
 
 def manglende_i_basen(base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKSJEUNIVERS) -> list[str]:
@@ -1027,6 +1032,9 @@ def kjoer(
     # som foer. En aksje som er tatt ut, hentes ikke (AD-21).
     if lista is None:
         lista = lista_fra_basen(base_sti, dato)
+        if not lista:
+            skriv(f"Lista i basen er tom for børsdagen {dato.isoformat()}. Ingenting å hente. 0 kall brukt.")
+            return None
 
     # Basen (FR-402): har den boersdagen for alle aksjene, er det ingenting aa hente.
     try:

@@ -192,8 +192,8 @@ def _dag(
     if (dato > siste or dato < foerste) and innhold is None and not tatt_ut:
         return Dag(dato, None, None, tom=True, lenke=False, skilte_seg_ut=False)
     tilstand_, tekst = les_tilstand(innhold, dato, idag, ut)
-    ut = isinstance(innhold, Vurdering) and innhold.styrke >= terskel
-    return Dag(dato, tilstand_, tekst, tom=False, lenke=dato in kursdager and dato > foerste, skilte_seg_ut=ut)
+    skilte = isinstance(innhold, Vurdering) and innhold.styrke >= terskel
+    return Dag(dato, tilstand_, tekst, tom=False, lenke=dato in kursdager and dato > foerste, skilte_seg_ut=skilte)
 
 
 def bygg_maaned(
