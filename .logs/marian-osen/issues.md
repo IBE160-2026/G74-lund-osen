@@ -162,3 +162,5 @@
 - [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Konflikt i `index.html` mellom 10.6 og 2.12 ved flettingen: «Dine egne aksjer» før «Børsdagen kort fortalt»
 - [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Spørsmål 11 i 2.12: hentingen måler ikke omsetningen for en ny aksje
 - [ ] 2026-11-08 [story-8-10-innstillinger](951-2026-11-08-19-20-18-story-8-10-innstillinger.md) — PR #125 (8.10) er ikke flettet; den flettes etter PR #123 og #124
+- [ ] 2026-11-08 [story-8-10b-vis-ki-tekst](950-2026-11-08-19-39-28-story-8-10b-vis-ki-tekst.md) — PR #126 (8.10b) er ikke flettet; den flettes etter PR #123, #124 og #125
+- [ ] 2026-11-08 [story-8-10b-vis-ki-tekst](950-2026-11-08-19-39-28-story-8-10b-vis-ki-tekst.md) — Når 10.6 og 8.10b begge er flettet, må `_boersdagen` bruke `_ki_er_paa()` (BH3, ECH3 i 8.10b)
