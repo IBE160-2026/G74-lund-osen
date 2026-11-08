@@ -41,6 +41,16 @@ en egen fil og byttes inn med os.replace (gjennomgangen, BH4, ECH1 og VG4).
 Lesingen og skrivingen i demobasen importerer verken requests, ki_lokal,
 ki_tekst eller ki_prompt. De importeres bare inne i lag_tekstene og
 promptavtrykk.
+
+Story 10.6: teksten om dagen paa forsiden (FR-607) ligger i en egen fil,
+DAGFIL, med promptens avtrykk og grunnlagets avtrykk som tekstene over. Den
+lages med Gemma, med samme vei som hentingen (dagsgrunnlag, lag_dagsrad), for
+siste demodag:
+
+    uv run python src/demo_ki.py --dagen
+
+Da lages bare teksten om dagen, og tekstene for aksjene staar. ki_dagen
+importeres bare inne i lag_dagsteksten og dagens_promptavtrykk.
 """
 
 import hashlib
@@ -60,6 +70,8 @@ from lagring_sqlite import SqliteKILogg, aapne_base
 
 FIL = Path(__file__).with_name("demo_ki_tekster.json")
 FORMAT = 1
+# Story 10.6: teksten om dagen.
+DAGFIL = Path(__file__).with_name("demo_ki_dagen.json")
 
 # Feltene i KIRad, utenom emnet og grunnlaget, i den rekkefoelgen fila har dem.
 FELTENE = (
@@ -261,20 +273,119 @@ def lag_tekstene(modell, fil: Path = FIL, skriv: Callable[[str], None] = print) 
     return radene
 
 
+# --- Story 10.6: teksten om dagen ------------------------------------------
+
+
+def dagens_promptavtrykk() -> str:
+    """sha256 av prompten for dagen: reglene og koden som setter den sammen,
+    det samme som AVTRYKK i tests/test_ki_dagen.py dekker."""
+    import inspect
+
+    import ki_dagen
+
+    tekst = ki_dagen.REGLER_DAGEN + inspect.getsource(ki_dagen.lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
+    return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
+
+
+def les_dagsraden(fil: Path = DAGFIL, prompt: str | None = None) -> KIRad:
+    """Raden for dagen i fila. Med prompt avvises en rad laget med en annen
+    prompt, som for tekstene for aksjene."""
+    innhold = json.loads(Path(fil).read_text(encoding="utf-8-sig"))
+    if not isinstance(innhold, dict) or type(innhold.get("format")) is not int or innhold["format"] != FORMAT:
+        raise UgyldigDemoKI(f"{Path(fil).name} har ikke format {FORMAT}")
+    verdi = innhold.get("rad")
+    ventet = {"dato", "grunnlag", "avtrykk", "promptavtrykk", *FELTENE}
+    if not isinstance(verdi, dict) or set(verdi) != ventet:
+        raise UgyldigDemoKI(f"feltene i raden for dagen stemmer ikke i {Path(fil).name}")
+    try:
+        dato = date.fromisoformat(verdi["dato"])
+    except (TypeError, ValueError) as feil:
+        raise UgyldigDemoKI(f"datoen kan ikke leses: {verdi['dato']!r}") from feil
+    rad = KIRad(emne=Emne.dagen(dato), grunnlag=verdi["grunnlag"], **{f: verdi[f] for f in FELTENE})
+    if avtrykk(rad) != verdi["avtrykk"]:
+        raise UgyldigDemoKI("avtrykket stemmer ikke med grunnlaget for dagen")
+    if not isinstance(verdi["promptavtrykk"], str) or not _SHA256.fullmatch(verdi["promptavtrykk"]):
+        raise UgyldigDemoKI("promptavtrykket for dagen er ikke en sha256")
+    if prompt is not None and verdi["promptavtrykk"] != prompt:
+        raise UgyldigDemoKI(
+            "teksten om dagen er laget med en annen prompt enn den i ki_dagen.py. "
+            "Lag den paa nytt med uv run python src/demo_ki.py --dagen"
+        )
+    return rad
+
+
+def lag_dagsteksten(modell, fil: Path = DAGFIL, skriv: Callable[[str], None] = print) -> KIRad:
+    """Lager teksten om siste demodag med modellen og skriver den i fil.
+    Feiler modellen, skrives fila ikke (som lag_tekstene). Ingen ny runde for
+    aa faa en bedre tekst (FR-604): bestaar teksten ikke kontrollen, staar
+    raden som den ble."""
+    import demo
+    from dagsgrunnlag import dagsgrunnlag
+    from ki_dagen import lag_dagsrad
+    from ki_tekst import _kursene
+    from lagring_sqlite import SqliteVurderingslager
+
+    dag = demo.SLUTTDATO
+    klokke = demo._klokke_for(dag)
+    prompt = dagens_promptavtrykk()
+    with tempfile.TemporaryDirectory() as mappe:
+        base = Path(mappe) / "demo.db"
+        demo.lag_demobase(base, skriv=lambda _: None, med_ki=False)
+        tilkobling = aapne_base(base)
+        try:
+            lager = SqliteVurderingslager(tilkobling, klokke, demo.DEMOUNIVERS)
+            serier, indeksserie = _kursene(tilkobling, demo.DEMOUNIVERS)
+            vurderinger = {a.symbol: lager.les(a.symbol, dag) for a in demo.DEMOUNIVERS}
+        finally:
+            tilkobling.close()
+    grunnlag = dagsgrunnlag(dag, demo.DEMOUNIVERS, vurderinger, serier, indeksserie)
+    if grunnlag is None:
+        raise UgyldigDemoKI("ingen aksje er vurdert paa siste demodag")
+    start = time.perf_counter()
+    rad = lag_dagsrad(Emne.dagen(dag), grunnlag, modell)
+    tid = time.perf_counter() - start
+    if rad.modellen_feilet:
+        raise UgyldigDemoKI(f"modellen feilet: {rad.grunn}. {Path(fil).name} er ikke endret.")
+    if dagens_promptavtrykk() != prompt:
+        raise UgyldigDemoKI(f"prompten ble endret underveis. {Path(fil).name} er ikke endret.")
+    feltene = {felt: getattr(rad, felt) for felt in FELTENE}
+    innhold = {
+        "format": FORMAT,
+        "rad": {
+            "dato": dag.isoformat(),
+            "grunnlag": json.loads(rad.grunnlag_som_json()),
+            "avtrykk": avtrykk(rad),
+            "promptavtrykk": prompt,
+            **feltene,
+        },
+    }
+    ny = Path(fil).with_name(Path(fil).name + ".ny")
+    ny.write_text(json.dumps(innhold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    os.replace(ny, fil)
+    utfall = "besto" if rad.besto else "ble stoppet av"
+    skriv(f"Teksten om dagen i {Path(fil).name}: {utfall} kontrollen ({tid:.1f} s).")
+    return rad
+
+
 def main(argv: list[str] | None = None) -> None:
     import argparse
 
     from ki_lokal import OllamaModell
 
-    argparse.ArgumentParser(
+    tolker = argparse.ArgumentParser(
         description="Lager KI-tekstene i demoen med Gemma i Ollama, én gang, i src/demo_ki_tekster.json."
-    ).parse_args(argv)
+    )
+    tolker.add_argument("--dagen", action="store_true", help="bare teksten om dagen, i src/demo_ki_dagen.json")
+    valg = tolker.parse_args(argv)
     modell = OllamaModell()
     if grunn := modell.sjekk():
         print(f"Ingen KI-tekster: {grunn}. Fila er ikke endret.")
         sys.exit(1)
     try:
-        lag_tekstene(modell)
+        if valg.dagen:
+            lag_dagsteksten(modell)
+        else:
+            lag_tekstene(modell)
     except UgyldigDemoKI as feil:
         print(f"Ingen nye KI-tekster: {feil}")
         sys.exit(1)

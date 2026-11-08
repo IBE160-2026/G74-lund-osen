@@ -243,7 +243,8 @@ class TestDemokommandoen:
         finally:
             tilkobling.close()
         # Hele raden, ikke bare emnet og teksten (gjennomgangen, BH8).
-        assert i_basen == radene
+        # Story 10.6: og raden for teksten om dagen, sist, fra sin egen fil.
+        assert i_basen == [*radene, demo_ki.les_dagsraden()]
 
     def test_importerer_verken_modellen_eller_requests(self, tmp_path):
         """Ville feilet hvis demo.py eller lesingen i demo_ki.py importerte
@@ -268,7 +269,9 @@ class TestDemokommandoen:
         assert svar.stdout.strip() == "[]", svar.stdout
         tilkobling = sqlite3.connect(tmp_path / "demo.db")
         try:
-            assert tilkobling.execute("SELECT COUNT(*) FROM ki_logg").fetchone()[0] == len(demo_ki.les_radene())
+            # Story 10.6: og raden for teksten om dagen, fra sin egen fil.
+            antall = tilkobling.execute("SELECT COUNT(*) FROM ki_logg").fetchone()[0]
+            assert antall == len(demo_ki.les_radene()) + 1
         finally:
             tilkobling.close()
 

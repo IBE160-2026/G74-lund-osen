@@ -1,0 +1,53 @@
+{
+  "format": 1,
+  "rad": {
+    "dato": "2026-10-09",
+    "grunnlag": {
+      "aksjer": 15,
+      "bedre_enn_indeksen": 7,
+      "bransjer": {
+        "Energi": {
+          "med_endring": 4,
+          "steg": 1
+        },
+        "Finans": {
+          "med_endring": 2,
+          "steg": 0
+        },
+        "Materialer": {
+          "med_endring": 2,
+          "steg": 2
+        },
+        "Shipping": {
+          "med_endring": 2,
+          "steg": 2
+        },
+        "Sjømat": {
+          "med_endring": 2,
+          "steg": 2
+        }
+      },
+      "hovedindeksen": "falt",
+      "med_kurs": 14,
+      "skilte_seg_ut": 7,
+      "skilte_seg_ut_blandet": 3,
+      "skilte_seg_ut_negativ": 2,
+      "skilte_seg_ut_positiv": 2,
+      "ukedag": "fredag"
+    },
+    "avtrykk": "abb7478ef8d9262a222ab440a05c26e9a40eaa446faabc91f58c1340b26c7d6a",
+    "promptavtrykk": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7",
+    "regelen": "Aksjer 15, fredag. Hovedindeksen falt. Bedre enn indeksen 7 av 14. Skilte seg ut 7: positiv 2, negativ 2, blandet 3. Energi: steg 1 av 4. Finans: steg 0 av 2. Materialer: steg 2 av 2. Shipping: steg 2 av 2. Sjømat: steg 2 av 2.",
+    "tekst": "Hovedindeksen falt fredag. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. I energi steg 1 av 4 aksjer. I materialer steg 2 av 2 aksjer.",
+    "besto": true,
+    "grunn": null,
+    "promptversjon": "dag-1",
+    "tjeneste": "lokal",
+    "modell": "gemma4:e4b",
+    "modell_id": "dc35e8d9c606",
+    "seed": 42,
+    "temperatur": 0.0,
+    "maskinvare": "gpu",
+    "ollama_versjon": "0.35.1"
+  }
+}

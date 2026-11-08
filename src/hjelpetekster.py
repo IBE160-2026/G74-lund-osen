@@ -58,6 +58,9 @@ DAGENE = "src/dagene.py"
 KI_KONTROLL = "src/ki_kontroll.py"
 KI_VISNING = "src/ki_visning.py"
 MOENSTRENE = "src/moenstrene.py"
+# Story 10.6: teksten om dagen paa forsiden.
+DAGSGRUNNLAG = "src/dagsgrunnlag.py"
+KI_DAGEN = "src/ki_dagen.py"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -610,6 +613,24 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "def kontroller("),
                 (AKSJE_MAL, "Laget av KI."),
+            ),
+        ),
+        # Story 10.6 (utdraget 08.11 §3): hjelpen ved «Børsdagen kort
+        # fortalt», med ordene fra utdraget i tre setninger, fordi hver
+        # hjelpetekst har hoeyst tre (story 8.0c). Utdraget har fem.
+        "boersdagen_kort_fortalt": Hjelpetekst(
+            "",
+            "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). Modellen fikk bare antall: om "
+            "hovedindeksen steg eller falt, hvor mange aksjer som gjorde det bedre enn indeksen, hvor mange som "
+            "skilte seg ut og med hvilken retning, og hvor mange som steg i hver bransje med minst to aksjer med "
+            "en endring, med ukedagen og antallet aksjer i lista, og ingen prosenter, kurser eller nyheter. "
+            "Teksten sjekkes før den vises: tall med prikket strek står i det modellen fikk, og den gir ikke råd.",
+            (
+                (DAGSGRUNNLAG, "def dagsgrunnlag("),
+                (DAGSGRUNNLAG, "Ingen kurs, prosent, volum eller forholdstall"),
+                (KI_DAGEN, "def kontroller_dagen("),
+                (KI_VISNING, "def bygg_dagsvisning("),
+                (KI_VISNING, "def prikkede_tall("),
             ),
         ),
         "ikke_raad": Hjelpetekst(

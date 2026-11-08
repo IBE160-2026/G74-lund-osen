@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-24-2026 19:26
-last_updated: 11-08-2026 15:48
+last_updated: 11-08-2026 21:53
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -216,7 +216,7 @@ development_status:
   10-4-måle-bidraget-egen-brukertest-etter-8-1: in-progress
   # 10-5 er lenken til selskapets investorside, ikke NewsWeb (2026-10-06). Navnet staar.
   10-5-lenke-til-selskapets-side-på-newsweb: done
-  10-6-ki-teksten-om-dagen-på-forsiden: backlog
+  10-6-ki-teksten-om-dagen-på-forsiden: done
   10-7-egen-nøkkel-til-gemini-anthropic-og-openai: done
   10-8-chatgpt-med-sign-in-with-chatgpt: backlog
   10-9-ki-teksten-forklarer-det-siden-viser: done

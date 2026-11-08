@@ -80,14 +80,15 @@ def radene(base, dato=TIRSDAG):
 
 class TestSteget:
     def test_en_rad_per_aksje_etter_vurderingene(self, stier):
-        """FR-604, AD-17. Ville feilet hvis steget kom foer vurderingene (F3)."""
+        """FR-604, AD-17. Ville feilet hvis steget kom foer vurderingene (F3).
+        Story 10.6: 15 kall for aksjene og ett for teksten om dagen (NFR-02)."""
         raa, base = stier
         modell = FalskModell()
         kode, _, ut = kjoer(raa, base, modell)
         assert kode == 0
         rader = radene(base)
         assert all(r is not None and r.besto for r in rader.values())
-        assert modell.kall == 15
+        assert modell.kall == 16
         assert ut.index("Skrev 15 rader i vurdering") < ut.index("KI-tekst for børsdagen 2026-09-22")
         assert "15 besto kontrollen, 0 ble stoppet av kontrollen, og modellen feilet for 0." in ut
 
@@ -236,7 +237,9 @@ class TestNaarNoeGaarGalt:
         kjoer(raa, base, modell, hent)
         rader = radene(base)
         assert rader["EQNR"] is None
-        assert sum(r is not None for r in rader.values()) == 14 == modell.kall
+        assert (
+            sum(r is not None for r in rader.values()) == 14 == modell.kall - 1
+        )  # Story 10.6: og ett kall for teksten om dagen.
 
 
 class TestSammeKveld:
@@ -258,7 +261,7 @@ class TestSammeKveld:
         kjoer(raa, base, None)
         modell = FalskModell()
         kode, kall, _ = kjoer(raa, base, modell)
-        assert (kode, kall, modell.kall) == (0, [], 15)
+        assert (kode, kall, modell.kall) == (0, [], 16)  # Story 10.6: og ett kall for teksten om dagen.
         assert all(r is not None for r in radene(base).values())
 
     def test_midnatt_stopper_steget_med_beskjed(self, stier):
@@ -378,7 +381,7 @@ class TestEtterGjennomgangen:
         assert kode == 1 and kall == []
         rader = radene(base)
         assert sum(r is not None for r in rader.values()) == 14 and rader["EQNR"] is None
-        assert modell.kall == 14
+        assert modell.kall == 15  # Story 10.6: og ett kall for teksten om dagen.
 
     def test_main_leser_av_fra_env(self, monkeypatch, tmp_path):
         """VG2: .env.example sier av, og main maa lese det fra .env."""
@@ -502,7 +505,12 @@ class TestForhaandssjekken:
         assert foerste.sjekker == 1 and all(r is None for r in radene(base).values())
         modell = SjekketModell(None)
         kode, kall, ut = kjoer(raa, base, modell)
-        assert (kode, kall, modell.kall, modell.sjekker) == (0, [], 15, 1)
+        assert (kode, kall, modell.kall, modell.sjekker) == (
+            0,
+            [],
+            16,
+            1,
+        )  # Story 10.6: og ett kall for teksten om dagen.
         assert len(radene(base)) == 15
         assert all(r is not None and r.besto for r in radene(base).values())
         assert "15 besto kontrollen" in ut
@@ -528,7 +536,7 @@ class TestForhaandssjekken:
         raa, base = stier
         modell = SjekketModell(None)
         kjoer(raa, base, modell)
-        assert modell.sjekker == 1 and modell.kall == 15
+        assert modell.sjekker == 1 and modell.kall == 16  # Story 10.6: og ett kall for teksten om dagen.
 
 
 class TestSjekkenEtterGjennomgangen:
