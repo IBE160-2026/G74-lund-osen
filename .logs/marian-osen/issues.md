@@ -164,3 +164,5 @@
 - [ ] 2026-11-08 [story-8-10-innstillinger](951-2026-11-08-19-20-18-story-8-10-innstillinger.md) — PR #125 (8.10) er ikke flettet; den flettes etter PR #123 og #124
 - [ ] 2026-11-08 [story-8-10b-vis-ki-tekst](950-2026-11-08-19-39-28-story-8-10b-vis-ki-tekst.md) — PR #126 (8.10b) er ikke flettet; den flettes etter PR #123, #124 og #125
 - [ ] 2026-11-08 [story-8-10b-vis-ki-tekst](950-2026-11-08-19-39-28-story-8-10b-vis-ki-tekst.md) — Når 10.6 og 8.10b begge er flettet, må `_boersdagen` bruke `_ki_er_paa()` (BH3, ECH3 i 8.10b)
+- [ ] 2026-11-08 [story-8-8-signaldager](949-2026-11-08-20-39-21-story-8-8-signaldager.md) — PR #127 (8.8) er ikke flettet; gruppen går gjennom de fire spørsmålene først
+- [ ] 2026-11-08 [story-8-8-signaldager](949-2026-11-08-20-39-21-story-8-8-signaldager.md) — Aksjesiden leser hele vurderingshistorikken to ganger (8.8, BH8/ECH8, lav)
