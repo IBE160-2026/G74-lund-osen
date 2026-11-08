@@ -641,6 +641,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-11-08 kl. 12:46 (gruppens svar):* story 8.11 bygges i dag, etter de seks andre. Rådet foreslo mandag til onsdag. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* alle forslagene i spesifikasjonene for 10.6, 2.11 og 2.12 er godtatt, også navnet «Børsdagen kort fortalt» i 10.6 og spørsmål 6 og 7 i 2.11. 10.6, 2.11 og 2.12 flettes i kveld, og 8.10, 8.10b, 8.8 og 8.11 mandag. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1966,6 +1968,8 @@ byttes uten at koden endres.
 
 *Avgjort 2026-11-08 kl. 11:57 (gruppens svar):* å bytte aksjer (2.12) tas i bruk fra mandag 09.11. Rådet foreslo etter tellingen for 10.4. Brukeren velger bransjen, «Ollama i dag», og prøvekjøringer på `data/db/ose.db` skjer med `mode=ro`. Rådet anbefalte alle tre. Regel 22 i `CLAUDE.md`, som sier at kjøringer på en gren aldri rører `data/db/ose.db`, er ikke endret med svaret. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–7 i spesifikasjonen 2.11 (`spec-2-11-lista-leses-fra-basen.md`) er godtatt. Spørsmål 6: en aksje som kommer inn igjen, får `ut` nullstilt, og en egen tabell med periodene venter til det trengs. Spørsmål 7: hentingen går videre med de 15 når basen ikke kan leses, som før 2.11. Storyen flettes i kveld. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
+
 ### Story 2.12: Velge og bytte aksjer
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2044,6 +2048,8 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-11-08 kl. 11:57 (gruppens svar):* å bytte aksjer (2.12) tas i bruk fra mandag 09.11. Rådet foreslo etter tellingen for 10.4. Brukeren velger bransjen, «Ollama i dag», og prøvekjøringer på `data/db/ose.db` skjer med `mode=ro`. Rådet anbefalte alle tre. Regel 22 i `CLAUDE.md`, som sier at kjøringer på en gren aldri rører `data/db/ose.db`, er ikke endret med svaret. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–11 i spesifikasjonen 2.12 (`spec-2-12-velge-og-bytte-aksjer.md`) er godtatt, og storyen flettes i kveld, etter 2.11. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -3232,6 +3238,8 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 *Lagt til 2026-10-08, endringsforslaget 08.10 (punkt 4.5), godkjent av Marian kl. 08:04:*
 - Teksten gjelder lista som er aktiv (FR-412), og tallet på aksjer telles. Testen prøver en liste med færre enn 15 og en med 18
 - **Ville feilet hvis:** grunnlaget sa «av 15» når lista hadde et annet antall
+
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–12 i spesifikasjonen 10.6 (`spec-10-6-ki-teksten-om-dagen-paa-forsiden.md`) er godtatt, også navnet «Børsdagen kort fortalt» (spørsmål 11), og storyen flettes i kveld. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
 
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 

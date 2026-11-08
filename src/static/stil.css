@@ -1174,3 +1174,36 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
 :where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
                                     color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
+/* Story 10.6: bryteren «Vis KI-tekst» på oversikten, som på aksjesiden. */
+:where(.side-oversikt) .dagsbryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
+                                           box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;
+                                           border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort);
+                                           color: var(--blekk); cursor: pointer; }
+:where(.side-oversikt) .dagsbryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-oversikt) .dagsbryter .spor { position: relative; width: 36px; height: 20px; border-radius: 999px;
+                                          background: var(--strek-2); flex: none; }
+:where(.side-oversikt) .dagsbryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+                                                 border-radius: 50%; background: var(--hvit); }
+:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: var(--blekk); }
+:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor::after { left: 18px; }
+:where(.side-oversikt) .dagsbryter .verdi { color: var(--dempet); font-weight: 400; }
+@media (forced-colors: active) {
+  :where(.side-oversikt) .dagsbryter .spor { border: 1px solid CanvasText; }
+  :where(.side-oversikt) .dagsbryter .spor::after { background: CanvasText; }
+  :where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: Highlight; }
+}
+/* Story 10.6 (utdraget 08.11 §3): «Børsdagen kort fortalt» under tabellen,
+   et kort som KI-delen på aksjesiden, med bryteren øverst til høyre og
+   tallene med prikket strek (designregler §4). */
+:where(.side-oversikt) .boersdagen { margin: 40px 0 8px; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
+                                     border-radius: 16px; }
+:where(.side-oversikt) .boersdagen .ki-topp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0 0 10px; }
+:where(.side-oversikt) .boersdagen .ki-topp .dagsbryter { margin: 0 0 0 auto; }
+:where(.side-oversikt) .boersdagen h2 { margin: 0; font-size: 24px; }
+:where(.side-oversikt) .boersdagen .merke-ki { color: var(--dempet); font-size: 13.5px; padding: 2px 10px; border: 1px solid var(--strek);
+                                               border-radius: 999px; }
+:where(.side-oversikt) .boersdagen p.ki-tekst { margin: 0; font-size: 17px; line-height: 1.55; color: var(--tekst); }
+:where(.side-oversikt) .boersdagen .tall { text-decoration: underline dotted currentColor; text-decoration-thickness: 1.5px;
+                                           text-underline-offset: 3px; }
+:where(.side-oversikt) .boersdagen p.modell { color: var(--dempet); font-size: 12.5px; margin: 8px 0 0; }
+:where(.side-oversikt) .boersdagen .uten { color: var(--dempet); margin: 0; }

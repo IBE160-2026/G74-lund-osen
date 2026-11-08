@@ -1139,7 +1139,7 @@ def kjoer(
                 ):
                     sys.exit(1)
             # Story 10.2: KI-radene som mangler, uten kall til EODHD.
-            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista)
+            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, med_dagen=True)
             return None
 
     # Filvakten (AD-6, K8): fila heter etter boersdagen, ikke kjoeredagen.
@@ -1161,7 +1161,9 @@ def kjoer(
             # som mangler for aksjene som alt er vurdert, uten kall til EODHD,
             # saa de ikke venter paa at forsoeket kommer gjennom.
             # Sa sjekken nei, sjekkes det ikke paa nytt etter forsoeket.
-            if not lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False):
+            if not lag_ki_tekster(
+                base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False, med_dagen=True
+            ):
                 modell = None
             return nytt_forsoek(
                 data_katalog,
@@ -1303,7 +1305,15 @@ def kjoer(
         and all(any(rad.dato == dato for rad in serier[symbol]) for symbol in skrevne)
     )
     lag_ki_tekster(
-        base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=alle_har_dagen, foerste_henting=foerste_henting
+        base_sti,
+        dato,
+        klokke,
+        modell,
+        skriv,
+        lista,
+        basen_har_kursene=alle_har_dagen,
+        foerste_henting=foerste_henting,
+        med_dagen=True,
     )
     if foerste_henting:
         # Story 2.3c: hva foerste henting gir, og kallene samme kveld, slik
@@ -1567,7 +1577,7 @@ def nytt_forsoek(
             sys.exit(1)
         if not skriv_vurderinger(base_sti, dato, dag, skrevne, klokke, skriv, lista, bare=skrevne):
             sys.exit(1)
-        lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False)
+        lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, basen_har_kursene=False, med_dagen=True)
 
     fortsatt = sorted(
         symbol for symbol in mangler if symbol not in skrevne or not any(rad.dato == dato for rad in serier[symbol])

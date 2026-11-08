@@ -662,7 +662,7 @@ class TestNoekkelenFoerKallet:
         assert foerste.kall == []
         hent = FalskHent(TJENESTENE[tjeneste][2]())
         kode, kall, _ = kjoer(raa, base, modell_for(tjeneste, hent))
-        assert (kode, kall, len(hent.kall)) == (0, [], 15)
+        assert (kode, kall, len(hent.kall)) == (0, [], 16)  # Story 10.6: og ett kall for teksten om dagen.
         rader = list(radene(base).values())
         assert len(rader) == 15
         assert all(r is not None and r.tekst == TEKST and r.tjeneste == tjeneste for r in rader)
