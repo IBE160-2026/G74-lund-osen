@@ -12,6 +12,8 @@ VIS_HJELP = "vis_hjelp"
 # Story 8.10b: KI-teksten, i samme tabell.
 VIS_KI_TEKST = "vis_ki_tekst"
 NAVNENE = (VIS_HJELP, VIS_KI_TEKST)
+# Valgene siden «Innstillinger» viser og kan lagre.
+PAA_SIDEN = (VIS_HJELP,)
 
 
 def har_tabellen(tilkobling: sqlite3.Connection | None) -> bool:

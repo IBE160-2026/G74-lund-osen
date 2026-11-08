@@ -8,7 +8,8 @@
 {% block innhold %}
 <section class="innstillinger" aria-labelledby="innstillinger-tittel">
   <h1 class="overskrift" id="innstillinger-tittel">Innstillinger</h1>
-  {% if not kan_lagres %}<p class="feil">Valgene kan ikke lagres før basen finnes. Hent kursene, eller start demoen, først.</p>{% endif %}
+  {#- Gjennomgangen (ECH1): også en base, eller en demobase, fra før 0011. #}
+  {% if not kan_lagres %}<p class="feil">Valgene kan ikke lagres i denne basen ennå. Kjør hentingen, eller lag demobasen på nytt, så har den tabellen for valgene.</p>{% endif %}
   <div class="valg">
     <h2>Hjelp</h2>
     <form method="post" action="/innstillinger">

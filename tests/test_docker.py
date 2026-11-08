@@ -1247,7 +1247,7 @@ HOEYDE_PAA_BILDET = 1864
 # Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
 # app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
 # og alle viser knappen; hoeydene er de samme.
-AVTRYKK_BAK_BILDET = "e71b2f171a573fa215c0fc6af19f15f859a1591eb9b1a2a293c6485a6061e381"
+AVTRYKK_BAK_BILDET = "ac553576af2b9e6d0a93b503df3ebf5c12b81f98163e164fe18ae2729409fa92"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1626,7 +1626,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
 # app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
 # og alle viser knappen; hoeydene er de samme.
-AVTRYKK_BAK_AKSJESIDEN = "196d60ead2ca1215e1f38044b16063c99383fb4c314947e974bedafdf685e55f"
+AVTRYKK_BAK_AKSJESIDEN = "1941b7625f62963ee4c9dc2761fab467dcd221d4777bf3bf42caae303ccf5d1e"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1739,12 +1739,12 @@ DE_NYE_BILDENE = {
 # app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
 # og alle viser knappen; hoeydene er de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "e71b2f171a573fa215c0fc6af19f15f859a1591eb9b1a2a293c6485a6061e381",
-    "docs/appen/boersometeret-demo.png": "4749027a721418a4265e3cc56577d607861c811895feff7fcd5c9ea75eb54c72",
-    "docs/appen/min-liste-demo.png": "db0b060a7d80c0f50e1a68e8c93ddf014508df4c452782b5e4232991cedfbcd7",
-    "docs/appen/oversikten-390-demo.png": "e71b2f171a573fa215c0fc6af19f15f859a1591eb9b1a2a293c6485a6061e381",
-    "docs/appen/boersometeret-390-demo.png": "4749027a721418a4265e3cc56577d607861c811895feff7fcd5c9ea75eb54c72",
-    "docs/appen/din-egen-liste-demo.png": "db0b060a7d80c0f50e1a68e8c93ddf014508df4c452782b5e4232991cedfbcd7",
+    TOPPEN_AV_OVERSIKTEN: "ac553576af2b9e6d0a93b503df3ebf5c12b81f98163e164fe18ae2729409fa92",
+    "docs/appen/boersometeret-demo.png": "b4e92e1664c8b37a3034763e4a4108c2f9e7c2ef1bbf8153a10b2c4273867356",
+    "docs/appen/min-liste-demo.png": "7a792aa3d6d2c482f3c0b89c3d156f4a114cf6e0abde44c5d22a0e98a4ba801b",
+    "docs/appen/oversikten-390-demo.png": "ac553576af2b9e6d0a93b503df3ebf5c12b81f98163e164fe18ae2729409fa92",
+    "docs/appen/boersometeret-390-demo.png": "b4e92e1664c8b37a3034763e4a4108c2f9e7c2ef1bbf8153a10b2c4273867356",
+    "docs/appen/din-egen-liste-demo.png": "7a792aa3d6d2c482f3c0b89c3d156f4a114cf6e0abde44c5d22a0e98a4ba801b",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

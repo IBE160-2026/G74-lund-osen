@@ -475,10 +475,8 @@ def _utenfor_maalingen():
 def _innstillingene():
     """Story 8.10 (FR-110): valgene i «Innstillinger», på hver side. Bare
     lesing. Uten basen er alt på."""
-    return {
-        "valgene": innstillinger.les(g.get("tilkobling")),
-        "vis_hjelp": innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_HJELP],
-    }
+    valgene = innstillinger.les(g.get("tilkobling"))
+    return {"valgene": valgene, "vis_hjelp": valgene[innstillinger.VIS_HJELP]}
 
 
 @app.context_processor
@@ -1757,12 +1755,16 @@ def lagre_innstilling():
     """Lagrer ett valg i tabellen innstilling, og sender tilbake til siden.
     Webserveren skriver bare den tabellen her (AD-3)."""
     _samme_side()
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
     tilkobling = g.get("tilkobling")
     if not innstillinger.har_tabellen(tilkobling):
         abort(404)
     navn = request.form.get("navn", "")
     til = request.form.get("til")
-    if navn not in innstillinger.NAVNENE or til not in (PAA, AV):
+    # Gjennomgangen (BH7, ECH3): bare valgene siden viser. «Vis KI-tekst»
+    # kommer i 8.10b.
+    if navn not in innstillinger.PAA_SIDEN or til not in (PAA, AV):
         abort(400)
     innstillinger.sett(tilkobling, navn, til == PAA)
     return redirect("/innstillinger", code=303)

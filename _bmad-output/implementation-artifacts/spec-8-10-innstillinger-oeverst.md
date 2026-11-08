@@ -56,3 +56,27 @@ Bygget på grenen `8-10-innstillinger-oeverst`, i worktreen `G74-lund-osen-8-10`
 - **Tester («Ville feilet hvis» i hver):** `tests/test_innstillinger.py`. Testene som talte tre knapper i stripa, teller fire, og versjonen er 11.
 - **Bildene:** alle sju i `docs/appen/` og bildet av «Din egen liste» viser knappen og er tatt på nytt med DevTools-protokollen, med de samme høydene.
 - **Hele settet,** alene: kl. 17:59:50–18:10:23 ga 8 feil (tre knapper i stripa i fire tester, og «min_liste» i en kommentar i 0011), rettet. Kl. 18:11:20–18:21:28 ga 3 feil i avtrykkene for bildene, rettet. Kl. 18:21:49–18:32:30: 4657 bestått, 24 hoppet over og 0 feilet.
+
+## Mutantene
+
+På `d9f2aaf5` seks: A (tabellen godtar en annen verdi), B («?» står med hjelpen av), B2 (hjelpevinduet står), C (knappen mangler i stripa), D (valget lagres ikke) og E (en annen side kan endre), med 1 test hver. Alle ble fanget, og hver fil var lik HEAD etterpå.
+
+## Gjennomgangen 08.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 10 funn, Edge Case Hunter 5 og Verification Gap 8.
+
+**Høy**
+- *BH1 og VG1, rettet.* Da tre knapper ble til fire i `tests/test_min_liste.py`, havnet sjekken av `aria-current` på aksjesiden og aksjen uten kurser i en kommentar, så den var borte (regel 13). Den er satt tilbake.
+
+**Middels**
+- *ECH1, rettet.* En base eller demobase fra før 0011 fikk «før basen finnes». Nå sier siden at den må hentes eller lages på nytt.
+- *BH5 og ECH2, rettet.* En POST med basefeil gir feilsiden, som GET.
+- *VG2, rettet.* En test leser valget i fila med en egen tilkobling og en ny klient, og svaret har ingen informasjonskapsel.
+- *VG3, rettet.* En test viser at bare `innstillinger.py` skriver tabellen, og at en POST bare endrer `innstilling` og en GET ingenting.
+- *VG4, rettet.* Testen leser rutene i `app.py`, ikke bare modulen.
+- *BH2, BH3 og BH4, delvis rettet.* Testen dekker nå også «Følg en aksje» og «Alle» i Min liste, og Edge Case Hunter fant ingen «?» utenfor makroen. At makroen viser hjelpen når valget mangler (uten «with context»), er ført.
+
+**Lav**
+- *Rettet:* BH6 og ECH5 (én lesing per side), BH7 og ECH3 (8.10 lagrer bare «Vis hjelp»), BH8 og VG8 (et avvist valg endrer ingenting), BH10 (docstringen med versjonen), ECH4 (README-en har knappen), VG5 (testen i demoen), VG6 og VG7 (flere sider og hele teksten).
+- *Ført:* BH9 (fokuset etter trykket står øverst på siden).
+- **Etter gjennomgangen:** hele settet alene kl. 18:41:38–18:52:01 ga 1 feil (en test leser «og børsometeret som et kart, med knappene» i README-en), rettet. Kl. 18:53:04–19:04:10: 4664 bestått, 24 hoppet over og 0 feilet.
