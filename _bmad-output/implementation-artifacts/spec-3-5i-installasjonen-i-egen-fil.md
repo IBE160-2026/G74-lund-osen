@@ -45,6 +45,8 @@ README-en ryddes etter gruppens svar 07.11 kl. 23:26 under story 3.3 og «Priori
 
 ## Spørsmål til gruppen før det bygges
 
+*Avgjort 2026-11-08 kl. 11:24 (gruppens svar):* forslagene i spørsmål 1–3 er godtatt, og rådet anbefalte alle tre. Overskriften «Enklest: dobbeltklikk (anbefalt)» med ankeret står over de fem stegene i README-en, og setningen om demoen flyttes først i `docs/installasjon.md`. Setningen «Velg versjon», som flyttes, sier «øverst i README-en». `docs/installasjon.md` er levende som README-en og `docs/hjelp.md`, med en ny linje om det i regel 19 i `CLAUDE.md`. Svaret er ført etter instruksjonen kl. 11:27 i `docs/ai-prompts/2026-11-08.md`.
+
 Det er tre ting sensor vil se som svaret kl. 23:26 og instruksjonen ikke avgjør:
 
 1. **Overskriften «Enklest: dobbeltklikk (anbefalt)» og setningen «Vi anbefaler demoen for faglærer og sensor …».** Etter ordlyden flyttes begge, fordi bare stegene og de to linjene står igjen. Da står overskriften i `docs/installasjon.md` over pilene, uten stegene den gjaldt, og ankeret `enklest-dobbeltklikk-uten-docker`, som «Til faglærer» og hjelpen lenker til, havner der. **Forslag:** overskriften og ankeret står over de fem stegene i README-en, og setningen om demoen flyttes først i `docs/installasjon.md`.
