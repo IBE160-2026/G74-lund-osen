@@ -1420,6 +1420,9 @@ def ki_bryter():
         abort(403)
     til = AV if request.form.get("til") == AV else PAA
     tilbake = request.form.get("tilbake", "/")
+    # Gjennomgangen av 10.6 (ECH12): uten tilbake gaar bryteren til / som foer.
+    if "tilbake" not in request.form:
+        tilbake = ""
     if _TILBAKE.fullmatch(tilbake):
         tilbake += f"#{KI_ANKER}"
     elif _TILBAKE_OVERSIKTEN.fullmatch(tilbake):

@@ -171,8 +171,48 @@ class TestKontrollen:
         formene i prompten."""
         assert kontroller_dagen(GOD, GRUNNLAG).besto
 
-    def test_tall_med_ord_bestaar_ved_feltet(self):
-        assert kontroller_dagen("I sjømat steg to av to aksjer.", GRUNNLAG).besto
+    def test_tallene_staar_med_sifre(self):
+        """Gjennomgangen (ECH10, VG7): tallene i formene står med sifre, så
+        hvert tall som vises, har prikket strek. Ville feilet hvis «to av to»
+        besto, som før gjennomgangen."""
+        assert kontroller_dagen("I sjømat steg 2 av 2 aksjer.", GRUNNLAG).besto
+        assert not kontroller_dagen("I sjømat steg to av to aksjer.", GRUNNLAG).besto
+
+    @pytest.mark.parametrize(
+        "tekst",
+        [
+            "Hovedindeksen falt ikke tirsdag.",
+            "Hovedindeksen falt kraftig tirsdag.",
+            "Aksjene gikk opp tirsdag.",
+            "Oslo Børs gikk ned tirsdag.",
+            "OSEBX gikk ned.",
+            "Det var en negativ dag.",
+            "Det var en urolig dag med store bevegelser.",
+            "Equinor var vinneren.",
+            "Finans gikk godt.",
+            "Energiaksjene gikk opp.",
+            "I energi steg 1 av 4 aksjer, så hele bransjen gikk ned.",
+            "Hovedindeksen falt tirsdag for andre dag på rad.",
+            "Flertallet av aksjene gjorde det godt.",
+            "Tiden er inne for å handle.",
+        ],
+    )
+    def test_bare_formene_og_bindeord(self, tekst):
+        """Gjennomgangen (BH1-BH3, ECH2-ECH6, VG1, VG2): ville feilet hvis en
+        nektelse, et synonym, et selskap, en bransje utenfor formen eller et
+        ord om hvor kraftig noe var, besto. Resten av teksten kan bare være
+        «og», «men» og tegnsetting."""
+        svar = kontroller_dagen(tekst, GRUNNLAG)
+        assert not svar.besto and any(g.startswith("1:") for g in svar.grunner), svar.grunner
+
+    def test_formene_med_bindeord_bestaar(self):
+        assert kontroller_dagen(
+            "Hovedindeksen falt tirsdag, men 9 av de 15 aksjene gikk bedre enn indeksen.", GRUNNLAG
+        ).besto
+        en = {**GRUNNLAG, "skilte_seg_ut": 1, "skilte_seg_ut_positiv": 1, "skilte_seg_ut_negativ": 0}
+        assert kontroller_dagen(
+            "1 aksje skilte seg ut: 1 med positiv retning.", {**en, "skilte_seg_ut_blandet": 0}
+        ).besto
 
     @pytest.mark.parametrize(
         "tekst",
@@ -196,8 +236,9 @@ class TestKontrollen:
     )
     def test_et_tall_utenfor_formene_stoppes(self, tekst):
         """Punkt 2: ville feilet hvis et tall utenfor formene besto, også et
-        som står i grunnlaget (15)."""
-        assert not kontroller_dagen(tekst, GRUNNLAG).besto
+        som står i grunnlaget (15). Gjennomgangen (BH10): grunnen er tallet."""
+        svar = kontroller_dagen(tekst, GRUNNLAG)
+        assert not svar.besto and any(g.startswith("2:") for g in svar.grunner), svar.grunner
 
     @pytest.mark.parametrize(
         "tekst",
@@ -466,7 +507,7 @@ class TestForsiden:
         side = html(klient)
         assert "Børsdagen kort fortalt" in side and "Laget av KI" in side
         assert '<span class="tall">1</span> skilte seg ut' in side
-        assert "Skrevet av gemma4:e4b da kursene ble hentet." in side
+        assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
         assert side.index('class="tabell') < side.index("boersdagen-kort-fortalt")
 
     def test_grunnlaget_maa_stemme_med_siden(self, klient):
@@ -543,7 +584,11 @@ class TestHjelpen:
         rot = Path(__file__).resolve().parent.parent
         hjelp = (rot / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "### Hva er «Børsdagen kort fortalt» på forsiden?" in hjelp
-        assert "hvor mange som steg i hver bransje" in hjelp and "Dagen er uten KI-tekst." in hjelp
+        assert "Dagen er uten KI-tekst." in hjelp
+        # Gjennomgangen (BH6, VG6): setningen om hva modellen fikk, ordrett i begge.
+        tekst = hjelpetekster()["boersdagen_kort_fortalt"].tekst
+        setningen = tekst[tekst.index("Modellen fikk bare antall:") : tekst.index("nyheter.") + len("nyheter.")]
+        assert setningen in hjelp
         assert "Børsdagen kort fortalt" in (rot / "README.md").read_text(encoding="utf-8")
 
 
@@ -582,7 +627,79 @@ class TestDemoen:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
         side = app_modul.app.test_client().get("/").data.decode("utf-8")
         tekst = les_dagsraden().tekst
-        assert "Skrevet av gemma4:e4b da kursene ble hentet." in side
+        assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
         from ki_visning import prikkede_tall
 
         assert str(prikkede_tall(tekst)) in side and DAGEN_UTEN not in side
+
+
+class TestEtterGjennomgangen:
+    """Funnene fra gjennomgangen av 10.6 som gjelder hentingen og bryteren."""
+
+    def test_ikke_teksten_om_dagen_foer_alle_aksjene_har_en_rad(self, stier):
+        """BH4, ECH1, VG3: ville feilet hvis teksten om dagen ble laget når en
+        aksje ennå mangler raden for dagen, for da står raden med et grunnlag
+        siden aldri regner, og dagen blir for godt uten tekst."""
+        from ki_tekst import lag_ki_tekster
+        from test_ki_tekst import OEYEBLIKK
+
+        raa, base = stier
+        kjoer(raa, base, None)
+        tilkobling = aapne_base(base)
+        try:
+            tilkobling.execute("DELETE FROM vurdering WHERE symbol = 'EQNR' AND dato = ?", (TIRSDAG.isoformat(),))
+            tilkobling.commit()
+        except Exception:
+            pytest.skip("vurdering kan ikke slettes i denne basen")
+        finally:
+            tilkobling.close()
+        modell = _Teller()
+        linjer = []
+        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, modell, linjer.append, med_dagen=True)
+        assert modell.dagkall == 0 and dagens_rad(base) is None
+        assert "Teksten om dagen: venter til alle aksjene har en rad for dagen." in linjer[-1]
+
+    def test_velg_dag_viser_teksten_for_den_dagen(self, klient):
+        """VG4: ville feilet hvis en valgt dag viste teksten for siste dag,
+        eller ingen tekst, eller bryteren ikke sendte tilbake til dagen."""
+        forsiden_med(TEKSTEN)
+        skriv_vurdering("EQNR", TORSDAG, vurdering(2, "Negativ"))
+        skriv_vurdering("DNB", TORSDAG, vurdering(1, "Positiv"))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            from app import SqliteOversiktsleser
+
+            leser = SqliteOversiktsleser(tilkobling)
+            lista = tuple(p.aksje for p in leser.oversikt())
+            serier = {a.symbol: lagring_sqlite.SqliteKurslager(tilkobling).serie(a.symbol) for a in lista}
+            grunnlag = dagsgrunnlag(
+                TORSDAG, lista, {a.symbol: leser.vurdering(a.symbol, TORSDAG) for a in lista}, serier, None
+            )
+        finally:
+            tilkobling.close()
+        torsdag = "1 skilte seg ut: 1 med negativ retning."
+        skriv_kirad(
+            KIRad(
+                emne=Emne.dagen(TORSDAG),
+                grunnlag=grunnlag,
+                regelen="r",
+                tekst=torsdag,
+                besto=True,
+                grunn=None,
+                promptversjon=DAGSPROMPTVERSJON,
+                tjeneste="lokal",
+                modell="gemma4:e4b",
+            )
+        )
+        side = html(klient, f"/?periode=velg&dag={TORSDAG.isoformat()}")
+        assert '<span class="tall">1</span> med negativ retning' in side and TEKSTEN not in side
+        assert f'name="tilbake" value="/?periode=velg&amp;dag={TORSDAG.isoformat()}"' in side
+
+    def test_bryteren_tilbake_til_valgt_dag(self, klient):
+        svar = klient.post("/ki", data={"til": "av", "tilbake": f"/?periode=velg&dag={FREDAG.isoformat()}"})
+        assert svar.headers["Location"].endswith(f"/?periode=velg&dag={FREDAG.isoformat()}#boersdagen-kort-fortalt")
+
+    def test_bryteren_uten_tilbake_gaar_til_forsiden_som_foer(self, klient):
+        """ECH12: ville feilet hvis en forespørsel uten tilbake fikk ankeret."""
+        svar = klient.post("/ki", data={"til": "av"})
+        assert svar.headers["Location"] in ("/", "http://localhost/")

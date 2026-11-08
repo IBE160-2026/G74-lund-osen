@@ -212,7 +212,8 @@ def bygg_dagsvisning(rad: KIRad | None, grunnlag: Mapping[str, object] | None) -
     tekst = unicodedata.normalize("NFC", rad.tekst).translate(_USYNLIGE)
     if _VAKT.search(tekst):
         return Dagsvisning()
-    return Dagsvisning(tekst=rad.tekst, modell=rad.modell)
+    # Gjennomgangen (VG5): modellen og tjenesten, som paa aksjesiden (FR-602).
+    return Dagsvisning(tekst=rad.tekst, modell=f"{rad.modell} ({rad.tjeneste})")
 
 
 def ki_paa(kapsel: str | None) -> bool:

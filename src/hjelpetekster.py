@@ -618,11 +618,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # hjelpetekst har hoeyst tre (story 8.0c). Utdraget har fem.
         "boersdagen_kort_fortalt": Hjelpetekst(
             "",
-            "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). Modellen fikk bare dette: om "
-            "hovedindeksen steg eller falt, hvor mange aksjer som gjorde det bedre enn indeksen, hvor mange som skilte "
-            "seg ut og med hvilken retning, og hvor mange som steg i hver bransje, og ingen prosenter, kurser eller "
-            "nyheter. Teksten sjekkes før den vises: tall med prikket strek står i det modellen fikk, og den gir "
-            "ikke råd.",
+            "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). Modellen fikk bare antall: om "
+            "hovedindeksen steg eller falt, hvor mange aksjer som gjorde det bedre enn indeksen, hvor mange som "
+            "skilte seg ut og med hvilken retning, og hvor mange som steg i hver bransje med minst to aksjer med "
+            "en endring, med ukedagen og antallet aksjer i lista, og ingen prosenter, kurser eller nyheter. "
+            "Teksten sjekkes før den vises: tall med prikket strek står i det modellen fikk, og den gir ikke råd.",
             (
                 (DAGSGRUNNLAG, "def dagsgrunnlag("),
                 (DAGSGRUNNLAG, "Ingen kurs, prosent, volum eller forholdstall"),

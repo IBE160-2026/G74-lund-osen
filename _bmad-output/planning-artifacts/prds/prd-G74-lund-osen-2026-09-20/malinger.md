@@ -2,7 +2,7 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-08T14:35
+updated: 2026-11-08T15:21
 ---
 
 # Målinger — grunnlaget for PRD-en
@@ -6175,3 +6175,5 @@ Kjørt fra et skript utenfor repoet, med koden i worktreen for grenen: `data/db/
 | Lengste kall | 1,89 s (kall nr. 1) |
 
 `maskinvare` `gpu` for alle 10, `gemma4:e4b` med `modell_id` `dc35e8d9c606`, og Ollama 0.35.1. Alle 10 tekstene har fem setninger. Klassene for tekstene er ikke satt; det er ikke gjort i denne prøven. Demoteksten ble laget kl. 14:28 med samme prompt og besto (13,5 s, første kall etter at Ollama startet).
+
+*Lagt til 2026-11-08 (gjennomgangen av 10.6, VG8):* raden «Ville blitt vist» over sammenlignet grunnlaget med seg selv, fordi skriptet regnet det én gang og ga det både til `lag_dagsrad` og `bygg_dagsvisning`. Den måler bare at teksten besto og at vakta ikke stoppet den, ikke at grunnlaget stemmer med det siden regner. Skriptet lå utenfor repoet. Etter gjennomgangen kan resten av teksten bare være bindeord og tegnsetting når formene er tatt ut. De 10 tekstene ble kontrollert på nytt med den kontrollen, med grunnlaget regnet på nytt fra `ose.db` med `mode=ro`, uten nye kall til modellen: 10 av 10 besto, og sha256 for basen var den samme før og etter.

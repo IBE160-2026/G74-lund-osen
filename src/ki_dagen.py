@@ -23,8 +23,10 @@ Kontrollen har alle fire punktene i FR-603:
 4. Gjetning og aarsaker, med listene GJETNING og AARSAKER, og ord som sier at
    modellen fant et moenster selv.
 
-Ukedagen skal vaere grunnlagets, og «i dag», «i går» og «i kveld» stoppes,
-fordi teksten ogsaa leses senere (spoersmaal 4).
+Ukedagen skal vaere grunnlagets, og «i dag», «i går», «i kveld», «i morgen»,
+«dagens» og «gårsdagens» stoppes, fordi teksten ogsaa leses senere
+(spoersmaal 4). Etter gjennomgangen kan resten av teksten, naar formene er
+tatt ut, bare vaere bindeordene i BINDEORD og tegnsetting.
 """
 
 import json
@@ -39,7 +41,6 @@ from ki_kontroll import (
     _RAAD,
     _SIFFER,
     _TALLORD_I_TEKST,
-    ANTALLORD,
     Kontrollsvar,
     normaliser,
 )
@@ -107,26 +108,35 @@ def dagsregel(grunnlag: Mapping[str, object]) -> str:
 
 # --- Kontrollen (FR-603) -----------------------------------------------------
 
-_N = r"(\d{1,6}|" + "|".join(sorted(ANTALLORD, key=len, reverse=True)) + r")(?![\w-])"
+# Gjennomgangen av 10.6 (BH1-BH3, ECH2-ECH9, VG1, VG2): kontrollen leser
+# formene i prompten, og naar de er tatt ut, kan resten av teksten bare vaere
+# bindeordene i BINDEORD og tegnsetting. En nektelse («steg ikke»), et
+# synonym («gikk opp»), et selskap, en bransje utenfor formen eller et ord om
+# hvor kraftig noe var, stoppes da uten at ordet maa staa i en liste.
+# Tallene i formene staar med sifre, som i opplysningene, saa hvert tall som
+# vises, har prikket strek (spoersmaal 8). Bare «Ingen aksjer skilte seg ut»
+# har et antall med ord.
+BINDEORD = frozenset(("og", "men"))
+_N = r"(\d{1,4})(?![\w-])"
 _UKEDAG = r"(mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)"
 _F_INDEKSEN = re.compile(
     r"(?<![\w-])hovedindeksen\s+(steg|falt|var\s+uendret)(?:\s+(?:på\s+)?" + _UKEDAG + r")?(?![\w-])", re.IGNORECASE
 )
 _F_BEDRE = re.compile(
-    r"(?<![\w-])" + _N + r"\s+av\s+(?:de\s+)?" + _N + r"\s+aksjer(?:ne)?\s+(?:gjorde\s+det|gikk)\s+bedre\s+enn\s+"
+    r"(?<![\w-])" + _N + r"\s+av\s+(?:de\s+)?" + _N + r"\s+aksje(?:r|ne)?\s+(?:gjorde\s+det|gikk)\s+bedre\s+enn\s+"
     r"(?:hoved)?indeksen(?![\w-])",
     re.IGNORECASE,
 )
-_F_SKILTE = re.compile(r"(?<![\w-])" + _N + r"\s+(?:aksjer\s+)?skilte\s+seg\s+ut(?![\w-])", re.IGNORECASE)
+_F_SKILTE = re.compile(r"(?<![\w-])(\d{1,4}|ingen)\s+(?:aksjer?\s+)?skilte\s+seg\s+ut(?![\w-])", re.IGNORECASE)
 _F_RETNING = re.compile(
-    r"(?<![\w-])" + _N + r"\s+(?:med\s+)?(positiv|negativ|blandet)(?:e|t)?(?:\s+retning)?(?![\w-])", re.IGNORECASE
+    r"(?<![\w-])" + _N + r"\s+(?:med\s+)?(positiv|negativ|blandet)(?:\s+retning)?(?![\w-])", re.IGNORECASE
 )
 _F_BRANSJE = re.compile(
     r"(?<![\w-])i\s+([a-zæøå]+(?:[\s-]+(?:og\s+)?[a-zæøå]+)?)\s+steg\s+"
     + _N
     + r"\s+av\s+(?:de\s+)?"
     + _N
-    + r"(?:\s+aksjer(?:ne)?)?(?![\w-])",
+    + r"(?:\s+aksje(?:r|ne)?)?(?![\w-])",
     re.IGNORECASE,
 )
 _RETNINGSFELT = {
@@ -135,22 +145,14 @@ _RETNINGSFELT = {
     "blandet": "skilte_seg_ut_blandet",
 }
 _VERBET = {"steg": "steg", "falt": "falt", "var uendret": "uendret"}
-
-# Utenfor formene: ord kontrollen ikke kan lese (punkt 1).
-_UTENFOR = re.compile(
-    r"(?<![\w-])((?:hoved)?indeks\w*|børsen|markedet|steg|falt|uendret|stigning\w*|oppgang\w*|nedgang\w*"
-    r"|positiv\w*|negativ\w*|blandet|bedre|dårligere|svakere|sterkere|skilte\s+seg\s+ut)(?![\w-])",
-    re.IGNORECASE,
-)
-_UKEDAGENE = re.compile(r"(?<![\w-])" + _UKEDAG + r"(?![\w-])", re.IGNORECASE)
+_ORD = re.compile(r"[\w-]+")
+# Tegnsettingen som kan staa mellom formene.
+_TEGN = frozenset(" \t\n.,:;")
 _NAA = re.compile(r"(?<![\w-])(i\s+dag|i\s+går|i\s+kveld|i\s+morgen|dagens|gårsdagens)(?![\w-])", re.IGNORECASE)
 
 
-def _antall(ord_: str) -> int | None:
-    ord_ = ord_.lower()
-    if ord_.isdecimal():
-        return int(ord_)
-    return ANTALLORD.get(ord_)
+def _antall(ord_: str) -> int:
+    return 0 if ord_.lower() == "ingen" else int(ord_)
 
 
 def _ta_ut(tekst: str, treff: re.Match) -> str:
@@ -201,15 +203,8 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
             grunner.append(f"1: ukedagen «{treff.group(2)}», grunnlaget sier {grunnlag.get('ukedag')}")
         tekst = _ta_ut(tekst, treff)
 
-    # Det som er igjen, leses uten formene.
-    for treff in _UTENFOR.finditer(tekst):
-        grunner.append(f"1: «{treff.group(0)}» utenfor formene")
-    for navn in bransjer:
-        for treff in re.finditer(r"(?<![\w-])" + re.escape(navn) + r"(?![\w-])", tekst, re.IGNORECASE):
-            grunner.append(f"1: bransjen «{treff.group(0)}» utenfor formen")
-    for treff in _UKEDAGENE.finditer(normaliser(tekst)):
-        if treff.group(1).lower() != grunnlag.get("ukedag"):
-            grunner.append(f"1: ukedagen «{treff.group(0)}», grunnlaget sier {grunnlag.get('ukedag')}")
+    # Det som er igjen: grunnene med navn foerst, saa alt annet enn bindeord
+    # og tegnsetting.
     for treff in _NAA.finditer(tekst):
         grunner.append(f"1: «{treff.group(0)}», teksten leses også senere")
     for treff in _SIFFER.finditer(tekst):
@@ -228,6 +223,12 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
         grunner.append(f"4: «{treff.group(0)}»")
     for treff in _EGET_MOENSTER.finditer(tekst):
         grunner.append(f"4: «{treff.group(0)}», modellen finner ikke mønstre selv")
+    andre = [o for o in _ORD.findall(tekst) if o.lower() not in BINDEORD]
+    if andre:
+        grunner.append(f"1: «{' '.join(andre[:8])}» utenfor formene")
+    tegn = sorted({t for t in _ORD.sub("", tekst) if t not in _TEGN})
+    if tegn:
+        grunner.append(f"1: tegnene «{''.join(tegn)}» utenfor formene")
     return Kontrollsvar(besto=not grunner, grunner=tuple(grunner))
 
 

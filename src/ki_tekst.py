@@ -222,6 +222,31 @@ def _grunnlagene(
     return grunnlagene
 
 
+def _grunnlaget_for_dagen(tilkobling, logg, vurderinger, dato, lista, skrivbar, skriv):
+    """Story 10.6: grunnlaget for teksten om dagen, eller None, og hva som
+    skal staa i utskriften.
+
+    Gjennomgangen (BH4, ECH1, VG3): teksten lages bare naar hver aksje i
+    lista har en rad for dagen, med vurdering eller grunn. Ellers ville en
+    henting med aksjer som venter paa et nytt forsoek, skrevet raden av et
+    grunnlag uten dem, og siden ville aldri vist den, fordi raden staar.
+    BH5: bare for inneveerende boersdag, saa en eldre dag uten raden ikke
+    stopper steget. BH11: en feil her stopper ikke tekstene for aksjene."""
+    if logg.les(Emne.dagen(dato)) is not None:
+        return None, "sto fra før"
+    if skrivbar() != dato:
+        return None, None
+    try:
+        radene = {a.symbol: vurderinger.les(a.symbol, dato) for a in lista}
+        if any(rad is None for rad in radene.values()):
+            return None, "venter til alle aksjene har en rad for dagen"
+        serier, indeksserie = _kursene(tilkobling, lista)
+        return dagsgrunnlag(dato, lista, radene, serier, indeksserie), None
+    except Exception as feil:  # NFR-04: teksten om dagen stopper ikke resten.
+        skriv(f"Teksten om dagen: grunnlaget kunne ikke regnes ({type(feil).__name__}).")
+        return None, "ble ikke laget"
+
+
 def _rad_uten_kall(
     emne: Emne, vurdering: Vurdering, grunnlag: Mapping[str, object], modell: Modell, foerste: str
 ) -> KIRad:
@@ -324,13 +349,9 @@ def lag_ki_tekster(
         # aksje er vurdert, og da gjelder sjekken foer foerste kall ogsaa den.
         dagens_grunnlag = None
         if med_dagen:
-            if logg.les(Emne.dagen(dato)) is not None:
-                om_dagen = "sto fra før"
-            else:
-                serier, indeksserie = _kursene(tilkobling, lista)
-                dagens_grunnlag = dagsgrunnlag(
-                    dato, lista, {a.symbol: vurderinger.les(a.symbol, dato) for a in lista}, serier, indeksserie
-                )
+            dagens_grunnlag, om_dagen = _grunnlaget_for_dagen(
+                tilkobling, logg, vurderinger, dato, lista, skrivbar, skriv
+            )
         # Svar c kl. 23:32: svarer ikke tjenesten, eller mangler modellen,
         # skrives ingen rader, og samme kommando kan kjoeres igjen.
         if (mangler or dagens_grunnlag is not None) and skrivbar() != dato:
@@ -355,7 +376,11 @@ def lag_ki_tekster(
                 f"{_hva_naa(grunn)}, og kjør samme kommando igjen før midnatt"
                 + (". Det gir 0 kall til EODHD." if basen_har_kursene else ".")
                 # Story 10.6: til slutt, saa resten av linja er som foer.
-                + (" Teksten om dagen venter også." if dagens_grunnlag is not None else "")
+                + (
+                    (" Teksten om dagen venter også." if mangler else " Teksten om dagen venter.")
+                    if dagens_grunnlag is not None
+                    else ""
+                )
             )
             return False
         feilet_for: str | None = None

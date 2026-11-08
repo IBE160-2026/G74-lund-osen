@@ -121,3 +121,37 @@ Bygget på grenen `10-6-ki-teksten-om-dagen`, i worktreen `G74-lund-osen-10-6`, 
 - **Demoen.** Teksten ble laget med Gemma kl. 14:28 og besto (oppdiktede selskaper). Alle sju bildene i `docs/appen/` ble tatt på nytt med DevTools-protokollen i Edge uten vindu. Seks er byte for byte de samme, og oversikten ved 390 px er 3832 px høy med delen nederst. Demoteksten ble laget på nytt kl. 14:46, etter `ruff format`, som endret koden i promptens avtrykk, og ble den samme teksten.
 - **Prøvekjøringen:** §57 i `malinger.md`, 10 av 10 besto.
 - **Hele settet,** alene, uten Ollama og Docker Desktop, med 7,2 GB ledig minne: kl. 15:00:33–15:10:32, 4631 bestått, 24 hoppet over og 0 feilet. To kjøringer før det (14:35:47–14:45:08 og 14:48:53–14:58:21) ga 16 og 3 feil, som er rettet: antall kall i to tester til, ordlista for stilarket (bryteren på forsiden har sin egen klasse, `dagsbryter`), demotestene som teller radene, og «gikk bedre enn indeksen» i hjelpen, som testene for periodevalget ikke tillater på siden når indeksen mangler.
+
+## Mutantene
+
+Én per del, på `1c27113e`, med kopi før og sha256 mot HEAD etter. Alle sju ble fanget, og hver fil var lik HEAD etterpå.
+
+| Del | Mutant | Fanget av |
+|---|---|---|
+| A | grunnlaget sier alltid 15 aksjer | 3 tester i `TestGrunnlaget` |
+| B | linja om råd tatt ut av prompten | 3 tester, også `test_versjonen_foelger_teksten` |
+| C | tallet ved feltet sjekkes ikke | 4 tester i `TestKontrollen` |
+| D | modellen kalles for dagen selv om den feilet for en aksje | 3 tester |
+| E | teksten vises uten at grunnlaget stemmer med siden | `test_grunnlaget_maa_stemme_med_siden` |
+| F | hjelpen sier ikke at teksten ikke gir råd | `test_hjelpen_har_ordene_fra_utdraget_i_tre_setninger` |
+| G | demoen skriver ikke inn teksten om dagen | 3 tester |
+
+## Gjennomgangen 08.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Tre gjennomganger av `1c27113e`, i parallell etter hele settet og mutantene: Blind Hunter med bare diffen, Edge Case Hunter og Verification Gap med repoet. De kjørte snutter og enkeltfiler, ikke hele settet. Blind Hunter hadde 11 funn, Edge Case Hunter 14 og Verification Gap 11.
+
+**Høy**
+- *BH1, BH2, ECH2, ECH3, ECH4 og VG1, rettet.* Kontrollen stoppet bare ord fra en liste utenfor formene. «Hovedindeksen steg ikke fredag.», «Aksjene gikk opp fredag.», «Oslo Børs gikk opp fredag.» og «Det var en negativ dag.» besto. Nå kan resten av teksten, når formene er tatt ut, bare være «og», «men» og tegnsetting (`BINDEORD` i `ki_dagen.py`), som setningen om mønstrene i 10.9. Hvert eksempel fra gjennomgangene står i `test_bare_formene_og_bindeord`.
+- *BH4, ECH1 og VG3 (høy og middels), rettet.* Teksten om dagen ble laget også i en henting der noen aksjer ventet på et nytt forsøk. Raden sto da med et grunnlag siden aldri regner, og dagen ble for godt uten tekst. Nå lages den først når hver aksje i lista har en rad for dagen (`_grunnlaget_for_dagen` i `ki_tekst.py`, `test_ikke_teksten_om_dagen_foer_alle_aksjene_har_en_rad`).
+
+**Middels**
+- *BH3, ECH5, ECH6 og VG2, rettet* med regelen over: bransjer utenfor formen, selskaper, «kraftig», «for andre dag på rad» og «flertallet» stoppes.
+- *VG5, rettet.* Modellnavnet sto uten tjenesten, mot FR-602. Nå «Skrevet av gemma4:e4b (lokal) da kursene ble hentet.»
+- *BH6 og VG6, rettet.* Hjelpen på siden sa «Modellen fikk bare dette» uten ukedagen, antallet aksjer og grensen for bransjene. Nå sier hjelpen og `docs/hjelp.md` det samme, ordrett, og testen sammenligner setningen.
+- *VG4, rettet.* Ingen test for en valgt dag. Nå `test_velg_dag_viser_teksten_for_den_dagen`, med teksten for torsdagen før siste dag, og bryteren tilbake til dagen.
+- *BH9, avvist.* `conftest.py` flytter `BASE_STI`, og dermed `demo_sti()`, til `tmp_path`.
+
+**Lav**
+- *Rettet:* ECH7 og ECH8 («1 aksje skilte seg ut», «av de 15 aksjene»), ECH10 og VG7 (tallene står med sifre, så hvert tall som vises, har prikket strek), ECH12 (uten `tilbake` går bryteren til `/` som før), ECH13 (utskriften når bare teksten om dagen venter), BH5 (en eldre dag uten raden stopper ikke steget), BH8 (terskelen fra `STANDARD`), BH10 (grunnen er tallet), BH11 (en feil i grunnlaget for dagen stopper ikke tekstene for aksjene), VG8 (Lagt til-linje i §57), VG9 (docstringen nevner alle ordene).
+- *Ført:* BH7 og ECH11. Bryteren på forsiden beholder perioden og dagen, men ikke sorteringen. ECH9: «1 skilte seg ut med negativ retning» stoppes; prompten gir formen med kolon. ECH14: feilet hovedindeksen om kvelden og ble hentet neste kveld, sier grunnlaget på siden noe annet enn raden, og dagen er uten tekst under «Velg dag». VG10: at hentingen og siden bruker samme liste når den ikke har 15 aksjer, er bare testet i `dagsgrunnlag`; lista fra basen kommer i 2.11. VG11: utdraget sier «under Dine egne aksjer», som kommer i 2.12; til da står delen under tabellen.
+- **Etter gjennomgangen:** hele settet alene kl. 15:22:02–15:31:42, 6,5 GB ledig minne: 4650 bestått, 24 hoppet over og 0 feilet.

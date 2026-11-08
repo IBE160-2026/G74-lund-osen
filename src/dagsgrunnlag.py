@@ -26,7 +26,7 @@ from types import MappingProxyType
 from dagene import MINST_I_BRANSJEN, STEG, _endringen, _retningen_paa_dagen, bevegelse
 from hovedindeks import indeksendring, sammenlign
 from kursdata import Aksje, Kursrad
-from signalberegning import BLANDET, NEGATIV, POSITIV, TERSKEL
+from signalberegning import BLANDET, NEGATIV, POSITIV, STANDARD
 from tallformat import ukedag
 from vurderingsdata import Grunn, Vurdering
 
@@ -50,7 +50,7 @@ def dagsgrunnlag(
     vurderinger: Mapping[str, Vurdering | Grunn | None],
     serier: Mapping[str, list[Kursrad]],
     indeksserie: list[Kursrad] | None,
-    terskel: int = TERSKEL,
+    terskel: int = STANDARD.terskel,
 ) -> MappingProxyType | None:
     """Grunnlaget for dag, eller None naar ingen aksje i lista er vurdert den
     dagen: da er det ingenting aa si om dagen.
