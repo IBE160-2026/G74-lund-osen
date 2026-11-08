@@ -109,3 +109,11 @@ Tre gjennomganger av `4594dfa2`, i parallell etter hele settet og mutantene: Bli
 
 **Fremgangsmåten for prøven** (del E), fra worktreen med `uv run python -`: åpne `data/db/ose.db` med `sqlite3.connect("file:…?mode=ro", uri=True)`, kopier den med `backup()` til en fil i `tempfile.TemporaryDirectory()`, tell radene i de sju tabellene og ta sha256 av alle radene i `kurs` og `vurdering` sortert, kjør `migrer(kopi, MIGRASJONSKATALOG)`, tell og ta avtrykket på nytt, les `inn` og `ut` i `aksje` og `les_lista(kopi, date(2026, 11, 9))`, og sammenlign sha256 for `data/db/ose.db` før og etter.
 - **Etter gjennomgangen:** hele settet alene kl. 16:28:59–16:39:12 ga 8 feil (tre tester som erstattet `oversikt` uten argumentet, og fire som krever at en base som ikke kan leses, gir henting), rettet med spørsmål 7. Kl. 16:43:54–16:53:17: 4607 bestått, 24 hoppet over og 0 feilet.
+
+## Mutantene
+
+På `4594dfa2` sju (A, A2, B, B2, C, C2 og D), alle fanget. På `db9e4ab9`, etter gjennomgangen, ni, med C2 for den nye regelen i oversikten, B3 «en tom liste blir de 15» og E «morgensjekken bruker de 15»: A 1, A2 4, B 2, B2 2, C 2, C2 1, D 1, B3 1 og E 1 test. Alle ble fanget, og hver fil var lik HEAD etterpå (kopi før, sha256 mot HEAD etter).
+
+## Bygget og ikke flettet
+
+Grenen `2-11-lista-leses-fra-basen` er ikke flettet. Gruppen går gjennom spørsmålene over før flettingen, og 6 og 7 er middels funn som står åpne (regel 25). 2.12 bygger på grenen.
