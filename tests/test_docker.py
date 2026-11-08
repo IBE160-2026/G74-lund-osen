@@ -2123,9 +2123,10 @@ def _seksjon(navn: str) -> str:
     pilene = dict(_pilene(_installasjonen()))
     if navn in pilene:
         return pilene[navn].split(f"\n{VELG_VEI}", 1)[0]
-    if navn == DOBBELTKLIKKET:
-        return _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
-    return _installasjonen().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
+    # Gjennomgangen (ECH3): en melding, ikke IndexError, når overskriften mangler.
+    kilde = _kom_i_gang() if navn == DOBBELTKLIKKET else _installasjonen()
+    assert f"### {navn}\n" in kilde, f"«{navn}» mangler"
+    return kilde.split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
 
 
 SEKSJONENE = {"Med Docker Desktop": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
@@ -2695,8 +2696,9 @@ class TestReadmeForNybegynnere:
         assert tabell.index("| D6 |") < tabell.index("| D7 |") < tabell.index(reserven)
         d7 = tabell.split("| D7 |", 1)[1].split("\n", 1)[0]
         assert "Linja «Linux»" in d7 and "«Med Docker Desktop»" in d7 and "«Uten Docker, med uv»" in d7, d7
-        # Story 3.5i: linja staar i docs/installasjon.md, og raden D7 i proeven
-        # rettes foer README-proeven (spesifikasjonen 3.5i).
+        # Story 3.5i: linja staar i docs/installasjon.md. Raden D7 i proeven
+        # viser fortsatt til README-en, og staar som aapent punkt i
+        # spesifikasjonen 3.5i (gjennomgangen, VG2).
         assert "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv)" in _installasjonen()
         assert "«Download ZIP»" in tabell.split("| D2 |", 1)[0] and "«Start demoen»" in tabell.split("| D4 |", 1)[0]
         tabell = tabell[tabell.index(reserven) :]
@@ -3821,7 +3823,8 @@ def _fra_rota(maal: str) -> str:
 
     fil, skille, anker = maal.partition("#")
     sti = posixpath.normpath(posixpath.join("docs", fil)) + ("/" if fil.endswith("/") else "")
-    if sti == "README.md":
+    # Gjennomgangen (ECH2): ../README.md uten anker er lenken til README-en.
+    if sti == "README.md" and skille:
         return f"#{anker}"
     return sti + skille + anker
 
@@ -4676,9 +4679,10 @@ FLYTTET = (
 )
 # Story 3.5i, kontrollpunkt f): antallet tester i filene som leste delene i
 # README-en, på main før grenen (958c27a3), og testene 3.5i la til: tre i
-# test_docker.py (153 før) og testen for d) i test_readme.py (2 før). Navnene
-# fra før står alle. Mutanten for f) overlevde med antallet fra før, fordi
-# de nye testene dekket over en som ble borte.
+# test_docker.py (153 før) og testen for d) i test_readme.py (2 før).
+# Mutanten for f) overlevde med antallet fra før, fordi de nye testene dekket
+# over en som ble borte. Gjennomgangen (BH6, ECH1, ECH5): navnene sjekkes i
+# TESTENE_SOM_LESER_DELENE under, ikke bare antallet.
 TESTENE_ETTER_3_5I = {
     "test_docker.py": 156,
     "test_dobbeltklikk.py": 38,
@@ -4691,6 +4695,121 @@ TESTENE_ETTER_3_5I = {
     "test_demo.py": 74,
     "test_aksjesiden_8_20a.py": 34,
     "test_boersometeret_8_20b.py": 16,
+}
+
+
+# Gjennomgangen av 3.5i (BH6, ECH1, ECH5): testene som leser delene som er
+# flyttet, med en av leserne under, ved byggingen. Ville en av dem blitt
+# slettet, fått nytt navn eller sluttet å lese delene, feiler testen for f).
+LESERNE = re.compile(
+    r"\b(_?installasjonen|readme_og_installasjonen|_seksjon|_pil|_pilene|_steg|_faq|_kommandoene|"
+    r"_delen_i_readme|_readme_avsnittet|_velg_vei|_dobbeltklikket|INSTALLASJONEN)\b"
+)
+TESTENE_SOM_LESER_DELENE = {
+    "test_docker.py": (
+        "test_advarselen_mot_down_v_staar_synlig",
+        "test_advarselen_om_down_v_og_basen",
+        "test_bare_kommandoer_i_kom_i_gang",
+        "test_begge_meldingene_i_samme_spoersmaal",
+        "test_bildene_av_appen_staar_bare_i_knappen",
+        "test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket",
+        "test_de_felles_stegene_staar_ikke_bak_en_pil",
+        "test_delen_om_den_lokale_modellen_sier_at_den_er_valgfri",
+        "test_demoen_den_ekte_versjonen_dokumentlista_og_mappestrukturen_bak_hver_sin_pil",
+        "test_demoen_foerst_og_zip_foer_kommandoene",
+        "test_demoen_paa_dagtid_og_helgen_i_steg_8",
+        "test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer",
+        "test_det_som_er_flyttet_bak_pilene_er_det_samme_som_foer",
+        "test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil",
+        "test_docker_foerst_og_uv_som_alternativ",
+        "test_docker_veien_har_stegene_bildene_og_kommandoene",
+        "test_dokumentene_og_mappestrukturen_lenker_til_installasjonen",
+        "test_du_trenger_versjonene",
+        "test_en_kommando_per_boks",
+        "test_err_connection_refused_under_staar_du_fast",
+        "test_forklaringen_i_tester_staar_bak_en_knapp",
+        "test_henvisningene_og_proevetabellen",
+        "test_hjelpen_har_dobbeltklikket_foerst",
+        "test_hvert_steg_hver_kommando_og_hver_lenke_fra_foer_finnes",
+        "test_hvert_steg_under_staar_du_fast_sier_hvilken_vei",
+        "test_hvert_tema_staar_i_readme_eller_hjelp",
+        "test_ingen_anbefalt_ved_den_ekte_versjonen",
+        "test_ingen_bokser_testene_ikke_ser",
+        "test_ingen_kommentar_paa_kommandolinjene",
+        "test_innholdet_i_pilene_er_det_samme_som_foer",
+        "test_installasjonen_av_uv_staar_foer_uv_sync",
+        "test_interesse_handelsvolum_oeverst",
+        "test_knappen_staar_rett_under_beskrivelsen_og_er_lukket",
+        "test_kom_i_gang_anbefaler_demoen_for_faglaerer_og_sensor",
+        "test_kommandoene_er_de_samme_som_i_koden_og_compose",
+        "test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor",
+        "test_lenken_til_staar_du_fast_sier_lenger_ned",
+        "test_lenkene_virker",
+        "test_like_spoersmaal_har_samme_svar",
+        "test_linja_om_linux_lenker_til_docker_og_uv",
+        "test_linja_som_viser_at_appen_er_klar",
+        "test_markdown_inne_i_pilene_vises_riktig_paa_github",
+        "test_meldingene_og_kommentarene_viser_til_installasjonen",
+        "test_mer_for_den_som_vil_er_lukket",
+        "test_merket_i_demoen_er_det_samme_som_i_malene",
+        "test_overskriftene_fra_foer_finnes",
+        "test_pila_og_tabellen_har_hvert_sitt_navn",
+        "test_pila_til_demoen_sier_at_den_er_anbefalt_for_faglaerer_og_sensor",
+        "test_porten_er_den_samme_overalt_og_ikke_5000",
+        "test_raadet_om_tidspunkt_uten_flagget",
+        "test_readme_lover_0_kall_bare_naar_basen_har_kursene",
+        "test_readme_proeven_har_hver_kommando",
+        "test_resten_av_dobbeltklikket_staar_bak_pila",
+        "test_siden_lastes_paa_nytt_etter_hentingen",
+        "test_spoersmaalene_som_ble_tatt_ut_staar_i_hjelp",
+        "test_staar_du_fast_har_hoeyst_5_spoersmaal",
+        "test_standardene_i_tabellen_er_de_i_koden",
+        "test_status_uten_storynumre_og_uten_kommando",
+        "test_steg_4_mappa_ikke_zip_fila",
+        "test_stegene_er_nummerert_og_har_hoeyst_65_ord",
+        "test_stegene_nevner_powershell_og_terminal",
+        "test_stopp_i_begge_versjonene",
+        "test_stoppkommandoen_for_demoen",
+        "test_svarene_beholdt_innholdet",
+        "test_svaret_om_cannot_find_path",
+        "test_svaret_om_mellomrommet_etter_cd",
+        "test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt",
+        "test_tabellen_og_du_trenger_sier_ikke_at_docker_trengs",
+        "test_tabellen_staar_uten_pil_foer_til_faglaerer",
+        "test_tallene_20_og_16_stemmer_med_koden",
+        "test_teksten_under_hvert_bilde",
+        "test_testene_leser_delene_i_installasjonen_og_ingen_er_borte",
+        "test_testene_uten_docker",
+        "test_tjenestene_i_readme_finnes_i_compose",
+        "test_under_tester_staar_kommandoene_og_lenken_synlig",
+        "test_uv_delen_er_to_nummererte_lister",
+        "test_uv_med_demo_flagget_som_appen_leser",
+        "test_variablene_i_tabellen_er_de_i_env_example",
+        "test_velg_vei_lenker_rett_inn_i_rekkefoelgen",
+        "test_zip_fila_maa_pakkes_ut",
+        "test_zip_lenken_gaar_til_main_i_dette_repoet",
+    ),
+    "test_dobbeltklikk.py": (
+        "test_readme_og_hjelpen_har_advarselen_og_godkjenningen",
+        "test_skriptene_bruker_kommandoene_i_readme",
+        "test_spoer_foer_uv_installeres",
+        "test_start_ps1_stopper_den_ekte_versjonen_i_en_mappe_med_git",
+        "test_vinduet_sier_hvor_noekkelen_staar_og_hvordan_den_limes_inn",
+        "test_webserveren_har_8_traader_i_skriptene_readme_og_dockerfile",
+    ),
+    "test_readme.py": (
+        "test_hver_lenke_i_readme_og_installasjonen_gaar_til_en_fil_og_et_anker_som_finnes",
+        "test_readme_sier_hva_man_gjoer_med_en_konto_fra_foer",
+    ),
+    "test_ki_tjenestene.py": (
+        "test_modellene",
+        "test_readme_sier_det_instruksjonen_krever",
+    ),
+    "test_kveldshenting.py": ("test_readme_og_hjelpen_sier_hva_jobben_gjoer_loggen_og_hvordan_den_slaas_av",),
+    "test_investorsidene_demo.py": ("test_hjelpen_sier_det_samme_som_sidene",),
+    "test_app.py": ("test_kommandoen_paa_den_tomme_siden_staar_i_readme",),
+    "test_demo.py": ("test_lenken_gaar_til_ankeret_i_readme",),
+    "test_aksjesiden_8_20a.py": ("test_de_gamle_ordene_staar_ikke_igjen",),
 }
 
 
@@ -4748,11 +4867,24 @@ class TestInstallasjonen:
         delene i README-en, bare ble slettet, eller hvis leserne testene
         bruker, ga tom tekst eller mindre enn før, så kravene ble oppfylt
         uten å sjekke noe."""
+        import ast
+
         for fil, foer in TESTENE_ETTER_3_5I.items():
             antall = len(
                 re.findall(r"^\s*def test_\w+", (ROT / "tests" / fil).read_text(encoding="utf-8"), re.MULTILINE)
             )
             assert antall >= foer, (fil, antall, foer)
+        # Hver test som leste delene, finnes og leser dem fortsatt.
+        for fil, navnene in TESTENE_SOM_LESER_DELENE.items():
+            kilde = (ROT / "tests" / fil).read_text(encoding="utf-8")
+            funksjonene = {
+                n.name: ast.get_source_segment(kilde, n)
+                for n in ast.walk(ast.parse(kilde))
+                if isinstance(n, ast.FunctionDef)
+            }
+            for navn in navnene:
+                assert navn in funksjonene, (fil, navn)
+                assert LESERNE.search(funksjonene[navn]), (fil, navn)
         # Kommandoene i «Kom i gang» er de samme som før, utenom de to i
         # «Tester» og installasjonen av uv der.
         tester = {"uv run pytest", UV_WINDOWS, UV_MAC}
@@ -4789,8 +4921,12 @@ class TestInstallasjonen:
         bildene = next(l for l in mappestruktur.splitlines() if l.startswith("- [`docs/bilder/readme/`]"))
         assert "skjermbildene i [`docs/installasjon.md`](docs/installasjon.md)" in bildene
         topp = INSTALLASJONEN.read_text(encoding="utf-8").split("---\n", 2)[1]
-        for felt in ('title: "Installasjonen"', "status: aktiv", "created: 2026-11-08", "updated: 2026-11-08T"):
+        for felt in ('title: "Installasjonen"', "status: aktiv", "created: 2026-11-08"):
             assert felt in topp, felt
+        # Gjennomgangen (BH4): fila er levende, så updated låses ikke til en dag,
+        # bare formen fra `date +%Y-%m-%dT%H:%M` (regel 4), og ikke før created.
+        updated = re.search(r"^updated: (\d{4}-\d{2}-\d{2})T\d{2}:\d{2}$", topp, re.MULTILINE)
+        assert updated and updated.group(1) >= "2026-11-08", topp
         # Regel 19 i CLAUDE.md sier at fila er levende.
         claude = re.sub(r"\s+", " ", (ROT / "CLAUDE.md").read_text(encoding="utf-8"))
         assert "`docs/installasjon.md`, med installasjonen som er flyttet fra «Kom i gang», er levende" in claude

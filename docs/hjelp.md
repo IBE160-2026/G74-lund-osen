@@ -2,12 +2,12 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-08T11:57
+updated: 2026-11-08T12:31
 ---
 
 # Hjelp til «Kom i gang»
 
-Spørsmål og svar til «Kom i gang» i [README-en](../README.md) og til [installasjonen](installasjon.md), sortert etter steget de hører til. De vanligste står også i installasjonen, under «Står du fast?». Dobbeltklikket står først, som i README-en. Stegene 1–4 hører til «Med Docker Desktop» og er felles for begge versjonene der, og demoen står før den ekte versjonen.
+Spørsmål og svar til «Kom i gang» i [README-en](../README.md) og til [installasjonen](installasjon.md), sortert etter steget de hører til. De vanligste står også i installasjonen, under «Står du fast?». Dobbeltklikket står først, som i README-en. Stegene 1–4 hører til «Med Docker Desktop» i installasjonen og er felles for begge versjonene der, og demoen står før den ekte versjonen.
 
 ## Start med dobbeltklikk
 
