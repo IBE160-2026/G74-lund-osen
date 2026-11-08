@@ -606,8 +606,9 @@ def test_basen_staar_paa_versjon_8(tmp_path):
     aapne_base(sti).close()
     tilkobling = sqlite3.connect(sti)
     try:
-        # Story 2.11: 9 med 0009_lista.sql. Navnet staar.
-        assert versjon(tilkobling) == 9
+        # Story 2.11: 9 med 0009_lista.sql, og story 2.12: 10 med
+        # 0010_valg.sql. Navnet staar.
+        assert versjon(tilkobling) == 10
     finally:
         tilkobling.close()
 

@@ -1004,6 +1004,8 @@ MALENE_BAK_BILDET = (
     "src/templates/index.html",
     # Story 8.17a: periodevalget over søylene og tabellen.
     "src/perioder.py",
+    # Story 2.12: «Dine egne aksjer» og merkene i tabellen.
+    "src/valg.py",
 )
 # Story 8.0f: ogsaa hjelpeskriptet (.js), som lastes paa begge sidene.
 SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
@@ -1235,7 +1237,12 @@ HOEYDE_PAA_BILDET = 1864
 # markedsoversikt.py, aksjedetalj.py, historikk.py, tilstand.py, hjelpetekster.py og 0009).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme,
 # ogsaa etter gjennomgangen.
-AVTRYKK_BAK_BILDET = "e5f749d3bfe51e0c619d873da2ffb974c837772932cddce0341e60cc581f6ed2"
+# Story 2.12: «Dine egne aksjer», «Din egen liste» og merkene «Egen» og «Utenfor målingen»
+# (index.html, _egne.html, app.py, valg.py, demo.py, hjelpetekster.py og stil.css). Alle
+# bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
+# nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
+# liste» er nytt.
+AVTRYKK_BAK_BILDET = "914c952ee9e42f83b481d3a24aac4a6fff285dae769dc834de4487a848d7a5e0"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1265,6 +1272,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/demo.py",
     "src/demo_ki.py",
     "src/demo_ki_tekster.json",
+    # Story 2.12: å velge og bytte aksjer.
+    "src/valg.py",
     "src/markedsoversikt.py",
     "src/oversiktsdata.py",
     "src/hovedindeks.py",
@@ -1602,7 +1611,12 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # markedsoversikt.py, aksjedetalj.py, historikk.py, tilstand.py, hjelpetekster.py og 0009).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme,
 # ogsaa etter gjennomgangen.
-AVTRYKK_BAK_AKSJESIDEN = "f88a060ed4e12bbbc25df95ffd5c1d0c12692a103dac37c4c1ad4709dbacc70d"
+# Story 2.12: «Dine egne aksjer», «Din egen liste» og merkene «Egen» og «Utenfor målingen»
+# (index.html, _egne.html, app.py, valg.py, demo.py, hjelpetekster.py og stil.css). Alle
+# bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
+# nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
+# liste» er nytt.
+AVTRYKK_BAK_AKSJESIDEN = "61d007817e2fa6489604f335c9d47aa90b98b11dea6627613d26e9dd699c2868"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1634,10 +1648,14 @@ DE_NYE_BILDENE = {
     "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 1682, FILENE_BAK_BOERSOMETERET),
     "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
     # Story 8.20a: 3509, med datoen og pilene på egen linje ved 390 px. Var 3524.
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 3509, MALENE_BAK_BILDET),
+    # Story 2.12: 3797, med «Dine egne aksjer» under tabellen.
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 3797, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 3327, FILENE_BAK_BOERSOMETERET),
+    # Story 2.12: «Din egen liste» i Min liste, bare delen (id-en
+    # din-egen-liste), klippet ut med 16 px over og under.
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1037, FILENE_BAK_MIN_LISTE),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1702,12 +1720,18 @@ DE_NYE_BILDENE = {
 # markedsoversikt.py, aksjedetalj.py, historikk.py, tilstand.py, hjelpetekster.py og 0009).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme,
 # ogsaa etter gjennomgangen.
+# Story 2.12: «Dine egne aksjer», «Din egen liste» og merkene «Egen» og «Utenfor målingen»
+# (index.html, _egne.html, app.py, valg.py, demo.py, hjelpetekster.py og stil.css). Alle
+# bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
+# nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
+# liste» er nytt.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "e5f749d3bfe51e0c619d873da2ffb974c837772932cddce0341e60cc581f6ed2",
-    "docs/appen/boersometeret-demo.png": "934410fe758f67a36133454abe6c5e6dab8762024261a47941ba61ff6a09c4fc",
-    "docs/appen/min-liste-demo.png": "f4b32b85a9b02a6e92932f6c8fa25cfab87087eb249a28fbaa5af3450198e17b",
-    "docs/appen/oversikten-390-demo.png": "e5f749d3bfe51e0c619d873da2ffb974c837772932cddce0341e60cc581f6ed2",
-    "docs/appen/boersometeret-390-demo.png": "934410fe758f67a36133454abe6c5e6dab8762024261a47941ba61ff6a09c4fc",
+    TOPPEN_AV_OVERSIKTEN: "914c952ee9e42f83b481d3a24aac4a6fff285dae769dc834de4487a848d7a5e0",
+    "docs/appen/boersometeret-demo.png": "51868c1a0e73e93f5ce715e4e3e377ad2309c7e7d674687b7713fd817999eb75",
+    "docs/appen/min-liste-demo.png": "1e1f1834e56105327d34054803cc686e571896af180fad99c149c1d5a9d85cc1",
+    "docs/appen/oversikten-390-demo.png": "914c952ee9e42f83b481d3a24aac4a6fff285dae769dc834de4487a848d7a5e0",
+    "docs/appen/boersometeret-390-demo.png": "51868c1a0e73e93f5ce715e4e3e377ad2309c7e7d674687b7713fd817999eb75",
+    "docs/appen/din-egen-liste-demo.png": "1e1f1834e56105327d34054803cc686e571896af180fad99c149c1d5a9d85cc1",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

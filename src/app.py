@@ -38,6 +38,7 @@ from urllib.parse import parse_qs, urlsplit
 from flask import Flask, abort, g, redirect, render_template, request
 
 import lagring_sqlite
+import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import (
@@ -265,11 +266,25 @@ def _migrer_en_gang(sti: Path) -> None:
 # ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
 # Story 3.4h: siden for et selskap i demoen leser merket i basen, så den
 # bare finnes i demoen.
-_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk", "boersometer", "demoselskap"}
+_RUTER_MED_BASE = {
+    "markedsoversikt",
+    "aksjedetalj",
+    "min_liste",
+    "merk",
+    "boersometer",
+    "demoselskap",
+    # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
+    "folg_side",
+    "folg",
+    "fjern_egen",
+    "angre",
+}
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
+# Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -302,7 +317,7 @@ def _aapne_basen() -> None:
         try:
             # Story 8.3: stjernen virker ogsaa i demoen. Bare merkingen
             # aapner demobasen for skriving, og den migreres fortsatt ikke.
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint not in _SKRIVERE)
             g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
             # Story 3.4c: en demobase fra foer, med historikken fra 02.01,
             # vises ikke. Siden ber om at den lages paa nytt.
@@ -317,7 +332,7 @@ def _aapne_basen() -> None:
         # Gjennomgangen av PR 1 (BH6): en demobase der den ekte skal ligge,
         # migreres ikke. Den vises skrivebeskyttet, med «Eksempeltall».
         try:
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint not in _SKRIVERE)
             g.eksempeltall = True
             # Story 3.4c (gjennomgangen, BH1): en demobase fra foer vises ikke
             # her heller.
@@ -1022,6 +1037,9 @@ def _tabellsiden(aktiv: str):
         siste_dag=sidens_siste(rader),
         periodeledd=ledd,
         standard_adresse=side_adresse(sti, None, alle, ledd),
+        # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
+        # Min liste, og merket «Egen» i tabellen.
+        egne=_egne(),
         **felles,
     )
 
@@ -1480,6 +1498,198 @@ def merk():
     deler = urlsplit(adresse)
     borte = til == FJERN and deler.path == MIN_LISTE and _ett(parse_qs(deler.query), "vis") != ALLE
     return redirect(adresse + ("#aksjene" if borte else f"#rad-{symbol}"), code=303)
+
+
+# --- Story 2.12: velge og bytte aksjer -------------------------------------
+
+
+def _valglager() -> valg.Valglager | None:
+    """Valglageret for basen siden leser, eller None naar basen ikke har
+    tabellene fra 0010 ennaa (en base en versjon bak). Bare lesing her."""
+    tilkobling = g.get("tilkobling")
+    if tilkobling is None or not valg.har_tabellene(tilkobling):
+        return None
+    return valg.Valglager(tilkobling, naa)
+
+
+def _egne() -> dict | None:
+    """«Dine egne aksjer» og «Din egen liste» - story 2.12 (utdraget 08.11
+    §1 og §2). Bare lesing (AD-10): aksjene i lista, ønskene som venter, og
+    omsetningen fra 2.13."""
+    lager = _valglager()
+    if lager is None:
+        return None
+    try:
+        lista = lager.i_lista()
+        ventende = lager.ventende()
+        egne = lager.egne()
+        fjernes = {o.symbol: o.id for o in ventende if o.handling == valg.FJERN}
+        rader = []
+        for aksje in lista:
+            if aksje.symbol in egne:
+                median, _ = lager.omsetning(aksje.symbol)
+                rader.append(
+                    {
+                        "symbol": aksje.symbol,
+                        "navn": aksje.navn,
+                        "sektor": aksje.sektor,
+                        "status": "fjernes" if aksje.symbol in fjernes else "hentet",
+                        "oenske": fjernes.get(aksje.symbol),
+                        "utenfor": valg.utenfor_maalingen(median),
+                    }
+                )
+        for o in ventende:
+            if o.handling == valg.FOLG:
+                median, _ = lager.omsetning(o.symbol)
+                rader.append(
+                    {
+                        "symbol": o.symbol,
+                        "navn": o.navn,
+                        "sektor": o.sektor,
+                        "status": "venter",
+                        "oenske": o.id,
+                        "utenfor": valg.utenfor_maalingen(median),
+                    }
+                )
+        folg = sum(o.handling == valg.FOLG for o in ventende)
+        antall = len(lista) + folg - len(fjernes)
+        sist, neste, igjen = valg.kallene(len(lista), folg, len(fjernes))
+        egne_i_lista = len(egne)
+        return {
+            "rader": rader,
+            "symboler": frozenset(r["symbol"] for r in rader if r["status"] != "venter"),
+            "utenfor": frozenset(r["symbol"] for r in rader if r["utenfor"]),
+            "antall_egne": sum(r["status"] != "fjernes" for r in rader),
+            "antall": antall,
+            "tak": valg.TAK,
+            "full": antall >= valg.TAK,
+            "lista": lista,
+            "fjernes": fjernes,
+            "kall": {
+                "faste": len(lista) - egne_i_lista,
+                "egne": egne_i_lista,
+                "indeks": valg.INDEKSKALL,
+                "margin": valg.KVOTE - len(lista) - valg.INDEKSKALL,
+                "sist": sist,
+                "neste": neste,
+                "igjen": igjen,
+            },
+        }
+    except (*BASEFEIL, ValueError) as feil:
+        app.logger.warning("Valget kunne ikke leses: %s: %s", type(feil).__name__, feil)
+        return None
+
+
+# Bare oversikten og Min liste er maal etter et valg.
+VALG_TILBAKE = {"oversikten": "/#dine-egne-aksjer", "min_liste": "/min-liste#din-egen-liste"}
+
+
+def _samme_side() -> None:
+    """Som bryteren og stjernen: kommer forespoerselen med Origin, maa den
+    vaere denne siden."""
+    opphav = request.headers.get("Origin")
+    if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
+        abort(403)
+
+
+@app.route("/folg")
+def folg_side():
+    """«Følg en aksje» og «Bytt ut» - story 2.12, utdraget §1 og §2. En side
+    med skjema, ikke en dialog med skript (spørsmål 8). Bare lesing."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    egne = _egne()
+    kode = (request.args.get("kode") or "").strip().upper()
+    bytt = (request.args.get("bytt") or "").strip().upper() or None
+    sok = (request.args.get("q") or "").strip()[:40]
+    i_lista = {a.symbol: a for a in egne["lista"]} if egne else {}
+    gammel = i_lista.get(bytt) if bytt else None
+    valgt = lager.boersaksje(kode) if kode else None
+    omsetning = None
+    if valgt is not None:
+        median, maalt = lager.omsetning(valgt.kode)
+        omsetning = {
+            "median": median / 1_000_000 if median is not None else None,
+            "maalt": maalt,
+            "utenfor": valg.utenfor_maalingen(median),
+        }
+    return render_template(
+        "folg.html",
+        aktiv="min_liste" if gammel else "oversikt",
+        sidesti="/folg",
+        sok=sok,
+        treff=lager.sok(sok) if sok and valgt is None else [],
+        valgt=valgt,
+        omsetning=omsetning,
+        gammel=gammel,
+        egne=egne,
+        bransjene=valg.BRANSJENE,
+        grense=valg.GRENSE_MNOK,
+        tilbake="min_liste" if gammel else "oversikten",
+        feil=request.args.get("feil"),
+    )
+
+
+@app.post("/folg")
+def folg():
+    """Ønsket om å følge en aksje, eller et bytte. Webserveren skriver bare
+    oenske (AD-3) og henter aldri (AD-10)."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    kode = (request.form.get("kode") or "").strip().upper()
+    bytt = (request.form.get("bytt") or "").strip().upper() or None
+    try:
+        lager.folg(kode, request.form.get("sektor", ""), bytt)
+    except (valg.UgyldigValg, valg.ListaErFull) as feil:
+        return render_template(
+            "folg.html",
+            aktiv="oversikt",
+            sidesti="/folg",
+            sok="",
+            treff=[],
+            valgt=None,
+            omsetning=None,
+            gammel=None,
+            egne=_egne(),
+            bransjene=valg.BRANSJENE,
+            grense=valg.GRENSE_MNOK,
+            tilbake="oversikten",
+            feil=str(feil),
+        ), 400
+    return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
+
+
+@app.post("/fjern")
+def fjern_egen():
+    """Ønsket om å fjerne en aksje fra lista ved neste henting."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    try:
+        lager.fjern((request.form.get("symbol") or "").strip().upper())
+    except valg.UgyldigValg:
+        abort(400)
+    return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
+
+
+@app.post("/angre")
+def angre():
+    """Angrer et ønske som ikke er tatt i bruk: raden i oenske slettes."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    try:
+        lager.angre(int(request.form.get("id", "")))
+    except (ValueError, valg.UgyldigValg):
+        abort(400)
+    return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
 
 
 if __name__ == "__main__":

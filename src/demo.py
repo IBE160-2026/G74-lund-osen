@@ -136,6 +136,19 @@ DEMOUNIVERS: tuple[Aksje, ...] = (
 DEMOINDEKS = Indeks("DEMIX", "DEMIX.OL", "Demoindeksen")
 INDEKS_START = 1400.0
 
+# Story 2.12 (spørsmål 10): oppdiktede selskaper på «Demo Børs» som kan
+# velges under «Følg en aksje», i tillegg til de 15. To har en måling av
+# omsetningen (i MNOK), én over og én under de 32 signalet er målt på, så
+# begge tekstene i dialogen vises. De andre er ikke målt.
+DEMOBOERSEN: tuple[tuple[str, str], ...] = (
+    ("HVLK", "Havlys Kraft"),
+    ("NRDE", "Nordnes Eiendom"),
+    ("SKRH", "Skarvik Helse"),
+    ("TNDT", "Tindtopp Teknologi"),
+    ("VKVF", "Vikvåg Forbruk"),
+)
+DEMOMAALT = {"HVLK": 85.0, "NRDE": 12.4}
+
 NYLIG_NOTERT = "VRDS"
 UTEN_KURSER = "MTFJ"
 SKILLER_SEG_UT = "BRFE"
@@ -363,6 +376,20 @@ def _bygg(sti: Path, radene: list | None = None) -> None:
             for aksje in DEMOUNIVERS:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
+
+        # Story 2.12: lista over «Demo Børs» og to målinger av omsetningen.
+        with tilkobling:
+            tilkobling.executemany(
+                "INSERT INTO boersliste (kode, navn) VALUES (?, ?)",
+                sorted({*DEMOBOERSEN, *((a.symbol, a.navn) for a in DEMOUNIVERS)}),
+            )
+            maalt = hentet.astimezone(OSLO).replace(hour=22, minute=40).isoformat()
+            fra = (SLUTTDATO - timedelta(days=91)).isoformat()
+            tilkobling.executemany(
+                "INSERT INTO omsetning (symbol, maalt, fra, til, handelsdager, dager_uten_volum, rader_uten_tall, "
+                "median_omsetning, feil) VALUES (?, ?, ?, ?, 63, 0, 0, ?, NULL)",
+                [(s, maalt, fra, SLUTTDATO.isoformat(), mnok * 1_000_000) for s, mnok in DEMOMAALT.items()],
+            )
 
         # Story 8.3: fem merket i Min liste, gjennom porten webserveren bruker.
         minliste = SqliteMinlistelager(tilkobling)
