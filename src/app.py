@@ -33,7 +33,7 @@ from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
@@ -453,6 +453,18 @@ def _eksempeltall():
 # appen. Malene henter dem med hjelp.tekst(), og MA-vinduet i grafens
 # tegnforklaring med parametre.ma_vindu. Tekstene, tegnforklaringen og
 # beregningen paa sidene bruker samme Parametre (gjennomgangen av 8.0b).
+
+
+@app.context_processor
+def _utenfor_maalingen():
+    """Story 2.12 (gjennomgangen, VG2, ECH10): «Utenfor målingen» ved navnet i
+    oversikten, på aksjesiden og i børsometeret, med omsetningen og hva
+    signalet er målt på når man peker på merket (utdraget 08.11 §2). Bare for
+    egne aksjer; de 15 er målt (malinger.md §36). Bare lesing."""
+    if request.endpoint not in _RUTER_MED_BASE:
+        return {"utenfor": {}}
+    egne = _egne()
+    return {"utenfor": egne["utenfor_tekst"] if egne else {}}
 
 
 @app.context_processor
@@ -1554,11 +1566,20 @@ def _egne() -> dict | None:
         folg = sum(o.handling == valg.FOLG for o in ventende)
         antall = len(lista) + folg - len(fjernes)
         sist, neste, igjen = valg.kallene(len(lista), folg, len(fjernes))
+        # Gjennomgangen (VG4): neste henting med én aksje til, regnet her og
+        # ikke i malen.
+        _, med_en, igjen_med_en = valg.kallene(len(lista), folg + 1, len(fjernes))
+        utenfor_tekst = {}
+        for rad in rader:
+            if rad["utenfor"]:
+                median, maalt = lager.omsetning(rad["symbol"])
+                utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt)
         egne_i_lista = len(egne)
         return {
             "rader": rader,
             "symboler": frozenset(r["symbol"] for r in rader if r["status"] != "venter"),
             "utenfor": frozenset(r["symbol"] for r in rader if r["utenfor"]),
+            "utenfor_tekst": utenfor_tekst,
             "antall_egne": sum(r["status"] != "fjernes" for r in rader),
             "antall": antall,
             "tak": valg.TAK,
@@ -1573,6 +1594,8 @@ def _egne() -> dict | None:
                 "sist": sist,
                 "neste": neste,
                 "igjen": igjen,
+                "med_en": med_en,
+                "igjen_med_en": igjen_med_en,
             },
         }
     except (*BASEFEIL, ValueError) as feil:
@@ -1616,12 +1639,24 @@ def folg_side():
             "maalt": maalt,
             "utenfor": valg.utenfor_maalingen(median),
         }
+    treff = []
+    if sok and valgt is None:
+        for aksje in lager.sok(sok):
+            median, maalt = lager.omsetning(aksje.kode)
+            treff.append({"kode": aksje.kode, "navn": aksje.navn, "median": median, "maalt": maalt})
+    # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
+    # ikke følges, og siden sier det før skjemaet sendes.
+    alt_fulgt = valgt is not None and (
+        valgt.kode in i_lista or any(o.symbol == valgt.kode and o.handling == valg.FOLG for o in lager.ventende())
+    )
     return render_template(
         "folg.html",
         aktiv="min_liste" if gammel else "oversikt",
         sidesti="/folg",
         sok=sok,
-        treff=lager.sok(sok) if sok and valgt is None else [],
+        treff=treff,
+        alt_fulgt=alt_fulgt,
+        mill=1_000_000,
         valgt=valgt,
         omsetning=omsetning,
         gammel=gammel,
@@ -1646,21 +1681,15 @@ def folg():
     try:
         lager.folg(kode, request.form.get("sektor", ""), bytt)
     except (valg.UgyldigValg, valg.ListaErFull) as feil:
-        return render_template(
-            "folg.html",
-            aktiv="oversikt",
-            sidesti="/folg",
-            sok="",
-            treff=[],
-            valgt=None,
-            omsetning=None,
-            gammel=None,
-            egne=_egne(),
-            bransjene=valg.BRANSJENE,
-            grense=valg.GRENSE_MNOK,
-            tilbake="oversikten",
-            feil=str(feil),
-        ), 400
+        # Gjennomgangen (BH9, ECH9): samme side, med aksjen og byttet, og
+        # grunnen. Kode og bytt er sjekket mot lista og tegnene foer de
+        # settes i adressen.
+        deler = {"feil": str(feil)}
+        if lager.boersaksje(kode) is not None:
+            deler["kode"] = kode
+        if bytt and re.fullmatch(r"[A-Z0-9-]{1,20}", bytt):
+            deler["bytt"] = bytt
+        return redirect("/folg?" + urlencode(deler), code=303)
     return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
 
 
@@ -1687,6 +1716,8 @@ def angre():
         abort(404)
     try:
         lager.angre(int(request.form.get("id", "")))
+    except valg.ListaErFull as feil:
+        return redirect("/folg?" + urlencode({"feil": str(feil)}), code=303)
     except (ValueError, valg.UgyldigValg):
         abort(400)
     return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)

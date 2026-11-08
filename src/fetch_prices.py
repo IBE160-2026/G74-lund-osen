@@ -1085,7 +1085,9 @@ def kjoer(
     if lista is None:
         # Story 2.12: ønskene fra siden tas i bruk først, og bare i en
         # vanlig henting, ikke den første på dagtid.
-        if not foerste_henting:
+        # Gjennomgangen (ECH3): bare paa selve boersdagen, ikke i helgen
+        # eller om natta etter, naar dato er en dag som alt er hentet.
+        if not foerste_henting and dag == dato:
             for linje in ta_i_bruk_oenskene(base_sti, dato):
                 skriv(linje)
         lista = lista_fra_basen(base_sti, dato)

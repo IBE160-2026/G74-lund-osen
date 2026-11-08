@@ -20,9 +20,11 @@ Spesifikasjonen er spec-2-12-velge-og-bytte-aksjer.md:
 import json
 import sqlite3
 from collections.abc import Callable
+from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from kursdata import Aksje
 
@@ -51,6 +53,7 @@ BRANSJENE = (
 FOLG = "folg"
 FJERN = "fjern"
 AKSJETYPE = "Common Stock"
+OSLO = ZoneInfo("Europe/Oslo")
 
 
 class UgyldigValg(ValueError):
@@ -81,6 +84,17 @@ class Boersaksje:
 def utenfor_maalingen(median_nok: float | None) -> bool:
     """Spørsmål 7: under 32 MNOK, eller ikke målt."""
     return median_nok is None or median_nok < GRENSE_MNOK * 1_000_000
+
+
+def utenfor_tekst(median_nok: float | None, maalt: date | None) -> str:
+    """Teksten bak merket «Utenfor målingen» (utdraget 08.11 §2)."""
+    if median_nok is None or maalt is None:
+        return "Omsetningen er ikke målt ennå. Signalet er målt på aksjer som omsettes for over 32 MNOK om dagen."
+    mnok = f"{median_nok / 1_000_000:.1f}".replace(".", ",")
+    return (
+        f"Median daglig omsetning de 3 siste månedene er {mnok} MNOK, målt {maalt:%d.%m.%Y}. Signalet er målt på "
+        "aksjer som omsettes for over 32 MNOK om dagen, og er ikke prøvd på en aksje som omsettes så lite."
+    )
 
 
 def kallene(i_lista: int, folg: int, fjern: int) -> tuple[int, int, int]:
@@ -148,57 +162,78 @@ class Valglager:
 
     def sok(self, tekst: str, grense: int = 20) -> list[Boersaksje]:
         """Aksjene på Oslo Børs der koden eller navnet har teksten, uten dem
-        som er i lista eller venter på å bli fulgt."""
+        som er i lista eller venter på å bli fulgt. Gjennomgangen (ECH6): %
+        og _ i teksten er vanlige tegn, ikke jokertegn."""
         tekst = (tekst or "").strip()
         if not tekst:
             return []
         opptatt = {a.symbol for a in self.i_lista()} | {o.symbol for o in self.ventende() if o.handling == FOLG}
-        moenster = f"%{tekst}%"
+        moenster = "%" + tekst.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
         rader = self._t.execute(
-            "SELECT kode, navn FROM boersliste WHERE kode LIKE ? OR navn LIKE ? ORDER BY kode",
+            "SELECT kode, navn FROM boersliste WHERE kode LIKE ? ESCAPE '\\' OR navn LIKE ? ESCAPE '\\' ORDER BY kode",
             (moenster, moenster),
         )
         return [Boersaksje(*r) for r in rader if r[0] not in opptatt][:grense]
 
     def omsetning(self, symbol: str) -> tuple[float | None, date | None]:
-        """Den siste målingen med et tall i omsetning (2.13): (median i NOK,
-        dagen den ble målt), eller (None, None)."""
+        """Den siste målingen i omsetning (2.13): (median i NOK, dagen den ble
+        målt i Oslo), eller (None, None). Gjennomgangen (ECH7): har den siste
+        målingen feil, er medianen None, og en eldre måling brukes ikke."""
         rad = self._t.execute(
-            "SELECT median_omsetning, maalt FROM omsetning WHERE symbol = ? AND median_omsetning IS NOT NULL "
-            "ORDER BY maalt DESC LIMIT 1",
+            "SELECT median_omsetning, maalt FROM omsetning WHERE symbol = ? ORDER BY maalt DESC LIMIT 1",
             (symbol,),
         ).fetchone()
         if rad is None:
             return None, None
-        return float(rad[0]), datetime.fromisoformat(rad[1]).date()
+        maalt = datetime.fromisoformat(rad[1]).astimezone(OSLO).date()
+        return (float(rad[0]) if rad[0] is not None else None), maalt
 
     # --- Skriving (bare oenske) ----------------------------------------
 
+    @contextmanager
+    def _laas(self):
+        """Gjennomgangen (BH2): sjekken av taket og skrivingen i én
+        transaksjon med skrivelås, så to forespørsler samtidig ikke begge
+        kommer under taket."""
+        if self._t.in_transaction:
+            self._t.commit()
+        self._t.execute("BEGIN IMMEDIATE")
+        try:
+            yield
+        except BaseException:
+            self._t.rollback()
+            raise
+        self._t.commit()
+
     def folg(self, kode: str, sektor: str, bytt_ut: str | None = None) -> None:
         """Ønsket om å følge kode, med bransjen brukeren valgte. Med bytt_ut
-        er det et bytte: ønsket om å fjerne den kommer i samme transaksjon,
-        og taket regnes med begge."""
+        er det et bytte: de to ønskene lages i samme transaksjon og peker på
+        hverandre (par), så de angres sammen (gjennomgangen, BH3, ECH2)."""
         aksje = self.boersaksje(kode)
         if aksje is None:
             raise UgyldigValg("koden står ikke i lista over Oslo Børs")
         if sektor not in BRANSJENE:
             raise UgyldigValg("bransjen er ikke en av de 13")
-        if kode in {a.symbol for a in self.i_lista()} or any(
-            o.symbol == kode and o.handling == FOLG for o in self.ventende()
-        ):
-            raise UgyldigValg("aksjen følges alt")
-        if bytt_ut is not None:
-            self._kan_fjernes(bytt_ut)
-        if bytt_ut is None and self.antall() >= TAK:
-            raise ListaErFull("Lista er full. Fjern en aksje for å følge en annen.")
         laget = self._klokke().isoformat()
-        with self._t:
+        with self._laas():
+            if kode in {a.symbol for a in self.i_lista()} or any(
+                o.symbol == kode and o.handling == FOLG for o in self.ventende()
+            ):
+                raise UgyldigValg("aksjen følges alt")
             if bytt_ut is not None:
-                self._t.execute("INSERT INTO oenske (handling, symbol, laget) VALUES ('fjern', ?, ?)", (bytt_ut, laget))
-            self._t.execute(
+                self._kan_fjernes(bytt_ut)
+            elif self.antall() >= TAK:
+                raise ListaErFull("Lista er full. Fjern en aksje for å følge en annen.")
+            folg_id = self._t.execute(
                 "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, ?, ?)",
                 (kode, aksje.navn, sektor, laget),
-            )
+            ).lastrowid
+            if bytt_ut is not None:
+                fjern_id = self._t.execute(
+                    "INSERT INTO oenske (handling, symbol, laget, par) VALUES ('fjern', ?, ?, ?)",
+                    (bytt_ut, laget, folg_id),
+                ).lastrowid
+                self._t.execute("UPDATE oenske SET par = ? WHERE id = ?", (fjern_id, folg_id))
 
     def _kan_fjernes(self, symbol: str) -> None:
         if symbol not in {a.symbol for a in self.i_lista()}:
@@ -207,27 +242,37 @@ class Valglager:
             raise UgyldigValg("aksjen fjernes alt ved neste henting")
 
     def fjern(self, symbol: str) -> None:
-        self._kan_fjernes(symbol)
-        with self._t:
+        with self._laas():
+            self._kan_fjernes(symbol)
             self._t.execute(
                 "INSERT INTO oenske (handling, symbol, laget) VALUES ('fjern', ?, ?)",
                 (symbol, self._klokke().isoformat()),
             )
 
     def angre(self, oenske_id: int) -> None:
-        """Sletter et ønske som ikke er tatt i bruk. Et ønske som er tatt i
-        bruk eller avvist, står (det er historikken for lista)."""
-        with self._t:
-            slettet = self._t.execute(
-                "DELETE FROM oenske WHERE id = ? AND tatt_i_bruk IS NULL AND avvist IS NULL", (oenske_id,)
-            ).rowcount
-        if not slettet:
-            raise UgyldigValg("ønsket finnes ikke, eller er alt tatt i bruk")
+        """Sletter et ønske som ikke er tatt i bruk, og den andre halvdelen av
+        et bytte. Et ønske som er tatt i bruk eller avvist, står (det er
+        historikken for lista). Gjennomgangen (BH1, ECH1, VG1): å angre et
+        ønske om å fjerne avvises når lista da ville fått mer enn TAK."""
+        with self._laas():
+            rad = self._t.execute(
+                "SELECT handling, par FROM oenske WHERE id = ? AND tatt_i_bruk IS NULL AND avvist IS NULL",
+                (oenske_id,),
+            ).fetchone()
+            if rad is None:
+                raise UgyldigValg("ønsket finnes ikke, eller er alt tatt i bruk")
+            handling, par = rad
+            if handling == FJERN and par is None and self.antall() + 1 > TAK:
+                raise ListaErFull("Lista er full. Fjern en aksje for å angre dette.")
+            self._t.execute(
+                "DELETE FROM oenske WHERE id IN (?, ?) AND tatt_i_bruk IS NULL AND avvist IS NULL",
+                (oenske_id, par if par is not None else oenske_id),
+            )
 
 
 def egne_i_lista(tilkobling: sqlite3.Connection) -> frozenset[str]:
     """Aksjene i lista (ut er ikke satt) med et ønske om å følge som er tatt i
-    bruk, og ikke et senere ønske om å fjerne som er tatt i bruk."""
+    bruk. En aksje som er tatt ut, har ut satt, så den er ikke med."""
     return frozenset(
         s
         for (s,) in tilkobling.execute(
@@ -260,22 +305,47 @@ def les_boerslista(tilkobling: sqlite3.Connection, fil: Path) -> int:
 
 
 def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
-    """Ønskene som venter, i den rekkefølgen de ble laget, for børsdagen dato.
+    """Ønskene som venter, for børsdagen dato: først ønskene om å fjerne, så
+    ønskene om å følge, i den rekkefølgen de ble laget.
 
-    Å følge legger aksjen inn i aksje med inn = dato, eller tar den inn igjen
-    (ut blir NULL). Å fjerne setter ut = dato, så kveldens henting ikke henter
-    den. Kom aksjen inn samme dag (inn = dato), kan ut ikke være dato, og da
-    slettes raden i stedet, fordi den ikke har kurser ennå. Gir linjene til
-    utskriften."""
+    Å fjerne setter ut = dato, så kveldens henting ikke henter aksjen. Har
+    aksjen alt kurs eller vurdering for dato, eller kom den inn samme dag,
+    blir ut dagen etter, så det som er lagret for dato, står i lista den
+    dagen. Ingen rad i aksje slettes (gjennomgangen, BH4, ECH4, AD-7).
+
+    Å følge legger aksjen inn med inn = dato, eller tar den inn igjen (ut blir
+    NULL). Gjennomgangen (BH1, VG1): har lista alt TAK aksjer, avvises ønsket
+    med grunnen. Gir linjene til utskriften."""
     linjer: list[str] = []
     dag = dato.isoformat()
+    neste = (dato + timedelta(days=1)).isoformat()
     with tilkobling:
-        for id_, handling, symbol, navn, sektor in tilkobling.execute(
+        ventende = tilkobling.execute(
             "SELECT id, handling, symbol, navn, sektor FROM oenske "
-            "WHERE tatt_i_bruk IS NULL AND avvist IS NULL ORDER BY id"
-        ).fetchall():
+            "WHERE tatt_i_bruk IS NULL AND avvist IS NULL ORDER BY handling = 'folg', id"
+        ).fetchall()
+        for id_, handling, symbol, navn, sektor in ventende:
             rad = tilkobling.execute("SELECT inn, ut FROM aksje WHERE symbol = ?", (symbol,)).fetchone()
-            if handling == FOLG:
+            if handling == FJERN:
+                if rad is None or rad[1] is not None:
+                    tilkobling.execute("UPDATE oenske SET avvist = ? WHERE id = ?", (f"{dag}: ikke i lista", id_))
+                    continue
+                har_dagen = tilkobling.execute(
+                    "SELECT EXISTS(SELECT 1 FROM kurs WHERE symbol = ? AND dato = ?) "
+                    "OR EXISTS(SELECT 1 FROM vurdering WHERE symbol = ? AND dato = ?)",
+                    (symbol, dag, symbol, dag),
+                ).fetchone()[0]
+                ut = neste if har_dagen or (rad[0] is not None and rad[0] >= dag) else dag
+                tilkobling.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", (ut, symbol))
+                linjer.append(f"{symbol} er tatt ut av lista fra {ut}. Det som er lagret, står.")
+            else:
+                i_lista = tilkobling.execute("SELECT count(*) FROM aksje WHERE ut IS NULL").fetchone()[0]
+                if i_lista >= TAK:
+                    tilkobling.execute(
+                        "UPDATE oenske SET avvist = ? WHERE id = ?", (f"{dag}: lista har {TAK} aksjer", id_)
+                    )
+                    linjer.append(f"{symbol} er ikke tatt inn: lista har alt {TAK} aksjer.")
+                    continue
                 if rad is None:
                     tilkobling.execute(
                         "INSERT INTO aksje (symbol, ticker, navn, sektor, inn) VALUES (?, ?, ?, ?, ?)",
@@ -284,39 +354,33 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
                 elif rad[1] is not None:
                     tilkobling.execute("UPDATE aksje SET ut = NULL, sektor = ? WHERE symbol = ?", (sektor, symbol))
                 linjer.append(f"{symbol} er tatt inn i lista fra {dag}.")
-            else:
-                if rad is None or rad[1] is not None:
-                    tilkobling.execute("UPDATE oenske SET avvist = ? WHERE id = ?", (f"{dag}: ikke i lista", id_))
-                    continue
-                if rad[0] is not None and rad[0] >= dag:
-                    tilkobling.execute("DELETE FROM aksje WHERE symbol = ?", (symbol,))
-                else:
-                    tilkobling.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", (dag, symbol))
-                linjer.append(f"{symbol} er tatt ut av lista fra {dag}. Det som er lagret, står.")
             tilkobling.execute("UPDATE oenske SET tatt_i_bruk = ? WHERE id = ?", (dag, id_))
     return linjer
 
 
 def uten_rader(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
-    """Spørsmål 6: en egen aksje som kom inn før dato og ikke har fått en
-    eneste kurs, tas ut fra dato, og ønsket merkes avvist. Det sjekkes
+    """Spørsmål 6: en egen aksje som kom inn før dato, ble forsøkt hentet (den
+    har en rad i vurdering, med grunn) og ikke har fått en eneste kurs, tas
+    ut fra dato, og det siste ønsket om å følge den merkes avvist. Det sjekkes
     kvelden etter, så et nytt forsøk samme kveld fortsatt kan hente den.
-    Radene i vurdering står (AD-7). Gir linjene til utskriften."""
+    Gjennomgangen (BH5): en aksje som aldri ble forsøkt, tas ikke ut. Radene i
+    vurdering står (AD-7). Gir linjene til utskriften."""
     dag = dato.isoformat()
     linjer = []
     with tilkobling:
-        for symbol, inn in tilkobling.execute(
-            "SELECT symbol, inn FROM aksje WHERE inn IS NOT NULL AND inn < ? AND ut IS NULL "
-            "AND NOT EXISTS (SELECT 1 FROM kurs WHERE kurs.symbol = aksje.symbol)",
+        for (symbol,) in tilkobling.execute(
+            "SELECT symbol FROM aksje WHERE inn IS NOT NULL AND inn < ? AND ut IS NULL "
+            "AND NOT EXISTS (SELECT 1 FROM kurs WHERE kurs.symbol = aksje.symbol) "
+            "AND EXISTS (SELECT 1 FROM vurdering v WHERE v.symbol = aksje.symbol AND v.dato >= aksje.inn)",
             (dag,),
         ).fetchall():
             if symbol not in egne_i_lista(tilkobling):
                 continue
             tilkobling.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", (dag, symbol))
             tilkobling.execute(
-                "UPDATE oenske SET tatt_i_bruk = NULL, avvist = ? WHERE symbol = ? AND handling = 'folg' "
-                "AND tatt_i_bruk = ?",
-                (f"{dag}: ga ingen kurser", symbol, inn),
+                "UPDATE oenske SET avvist = ? WHERE id = (SELECT max(id) FROM oenske WHERE symbol = ? "
+                "AND handling = 'folg' AND tatt_i_bruk IS NOT NULL)",
+                (f"{dag}: ga ingen kurser", symbol),
             )
             linjer.append(f"{symbol} ga ingen kurser etter at den ble valgt, og er tatt ut av lista igjen.")
     return linjer

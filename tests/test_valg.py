@@ -62,6 +62,8 @@ class TestValget:
             l.folg("NYD", "Kraft")
 
     def test_et_bytte_gaar_ogsaa_med_full_liste(self, tmp_path):
+        """Ville feilet hvis et bytte ble avvist med full liste: det endrer
+        ikke antallet."""
         base = tmp_path / "ose.db"
         med_boersen(base)
         l = lager(base)
@@ -218,7 +220,10 @@ class TestSidene:
         side = klient.get("/folg?q=ny").data.decode("utf-8")
         assert "Ny Aksje ASA" in side
         bekreft = klient.get("/folg?kode=NYA").data.decode("utf-8")
-        assert "Følge Ny Aksje ASA?" in bekreft and "Omsetningen er ikke målt ennå." in bekreft
+        assert (
+            "Følge Ny Aksje ASA?" in bekreft
+            and "Omsetningen er ikke målt ennå, så den merkes «Utenfor målingen»." in bekreft
+        )
         svar = klient.post("/folg", data={"kode": "NYA", "sektor": "Kraft"})
         assert svar.status_code == 303
         side = klient.get("/").data.decode("utf-8")
@@ -228,7 +233,8 @@ class TestSidene:
         """Spørsmål 4 og NFR-06: ingen bransje foreslås, og uten bransje avvises valget."""
         bekreft = klient.get("/folg?kode=NYA").data.decode("utf-8")
         assert '<option value="">Velg bransje</option>' in bekreft and "selected" not in bekreft
-        assert klient.post("/folg", data={"kode": "NYA", "sektor": ""}).status_code == 400
+        svar = klient.post("/folg", data={"kode": "NYA", "sektor": ""})
+        assert svar.status_code == 303 and "feil=" in svar.headers["Location"]
 
     def test_full_liste_sier_det(self, klient):
         for kode, _ in BOERSEN[:3]:
@@ -236,7 +242,7 @@ class TestSidene:
         side = klient.get("/").data.decode("utf-8")
         assert "Lista er full. Fjern en aksje for å følge en annen." in side and 'href="/folg"' not in side
         svar = klient.post("/folg", data={"kode": "NYD", "sektor": "Kraft"})
-        assert svar.status_code == 400
+        assert svar.status_code == 303 and "feil=Lista+er+full" in svar.headers["Location"]
 
     def test_din_egen_liste_i_min_liste(self, klient):
         """Utdraget §2: ville feilet hvis kallene ikke ble regnet av lista."""
@@ -289,3 +295,143 @@ def test_demoen_virker_likt(tmp_path, monkeypatch):
     side = klient.get("/").data.decode("utf-8")
     assert "1 egne · 16 av 18 aksjer i lista" in side
     assert "Venter på henting i kveld etter kl. 22." in side and "Demoen henter ingenting" in side
+
+
+class TestEtterGjennomgangen:
+    """Funnene fra gjennomgangen av 2.12."""
+
+    def test_angre_et_oenske_om_aa_fjerne_kan_ikke_gi_19(self, tmp_path):
+        """BH1, ECH1, VG1 (høy): ville feilet hvis lista kunne få 19 aksjer ved
+        å angre et ønske om å fjerne."""
+        base = tmp_path / "ose.db"
+        med_boersen(base)
+        l = lager(base)
+        l.fjern("DNB")
+        for kode, _ in BOERSEN:
+            l.folg(kode, "Kraft")
+        assert l.antall() == 18
+        fjern = next(o for o in l.ventende() if o.handling == "fjern")
+        with pytest.raises(ListaErFull):
+            l.angre(fjern.id)
+        assert l.antall() == 18
+
+    def test_et_bytte_angres_helt(self, tmp_path):
+        """BH3, ECH2: ville feilet hvis bare den ene halvdelen av et bytte ble angret."""
+        base = tmp_path / "ose.db"
+        med_boersen(base)
+        l = lager(base)
+        l.folg("NYA", "Kraft", bytt_ut="DNB")
+        folg = next(o for o in l.ventende() if o.handling == "folg")
+        l.angre(folg.id)
+        assert l.ventende() == []
+
+    def test_hentingen_tar_aldri_inn_mer_enn_18(self, tmp_path):
+        """BH1, VG1: ville feilet hvis ønskene kunne gi mer enn 18 i aksje."""
+        base = tmp_path / "ose.db"
+        med_boersen(base)
+        tilkobling = aapne_base(base)
+        try:
+            for kode, navn in BOERSEN:
+                tilkobling.execute(
+                    "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, 'Kraft', 'x')",
+                    (kode, navn),
+                )
+            tilkobling.commit()
+            linjer = valg.ta_i_bruk(tilkobling, TIRSDAG_22_09)
+            assert tilkobling.execute("SELECT count(*) FROM aksje WHERE ut IS NULL").fetchone()[0] == 18
+            assert any("lista har alt 18 aksjer" in linje for linje in linjer)
+        finally:
+            tilkobling.close()
+
+    def test_en_aksje_med_rader_samme_dag_slettes_ikke(self, stier):
+        """BH4, ECH4 (AD-7): ville feilet hvis hentingen slettet en aksje med
+        kurser, eller alle ønskene ble rullet tilbake."""
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        med_boersen(base)
+        tilkobling = aapne_base(base)
+        try:
+            tilkobling.execute("INSERT INTO oenske (handling, symbol, laget) VALUES ('fjern', 'DNB', 'x')")
+            tilkobling.commit()
+            valg.ta_i_bruk(tilkobling, TIRSDAG_22_09)
+            assert tilkobling.execute("SELECT ut FROM aksje WHERE symbol = 'DNB'").fetchone()[0] == "2026-09-23"
+            assert tilkobling.execute("SELECT count(*) FROM vurdering WHERE symbol = 'DNB'").fetchone()[0] == 1
+        finally:
+            tilkobling.close()
+
+    def test_soeket_tar_prosent_som_et_tegn(self, tmp_path):
+        """ECH6: ville feilet hvis % ga alle aksjene."""
+        base = tmp_path / "ose.db"
+        med_boersen(base)
+        assert lager(base).sok("%") == []
+
+    def test_rutene_skriver_bare_oensket(self, klient, stier):
+        """VG8, BH11: ville feilet hvis /folg, /fjern eller /angre skrev i
+        aksje, kurs eller vurdering."""
+        _, base = stier
+
+        def tellinger():
+            t = aapne_base(base)
+            try:
+                return [
+                    t.execute(f"SELECT count(*) FROM {tab}").fetchone()[0] for tab in ("aksje", "kurs", "vurdering")
+                ]
+            finally:
+                t.close()
+
+        foer = tellinger()
+        klient.post("/folg", data={"kode": "NYA", "sektor": "Kraft"})
+        klient.post("/fjern", data={"symbol": "DNB"})
+        klient.post("/folg", data={"kode": "NYB", "sektor": "Helse", "bytt": "EQNR"})
+        assert tellinger() == foer
+
+    @pytest.mark.parametrize("sti, data", [("/fjern", {"symbol": "DNB"}), ("/angre", {"id": "1"})])
+    def test_en_annen_side_kan_ikke_fjerne_eller_angre(self, klient, sti, data):
+        assert klient.post(sti, data=data, headers={"Origin": "https://annen.no"}).status_code == 403
+
+    def test_bytte_fra_min_liste(self, klient):
+        """VG11: ville feilet hvis byttet sa et annet antall enn lista har."""
+        side = klient.get("/folg?kode=NYA&bytt=DNB").data.decode("utf-8")
+        assert "Bytt ut DNB Bank" in side and "Etter byttet er Ny Aksje ASA en av de 15" in side
+        assert klient.post("/folg", data={"kode": "NYA", "sektor": "Kraft", "bytt": "DNB"}).status_code == 303
+        assert "Fjernes ved hentingen i kveld etter kl. 22." in klient.get("/min-liste").data.decode("utf-8")
+
+    def test_kalltallene_paa_siden(self, klient):
+        """VG4: ville feilet hvis tallene i dialogen var regnet feil i malen."""
+        side = klient.get("/folg?kode=NYA").data.decode("utf-8")
+        assert "Siste henting brukte 16 av 20 kall. Med denne bruker neste henting 17, og 3 er igjen" in side
+
+    def test_en_aksje_i_lista_kan_ikke_foelges_igjen(self, klient, stier):
+        """ECH11: ville feilet hvis siden viste «Følge …?» for en aksje i lista."""
+        med_boersen(stier[1], [("DNB", "DnB ASA")])
+        side = klient.get("/folg?kode=DNB").data.decode("utf-8")
+        assert "er alt i lista" in side and "Følg aksjen" not in side
+
+    def test_en_feil_beholder_byttet(self, klient):
+        """BH9, ECH9: ville feilet hvis en avvist forespørsel mistet byttet."""
+        klient.post("/fjern", data={"symbol": "DNB"})
+        svar = klient.post("/folg", data={"kode": "NYA", "sektor": "Kraft", "bytt": "DNB"})
+        assert (
+            svar.status_code == 303
+            and "bytt=DNB" in svar.headers["Location"]
+            and "kode=NYA" in svar.headers["Location"]
+        )
+
+
+def test_en_egen_aksje_staar_i_tabellen_med_merket(stier, monkeypatch):
+    """VG5 og utdraget §1: ville feilet hvis en egen aksje sto uten merket
+    «Egen» i tabellen etter hentingen, eller manglet i «Dine egne aksjer»."""
+    raa, base = stier
+    kjoer_23(raa, base, OEYEBLIKK_22_09 - timedelta(days=1))
+    med_boersen(base)
+    l = lager(base)
+    l.folg("NYA", "Kraft")
+    l._t.close()
+    kjoer_23(raa, base, OEYEBLIKK_22_09)
+    monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
+    monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 9, 23, 12, 0).astimezone())
+    app_modul.app.config["TESTING"] = True
+    side = app_modul.app.test_client().get("/").data.decode("utf-8")
+    assert '<a href="/aksje/NYA">Ny Aksje ASA</a> <span class="egenmerke">Egen</span>' in side
+    assert "Hentet. Står i tabellen over." in side and "1 egne · 16 av 18 aksjer i lista" in side
+    assert 'class="utenformerke" title="Omsetningen er ikke målt ennå.' in side

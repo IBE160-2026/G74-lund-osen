@@ -621,7 +621,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Lista kan ha opptil 18 aksjer, og aksjer du følger selv, står i tabellen sammen med de andre, merket "
             "«Egen». En ny aksje hentes ved neste henting om kvelden og bruker da 1 kall om dagen, og fjerner du den før det, "
             "brukes ingen kall; valget lagres på denne maskinen. Signalet er målt på aksjer som omsettes for over "
-            "32 MNOK om dagen, og omsettes aksjen mindre, merkes den «Utenfor målingen».",
+            "32 MNOK om dagen, og omsettes aksjen mindre, eller er omsetningen ikke målt, merkes den «Utenfor målingen».",
             (
                 (VALG, "TAK = 18"),
                 (VALG, "GRENSE_MNOK = 32.0"),

@@ -31,6 +31,8 @@ CREATE TABLE oenske (
     laget TEXT NOT NULL,
     tatt_i_bruk TEXT,
     avvist TEXT,
+    -- Et bytte er to oensker som peker paa hverandre, saa de angres sammen.
+    par INTEGER,
     CHECK ((handling = 'folg') = (navn IS NOT NULL AND sektor IS NOT NULL)),
-    CHECK (tatt_i_bruk IS NULL OR avvist IS NULL)
+    CHECK (tatt_i_bruk IS NULL OR avvist IS NULL OR handling = 'folg')
 );

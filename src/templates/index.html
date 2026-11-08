@@ -49,7 +49,7 @@
               {#- Story 2.12 (utdraget 08.11 §1): en egen aksje står sammen med
                   de andre, med merket «Egen», og «Utenfor målingen» i grått. #}
               {%- if egne and rad.aksje.symbol in egne.symboler %} <span class="egenmerke">Egen</span>{% endif %}
-              {%- if egne and rad.aksje.symbol in egne.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}
+              {%- if rad.aksje.symbol in utenfor %} <span class="utenformerke" title="{{ utenfor[rad.aksje.symbol] }}">Utenfor målingen</span>{% endif %}
               {#- Avvik 11: ticker og bransje med symbol under navnet. #}
               <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
               {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}

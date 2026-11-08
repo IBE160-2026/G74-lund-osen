@@ -1169,3 +1169,8 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .feil, :where(.side-oversikt) .full { color: var(--ned); font-weight: 600; }
 :where(.side-oversikt) .bytt-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 24px; }
 :where(.side-oversikt) .bytt-lista .knapp { margin-left: auto; min-height: 36px; }
+/* Story 2.12 (gjennomgangen, VG2): «Utenfor målingen» på aksjesiden og i
+   børsometeret, i grått. */
+:where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
+:where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+                                    color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
