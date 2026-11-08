@@ -323,6 +323,8 @@ class TestRammen:
                     href in ("/", "/min-liste", "/min-liste?vis=alle")
                     # Story 8.6: børsometeret, fra knappen i stripa.
                     or href == "/boersometer"
+                    # Story 8.11: filteret på signalet, med resten av adressen.
+                    or re.fullmatch(r"/(min-liste)?\?([a-z]+=[A-Za-z0-9-]+&amp;)*signal=(positiv|negativ)", href)
                     # Story 2.12: «Følg en aksje» og «Bytt ut».
                     or re.fullmatch(r"/folg(\?bytt=[A-Z0-9-]+)?", href)
                     # Story 10.5: lenken til investorsiden for aksjen.

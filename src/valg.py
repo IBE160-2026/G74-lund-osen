@@ -235,6 +235,36 @@ class Valglager:
                 ).lastrowid
                 self._t.execute("UPDATE oenske SET par = ? WHERE id = ?", (fjern_id, folg_id))
 
+    def bruk_liste(self, aksjer: list[tuple[str, str]]) -> None:
+        """Story 8.11: en ferdig liste, [(kode, bransje)], blir lista ved
+        neste henting. Ønskene som venter, slettes (de er ikke tatt i bruk),
+        hver aksje i lista som ikke er i den ferdige, får et ønske om å
+        fjernes, og hver i den ferdige som ikke er i lista, et ønske om å
+        følges. Alt i én transaksjon med skrivelås, så lista aldri får mer
+        enn TAK (spørsmål 2 i spec-8-11-ferdige-lister.md)."""
+        if len(aksjer) > TAK or len({k for k, _ in aksjer}) != len(aksjer):
+            raise ListaErFull("En ferdig liste har opptil 18 aksjer.")
+        laget = self._klokke().isoformat()
+        with self._laas():
+            self._t.execute("DELETE FROM oenske WHERE tatt_i_bruk IS NULL AND avvist IS NULL")
+            lista = [a.symbol for a in self.i_lista()]
+            maal = {k for k, _ in aksjer}
+            for symbol in lista:
+                if symbol not in maal:
+                    self._t.execute(
+                        "INSERT INTO oenske (handling, symbol, laget) VALUES ('fjern', ?, ?)", (symbol, laget)
+                    )
+            for kode, sektor in aksjer:
+                if kode in lista:
+                    continue
+                aksje = self.boersaksje(kode)
+                if aksje is None or sektor not in BRANSJENE:
+                    raise UgyldigValg("en aksje i lista står ikke i lista over Oslo Børs")
+                self._t.execute(
+                    "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, ?, ?)",
+                    (kode, aksje.navn, sektor, laget),
+                )
+
     def _kan_fjernes(self, symbol: str) -> None:
         if symbol not in {a.symbol for a in self.i_lista()}:
             raise UgyldigValg("aksjen er ikke i lista")

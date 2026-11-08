@@ -242,6 +242,16 @@
     </div>
 
   {% endif %}
+  {#- Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
+      lista som vises. #}
+  {% if rader %}
+    <nav class="signalfilter" aria-label="Filter på signalet">
+      {% for tekst, adresse, er_aktiv in filterlenker %}<a class="visknapp" href="{{ adresse }}"{% if er_aktiv %} aria-current="true"{% endif %}>{{ tekst }}</a>{% endfor %}
+    </nav>
+    {% if signalfilter %}
+      <p class="filtertekst">Bare aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }}, {{ signalfilter }}. Filteret viser hva sjekkene ga, og er ikke et råd om å kjøpe eller selge.{% if not (skilte_seg_ut or oevrige or sortert) %} Ingen av aksjene her fikk det.{% endif %}</p>
+    {% endif %}
+  {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
         8.2a, e: tabellen er da én liste, ikke sortert innenfor hver del. #}
