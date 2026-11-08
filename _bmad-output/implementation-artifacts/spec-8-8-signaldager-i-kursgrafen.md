@@ -87,3 +87,5 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 ## Bygget og ikke flettet
 
 Grenen `8-8-signaldager-i-kursgrafen` er ikke flettet. Den er bygget fra main og står alene.
+
+*Svar 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spørsmål 1–4 er godtatt, og rådet anbefalte det. Ingen funn på middels eller over står åpne. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
