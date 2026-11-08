@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5i): installasjonen i docs/installasjon.md, og «Kom i gang» med de fem stegene'
 type: 'docs'
 created: '2026-11-08'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '958c27a3'
@@ -109,3 +109,5 @@ Gjennomgang 08.11 av diffen `643d32cd..059a0ea9` (grenen etter flettingen av mai
 **Spørsmål til gruppen etter gjennomgangen:** BH1: skal lenken «Den ekte versjonen» i demoen gå til `docs/installasjon.md#den-ekte-versjonen` (stegene 5–9 med Docker), med nye bilder i `docs/appen/` og ECH7 og BH16 samtidig, i en egen PR? Forslag: ja, i en egen PR etter denne. Til da lander lenken på linja om den ekte versjonen i README-en, som lenker videre.
 
 *Svar 2026-11-08 kl. 12:57 (gruppens svar):* BH1 lukkes. Lenken «Den ekte versjonen» i demoen beholdes som den er, fordi dobbeltklikket er hovedveien. Rådet anbefalte det. Det blir ingen egen PR for lenken, og ECH7 og BH16 står fortsatt i `issues.md`. Med det står ingen funn på middels eller over åpne. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
+
+*Lagt til 2026-11-08:* 3.5i er flettet med PR #121 i `17b940ef` kl. 13:06, låst til head-en `53f56638`, etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`. CI var grønn på head-en (run 42478404253), med 4566 bestått og 31 hoppet over i jobben `pytest`. Hele settet lokalt på grenen: 4573 bestått, 24 hoppet over og 0 feilet tre ganger, siste før `4d1656f7`. BH1 er lukket med gruppens svar kl. 12:57. VG2 (raden D7 og innledningen til §9 i `docs/kvalitetssikring.md`) og VG3 (morgensjekken) tas på main etter flettingen.

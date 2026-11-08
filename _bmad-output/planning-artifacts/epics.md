@@ -2629,6 +2629,8 @@ Resten ryddes etter alle testene.
 
 *Lagt til 2026-10-30 kl. 12:55:* 3.5h, «Til faglærer» med fire punkter og BH4, BH7 og BH9 fra 3.5g, er squash-flettet i `a3e6057`, PR #107, låst til head-en `83c9bbf` (spesifikasjonen `spec-3-5h-til-faglaerer.md`), med CI 41051154071 grønn. a, b og d er gjort, og c står som før.
 
+*Lagt til 2026-11-08:* 3.5i er flettet med PR #121 i `17b940ef` kl. 13:06, låst til head-en `53f56638`, etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`. CI var grønn på head-en (run 42478404253), med 4566 bestått og 31 hoppet over i jobben `pytest`. Hele settet lokalt på grenen: 4573 bestått, 24 hoppet over og 0 feilet tre ganger, siste før `4d1656f7`. BH1 er lukket med gruppens svar kl. 12:57. VG2 (raden D7 og innledningen til §9 i `docs/kvalitetssikring.md`) og VG3 (morgensjekken) tas på main etter flettingen. Story 3.5i er done.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
