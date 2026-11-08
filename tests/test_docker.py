@@ -1245,7 +1245,12 @@ HOEYDE_PAA_BILDET = 1864
 # byte de samme.
 # Flettingen av main (10.6) inn i 2.11: avtrykkene er regnet ut paa nytt. Alle bildene ble
 # tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "ada777b846f4513225c0d8d5dfaf1a4621aed78951227c06a6d540e34ad76839"
+# Story 8.8: prikkene for signaldagene i kursgrafen (aksje.html, graf.py, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden er ny og 2258 px hoey;
+# de andre er byte for byte de samme.
+# Flettingen av main (2.11 og 10.6) inn i 8.8: avtrykkene er regnet ut paa nytt. Alle
+# bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+AVTRYKK_BAK_BILDET = "c9b078b09c70d419543807b8b579860ddcbd1cb4a9f75a74e32ea912e58fdb4b"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1621,7 +1626,12 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # byte de samme.
 # Flettingen av main (10.6) inn i 2.11: avtrykkene er regnet ut paa nytt. Alle bildene ble
 # tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "c9f290357e00108a9636cf6b091f3fc2354343c23faeeab8a52a610efed48094"
+# Story 8.8: prikkene for signaldagene i kursgrafen (aksje.html, graf.py, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden er ny og 2258 px hoey;
+# de andre er byte for byte de samme.
+# Flettingen av main (2.11 og 10.6) inn i 8.8: avtrykkene er regnet ut paa nytt. Alle
+# bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+AVTRYKK_BAK_AKSJESIDEN = "05868261a445e8ad5d2a54b8e389db7f378f6f7364f670a31978f1feb4584ab8"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1728,12 +1738,17 @@ DE_NYE_BILDENE = {
 # byte de samme.
 # Flettingen av main (10.6) inn i 2.11: avtrykkene er regnet ut paa nytt. Alle bildene ble
 # tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# Story 8.8: prikkene for signaldagene i kursgrafen (aksje.html, graf.py, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden er ny og 2258 px hoey;
+# de andre er byte for byte de samme.
+# Flettingen av main (2.11 og 10.6) inn i 8.8: avtrykkene er regnet ut paa nytt. Alle
+# bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "ada777b846f4513225c0d8d5dfaf1a4621aed78951227c06a6d540e34ad76839",
-    "docs/appen/boersometeret-demo.png": "6d06a89fb40d2ee2e4ac8743b2b930e52a06eb57340d2d21818833f92338d437",
-    "docs/appen/min-liste-demo.png": "58d69ee00679d966202ccd4a071995e04eca84073d765061618dd63011791fc3",
-    "docs/appen/oversikten-390-demo.png": "ada777b846f4513225c0d8d5dfaf1a4621aed78951227c06a6d540e34ad76839",
-    "docs/appen/boersometeret-390-demo.png": "6d06a89fb40d2ee2e4ac8743b2b930e52a06eb57340d2d21818833f92338d437",
+    TOPPEN_AV_OVERSIKTEN: "c9b078b09c70d419543807b8b579860ddcbd1cb4a9f75a74e32ea912e58fdb4b",
+    "docs/appen/boersometeret-demo.png": "f1a8772f949daebe13851ba9b01d4254d46a6b12e792791791e5ee6de2a2e4d9",
+    "docs/appen/min-liste-demo.png": "bf4afee04419d7e011d34ce0a4f63f6b8e7e5968cf1e94c0b64b602c4c7c22df",
+    "docs/appen/oversikten-390-demo.png": "c9b078b09c70d419543807b8b579860ddcbd1cb4a9f75a74e32ea912e58fdb4b",
+    "docs/appen/boersometeret-390-demo.png": "f1a8772f949daebe13851ba9b01d4254d46a6b12e792791791e5ee6de2a2e4d9",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

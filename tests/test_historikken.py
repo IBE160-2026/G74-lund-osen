@@ -468,7 +468,10 @@ class TestLesingen:
         monkeypatch.setattr(SqliteVurderingslager, "les", lambda *a: pytest.fail("les per dag"))
         _side(klient, f"/aksje/{SYMBOL}")
         maaneden = (SYMBOL, date(2026, 10, 1), date(2026, 10, 31))
-        assert sorted(kall) == [(SYMBOL, date.min, date(2026, 10, 9)), maaneden], kall
+        # Story 8.8: og én lesing til, for signaldagene i kursgrafen, også
+        # den for hele perioden, aldri dag for dag.
+        dagene = (SYMBOL, date.min, date(2026, 10, 9))
+        assert sorted(kall) == [dagene, dagene, maaneden], kall
 
 
 class TestVurderKallesIkke:

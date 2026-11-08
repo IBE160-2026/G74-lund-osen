@@ -140,7 +140,7 @@ from perioder import MIN_LISTE as MIN_LISTE_VALG
 from perioder import OVERSIKTEN as OVERSIKTEN_VALG
 from signalberegning import BLANDET, STANDARD
 from tallformat import avrundet, dato, med_og, tall, ukedag
-from vurderingsdata import Grunn
+from vurderingsdata import Grunn, Vurdering
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -1195,10 +1195,13 @@ def aksjedetalj(symbol: str):
 
     # Story 8.2c: den brede og den smale grafen av de samme valgene
     # (gjennomgangen, BH6).
+    signal, signal_fra = _signaldagene(post, rader)
     grafvalg = dict(
         indeks=indeks,
         merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
         merket=dagen.dato if dagen else None,
+        signal=signal,
+        alle=ANTALL_SJEKKER,
     )
     svar = app.make_response(
         render_template(
@@ -1210,6 +1213,8 @@ def aksjedetalj(symbol: str):
             # Story 8.2c: den samme grafen med egne mål, som stilarket viser
             # i stedet når figuren er smal.
             graf_smal=bygg_graf(detalj.punkter, smal=True, **grafvalg),
+            # Story 8.8: dagen markeringene starter.
+            signal_fra=signal_fra,
             valg=valg,
             dagen=dagen,
             # Story 8.16b: merket øverst bare for en dag før siste børsdag.
@@ -1265,6 +1270,29 @@ def demoselskap(symbol: str):
         abort(404)
     # Spørsmål 9: stripa som på aksjesiden, uten en fylt knapp.
     return render_template("investorside.html", side=side, aktiv="aksje")
+
+
+def _signaldagene(post, rader) -> tuple[dict[date, tuple[int, str]], date | None]:
+    """Story 8.8 (FR-206): dagene aksjen skilte seg ut, {dato: (styrke,
+    retning)}, og dagen den første raden i vurdering er fra, med vurdering
+    eller grunn. Lest med les_periode fra 2.7, aldri regnet av kursene
+    (AD-7). En dag med grunn eller uten rad er ikke med. Kan vurderingene
+    ikke leses, er det ingen markeringer, og grafen vises som før."""
+    if not rader:
+        return {}, None
+    try:
+        lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
+        radene = lager.les_periode(post.aksje.symbol, date.min, rader[-1].dato)
+    except (*BASEFEIL, ValueError):
+        return {}, None
+    if not radene:
+        return {}, None
+    signal = {
+        dag: (rad.styrke, rad.retning)
+        for dag, rad in radene.items()
+        if isinstance(rad, Vurdering) and rad.styrke >= STANDARD.terskel
+    }
+    return signal, min(radene)
 
 
 def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
