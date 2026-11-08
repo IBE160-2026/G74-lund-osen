@@ -42,7 +42,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
-| Klar | Med en gang | Etter første henting, når som helst. Før kl. 22 på en børsdag gir den forrige børsdag, og samme dag etter kl. 22 trengs bonuskvote hos EODHD, ellers får dagen aldri signal |
+| Klar | Med en gang | Etter første henting, som kan startes når som helst. Før kl. 22 på en børsdag henter den forrige børsdag, og dagens kurser etter kl. 22 trenger da bonuskvote hos EODHD |
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](docs/installasjon.md#med-docker-desktop) ([demoen](docs/installasjon.md#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
@@ -79,14 +79,14 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Ferdig**
 
-- De tre sjekkene, trend, bevegelse og interesse, og styrken for hver aksje hver børsdag, med regelforklaringen på aksjesiden
+- De tre sjekkene, trend, bevegelse og interesse, styrken for hver aksje hver børsdag, også fra 2027, og regelforklaringen på aksjesiden
 - Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
-- Oversikten og utseendet fra designforslaget, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
+- Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Periodevalget på alle sidene, og hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Vis dagen», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
 - Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene «Markedsoversikt», «Børsometer» og «Min liste» øverst
-- KI-teksten fra en lokal modell på aksjesiden eller med egen nøkkel, med bryter, og bare tekster som besto kontrollen
-- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene og KI-tekst laget med Gemma
+- KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
+- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 
 **Neste i v1**
 
@@ -109,7 +109,7 @@ Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis 
 Testene kjøres med [uv](https://docs.astral.sh/uv/), uten Docker. Har du ikke uv, står installasjonen bak pila under.
 
 <details>
-<summary>Installere uv, og når uv ikke blir funnet</summary>
+<summary>Har du ikke uv? Slik installerer du den</summary>
 
 **På en ren maskin uten Docker** trenger du bare [uv](https://docs.astral.sh/uv/). Appen krever Python 3.13 eller nyere (`requires-python` i `pyproject.toml`), og uv henter den hvis maskinen ikke har den. Installer uv først, etter [fremgangsmåten hos uv](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -125,7 +125,7 @@ Mac (Terminal):
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i steg 4 med Docker.
+Blir `uv` ikke funnet etterpå («The term 'uv' is not recognized» eller «command not found: uv»), lukker du vinduet, åpner et nytt og går til mappa, som i [steg 4 med Docker](docs/installasjon.md#med-docker-desktop) i installasjonen.
 
 </details>
 
@@ -139,23 +139,39 @@ uv sync
 uv run pytest
 ```
 
-Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 5 og 10 minutter på maskinen vår 20.10.
+Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 10 og 14 minutter på maskinen vår 08.11.
 
-Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.
+Alle testene skal bestå. Noen hoppes over fordi de gjelder en annen type maskin, men alle kjøres minst ett sted.
 
 <details>
-<summary>Hvorfor hoppes noen over?</summary>
+<summary>Hvilke tester hoppes over, og hvorfor?</summary>
 
-Noen hoppes over, med grunnen i utskriften når du legger til `-rs`: på Windows testene som bytter tidssone, fordi `time.tzset` ikke finnes der (de kjøres i CI), og testen for Unix-sokler, som Python på Windows ikke har. På en maskin uten IPv6 (`::1`) hoppes testen for den over. I en mappe fra ZIP-fila, uten git, hoppes også testene som sjekker hva som er sporet i git, over.
+Grunnen står i utskriften når du legger til `-rs`.
+
+**På Windows**, som PC-en vår: testene som bytter tidssone, fordi `time.tzset` ikke finnes der, testen for Unix-sokler, som Python på Windows ikke har, og testene for `start.sh`, skriptet bak dobbeltklikket på Mac, som krever bash, `lsof` og `ps`. De kjøres i CI ved hver push.
+
+**På Linux og Mac:** testene for dobbeltklikket og kveldshentingen på Windows, som krever Windows PowerShell. De kjøres på PC-en vår før hver commit som endrer koden eller testene, og porten og kveldshentingen også i CI på Windows ved hver push.
+
+**På alle maskiner, når noe mangler:**
+
+- Uten Edge eller Chrome hoppes testene som åpner sidene i en nettleser, over. I CI feiler de i stedet.
+- Uten IPv6 (`::1`) hoppes testen for den over.
+- I en mappe fra ZIP-fila, uten git, hoppes testene som sjekker hva som er sporet i git, over.
+- Er port 8000 i bruk, hoppes testene som starter appen på den porten, over.
+
+De kjøres på PC-en vår før hver commit som endrer koden eller testene, og i CI ved hver push.
 
 </details>
 
-Slik er testene satt opp:
+<details>
+<summary>Slik er testene satt opp: ingen nettkall, ingen ekte data og CI ved hver push</summary>
 
 - Ingen nettkall: `tests/conftest.py` sperrer nettverket i hver test.
 - `data/` røres ikke: testene bruker en midlertidig mappe.
 - CI kjører på hver push og pull request mot `main`, uten hemmeligheter og uten API-nøkkel.
 - ruff kjøres før en commit: `uv run ruff check --fix`, som også sorterer importene, og så `uv run ruff format`. Reglene står i `pyproject.toml`: pyflakes, importene og bugbear, som finner feil og rot, ikke smak. CI kjører `ruff check` og `ruff format --check` før testene, og `tests/test_ruff.py` gjør det samme, så `uv run pytest` feiler hvis noe er glemt.
+
+</details>
 
 Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan KI-generert kode kvalitetssikres, og alt står i [`docs/kvalitetssikring.md`](docs/kvalitetssikring.md).
 
@@ -207,7 +223,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/`](docs/) — arbeidsprosessen, [`docs/installasjon.md`](docs/installasjon.md) med Docker, uv og resten av installasjonen, og [`docs/hjelp.md`](docs/hjelp.md) med spørsmål og svar til «Kom i gang»
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i [`docs/installasjon.md`](docs/installasjon.md): [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
-- [`docs/skisser/2026-11-06/`](docs/skisser/2026-11-06/) — skissene av aksjesiden og børsometeret laget av KI i chatten 06.11, etter gruppens gjennomgang, med oppdiktede selskaper og tall: fem PNG-er og [`docs/skisser/2026-11-06/LESMEG.md`](docs/skisser/2026-11-06/LESMEG.md) med svarene de bygger på. Ikke bygget
+- [`docs/skisser/2026-11-06/`](docs/skisser/2026-11-06/) — skissene av aksjesiden og børsometeret laget av KI i chatten 06.11, etter gruppens gjennomgang, med oppdiktede selskaper og tall: fem PNG-er og [`docs/skisser/2026-11-06/LESMEG.md`](docs/skisser/2026-11-06/LESMEG.md) med svarene de bygger på. Bygget 07.11 i 8.20a, 8.20b og 3.4h
 - [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png) og [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken

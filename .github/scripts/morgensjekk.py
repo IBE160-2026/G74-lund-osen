@@ -271,14 +271,18 @@ igjen = (BRIEF_FRIST - IDAG).days
 print(f"  innleveringsfrist {BRIEF_FRIST:%d.%m}: "
       + (f"{igjen} dager igjen" if igjen > 0 else "i dag" if igjen == 0 else "passert, briefen skal ikke endres"))
 
-# 8. README-lenkene (samme logikk som tests/test_readme.py)
+# 8. Lenkene i README-en og i docs/installasjon.md, at fila finnes (samme
+# logikk som tests/test_readme.py, som ogsaa sjekker ankrene). Story 3.5i
+# (VG3): installasjonen staar i docs/, saa stiene der regnes fra docs/.
 print("\n== 8 README-LENKENE")
-readme = les("README.md") or ""
-lenker = re.findall(r"\]\(([^)\s]+)\)", readme)
-lokale = [l for l in lenker if not l.startswith(("http://", "https://", "mailto:", "#"))]
-brutt = [l for l in lokale if not (REPO / l.split("#", 1)[0]).exists()]
-print(f"  {len(lokale)} lokale lenker, {len(brutt)} peker paa noe som ikke finnes"
-      + (f": {brutt}" if brutt else ""))
+for navn in ("README.md", "docs/installasjon.md"):
+    tekst = les(navn) or ""
+    mappe = (REPO / navn).parent
+    lenker = re.findall(r"\]\(([^)\s]+)\)", tekst)
+    lokale = [l for l in lenker if not l.startswith(("http://", "https://", "mailto:", "#"))]
+    brutt = [l for l in lokale if not (mappe / l.split("#", 1)[0]).exists()]
+    print(f"  {navn}: {len(lokale)} lokale lenker, {len(brutt)} peker paa noe som ikke finnes"
+          + (f": {brutt}" if brutt else ""))
 
 # 9. Lekkasjesjekk: filer som ikke skal vaere der, og noekler i innhold
 print("\n== 9 LEKKASJESJEKK")

@@ -270,6 +270,32 @@ def test_lekkasjesjekken_unntar_ikke_agents():
     assert ".agents" not in kilde
 
 
+def test_morgensjekken_sjekker_lenkene_i_installasjonen(tmp_path, capsys):
+    """Story 3.5i (VG3), instruksjonen 08.11 kl. 13:00. Kjoerer del 8 av
+    morgensjekken mot en midlertidig mappe. Ville feilet hvis morgensjekken
+    bare sjekket lenkene i README-en, eller regnet stiene i
+    docs/installasjon.md fra rota i stedet for fra docs/."""
+    kilde = (ROT / ".github" / "scripts" / "morgensjekk.py").read_text(encoding="utf-8")
+    del_8 = "# " + kilde.split("\n# 8. ", 1)[1].split("\n# 9. ", 1)[0]
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[Installasjonen](docs/installasjon.md)\n", encoding="utf-8")
+    (tmp_path / "docs" / "hjelp.md").write_text("", encoding="utf-8")
+    (tmp_path / "docs" / "installasjon.md").write_text(
+        "[Hjelp](hjelp.md#steg) [README](../README.md) [Borte](borte.md) [Anker](#x)\n", encoding="utf-8"
+    )
+
+    def les(rel):
+        p = tmp_path / rel
+        return p.read_text(encoding="utf-8") if p.is_file() else None
+
+    exec(del_8, {"re": re, "REPO": tmp_path, "les": les})
+    linjer = [l.strip() for l in capsys.readouterr().out.splitlines() if l.strip()]
+    assert linjer[1:] == [
+        "README.md: 1 lokale lenker, 0 peker paa noe som ikke finnes",
+        "docs/installasjon.md: 3 lokale lenker, 1 peker paa noe som ikke finnes: ['borte.md']",
+    ], linjer
+
+
 NEXTJS = [".next/", "out/", ".vercel/", ".turbo/", "*.tsbuildinfo", "next-env.d.ts"]
 NODE_LOGGER = ["npm-debug.log*", "yarn-debug.log*", "yarn-error.log*", ".pnpm-debug.log*"]
 ENGELSKE_OVERSKRIFTER = [

@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-08T13:08
+updated: 2026-11-08T13:11
 ---
 
 # Kvalitetssikring
@@ -915,6 +915,8 @@ prøver. Det som står over, gjelder fortsatt commit `3803b4d`.
 Kommandoene står i den rekkefølgen «Kom i gang» i [`README.md`](../README.md)
 har dem. Endres README-en før prøven, rettes lista her i samme commit.
 
+*Rettet 2026-11-08 (story 3.5i, VG2 og VG3, instruksjonen kl. 13:00):* fra 3.5i står stegene med Docker og uv, linja «Linux» og resten av det som sto i «Kom i gang», ordrett i [`docs/installasjon.md`](installasjon.md). README-en har de fem stegene for dobbeltklikket, linja «Første gang» og linja «Ekte kurser», som lenker til installasjonen. Kommandoene i reserven står derfor i den rekkefølgen installasjonen har dem, og endres installasjonen før prøven, rettes lista her i samme commit. Morgensjekken sjekker fra 08.11 også at lenkene i installasjonen går til filer som finnes, og `tests/test_readme.py` sjekker filene og ankrene i begge.
+
 *Lagt til 2026-10-10 (story 2.3b):* teksten under «Når du henter» i README-en er endret. Setningen om dager børsen er stengt nevner ikke lenger fila for dagen, og en ny setning sier at samme kommando kjørt igjen senere samme kveld prøver aksjene som mangler dagens kurs. Ingen kommando er ny eller endret, så tabellen under står. Prøven fører commiten den brukte.
 
 *Lagt til 2026-10-12 (flettingen av 2.3b):* etter PR #30 står teksten ikke lenger i README-en, men under «Når kan jeg hente?» i `docs/hjelp.md`. Endringen fra 2.3b er ført der. Ingen kommando i «Kom i gang» er endret.
@@ -950,6 +952,8 @@ har dem. Endres README-en før prøven, rettes lista her i samme commit.
 *Rettet 2026-10-28 (story 3.5g, gruppens svar 27.10 kl. 06:09, c, under story 3.5 i `epics.md`):* radene D1–D6 følger de fem stegene under «Enklest: dobbeltklikk (anbefalt)» og linjene under dem, «Første gang», «Ekte kurser» og «Linux». Hver rad sier hvilket steg eller hvilken linje den gjelder, og spørsmålene fra før står i radene: «Dobbeltklikk «Start demoen»» er flyttet fra D3 til D2, fordi det er steg 3, og advarselen sjekkes mot svarene i `docs/hjelp.md` som linja «Første gang» lenker til, fordi avsnittet i README-en står bak pila «Slik virker dobbeltklikket». Overskriften over tabellen har navnet fra før 3.5g, som ankeret `enklest-dobbeltklikk-uten-docker` beholder. Ingen rad i reserven er endret.
 
 *Lagt til 2026-10-30 (story 3.5h, gruppens svar 29.10 kl. 19:36, d, under story 3.5 i `epics.md`):* linja «Linux» under stegene har sin egen rad D7, som sjekker at lenkene til Docker og uv virker (BH9 i 3.5g). Spørsmålet om linja «Linux» sist i D6 er det samme, og besvares i D7 (gjennomgangen av 3.5h, BH2 og VG1).
+
+*Rettet 2026-11-08 (story 3.5i, VG2 og VG3, instruksjonen kl. 13:00):* linja «Linux» står ikke lenger under stegene i README-en, men øverst i [`docs/installasjon.md`](installasjon.md), med lenkene til pilene «Med Docker Desktop» og «Uten Docker, med uv» der. README-en viser til installasjonen fra linja «Ekte kurser». D7, og spørsmålet om linja «Linux» sist i D6, gjelder derfor linja i installasjonen. Morgensjekken sjekker også lenkene der.
 
 **Hovedveien: «Enklest: dobbeltklikk, uten Docker»**
 

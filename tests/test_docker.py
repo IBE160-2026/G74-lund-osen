@@ -646,7 +646,12 @@ class TestReadme:
         assert "er demoen veien for å se appen med en gang" not in topp
         klar = [l for l in topp.splitlines() if l.startswith("| Klar |")]
         assert len(klar) == 1 and "når som helst" in klar[0] and "etter kl. 22" in klar[0]
-        assert "Før kl. 22 på en børsdag gir den forrige børsdag" in klar[0]
+        # Instruksjonen 08.11 kl. 13:00: raden skrevet enklere, etter
+        # fetch_prices.py (2.3c): første henting bruker 16 kall, saa kveldens
+        # henting samme dag trenger bonuskvoten. Var «... gir den forrige
+        # børsdag, og samme dag etter kl. 22 trengs bonuskvote ...».
+        assert "Før kl. 22 på en børsdag henter den forrige børsdag" in klar[0]
+        assert "bonuskvote hos EODHD" in klar[0]
         steg8 = _steg("Den ekte versjonen", 8)
         assert "Første gang går det når som helst; før kl. 22 en børsdag gir den forrige børsdag." in steg8
         assert "når basen er tom, kan du også hente på dagtid og i helgen" in _hjelp()
@@ -822,25 +827,33 @@ class TestReadme:
         tester = README.read_text(encoding="utf-8").split("\n## Tester\n", 1)[1].split("\n## ", 1)[0]
         knapper = _detaljer(tester)
         # Story 3.3h: installasjonen av uv staar bak sin egen pil, foerst.
-        assert list(knapper) == [UV_PILA, "Hvorfor hoppes noen over?"], list(knapper)
-        forklaring = knapper["Hvorfor hoppes noen over?"]
+        # Instruksjonen 08.11 kl. 13:00: tre piler med tydelige overskrifter,
+        # og punktene om oppsettet bak den tredje.
+        assert list(knapper) == [UV_PILA, HOPPES_PILA, OPPSETT_PILA], list(knapper)
+        forklaring = knapper[HOPPES_PILA]
         synlig = re.sub(r"<details>.*?</details>", "", tester, flags=re.DOTALL)
         for grunn in ("time.tzset", "Unix-sokler", "`::1`", "uten git", "`-rs`"):
             assert grunn in forklaring and grunn not in synlig, grunn
-        assert "Alle testene skal bestå." in synlig
+        # Lista etter maskin, og hvor testene kjoeres likevel: PC-en vaar
+        # foer hver commit, eller CI ved hver push.
+        for maskin in ("**På Windows**", "**På Linux og Mac:**", "**På alle maskiner, når noe mangler:**"):
+            assert maskin in forklaring, maskin
+        assert "Windows PowerShell" in forklaring and "Edge eller Chrome" in forklaring
+        assert "PC-en vår før hver commit" in forklaring and "i CI ved hver push" in forklaring
         assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
-        assert "- Ingen nettkall:" in synlig and "- CI kjører" in synlig
+        assert "- Ingen nettkall:" in knapper[OPPSETT_PILA] and "- Ingen nettkall:" not in synlig
         assert "](docs/kvalitetssikring.md)" in synlig
         # Gjennomgangen, BH10 og ECH7: indeksene i samme tekst, og knappen
-        # rett etter «Alle testene skal bestå», foer punktene.
-        hvorfor = tester.index("<details>\n<summary>Hvorfor hoppes noen over?</summary>")
+        # rett etter «Alle testene skal bestå», foer oppsettet.
+        hvorfor = tester.index(f"<details>\n<summary>{HOPPES_PILA}</summary>")
         assert tester.index("uv run pytest") < tester.index("Alle testene skal bestå.") < hvorfor
-        assert tester.rindex("</details>") < tester.index("\n- Ingen nettkall:")
-        # 21.10: en kort innledning foer punktene, saa de ikke ser ut som
-        # svaret i pila «Hvorfor hoppes noen over?». Ville feilet hvis
-        # punktene kom rett etter </details>.
-        assert "\n</details>\n\nSlik er testene satt opp:\n\n- Ingen nettkall:" in tester
-        assert "Alle testene skal bestå. Noen hoppes over, og knappen under sier hvorfor.\n\n<details>" in tester
+        assert hvorfor < tester.index(f"<summary>{OPPSETT_PILA}</summary>")
+        assert tester.rindex("</details>") < tester.index("Hver story som endrer koden")
+        synlig_setning = (
+            "Alle testene skal bestå. Noen hoppes over fordi de gjelder en annen type maskin, men alle kjøres "
+            "minst ett sted.\n\n<details>"
+        )
+        assert synlig_setning in tester
         assert not _blokkene(forklaring), forklaring
 
     def test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket(self):
@@ -966,7 +979,12 @@ SKJERMBILDET = "docs/appen/oversikten-demo.png"
 UV_WINDOWS = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
 UV_MAC = "curl -LsSf https://astral.sh/uv/install.sh | sh"
 # Story 3.3h: pila under «Tester» med installasjonen av uv og tipset.
-UV_PILA = "Installere uv, og når uv ikke blir funnet"
+# Instruksjonen 08.11 kl. 13:00: tydelige overskrifter på de tre pilene.
+# Var «Installere uv, og når uv ikke blir funnet» og «Hvorfor hoppes noen
+# over?», og punktene sto åpent under «Slik er testene satt opp:».
+UV_PILA = "Har du ikke uv? Slik installerer du den"
+HOPPES_PILA = "Hvilke tester hoppes over, og hvorfor?"
+OPPSETT_PILA = "Slik er testene satt opp: ingen nettkall, ingen ekte data og CI ved hver push"
 # Gjennomgangen av 3.3e (BH6, VG1, ECH1-ECH3): ogsaa signalberegningen,
 # hjelpetekstene, boersdagene, indeksen og aksjene demoen bygges av, og hver
 # delmal (_*.html), saa en ny delmal kommer med. Fra src/static/ bare
@@ -2739,13 +2757,18 @@ class TestReadmeForNybegynnere:
         assert f"Windows (PowerShell):\n\n```\n{UV_WINDOWS}\n```" in tester
         assert f"Mac (Terminal):\n\n```\n{UV_MAC}\n```" in tester
         assert tester.index(UV_WINDOWS) < tester.index(UV_MAC) < tester.index("```\nuv sync\n```")
-        funnet = "lukker du vinduet, åpner et nytt og går til mappa, som i steg 4"
+        # Instruksjonen 08.11 kl. 13:00: «steg 4 med Docker» lenker til
+        # installasjonen.
+        funnet = "lukker du vinduet, åpner et nytt og går til mappa, som i "
+        assert "som i [steg 4 med Docker](docs/installasjon.md#med-docker-desktop)" in tester
         assert "«The term 'uv' is not recognized» eller «command not found: uv»" in tester and funnet in tester
         assert "Første `uv sync` laster ned Python og pakkene" in tester
         # Gjennomgangen (BH1, VG2, ECH5): tidene som staar i dagsfila 18.10,
         # 219-424 s, i hele minutter. 424 s er kjoeringen for 3.3e. Fra 21.10
         # tidene i Utført-linjene 20.10, 307,84-579,47 s.
-        assert "Hele testsettet tok mellom 5 og 10 minutter på maskinen vår 20.10." in tester
+        # Instruksjonen 08.11 kl. 13:00: tida for hele settet 08.11, fra
+        # kjoeringene 08.11: 9:51 til 13:18 min. Var «mellom 5 og 10 minutter ... 20.10».
+        assert "Hele testsettet tok mellom 10 og 14 minutter på maskinen vår 08.11." in tester
         uv = _seksjon("Uten Docker, med uv")
         # Story 3.5i: «Tester» staar i README-en.
         assert "[«Tester»](../README.md#tester)" in uv
@@ -3080,7 +3103,14 @@ class TestReadmeForNybegynnere:
             "signalet dag for dag",
             "oversikten og utseendet fra designforslaget",
             "sortering ved klikk i kolonneraden",
-            "ki-teksten fra en lokal modell på aksjesiden",
+            # Story 10.9 (instruksjonen 08.11 kl. 13:00): KI-teksten
+            # forklarer sjekkene og mønstrene. Var «ki-teksten fra en lokal
+            # modell på aksjesiden».
+            "ki-teksten forklarer sjekkene og mønstrene, fra en lokal modell",
+            # Story 2.16: børskalenderen for alle år.
+            "hver børsdag, også fra 2027",
+            # Story 8.20: aksjesiden og børsometeret som skissene 06.11.
+            "utseendet fra designforslaget og skissene 06.11",
             # Gjennomgangen av 3.3h (BH1, ECH3, VG3): at bare tekster som
             # besto kontrollen vises, og kontrollen av børsdagen, står.
             "bare tekster som besto kontrollen",
@@ -3098,7 +3128,9 @@ class TestReadmeForNybegynnere:
             "fra kl. 22",
             # Story 3.4b: KI-teksten i demoen er flettet.
             # Rådets funn 20.10: demoen viser kombinasjonene av de tre sjekkene.
-            "alle 10 fargekombinasjonene av de tre sjekkene og ki-tekst laget med gemma",
+            # Story 3.4h: investorsidene i demoen. Var «... og ki-tekst laget
+            # med gemma».
+            "alle 10 fargekombinasjonene av de tre sjekkene, ki-tekst fra gemma og investorsider",
             # Story 8.16: periodene i kursgrafen er flettet.
             # Story 8.20a (del J): «Vis dagen» ved datoen.
             "periodene i kursgrafen med «vis dagen»",
@@ -3107,7 +3139,8 @@ class TestReadmeForNybegynnere:
             # Story 8.6: børsometeret er flettet.
             "og børsometeret",
             # Story 10.7: egne nøkler er flettet.
-            "eller med egen nøkkel",
+            # Var «eller med egen nøkkel» til 10.9 kom inn i punktet.
+            "eller egen nøkkel",
             # Story 2.3c: første henting på dagtid er flettet.
             "første gang på dagtid",
         ):
@@ -3747,7 +3780,9 @@ AVTRYKK_I_PILENE = {
     "Demoen": "a49a8d06bb28990eeed5c254fd46f2f9f09772dff7f8ced861088452d97933cf",
     "Den ekte versjonen": "c087d5b97500a0a7689a714c40f709f1ac8f3f5cd9b49918d90ed7083f753ad7",
     "Dokumentene": "d80b9ef99d341dbb6f3c1b9c31ced942aa6e8e232b57cc2e89675b7198efa68c",
-    "Mappestruktur": "19ecc179facb58872b79a50420fcb5f66670300621a10335b6a6e0648d3375af",
+    # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
+    # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
+    "Mappestruktur": "2b26269852ce7a454d02c54179eb21f53651f2c761be8069ef6de1279e483091",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
@@ -3969,8 +4004,10 @@ class TestReadmeBakPiler:
         synlig = _utenfor_pilene(tester)
         assert [b.strip() for _, b in _blokkene(synlig)] == ["uv sync", "uv run pytest"]
         assert "[`docs/kvalitetssikring.md`](docs/kvalitetssikring.md)" in synlig
+        # Instruksjonen 08.11 kl. 13:00: punktene staar bak pila OPPSETT_PILA.
+        oppsett = _detaljer(tester)[OPPSETT_PILA]
         for punkt in ("- Ingen nettkall:", "- `data/` røres ikke:", "- CI kjører", "- ruff kjøres før en commit:"):
-            assert punkt in synlig, punkt
+            assert punkt in oppsett and punkt not in synlig, punkt
         uv = _detaljer(tester)[UV_PILA]
         for innhold in (UV_WINDOWS, UV_MAC, "«The term 'uv' is not recognized»", "**På en ren maskin uten Docker**"):
             assert innhold in uv and innhold not in synlig, innhold
