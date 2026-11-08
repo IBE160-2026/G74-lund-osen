@@ -2,7 +2,7 @@
 title: 'Story 10.6: KI-teksten om dagen på forsiden, «Børsdagen kort fortalt»'
 type: 'feature'
 created: '2026-11-08'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '408b7494'
 context:
@@ -160,3 +160,7 @@ Tre gjennomganger av `1c27113e`, i parallell etter hele settet og mutantene: Bli
 ## Bygget og ikke flettet
 
 Grenen `10-6-ki-teksten-om-dagen` er ikke flettet. Gruppen går gjennom spørsmålene over før flettingen (svaret 08.11 kl. 12:32).
+
+*Lagt til 2026-11-08 (gruppens svar kl. 21:35):* forslagene i spørsmål 1–12 er godtatt, også navnet «Børsdagen kort fortalt» (spørsmål 11), og rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md` og i `epics.md` under «Prioritering» og story 10.6.
+
+*Lagt til 2026-11-08:* 10.6 er flettet med PR #122 i `c517e460` kl. 21:50, låst til head-en `46f883e0`, etter instruksjonen kl. 21:47. Main hadde ikke fått kode eller tester siden grenen (`408b7494`), så main ble ikke flettet inn først. CI var grønn på head-en (run 42490597204). Hele settet lokalt på grenen: 4650 bestått, 24 hoppet over og 0 feilet. Ingen funn på middels eller over sto åpne. BH7/ECH11, ECH14 og VG10 er fortsatt åpne punkter i `issues.md`.
