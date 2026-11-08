@@ -274,7 +274,9 @@ def test_hva_fargene_betyr_staar_ikke_igjen():
     """J: «Hva fargene betyr» er kortet «Slik leser du børsometeret». Ville
     feilet hvis det gamle navnet sto igjen i hjelpen, README-en, hjelpetekstene
     eller malene."""
-    filer = [ROT / "docs" / "hjelp.md", ROT / "README.md", ROT / "src" / "hjelpetekster.py"]
+    # Story 3.5i: og docs/installasjon.md, med det som er flyttet fra README-en.
+    filer = [ROT / "docs" / "hjelp.md", ROT / "README.md", ROT / "docs" / "installasjon.md"]
+    filer += [ROT / "src" / "hjelpetekster.py"]
     filer += sorted((ROT / "src" / "templates").glob("*.html"))
     for fil in filer:
         assert "Hva fargene betyr" not in fil.read_text(encoding="utf-8"), fil.name

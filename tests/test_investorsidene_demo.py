@@ -21,6 +21,7 @@ import pytest
 import demo
 import investorsider
 import lagring_sqlite
+from dokumentene import installasjonen
 from investorsider import BREDDE, HOYDE, SKRIFTER, Skrift
 from kursdata import AKSJEUNIVERS, INVESTORSIDER
 from lagring_sqlite import SqliteKurslager, aapne_base
@@ -539,6 +540,7 @@ def test_hjelpen_sier_det_samme_som_sidene():
     svar = hjelp.split("### Hvor finner jeg børsmeldingene?", 1)[1].split("\n### ", 1)[0]
     assert "Under kursgrafen" not in svar and "har ingen investorside" not in svar
     assert "«Investorsiden til ‹navn›»" in svar and "ny fane" in svar and "tegning laget av KI" in svar
-    readme = (ROT / "README.md").read_text(encoding="utf-8")
+    # Story 3.5i: «Demoen» staar i docs/installasjon.md.
+    readme = installasjonen()
     steg6 = next(linje for linje in readme.splitlines() if linje.startswith("6. **Åpne http://127.0.0.1:8000**"))
     assert "boblen «Investorsiden til ‹navn›»" in steg6 and "en side i appen" in steg6 and "laget av KI" in steg6

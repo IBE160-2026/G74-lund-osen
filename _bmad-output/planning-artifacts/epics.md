@@ -623,6 +623,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-11-07 kl. 23:26 (gruppens svar):* README-en beholder hva appen er, de fem stegene for dobbeltklikket og én linje om den ekte versjonen. Docker, uv, Linux, «Står du fast?» og «Mer for den som vil» flyttes uendret til `docs/installasjon.md`, og testene følger med. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-08 kl. 11:24 (gruppens svar):* forslagene i spørsmål 1–3 i spesifikasjonen 3.5i (`spec-3-5i-installasjonen-i-egen-fil.md`) er godtatt, og rådet anbefalte alle tre. Overskriften «Enklest: dobbeltklikk (anbefalt)» med ankeret står over de fem stegene i README-en, og setningen om demoen flyttes først i `docs/installasjon.md`. Setningen «Velg versjon», som flyttes, sier «øverst i README-en». `docs/installasjon.md` er levende som README-en og `docs/hjelp.md`, med en ny linje om det i regel 19 i `CLAUDE.md`. Svaret er ført etter instruksjonen kl. 11:27 i `docs/ai-prompts/2026-11-08.md`.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2337,6 +2339,8 @@ tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
 *Avgjort 2026-11-07 kl. 22:48 (gruppens svar):* videoen av demoen beholdes og lages til slutt, rett før README-prøven. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-07 kl. 23:26 (gruppens svar):* README-en beholder hva appen er, de fem stegene for dobbeltklikket og én linje om den ekte versjonen. Docker, uv, Linux, «Står du fast?» og «Mer for den som vil» flyttes uendret til `docs/installasjon.md`, og testene følger med. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 11:24 (gruppens svar):* forslagene i spørsmål 1–3 i spesifikasjonen 3.5i (`spec-3-5i-installasjonen-i-egen-fil.md`) er godtatt, og rådet anbefalte alle tre. Overskriften «Enklest: dobbeltklikk (anbefalt)» med ankeret står over de fem stegene i README-en, og setningen om demoen flyttes først i `docs/installasjon.md`. Setningen «Velg versjon», som flyttes, sier «øverst i README-en». `docs/installasjon.md` er levende som README-en og `docs/hjelp.md`, med en ny linje om det i regel 19 i `CLAUDE.md`. Svaret er ført etter instruksjonen kl. 11:27 i `docs/ai-prompts/2026-11-08.md`.
 
 ### Story 3.4: Demoversjonen
 

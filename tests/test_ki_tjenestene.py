@@ -23,6 +23,7 @@ import ki_lokal
 import ki_openai
 import ki_sky
 from conftest import NettverkISTest
+from dokumentene import installasjonen
 from ki_anthropic import AnthropicModell
 from ki_gemini import GeminiModell
 from ki_modell import Modell, ModellFeilet, Modellsvar, lag_ki_rad
@@ -697,8 +698,11 @@ class TestNoekkelenFoerKallet:
 
 
 def _readme_avsnittet() -> str:
-    readme = (ROT / "README.md").read_text(encoding="utf-8")
+    """Pila om egen noekkel. Story 3.5i: i docs/installasjon.md, og ikke
+    lenger i README-en."""
+    readme = installasjonen()
     start = "<summary>Egen nøkkel til Gemini, Anthropic eller OpenAI (valgfri)</summary>"
+    assert start not in (ROT / "README.md").read_text(encoding="utf-8")
     return readme.split(start, 1)[1].split("</details>", 1)[0]
 
 

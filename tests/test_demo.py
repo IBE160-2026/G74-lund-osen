@@ -21,6 +21,7 @@ import demo_ki
 import fetch_prices
 import lagring_sqlite
 from aksjedetalj import bygg_detalj
+from dokumentene import installasjonen
 from kursdata import AKSJEUNIVERS
 from lagring_sqlite import (
     DEMOMERKE,
@@ -907,11 +908,15 @@ class TestLenkenTilDenEkteVersjonen:
 
     def test_lenken_gaar_til_ankeret_i_readme(self):
         """Ville feilet hvis adressen gikk til et annet repo enn README-en
-        lenker til, eller til et anker README-en ikke har."""
+        lenker til, eller til et anker README-en ikke har. Story 3.5i:
+        lenken til GitHub-siden staar i docs/installasjon.md, og README-en
+        lenker til testkjoeringen i samme repo. Ankeret staar én gang i
+        README-en, på linja om den ekte versjonen."""
         readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
         repo, anker = app_modul.EKTE_VERSJONEN_URL.split("#", 1)
-        assert f"]({repo})" in readme
-        assert f'<a name="{anker}"></a>' in readme
+        assert f"]({repo})" in installasjonen() and f"]({repo}/actions/workflows/tester.yml)" in readme
+        assert readme.count(f'<a name="{anker}"></a>') == 1
+        assert f'<a name="{anker}"></a>**Ekte kurser:**' in readme
 
     def test_ingen_lenke_i_den_ekte_versjonen(self, klient):
         """Ville feilet hvis lenken sto også i den ekte versjonen (M1)."""

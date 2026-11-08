@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pytest
 
+from dokumentene import installasjonen
 from test_docker import README, ROT, _hjelp
 
 JOBBEN = ROT / "start" / "kveldshenting.ps1"
@@ -193,8 +194,10 @@ def test_jobbnavnet_er_det_samme_i_begge_skriptene():
 
 def test_readme_og_hjelpen_sier_hva_jobben_gjoer_loggen_og_hvordan_den_slaas_av():
     """Ville feilet hvis README-en eller docs/hjelp.md ikke sa hva jobben
-    gjoer, hvor loggen er, og hvordan den slaas av (regel 19)."""
-    readme = README.read_text(encoding="utf-8")
+    gjoer, hvor loggen er, og hvordan den slaas av (regel 19). Story 3.5i:
+    pila om jobben staar i docs/installasjon.md, ikke i README-en."""
+    readme = installasjonen()
+    assert "legg-inn-kveldshentingen.ps1" not in README.read_text(encoding="utf-8")
     hjelp = _hjelp()
     for tekst in (readme, hjelp):
         assert "data/logg/kveldshenting-" in tekst

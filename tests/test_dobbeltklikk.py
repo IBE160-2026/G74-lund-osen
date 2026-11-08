@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pytest
 
+from dokumentene import installasjonen
 from test_docker import CI, README, ROT, _hjelp
 from test_ryddighet import UTEN_GIT, har_git
 
@@ -51,13 +52,17 @@ def _delen_i_readme() -> str:
     """Fra 3.5f (gruppens svar 25.10 kl. 11:32) en egen del foerst i «Kom i
     gang», ikke bak en pil under «Mer for den som vil». Fra 3.5g (gruppens
     svar 26.10 kl. 23:00) de fem stegene foerst, og resten i pila «Slik
-    virker dobbeltklikket», saa delen er begge."""
+    virker dobbeltklikket», saa delen er begge. Story 3.5i (gruppens svar
+    07.11 kl. 23:26): stegene staar i README-en til «Status», og pila i
+    docs/installasjon.md."""
     tekst = README.read_text(encoding="utf-8")
     start = tekst.index("\n### Enklest: dobbeltklikk (anbefalt)\n")
-    stegene = tekst[start : tekst.index("\n<details>\n", start)]
+    stegene = tekst[start : tekst.index("\n## ", start)]
+    assert "\n<details>\n" not in stegene, "en pil står igjen i «Kom i gang»"
+    resten = installasjonen()
     summary = '\n<summary><a name="slik-virker-dobbeltklikket"></a>Slik virker dobbeltklikket</summary>\n\n'
-    assert summary in tekst, "fant ikke pila «Slik virker dobbeltklikket»"
-    pila = tekst.split(summary, 1)[1].split("\n\n</details>\n", 1)[0]
+    assert summary in resten, "fant ikke pila «Slik virker dobbeltklikket»"
+    pila = resten.split(summary, 1)[1].split("\n\n</details>\n", 1)[0]
     return stegene + "\n\n" + pila
 
 
@@ -613,13 +618,15 @@ def test_readme_og_hjelpen_har_advarselen_og_godkjenningen():
     kom_i_gang = tekst.split("\n## Kom i gang: nedlasting og installasjon\n", 1)[1].split("\n## ", 1)[0]
     # Story 3.5g: stegene staar foer den foerste pila, og pila til Docker
     # kommer etter. Filene for Windows og Mac forklares i «Slik virker
-    # dobbeltklikket».
+    # dobbeltklikket». Story 3.5i: stegene er alt i «Kom i gang» som er en
+    # pil eller en boks, og pila til Docker staar i docs/installasjon.md.
     foer_pilene = kom_i_gang.split("\n<details>\n", 1)[0]
+    assert foer_pilene == kom_i_gang and "```" not in kom_i_gang
     assert "dobbeltklikk «Start demoen».**" in foer_pilene
     # Gjennomgangen av 3.5g (BH8, ECH8, VG1): Docker-pila finnes og står etter.
     docker = '<summary><a name="med-docker-desktop"></a>'
-    assert docker in kom_i_gang and kom_i_gang.index(foer_pilene) == 0
-    assert len(foer_pilene) < kom_i_gang.index(docker)
+    assert docker not in tekst and docker in installasjonen()
+    assert "](docs/installasjon.md)" in foer_pilene
     assert "`.cmd` for Windows og `.command` for Mac" in del_
     assert "Dobbeltklikk «Start demoen».**" in del_
     assert "<summary>Start med dobbeltklikk" not in tekst

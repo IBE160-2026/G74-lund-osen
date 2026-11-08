@@ -109,6 +109,9 @@ et sitat som ikke fantes».
     levende dokument som README-en. Teksten rettes der den står, og
     historikken ligger i git, fordi hjelpen leses av brukere. De andre
     dokumentene får fortsatt en Rettet-linje.
+    *Lagt til 2026-11-08 (story 3.5i, gruppens svar kl. 11:24):*
+    `docs/installasjon.md`, med installasjonen som er flyttet fra «Kom i
+    gang», er levende som README-en og `docs/hjelp.md`.
 20. **Felles arbeid står på begge.** Vi diskuterer og avgjør arbeidet sammen, og
     det meste skrives inn på én maskin. Hver commit får derfor den av oss som
     ikke committer, som medforfatter. Linjen står nederst i meldingen, i samme

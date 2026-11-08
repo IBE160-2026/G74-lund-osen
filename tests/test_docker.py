@@ -15,6 +15,8 @@ import re
 import tomllib
 from pathlib import Path
 
+from dokumentene import INSTALLASJONEN, installasjonen, readme_og_installasjonen
+
 ROT = Path(__file__).resolve().parent.parent
 DOCKERFILE = ROT / "Dockerfile"
 DOCKERIGNORE = ROT / ".dockerignore"
@@ -264,7 +266,8 @@ class TestCompose:
         compose = COMPOSE.read_text(encoding="utf-8")
         app_py = (ROT / "src" / "app.py").read_text(encoding="utf-8")
         ci = CI.read_text(encoding="utf-8")
-        readme = README.read_text(encoding="utf-8")
+        # Story 3.5i: adressene og «Serving on» staar i docs/installasjon.md.
+        readme = readme_og_installasjonen()
         hjelp = _hjelp()
         # Adressen til Ollama (STANDARD_URL i ki_lokal.py) er en annen tjeneste (BH6).
         ollama = str(urlsplit(STANDARD_URL).port)
@@ -299,7 +302,7 @@ class TestCompose:
             ("compose.yaml", compose),
             ("src/app.py", app_py),
             ("CI", ci),
-            ("README.md", readme),
+            ("README.md og docs/installasjon.md", readme),
             ("docs/hjelp.md", hjelp),
         ):
             assert "5000" not in tekst, navn
@@ -457,8 +460,9 @@ class TestOllama:
 
     def test_readme_lover_0_kall_bare_naar_basen_har_kursene(self):
         """Instruksjonen kl. 23:58: README-en sier det samme som utskriften
-        fra hentingen, 0 kall bare naar basen har dagens kurs for alle."""
-        tekst = README.read_text(encoding="utf-8")
+        fra hentingen, 0 kall bare naar basen har dagens kurs for alle. Story
+        3.5i: delen staar i docs/installasjon.md."""
+        tekst = _installasjonen()
         modell = tekst.split("<summary>Den lokale modellen for KI-teksten (valgfri)</summary>", 1)[1].split(
             "</details>", 1
         )[0]
@@ -497,6 +501,13 @@ def _kom_i_gang() -> str:
     return tekst.split(f"\n{KOM_I_GANG}\n", 1)[1].split("\n## ", 1)[0]
 
 
+# Story 3.5i (gruppens svar 07.11 kl. 23:26 og 08.11 kl. 11:24): resten av
+# «Kom i gang» staar ordrett i docs/installasjon.md, med stiene rettet for
+# mappa docs/. Testene som leste delene i «Kom i gang», leser dem der.
+def _installasjonen() -> str:
+    return installasjonen()
+
+
 def _blokkene(tekst: str) -> list[tuple[str, str]]:
     """Kodeblokkene i teksten som (spraak, innhold). En blokk uten spraak er
     kommandoer. ```text er det terminalen viser (story 3.4, PR 3)."""
@@ -505,8 +516,15 @@ def _blokkene(tekst: str) -> list[tuple[str, str]]:
 
 def _kommandoene() -> list[str]:
     """Hver kommando i kodeblokkene uten spraak i «Kom i gang». Fra PR 3 har
-    ingen linje kommentar med #, og testen for det staar for seg."""
-    return [l.strip() for spraak, b in _blokkene(_kom_i_gang()) if not spraak for l in b.splitlines() if l.strip()]
+    ingen linje kommentar med #, og testen for det staar for seg. Story 3.5i:
+    kommandoene staar i docs/installasjon.md, og README-en har ingen."""
+    return [
+        l.strip()
+        for spraak, b in _blokkene(_kom_i_gang() + _installasjonen())
+        if not spraak
+        for l in b.splitlines()
+        if l.strip()
+    ]
 
 
 class TestReadme:
@@ -522,8 +540,9 @@ class TestReadme:
 
     def test_docker_foerst_og_uv_som_alternativ(self):
         """Rettelsen 05.10 og svaret fra hjelpelaereren. Ville feilet hvis uv
-        kom foerst, eller en av kommandoene manglet."""
-        del_ = _kom_i_gang()
+        kom foerst, eller en av kommandoene manglet. Story 3.5i: stegene staar
+        i docs/installasjon.md."""
+        del_ = _installasjonen()
         # Fra 3.4 PR 3 hentes koden med «Download ZIP», ikke git clone (svar 1 11.10).
         for kommando in (
             "«Download ZIP»",
@@ -538,8 +557,9 @@ class TestReadme:
 
     def test_tjenestene_i_readme_finnes_i_compose(self):
         """Ville feilet hvis README-en viste en tjeneste compose.yaml ikke har."""
-        # README-en og docs/hjelp.md, der demo-lag staar fra 22:32.
-        tekst = README.read_text(encoding="utf-8") + _hjelp()
+        # README-en og docs/hjelp.md, der demo-lag staar fra 22:32. Story 3.5i:
+        # og docs/installasjon.md.
+        tekst = readme_og_installasjonen() + _hjelp()
         # [\w-], saa demo-lag ikke leses som demo (story 3.4).
         brukt = set(re.findall(r"docker compose run --rm ([\w-]+)", tekst))
         brukt |= set(re.findall(r"docker compose up --build ([\w-]+)", tekst))
@@ -548,8 +568,9 @@ class TestReadme:
 
     def test_advarselen_om_down_v_og_basen(self):
         """Story 3.2, svar 3, og AD-7: ville feilet hvis README-en ikke advarte
-        mot docker compose down -v, eller sa at basen kan slettes."""
-        del_ = _kom_i_gang()
+        mot docker compose down -v, eller sa at basen kan slettes. Story 3.5i:
+        advarselen staar i docs/installasjon.md."""
+        del_ = _installasjonen()
         assert "**Skriv aldri `docker compose down -v`.**" in del_
         assert "vurderingene kan ikke lages på nytt" in del_
         # Detaljene om volumene staar i docs/hjelp.md fra 22:32.
@@ -568,14 +589,15 @@ class TestReadme:
         og svaret «Når kan jeg hente?» sier selv timen fra TIDSGRENSE."""
         import fetch_prices
 
-        tekst = README.read_text(encoding="utf-8")
+        # Story 3.5i: README-en og docs/installasjon.md.
+        tekst = readme_og_installasjonen()
         for flagg in ("--uten-tidskontroll", "--hent-foer-kl-22"):
             assert flagg not in tekst and flagg not in _hjelp(), flagg
         # Gjennomgangen, BH5 og ECH3: tekstene sier hele timer, saa grensen
         # maa vaere en hel time, og timen staar med ordgrense.
         grense = fetch_prices.TIDSGRENSE
         assert grense.minute == 0
-        assert re.search(rf"etter kl\. {grense.hour}\b(?![:.]\d)", _kom_i_gang()) and "helgen" in _hjelp()
+        assert re.search(rf"etter kl\. {grense.hour}\b(?![:.]\d)", _installasjonen()) and "helgen" in _hjelp()
         # BH4: bare tidspunktet for hentingen, ikke andre klokkeslett.
         for gammel in (r"etter kl\. 21\b(?![:.]\d)", r"før kl\. 21\b(?![:.]\d)"):
             assert not re.search(gammel, tekst), gammel
@@ -593,7 +615,7 @@ class TestReadme:
         for 3.4, 10.10), Python i imaget fra Dockerfile, at Mac ikke er
         prøvd (svar 3 11.10), og Python for veien uten Docker fra
         pyproject.toml."""
-        trenger = [a for a in _kom_i_gang().split("\n\n") if a.startswith("**Du trenger**")]
+        trenger = [a for a in _installasjonen().split("\n\n") if a.startswith("**Du trenger**")]
         assert len(trenger) == 1
         trenger = trenger[0]
         assert "Vi prøvde 10.10 med Docker Desktop 4.91.0 (motor 29.8.0, Compose v5.5.1) på Windows" in trenger
@@ -604,7 +626,7 @@ class TestReadme:
         # uv henter Python, så de to avsnittene sier det samme (BH1, ECH).
         assert f"bare [uv](https://docs.astral.sh/uv/), som henter Python {_python_krav()} eller nyere" in trenger
         assert "«Uten Docker, med uv»" in trenger
-        assert f"<summary>{UV_PIL}</summary>" in _kom_i_gang()
+        assert f"<summary>{UV_PIL}</summary>" in _installasjonen()
 
     def test_demoen_paa_dagtid_og_helgen_i_steg_8(self):
         """3.3b, punkt d: på dagtid en børsdag er demoen veien for å se appen
@@ -636,8 +658,9 @@ class TestReadme:
         demoen for faglaerer og sensor. Demoen virker uten .env. Koden hentes med «Download ZIP»
         foer den foerste kommandoen, ikke med git clone (svar 1 11.10). Het
         test_ekte_versjonen_foerst_og_zip_foer_kommandoene fra 11.10 til 3.3c.
-        Ville feilet hvis den ekte versjonen kom foer demoen igjen."""
-        del_ = _kom_i_gang()
+        Ville feilet hvis den ekte versjonen kom foer demoen igjen. Story 3.5i:
+        stegene staar i docs/installasjon.md, og README-en har dobbeltklikket."""
+        del_ = _installasjonen()
         kommandoer = _kommandoene()
         assert kommandoer[0] == "docker compose up --build demo"
         assert del_.index("«Download ZIP»") < del_.index("docker compose up --build demo")
@@ -649,7 +672,10 @@ class TestReadme:
         # Story 3.5g (gruppens svar 26.10 kl. 23:00): Docker og «Står du
         # fast?» staar bak hver sin pil, i den rekkefoelgen, og overskriftene
         # er dobbeltklikket og «Mer for den som vil».
-        assert overskrifter == [DOBBELTKLIKKET, "Mer for den som vil"], overskrifter
+        # Story 3.5i: dobbeltklikket i README-en, og «Mer for den som vil» i
+        # docs/installasjon.md.
+        assert overskrifter == ["Mer for den som vil"], overskrifter
+        assert re.findall(r"^### (.+)$", _kom_i_gang(), re.MULTILINE) == [DOBBELTKLIKKET]
         docker = '<summary><a name="med-docker-desktop"></a>Med Docker Desktop</summary>'
         staar = '<summary><a name="står-du-fast"></a>Står du fast?</summary>'
         assert (
@@ -673,7 +699,8 @@ class TestReadme:
         import app
         import demo
 
-        tekst = README.read_text(encoding="utf-8")
+        # Story 3.5i: README-en og docs/installasjon.md.
+        tekst = readme_og_installasjonen()
         # Hele linjer i kodeblokkene, ikke bare tekst et sted (VG3).
         kommandoer = _kommandoene()
         for kommando in (app.HENTEKOMMANDO, app.HENTEKOMMANDO_DOCKER, demo.DEMOKOMMANDO):
@@ -696,10 +723,11 @@ class TestReadme:
         assert brukt == {"demo", "ki"} and brukt <= profiler
 
     def test_uv_med_demo_flagget_som_appen_leser(self, monkeypatch):
-        """uv-veien: README-en viser --demo, og det er flagget les_flagg kjenner."""
+        """uv-veien: README-en viser --demo, og det er flagget les_flagg kjenner.
+        Story 3.5i: uv-veien staar i docs/installasjon.md."""
         import app
 
-        tekst = _kom_i_gang()
+        tekst = _installasjonen()
         flagg = re.findall(r"uv run python src/app\.py (--[\w-]+)", tekst)
         assert flagg == ["--demo"]
         # setenv foerst, ellers lekker bryteren til testene etter (som i test_demo.py).
@@ -714,7 +742,7 @@ class TestReadme:
         down som stoppkommando for demoen, eller CI proevde en annen kommando
         enn README-en viser."""
         demo = _seksjon("Demoen")
-        bytte = _detaljer(_kom_i_gang())["Bytte mellom demoen og den ekte versjonen"]
+        bytte = _detaljer(_installasjonen())["Bytte mellom demoen og den ekte versjonen"]
         for avsnitt in (demo, bytte):
             assert "docker compose --profile demo down" in avsnitt
         assert "`docker compose down` stopper ikke demoen" in bytte
@@ -841,7 +869,6 @@ class TestReadme:
         assert sorted(b for _, b in andre) == sorted(
             # Gruppens svar 05.11 kl. 12:14 og 12:20: toppen av oversikten og de nye bildene.
             [
-                *(f"docs/bilder/readme/{navn}" for navn in BILDENE.values()),
                 SKJERMBILDET,
                 AKSJESIDEBILDET,
                 *DE_NYE_BILDENE,
@@ -850,12 +877,21 @@ class TestReadme:
         for alt, sti in andre:
             assert alt.strip(), sti
             assert (ROT / sti).is_file(), sti
+        # Story 3.5i: de tre skjermbildene staar med stegene i
+        # docs/installasjon.md, med stien fra docs/, og ingen andre bilder.
+        installasjonen = _installasjonen()
+        tre = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", installasjonen)
+        assert sorted(b for _, b in tre) == sorted(f"bilder/readme/{navn}" for navn in BILDENE.values()), tre
+        for alt, sti in tre:
+            assert alt.strip(), sti
+            assert (ROT / "docs" / sti).is_file(), sti
         # Hvert bilde i sitt steg i «Felles for begge».
         for nummer, navn in BILDENE.items():
-            assert f"](docs/bilder/readme/{navn})" in _steg("Med Docker Desktop", nummer), navn
+            assert f"](bilder/readme/{navn})" in _steg("Med Docker Desktop", nummer), navn
         # Ogsaa HTML-bilder og bilder med referanse (BH7).
-        assert "<img" not in tekst.lower()
-        assert not re.search(r"!\[[^\]]*\]\[", tekst)
+        for del_ in (tekst, installasjonen):
+            assert "<img" not in del_.lower()
+            assert not re.search(r"!\[[^\]]*\]\[", del_)
 
     def test_teksten_under_hvert_bilde(self):
         """Svar 2 kl. 14:48: teksten under et bilde telles for seg, høyst 25
@@ -1807,7 +1843,9 @@ class TestBildeneAvAppen:
         assert etter.startswith("<details>\n<summary>Bilder av appen (demoen)</summary>\n\n"), etter[:80]
         assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
         # Lukket som de andre knappene: ingen <details> i README-en er åpen.
-        assert re.findall(r"<details[^>]*>", tekst) == ["<details>"] * tekst.count("<details")
+        # Story 3.5i: heller ikke i docs/installasjon.md, der pilene står.
+        for del_ in (tekst, _installasjonen()):
+            assert re.findall(r"<details[^>]*>", del_) == ["<details>"] * del_.count("<details")
 
     def test_begge_bildene_ligger_i_docs_appen_med_alt_tekst_og_teksten_under(self):
         """Ville feilet hvis et bilde lå utenfor docs/appen/, manglet
@@ -1837,6 +1875,8 @@ class TestBildeneAvAppen:
         uten_knappen = tekst.replace(_knappen_med_bildene(), "")
         assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
         assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
+        # Story 3.5i: heller ikke i docs/installasjon.md.
+        assert "appen/" not in _installasjonen()
 
     def test_mappa_har_bare_bilder_og_video_av_appen(self):
         """Regel 16: bare bilder og video av demoen. Ville feilet med en annen
@@ -1961,10 +2001,11 @@ DOBBELTKLIKKET = "Enklest: dobbeltklikk (anbefalt)"
 DOBBELTKLIKK_ANKER = "enklest-dobbeltklikk-uten-docker"
 # Story 3.5h (gruppens svar 29.10 kl. 19:36, a): de 16 lenkene i «Til
 # faglærer» foer den ble kortet ned, saa ingen forsvinner.
+# Story 3.5i: Docker og demoen staar i docs/installasjon.md.
 TIL_FAGLAERER_LENKENE = (
     "#enklest-dobbeltklikk-uten-docker",
-    "#med-docker-desktop",
-    "#demoen",
+    "docs/installasjon.md#med-docker-desktop",
+    "docs/installasjon.md#demoen",
     "#den-ekte-versjonen",
     "#tester",
     "_bmad-output/planning-artifacts/product-brief.md",
@@ -1987,11 +2028,12 @@ PILENE = {"Demoen": "demoen", "Den ekte versjonen": "den-ekte-versjonen"}
 
 
 def _pil(navn: str) -> str:
-    """Innholdet i pila for demoen eller den ekte versjonen i «Kom i gang»."""
+    """Innholdet i pila for demoen eller den ekte versjonen. Story 3.5i: i
+    docs/installasjon.md."""
     treff = re.search(
         rf'^<details>\n<summary><a name="{PILENE[navn]}"></a>{re.escape(navn)}: [^\n]*</summary>\n\n'
         r"(.*?)\n\n</details>$",
-        _kom_i_gang(),
+        _installasjonen(),
         re.MULTILINE | re.DOTALL,
     )
     assert treff, navn
@@ -2076,11 +2118,15 @@ def _seksjon(navn: str) -> str:
     delen under overskriften til den foerste pila."""
     if navn in PILENE:
         return _pil(navn)
-    pilene = dict(_pilene(_kom_i_gang()))
+    # Story 3.5i: pilene og «Mer for den som vil» staar i docs/installasjon.md,
+    # og dobbeltklikket i README-en.
+    pilene = dict(_pilene(_installasjonen()))
     if navn in pilene:
         return pilene[navn].split(f"\n{VELG_VEI}", 1)[0]
-    del_ = _kom_i_gang().split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
-    return del_.split("\n<details>\n", 1)[0] if navn == DOBBELTKLIKKET else del_
+    # Gjennomgangen (ECH3): en melding, ikke IndexError, når overskriften mangler.
+    kilde = _kom_i_gang() if navn == DOBBELTKLIKKET else _installasjonen()
+    assert f"### {navn}\n" in kilde, f"«{navn}» mangler"
+    return kilde.split(f"### {navn}\n", 1)[1].split("\n### ", 1)[0]
 
 
 SEKSJONENE = {"Med Docker Desktop": [1, 2, 3, 4], "Den ekte versjonen": [5, 6, 7, 8, 9], "Demoen": [5, 6, 7]}
@@ -2243,7 +2289,8 @@ UTE_AV_README = {
         "Kommandoene skrives i PowerShell eller Terminal, ikke i Docker Desktop. Docker Desktop skal "
         "bare være åpent, og du skriver ingenting i det. Ledetekst (Command Prompt) på Windows virker "
         "også for demoen, men stegene er skrevet for PowerShell, og den ekte versjonen trenger "
-        "PowerShell.\n\nKopier kommandoen med ikonet til høyre i den grå boksen i README-en. Ikonet synes "
+        # Story 3.5i: boksene staar i docs/installasjon.md, og hjelpen sier det.
+        "PowerShell.\n\nKopier kommandoen med ikonet til høyre i den grå boksen i installasjonen. Ikonet synes "
         "først når musa er over boksen. Du kan også markere kommandoen og trykke Ctrl+C (Cmd+C på Mac), "
         "eller skrive den inn. Lim den inn i PowerShell-vinduet fra steg 4 med Ctrl+V (Cmd+V på Mac), og "
         "trykk Enter."
@@ -2293,24 +2340,27 @@ class TestReadmeForNybegynnere:
     høyst 8 spørsmål, og resten i docs/hjelp.md."""
 
     def test_ingen_kommentar_paa_kommandolinjene(self):
-        """Linjene skal virke ogsaa i Ledetekst, der # ikke er en kommentar."""
-        for _spraak, blokk in _blokkene(_kom_i_gang()):
+        """Linjene skal virke ogsaa i Ledetekst, der # ikke er en kommentar.
+        Story 3.5i: boksene staar i docs/installasjon.md, og README-en har ingen."""
+        assert _blokkene(_installasjonen()) and not _blokkene(_kom_i_gang())
+        for _spraak, blokk in _blokkene(_installasjonen()):
             assert "#" not in blokk, blokk
 
     def test_en_kommando_per_boks(self):
         """En av oss fikk to kommandoer paa samme linje 11.10."""
-        for _spraak, blokk in _blokkene(_kom_i_gang()):
+        assert _blokkene(_installasjonen())
+        for _spraak, blokk in _blokkene(_installasjonen()):
             assert len([l for l in blokk.splitlines() if l.strip()]) == 1, blokk
 
     def test_bare_kommandoer_i_kom_i_gang(self):
         """En blokk med spraak slapp unna testene for # og én kommando. I
         «Kom i gang» er alle blokker kommandoer, og linja fra terminalen
         staar i docs/hjelp.md."""
-        assert {spraak for spraak, _ in _blokkene(_kom_i_gang())} == {""}
+        assert {spraak for spraak, _ in _blokkene(_installasjonen())} == {""}
 
     def test_ingen_bokser_testene_ikke_ser(self):
         """GitHub viser ogsaa ~~~ og ``` med innrykk som bokser."""
-        for linje in _kom_i_gang().splitlines():
+        for linje in (_kom_i_gang() + _installasjonen()).splitlines():
             assert not re.match(r"^ +```|^ *~~~", linje), linje
 
     def test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt(self):
@@ -2320,7 +2370,9 @@ class TestReadmeForNybegynnere:
         versjon, eller anbefalte den ekte."""
         # Story 3.5g: tabellen staar i pila «Demoen og den ekte versjonen», og
         # anbefalingen er den foerste setningen i «Kom i gang».
-        topp = _kom_i_gang().split('<summary><a name="med-docker-desktop"></a>', 1)[0]
+        # Story 3.5i (svaret 08.11 kl. 11:24): setningen staar foerst i
+        # docs/installasjon.md.
+        topp = _installasjonen().split('<summary><a name="med-docker-desktop"></a>', 1)[0]
         # Svarene 28.10 kl. 11:19 og 11:23 (e): tabellen staar oeverst.
         hode = [l for l in _tabellen().splitlines() if l.startswith("|")][0]
         assert "Den ekte versjonen" in hode and "| Demoen |" in hode
@@ -2359,7 +2411,8 @@ class TestReadmeForNybegynnere:
         steg = _steg("Med Docker Desktop", 4)
         assert "dra mappa `G74-lund-osen-main` fra steg 2 (ikke ZIP-fila), der README og compose ligger" in steg
         sporsmaal = "Står det .zip til slutt i linja."
-        assert f"[Står det `.zip` til slutt?](docs/hjelp.md#{_anker(sporsmaal)})" in steg
+        # Story 3.5i: stien fra docs/installasjon.md.
+        assert f"[Står det `.zip` til slutt?](hjelp.md#{_anker(sporsmaal)})" in steg
         steg4 = _hjelp().split("\n## Steg 4: mappa\n", 1)[1].split("\n## ", 1)[0]
         svar = steg4.split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
         assert "Dra mappa du pakket ut i steg 2, ikke ZIP-fila." in svar
@@ -2426,8 +2479,8 @@ class TestReadmeForNybegynnere:
         ECH12). «Serving on» forklares i stegene der linja staar, ikke i
         avsnittet. Steg 8 bruker et nytt vindu, saa det sier «det nye
         PowerShell-vinduet», ikke «fra steg 4» (BH1). Svaret under «Står du
-        fast?» har ogsaa kopieringen (VG7)."""
-        del_ = _kom_i_gang()
+        fast?» har ogsaa kopieringen (VG7). Story 3.5i: i docs/installasjon.md."""
+        del_ = _installasjonen()
         assert del_.count(KOPIERINGEN) == 1
         avsnitt = del_.split(KOPIERINGEN, 1)[1].split("\n\n", 1)[0]
         for innhold in (
@@ -2499,8 +2552,9 @@ class TestReadmeForNybegynnere:
         rett under pila til den ekte versjonen, utenfor alle piler, så den
         kommer rett etter steg 9 når pila er åpen, og synes for alle når den
         er lukket. Ville feilet hvis advarselen sto i en pil, ikke kom rett
-        etter pila til den ekte versjonen, eller var endret."""
-        tekst = _kom_i_gang()
+        etter pila til den ekte versjonen, eller var endret. Story 3.5i: i
+        docs/installasjon.md."""
+        tekst = _installasjonen()
         advarsel = ADVARSELEN_MOT_DOWN_V.split(".**", 1)[0] + ".**"
         assert tekst.count(advarsel) == 1
         assert advarsel not in _pil("Den ekte versjonen")
@@ -2537,7 +2591,8 @@ class TestReadmeForNybegynnere:
         rest = re.sub(r"<details>.*?</details>", "", faq, flags=re.DOTALL)
         assert [l for l in rest.splitlines() if l.strip()] == [
             "Klikk på spørsmålet som passer.",
-            "Flere spørsmål og svar står i [docs/hjelp.md](docs/hjelp.md).",
+            # Story 3.5i: stien fra docs/installasjon.md, lenketeksten uendret.
+            "Flere spørsmål og svar står i [docs/hjelp.md](hjelp.md).",
         ]
 
     def test_hvert_tema_staar_i_readme_eller_hjelp(self):
@@ -2550,9 +2605,15 @@ class TestReadmeForNybegynnere:
             assert tema in i_readme or tema in i_hjelp, tema
 
     def test_lenkene_virker(self):
-        """Lenker til en fil eller et avsnitt, i README-en og docs/hjelp.md."""
+        """Lenker til en fil eller et avsnitt, i README-en og docs/hjelp.md.
+        Story 3.5i: og i docs/installasjon.md."""
         readme = README.read_text(encoding="utf-8")
-        for tekst, mappe, egne in ((readme, ROT, _ankrene(readme)), (_hjelp(), HJELP.parent, _ankrene(_hjelp()))):
+        installasjonen = INSTALLASJONEN.read_text(encoding="utf-8")
+        for tekst, mappe, egne in (
+            (readme, ROT, _ankrene(readme)),
+            (_hjelp(), HJELP.parent, _ankrene(_hjelp())),
+            (installasjonen, INSTALLASJONEN.parent, _ankrene(installasjonen)),
+        ):
             for maal in re.findall(r"\]\(([^)\s]+)\)", tekst):
                 if maal.startswith(("http://", "https://", "mailto:")):
                     continue
@@ -2562,7 +2623,7 @@ class TestReadmeForNybegynnere:
                 if anker:
                     ankre = egne if not fil else _ankrene((mappe / fil).read_text(encoding="utf-8"))
                     assert anker in ankre, maal
-        assert "](#står-du-fast)" in readme and "](docs/hjelp.md)" in _faq()
+        assert "](#står-du-fast)" in installasjonen and "](hjelp.md)" in _faq()
 
     def test_hjelp_har_frontmatter_og_er_nevnt_i_readme(self):
         """Regel 4 og 19."""
@@ -2613,7 +2674,7 @@ class TestReadmeForNybegynnere:
     def test_henvisningene_og_proevetabellen(self):
         """Hver «steg N» peker paa et steg som finnes, og §9 har stegene i
         rekkefoelge for begge versjonene (VG i gjennomgangen av PR 3)."""
-        tekst = _kom_i_gang() + _hjelp()
+        tekst = _kom_i_gang() + _installasjonen() + _hjelp()
         for n in re.findall(r"[Ss]teg (\d+)", tekst):
             assert 1 <= int(n) <= 9, n
         # «steg N i demoen» og «steg N i den ekte versjonen» peker paa et steg
@@ -2635,7 +2696,10 @@ class TestReadmeForNybegynnere:
         assert tabell.index("| D6 |") < tabell.index("| D7 |") < tabell.index(reserven)
         d7 = tabell.split("| D7 |", 1)[1].split("\n", 1)[0]
         assert "Linja «Linux»" in d7 and "«Med Docker Desktop»" in d7 and "«Uten Docker, med uv»" in d7, d7
-        assert "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv)" in _kom_i_gang()
+        # Story 3.5i: linja staar i docs/installasjon.md. Raden D7 i proeven
+        # viser fortsatt til README-en, og staar som aapent punkt i
+        # spesifikasjonen 3.5i (gjennomgangen, VG2).
+        assert "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv)" in _installasjonen()
         assert "«Download ZIP»" in tabell.split("| D2 |", 1)[0] and "«Start demoen»" in tabell.split("| D4 |", 1)[0]
         tabell = tabell[tabell.index(reserven) :]
         # Story 3.3c: demoen foer den ekte versjonen, som i README-en, og en
@@ -2683,7 +2747,8 @@ class TestReadmeForNybegynnere:
         # tidene i Utført-linjene 20.10, 307,84-579,47 s.
         assert "Hele testsettet tok mellom 5 og 10 minutter på maskinen vår 20.10." in tester
         uv = _seksjon("Uten Docker, med uv")
-        assert "[«Tester»](#tester)" in uv
+        # Story 3.5i: «Tester» staar i README-en.
+        assert "[«Tester»](../README.md#tester)" in uv
         assert UV_WINDOWS not in uv and UV_MAC not in uv and "install.ps1" not in uv and "install.sh" not in uv
         sporsmaal = "«The term 'uv' is not recognized» eller «command not found: uv»."
         svar = _hjelp().split(f"### {sporsmaal}\n\n", 1)[1].split("\n\n", 1)[0]
@@ -2780,7 +2845,7 @@ class TestReadmeForNybegynnere:
         # Story 3.3e: installasjonen av uv står bare under «Tester».
         assert uv.startswith(
             "Med Python 3.13 og [uv](https://docs.astral.sh/uv/). Installasjonen av uv står under "
-            "[«Tester»](#tester). Først demoen.\n\n**Demoen**"
+            "[«Tester»](../README.md#tester). Først demoen.\n\n**Demoen**"
         )
         assert etter.startswith(" og øyeblikksbildene ligger da i `data/` i mappa. Uten `--demo` åpner")
         for navn, liste in (("Demoen", demo), ("Den ekte versjonen", ekte)):
@@ -3050,7 +3115,9 @@ class TestReadmeForNybegynnere:
         # Story 3.3h: det rundt appen står i én setning under listene, ikke
         # i «Ferdig».
         rundt = (
-            "Rundt appen er dette også ferdig: README-en med bilder i «Kom i gang» og demoen først, ruff i CI og "
+            # Story 3.5i: installasjonen med bildene staar i en egen fil.
+            "Rundt appen er dette også ferdig: README-en med demoen først og installasjonen med bilder i en egen "
+            "fil, ruff i CI og "
             "i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene."
         )
         assert rundt in status
@@ -3106,8 +3173,9 @@ class TestReadmeForNybegynnere:
             assert setning in etter, setning
 
     def test_lenken_til_staar_du_fast_sier_lenger_ned(self):
-        """Kl. 23:46: «se «Står du fast?» lenger ned»."""
-        assert "se [«Står du fast?»](#står-du-fast) lenger ned." in _kom_i_gang()
+        """Kl. 23:46: «se «Står du fast?» lenger ned». Story 3.5i: i
+        docs/installasjon.md, der «Står du fast?» staar lenger ned."""
+        assert "se [«Står du fast?»](#står-du-fast) lenger ned." in _installasjonen()
 
     def test_beskrivelsen_foelger_koden_og_gir_ikke_raad(self):
         """Beskrivelsen som ble godkjent 11.10 kl. 23:50. Antallet aksjer er
@@ -3233,8 +3301,10 @@ class TestReadmeForNybegynnere:
         # .env.example, .gitignore og .mailmap. Gruppens svar 27.10 kl. 06:31:
         # 31 med .logs/. Gruppens svar 05.11 kl. 12:14 og 12:20: 36 med de fem
         # nye bildene i docs/appen/. Instruksjonen 07.11 kl. 09:10: 38 med
-        # docs/skisser/2026-11-06/ og LESMEG.md der, med hele stien.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 38, lenker
+        # docs/skisser/2026-11-06/ og LESMEG.md der, med hele stien. Story
+        # 3.5i: 40 med docs/installasjon.md i punktet for docs/ og i punktet
+        # for skjermbildene, som staar der.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 40, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -3279,36 +3349,39 @@ class TestReadmeForNybegynnere:
         finnes, eller med lenkene i en annen rekkefølge."""
         tekst = README.read_text(encoding="utf-8")
         lista = tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
+        # Story 3.5i: Docker og demoen staar i docs/installasjon.md, saa
+        # maalet er fila og ankeret der. Den ekte versjonen er linja i
+        # README-en, med ankeret fra foer.
         forventet = [
             # Story 3.5f: foerst dobbeltklikket, saa Docker. Story 3.5g:
             # lenketeksten uten «(anbefalt)», og ankeret fra foer.
-            ("med et dobbeltklikk på «Start demoen»", DOBBELTKLIKK_LENKE, DOBBELTKLIKK_ANKER),
+            ("med et dobbeltklikk på «Start demoen»", DOBBELTKLIKK_LENKE, f"#{DOBBELTKLIKK_ANKER}"),
             # Gjennomgangen, BH2: demolenken sier ogsaa hvor steg 1-4 staar.
-            ("eller med Docker Desktop etter", "steg 1–4", "med-docker-desktop"),
+            ("eller med Docker Desktop etter", "steg 1–4", "docs/installasjon.md#med-docker-desktop"),
             # Gjennomgangen av 3.5h (BH11): demoen står i parentes rett etter steg 1-4.
-            ("](#med-docker-desktop) (", "demoen", _anker("Demoen")),
+            ("](docs/installasjon.md#med-docker-desktop) (", "demoen", f"docs/installasjon.md#{_anker('Demoen')}"),
             # Story 3.3i (U52): en invitasjon til den ekte versjonen, etter demoen.
             (
                 "Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD",
                 "den ekte versjonen",
-                _anker("Den ekte versjonen"),
+                f"#{_anker('Den ekte versjonen')}",
             ),
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
-            ("med to kommandoer etter at uv er installert", "Tester", _anker("Tester")),
+            ("med to kommandoer etter at uv er installert", "Tester", f"#{_anker('Tester')}"),
         ]
         assert lista[0].startswith("- Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel"), lista[0]
         assert lista[1].startswith("- Testene: "), lista[1]
         to_foerste = "\n".join(lista[:2])
-        funnet = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", to_foerste)
+        funnet = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", to_foerste)
         assert funnet == [(t, a) for _, t, a in forventet], funnet
-        alle = _alle_ankrene(tekst)
         forrige = 0
-        for forklaring, lenketekst, anker_ in forventet:
-            i = to_foerste.index(f"[{lenketekst}](#{anker_})")
+        for forklaring, lenketekst, maal in forventet:
+            i = to_foerste.index(f"[{lenketekst}]({maal})")
             assert forklaring in to_foerste[forrige:i], (forklaring, lenketekst)
             forrige = i
-            # Hvert anker finnes én gang (ECH5).
-            assert alle.count(anker_) == 1, anker_
+            # Hvert anker finnes én gang i fila det staar i (ECH5).
+            fil, _, anker_ = maal.partition("#")
+            assert _alle_ankrene((ROT / fil).read_text(encoding="utf-8") if fil else tekst).count(anker_) == 1, maal
         assert _anker("Med Docker Desktop") == "med-docker-desktop"
         assert f'<a name="{DOBBELTKLIKK_ANKER}"></a>\n\n### {DOBBELTKLIKKET}\n' in tekst
 
@@ -3388,7 +3461,12 @@ class TestReadmeDemoenAnbefales:
         «Anbefalt» i tabellen), eller hvis «Kom i gang» ikke begynte med
         anbefalingen av demoen (gjennomgangen, ECH1 og ECH2)."""
         tekst = README.read_text(encoding="utf-8")
-        foerste = _kom_i_gang().lstrip("\n").split("\n\n", 1)[0]
+        installasjonen = _installasjonen()
+        # Story 3.5i (gruppens svar 08.11 kl. 11:24, spoersmaal 1): «Kom i gang»
+        # begynner med overskriften til dobbeltklikket og ankeret, og
+        # anbefalingen staar foerst i docs/installasjon.md.
+        assert _kom_i_gang().lstrip("\n").startswith(f'<a name="{DOBBELTKLIKK_ANKER}"></a>\n\n### {DOBBELTKLIKKET}\n')
+        foerste = installasjonen.lstrip("\n").split("\n\n", 1)[0]
         anbefalingen = (
             "Vi anbefaler demoen for faglærer og sensor, fordi den ikke trenger nøkkel og viser "
             "hovedfunksjonene med faste eksempeldata, også KI-teksten."
@@ -3403,14 +3481,15 @@ class TestReadmeDemoenAnbefales:
         # daterte linjer lenger (gjennomgangen av 3.3h, BH12). Story 3.5f:
         # og ved dobbeltklikket i «Velg vei etter hva du har», som veien.
         # Story 3.5g: og i overskriften til dobbeltklikket.
-        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == [
+        # Story 3.5i: overskriften i README-en, og resten i docs/installasjon.md.
+        assert re.findall(r"anbefal\w*", tekst, re.IGNORECASE) == ["anbefalt"], re.findall(r"\w*anbefal\w*", tekst)
+        assert re.findall(r"anbefal\w*", installasjonen, re.IGNORECASE) == [
             "anbefaler",
             "anbefalt",
             "anbefalt",
-            "anbefalt",
-        ], re.findall(r"\w*anbefal\w*", tekst)
-        assert f"[{DOBBELTKLIKK_LENKE}](#{DOBBELTKLIKK_ANKER}) (anbefalt):" in tekst
-        assert '<a name="demoen"></a>Demoen: anbefalt for faglærer og sensor' in tekst
+        ], re.findall(r"\w*anbefal\w*", installasjonen)
+        assert f"[{DOBBELTKLIKK_LENKE}](../README.md#{DOBBELTKLIKK_ANKER}) (anbefalt):" in installasjonen
+        assert '<a name="demoen"></a>Demoen: anbefalt for faglærer og sensor' in installasjonen
         assert re.search(r"anbefal", _uten_daterte_linjer(_hjelp()), re.IGNORECASE) is None
 
     def test_ingen_anbefalt_ved_den_ekte_versjonen(self):
@@ -3418,15 +3497,20 @@ class TestReadmeDemoenAnbefales:
         overskriften eller tabellen, eller hvis en lenke gikk til det gamle
         ankeret."""
         tekst = README.read_text(encoding="utf-8")
+        installasjonen = _installasjonen()
         # Story 3.5f: «(anbefalt)» står bare ved dobbeltklikket, som er veien,
-        # ikke versjonen. Story 3.5g: i overskriften og i «Velg vei».
-        assert tekst.count("(anbefalt)") == 2
+        # ikke versjonen. Story 3.5g: i overskriften og i «Velg vei». Story
+        # 3.5i: overskriften i README-en og «Velg vei» i docs/installasjon.md.
+        assert tekst.count("(anbefalt)") == 1 and installasjonen.count("(anbefalt)") == 1
         assert f"\n### {DOBBELTKLIKKET}\n" in tekst
-        assert f"[{DOBBELTKLIKK_LENKE}](#{DOBBELTKLIKK_ANKER}) (anbefalt):" in tekst
-        # Story 3.3h: pila til den ekte versjonen, med ankeret.
-        assert '<summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: ' in tekst
-        assert "](#den-ekte-versjonen)" in tekst
+        assert f"[{DOBBELTKLIKK_LENKE}](../README.md#{DOBBELTKLIKK_ANKER}) (anbefalt):" in installasjonen
+        # Story 3.3h: pila til den ekte versjonen, med ankeret. Story 3.5i: i
+        # docs/installasjon.md, og README-en har ankeret paa linja om den
+        # ekte versjonen. Én gang i hver fil.
+        assert '<summary><a name="den-ekte-versjonen"></a>Den ekte versjonen: ' in installasjonen
+        assert "](#den-ekte-versjonen)" in tekst and "](#den-ekte-versjonen)" in installasjonen
         assert _alle_ankrene(tekst).count("den-ekte-versjonen") == 1
+        assert _alle_ankrene(installasjonen).count("den-ekte-versjonen") == 1
         # Gjennomgangen (BH1, ECH4): ingen lenke til det gamle ankeret, heller
         # ikke fra dokumentene, utenom dagsfilene, som lagrer instruksjonene
         # ordrett.
@@ -3459,6 +3543,8 @@ class TestReadmeDemoenAnbefales:
         assert len(beskrivelse) == 1
         assert "trend, bevegelse og interesse (handelsvolum)" in beskrivelse[0]
         assert tekst.count("(handelsvolum)") == 1
+        # Story 3.5i: heller ikke i docs/installasjon.md.
+        assert "(handelsvolum)" not in _installasjonen()
 
     def test_ingen_av_de_ekstra_staar_under_neste_i_v1(self):
         """Svaret kl. 14:48: det briefen ikke lover, står under «Ekstra,
@@ -3654,11 +3740,14 @@ LENKENE_FOER_3_3H = {
 # foer. Var 3bb398cd....
 # Story 3.4h (regel 19): steg 6 i «Demoen» sier at boblen nederst på aksjesiden
 # går til en side i appen. Var f124a92b....
+# Story 3.5i (regel 19): «Dokumentene» og «Mappestruktur» lenker til
+# docs/installasjon.md. Var 7ba6eada... og 0c6df769.... Pilene til demoen og
+# den ekte versjonen staar uendret i docs/installasjon.md, med samme avtrykk.
 AVTRYKK_I_PILENE = {
     "Demoen": "a49a8d06bb28990eeed5c254fd46f2f9f09772dff7f8ced861088452d97933cf",
     "Den ekte versjonen": "c087d5b97500a0a7689a714c40f709f1ac8f3f5cd9b49918d90ed7083f753ad7",
-    "Dokumentene": "7ba6eada43af3ebdfe55e420dd4dcf05be7b034275d53aa1ff6af5ddffbaafa2",
-    "Mappestruktur": "0c6df769ca555da84d1d849881ca008014c4e941100ab942d257a309e277c70f",
+    "Dokumentene": "d80b9ef99d341dbb6f3c1b9c31ced942aa6e8e232b57cc2e89675b7198efa68c",
+    "Mappestruktur": "19ecc179facb58872b79a50420fcb5f66670300621a10335b6a6e0648d3375af",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
@@ -3680,13 +3769,18 @@ AVTRYKK_I_PILENE = {
 # versjonen» og står øverst, og pila til Docker lenker dit. Var d9bc0617...
 # og 44485fc5.... Story 8.20c (U75): avsnittet om noekkelen i «Slik virker
 # dobbeltklikket» sier hva man gjoer med en konto fra foer. Var 9066cc12....
+# Story 3.5i: pilene staar i docs/installasjon.md, med stiene rettet for
+# mappa docs/, og «øverst i README-en» i «Velg versjon» (gruppens svar 08.11
+# kl. 11:24). Med stiene rettet tilbake gir pilene avtrykkene fra foer, sjekket
+# én gang under byggingen. Var aa699409..., bed9f253..., 2efeb526...,
+# d878f1a0... og c75b3ea0.... «Du trenger» er uendret.
 AVTRYKK_I_KOM_I_GANG = {
-    VELG_VEI_PIL: "aa69940997c10246503b38bad1da10dc53afea965745fefbd33e75eaea4e23b4",
+    VELG_VEI_PIL: "a21fbc0cefc67d840a1aa4cbdcc11f11141800225381d1b809dc09ea9c5315a4",
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
-    "Med Docker Desktop": "bed9f253f46f680c10ff969a60a0e2ce0508da9bcec668598c343994331c3453",
-    "Uten Docker, med uv": "2efeb5262b38f15a7fa04bc9715e149cbd053c7c45c193c9e0c048bab02dfc13",
-    "Slik virker dobbeltklikket": "d878f1a0717a772abb79edcbf8981f2bd46d2608b37586a67c457c46d0d931c5",
-    "Står du fast?": "c75b3ea0c4d84655d313b1002cf5845f2321e140fd737a8ac9df20d0de68c2ea",
+    "Med Docker Desktop": "440935debadb3cea3dc714c75663de5b576648547ec3295953836948b83d1cbd",
+    "Uten Docker, med uv": "a1d3d1cf96d7b4b5a0e9f1428ed3876b508939fe326ab67bfeabaa9b63dbc3f0",
+    "Slik virker dobbeltklikket": "6cd3d9de32ad3dbb44532b20185e4746d72d288dbdb1b756a32efb674da59358",
+    "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 
 # Svaret 20.10 kl. 20:20: advarselen staar rett under pila til den ekte
@@ -3720,6 +3814,21 @@ def _seksjonen(tekst: str, overskrift: str) -> str:
     return tekst.split(f"\n## {overskrift}\n", 1)[1].split("\n## ", 1)[0]
 
 
+def _fra_rota(maal: str) -> str:
+    """Et lenkemaal i docs/installasjon.md slik det sto i README-en: stien
+    regnet fra rota, og en lenke til README-en som et anker (story 3.5i)."""
+    if maal.startswith(("http://", "https://", "mailto:", "#")):
+        return maal
+    import posixpath
+
+    fil, skille, anker = maal.partition("#")
+    sti = posixpath.normpath(posixpath.join("docs", fil)) + ("/" if fil.endswith("/") else "")
+    # Gjennomgangen (ECH2): ../README.md uten anker er lenken til README-en.
+    if sti == "README.md" and skille:
+        return f"#{anker}"
+    return sti + skille + anker
+
+
 class TestReadmeBakPiler:
     """Story 3.3h (gruppens svar 20.10 kl. 10:14, 10:15, 10:18 og 10:19, og
     kl. 16:19): README-en er kortere å lese, med mer bak en pil, og
@@ -3731,10 +3840,15 @@ class TestReadmeBakPiler:
         eller mappestrukturen sto inne i pila."""
         tekst = README.read_text(encoding="utf-8")
         synlig = _utenfor_pilene(tekst)
+        # Story 3.5i: pilene staar i docs/installasjon.md, og ingenting av dem
+        # synes der eller i README-en foer pila er åpnet.
+        installasjonen = _installasjonen()
+        synlig_i_installasjonen = _utenfor_pilene(installasjonen)
         for navn in PILENE:
             innhold = _pil(navn)
-            assert innhold and innhold not in synlig, navn
-        assert "**Start demoen.**" not in synlig and "**Hent en nøkkel.**" not in synlig
+            assert innhold and innhold not in synlig and innhold not in synlig_i_installasjonen, navn
+        for steg in ("**Start demoen.**", "**Hent en nøkkel.**"):
+            assert steg in installasjonen and steg not in synlig and steg not in synlig_i_installasjonen, steg
         for overskrift, summary in (
             ("Dokumentene", "Dokumentlista: plan og krav, arbeidsprosess og kvalitet"),
             ("Mappestruktur", "Mappene og filene i repoet"),
@@ -3749,11 +3863,13 @@ class TestReadmeBakPiler:
         # Story 3.5g: i pila til Docker, ikke synlig.
         # Gjennomgangen av 3.5g (BH2, ECH6, VG4): tabellen står i en annen pil.
         # Svarene 28.10 kl. 11:19 og 11:23 (e): tabellen står øverst.
+        # Story 3.5i (gruppens svar 08.11 kl. 11:24, spoersmaal 2): «øverst i
+        # README-en», og lenken til tabellen der.
         velg = (
             f"{VELG_VEI} Klikk på pila for den versjonen du vil prøve. [Tabellen «Demoen og den ekte "
-            "versjonen»](#demoen-og-den-ekte-versjonen) øverst viser forskjellen."
+            "versjonen»](../README.md#demoen-og-den-ekte-versjonen) øverst i README-en viser forskjellen."
         )
-        assert velg in dict(_pilene(_kom_i_gang()))["Med Docker Desktop"] and velg not in synlig
+        assert velg in dict(_pilene(installasjonen))["Med Docker Desktop"] and velg not in synlig_i_installasjonen
 
     def test_innholdet_i_pilene_er_det_samme_som_foer(self):
         """Gjennomgangen av 3.3h (ECH2, BH5): stegene, bildene og advarselen
@@ -3784,7 +3900,7 @@ class TestReadmeBakPiler:
         senere, settes avtrykket på nytt i samme commit."""
         import hashlib
 
-        pilene = dict(_pilene(_kom_i_gang()))
+        pilene = dict(_pilene(_installasjonen()))
         avtrykk = {navn: hashlib.sha256(pilene[navn].encode("utf-8")).hexdigest() for navn in AVTRYKK_I_KOM_I_GANG}
         assert avtrykk == AVTRYKK_I_KOM_I_GANG, avtrykk
 
@@ -3797,14 +3913,16 @@ class TestReadmeBakPiler:
         står, fordi kvalitetssikringen nevner testen (M1 i 3.3h). Ville
         feilet hvis et av stegene, et bilde eller avsnittet om å lime inn sto
         utenfor pila, eller pila hadde en annen pil inni."""
-        synlig = _utenfor_pilene(_kom_i_gang())
-        docker = dict(_pilene(_kom_i_gang()))["Med Docker Desktop"]
+        # Story 3.5i: pila staar i docs/installasjon.md, med stien til bildene
+        # fra docs/. Ingenting av den synes i README-en heller.
+        synlig = _utenfor_pilene(_installasjonen()) + _kom_i_gang()
+        docker = dict(_pilene(_installasjonen()))["Med Docker Desktop"]
         assert "<details>" not in docker
-        assert '<summary><a name="med-docker-desktop"></a>Med Docker Desktop</summary>' in _kom_i_gang()
+        assert '<summary><a name="med-docker-desktop"></a>Med Docker Desktop</summary>' in _installasjonen()
         for steg in STEGENE_FOER_3_3H[:4]:
             assert f"\n{steg}" in "\n" + docker and steg not in synlig, steg
         for bilde in BILDENE.values():
-            assert f"docs/bilder/readme/{bilde})" in docker and bilde not in synlig, bilde
+            assert f"](bilder/readme/{bilde})" in docker and bilde not in synlig, bilde
         for avsnitt in (KOPIERINGEN, VELG_VEI):
             assert avsnitt in docker and avsnitt not in synlig, avsnitt
 
@@ -3830,8 +3948,9 @@ class TestReadmeBakPiler:
 
     def test_pila_til_demoen_sier_at_den_er_anbefalt_for_faglaerer_og_sensor(self):
         """Svaret 19.10 kl. 14:46. Ville feilet hvis «anbefalt» falt ut av pila
-        til demoen, eller kom i pila til den ekte versjonen."""
-        tekst = _kom_i_gang()
+        til demoen, eller kom i pila til den ekte versjonen. Story 3.5i: i
+        docs/installasjon.md."""
+        tekst = _installasjonen()
         # Story 3.5g: «Står du fast?» har piler inni, så summary leses linje
         # for linje.
         pilene = {
@@ -3862,7 +3981,12 @@ class TestReadmeBakPiler:
         README-en foer pilene falt ut, i pilene eller utenfor dem."""
         from collections import Counter
 
-        tekst = README.read_text(encoding="utf-8")
+        # Story 3.5i: README-en og docs/installasjon.md etter hverandre, i den
+        # rekkefoelgen delene sto, og lenkene i installasjonen regnet fra rota,
+        # slik de sto i README-en.
+        readme = README.read_text(encoding="utf-8")
+        installasjonen = _installasjonen()
+        tekst = readme + "\n" + installasjonen
         steg = []
         for linje in re.findall(r"^\d+\. .*$", tekst, re.MULTILINE):
             tittel = re.match(r"^(\d+\. \*\*[^*]+\*\*)", linje)
@@ -3871,13 +3995,16 @@ class TestReadmeBakPiler:
         assert steg == [*STEGENE_I_DOBBELTKLIKKET, *STEGENE_FOER_3_3H], steg
         kommandoer = Counter(b.strip() for spraak, b in _blokkene(tekst) if not spraak)
         assert not Counter(KOMMANDOENE_FOER_3_3H) - kommandoer, Counter(KOMMANDOENE_FOER_3_3H) - kommandoer
-        lenker = Counter(re.findall(r"\]\(([^)\s]+)\)", tekst))
+        # En lenke fra README-en til et anker i installasjonen gaar dit ankeret
+        # i README-en sto.
+        lenker = Counter(re.sub(r"^docs/installasjon\.md#", "#", m) for m in re.findall(r"\]\(([^)\s]+)\)", readme))
+        lenker += Counter(_fra_rota(m) for m in re.findall(r"\]\(([^)\s]+)\)", installasjonen))
         assert not Counter(LENKENE_FOER_3_3H) - lenker, Counter(LENKENE_FOER_3_3H) - lenker
-        # Ankrene lenkene går til, finnes én gang.
-        alle = _alle_ankrene(tekst)
+        # Ankrene lenkene går til, finnes én gang i fila de står i.
         for maal in LENKENE_FOER_3_3H:
             if maal.startswith("#"):
-                assert alle.count(maal[1:]) == 1, maal
+                antall = (_alle_ankrene(readme).count(maal[1:]), _alle_ankrene(installasjonen).count(maal[1:]))
+                assert 1 in antall and max(antall) == 1, (maal, antall)
 
     def test_hjelpen_sier_klokkeslettet_fra_tidsgrensen_og_har_ingen_daterte_linjer(self):
         """Gruppens svar kl. 16:19: hjelpen rettes der teksten står, og
@@ -3908,14 +4035,19 @@ class TestReadmeBakPiler:
         en pil, med pilene til spørsmålene inni. Det er den eneste pila som
         kan ha piler inni, og bare ett nivå. Ville feilet med en pil inni en
         annen pil et annet sted, eller to nivåer inni «Står du fast?»."""
-        for navn, tekst in (("README.md", README.read_text(encoding="utf-8")), ("docs/hjelp.md", _hjelp())):
+        # Story 3.5i: og docs/installasjon.md, der «Står du fast?» staar nå.
+        for navn, tekst in (
+            ("README.md", README.read_text(encoding="utf-8")),
+            ("docs/hjelp.md", _hjelp()),
+            ("docs/installasjon.md", _installasjonen()),
+        ):
             aapne = re.findall(r"<details\b", tekst)
             assert len(aapne) == tekst.count("</details>") == tekst.count("<summary>"), (navn, len(aapne))
             hele = []
             for summary, innhold in _pilene(tekst):
                 hele.append((summary, innhold))
                 if "<details" in innhold:
-                    assert (navn, summary) == ("README.md", "Står du fast?"), (navn, summary)
+                    assert (navn, summary) == ("docs/installasjon.md", "Står du fast?"), (navn, summary)
                     indre = _pilene(innhold)
                     assert indre and all("<details" not in i for _, i in indre), summary
                     hele += indre
@@ -4009,12 +4141,13 @@ class TestFemSpoersmaal:
 
 
 def _velg_vei() -> list[tuple[str, str, str]]:
-    """Punktene under «Velg vei etter hva du har» som (lenketekst, anker,
-    resten av linja)."""
-    del_ = _kom_i_gang().split("\n**Velg vei etter hva du har:**\n\n", 1)[1].split("\n\n", 1)[0]
+    """Punktene under «Velg vei etter hva du har» som (lenketekst, maal,
+    resten av linja). Story 3.5i: i docs/installasjon.md, og maalet er
+    ankeret der eller ../README.md# og ankeret i README-en."""
+    del_ = _installasjonen().split("\n**Velg vei etter hva du har:**\n\n", 1)[1].split("\n\n", 1)[0]
     punkter = []
     for linje in del_.splitlines():
-        treff = re.fullmatch(r"- \[([^\]]+)\]\(#([^)]+)\)(.*)", linje)
+        treff = re.fullmatch(r"- \[([^\]]+)\]\(((?:\.\./README\.md)?#[^)]+)\)(.*)", linje)
         assert treff, linje
         punkter.append(treff.groups())
     return punkter
@@ -4033,6 +4166,14 @@ def _ord(tekst: str) -> int:
 
 
 LINUX_LINJA = "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under."
+# Story 3.5i (spesifikasjonen, med svaret 08.11 kl. 11:24): linja om den
+# ekte versjonen i README-en, med ankeret lenken i demoen gaar til.
+EKTE_LINJA = (
+    '<a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for '
+    "«Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra "
+    "ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: "
+    "[Installasjonen](docs/installasjon.md)."
+)
 
 
 class TestHovedveien:
@@ -4046,21 +4187,59 @@ class TestHovedveien:
         """Story 3.5g: «Kom i gang» er én setning, overskriften med ankeret
         fra før, de fem stegene, linja om advarselen, linja om den ekte
         versjonen og linja om Linux (gruppens svar 27.10 kl. 06:09, a), og så
-        pilene i rekkefølgen i instruksjonen. Ville feilet
-        hvis stegene ikke sto først, et steg manglet, sto i en annen
-        rekkefølge eller hadde mer enn 25 ord, noe annet sto synlig før
-        pilene, en pil manglet eller sto i en annen rekkefølge, eller
-        dobbeltklikket sto igjen under «Mer for den som vil»."""
+        pilene i rekkefølgen i instruksjonen.
+
+        Story 3.5i, kontrollpunkt a) og c) (gruppens svar 07.11 kl. 23:26 og
+        08.11 kl. 11:24): «Kom i gang» i README-en har bare overskriften med
+        ankeret, de fem stegene, linja om første gang og linja om den ekte
+        versjonen, med ankeret den-ekte-versjonen og lenken til
+        docs/installasjon.md. Der står anbefalingen først, så linja om Linux
+        og pilene. Ville feilet hvis stegene ikke sto først, et steg manglet,
+        sto i en annen rekkefølge eller hadde mer enn 25 ord, en pil, en
+        boks, Docker-stegene, uv-kommandoene, linja om Linux, «Står du fast?»
+        eller «Mer for den som vil» sto igjen i README-en, ankeret sto på en
+        annen linje eller manglet, en pil manglet eller sto i en annen
+        rekkefølge i installasjonen, eller dobbeltklikket sto igjen under «Mer
+        for den som vil»."""
+        import app
+
         del_ = _kom_i_gang()
-        overskrifter = re.findall(r"^### (.+)$", _utenfor_pilene(del_), re.MULTILINE)
-        assert overskrifter == [DOBBELTKLIKKET, "Mer for den som vil"], overskrifter
-        foer = del_.split("\n<details>\n", 1)[0].strip("\n")
-        avsnitt = [a for a in foer.split("\n\n") if a.strip()]
-        assert len(avsnitt) == 7, avsnitt
-        anbefalingen, anker, overskrift, stegene, advarselen, ekte, linux = avsnitt
+        readme = README.read_text(encoding="utf-8")
+        installasjonen = _installasjonen()
+        # a): ingen pil, ingen boks og ingen overskrift utenom dobbeltklikket.
+        assert "<details>" not in del_ and "<summary>" not in del_ and not _blokkene(del_), del_
+        assert re.findall(r"^#{1,6} (.+)$", del_, re.MULTILINE) == [DOBBELTKLIKKET]
+        avsnitt = [a for a in del_.strip("\n").split("\n\n") if a.strip()]
+        assert len(avsnitt) == 5, avsnitt
+        anker, overskrift, stegene, advarselen, ekte = avsnitt
+        assert anker == f'<a name="{DOBBELTKLIKK_ANKER}"></a>' and overskrift == f"### {DOBBELTKLIKKET}"
+        # Det som er flyttet, står ikke igjen noe sted i README-en.
+        for flyttet in (
+            *(f"<summary>{p}</summary>" for p in ("Du trenger", "Står du fast?", "Slik virker dobbeltklikket")),
+            *(f"{p}</summary>" for p in PILENE_I_KOM_I_GANG),
+            "### Mer for den som vil",
+            LINUX_LINJA,
+            "**Linux:**",
+            "docker compose",
+            "uv run python",
+            "cp .env.example .env",
+            "Vi anbefaler demoen",
+        ):
+            assert flyttet not in readme, flyttet
+        # c): linja om den ekte versjonen, slik den står i spesifikasjonen,
+        # med ankeret EKTE_VERSJONEN_URL går til, én gang i README-en.
+        assert ekte == EKTE_LINJA, ekte
+        assert app.EKTE_VERSJONEN_URL.endswith("/G74-lund-osen#den-ekte-versjonen")
+        assert _alle_ankrene(readme).count("den-ekte-versjonen") == 1
+        # Installasjonen: anbefalingen og linja om Linux synlig, så pilene.
+        overskrifter = re.findall(r"^### (.+)$", _utenfor_pilene(installasjonen), re.MULTILINE)
+        assert overskrifter == ["Mer for den som vil"], overskrifter
+        foer = installasjonen.split("\n<details>\n", 1)[0].strip("\n")
+        foer_avsnitt = [a for a in foer.split("\n\n") if a.strip()]
+        assert len(foer_avsnitt) == 2, foer_avsnitt
+        anbefalingen, linux = foer_avsnitt
         assert anbefalingen.startswith("Vi anbefaler demoen for faglærer og sensor") and "\n" not in anbefalingen
         assert len(re.findall(r"[.!?](?:\s|$)", anbefalingen)) == 1, anbefalingen
-        assert anker == f'<a name="{DOBBELTKLIKK_ANKER}"></a>' and overskrift == f"### {DOBBELTKLIKKET}"
         linjene = stegene.splitlines()
         assert [int(re.match(r"(\d+)\. ", l).group(1)) for l in linjene] == [1, 2, 3, 4, 5], linjene
         for linje, tittel in zip(linjene, STEGENE_I_DOBBELTKLIKKET, strict=True):
@@ -4083,12 +4262,14 @@ class TestHovedveien:
         assert lenkene == [("Windows", "windows-advarer-mot-fila"), ("Mac", "mac-sier-at-fila-ikke-kan-åpnes")]
         for _, maal in lenkene:
             assert maal in hjelp, maal
-        assert ekte.startswith("**Ekte kurser:**") and "«Start den ekte versjonen»" in ekte and "\n" not in ekte
+        # Story 3.5i: med ankeret foran (c).
+        assert ekte.startswith('<a name="den-ekte-versjonen"></a>**Ekte kurser:**')
+        assert "«Start den ekte versjonen»" in ekte and "\n" not in ekte
         assert "nøkkel fra EODHD" in ekte
         # Gjennomgangen av 3.5g (BH5, ECH4): vernet mot .git står synlig.
         assert "bare i en kopi fra ZIP-fila, ikke i en klon" in ekte
         assert linux == LINUX_LINJA
-        assert [s for s, _ in _pilene(del_)][: len(PILENE_I_KOM_I_GANG)] == list(PILENE_I_KOM_I_GANG)
+        assert [s for s, _ in _pilene(installasjonen)][: len(PILENE_I_KOM_I_GANG)] == list(PILENE_I_KOM_I_GANG)
         assert not any("dobbeltklikk" in s.lower() for s in _detaljer(_seksjon("Mer for den som vil")))
 
     def test_tabellen_staar_uten_pil_foer_til_faglaerer(self):
@@ -4113,9 +4294,12 @@ class TestHovedveien:
         i = tekst.index(TABELLEN)
         assert tekst.index("**Innhold:**") < i < tekst.index("\nTil faglærer:\n") < tekst.index("\n## Kom i gang")
         assert tekst.count("| | Demoen | Den ekte versjonen |") == 1
-        assert not any("| Klar |" in innhold for _, innhold in _pilene(_kom_i_gang()))
-        lenke = "](#demoen-og-den-ekte-versjonen)"
-        assert lenke in dict(_pilene(_kom_i_gang()))["Med Docker Desktop"]
+        # Story 3.5i: pilene staar i docs/installasjon.md, og lenken gaar til
+        # tabellen i README-en.
+        assert not any("| Klar |" in innhold for _, innhold in _pilene(_installasjonen()))
+        assert "| Klar |" not in _installasjonen()
+        lenke = "](../README.md#demoen-og-den-ekte-versjonen)"
+        assert lenke in dict(_pilene(_installasjonen()))["Med Docker Desktop"]
         assert tekst.count('<a name="demoen-og-den-ekte-versjonen"></a>') == 1
 
     def test_pila_og_tabellen_har_hvert_sitt_navn(self):
@@ -4125,16 +4309,19 @@ class TestHovedveien:
         og tabellen fikk samme navn, pila het noe annet, eller lenken til
         tabellen brøt."""
         tekst = README.read_text(encoding="utf-8")
-        navnene = [navn for navn, _ in _pilene(_kom_i_gang())]
+        # Story 3.5i: pilene staar i docs/installasjon.md.
+        installasjonen = _installasjonen()
+        navnene = [navn for navn, _ in _pilene(installasjonen)]
         assert navnene[0] == VELG_VEI_PIL == "Velg vei: dobbeltklikk, Docker eller uv", navnene
         assert "Demoen og den ekte versjonen" not in navnene
         assert tekst.count("<summary>Demoen og den ekte versjonen</summary>") == 0
         assert tekst.count("**Demoen og den ekte versjonen:**") == 1
         assert _alle_ankrene(tekst).count("demoen-og-den-ekte-versjonen") == 1
         # Pila begynner rett etter de fem stegene og de tre linjene under
-        # (gjennomgangen av 3.5h, BH13).
-        linux = "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under."
-        mellom = tekst.split(linux, 1)[1].split(f"<summary>{VELG_VEI_PIL}</summary>", 1)[0]
+        # (gjennomgangen av 3.5h, BH13). Story 3.5i: rett etter linja om
+        # Linux i docs/installasjon.md.
+        assert "<summary>Demoen og den ekte versjonen</summary>" not in installasjonen
+        mellom = installasjonen.split(LINUX_LINJA, 1)[1].split(f"<summary>{VELG_VEI_PIL}</summary>", 1)[0]
         assert mellom.split() == ["<details>"], mellom
 
     def test_hvert_steg_under_staar_du_fast_sier_hvilken_vei(self):
@@ -4176,19 +4363,22 @@ class TestHovedveien:
         tredje kort linje under stegene, «Linux: bruk Docker eller uv,
         under.», med lenker til pilene for Docker og uv. Ville feilet hvis
         linja manglet, sto et annet sted enn rett etter linja om den ekte
-        versjonen, sto bak en pil, eller lenket til et anker som ikke finnes."""
-        del_ = _kom_i_gang()
+        versjonen, sto bak en pil, eller lenket til et anker som ikke finnes.
+
+        Story 3.5i: linja står i docs/installasjon.md, rett etter anbefalingen
+        og før pilene, og ikke i README-en."""
+        del_ = _installasjonen()
         foer = del_.split("\n<details>\n", 1)[0]
-        assert foer.count(LINUX_LINJA) == 1
+        assert foer.count(LINUX_LINJA) == 1 and del_.count(LINUX_LINJA) == 1
+        assert LINUX_LINJA not in README.read_text(encoding="utf-8")
         assert not any(LINUX_LINJA in innhold for _, innhold in _pilene(del_))
         avsnitt = [a.strip() for a in foer.split("\n\n") if a.strip()]
-        assert avsnitt[-2].startswith("**Ekte kurser:**") and avsnitt[-1] == LINUX_LINJA
+        assert avsnitt[-2].startswith("Vi anbefaler demoen") and avsnitt[-1] == LINUX_LINJA
         assert re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", LINUX_LINJA) == "**Linux:** bruk Docker eller uv, under."
         lenkene = re.findall(r"\]\(#([^)]+)\)", LINUX_LINJA)
         assert lenkene == ["med-docker-desktop", "uten-docker-med-uv"]
-        tekst = README.read_text(encoding="utf-8")
         for maal in lenkene:
-            assert f'<a name="{maal}"></a>' in tekst, maal
+            assert f'<a name="{maal}"></a>' in del_, maal
 
     def test_resten_av_dobbeltklikket_staar_bak_pila(self):
         """Story 3.5g: teksten som sto under dobbeltklikket, står uendret i
@@ -4218,7 +4408,8 @@ class TestHovedveien:
             "**Godkjenningen på Mac.**",
             "**Den ekte versjonen** starter bare i en kopi fra «Download ZIP»",
             "Den ekte versjonen spør etter nøkkelen fra EODHD første gang.",
-            "Skriptene står i [`start/`](start/)",
+            # Story 3.5i: stien fra docs/installasjon.md.
+            "Skriptene står i [`start/`](../start/)",
             "Den bruker port 8000, som Docker.",
         ):
             assert setning in slik, setning
@@ -4228,18 +4419,24 @@ class TestHovedveien:
         """Story 3.5g: hver overskrift som sto i «Kom i gang» før, står som
         overskrift eller som pil, og hvert anker lenkene bruker, finnes én
         gang. Ville feilet hvis en av dem falt ut, eller et anker ble borte
-        eller sto to ganger."""
+        eller sto to ganger.
+
+        Story 3.5i: overskriftene og pilene står i README-en eller i
+        docs/installasjon.md, og hvert anker står én gang i fila lenkene går
+        til. Den-ekte-versjonen står i begge: på linja i README-en og i pila
+        i installasjonen."""
         tekst = README.read_text(encoding="utf-8")
-        del_ = _kom_i_gang()
+        installasjonen = INSTALLASJONEN.read_text(encoding="utf-8")
+        del_ = _kom_i_gang() + _installasjonen()
         overskrifter = set(re.findall(r"^### (.+)$", del_, re.MULTILINE))
         pilene = {re.sub(ANKER_I_PIL, "", s) for s in re.findall(r"^<summary>(.+)</summary>$", del_, re.MULTILINE)}
         for gammel in ("Med Docker Desktop", "Står du fast?", "Mer for den som vil", "Uten Docker, med uv"):
             assert gammel in overskrifter | pilene, gammel
         assert DOBBELTKLIKKET in overskrifter
-        alle = _alle_ankrene(tekst)
+        i_readme, i_installasjonen = _alle_ankrene(tekst), _alle_ankrene(installasjonen)
+        for anker in ("kom-i-gang", DOBBELTKLIKK_ANKER, "den-ekte-versjonen", "tester"):
+            assert i_readme.count(anker) == 1, anker
         for anker in (
-            "kom-i-gang",
-            DOBBELTKLIKK_ANKER,
             "med-docker-desktop",
             "demoen",
             "den-ekte-versjonen",
@@ -4247,9 +4444,8 @@ class TestHovedveien:
             "står-du-fast",
             "slik-virker-dobbeltklikket",
             "mer-for-den-som-vil",
-            "tester",
         ):
-            assert alle.count(anker) == 1, anker
+            assert i_installasjonen.count(anker) == 1, anker
 
     def test_velg_vei_lenker_rett_inn_i_rekkefoelgen(self):
         """Ville feilet hvis lista under tabellen manglet, en vei sto i en
@@ -4264,20 +4460,23 @@ class TestHovedveien:
         assert _seksjon("Du trenger").startswith("**Du trenger**")
         punkter = _velg_vei()
         assert [t for t, _, _ in punkter] == [DOBBELTKLIKK_LENKE, "Med Docker Desktop", "Uten Docker, med uv"]
+        # Story 3.5i: dobbeltklikket i README-en, og de to andre i
+        # docs/installasjon.md, der lista står.
         assert [a for _, a, _ in punkter] == [
-            "enklest-dobbeltklikk-uten-docker",
-            "med-docker-desktop",
-            "uten-docker-med-uv",
+            "../README.md#enklest-dobbeltklikk-uten-docker",
+            "#med-docker-desktop",
+            "#uten-docker-med-uv",
         ]
-        alle = _alle_ankrene(README.read_text(encoding="utf-8"))
-        for _, anker, _ in punkter:
-            assert alle.count(anker) == 1, anker
-        assert punkter[1][1] == _anker(punkter[1][0])
+        for _, maal, _ in punkter:
+            fil, _, anker = maal.partition("#")
+            tekst = README.read_text(encoding="utf-8") if fil else INSTALLASJONEN.read_text(encoding="utf-8")
+            assert _alle_ankrene(tekst).count(anker) == 1, maal
+        assert punkter[1][1] == "#" + _anker(punkter[1][0])
         assert punkter[0][2].startswith(" (anbefalt): ")
         # Story 3.5g: uv står ikke lenger under «Mer for den som vil».
         assert punkter[2][2].startswith(": kommandoene i et terminalvindu.")
         # Ankeret til uv står i pila.
-        assert f"<summary>{UV_PIL}</summary>" in _kom_i_gang()
+        assert f"<summary>{UV_PIL}</summary>" in _installasjonen()
 
     def test_docker_veien_har_stegene_bildene_og_kommandoene(self):
         """Ville feilet hvis Docker-veien eller en kommando manglet i «Kom i
@@ -4285,13 +4484,14 @@ class TestHovedveien:
         # Story 3.5g: fra pila til Docker til pila til uv, med pilene til
         # demoen og den ekte versjonen og advarselen mot down -v imellom.
         start = '<summary><a name="med-docker-desktop"></a>Med Docker Desktop</summary>'
-        docker = _kom_i_gang().split(start, 1)[1].split(f"<summary>{UV_PIL}</summary>", 1)[0]
-        assert [s for s, _ in _pilene(_kom_i_gang())][2:5] == list(PILENE_I_KOM_I_GANG[2:5])
+        # Story 3.5i: i docs/installasjon.md, med stien til bildene fra docs/.
+        docker = _installasjonen().split(start, 1)[1].split(f"<summary>{UV_PIL}</summary>", 1)[0]
+        assert [s for s, _ in _pilene(_installasjonen())][2:5] == list(PILENE_I_KOM_I_GANG[2:5])
         assert [int(n) for n in re.findall(r"^(\d+)\. ", docker, re.MULTILINE)] == [1, 2, 3, 4, 5, 6, 7, 5, 6, 7, 8, 9]
         for bilde in BILDENE.values():
-            assert f"](docs/bilder/readme/{bilde})" in docker, bilde
+            assert f"](bilder/readme/{bilde})" in docker, bilde
         assert KOPIERINGEN in docker and f"\n{VELG_VEI} Klikk på pila" in docker
-        assert "**Velg vei.**" not in README.read_text(encoding="utf-8")
+        assert "**Velg vei.**" not in readme_og_installasjonen()
         assert '<a name="demoen"></a>' in docker and '<a name="den-ekte-versjonen"></a>' in docker
         kommandoene = [l.strip() for spraak, b in _blokkene(docker) if not spraak for l in b.splitlines()]
         assert kommandoene == [
@@ -4310,8 +4510,9 @@ class TestHovedveien:
         """Ville feilet hvis den direkte lenken gikk til en annen gren eller
         et annet repo enn GitHub-siden README-en lenker til, eller ikke sto
         både i dobbeltklikket og i steg 2. Mappa GitHub pakker ut, heter
-        repoet og grenen, G74-lund-osen-main, som stegene sier."""
-        tekst = README.read_text(encoding="utf-8")
+        repoet og grenen, G74-lund-osen-main, som stegene sier. Story 3.5i:
+        README-en og docs/installasjon.md, i den rekkefølgen."""
+        tekst = readme_og_installasjonen()
         repoet = "https://github.com/IBE160-2026/G74-lund-osen"
         assert f"[GitHub-siden]({repoet})" in tekst
         assert f"{repoet}/actions/workflows/tester.yml" in tekst
@@ -4345,8 +4546,9 @@ class TestHovedveien:
         """Ville feilet hvis «Til faglærer» viste til Docker foer
         dobbeltklikket."""
         lista = README.read_text(encoding="utf-8").split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0]
-        assert lista.index("](#enklest-dobbeltklikk-uten-docker)") < lista.index("](#med-docker-desktop)")
-        assert lista.index("](#med-docker-desktop)") < lista.index("](#demoen)")
+        # Story 3.5i: Docker og demoen i docs/installasjon.md.
+        docker, demoen = "](docs/installasjon.md#med-docker-desktop)", "](docs/installasjon.md#demoen)"
+        assert lista.index("](#enklest-dobbeltklikk-uten-docker)") < lista.index(docker) < lista.index(demoen)
 
     def test_mappestrukturen_forklarer_alt_i_rota(self):
         """Ville feilet hvis en fil eller mappe i rota som git sporer, ikke
@@ -4403,9 +4605,10 @@ class TestHovedveien:
         # Story 3.5g: avsnittet om advarselen står i pila «Slik virker
         # dobbeltklikket». Gjennomgangen (BH7, ECH1, VG2): lenken går til
         # ankeret i den pila, ikke til de fem stegene.
-        assert "«Slik virker dobbeltklikket» i [README-en](../README.md#slik-virker-dobbeltklikket)" in hjelp
+        # Story 3.5i: pila står i docs/installasjon.md.
+        assert "«Slik virker dobbeltklikket» i [installasjonen](installasjon.md#slik-virker-dobbeltklikket)" in hjelp
         assert '<summary><a name="slik-virker-dobbeltklikket"></a>Slik virker dobbeltklikket</summary>' in (
-            README.read_text(encoding="utf-8")
+            _installasjonen()
         )
         neste = hjelp.split("### Hvordan starter jeg neste gang?\n\n", 1)[1]
         assert neste.startswith("Med dobbeltklikket: ") and "\n\nMed Docker: " in neste
@@ -4455,3 +4658,275 @@ class TestKortFortalt:
         lista = README.read_text(encoding="utf-8").split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0]
         assert sum("prd.md#kort-fortalt)" in linje for linje in lista.splitlines()) == 1
         assert "kort-fortalt" in _ankrene(PRD.read_text(encoding="utf-8"))
+
+
+# Story 3.5i, kontrollpunkt e): delene som er flyttet til docs/installasjon.md,
+# slik meldingene og kommentarene nevner dem. Begge stavemaatene, fordi
+# .env.example skriver «noekkel».
+FLYTTET = (
+    "Den lokale modellen",
+    "Egen nøkkel til Gemini, Anthropic eller OpenAI",
+    "Egen noekkel til Gemini, Anthropic eller OpenAI",
+    "Slik virker dobbeltklikket",
+    "Hentingen hver kveld",
+    "Står du fast?",
+    "Mer for den som vil",
+    "Bytte mellom demoen og den ekte versjonen",
+    "Variablene i .env",
+    "Med Docker Desktop",
+    "Uten Docker, med uv",
+    "Du trenger",
+)
+# Story 3.5i, kontrollpunkt f): antallet tester i filene som leste delene i
+# README-en, på main før grenen (958c27a3), og testene 3.5i la til: tre i
+# test_docker.py (153 før) og testen for d) i test_readme.py (2 før).
+# Mutanten for f) overlevde med antallet fra før, fordi de nye testene dekket
+# over en som ble borte. Gjennomgangen (BH6, ECH1, ECH5): navnene sjekkes i
+# TESTENE_SOM_LESER_DELENE under, ikke bare antallet.
+TESTENE_ETTER_3_5I = {
+    "test_docker.py": 156,
+    "test_dobbeltklikk.py": 38,
+    "test_readme.py": 3,
+    "test_ki_tekst.py": 43,
+    "test_ki_tjenestene.py": 39,
+    "test_kveldshenting.py": 20,
+    "test_investorsidene_demo.py": 18,
+    "test_app.py": 236,
+    "test_demo.py": 74,
+    "test_aksjesiden_8_20a.py": 34,
+    "test_boersometeret_8_20b.py": 16,
+}
+
+
+# Gjennomgangen av 3.5i (BH6, ECH1, ECH5): testene som leser delene som er
+# flyttet, med en av leserne under, ved byggingen. Ville en av dem blitt
+# slettet, fått nytt navn eller sluttet å lese delene, feiler testen for f).
+LESERNE = re.compile(
+    r"\b(_?installasjonen|readme_og_installasjonen|_seksjon|_pil|_pilene|_steg|_faq|_kommandoene|"
+    r"_delen_i_readme|_readme_avsnittet|_velg_vei|_dobbeltklikket|INSTALLASJONEN)\b"
+)
+TESTENE_SOM_LESER_DELENE = {
+    "test_docker.py": (
+        "test_advarselen_mot_down_v_staar_synlig",
+        "test_advarselen_om_down_v_og_basen",
+        "test_bare_kommandoer_i_kom_i_gang",
+        "test_begge_meldingene_i_samme_spoersmaal",
+        "test_bildene_av_appen_staar_bare_i_knappen",
+        "test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket",
+        "test_de_felles_stegene_staar_ikke_bak_en_pil",
+        "test_delen_om_den_lokale_modellen_sier_at_den_er_valgfri",
+        "test_demoen_den_ekte_versjonen_dokumentlista_og_mappestrukturen_bak_hver_sin_pil",
+        "test_demoen_foerst_og_zip_foer_kommandoene",
+        "test_demoen_paa_dagtid_og_helgen_i_steg_8",
+        "test_det_foerste_spoersmaalet_er_at_docker_ikke_kjoerer",
+        "test_det_som_er_flyttet_bak_pilene_er_det_samme_som_foer",
+        "test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil",
+        "test_docker_foerst_og_uv_som_alternativ",
+        "test_docker_veien_har_stegene_bildene_og_kommandoene",
+        "test_dokumentene_og_mappestrukturen_lenker_til_installasjonen",
+        "test_du_trenger_versjonene",
+        "test_en_kommando_per_boks",
+        "test_err_connection_refused_under_staar_du_fast",
+        "test_forklaringen_i_tester_staar_bak_en_knapp",
+        "test_henvisningene_og_proevetabellen",
+        "test_hjelpen_har_dobbeltklikket_foerst",
+        "test_hvert_steg_hver_kommando_og_hver_lenke_fra_foer_finnes",
+        "test_hvert_steg_under_staar_du_fast_sier_hvilken_vei",
+        "test_hvert_tema_staar_i_readme_eller_hjelp",
+        "test_ingen_anbefalt_ved_den_ekte_versjonen",
+        "test_ingen_bokser_testene_ikke_ser",
+        "test_ingen_kommentar_paa_kommandolinjene",
+        "test_innholdet_i_pilene_er_det_samme_som_foer",
+        "test_installasjonen_av_uv_staar_foer_uv_sync",
+        "test_interesse_handelsvolum_oeverst",
+        "test_knappen_staar_rett_under_beskrivelsen_og_er_lukket",
+        "test_kom_i_gang_anbefaler_demoen_for_faglaerer_og_sensor",
+        "test_kommandoene_er_de_samme_som_i_koden_og_compose",
+        "test_kopieringen_forklares_en_gang_og_hvert_steg_sier_hvor",
+        "test_lenken_til_staar_du_fast_sier_lenger_ned",
+        "test_lenkene_virker",
+        "test_like_spoersmaal_har_samme_svar",
+        "test_linja_om_linux_lenker_til_docker_og_uv",
+        "test_linja_som_viser_at_appen_er_klar",
+        "test_markdown_inne_i_pilene_vises_riktig_paa_github",
+        "test_meldingene_og_kommentarene_viser_til_installasjonen",
+        "test_mer_for_den_som_vil_er_lukket",
+        "test_merket_i_demoen_er_det_samme_som_i_malene",
+        "test_overskriftene_fra_foer_finnes",
+        "test_pila_og_tabellen_har_hvert_sitt_navn",
+        "test_pila_til_demoen_sier_at_den_er_anbefalt_for_faglaerer_og_sensor",
+        "test_porten_er_den_samme_overalt_og_ikke_5000",
+        "test_raadet_om_tidspunkt_uten_flagget",
+        "test_readme_lover_0_kall_bare_naar_basen_har_kursene",
+        "test_readme_proeven_har_hver_kommando",
+        "test_resten_av_dobbeltklikket_staar_bak_pila",
+        "test_siden_lastes_paa_nytt_etter_hentingen",
+        "test_spoersmaalene_som_ble_tatt_ut_staar_i_hjelp",
+        "test_staar_du_fast_har_hoeyst_5_spoersmaal",
+        "test_standardene_i_tabellen_er_de_i_koden",
+        "test_status_uten_storynumre_og_uten_kommando",
+        "test_steg_4_mappa_ikke_zip_fila",
+        "test_stegene_er_nummerert_og_har_hoeyst_65_ord",
+        "test_stegene_nevner_powershell_og_terminal",
+        "test_stopp_i_begge_versjonene",
+        "test_stoppkommandoen_for_demoen",
+        "test_svarene_beholdt_innholdet",
+        "test_svaret_om_cannot_find_path",
+        "test_svaret_om_mellomrommet_etter_cd",
+        "test_tabellen_nevner_begge_og_hvilken_som_er_anbefalt",
+        "test_tabellen_og_du_trenger_sier_ikke_at_docker_trengs",
+        "test_tabellen_staar_uten_pil_foer_til_faglaerer",
+        "test_tallene_20_og_16_stemmer_med_koden",
+        "test_teksten_under_hvert_bilde",
+        "test_testene_leser_delene_i_installasjonen_og_ingen_er_borte",
+        "test_testene_uten_docker",
+        "test_tjenestene_i_readme_finnes_i_compose",
+        "test_under_tester_staar_kommandoene_og_lenken_synlig",
+        "test_uv_delen_er_to_nummererte_lister",
+        "test_uv_med_demo_flagget_som_appen_leser",
+        "test_variablene_i_tabellen_er_de_i_env_example",
+        "test_velg_vei_lenker_rett_inn_i_rekkefoelgen",
+        "test_zip_fila_maa_pakkes_ut",
+        "test_zip_lenken_gaar_til_main_i_dette_repoet",
+    ),
+    "test_dobbeltklikk.py": (
+        "test_readme_og_hjelpen_har_advarselen_og_godkjenningen",
+        "test_skriptene_bruker_kommandoene_i_readme",
+        "test_spoer_foer_uv_installeres",
+        "test_start_ps1_stopper_den_ekte_versjonen_i_en_mappe_med_git",
+        "test_vinduet_sier_hvor_noekkelen_staar_og_hvordan_den_limes_inn",
+        "test_webserveren_har_8_traader_i_skriptene_readme_og_dockerfile",
+    ),
+    "test_readme.py": (
+        "test_hver_lenke_i_readme_og_installasjonen_gaar_til_en_fil_og_et_anker_som_finnes",
+        "test_readme_sier_hva_man_gjoer_med_en_konto_fra_foer",
+    ),
+    "test_ki_tjenestene.py": (
+        "test_modellene",
+        "test_readme_sier_det_instruksjonen_krever",
+    ),
+    "test_kveldshenting.py": ("test_readme_og_hjelpen_sier_hva_jobben_gjoer_loggen_og_hvordan_den_slaas_av",),
+    "test_investorsidene_demo.py": ("test_hjelpen_sier_det_samme_som_sidene",),
+    "test_app.py": ("test_kommandoen_paa_den_tomme_siden_staar_i_readme",),
+    "test_demo.py": ("test_lenken_gaar_til_ankeret_i_readme",),
+    "test_aksjesiden_8_20a.py": ("test_de_gamle_ordene_staar_ikke_igjen",),
+}
+
+
+def _uten_kommentartegn(tekst: str) -> str:
+    """Teksten med kommentartegnene i starten av linjene tatt bort og
+    mellomrommene samlet, så en setning over flere kommentarlinjer leses som
+    én."""
+    return re.sub(r"\s+", " ", re.sub(r"(?m)^\s*#\s?", "", tekst))
+
+
+class TestInstallasjonen:
+    """Story 3.5i (gruppens svar 07.11 kl. 23:26 og 08.11 kl. 11:24): resten
+    av «Kom i gang» står i docs/installasjon.md, og det som viser til delene,
+    viser dit."""
+
+    def test_meldingene_og_kommentarene_viser_til_installasjonen(self):
+        """Kontrollpunkt e). Ville feilet hvis en melding i src/ki_tekst.py,
+        en kommentar i .env.example eller en lenke eller setning i
+        docs/hjelp.md eller README-en fortsatt sa «i README-en» om en del som
+        er flyttet, eller lenket til den i README-en."""
+        import ki_tekst
+
+        filene = {
+            "src/ki_tekst.py": (ROT / "src" / "ki_tekst.py").read_text(encoding="utf-8"),
+            ".env.example": (ROT / ".env.example").read_text(encoding="utf-8"),
+            "docs/hjelp.md": _hjelp(),
+            "README.md": README.read_text(encoding="utf-8"),
+        }
+        for navn, tekst in filene.items():
+            setninger = re.split(r"(?<=[.!?])\s", _uten_kommentartegn(tekst))
+            for del_ in FLYTTET:
+                for setning in setninger:
+                    if f"«{del_}»" in setning:
+                        assert "README-en" not in setning.split(f"«{del_}»", 1)[1], (navn, setning)
+        # Meldingene brukeren ser, etter hver grunn, og kommentarene i .env.example.
+        for grunn, del_ in (
+            ("OSE_KI_GEMINI_NOKKEL mangler", "Egen nøkkel til Gemini, Anthropic eller OpenAI"),
+            ("modellen gemma4:e4b er ikke hentet", "Den lokale modellen"),
+            ("Ollama svarer ikke", "Den lokale modellen"),
+        ):
+            assert ki_tekst._hva_naa(grunn).endswith(f"se «{del_}» i docs/installasjon.md"), grunn
+        env = _uten_kommentartegn(filene[".env.example"])
+        assert "se «Den lokale modellen» i docs/installasjon.md." in env
+        assert "se «Egen noekkel til Gemini, Anthropic eller OpenAI» i docs/installasjon.md." in env
+        # Lenkene i hjelpen til delene som er flyttet, går til installasjonen.
+        hjelp = filene["docs/hjelp.md"]
+        for anker in ("slik-virker-dobbeltklikket", "hentingen-hver-kveld"):
+            assert f"](installasjon.md#{anker})" in hjelp and f"](../README.md#{anker})" not in hjelp, anker
+        assert "](../README.md#" in hjelp and all(
+            a in _ankrene(filene["README.md"]) for a in re.findall(r"\]\(\.\./README\.md#([^)]+)\)", hjelp)
+        )
+
+    def test_testene_leser_delene_i_installasjonen_og_ingen_er_borte(self):
+        """Kontrollpunkt f). Ville feilet hvis en test i filene som leste
+        delene i README-en, bare ble slettet, eller hvis leserne testene
+        bruker, ga tom tekst eller mindre enn før, så kravene ble oppfylt
+        uten å sjekke noe."""
+        import ast
+
+        for fil, foer in TESTENE_ETTER_3_5I.items():
+            antall = len(
+                re.findall(r"^\s*def test_\w+", (ROT / "tests" / fil).read_text(encoding="utf-8"), re.MULTILINE)
+            )
+            assert antall >= foer, (fil, antall, foer)
+        # Hver test som leste delene, finnes og leser dem fortsatt.
+        for fil, navnene in TESTENE_SOM_LESER_DELENE.items():
+            kilde = (ROT / "tests" / fil).read_text(encoding="utf-8")
+            funksjonene = {
+                n.name: ast.get_source_segment(kilde, n)
+                for n in ast.walk(ast.parse(kilde))
+                if isinstance(n, ast.FunctionDef)
+            }
+            for navn in navnene:
+                assert navn in funksjonene, (fil, navn)
+                assert LESERNE.search(funksjonene[navn]), (fil, navn)
+        # Kommandoene i «Kom i gang» er de samme som før, utenom de to i
+        # «Tester» og installasjonen av uv der.
+        tester = {"uv run pytest", UV_WINDOWS, UV_MAC}
+        assert set(KOMMANDOENE_FOER_3_3H) - tester <= set(_kommandoene()), set(KOMMANDOENE_FOER_3_3H) - set(
+            _kommandoene()
+        )
+        assert not tester & set(_kommandoene())
+        # Hver pil og hvert steg leses der det står, og er ikke tomt.
+        for pil in PILENE_I_KOM_I_GANG:
+            assert _seksjon(pil).strip(), pil
+        for seksjon, numre in SEKSJONENE.items():
+            for n in numre:
+                assert _steg(seksjon, n).strip(), (seksjon, n)
+        assert len(_detaljer(_faq())) == 5
+        assert _detaljer(_seksjon("Mer for den som vil"))
+        # Leserne i de andre filene.
+        from test_dobbeltklikk import _delen_i_readme
+        from test_ki_tjenestene import _readme_avsnittet
+
+        assert "**Advarselen fra Windows.**" in _delen_i_readme() and "1. **Last ned koden**" in _delen_i_readme()
+        assert "`OSE_KI_GEMINI_NOKKEL`" in _readme_avsnittet()
+
+    def test_dokumentene_og_mappestrukturen_lenker_til_installasjonen(self):
+        """Kontrollpunkt g) og regel 4 og 19. Ville feilet hvis
+        docs/installasjon.md manglet i «Dokumentene» eller «Mappestruktur»,
+        eller fila manglet frontmatteren som docs/hjelp.md har, med status
+        aktiv, fordi den er levende (gruppens svar 08.11 kl. 11:24)."""
+        readme = README.read_text(encoding="utf-8")
+        dokumentene = _seksjonen(readme, "Dokumentene")
+        assert "- [Installasjonen](docs/installasjon.md): " in dokumentene
+        mappestruktur = _seksjonen(readme, "Mappestruktur")
+        docs = next(l for l in mappestruktur.splitlines() if l.startswith("- [`docs/`](docs/)"))
+        assert "[`docs/installasjon.md`](docs/installasjon.md)" in docs
+        bildene = next(l for l in mappestruktur.splitlines() if l.startswith("- [`docs/bilder/readme/`]"))
+        assert "skjermbildene i [`docs/installasjon.md`](docs/installasjon.md)" in bildene
+        topp = INSTALLASJONEN.read_text(encoding="utf-8").split("---\n", 2)[1]
+        for felt in ('title: "Installasjonen"', "status: aktiv", "created: 2026-11-08"):
+            assert felt in topp, felt
+        # Gjennomgangen (BH4): fila er levende, så updated låses ikke til en dag,
+        # bare formen fra `date +%Y-%m-%dT%H:%M` (regel 4), og ikke før created.
+        updated = re.search(r"^updated: (\d{4}-\d{2}-\d{2})T\d{2}:\d{2}$", topp, re.MULTILINE)
+        assert updated and updated.group(1) >= "2026-11-08", topp
+        # Regel 19 i CLAUDE.md sier at fila er levende.
+        claude = re.sub(r"\s+", " ", (ROT / "CLAUDE.md").read_text(encoding="utf-8"))
+        assert "`docs/installasjon.md`, med installasjonen som er flyttet fra «Kom i gang», er levende" in claude

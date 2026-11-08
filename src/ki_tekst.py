@@ -242,11 +242,11 @@ def _hva_naa(grunn: str) -> str:
         # (gjennomgangen av 10.7b, BH1, ECH1, ECH2).
         return (
             "Legg nøkkelen inn eller rett den i .env, eller i miljøet, som går foran, "
-            "se «Egen nøkkel til Gemini, Anthropic eller OpenAI» i README-en"
+            "se «Egen nøkkel til Gemini, Anthropic eller OpenAI» i docs/installasjon.md"
         )
     if "ikke hentet" in grunn:
-        return "Hent modellen, se «Den lokale modellen» i README-en"
-    return "Start Ollama, se «Den lokale modellen» i README-en"
+        return "Hent modellen, se «Den lokale modellen» i docs/installasjon.md"
+    return "Start Ollama, se «Den lokale modellen» i docs/installasjon.md"
 
 
 def lag_ki_tekster(
