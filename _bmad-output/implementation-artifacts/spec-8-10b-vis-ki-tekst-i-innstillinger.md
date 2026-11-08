@@ -48,3 +48,22 @@ Bygget på grenen `8-10b-vis-ki-tekst`, i worktreen `G74-lund-osen-8-10b`, fra g
 - **Avvik:** ingen fra delene. Testen fra 8.10 som avviste «vis_ki_tekst», avviser nå et ukjent navn.
 - **Tester («Ville feilet hvis» i hver):** `tests/test_innstillinger_ki.py`.
 - **Hele settet,** alene: kl. 19:07:33–19:18:30, 4670 bestått, 24 hoppet over og 0 feilet. Alle bildene ble tatt på nytt og er byte for byte de samme.
+
+## Mutantene
+
+På `5f98fe88` fire: A (bryteren ved teksten skriver ikke raden) 1, B (siden leser bare kapselen) 2, C (Innstillinger kan ikke lagre KI-teksten) 2 og D (uten rad gjelder ikke kapselen) 1 test. Alle ble fanget, og hver fil var lik HEAD etterpå.
+
+## Gjennomgangen 08.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 8 funn, Edge Case Hunter 5 og Verification Gap 6. Ingen høye.
+
+**Middels**
+- *BH1, ECH1 og ECH2, rettet.* Kunne raden ikke skrives (låst base eller basefeil), satte `/ki` kapselen likevel, og raden, som går foran, viste den gamle verdien. Nå setter ikke bryteren kapselen da, og siden sier at basen ikke kan brukes (503), så de to aldri viser hver sin verdi. Før 8.10b virket bryteren også mens basen var låst; det er prisen for ett valg i basen (`test_kan_valget_ikke_skrives_endres_ingenting`).
+- *BH3 og ECH3, åpent til flettingen.* 10.6 (PR #122) leser kapselen direkte i `_boersdagen`. Når begge er flettet, må `_boersdagen` bruke `_ki_er_paa()`, ellers kan forsiden og aksjesiden vise hver sin verdi. Det gjøres i flettingen av den som kommer sist, og står i issues.md.
+- *VG1, rettet.* `test_uten_tabellen_virker_bryteren_med_kapselen`.
+- *VG3, rettet med teksten over.* Hjelpen sier at et trykk endrer begge; når basen ikke kan skrives, endres ingen av dem.
+
+**Lav**
+- *Rettet:* BH8 og VG5 (raden sjekkes også ved «på»), VG2 (kapselen fra Innstillinger).
+- *Ført:* BH2 og ECH4 (`/ki` åpner, og en ny installasjon lager, basen), BH4 (en forbigående lesefeil gir kapselen), BH5 (kapselen deles av demoen og den ekte versjonen på samme port), BH6 (med en base fra før 0011 gjelder bare kapselen), BH7 (Origin som for de andre skjemaene), VG4 og VG6.
+- **Etter gjennomgangen:** hele settet alene kl. 19:25:46–19:36:23: 4673 bestått, 24 hoppet over og 0 feilet. Bildene ble tatt på nytt og er byte for byte de samme.

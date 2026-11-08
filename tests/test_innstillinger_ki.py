@@ -73,6 +73,9 @@ class TestSammeValg:
         klient.delete_cookie(KAPSEL)
         assert ki_i_innstillinger(klient) == ki_ved_teksten(klient) == "false"
         klient.post("/ki", data={"til": "paa", "tilbake": "/aksje/EQNR"})
+        # Gjennomgangen (BH8, VG5): raden også ved «på».
+        assert raden(lagring_sqlite.BASE_STI) == (1,)
+        klient.delete_cookie(KAPSEL)
         assert ki_i_innstillinger(klient) == ki_ved_teksten(klient) == "true"
 
     def test_raden_gaar_foran_kapselen(self, klient):
@@ -95,3 +98,34 @@ class TestSammeValg:
         kilde = inspect.getsource(app_modul.ki_bryter) + inspect.getsource(app_modul._lagre_ki)
         for ord_ in ("requests", "urlopen", "hent_", "fetch_prices", "eodhd"):
             assert ord_ not in kilde, ord_
+
+
+class TestEtterGjennomgangen:
+    def test_innstillinger_setter_kapselen_ogsaa(self, klient):
+        """VG2: ville feilet hvis valget fra Innstillinger ikke satte kapselen,
+        som gjelder når raden mangler (en ny demobase)."""
+        svar = klient.post("/innstillinger", data={"navn": "vis_ki_tekst", "til": "av"})
+        assert f"{KAPSEL}=av" in svar.headers["Set-Cookie"]
+
+    def test_uten_tabellen_virker_bryteren_med_kapselen(self, klient, monkeypatch):
+        """VG1: ville feilet hvis /ki ga en feil i en base fra før 0011."""
+        import innstillinger
+
+        monkeypatch.setattr(innstillinger, "har_tabellen", lambda _t: False)
+        svar = klient.post("/ki", data={"til": "av", "tilbake": "/aksje/EQNR"})
+        assert svar.status_code == 303 and f"{KAPSEL}=av" in svar.headers["Set-Cookie"]
+
+    def test_kan_valget_ikke_skrives_endres_ingenting(self, klient, monkeypatch):
+        """BH1, ECH1, ECH2: ville feilet hvis bryteren satte kapselen når raden
+        ikke kunne skrives, så de to viste hver sin verdi."""
+        import innstillinger
+
+        klient.post("/ki", data={"til": "av", "tilbake": "/aksje/EQNR"})
+
+        def laast(*_a):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(innstillinger, "sett", laast)
+        svar = klient.post("/ki", data={"til": "paa", "tilbake": "/aksje/EQNR"})
+        assert svar.status_code == 503 and "Set-Cookie" not in svar.headers
+        assert raden(lagring_sqlite.BASE_STI) == (0,)

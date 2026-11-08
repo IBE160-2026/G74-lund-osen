@@ -1630,7 +1630,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # og alle viser knappen; hoeydene er de samme.
 # Story 8.10b: «Vis KI-tekst» i Innstillinger (app.py og innstillinger.py). Alle bildene ble
 # tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "740310394c319c9dc8826aaad5d0409a06147bb803b125153d6a9d0f86d1dc6a"
+AVTRYKK_BAK_AKSJESIDEN = "9b619a640070f7a25ba7a974493adacf254a828b72d8176b37d702bc50022a52"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1746,11 +1746,11 @@ DE_NYE_BILDENE = {
 # tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "6d151b7f6de251c5298468687a2c078bb00bd592687bb4bf3f1d093aaaac9171",
-    "docs/appen/boersometeret-demo.png": "104c703013f586d631f6b9e57feaa2ba2fd4e562a83d30bc593279718815bc1f",
-    "docs/appen/min-liste-demo.png": "9748da476fe63d6e5dcfeeea6c9dd2e5a013ccd74355bffca0bd87a7a2db79ce",
+    "docs/appen/boersometeret-demo.png": "b1d29a0182f3edb1b63371ccf6a02d123db839914186a13101ed0df3c25304c2",
+    "docs/appen/min-liste-demo.png": "9997c94bf67612a2ffcb41ad11ecffc602cd07a3f4218654340a82ca4f4271ad",
     "docs/appen/oversikten-390-demo.png": "6d151b7f6de251c5298468687a2c078bb00bd592687bb4bf3f1d093aaaac9171",
-    "docs/appen/boersometeret-390-demo.png": "104c703013f586d631f6b9e57feaa2ba2fd4e562a83d30bc593279718815bc1f",
-    "docs/appen/din-egen-liste-demo.png": "9748da476fe63d6e5dcfeeea6c9dd2e5a013ccd74355bffca0bd87a7a2db79ce",
+    "docs/appen/boersometeret-390-demo.png": "b1d29a0182f3edb1b63371ccf6a02d123db839914186a13101ed0df3c25304c2",
+    "docs/appen/din-egen-liste-demo.png": "9997c94bf67612a2ffcb41ad11ecffc602cd07a3f4218654340a82ca4f4271ad",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

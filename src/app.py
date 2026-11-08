@@ -1420,7 +1420,11 @@ def ki_bryter():
     til = AV if request.form.get("til") == AV else PAA
     # Story 8.10b (FR-110, FR-601): valget i basen, som Innstillinger viser,
     # så de to aldri viser hver sin verdi. Kapselen skrives fortsatt.
-    _lagre_ki(til)
+    # Gjennomgangen (BH1, ECH1, ECH2): kan valget ikke skrives i basen,
+    # settes heller ikke kapselen, og siden sier at basen ikke kan brukes, så
+    # bryteren og Innstillinger aldri viser hver sin verdi.
+    if g.get("basefeil") or not _lagre_ki(til):
+        return _basen_kan_ikke_aapnes()
     tilbake = request.form.get("tilbake", "/")
     if _TILBAKE.fullmatch(tilbake):
         tilbake += f"#{KI_ANKER}"
@@ -1753,12 +1757,19 @@ def _ki_er_paa() -> bool:
     return ki_paa(request.cookies.get(KAPSEL))
 
 
-def _lagre_ki(til: str) -> None:
+def _lagre_ki(til: str) -> bool:
     """Valget i basen når den har tabellen. Bryteren og Innstillinger
-    skriver begge her (FR-110)."""
+    skriver begge her (FR-110). Gir False bare når basen har tabellen og
+    skrivingen feilet; uten tabellen gjelder kapselen alene, som før 8.10b."""
     tilkobling = g.get("tilkobling")
-    if innstillinger.har_tabellen(tilkobling):
+    if not innstillinger.har_tabellen(tilkobling):
+        return True
+    try:
         innstillinger.sett(tilkobling, innstillinger.VIS_KI_TEKST, til == PAA)
+    except sqlite3.Error as feil:
+        app.logger.warning("KI-valget kunne ikke lagres: %s", type(feil).__name__)
+        return False
+    return True
 
 
 @app.route("/innstillinger")
