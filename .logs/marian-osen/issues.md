@@ -157,3 +157,7 @@
 - [ ] 2026-11-08 [story-2-11-lista-fra-basen](953-2026-11-08-17-02-14-story-2-11-lista-fra-basen.md) — PR #123 (2.11) er ikke flettet; spørsmål 6 og 7 i spesifikasjonen er middels funn som står åpne (regel 25)
 - [ ] 2026-11-08 [story-2-11-lista-fra-basen](953-2026-11-08-17-02-14-story-2-11-lista-fra-basen.md) — ECH6 i 2.11: en aksje som tas inn igjen, mister datoen den gikk ut (spørsmål 6)
 - [ ] 2026-11-08 [story-2-11-lista-fra-basen](953-2026-11-08-17-02-14-story-2-11-lista-fra-basen.md) — BH3, ECH3 og VG3 i 2.11: en base som ikke kan leses, gir fortsatt de 15 i hentingen (spørsmål 7)
+- [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — PR #124 (2.12) er ikke flettet; den flettes etter PR #123
+- [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Mandag 09.11: `uv run python src/fetch_prices.py --les-boerslista` én gang før aksjer kan velges (2.12)
+- [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Konflikt i `index.html` mellom 10.6 og 2.12 ved flettingen: «Dine egne aksjer» før «Børsdagen kort fortalt»
+- [ ] 2026-11-08 [story-2-12-velge-og-bytte-aksjer](952-2026-11-08-18-00-13-story-2-12-velge-og-bytte-aksjer.md) — Spørsmål 11 i 2.12: hentingen måler ikke omsetningen for en ny aksje
