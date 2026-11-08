@@ -981,7 +981,10 @@ class TestHistorikkenSomDenEkte:
         c = sqlite3.connect(mal)
         try:
             ki = c.execute("SELECT DISTINCT dato FROM ki_logg").fetchall()
-            antall = c.execute("SELECT COUNT(*) FROM ki_logg WHERE dato = ?", ("2026-10-09",)).fetchone()[0]
+            # Story 10.6: radene for aksjene, ikke raden for teksten om dagen.
+            antall = c.execute(
+                "SELECT COUNT(*) FROM ki_logg WHERE dato = ? AND slag = 'aksje'", ("2026-10-09",)
+            ).fetchone()[0]
         finally:
             c.close()
         assert ki == [("2026-10-09",)] and antall == len(demo_ki.les_radene())

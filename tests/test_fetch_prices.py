@@ -3841,7 +3841,7 @@ class TestFoersteHenting:
         raa, base = stier
         modell = FalskModell()
         kjoer_23(raa, base, DAGTID_22_09, som_api_et([]), modell=modell)
-        assert modell.kall == len(AKSJEUNIVERS)
+        assert modell.kall == len(AKSJEUNIVERS) + 1  # Story 10.6: og ett kall for teksten om dagen.
         tilkobling = aapne_base(base)
         try:
             datoene = {r[0] for r in tilkobling.execute("SELECT DISTINCT dato FROM ki_logg")}

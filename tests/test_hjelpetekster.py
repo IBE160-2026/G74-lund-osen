@@ -439,6 +439,8 @@ class TestSidene:
                 "hjelp-hentet": ["data_hentet", "uten_data"],
                 # Story 8.17a: periodevalget over søylene og tabellen.
                 "hjelp-perioden": ["perioden_oversikten"],
+                # Story 10.6: «Børsdagen kort fortalt» under tabellen.
+                "hjelp-boersdagen": ["boersdagen_kort_fortalt"],
             },
             "/aksje/BRFE": {
                 # Story 8.0d, PR 3: «data hentet» står ved «Oppdatert» i stripa,
@@ -650,7 +652,10 @@ class TestStory80c:
             # avsnittet med modellens ord tas ut.
             side = _side(klient, adresse)
             # Gjennomgangen, BH11: hoeyst ett avsnitt, og bare paa aksjesiden.
-            assert side.count('<p class="ki-tekst">') <= (1 if adresse.startswith("/aksje/") else 0), adresse
+            # Story 10.6: og teksten om dagen paa oversikten.
+            assert side.count('<p class="ki-tekst">') <= (
+                1 if adresse.startswith("/aksje/") or adresse == "/" else 0
+            ), adresse
             html = re.sub(r'<p class="ki-tekst">.*?</p>', "", side, flags=re.DOTALL)
             tekst = synlig_tekst(html)
             for ord_ in VALGT_BORT:

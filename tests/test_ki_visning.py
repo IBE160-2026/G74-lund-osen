@@ -290,7 +290,10 @@ class TestBryteren:
             "/\n/eksempel.no",
             "/%2F/eksempel.no",
             "/aksje/EQNR\r\nSet-Cookie: x=1",
-            "/",
+            # Story 10.6: «/» går nå til «Børsdagen kort fortalt» på
+            # oversikten (test_bryteren_sender_tilbake_til_delen i
+            # test_ki_dagen.py). En annen adresse på oversikten avvises.
+            "/?periode=1-uke&x=1",
             "/aksje/",
         ],
     )

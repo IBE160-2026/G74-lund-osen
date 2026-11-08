@@ -174,6 +174,48 @@ def ki_tekst(tekst: str) -> Markup:
     return Markup("").join(deler)
 
 
+# Story 10.6 (FR-607, utdraget 08.11 §3): «Børsdagen kort fortalt» paa
+# forsiden. Tekstene uten KI-tekst staar ordrett fra utdraget.
+DAGEN_UTEN = "Dagen er uten KI-tekst."
+PERIODEN_UTEN = "Perioden er uten KI-tekst. Teksten skrives for én børsdag om gangen."
+DAGEN_AV = "KI-teksten er slått av. Tabellen over viser bare det reglene har regnet ut."
+
+
+@dataclass(frozen=True)
+class Dagsvisning:
+    """Teksten om dagen og modellen, eller ingen tekst (DAGEN_UTEN)."""
+
+    tekst: str | None = None
+    modell: str | None = None
+
+    @property
+    def vist(self) -> bool:
+        return self.tekst is not None
+
+
+def _vanlig(verdi):
+    """Grunnlaget som vanlige dict paa alle nivaaer, saa et grunnlag lest fra
+    loggen kan sammenlignes med et som er regnet naa."""
+    if isinstance(verdi, Mapping):
+        return {n: _vanlig(v) for n, v in verdi.items()}
+    return verdi
+
+
+def bygg_dagsvisning(rad: KIRad | None, grunnlag: Mapping[str, object] | None) -> Dagsvisning:
+    """Teksten om dagen vises bare naar den besto kontrollen, grunnlaget i
+    raden er det samme som grunnlaget regnet av det siden viser (FR-607), og
+    vakta ikke stopper den (NFR-06). Ellers er dagen uten KI-tekst."""
+    if rad is None or grunnlag is None or not rad.besto or rad.tekst is None:
+        return Dagsvisning()
+    if rad.emne.slag != "dag" or _vanlig(rad.grunnlag) != _vanlig(grunnlag):
+        return Dagsvisning()
+    tekst = unicodedata.normalize("NFC", rad.tekst).translate(_USYNLIGE)
+    if _VAKT.search(tekst):
+        return Dagsvisning()
+    # Gjennomgangen (VG5): modellen og tjenesten, som paa aksjesiden (FR-602).
+    return Dagsvisning(tekst=rad.tekst, modell=f"{rad.modell} ({rad.tjeneste})")
+
+
 def ki_paa(kapsel: str | None) -> bool:
     """Bryteren: paa naar kapselen mangler eller sier paa (FR-601)."""
     return kapsel != AV
