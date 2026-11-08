@@ -67,3 +67,8 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 - *Rettet:* BH8 og VG5 (raden sjekkes også ved «på»), VG2 (kapselen fra Innstillinger).
 - *Ført:* BH2 og ECH4 (`/ki` åpner, og en ny installasjon lager, basen), BH4 (en forbigående lesefeil gir kapselen), BH5 (kapselen deles av demoen og den ekte versjonen på samme port), BH6 (med en base fra før 0011 gjelder bare kapselen), BH7 (Origin som for de andre skjemaene), VG4 og VG6.
 - **Etter gjennomgangen:** hele settet alene kl. 19:25:46–19:36:23: 4673 bestått, 24 hoppet over og 0 feilet. Bildene ble tatt på nytt og er byte for byte de samme.
+- **Mutantene på nytt** på `b870f693`, med E «kapselen settes når raden ikke kan skrives»: A 2, B 2, C 3, D 1 og E 1 test. Alle fem ble fanget, og hver fil var lik HEAD etterpå.
+
+## Bygget og ikke flettet
+
+Grenen `8-10b-vis-ki-tekst` er ikke flettet. Den bygger på 8.10 (PR #125), og flettes etter 2.11, 2.12 og 8.10. Flettes 10.6 (PR #122) også, må `_boersdagen` bruke `_ki_er_paa()` (BH3, ECH3).
