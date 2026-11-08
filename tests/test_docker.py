@@ -4675,12 +4675,14 @@ FLYTTET = (
     "Du trenger",
 )
 # Story 3.5i, kontrollpunkt f): antallet tester i filene som leste delene i
-# README-en, på main før grenen (958c27a3). test_readme.py har fått testen
-# for d).
-TESTENE_FOER_3_5I = {
-    "test_docker.py": 153,
+# README-en, på main før grenen (958c27a3), og testene 3.5i la til: tre i
+# test_docker.py (153 før) og testen for d) i test_readme.py (2 før). Navnene
+# fra før står alle. Mutanten for f) overlevde med antallet fra før, fordi
+# de nye testene dekket over en som ble borte.
+TESTENE_ETTER_3_5I = {
+    "test_docker.py": 156,
     "test_dobbeltklikk.py": 38,
-    "test_readme.py": 2,
+    "test_readme.py": 3,
     "test_ki_tekst.py": 43,
     "test_ki_tjenestene.py": 39,
     "test_kveldshenting.py": 20,
@@ -4746,7 +4748,7 @@ class TestInstallasjonen:
         delene i README-en, bare ble slettet, eller hvis leserne testene
         bruker, ga tom tekst eller mindre enn før, så kravene ble oppfylt
         uten å sjekke noe."""
-        for fil, foer in TESTENE_FOER_3_5I.items():
+        for fil, foer in TESTENE_ETTER_3_5I.items():
             antall = len(
                 re.findall(r"^\s*def test_\w+", (ROT / "tests" / fil).read_text(encoding="utf-8"), re.MULTILINE)
             )
