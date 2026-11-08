@@ -168,3 +168,4 @@
 - [ ] 2026-11-08 [story-8-8-signaldager](949-2026-11-08-20-39-21-story-8-8-signaldager.md) — Aksjesiden leser hele vurderingshistorikken to ganger (8.8, BH8/ECH8, lav)
 - [ ] 2026-11-08 [story-8-11-ferdige-lister](948-2026-11-08-21-31-40-story-8-11-ferdige-lister.md) — PR #128 (8.11) er ikke flettet; gruppen må sjekke bransjen for hver av de 88 aksjene i `src/ferdige_lister.py`
 - [ ] 2026-11-08 [story-8-11-ferdige-lister](948-2026-11-08-21-31-40-story-8-11-ferdige-lister.md) — Valideringen i `bruk_liste` prøves bare gjennom ruta (8.11, VG6, middels)
+- [ ] 2026-11-08 [svarene-21-35-og-flettingen-10-6-og-2-11](947-2026-11-08-23-53-14-svarene-21-35-og-flettingen-10-6-og-2-11.md) — PR #124 (2.12) har konflikt mot main etter squash-flettingen av #123; main inn i grenen, hele settet og CI grønn før flettingen mandag kl. 23:50
