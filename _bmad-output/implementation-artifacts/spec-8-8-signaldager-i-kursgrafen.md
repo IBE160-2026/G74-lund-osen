@@ -82,3 +82,8 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 - *Rettet:* BH10 (negativ testes), BH12 og VG6 («Ingen av dagene i grafen hadde …»), VG5 (setningen «før den dagen» testes også når den ikke skal stå), BH7 (hjelpen sier nå at startdatoen er den første raden, med signal eller grunn), BH14 (`dato` viser året når det er et annet).
 - *Ført:* BH1 og ECH6 (terskelen er `STANDARD`, som `parametre` på siden, så de er like; endres terskelen, tolkes historikken med den nye), BH8 og ECH8 (hele historikken leses to ganger per side), BH9 (testen av `bygg_graf` alene; appnivåtestene fanger en mutant som regner signalet, VG), BH11, VG9 og VG10 (hjelpeteksten er ikke bundet til tallene), BH13 (status), BH15 (navnet `alle`), ECH5 og VG8 (en ugyldig rad gir ingen prikker uten beskjed), VG7.
 - **Etter gjennomgangen:** hele settet alene kl. 20:28:03–20:37:44: 4586 bestått, 24 hoppet over og 0 feilet. Bildet av aksjesiden er tatt på nytt, 2258 px som før.
+- **Mutantene på nytt** på `c44330ba`, med E «retningen bare med farge» og F «lista synlig»: A 4, B 2, C 5, D 1, E 1 og F 1 test. Alle seks ble fanget, og hver fil var lik HEAD etterpå.
+
+## Bygget og ikke flettet
+
+Grenen `8-8-signaldager-i-kursgrafen` er ikke flettet. Den er bygget fra main og står alene.
