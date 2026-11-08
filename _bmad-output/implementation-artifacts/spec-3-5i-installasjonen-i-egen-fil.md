@@ -2,7 +2,7 @@
 title: 'Story 3.5 (3.5i): installasjonen i docs/installasjon.md, og «Kom i gang» med de fem stegene'
 type: 'docs'
 created: '2026-11-08'
-status: 'draft'
+status: 'review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: '958c27a3'
@@ -62,3 +62,48 @@ Lenken i demoen lander da på denne linja, ikke på Docker-stegene 5–9, som f�
 ## Gjennomgangen
 
 Fylles ut etter at det er bygget.
+
+*Rettet 2026-11-08 kl. 12:45:* kontrollpunkt b) og punkt 4 i planen sier at en test sammenligner med README-en på `958c27a3`. Instruksjonen kl. 11:27 sier at b) sjekkes én gang under byggingen og ikke som en fast test, fordi `docs/installasjon.md` er levende (svaret kl. 11:24). Sjekken står under.
+
+**b), sjekket én gang 08.11 på arbeidskopien før `7be9aac8`.** Skriptet tar `git show 958c27a3:README.md`, linje 62 (anbefalingen), en tom linje og linje 78–471 (fra «Linux» til slutten av «Mer for den som vil»), og sammenligner linje for linje med alt under `# Installasjonen` i `docs/installasjon.md`, etter at stiene er rettet tilbake: `](bilder/readme/` til `](docs/bilder/readme/`, `](hjelp.md` til `](docs/hjelp.md`, `](kilder-og-rettigheter.md` til `](docs/kilder-og-rettigheter.md`, `](../start/)` til `](start/)`, `](../README.md#` til `](#`, og «øverst i README-en viser» til «øverst viser» (spørsmål 2). Resultatet: 396 linjer forventet, 396 i fila, 0 avvik, og 12 linjer med rettet sti. Med stiene rettet tilbake på samme måte gir de seks pilene i `AVTRYKK_I_KOM_I_GANG` avtrykkene fra før (sjekket samme sted), og pilene til demoen og den ekte versjonen har de samme avtrykkene uten noen retting.
+
+**Testene.** Hele settet alene, med grense på 15 minutter: 4573 bestått, 24 hoppet over og 0 feilet tre ganger: 11:57:43–12:11:01 (3,5 GB ledig) før `7be9aac8`, 12:12:35–12:25:45 (3,6 GB) før `059a0ea9`, og 12:31:44–12:44:17 (3,8 GB) før `4d1656f7`.
+
+**Mutantene**, én om gangen, med kopi før og sha256 mot HEAD etter, alle like:
+
+| Kontrollpunkt | Mutant | Test | Utfall |
+|---|---|---|---|
+| a) | linja «Linux» tilbake i «Kom i gang» i README-en | `TestHovedveien::test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil` | drept |
+| c) | ankeret tatt av linja om den ekte versjonen | samme | drept |
+| d) | «Til faglærer» lenker til `#med-docker-desktop` i README-en | `test_readme.py::test_hver_lenke_i_readme_og_installasjonen_gaar_til_en_fil_og_et_anker_som_finnes` | drept |
+| e) | meldingen «Start Ollama» sier «i README-en» | `TestInstallasjonen::test_meldingene_og_kommentarene_viser_til_installasjonen` | drept |
+| f) | `test_stopp_i_begge_versjonene` gjort om til en hjelpefunksjon | `TestInstallasjonen::test_testene_leser_delene_i_installasjonen_og_ingen_er_borte` | overlevde på `7be9aac8`, drept fra `059a0ea9` |
+| f) | samme test med nytt navn | samme | drept på `4d1656f7` |
+| g) | lenketeksten «Installasjonen» i «Dokumentene» endret | `TestInstallasjonen::test_dokumentene_og_mappestrukturen_lenker_til_installasjonen` | drept |
+
+Gjennomgang 08.11 av diffen `643d32cd..059a0ea9` (grenen etter flettingen av main), med Blind Hunter (BH, 16 funn), Edge Case Hunter (ECH, 5 funn) og Verification Gap (VG, 3 funn):
+
+| # | Funn | Dom | Rute |
+|---|---|---|---|
+| BH1 | Ankeret `den-ekte-versjonen`, som lenken i demoen og «Til faglærer» går til, står nå på linja om dobbeltklikket, ikke på Docker-stegene 5–9. Den som kjører demoen i Docker, lander på en linje om dobbeltklikket, med lenke videre til installasjonen | medium | **åpent, spørsmål til gruppen** (regel 25): det følger av linja i spesifikasjonen og svaret kl. 11:24. Å la lenken i demoen gå til `docs/installasjon.md#den-ekte-versjonen` endrer `src/app.py`, så bildene i `docs/appen/` må tas på nytt, med ECH7 og BH16 (`issues.md`) |
+| BH2, VG1, ECH4 | b) har ingen fast test, og de nye avtrykkene låser bare teksten slik den er nå. Delene under «Mer for den som vil» har ikke avtrykk | low | **står**: instruksjonen kl. 11:27 sier at b) ikke skal være en fast test. b) er sjekket én gang (over), og delene under «Mer for den som vil» hadde ikke avtrykk i README-en heller |
+| BH3 | Testen for stegene, kommandoene og lenkene fra før godtar et anker i hvilken som helst av de to filene | low | **står**: d) sjekker hver lenke mot fila den går til |
+| BH4 | Testen for g) låste `updated` til 08.11 i en levende fil | medium | **rettet** i `4d1656f7`: formen fra `date`, ikke før `created` |
+| BH5 | e) leser bare fire filer | low | **står**: `git grep` etter lenker til ankrene som er flyttet, i sporede filer utenom dagsfilene og loggene, finner bare spesifikasjonen og en docstring. Ingen tekst i `src/` utenom `ki_tekst.py` viser til delene |
+| BH6, ECH1, ECH5 | Testen for f) teller testene, men sjekker ikke navnene, som kommentaren sa | medium | **rettet** i `4d1656f7`: `TESTENE_SOM_LESER_DELENE` med de 96 testene som leser delene. Hver av dem må finnes og lese delene, og mutanten f2 dør |
+| BH7 | Installasjonen hopper fra `#` til `###` | low | **står**: flyttet ordrett (b) |
+| BH8 | Installasjonen sier ikke først hva fila er | low | **står**: anbefalingen står først, etter svaret kl. 11:24 |
+| BH9 | Hjelpen sier at stegene 1–4 hører til «Med Docker Desktop», uten å si hvor | low | **rettet** i `4d1656f7`: «i installasjonen». «se «Tester» i README-en» i «Står du fast?» står ordrett (b) |
+| BH10 | Navn i testene sier fortsatt «readme» | low | **står**: navnene står, fordi kvalitetssikringen og spesifikasjonene viser til dem |
+| BH11 | Noen positive krav leser README-en og installasjonen sammen | low | **står**: a) og d) sier hvor delene står |
+| BH12 | Gulvet på 20 lenker med anker i d), mot 27 nå | low | **står**: gulvet hindrer at testen går tom, og hver lenke sjekkes |
+| BH13 | a) forbyr «docker compose» og «uv run python» i hele README-en | low | **står**: a) sier at Docker og uv ikke står igjen i README-en |
+| BH14 | Svaret kl. 11:24 står to ganger i `epics.md` | low | **står**: instruksjonen sier der svaret kl. 23:26 står, og det står to steder |
+| BH15 | Kommentarlinjene i `.env.example` er lengre | low | **står**: kosmetisk |
+| BH16 | «Status» sier at installasjonen er ferdig, mens storyen var `in-progress` | low | **rettet** i `4d1656f7`: `review`. «Ferdig» betyr flettet til main, og setningen gjelder når PR-en er flettet |
+| ECH2 | `_fra_rota` gjorde `../README.md` uten anker til `#` | low | **rettet** i `4d1656f7` |
+| ECH3 | `_seksjon` ga IndexError uten melding | low | **rettet** i `4d1656f7` |
+| VG2 | Kommentaren i testen viste til en utsettelse for raden D7 som ikke sto i spesifikasjonen. §9 i `docs/kvalitetssikring.md` sier at kommandoene står i rekkefølgen i README-en | low | **rettet** i `4d1656f7` (kommentaren). **Åpent punkt**: D7 og innledningen til §9 viser til README-en og rettes før README-prøven. Ingen linje fjernes fra kvalitetssikringen i denne PR-en |
+| VG3 | Morgensjekken sjekker bare lenkene i README-en, og kommentaren sier «samme logikk som tests/test_readme.py» | low | **åpent punkt**: `.github/scripts/morgensjekk.py` er ikke endret i 3.5i |
+
+**Spørsmål til gruppen etter gjennomgangen:** BH1: skal lenken «Den ekte versjonen» i demoen gå til `docs/installasjon.md#den-ekte-versjonen` (stegene 5–9 med Docker), med nye bilder i `docs/appen/` og ECH7 og BH16 samtidig, i en egen PR? Forslag: ja, i en egen PR etter denne. Til da lander lenken på linja om den ekte versjonen i README-en, som lenker videre.
