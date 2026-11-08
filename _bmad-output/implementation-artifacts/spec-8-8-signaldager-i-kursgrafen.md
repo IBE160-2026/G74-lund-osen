@@ -2,7 +2,7 @@
 title: 'Story 8.8: Signaldager i kursgrafen'
 type: 'feature'
 created: '2026-11-08'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '6ec218c9'
 context:
@@ -89,3 +89,5 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 Grenen `8-8-signaldager-i-kursgrafen` er ikke flettet. Den er bygget fra main og står alene.
 
 *Svar 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spørsmål 1–4 er godtatt, og rådet anbefalte det. Ingen funn på middels eller over står åpne. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
+*Lagt til 2026-11-09:* 8.8 er flettet med PR #127 i `ab5fb6a7` kl. 00:21, låst til head-en `32bf3918`, etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`. 8.11 (PR #128) er ikke flettet først, fordi #124 (2.12) ikke ble flettet 08.11, og da gjøres bare 8.8 av steg 2 (steg 0 i instruksjonen). Main (2.11, 10.6 og føringene) ble flettet inn i `32bf3918`, med konfliktene i `sprint-status.yaml`, `stil.css` og avtrykkene i `tests/test_docker.py` løst, og de sju bildene tatt på nytt, byte for byte de samme. Hele settet alene 00:03:16–00:18:08: 4695 bestått, 24 hoppet over og 0 feilet. CI var grønn på head-en (run 42534544829, 4688 bestått og 31 hoppet over i `pytest`). Treet på main etter `git pull --ff-only` er likt treet på `32bf3918`. Ingen funn på middels eller over sto åpne.
