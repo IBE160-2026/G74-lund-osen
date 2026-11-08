@@ -107,3 +107,5 @@ Gjennomgang 08.11 av diffen `643d32cd..059a0ea9` (grenen etter flettingen av mai
 | VG3 | Morgensjekken sjekker bare lenkene i README-en, og kommentaren sier «samme logikk som tests/test_readme.py» | low | **åpent punkt**: `.github/scripts/morgensjekk.py` er ikke endret i 3.5i |
 
 **Spørsmål til gruppen etter gjennomgangen:** BH1: skal lenken «Den ekte versjonen» i demoen gå til `docs/installasjon.md#den-ekte-versjonen` (stegene 5–9 med Docker), med nye bilder i `docs/appen/` og ECH7 og BH16 samtidig, i en egen PR? Forslag: ja, i en egen PR etter denne. Til da lander lenken på linja om den ekte versjonen i README-en, som lenker videre.
+
+*Svar 2026-11-08 kl. 12:57 (gruppens svar):* BH1 lukkes. Lenken «Den ekte versjonen» i demoen beholdes som den er, fordi dobbeltklikket er hovedveien. Rådet anbefalte det. Det blir ingen egen PR for lenken, og ECH7 og BH16 står fortsatt i `issues.md`. Med det står ingen funn på middels eller over åpne. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
