@@ -1,5 +1,7 @@
 # Epic 9 Context: Dokumentasjon av prosessen
 
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
+
 <!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
 
 ## Goal

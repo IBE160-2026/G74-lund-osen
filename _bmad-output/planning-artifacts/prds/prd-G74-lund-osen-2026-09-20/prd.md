@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-07T15:47
+updated: 2026-11-09T00:04
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -37,6 +37,8 @@ updated: 2026-11-07T15:47
 ---
 
 # PRD — OSE Signal
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 **Emne:** IBE160 Programmering med KI, Høgskolen i Molde
 **Gruppe:** G74 — Joakim Lund, Marian Osen

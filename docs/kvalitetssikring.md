@@ -2,10 +2,12 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-08T23:52
+updated: 2026-11-09T00:04
 ---
 
 # Kvalitetssikring
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Hva som er testet i OSE Signal, hvordan, og hva som ikke er det. Dokumentet er
 story 9.1 i [`epics.md`](../_bmad-output/planning-artifacts/epics.md). Det skulle

@@ -134,6 +134,11 @@ et sitat som ikke fantes».
     «Medlemmer» i README-en, i briefen og i Co-authored-by. Det som alt står i
     dokumentene og loggene, blir stående som historikk, og instruksjonene lagres
     ordrett som før (regel 18).
+    *Lagt til 2026-11-09 (gruppens svar 08.11 kl. 22:14):* avgjørelser føres
+    alltid som gruppens, også når svaret gis av én av oss i økta. Der en eldre
+    avgjørelse står som én persons, som «Marians beslutning», var den gruppens,
+    og dokumentet har en Rettet-linje øverst om det (memloggene nederst, regel 5).
+    Det en person gjorde selv, som å sende en e-post, står.
 21. **Tall skrives norsk der de leses, og som tall der de regnes.** Det sidene
     viser: desimalkomma, hardt mellomrom som tusenskille og foran %, og vanlig
     bindestrek (-) som minus, så tallet kan limes inn i et regneark. Hvor mange
