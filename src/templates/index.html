@@ -323,6 +323,31 @@
       Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.
     </p>
     {% endif %}
+
+    {#- Story 10.6 (FR-607, utdraget 08.11 §3): «Børsdagen kort fortalt»
+        under tabellen, bare på oversikten. Teksten vises bare når grunnlaget
+        i KI-loggen er det samme som det siden viser, og tallene har prikket
+        strek. Bryteren er den samme som på aksjesiden (FR-601), og står fast
+        øverst til høyre, med KI på og av. #}
+    {% if boersdagen %}
+    <section class="boersdagen" id="boersdagen-kort-fortalt" aria-labelledby="boersdagen-tittel">
+      <div class="ki-topp">
+        <h2><span id="boersdagen-tittel">Børsdagen kort fortalt</span> {{ hjelpeknapp("hjelp-boersdagen", "Hjelp: børsdagen kort fortalt") }}</h2>
+        {% if boersdagen.tekst %}<span class="merke-ki">Laget av KI</span>{% endif %}
+        <form class="dagsbryter" method="post" action="/ki">
+          <input type="hidden" name="til" value="{{ boersdagen.til }}">
+          <input type="hidden" name="tilbake" value="{{ boersdagen.tilbake }}">
+          <button type="submit" role="switch" aria-checked="{{ 'true' if boersdagen.er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">Vis KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if boersdagen.er_paa else 'Av' }}</span></button>
+        </form>
+      </div>
+      {% if boersdagen.tekst %}
+        <p class="ki-tekst">{{ boersdagen.tekst|prikkede_tall }}</p>
+        <p class="modell">Skrevet av {{ boersdagen.modell }} da kursene ble hentet.</p>
+      {% else %}
+        <p class="uten">{{ boersdagen.uten }}</p>
+      {% endif %}
+    </section>
+    {% endif %}
   {% elif demokommando %}
     {% if aktiv != "min_liste" %}<h1 class="overskrift">Markedsoversikt</h1>{% endif %}
     <p>
@@ -348,6 +373,7 @@
     {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
     {#- Story 8.17b: «Sammenlign med» i Min liste. #}
     {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign siste børsdag med", [("", ["sammenlign_med"])]) }}{% endif %}
+    {% if boersdagen %}{{ hjelpevindu("hjelp-boersdagen", "Børsdagen kort fortalt", [("", ["boersdagen_kort_fortalt"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}

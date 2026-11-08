@@ -43,25 +43,42 @@ def ny(basefil):
 
 class TestTabellen:
     def test_tom_base_migreres_til_siste_versjon(self):
-        """Versjon 8 fra story 2.13 (0008_omsetning.sql). Foer det 7 fra story
-        8.3 (0007_min_liste.sql) og 6 fra story 2.8 (0006_indeks.sql)."""
+        """Versjon 9 fra story 2.11 (0009_lista.sql). Foer det 8 fra story
+        2.13 (0008_omsetning.sql), 7 fra story 8.3 (0007_min_liste.sql) og 6
+        fra story 2.8 (0006_indeks.sql)."""
         tilkobling = sqlite3.connect(":memory:")
         try:
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 8
-            assert siste_versjon(MIGRASJONSKATALOG) == 8
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 9
+            assert siste_versjon(MIGRASJONSKATALOG) == 9
         finally:
             tilkobling.close()
 
-    def test_aksje_er_lik_aksjeuniverset_felt_for_felt_og_i_samme_rekkefoelge(self, ny):
-        """SQLite lover ingen rekkefoelge uten ORDER BY, saa rowid gir den."""
-        felt = [f.name for f in dataclasses.fields(AKSJEUNIVERS[0])]
-        assert felt == ["symbol", "ticker", "navn", "sektor"]
-        i_basen = ny.execute(f"SELECT {', '.join(felt)} FROM aksje ORDER BY rowid").fetchall()
-        assert i_basen == [dataclasses.astuple(aksje) for aksje in AKSJEUNIVERS]
+    def test_de_15_i_0003_er_lik_aksjeuniverset_felt_for_felt_og_i_samme_rekkefoelge(self, tmp_path):
+        """Story 2.11, del D: lista kan byttes i basen, saa testen holder de 15
+        i 0003_aksje.sql like AKSJEUNIVERS, lista appen starter med, ikke
+        tabellen slik den er naa. SQLite lover ingen rekkefoelge uten ORDER
+        BY, saa rowid gir den. Ville feilet hvis 0003 og AKSJEUNIVERS sa
+        ulikt om de 15."""
+        import shutil
+
+        katalog = tmp_path / "til_0003"
+        katalog.mkdir()
+        for fil in sorted(MIGRASJONSKATALOG.glob("000[123]_*.sql")):
+            shutil.copy(fil, katalog / fil.name)
+        tilkobling = sqlite3.connect(":memory:")
+        try:
+            assert migrer(tilkobling, katalog) == 3
+            felt = [f.name for f in dataclasses.fields(AKSJEUNIVERS[0])]
+            assert felt == ["symbol", "ticker", "navn", "sektor"]
+            i_basen = tilkobling.execute(f"SELECT {', '.join(felt)} FROM aksje ORDER BY rowid").fetchall()
+            assert i_basen == [dataclasses.astuple(aksje) for aksje in AKSJEUNIVERS]
+        finally:
+            tilkobling.close()
 
     def test_kolonnene_er_feltene_i_aksje(self, ny):
+        """Story 2.11: og inn og ut, naar aksjen kom inn i lista og gikk ut."""
         kolonner = [rad[1] for rad in ny.execute("PRAGMA table_info(aksje)")]
-        assert kolonner == [f.name for f in dataclasses.fields(AKSJEUNIVERS[0])]
+        assert kolonner == [f.name for f in dataclasses.fields(AKSJEUNIVERS[0])] + ["inn", "ut"]
 
 
 # En gyldig rad per tabell, med symbolet som parameter. Verdiene er oppdiktet.
@@ -157,18 +174,19 @@ class TestAksjenStaarFast:
 
     def test_navn_og_sektor_kan_endres(self, ny):
         ny.execute(RAD["kurs"], ("EQNR",))
-        ny.execute("UPDATE aksje SET navn = 'Nytt navn', sektor = 'Ny' WHERE symbol = 'EQNR'")
-        assert ny.execute("SELECT navn, sektor FROM aksje WHERE symbol = 'EQNR'").fetchone() == ("Nytt navn", "Ny")
+        # Story 2.11: sektor maa vaere en av de 13 bransjene (0009).
+        ny.execute("UPDATE aksje SET navn = 'Nytt navn', sektor = 'Kraft' WHERE symbol = 'EQNR'")
+        assert ny.execute("SELECT navn, sektor FROM aksje WHERE symbol = 'EQNR'").fetchone() == ("Nytt navn", "Kraft")
 
     @pytest.mark.parametrize(
         "sql",
         [
-            "INSERT OR REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
-            "INSERT OR REPLACE INTO aksje VALUES ('EQNR', 'NY.OL', 'Ny', 'Energi')",
-            "REPLACE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
-            "INSERT OR REPLACE INTO aksje VALUES ('NY', 'DNB.OL', 'Ny', 'Finans')",
-            "INSERT INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi') ON CONFLICT DO NOTHING",
-            "INSERT OR IGNORE INTO aksje VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+            "INSERT OR REPLACE INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+            "INSERT OR REPLACE INTO aksje (symbol, ticker, navn, sektor) VALUES ('EQNR', 'NY.OL', 'Ny', 'Energi')",
+            "REPLACE INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
+            "INSERT OR REPLACE INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'DNB.OL', 'Ny', 'Finans')",
+            "INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi') ON CONFLICT DO NOTHING",
+            "INSERT OR IGNORE INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'EQNR.OL', 'Ny', 'Energi')",
             "UPDATE OR REPLACE aksje SET ticker = 'EQNR.OL' WHERE symbol = 'DNB'",
         ],
     )
@@ -194,7 +212,7 @@ class TestAksjenStaarFast:
         assert ny.execute("SELECT ticker, navn FROM aksje WHERE symbol = 'EQNR'").fetchone() == (ticker, "Nytt navn")
 
     def test_ny_aksje_kan_legges_til(self, ny):
-        ny.execute("INSERT INTO aksje VALUES ('NY', 'NY.OL', 'Ny', 'Energi')")
+        ny.execute("INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES ('NY', 'NY.OL', 'Ny', 'Energi')")
         ny.execute(RAD["kurs"], ("NY",))
         assert antall(ny, "aksje") == 16
 
@@ -232,8 +250,8 @@ class TestBaseIVersjon2:
             foer = alle_rader(tilkobling)
 
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
-            # min_liste, 0008 (story 2.13) omsetning
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 8
+            # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 9
             # 0004 (story 2.1c) legger fire maalinger til vurdering. En rad
             # med grunn har ingen, saa de er NULL.
             foer["vurdering"] = [rad + (None,) * 4 for rad in foer["vurdering"]]

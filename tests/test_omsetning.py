@@ -24,8 +24,8 @@ import lagring_fil
 import lagring_sqlite
 import omsetning
 from kursdata import AKSJEUNIVERS, Kursrad
-from lagring_sqlite import MIGRASJONSKATALOG, SqliteKurslager, aapne_base
-from migrering import migrer, siste_versjon, versjon
+from lagring_sqlite import SqliteKurslager, aapne_base
+from migrering import migrer, versjon
 from omsetning import MAALT_I_MALINGER, maal_omsetning, maalt_i_malingene, regn_ut, rekkefoelge, vindu
 from test_indeks import katalog_til
 
@@ -429,7 +429,8 @@ class TestLagringen:
             tilkobling.execute("INSERT INTO min_liste (symbol) VALUES ('EQNR')")
             tilkobling.commit()
             foer = _skjema_og_rader(tilkobling)
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 8 == siste_versjon(MIGRASJONSKATALOG)
+            # Story 2.11: til 0008, fordi 0009 endrer aksje med vilje.
+            assert migrer(tilkobling, katalog_til(tmp_path, 8)) == 8
             etter = _skjema_og_rader(tilkobling)
         finally:
             tilkobling.close()
@@ -605,7 +606,8 @@ def test_basen_staar_paa_versjon_8(tmp_path):
     aapne_base(sti).close()
     tilkobling = sqlite3.connect(sti)
     try:
-        assert versjon(tilkobling) == 8
+        # Story 2.11: 9 med 0009_lista.sql. Navnet staar.
+        assert versjon(tilkobling) == 9
     finally:
         tilkobling.close()
 

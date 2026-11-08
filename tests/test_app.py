@@ -818,7 +818,7 @@ class TestBasenIWebserveren:
 
         monkeypatch.setattr(SqliteKurslager, "serie", laast)
         # Story 2.2b: oversikten leser gjennom Oversiktsleser.
-        monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", lambda self: laast(self, None))
+        monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "oversikt", lambda self, dag=None: laast(self, None))
         # Gjennomgangen av 2.2b: ogsaa oppslaget i aksjedetaljen (post).
         monkeypatch.setattr(lagring_sqlite.SqliteOversiktsleser, "post", laast)
 

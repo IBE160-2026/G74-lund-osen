@@ -22,10 +22,10 @@ from pathlib import Path
 
 import lagring_sqlite
 from boersdag import innevaerende_boersdag, norsk_dato
-from fetch_prices import _aapne_for_sjekken, manglende_i_basen, manglende_vurderinger, naa
+from fetch_prices import _aapne_for_sjekken, lista_fra_basen, manglende_i_basen, manglende_vurderinger, naa
 from indeksdata import HOVEDINDEKS
 from kilogg import Emne
-from kursdata import AKSJEUNIVERS, Aksje
+from kursdata import Aksje
 from lagring_sqlite import SqliteIndekslager, SqliteKILogg, SqliteVurderingslager
 from vurderingsdata import Vurdering
 
@@ -33,15 +33,20 @@ FERDIG = "FERDIG"
 
 
 def mangler_for_dagen(
-    base_sti: Path, oeyeblikk: datetime, lista: tuple[Aksje, ...] = AKSJEUNIVERS
+    base_sti: Path, oeyeblikk: datetime, lista: tuple[Aksje, ...] | None = None
 ) -> tuple[date, list[str]]:
     """Boersdagen og det som mangler for den. Tom liste betyr ferdig.
 
     En base som ikke kan aapnes eller leses, gir en feil, ikke en tom liste.
+    Story 2.11 (gjennomgangen, VG1, ECH4): lista er aksjene i lista i basen
+    paa boersdagen, som hentingen bruker, saa en aksje som er tatt ut, ikke
+    alltid mangler.
     """
     dato = innevaerende_boersdag(norsk_dato(oeyeblikk))
     if not base_sti.exists():
         return dato, ["basen"]
+    if lista is None:
+        lista = lista_fra_basen(base_sti, dato)
     mangler = [f"kurs {symbol}" for symbol in manglende_i_basen(base_sti, dato, lista)]
     mangler += [f"vurdering {symbol}" for symbol in manglende_vurderinger(base_sti, dato, lista)]
     tilkobling = _aapne_for_sjekken(base_sti)
@@ -63,16 +68,17 @@ def mangler_for_dagen(
 
 def main(base_sti: Path | None = None, oeyeblikk: datetime | None = None) -> int:
     try:
-        dato, mangler = mangler_for_dagen(base_sti or lagring_sqlite.BASE_STI, oeyeblikk or naa())
+        sti = base_sti or lagring_sqlite.BASE_STI
+        tidspunkt = oeyeblikk or naa()
+        dato, mangler = mangler_for_dagen(sti, tidspunkt)
+        antall = len(lista_fra_basen(sti, dato))
     except Exception as feil:
         print(f"Sjekken feilet ({type(feil).__name__}). Kjøringen går som før.")
         return 2
     if mangler:
         print(f"Børsdagen {dato.isoformat()} mangler {len(mangler)}: {', '.join(mangler)}.")
         return 1
-    print(
-        f"{FERDIG} {dato.isoformat()}: kursene og vurderingene for de {len(AKSJEUNIVERS)}, hovedindeksen og KI-tekstene."
-    )
+    print(f"{FERDIG} {dato.isoformat()}: kursene og vurderingene for de {antall}, hovedindeksen og KI-tekstene.")
     return 0
 
 

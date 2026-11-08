@@ -41,7 +41,15 @@ from typing import Callable
 
 import lagring_sqlite
 from boersdag import OSLO, UtenforKalenderen, innevaerende_boersdag, norsk_dato
-from fetch_prices import BASEFEIL, UlesbarKvote, _uten_noekkel, les_kvotetall, manglende_i_basen, nekt_demobase
+from fetch_prices import (
+    BASEFEIL,
+    UlesbarKvote,
+    _uten_noekkel,
+    les_kvotetall,
+    lista_fra_basen,
+    manglende_i_basen,
+    nekt_demobase,
+)
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import PROSJEKTROT
 
@@ -489,7 +497,7 @@ def maal_omsetning(
     les_kvote: Callable[[str], object],
     klokke: Callable[[], datetime],
     skriv: Callable[[str], None] = print,
-    lista: tuple[Aksje, ...] = AKSJEUNIVERS,
+    lista: tuple[Aksje, ...] | None = None,
 ) -> int:
     """Maalingen. Gir 0 naar den er ferdig eller ingen kall er igjen, og 1
     naar den stoppet. Stopper den etter et kall, eller avbrytes den, lagres
@@ -507,6 +515,10 @@ def maal_omsetning(
     except UtenforKalenderen as feil:
         skriv(f"{feil}. Målingen gjetter ikke på børsdagen (NFR-08). 0 kall brukt.")
         return 1
+    # Story 2.11 (gjennomgangen, VG1): lista i basen paa boersdagen, som
+    # hentingen bruker.
+    if lista is None:
+        lista = lista_fra_basen(base_sti, boersdag)
     try:
         mangler = manglende_i_basen(base_sti, boersdag, lista)
     except BASEFEIL as feil:

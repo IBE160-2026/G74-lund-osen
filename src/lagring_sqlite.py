@@ -468,7 +468,7 @@ _OVERSIKT = (
     + ", ".join(f"f.{k}" for k in _KURSFELT.split(", "))
     + ", "
     + ", ".join(f"v.{k}" for k in VURDERINGSKOLONNER)
-    + ", v.grunn "
+    + ", v.grunn, a.ut "
     "FROM aksje a "
     "LEFT JOIN kursserie ks ON ks.symbol = a.symbol "
     "LEFT JOIN kurs n ON n.symbol = a.symbol "
@@ -497,8 +497,21 @@ class SqliteOversiktsleser:
         _krev_siste_versjon(tilkobling)
         self._tilkobling = tilkobling
 
-    def oversikt(self) -> list[Oversiktspost]:
-        return [_post(rad) for rad in self._tilkobling.execute(_OVERSIKT + "ORDER BY a.rowid")]
+    def oversikt(self, dag: date | None = None) -> list[Oversiktspost]:
+        """Aksjene i lista. Story 2.11: med dag er det aksjene i lista den
+        dagen, med samme regel som les_lista (gjennomgangen, BH1, ECH1,
+        ECH2, VG2), og uten dag de som ikke er tatt ut. post gir en aksje som
+        er tatt ut, til aksjesiden."""
+        if dag is None:
+            return [_post(rad) for rad in self._tilkobling.execute(_OVERSIKT + "WHERE a.ut IS NULL ORDER BY a.rowid")]
+        d = dag.isoformat()
+        return [
+            _post(rad)
+            for rad in self._tilkobling.execute(
+                _OVERSIKT + "WHERE (a.inn IS NULL OR a.inn <= ?) AND (a.ut IS NULL OR a.ut > ?) ORDER BY a.rowid",
+                (d, d),
+            )
+        ]
 
     def post(self, symbol: str) -> Oversiktspost | None:
         rad = self._tilkobling.execute(_OVERSIKT + "WHERE a.symbol = ?", (symbol,)).fetchone()
@@ -520,7 +533,7 @@ def _post(rad) -> Oversiktspost:
     symbol, ticker, navn, sektor, hentet = rad[:5]
     nyeste = _kursrad(*rad[5:9])
     forrige = _kursrad(*rad[9:13])
-    *felt, grunn = rad[13:]
+    *felt, grunn, ut = rad[13:]
     har_rad = grunn is not None or felt[0] is not None
     return Oversiktspost(
         aksje=Aksje(symbol, ticker, navn, sektor),
@@ -528,6 +541,24 @@ def _post(rad) -> Oversiktspost:
         forrige=forrige,
         hentet=datetime.fromisoformat(hentet) if hentet is not None else None,
         innhold=_innhold(felt, grunn) if har_rad else None,
+        ut=date.fromisoformat(ut) if ut is not None else None,
+    )
+
+
+def les_lista(tilkobling: sqlite3.Connection, dato: date, *, godta_en_versjon_bak: bool = False) -> tuple[Aksje, ...]:
+    """Aksjene i lista paa dato - story 2.11, FR-412, AD-21.
+
+    En aksje er i lista naar inn er NULL eller ikke etter dato, og ut er NULL
+    eller etter dato. Rekkefoelgen er rowid, som i oversikten. Bare lesing."""
+    _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
+    dag = dato.isoformat()
+    return tuple(
+        Aksje(*rad)
+        for rad in tilkobling.execute(
+            "SELECT symbol, ticker, navn, sektor FROM aksje "
+            "WHERE (inn IS NULL OR inn <= ?) AND (ut IS NULL OR ut > ?) ORDER BY rowid",
+            (dag, dag),
+        )
     )
 
 
@@ -684,7 +715,8 @@ class SqliteMinlistelager:
         self._skriv(symbol, "DELETE FROM min_liste WHERE symbol = ?", self._merket_i_tabellen())
 
     def _symboler(self) -> list[str]:
-        return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM aksje")]
+        # Story 2.11 (gjennomgangen, VG7): bare aksjer som ikke er tatt ut.
+        return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM aksje WHERE ut IS NULL")]
 
     def _merket_i_tabellen(self) -> list[str]:
         return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM min_liste")]
