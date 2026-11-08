@@ -80,3 +80,8 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 - *Rettet:* BH6 og ECH5 (én lesing per side), BH7 og ECH3 (8.10 lagrer bare «Vis hjelp»), BH8 og VG8 (et avvist valg endrer ingenting), BH10 (docstringen med versjonen), ECH4 (README-en har knappen), VG5 (testen i demoen), VG6 og VG7 (flere sider og hele teksten).
 - *Ført:* BH9 (fokuset etter trykket står øverst på siden).
 - **Etter gjennomgangen:** hele settet alene kl. 18:41:38–18:52:01 ga 1 feil (en test leser «og børsometeret som et kart, med knappene» i README-en), rettet. Kl. 18:53:04–19:04:10: 4664 bestått, 24 hoppet over og 0 feilet.
+- **Mutantene på nytt** på `1b9b7421`: A 1, B 3, B2 1, C 1, D 4 og E 3 tester. Alle seks ble fanget, og hver fil var lik HEAD etterpå.
+
+## Bygget og ikke flettet
+
+Grenen `8-10-innstillinger-oeverst` er ikke flettet. Den bygger på 2.12 (PR #124), som bygger på 2.11 (PR #123), så de flettes i den rekkefølgen. 8.10b bygger på denne.
