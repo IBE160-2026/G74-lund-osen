@@ -77,3 +77,8 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 
 **Lav, ført:** BH6 og ECH8 (hver aksje rangeres etter sin egen siste måling), BH7 (duplikater kan ikke oppstå: begge tabellene har primærnøkkel), BH8 og ECH5 (lista regnes på nytt ved POST), BH10 og ECH10 (filteret forsvinner ved sortering og perioder; hjelpen sier det nå), BH11 (rettet: «med retning positiv»), BH12 (`assert` i modulen, demokodene i samme ordbok, og NORSE og HKY som Forbruk; gruppen sjekker bransjene, spørsmål 1), BH13, BH14, BH15 (Origin som de andre skjemaene), ECH6, ECH7 (bransjen fra den ferdige lista erstatter et ventende valg), ECH9, VG9, VG10 (rettet: demoen har Kraft og Eiendom), VG11.
 - **Etter gjennomgangen:** hele settet alene kl. 21:19:15–21:29:21: 4664 bestått, 24 hoppet over og 0 feilet. Bildene av oversikten, Min liste, oversikten ved 390 px og «Din egen liste» er tatt på nytt.
+- **Mutantene på nytt** på `48f4b3e3`, med F «overskriften regnes etter filteret» og G «Min liste viser alle med 3 av 3»: A 1, B 2, C 2, D 2, E 2, F 1 og G 1 test. Alle sju ble fanget, og hver fil var lik HEAD etterpå.
+
+## Bygget og ikke flettet
+
+Grenen `8-11-ferdige-lister` er ikke flettet. Den bygger på 2.12 (PR #124) og flettes etter den. Gruppen må sjekke bransjene i `BRANSJE` først (spørsmål 1).
