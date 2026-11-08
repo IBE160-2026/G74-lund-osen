@@ -3779,7 +3779,9 @@ LENKENE_FOER_3_3H = {
 AVTRYKK_I_PILENE = {
     "Demoen": "a49a8d06bb28990eeed5c254fd46f2f9f09772dff7f8ced861088452d97933cf",
     "Den ekte versjonen": "c087d5b97500a0a7689a714c40f709f1ac8f3f5cd9b49918d90ed7083f753ad7",
-    "Dokumentene": "d80b9ef99d341dbb6f3c1b9c31ced942aa6e8e232b57cc2e89675b7198efa68c",
+    # Instruksjonen 08.11 kl. 13:00 (regel 19): utdraget fra designtavla 08.11
+    # i «Dokumentene». Var d80b9ef9....
+    "Dokumentene": "cda0d0fd1a25faf3bc605f55e4f8bfe874edefc0845c326f5535a7d7a8b26b6c",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     "Mappestruktur": "2b26269852ce7a454d02c54179eb21f53651f2c761be8069ef6de1279e483091",
