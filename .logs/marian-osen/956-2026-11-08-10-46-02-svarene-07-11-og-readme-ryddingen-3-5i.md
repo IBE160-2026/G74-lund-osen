@@ -18,3 +18,37 @@ Instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`: føre gruppens svar f
 
 ### Åpne punkter
 - PR #121 (3.5i) venter på svar på de tre spørsmålene i spesifikasjonen: 1) overskriften «Enklest: dobbeltklikk (anbefalt)» med ankeret over de fem stegene, mens setningen om demoen flyttes; 2) «øverst i README-en» i setningen «Velg versjon»; 3) `docs/installasjon.md` som levende dokument, med en linje i regel 19.
+
+## 2026-11-08 kl. 12:50 — Marian Osen
+
+### Oppgave
+Instruksjonen kl. 11:27: gruppens svar kl. 11:24 føres (forslagene i spørsmål 1–3 er godtatt), og README-ryddingen i PR #121 (3.5i) bygges etter spesifikasjonen i worktreen `G74-lund-osen-3-5i`. Det stoppes før flettingen.
+
+### Plan
+- Dagsfila, så main flettet inn i grenen, og svaret i spesifikasjonen og `epics.md`.
+- `docs/installasjon.md` lages med et skript, så flyttingen blir ordrett. README-en, hjelpen, `src/ki_tekst.py`, `.env.example`, regel 19 og `sprint-status.yaml` rettes.
+- Testene leser delene der de står, og a), c), d), e), f) og g) får tester. b) sjekkes én gang.
+- Hele settet alene før hver commit som endrer tester. Så mutantene, gjennomgangen, triagen, pushen og CI.
+- Spesifikasjonen: `_bmad-output/implementation-artifacts/spec-3-5i-installasjonen-i-egen-fil.md`.
+
+### Resultat
+- Main: `e4048ce6` (dagsfila, med kvoten 0 brukt og 20 igjen 08.11 i GMT, og `extraLimit` 463).
+- Grenen `3-5i-installasjonen-i-egen-fil`:
+  - `643d32cd`: main flettet inn.
+  - `af05e738`: svaret kl. 11:24.
+  - `7be9aac8`: byggingen.
+  - `059a0ea9`: testen for f) teller testene etter 3.5i.
+  - `4d1656f7`: rettingene etter gjennomgangen.
+  - `8d858b59`: triagen i spesifikasjonen.
+- b) er sjekket én gang mot `958c27a3`: 396 linjer, 0 avvik og 12 linjer med rettet sti. De seks pilene gir avtrykkene fra før når stiene rettes tilbake.
+- Hele settet ga 4573 bestått, 24 hoppet over og 0 feilet tre ganger (11:57:43–12:11:01, 12:12:35–12:25:45 og 12:31:44–12:44:17), med 3,5–3,8 GB ledig. Dokumenttestene ga 262 bestått før pushen.
+- Mutantene: sju, alle drept til slutt. Mutanten for f) overlevde først. sha256 var lik HEAD etter hver av dem.
+- Gjennomgangen fant 16 funn fra Blind Hunter, 5 fra Edge Case Hunter og 3 fra Verification Gap. BH4, BH6, ECH1 og ECH5 (medium) er rettet. BH1 (medium) står åpen som spørsmål til gruppen.
+- CI er grønn på `8d858b59` (run 42477209734): docker, dobbeltklikk på Windows og macOS, og pytest.
+- `src/app.py` er ikke endret, så bildene i `docs/appen/` er de samme.
+
+### Åpne punkter
+- BH1 i 3.5i (medium, regel 25): lenken «Den ekte versjonen» i demoen lander på linja om dobbeltklikket i README-en, ikke på Docker-stegene. Forslag: i en egen PR lenke til `docs/installasjon.md#den-ekte-versjonen`, med nye bilder i `docs/appen/` og ECH7 og BH16 samtidig.
+- VG2 i 3.5i: raden D7 og innledningen til §9 i `docs/kvalitetssikring.md` viser til README-en, og rettes før README-prøven.
+- VG3 i 3.5i: morgensjekken (`.github/scripts/morgensjekk.py`) sjekker bare lenkene i README-en, ikke i `docs/installasjon.md`.
+- PR #121 er ikke flettet.
