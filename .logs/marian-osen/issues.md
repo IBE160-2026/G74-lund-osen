@@ -154,3 +154,6 @@
 - [ ] 2026-11-08 [story-10-6-boersdagen-kort-fortalt](954-2026-11-08-15-48-16-story-10-6-boersdagen-kort-fortalt.md) — ECH14 i 10.6: feiler hovedindeksen om kvelden og hentes neste kveld, er dagen uten tekst under «Velg dag»
 - [ ] 2026-11-08 [story-10-6-boersdagen-kort-fortalt](954-2026-11-08-15-48-16-story-10-6-boersdagen-kort-fortalt.md) — BH7 og ECH11 i 10.6: bryteren på forsiden beholder ikke sorteringen
 - [ ] 2026-11-08 [story-10-6-boersdagen-kort-fortalt](954-2026-11-08-15-48-16-story-10-6-boersdagen-kort-fortalt.md) — VG10 i 10.6: samme liste i hentingen og på siden med et annet antall enn 15 er bare testet i `dagsgrunnlag`
+- [ ] 2026-11-08 [story-2-11-lista-fra-basen](953-2026-11-08-17-02-14-story-2-11-lista-fra-basen.md) — PR #123 (2.11) er ikke flettet; spørsmål 6 og 7 i spesifikasjonen er middels funn som står åpne (regel 25)
+- [ ] 2026-11-08 [story-2-11-lista-fra-basen](953-2026-11-08-17-02-14-story-2-11-lista-fra-basen.md) — ECH6 i 2.11: en aksje som tas inn igjen, mister datoen den gikk ut (spørsmål 6)
+- [ ] 2026-11-08 [story-2-11-lista-fra-basen](953-2026-11-08-17-02-14-story-2-11-lista-fra-basen.md) — BH3, ECH3 og VG3 i 2.11: en base som ikke kan leses, gir fortsatt de 15 i hentingen (spørsmål 7)
