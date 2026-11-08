@@ -615,6 +615,14 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-11-07 kl. 17:36 (gruppens svar):* 8.20b bygges før 3.4h, så den blir ferdig før kl. 21:00, og 3.4h bygges i natt; brukertesten trenger 8.20a og 8.20b, ikke investorsidene. Det endrer rekkefølgen i svaret kl. 10:33 (spørsmål 21). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 18:04 i `docs/ai-prompts/2026-11-07.md`.
 
+*Avgjort 2026-11-07 kl. 22:48 (gruppens svar):* videoen av demoen beholdes og lages til slutt, rett før README-prøven. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-07 kl. 22:49 (gruppens svar):* målet er at alt er ferdig innen 15.11. Rådet var enig, hvis maskinen står på hver kveld mandag til fredag, minst én tar testen og funnene er små. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-07 kl. 22:51 (gruppens svar):* brukertesten, story 8.1 og 10.4, tas tirsdag 10.11 eller onsdag 11.11, eller begge dagene, med den ekte versjonen og dataene fra kvelden før. Opplegget står i `spec-8-1-brukertesten.md` og skjemaet i `docs/brukertest.md`. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-07 kl. 23:26 (gruppens svar):* README-en beholder hva appen er, de fem stegene for dobbeltklikket og én linje om den ekte versjonen. Docker, uv, Linux, «Står du fast?» og «Mer for den som vil» flyttes uendret til `docs/installasjon.md`, og testene følger med. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2326,6 +2334,10 @@ tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
 
 *Avgjort 2026-10-23 kl. 16:37 (gruppens svar):* tre veier prøves, hver på sin gren: dobbeltklikk med uv (3.5a), dobbeltklikk med Docker (3.5b) og et installasjonsprogram for Windows (3.5c), ikke for Mac. Gruppen velger hovedveien i «Kom i gang» før README-prøven, med Docker som reserve.
 
+*Avgjort 2026-11-07 kl. 22:48 (gruppens svar):* videoen av demoen beholdes og lages til slutt, rett før README-prøven. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-07 kl. 23:26 (gruppens svar):* README-en beholder hva appen er, de fem stegene for dobbeltklikket og én linje om den ekte versjonen. Docker, uv, Linux, «Står du fast?» og «Mer for den som vil» flyttes uendret til `docs/installasjon.md`, og testene følger med. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
@@ -3069,6 +3081,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-10-23 kl. 15:53 (gruppen uten preferanse, rådets forslag):* de to åpne punktene i `spec-8-1-brukertesten.md`. a) Har personen verken forklart noe eller åpnet en aksjeside i del A, er aksjen i del B den øverste i tabellen. b) Slår personen på KI-teksten selv i del A, teller forklaringen for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
 
+*Avgjort 2026-11-07 kl. 22:51 (gruppens svar):* brukertesten, story 8.1 og 10.4, tas tirsdag 10.11 eller onsdag 11.11, eller begge dagene, med den ekte versjonen og dataene fra kvelden før. Opplegget står i `spec-8-1-brukertesten.md` og skjemaet i `docs/brukertest.md`. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
+
 *Avgjort 2026-11-05 kl. 12:23 og 12:24 (gruppens svar):* uka som teller for «Én ukes drift er logget», er 29.10–04.11, de sju første dagene jobben gikk av seg selv. Den og loggdelen av 10.4 telles før brukertesten. Delen med en person venter på brukertesten.
 
 *Lagt til 2026-11-05 (loggdelen, svarene kl. 12:23 og 12:24):* loggdelen er talt for uka 29.10–04.11 i `spec-10-4-loggdelen.md`. Av 75 KI-tekster som besto kontrollen, gjentar alle 75 regelforklaringen, 0 sier mer og 0 er usikre. Det er et funn til refleksjonsrapporten, ikke en feil. Delen med en person venter på brukertesten, så 10-4 står som `in-progress`.
@@ -3640,6 +3654,8 @@ noteres det, med tidspunkt.
 *Avgjort 2026-10-23 kl. 12:29 (gruppens svar):* 10.4 tas rett etter 8.1, med samme person og samme aksje, først med KI av (8.1) og så på (10.4), som to tester med hvert sitt notat (avgjort 23.09). Brukertesten tas neste uke.
 
 *Avgjort 2026-10-23 kl. 15:53 (gruppen uten preferanse, rådets forslag):* de to åpne punktene i `spec-8-1-brukertesten.md`. a) Har personen verken forklart noe eller åpnet en aksjeside i del A, er aksjen i del B den øverste i tabellen. b) Slår personen på KI-teksten selv i del A, teller forklaringen for 8.1 bare hvis den kom før det, del B hoppes over, og 10.4 tas med neste person.
+
+*Avgjort 2026-11-07 kl. 22:51 (gruppens svar):* brukertesten, story 8.1 og 10.4, tas tirsdag 10.11 eller onsdag 11.11, eller begge dagene, med den ekte versjonen og dataene fra kvelden før. Opplegget står i `spec-8-1-brukertesten.md` og skjemaet i `docs/brukertest.md`. Svaret er ført etter instruksjonen kl. 10:36 i `docs/ai-prompts/2026-11-08.md`.
 
 ### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 

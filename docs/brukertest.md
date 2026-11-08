@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-07T00:07
+updated: 2026-11-08T10:41
 ---
 
 # Brukertesten
@@ -12,6 +12,8 @@ updated: 2026-11-07T00:07
 *Rettet 2026-10-23 (gjennomgangen av 3.4e, VG6):* slår personen på KI-teksten selv i del A, hoppes del B over, og 10.4 tas med neste person (svaret 23.10 kl. 15:53, b).
 
 *Rettet 2026-11-03 (gruppens svar 02.11 kl. 22:15, C):* «neste uke» i svaret 23.10 kl. 12:29 gjelder ikke lenger. Brukertesten, story 8.1 og 10.4, tas senere, uten dato ennå, og «Brukerutfall» står som mål for v1 i §7 i PRD-en.
+
+*Rettet 2026-11-08 (gruppens svar 07.11 kl. 22:51):* brukertesten tas tirsdag 10.11 eller onsdag 11.11, eller begge dagene, med den ekte versjonen og dataene fra kvelden før.
 
 Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller et volum som personen sier høyt, står som [kurs] eller [volum] (regel 16). Originalnotatene ligger i `_privat/` (regel 10).
 
@@ -28,6 +30,12 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 | Det som ble sagt, ordrett | |
 
 *Rettet 2026-11-07:* knappen «Skjul KI-teksten» og «Vis KI-teksten» finnes ikke lenger. Den er nå bryteren «KI-tekst» med «På» og «Av» (`role="switch"` i makroen `ki_bryter` i `src/templates/aksje.html`), inne i rammen «‹navn› kort fortalt» øverst til høyre når teksten vises, og alene når KI er av. Den kom med story 8.2b (U33, U46 og U67), squash-flettet i `6f62f564`, PR #109, og svaret 04.11 kl. 09:58 på spørsmål 5 og 6 i `spec-8-2b-funnene-fra-ux-loggen.md` holdt den i blekk og utenfor stripa. KI av før del A betyr at bryteren viser «Av», og i del B slås den til «På». Raden «KI av: knappen sier «Vis KI-teksten»» over gjelder bryteren som viser «Av».
+
+*Rettet 2026-11-08 (slått opp i `src/templates/aksje.html` på `50103bcc`):* rammen heter nå «Signalet forklart», ikke «‹navn› kort fortalt» (story 10.9). Bryteren «KI-tekst» står fast øverst til høyre i rammen, både med KI på og av. Med KI av står rammen med appens setninger om dagene og om samme dag, uten KI-teksten. Med KI på kommer KI-teksten under dem, med «Laget av KI».
+
+*Lagt til 2026-11-08 (slått opp i `src/templates/_perioder.html` og `src/perioder.py` på `50103bcc`):* datofeltet står etter periodeknappene på oversikten, Min liste, aksjesiden og børsometeret. Med dataene fra kvelden før heter den første knappen «I går», og feltet viser den dagen. Det er dagen raden «Siste henting, dato» gjelder.
+
+*Lagt til 2026-11-08 (slått opp i `compose.yaml`, `start/start.ps1` og `src/app.py` på `50103bcc`):* på denne maskinen startes den ekte versjonen fra repo-mappa på main med `uv run python src/app.py`, fordi kveldsjobben skriver `data/db/ose.db` der. Docker bruker sitt eget volum, og «Start den ekte versjonen» stopper i en klon. Opplegget står i spesifikasjonen, under «Slik er det i dag».
 
 ## Del A (story 8.1): KI av
 
