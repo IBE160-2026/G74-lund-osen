@@ -83,3 +83,5 @@ På `f87c29ea` åtte (A–H), alle fanget. På `1f936f3a`, etter gjennomgangen, 
 ## Bygget og ikke flettet
 
 Grenen `2-12-velge-og-bytte-aksjer` er ikke flettet. Den bygger på 2.11 (PR #123), som flettes først. Gruppen går gjennom spørsmålene før flettingen, og BH6/ECH5 står åpent som spørsmål 6 i 2.11 (regel 25). Mandag kjøres `uv run python src/fetch_prices.py --les-boerslista` én gang før aksjer kan velges. `index.html` får en konflikt med 10.6 (PR #122), fordi begge legger en del under tabellen; rekkefølgen er «Dine egne aksjer» og så «Børsdagen kort fortalt» (§11 i utdraget 13.10).
+
+*Svar 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–11 er godtatt, og rådet anbefalte alt. BH6 og ECH5 (middels) lukkes med spørsmål 6 i 2.11, som gruppen godtok samme kveld: en aksje som tas inn igjen, får `ut` nullstilt, og en egen tabell med periodene venter til det trengs. Graden på funnene er ikke endret (regel 25). Med det står ingen funn på middels eller over åpne. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
