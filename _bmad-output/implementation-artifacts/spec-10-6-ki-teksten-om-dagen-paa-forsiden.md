@@ -155,3 +155,8 @@ Tre gjennomganger av `1c27113e`, i parallell etter hele settet og mutantene: Bli
 - *Rettet:* ECH7 og ECH8 («1 aksje skilte seg ut», «av de 15 aksjene»), ECH10 og VG7 (tallene står med sifre, så hvert tall som vises, har prikket strek), ECH12 (uten `tilbake` går bryteren til `/` som før), ECH13 (utskriften når bare teksten om dagen venter), BH5 (en eldre dag uten raden stopper ikke steget), BH8 (terskelen fra `STANDARD`), BH10 (grunnen er tallet), BH11 (en feil i grunnlaget for dagen stopper ikke tekstene for aksjene), VG8 (Lagt til-linje i §57), VG9 (docstringen nevner alle ordene).
 - *Ført:* BH7 og ECH11. Bryteren på forsiden beholder perioden og dagen, men ikke sorteringen. ECH9: «1 skilte seg ut med negativ retning» stoppes; prompten gir formen med kolon. ECH14: feilet hovedindeksen om kvelden og ble hentet neste kveld, sier grunnlaget på siden noe annet enn raden, og dagen er uten tekst under «Velg dag». VG10: at hentingen og siden bruker samme liste når den ikke har 15 aksjer, er bare testet i `dagsgrunnlag`; lista fra basen kommer i 2.11. VG11: utdraget sier «under Dine egne aksjer», som kommer i 2.12; til da står delen under tabellen.
 - **Etter gjennomgangen:** hele settet alene kl. 15:22:02–15:31:42, 6,5 GB ledig minne: 4650 bestått, 24 hoppet over og 0 feilet.
+- **Mutantene på nytt** på `d78f2e4b`, med de tre nye delene: A 3, B 3, C 4, D 3, E 1, F 1 og G 3 tester, og C2 «ord utenfor formene godtas» 17, D2 «teksten om dagen lages selv om en aksje mangler raden» 1 og E2 «modellen uten tjenesten» 2. Alle ti ble fanget, og hver fil var lik HEAD etterpå.
+
+## Bygget og ikke flettet
+
+Grenen `10-6-ki-teksten-om-dagen` er ikke flettet. Gruppen går gjennom spørsmålene over før flettingen (svaret 08.11 kl. 12:32).
