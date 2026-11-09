@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-09T00:05
+updated: 2026-11-09T10:31
 ---
 
 # Brukertesten
@@ -46,6 +46,8 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 *Lagt til 2026-11-09 (story 8.8, PR #127; spørsmål 1 og 3 i `spec-8-8-signaldager-i-kursgrafen.md`):* kursgrafen på aksjesiden har prikker på dagene med signalstyrke 2 eller mer, og under grafen står «Prikkene på kurslinja viser dagene med signalstyrke 2 eller mer, fra ‹dato›.»
 
 *Lagt til 2026-11-09 (slått opp i `src/app.py`, `src/lagring_sqlite.py` og `start/kveldshenting.ps1` på `673230d9`):* slik får `data/db/ose.db` migrasjonen 0011 (8.10) før testen tirsdag 10.11. 0011 flettes mandag 09.11 kl. 23:50, etter 0010 (2.12). Jobben kl. 22:15 mandag bruker commiten origin/main hadde ved midnatt søndag–mandag (steg 1 i `kveldshenting.ps1`), så den gir basen 0009 (2.11, flettet 08.11 kl. 23:50), ikke 0010 og 0011. Startes den ekte versjonen tirsdag fra repo-mappa på main etter `git pull --ff-only`, kjører `aapne_base` `migrer()` én gang i prosessen, og basen får 0010 og 0011 før siden vises. Ellers får basen dem i jobben tirsdag kl. 22:15, som bruker main fra midnatt mandag–tirsdag. Regel 22 sier at webserveren bare skriver merkingen i Min liste. At den også migrerer basen, er et åpent punkt til gruppen. Er 2.12 og 8.10 ikke flettet mandag, har testen ikke Innstillinger, og KI slås av med bryteren som før.
+
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar), lagt til etter linja over:* webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), så punktet over er besvart, med en Lagt til-linje under regel 22 i `CLAUDE.md`. Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 ## Del A (story 8.1): KI av
 

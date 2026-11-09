@@ -165,6 +165,10 @@ et sitat som ikke fantes».
     som en kopi i en midlertidig mappe som slettes etterpå, og skriver aldri
     i den. sha256 for basen er den samme før og etter. Brukt første gang i
     §57 i `malinger.md` (story 10.6).
+    *Lagt til 2026-11-09 (gruppens svar kl. 10:23):* webserveren fra main
+    migrerer basen når den startes, og skriver også ønskene (2.12) og
+    innstillingene (8.10), ikke bare merkingen i Min liste. Rådet anbefalte
+    at `--les-boerslista` migrerer først tirsdag.
 23. **ruff før en commit.** `uv run ruff check --fix` og så `uv run ruff format`
     før hver commit som endrer `src/` eller `tests/`. Reglene står i `pyproject.toml`
     og er bare de som finner feil eller rot: pyflakes, importene og bugbear.
