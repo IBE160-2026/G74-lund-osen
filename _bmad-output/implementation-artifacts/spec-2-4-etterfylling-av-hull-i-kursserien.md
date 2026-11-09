@@ -47,3 +47,30 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 ## Grenser
 
 Ingen API-kall, `src/fetch_prices.py` kjøres bare i testene med en falsk henter, og `data/db/ose.db` røres ikke. Ingen migrasjon.
+
+## Bygget 09.11 (ekstravinduet)
+
+Bygget på grenen `2-4-etterfylling`, i worktreen `G74-lund-osen-2-4`, fra `1a72810a`. Ingen endring i `src/`. Testene er i `tests/test_etterfyllingen_2_4.py`, og svaret står i «Jeg har ikke hentet på noen dager.» i `docs/hjelp.md`. Ingen side endres, så bildene og avtrykkene i `tests/test_docker.py` står.
+
+## Mutantene
+
+Én per del på `653d8d0c`, med kopi før og fila lik HEAD etterpå: A (`kurs` skjøtes med `INSERT OR REPLACE` uten `DELETE`) fanget av `test_eldre_rader_er_kildens_nye`, B (indeksen lagres ikke) av `test_hullet_i_hovedindeksen_fylles_ogsaa`, C (intervallet fire dager) av `test_samme_kall_etter_et_hull_som_dagen_etter`, etter at testen regner intervallet av `DAGER_TILBAKE` og ikke av `bygg_intervall` (`fbf4c7ce`), og D (lageret godtar enhver dato) av `test_ad7_stopper_et_forsoek_paa_aa_etterfylle`.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `1a72810a..fbf4c7ce`: Blind Hunter med bare diffen (11 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (5 og 5 funn, med mutanter i en kopi utenfor worktreen). Ingen høye.
+
+**Middels**
+- *BH1, BH2, BH3, ECH1, ECH2 og ECH3, rettet.* Hjelpen sa «Neste henting fyller hullet» uten forbehold, og at kurslinja går rett over dagene som mangler. Et hull fra dager uten henting står i enden av serien, så grafen slutter på siste dag som er hentet, og har ingen linje over hullet. Hjelpen sier nå at hentingen må være etter kl. 22 eller i helgen når basen mangler forrige børsdag, at en aksje som feiler, står med hullet til et nytt forsøk eller neste henting, og at hovedindeksen som feiler, står med hullet til neste kveld som henter, fordi den ikke prøves på nytt og en henting som finner aksjenes kurser i basen, ikke henter den (`manglende_i_basen` ser bare på aksjene).
+- *BH5 og VG1, rettet.* Testen for indeksen så bare at hullet var fylt. Nå med kildens endrede kurser, og mutanten B2 (`indeks` skjøtes uten `DELETE`), som overlevde i gjennomgangen, ble fanget.
+- *VG2, rettet.* `TestNaarHentingenFeiler`: en aksje og hovedindeksen som feiler etter hullet.
+- *BH4, rettet.* `test_en_uke_med_helgen`: en uke borte, over helgen.
+- *BH11, ikke reelt.* K9 og sitatet fra endringsforslaget 28.09, §4.6, er slått opp (Edge Case Hunter gjorde det samme).
+
+**Lav**
+- *Rettet:* ECH4 (signalet lagres bare for børsdagen hentingen gjelder, også i helgen), ECH5 (en aksje som er tatt ut av lista, hentes ikke).
+- *Ført:* BH6 (den eldste dagen i `endret` er ikke en egen prøve, fordi serien fra mandag alt begynner tidligere), BH7 og VG4 (testen for AD-7 prøver regelen i lageret, som kontrollen i epics.md ber om, ikke noe 2.4 endrer), BH8 (testene bruker `AKSJEUNIVERS`, som er lista i en ny testbase), BH9 (kl. 22:00 sommertid er grensen og godtas), BH10 og VG5 (ett år er prøvd i `test_fetch_prices.py`, `TestIntervall`), VG3 (sidene endres ikke).
+
+*Lagt til 2026-11-09 under spørsmål 4 (gjennomgangen, BH3):* et hull fra dager uten henting står i enden av serien, så grafen slutter på den siste dagen som er hentet, og går ikke over hullet. Forslaget er det samme: ingen merking.
+
+6. **Hovedindeksen etter en feil.** *Lagt til 2026-11-09 (gjennomgangen, ECH1):* feiler hovedindeksen i hentingen etter hullet, henter ingen kjøring den før neste kveld der en aksje mangler kursene, fordi `manglende_i_basen` bare ser på aksjene. *Forslag:* som før, og hjelpen sier det. Å hente indeksen i helgen når bare den mangler, ville bruke et kall som i dag ikke brukes.
