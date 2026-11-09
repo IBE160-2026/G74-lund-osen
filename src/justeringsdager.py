@@ -9,7 +9,7 @@ kolonnene i kurs (AD-5, AD-19). Den er etterpåklok: en dag kan bare merkes
 når den har en rad før seg.
 """
 
-from datetime import date, timedelta
+from datetime import date
 
 from kursdata import Kursrad
 
@@ -19,8 +19,16 @@ from kursdata import Kursrad
 # under 0,05 (én hendelse til ved 0,01).
 TERSKEL_PP = 0.1
 
-# «Det siste året» (FR-407, story 8.14): dagene etter samme dato året før.
-AARET = timedelta(days=365)
+
+def aaret_foer(til: date) -> date:
+    """«Det siste året» (FR-407, story 8.14) begynner på samme dato året
+    før, som «1 år» i kursgrafen (perioder.startdag). Gjennomgangen (ECH1,
+    BH11): her sto 365 dager, som mistet den første dagen i grafen og en dag
+    over 29. februar. 29. februar blir 28. februar året før."""
+    try:
+        return til.replace(year=til.year - 1)
+    except ValueError:
+        return til.replace(year=til.year - 1, day=28)
 
 
 def _endring(fra: float, til: float) -> float:
@@ -37,9 +45,10 @@ def er_justeringsdag(forrige: Kursrad, rad: Kursrad) -> bool:
 
 
 def justeringsdager(serie: list[Kursrad], til: date | None = None) -> tuple[date, ...]:
-    """Justeringsdagene i serien, eldst først. Med til bare det siste året
-    til og med til. Serien er sortert på dato, som lagrene gir den."""
+    """Justeringsdagene i serien, eldst først. Med til bare det siste året,
+    fra aaret_foer(til) til og med til. Serien er sortert på dato, som
+    lagrene gir den."""
     dager = tuple(rad.dato for forrige, rad in zip(serie, serie[1:], strict=False) if er_justeringsdag(forrige, rad))
     if til is None:
         return dager
-    return tuple(d for d in dager if til - AARET < d <= til)
+    return tuple(d for d in dager if aaret_foer(til) <= d <= til)

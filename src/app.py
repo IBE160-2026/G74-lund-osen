@@ -1242,10 +1242,11 @@ def aksjedetalj(symbol: str):
     # (gjennomgangen, BH6).
     signal, signal_fra = _signaldagene(post, rader)
     # Story 8.14 (FR-407): justeringsdagene det siste året til dagen siden
-    # viser, regnet av kursserien alene.
+    # viser, regnet av kursserien alene. Grafen får alle dagene i serien og
+    # merker dem den har (gjennomgangen, BH1).
     justeringer = justeringsdager(rader, til=slutt)
     grafvalg = dict(
-        justeringer=justeringer,
+        justeringer=justeringsdager(rader),
         indeks=indeks,
         merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
         merket=dagen.dato if dagen else None,

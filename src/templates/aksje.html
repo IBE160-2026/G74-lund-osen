@@ -66,7 +66,8 @@
       <span class="verdi {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">{% if detalj.endring is not none %}{{ detalj.endring|tall('endring') }}{% else %}–{% endif %}</span>
       {% if detalj.forrige_dato %}<span class="forklaring">fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til {{ detalj.dato|ukedag }} {{ detalj.dato|dato }}</span>{% endif %}
       {#- Story 2.6 (FR-407): dagen er en justeringsdag. #}
-      {% if detalj.justeringsdag %}<span class="forklaring justeringsdag">Justeringsdag: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt.</span>{% endif %}
+      {#- Gjennomgangen (ECH2): bare med en endring å forklare. #}
+      {% if detalj.justeringsdag and detalj.endring is not none %}<span class="forklaring justeringsdag">Justeringsdag: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt.</span>{% endif %}
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>
@@ -292,7 +293,7 @@
         {% elif signal_fra %}{% set n = graf.signaldager|length %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}. {% if n %}Rund prikk er positiv, firkant negativ og rute blandet. {{ n }} {{ "dag" if n == 1 else "dager" }} i grafen{% if n <= 31 %}<span class="skjult">: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}){% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}.{% else %}Ingen av dagene i grafen hadde signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% endif %}
         {#- Story 8.14 (FR-407): antallet det siste året og den siste dagen,
             regnet av kursserien. Ordet «utbytte» står ikke her. #}
-        <span class="justeringstekst">{% set nj = justeringer|length %}{% if graf.justeringsdager %}De korte strekene nederst i grafen er justeringsdager: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt den dagen. {% endif %}{% if nj %}Det siste året var det {{ nj }} {{ "justeringsdag" if nj == 1 else "justeringsdager" }}, den siste {{ justeringer[-1]|dato }}.{% else %}Ingen justeringsdager det siste året.{% endif %}</span>
+        <span class="justeringstekst">{% set nj = justeringer|length %}{% if graf.justeringsdager %}De korte strekene nederst i grafen er justeringsdager<span class="skjult"> ({% for d, x in graf.justeringsdager %}{{ d|dato }}{% if not loop.last %}, {% endif %}{% endfor %})</span>: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt den dagen. {% endif %}{% if nj %}Det siste året var det {{ nj }} {{ "justeringsdag" if nj == 1 else "justeringsdager" }}, den siste {{ justeringer[-1]|dato }}.{% else %}Ingen justeringsdager det siste året.{% endif %}</span>
         {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}

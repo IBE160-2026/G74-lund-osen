@@ -8,7 +8,7 @@ oppdiktet (regel 16).
 import ast
 import inspect
 import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 
@@ -63,7 +63,9 @@ class TestRegelen:
             Kursrad(dato=date(2025, 9, 24), slutt=99.0, justert_slutt=99.0, volum=1),
         ]
         assert jd.justeringsdager(serie) == (date(2025, 9, 22), date(2025, 9, 23), date(2025, 9, 24))
-        assert jd.justeringsdager(serie, til=date(2026, 9, 23)) == (date(2025, 9, 24),)
+        # Gjennomgangen (ECH1): fra samme dato året før, som «1 år» i grafen.
+        assert jd.justeringsdager(serie, til=date(2026, 9, 23)) == (date(2025, 9, 23), date(2025, 9, 24))
+        assert jd.justeringsdager(serie, til=date(2026, 9, 24)) == (date(2025, 9, 24),)
         assert jd.justeringsdager(serie, til=date(2025, 9, 23)) == (date(2025, 9, 22), date(2025, 9, 23))
 
     def test_bare_kursserien(self):
@@ -78,13 +80,22 @@ class TestRegelen:
         assert moduler == {"datetime", "kursdata"}
 
 
+MIDT_I = date(2026, 9, 15)
+
+
 def _hent(ticker, *_):
-    """EQNR har en justeringsdag siste børsdag: kilden har regnet kursene
-    før den ned med 2 %. De andre har ingen."""
+    """EQNR har to justeringsdager, tirsdag 15.09 og siste børsdag 22.09:
+    kilden har regnet kursene før hver av dem ned med 2 %. De andre har
+    ingen. Gjennomgangen (VG2, VG3): to dager, én midt i serien."""
     serie = serie_til(TIRSDAG, dager=64)
     if ticker.startswith(JUSTERT + "."):
         serie = [
-            {**r, "adjusted_close": r["adjusted_close"] * (0.98 if r["date"] < TIRSDAG.isoformat() else 1)}
+            {
+                **r,
+                "adjusted_close": r["adjusted_close"]
+                * (0.98 if r["date"] < TIRSDAG.isoformat() else 1)
+                * (0.98 if r["date"] < MIDT_I.isoformat() else 1),
+            }
             for r in serie
         ]
     return serie
@@ -115,9 +126,15 @@ def _side(klient, adresse: str) -> str:
 
 
 def _spennet(side: str, klasse: str) -> str:
-    treff = re.search(rf'<span class="[^"]*\b{klasse}\b[^"]*"[^>]*>(.*?)</span>', side, re.S)
+    """Det første spennet med klassen, med spennene inni (BH4)."""
+    treff = re.search(rf'<span class="[^"]*\b{klasse}\b[^"]*"[^>]*>', side)
     assert treff, klasse
-    return treff.group(0)
+    dybde, i = 1, treff.end()
+    for m in re.finditer(r"<span\b|</span>", side[i:]):
+        dybde += 1 if m.group(0) == "<span" else -1
+        if dybde == 0:
+            return side[treff.start() : i + m.end()]
+    raise AssertionError(klasse)
 
 
 class TestOversikten:
@@ -138,9 +155,18 @@ class TestOversikten:
 
     def test_valgt_dag(self, klient):
         """Ville feilet hvis en dag valgt med datoen fikk merket fra siste
-        børsdag, eller ikke sitt eget."""
+        børsdag, eller ikke sitt eget, eller merket ble regnet mot en annen
+        rad enn den før (gjennomgangen, VG3)."""
         assert 'class="justeringsdag"' in _side(klient, "/?periode=velg&dag=2026-09-22")
-        assert 'class="justeringsdag"' not in _side(klient, "/?periode=velg&dag=2026-09-21")
+        assert 'class="justeringsdag"' in _side(klient, "/?periode=velg&dag=2026-09-15")
+        for dag in ("2026-09-16", "2026-09-21"):
+            assert 'class="justeringsdag"' not in _side(klient, f"/?periode=velg&dag={dag}")
+
+    def test_forklaringen_ved_musepekeren(self, klient):
+        """Gjennomgangen (VG6): ville feilet hvis merket i oversikten ikke
+        forklarte hvorfor sluttkursen og endringen ikke stemmer."""
+        merket = _spennet(_side(klient, "/"), "justeringsdag")
+        assert 'title="Justeringsdag: kilden regnet de eldre kursene om' in merket
 
     def test_ordet_er_justeringsdag(self, klient):
         """8.14: ville feilet hvis merket kalte justeringen et utbytte."""
@@ -162,9 +188,21 @@ class TestAksjesiden:
         """8.14: ville feilet hvis grafen ikke merket dagen, eller antallet og
         den siste datoen manglet i aksjedetaljen."""
         side = _side(klient, f"/aksje/{JUSTERT}")
-        assert side.count('<line class="justeringsdag"') == 2  # den brede og den smale grafen
+        # To dager, i den brede og den smale grafen.
+        assert side.count('<line class="justeringsdag"') == 4
         tekst = _spennet(side, "justeringstekst")
-        assert "Det siste året var det 1 justeringsdag, den siste 22.09." in tekst
+        assert "Det siste året var det 2 justeringsdager, den siste 22.09." in tekst
+        # Skjermleseren får datoene (gjennomgangen, BH4), og forklaringen står.
+        assert "(15.09, 22.09)" in tekst and "De korte strekene nederst" in tekst
+
+    def test_strekene_staar_ved_dagene(self, klient):
+        """Gjennomgangen (VG1): ville feilet hvis strekene sto et annet sted
+        enn ved justeringsdagene. Den siste står ved punktet for siste dag."""
+        side = _side(klient, f"/aksje/{JUSTERT}")
+        bred = side.split('<svg class="graf"', 1)[1].split("</svg>", 1)[0]
+        xene = re.findall(r'<line class="justeringsdag" x1="([0-9.]+)"', bred)
+        siste = re.search(r'<circle class="sistepunkt" cx="([0-9.]+)"', bred).group(1)
+        assert len(xene) == 2 and xene[-1] == siste and float(xene[0]) < float(siste)
 
     def test_ingen_justeringsdager(self, klient):
         """8.14: ville feilet hvis en aksje uten justeringsdager fikk streker
@@ -184,13 +222,16 @@ class TestAksjesiden:
         """8.14: ville feilet hvis grafen merket andre dager enn regelen i 2.6
         finner i kursserien til samme dag."""
         side = _side(klient, f"/aksje/{JUSTERT}?periode=velg&dag=2026-09-21")
-        assert '<line class="justeringsdag"' not in side
-        assert "Ingen justeringsdager det siste året." in _spennet(side, "justeringstekst")
-        # Dagen før er ikke en justeringsdag i oversikten heller.
+        bred = side.split('<svg class="graf"', 1)[1].split("</svg>", 1)[0]
+        assert bred.count('<line class="justeringsdag"') == 1
+        tekst = _spennet(side, "justeringstekst")
+        assert "(15.09)" in tekst and "Det siste året var det 1 justeringsdag, den siste 15.09." in tekst
+        # Dagen grafen slutter på, er ikke en justeringsdag i oversikten heller.
         assert 'class="justeringsdag"' not in _side(klient, "/?periode=velg&dag=2026-09-21")
 
 
-def test_aaret_er_365_dager():
-    """Ville feilet hvis «det siste året» var noe annet enn dagene etter
-    samme dato året før."""
-    assert jd.AARET == timedelta(days=365)
+def test_aaret_begynner_paa_samme_dato_aaret_foer():
+    """Gjennomgangen (ECH1, BH11): ville feilet hvis «det siste året» var
+    365 dager, som mister den første dagen i «1 år» i grafen."""
+    assert jd.aaret_foer(date(2026, 11, 10)) == date(2025, 11, 10)
+    assert jd.aaret_foer(date(2028, 2, 29)) == date(2027, 2, 28)
