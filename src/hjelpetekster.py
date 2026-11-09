@@ -58,6 +58,8 @@ DAGENE = "src/dagene.py"
 KI_KONTROLL = "src/ki_kontroll.py"
 KI_VISNING = "src/ki_visning.py"
 MOENSTRENE = "src/moenstrene.py"
+# Story 2.12: å velge og bytte aksjer.
+VALG = "src/valg.py"
 # Story 10.6: teksten om dagen paa forsiden.
 DAGSGRUNNLAG = "src/dagsgrunnlag.py"
 KI_DAGEN = "src/ki_dagen.py"
@@ -613,6 +615,21 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "def kontroller("),
                 (AKSJE_MAL, "Laget av KI."),
+            ),
+        ),
+        # Story 2.12 (utdraget 08.11 §1): hjelpen ved «Dine egne aksjer», med
+        # ordene fra utdraget i tre setninger (story 8.0c).
+        "dine_egne_aksjer": Hjelpetekst(
+            "",
+            "Lista kan ha opptil 18 aksjer, og aksjer du følger selv, står i tabellen sammen med de andre, merket "
+            "«Egen». En ny aksje hentes ved neste henting om kvelden og bruker da 1 kall om dagen, og fjerner du den før det, "
+            "brukes ingen kall; valget lagres på denne maskinen. Signalet er målt på aksjer som omsettes for over "
+            "32 MNOK om dagen, og omsettes aksjen mindre, eller er omsetningen ikke målt, merkes den «Utenfor målingen».",
+            (
+                (VALG, "TAK = 18"),
+                (VALG, "GRENSE_MNOK = 32.0"),
+                (VALG, "def utenfor_maalingen("),
+                (VALG, "def ta_i_bruk("),
             ),
         ),
         # Story 10.6 (utdraget 08.11 §3): hjelpen ved «Børsdagen kort

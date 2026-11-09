@@ -359,6 +359,8 @@ class TestSiden:
             ("/", "Markedsoversikt"),
             ("/boersometer", "Børsometer"),
             ("/min-liste", "Min liste"),
+            # Story 8.10: «Innstillinger» etter de tre.
+            ("/innstillinger", "Innstillinger"),
         ]
         assert [tekst for _, fylt, tekst in knapper if fylt] == ["Børsometer"]
         oversikten = re.sub(r'<svg class="ikon".*?</svg>', "", _side(klient, "/"), flags=re.S)

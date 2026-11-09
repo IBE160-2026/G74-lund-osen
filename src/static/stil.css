@@ -72,6 +72,8 @@
   /* Story 2.9b: gult bransjesymbol ved 3 av 3 over søylene, 3,82:1 mot
      hvitt (designregler §3). */
   --gul-symbol: #a67c00;
+  /* Story 2.12: merket «Egen» i blått (utdraget 08.11 §1). */
+  --egen: #1D4ED8;
   /* Story 8.6b, c: de tre trinnene i børsometeret som ikke er --opp og --ned. */
   --trinn-noeytral: #E9E7E1;
   --trinn-lys-opp: #B4E2C4;
@@ -1144,6 +1146,58 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .signaldag.alle { stroke: var(--gul-symbol); stroke-width: 2.5; }
 :where(.side-aksje) figcaption .skjult { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
                                          clip: rect(0 0 0 0); white-space: nowrap; }
+/* Story 2.12 (utdraget 08.11 §1 og §2): «Dine egne aksjer» og «Din egen
+   liste» som kort under tabellen, merket «Egen» i blått og «Utenfor
+   målingen» i grått, og siden «Følg en aksje». */
+:where(.side-oversikt) .egne { margin: 40px 0 8px; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
+                               border-radius: 16px; }
+:where(.side-oversikt) .egne-topp { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+:where(.side-oversikt) .egne h2 { margin: 0; font-size: 24px; }
+:where(.side-oversikt) .egne h3 { margin: 18px 0 6px; font-size: 18px; }
+:where(.side-oversikt) .antall-egne { color: var(--dempet); margin: 0; }
+:where(.side-oversikt) .egne-rader, :where(.side-oversikt) .bytt-lista, :where(.side-oversikt) .treff { list-style: none; padding: 0; margin: 12px 0; }
+:where(.side-oversikt) .egen-rad, :where(.side-oversikt) .bytt-lista li, :where(.side-oversikt) .treff li { display: flex; flex-wrap: wrap; align-items: center;
+                                                                                                             gap: 6px 12px; padding: 10px 0; border-top: 1px solid var(--strek); }
+:where(.side-oversikt) .egen-rad form, :where(.side-oversikt) .egen-rad .status { margin-left: auto; }
+:where(.side-oversikt) .egen-rad .status { color: var(--dempet); font-size: 14px; }
+:where(.side-oversikt) .egenmerke, :where(.side-oversikt) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px;
+                                                                           font-size: 12.5px; font-weight: 600; }
+:where(.side-oversikt) .egenmerke { color: var(--egen); border: 1px solid var(--egen); }
+:where(.side-oversikt) .utenformerke { color: var(--dempet); border: 1px solid var(--strek-2); }
+:where(.side-oversikt) .knapp { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px;
+                                border: 1px solid var(--strek-2); background: var(--kort); color: var(--blekk); font: inherit;
+                                font-weight: 600; text-decoration: none; cursor: pointer; }
+:where(.side-oversikt) .knapp.hoved { background: var(--blekk); color: var(--hvit); border-color: var(--blekk); }
+:where(.side-oversikt) .demoboks { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--strek-2); border-radius: 10px;
+                                   color: var(--dempet); font-size: 14px; }
+:where(.side-oversikt) .folg { max-width: 720px; }
+:where(.side-oversikt) .folgskjema { display: grid; gap: 10px; margin: 16px 0; }
+:where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }
+:where(.side-oversikt) .folgskjema select, :where(.side-oversikt) .sok input { min-height: 44px; font: inherit; padding: 0 10px; }
+:where(.side-oversikt) .sok { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+:where(.side-oversikt) .feil, :where(.side-oversikt) .full { color: var(--ned); font-weight: 600; }
+:where(.side-oversikt) .bytt-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 24px; }
+:where(.side-oversikt) .bytt-lista .knapp { margin-left: auto; min-height: 36px; }
+/* Story 2.12 (gjennomgangen, VG2): «Utenfor målingen» på aksjesiden og i
+   børsometeret, i grått. */
+:where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
+:where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+                                    color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
+/* Story 8.10 (utdraget 08.11 §4): «Innstillinger», med en bryter per valg. */
+:where(.side-oversikt) .innstillinger { max-width: 720px; }
+:where(.side-oversikt) .innstillinger .valg { margin: 16px 0; padding: 18px 20px; background: var(--kort); border: 1px solid var(--strek);
+                                              border-radius: 16px; }
+:where(.side-oversikt) .innstillinger h2 { margin: 0 0 10px; font-size: 20px; }
+:where(.side-oversikt) .innstillinger .nederst { color: var(--dempet); }
+:where(.side-oversikt) .innstillingsbryter { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
+                                             font: inherit; font-weight: 600; border: 1px solid var(--strek-2); border-radius: 999px;
+                                             background: var(--kort); color: var(--blekk); cursor: pointer; }
+:where(.side-oversikt) .innstillingsbryter .spor { position: relative; width: 36px; height: 20px; border-radius: 999px; background: var(--strek-2); }
+:where(.side-oversikt) .innstillingsbryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+                                                          border-radius: 50%; background: var(--hvit); }
+:where(.side-oversikt) .innstillingsbryter[aria-checked="true"] .spor { background: var(--blekk); }
+:where(.side-oversikt) .innstillingsbryter[aria-checked="true"] .spor::after { left: 18px; }
+:where(.side-oversikt) .innstillingsbryter .verdi { color: var(--dempet); font-weight: 400; }
 /* Story 10.6: bryteren «Vis KI-tekst» på oversikten, som på aksjesiden. */
 :where(.side-oversikt) .dagsbryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
                                            box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;

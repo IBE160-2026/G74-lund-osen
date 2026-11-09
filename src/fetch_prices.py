@@ -91,6 +91,7 @@ from dotenv import load_dotenv
 import boersdag
 import lagring_fil
 import lagring_sqlite
+import valg
 from boersdag import (
     OSLO,
     UtenforKalenderen,
@@ -774,6 +775,57 @@ def _aapne_for_sjekken(base_sti: Path) -> sqlite3.Connection:
     return tilkobling
 
 
+def les_boerslista(base_sti: Path, fil: Path, skriv: Callable[[str], None] = print) -> None:
+    """Story 2.12: lista over Oslo Børs inn i basen, uten kall. Basen
+    migreres (AD-16). En demobase skrives ikke (FR-411)."""
+    nekt_demobase(base_sti, skriv)
+    if not Path(fil).is_file():
+        skriv(f"Fila {fil} finnes ikke. Den er ikke i repoet (regel 10). 0 kall brukt.")
+        sys.exit(1)
+    base_sti.parent.mkdir(parents=True, exist_ok=True)
+    tilkobling = aapne_base(base_sti)
+    try:
+        antall = valg.les_boerslista(tilkobling, fil)
+    finally:
+        tilkobling.close()
+    skriv(f"Lista over Oslo Børs har {antall} aksjer i basen nå. 0 kall brukt.")
+
+
+def ta_i_bruk_oenskene(base_sti: Path, dato: date) -> list[str]:
+    """Story 2.12: ønskene fra siden for børsdagen, og en egen aksje som ikke
+    har fått kurser, tatt ut igjen (valg.py). Basen aapnes for skriving bare
+    naar den er paa siste versjon og har et ønske som venter, eller en egen
+    aksje uten kurser; ellers skrives ingenting her, og sjekkene foer foerste
+    kall leser den som foer. En feil stopper ikke hentingen."""
+    if not base_sti.exists():
+        return []
+    try:
+        tilkobling = _aapne_for_sjekken(base_sti)
+        try:
+            tabeller = {r[0] for r in tilkobling.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+            if "oenske" not in tabeller:
+                return []
+            venter = tilkobling.execute(
+                "SELECT count(*) FROM oenske WHERE tatt_i_bruk IS NULL AND avvist IS NULL"
+            ).fetchone()[0]
+            uten = tilkobling.execute(
+                "SELECT count(*) FROM aksje WHERE inn IS NOT NULL AND inn < ? AND ut IS NULL "
+                "AND NOT EXISTS (SELECT 1 FROM kurs WHERE kurs.symbol = aksje.symbol)",
+                (dato.isoformat(),),
+            ).fetchone()[0]
+        finally:
+            tilkobling.close()
+        if not venter and not uten:
+            return []
+        tilkobling = aapne_base(base_sti)
+        try:
+            return valg.uten_rader(tilkobling, dato) + valg.ta_i_bruk(tilkobling, dato)
+        finally:
+            tilkobling.close()
+    except (*BASEFEIL, ValueError) as feil:
+        return [f"Ønskene fra siden kunne ikke tas i bruk ({type(feil).__name__}). De venter til neste henting."]
+
+
 def lista_fra_basen(base_sti: Path, dato: date) -> tuple[Aksje, ...]:
     """Aksjene i lista paa dato, fra aksje i basen - story 2.11.
 
@@ -1031,6 +1083,13 @@ def kjoer(
     # og AKSJEUNIVERS bare naar basen ikke finnes ennaa eller ikke kan leses,
     # som foer. En aksje som er tatt ut, hentes ikke (AD-21).
     if lista is None:
+        # Story 2.12: ønskene fra siden tas i bruk først, og bare i en
+        # vanlig henting, ikke den første på dagtid.
+        # Gjennomgangen (ECH3): bare paa selve boersdagen, ikke i helgen
+        # eller om natta etter, naar dato er en dag som alt er hentet.
+        if not foerste_henting and dag == dato:
+            for linje in ta_i_bruk_oenskene(base_sti, dato):
+                skriv(linje)
         lista = lista_fra_basen(base_sti, dato)
         if not lista:
             skriv(f"Lista i basen er tom for børsdagen {dato.isoformat()}. Ingenting å hente. 0 kall brukt.")
@@ -1628,7 +1687,21 @@ def main(argv: list[str] | None = None) -> None:
             "av dagens, etter hentingen (story 2.13). Bruker aldri bonuskvoten"
         ),
     )
+    parser.add_argument(
+        "--les-boerslista",
+        action="store_true",
+        help=(
+            "les lista over aksjene på Oslo Børs fra data/proever/symbolliste-OL-2026-10-22.json inn i "
+            "basen, uten API-kall, så aksjer kan velges på siden (story 2.12)"
+        ),
+    )
     argumenter = parser.parse_args(argv)
+    if argumenter.les_boerslista:
+        # Story 2.12, spørsmål 2: ingen kall, bare fila fra malinger.md §40.
+        import omsetning
+
+        les_boerslista(lagring_sqlite.BASE_STI, omsetning.LISTEFIL)
+        return
     if argumenter.maal_omsetning:
         # Story 2.13: et eget valg. omsetning.py importerer fra denne fila og
         # importeres derfor her. Nettfunksjonene gis inn herfra (AD-2).

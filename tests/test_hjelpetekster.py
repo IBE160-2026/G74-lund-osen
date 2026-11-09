@@ -439,6 +439,8 @@ class TestSidene:
                 "hjelp-hentet": ["data_hentet", "uten_data"],
                 # Story 8.17a: periodevalget over søylene og tabellen.
                 "hjelp-perioden": ["perioden_oversikten"],
+                # Story 2.12: «Dine egne aksjer» under tabellen.
+                "hjelp-egne": ["dine_egne_aksjer"],
                 # Story 10.6: «Børsdagen kort fortalt» under tabellen.
                 "hjelp-boersdagen": ["boersdagen_kort_fortalt"],
             },

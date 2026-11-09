@@ -32,6 +32,11 @@
   {% else %}
     <h1 class="overskrift">{{ detalj.aksje.navn }}</h1>
   {% endif %}
+  {#- Story 2.12 (utdraget 08.11 §2): «Utenfor målingen» ved navnet, med
+      omsetningen når man peker på merket. #}
+  {% if detalj.aksje.symbol in utenfor %}
+    <p class="utenfor-linje"><span class="utenformerke" title="{{ utenfor[detalj.aksje.symbol] }}">Utenfor målingen</span> {{ utenfor[detalj.aksje.symbol] }}</p>
+  {% endif %}
   {#- Svar 18: børsen og datoen, «Demo Børs» i demoen. #}
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
   {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sier hva

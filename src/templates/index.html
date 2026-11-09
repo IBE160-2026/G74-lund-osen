@@ -46,6 +46,10 @@
           <tr {% if rad.skiller_seg_ut %}class="utslag{% if rad.styrke == antall_sjekker %} alle{% endif %}"{% endif %}>
           {%- endif %}
             <td class="selskap"><form id="rad-{{ rad.aksje.symbol }}" class="stjerne" method="post" action="/min-liste/merk"><input type="hidden" name="symbol" value="{{ rad.aksje.symbol }}"><input type="hidden" name="til" value="{{ 'fjern' if merket else 'merk' }}"><input type="hidden" name="tilbake" value="{{ tilbake }}"><button type="submit" class="stjerneknapp{% if merket %} merket{% endif %}" aria-pressed="{{ 'true' if merket else 'false' }}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg><span class="skjult">Min liste: {{ rad.aksje.navn }}</span></button></form><a href="/aksje/{{ rad.aksje.symbol }}">{{ rad.aksje.navn }}</a>
+              {#- Story 2.12 (utdraget 08.11 §1): en egen aksje står sammen med
+                  de andre, med merket «Egen», og «Utenfor målingen» i grått. #}
+              {%- if egne and rad.aksje.symbol in egne.symboler %} <span class="egenmerke">Egen</span>{% endif %}
+              {%- if rad.aksje.symbol in utenfor %} <span class="utenformerke" title="{{ utenfor[rad.aksje.symbol] }}">Utenfor målingen</span>{% endif %}
               {#- Avvik 11: ticker og bransje med symbol under navnet. #}
               <span class="linje">{{ rad.aksje.symbol }}{% if rad.aksje.sektor %} · {{ bransjesymbol(rad.aksje.sektor) }}{{ rad.aksje.sektor }}{% endif %}</span>
               {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}
@@ -324,6 +328,9 @@
     </p>
     {% endif %}
 
+    {#- Story 2.12: «Dine egne aksjer» under tabellen, og «Din egen liste» i
+        Min liste (utdraget 08.11 §1 og §2, rekkefølgen i §11 i utdraget 13.10). #}
+    {% include "_egne.html" %}
     {#- Story 10.6 (FR-607, utdraget 08.11 §3): «Børsdagen kort fortalt»
         under tabellen, bare på oversikten. Teksten vises bare når grunnlaget
         i KI-loggen er det samme som det siden viser, og tallene har prikket
@@ -373,6 +380,7 @@
     {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
     {#- Story 8.17b: «Sammenlign med» i Min liste. #}
     {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign siste børsdag med", [("", ["sammenlign_med"])]) }}{% endif %}
+    {% if egne and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-egne", "Dine egne aksjer", [("", ["dine_egne_aksjer"])]) }}{% endif %}
     {% if boersdagen %}{{ hjelpevindu("hjelp-boersdagen", "Børsdagen kort fortalt", [("", ["boersdagen_kort_fortalt"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}

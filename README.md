@@ -25,10 +25,13 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 *Min liste i demoen, med aksjene som har stjerne, med oppdiktede tall («Eksempeltall»).*
 
 ![Oversikten i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-390-demo.png)
-*Oversikten i demoen ved 390 px, som på en mobil, med «Børsdagen kort fortalt» nederst, KI-teksten om hele børsdagen, med oppdiktede tall («Eksempeltall»).*
+*Oversikten i demoen ved 390 px, som på en mobil, med «Dine egne aksjer» under tabellen og «Børsdagen kort fortalt» nederst, KI-teksten om hele børsdagen, med oppdiktede tall («Eksempeltall»).*
 
 ![Børsometeret i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-390-demo.png)
 *Børsometeret i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
+
+![«Din egen liste» i Min liste i demoen: hva du trenger for å følge andre aksjer, kallene lista bruker, og «Bytt ut» ved hver aksje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
+*«Din egen liste» i Min liste i demoen, med kallene lista bruker og «Bytt ut» ved hver aksje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
 ![Investorsiden for Brattfjell Energi (BRFE) i demoen, den man kommer til fra aksjesiden, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-demo.png)
 *Investorsiden for BRFE i demoen, fra boblen nederst på aksjesiden, med «Illustrasjon laget av KI» under tegningen, med oppdiktede selskaper («Eksempeltall»).*
@@ -87,7 +90,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Periodevalget på alle sidene, og hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Vis dagen», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
-- Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene «Markedsoversikt», «Børsometer» og «Min liste» øverst
+- Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene øverst og «Innstillinger» med «Vis hjelp»
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 

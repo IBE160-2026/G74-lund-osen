@@ -33,11 +33,13 @@ from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
+import innstillinger
 import lagring_sqlite
+import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
 from boersometer import (
@@ -270,11 +272,30 @@ def _migrer_en_gang(sti: Path) -> None:
 # ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
 # Story 3.4h: siden for et selskap i demoen leser merket i basen, så den
 # bare finnes i demoen.
-_RUTER_MED_BASE = {"markedsoversikt", "aksjedetalj", "min_liste", "merk", "boersometer", "demoselskap"}
+_RUTER_MED_BASE = {
+    "markedsoversikt",
+    "aksjedetalj",
+    "min_liste",
+    "merk",
+    "boersometer",
+    "demoselskap",
+    # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
+    "folg_side",
+    # Story 8.10: «Innstillinger».
+    "innstillinger_side",
+    "lagre_innstilling",
+    # Story 8.10b: bryteren ved KI-teksten skriver valget i basen.
+    "ki_bryter",
+    "folg",
+    "fjern_egen",
+    "angre",
+}
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
+# Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "lagre_innstilling", "ki_bryter"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -307,7 +328,7 @@ def _aapne_basen() -> None:
         try:
             # Story 8.3: stjernen virker ogsaa i demoen. Bare merkingen
             # aapner demobasen for skriving, og den migreres fortsatt ikke.
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint not in _SKRIVERE)
             g.eksempeltall = les_merket(g.tilkobling) == DEMOMERKE
             # Story 3.4c: en demobase fra foer, med historikken fra 02.01,
             # vises ikke. Siden ber om at den lages paa nytt.
@@ -322,7 +343,7 @@ def _aapne_basen() -> None:
         # Gjennomgangen av PR 1 (BH6): en demobase der den ekte skal ligge,
         # migreres ikke. Den vises skrivebeskyttet, med «Eksempeltall».
         try:
-            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint != _SKRIVER)
+            g.tilkobling = aapne_base(sti, kjoer_migrasjoner=False, skrivebeskyttet=request.endpoint not in _SKRIVERE)
             g.eksempeltall = True
             # Story 3.4c (gjennomgangen, BH1): en demobase fra foer vises ikke
             # her heller.
@@ -443,6 +464,26 @@ def _eksempeltall():
 # appen. Malene henter dem med hjelp.tekst(), og MA-vinduet i grafens
 # tegnforklaring med parametre.ma_vindu. Tekstene, tegnforklaringen og
 # beregningen paa sidene bruker samme Parametre (gjennomgangen av 8.0b).
+
+
+@app.context_processor
+def _utenfor_maalingen():
+    """Story 2.12 (gjennomgangen, VG2, ECH10): «Utenfor målingen» ved navnet i
+    oversikten, på aksjesiden og i børsometeret, med omsetningen og hva
+    signalet er målt på når man peker på merket (utdraget 08.11 §2). Bare for
+    egne aksjer; de 15 er målt (malinger.md §36). Bare lesing."""
+    if request.endpoint not in _RUTER_MED_BASE:
+        return {"utenfor": {}}
+    egne = _egne()
+    return {"utenfor": egne["utenfor_tekst"] if egne else {}}
+
+
+@app.context_processor
+def _innstillingene():
+    """Story 8.10 (FR-110): valgene i «Innstillinger», på hver side. Bare
+    lesing. Uten basen er alt på."""
+    valgene = innstillinger.les(g.get("tilkobling"))
+    return {"valgene": valgene, "vis_hjelp": valgene[innstillinger.VIS_HJELP]}
 
 
 @app.context_processor
@@ -1027,6 +1068,9 @@ def _tabellsiden(aktiv: str):
         siste_dag=sidens_siste(rader),
         periodeledd=ledd,
         standard_adresse=side_adresse(sti, None, alle, ledd),
+        # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
+        # Min liste, og merket «Egen» i tabellen.
+        egne=_egne(),
         # Story 10.6: «Børsdagen kort fortalt», bare paa oversikten.
         boersdagen=None if i_lista else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd),
         **felles,
@@ -1172,7 +1216,7 @@ def aksjedetalj(symbol: str):
 
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
-    ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ki_er_paa = _ki_er_paa()
     ki = _ki_visning(post, detalj, rader[-1].dato) if ki_er_paa and detalj.sjekker else None
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
     # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
@@ -1392,8 +1436,10 @@ def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste:
     grunnlaget i raden er det samme som grunnlaget regnet her av det siden
     viser: vurderingene som er lagret, kursene og hovedindeksen, for aksjene
     i lista (dagsgrunnlag.py). Webserveren leser bare (AD-10). En periode har
-    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det."""
-    er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det.
+    Story 8.10b (BH3, ECH3): paa eller av leses med _ki_er_paa(), som paa
+    aksjesiden, saa valget i Innstillinger gjelder begge."""
+    er_paa = _ki_er_paa()
     bryter = {
         "er_paa": er_paa,
         "til": AV if er_paa else PAA,
@@ -1453,6 +1499,13 @@ def ki_bryter():
     if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
         abort(403)
     til = AV if request.form.get("til") == AV else PAA
+    # Story 8.10b (FR-110, FR-601): valget i basen, som Innstillinger viser,
+    # så de to aldri viser hver sin verdi. Kapselen skrives fortsatt.
+    # Gjennomgangen (BH1, ECH1, ECH2): kan valget ikke skrives i basen,
+    # settes heller ikke kapselen, og siden sier at basen ikke kan brukes, så
+    # bryteren og Innstillinger aldri viser hver sin verdi.
+    if g.get("basefeil") or not _lagre_ki(til):
+        return _basen_kan_ikke_aapnes()
     tilbake = request.form.get("tilbake", "/")
     # Gjennomgangen av 10.6 (ECH12): uten tilbake gaar bryteren til / som foer.
     if "tilbake" not in request.form:
@@ -1564,6 +1617,283 @@ def merk():
     deler = urlsplit(adresse)
     borte = til == FJERN and deler.path == MIN_LISTE and _ett(parse_qs(deler.query), "vis") != ALLE
     return redirect(adresse + ("#aksjene" if borte else f"#rad-{symbol}"), code=303)
+
+
+# --- Story 2.12: velge og bytte aksjer -------------------------------------
+
+
+def _valglager() -> valg.Valglager | None:
+    """Valglageret for basen siden leser, eller None naar basen ikke har
+    tabellene fra 0010 ennaa (en base en versjon bak). Bare lesing her."""
+    tilkobling = g.get("tilkobling")
+    if tilkobling is None or not valg.har_tabellene(tilkobling):
+        return None
+    return valg.Valglager(tilkobling, naa)
+
+
+def _egne() -> dict | None:
+    """«Dine egne aksjer» og «Din egen liste» - story 2.12 (utdraget 08.11
+    §1 og §2). Bare lesing (AD-10): aksjene i lista, ønskene som venter, og
+    omsetningen fra 2.13."""
+    lager = _valglager()
+    if lager is None:
+        return None
+    try:
+        lista = lager.i_lista()
+        ventende = lager.ventende()
+        egne = lager.egne()
+        fjernes = {o.symbol: o.id for o in ventende if o.handling == valg.FJERN}
+        rader = []
+        for aksje in lista:
+            if aksje.symbol in egne:
+                median, _ = lager.omsetning(aksje.symbol)
+                rader.append(
+                    {
+                        "symbol": aksje.symbol,
+                        "navn": aksje.navn,
+                        "sektor": aksje.sektor,
+                        "status": "fjernes" if aksje.symbol in fjernes else "hentet",
+                        "oenske": fjernes.get(aksje.symbol),
+                        "utenfor": valg.utenfor_maalingen(median),
+                    }
+                )
+        for o in ventende:
+            if o.handling == valg.FOLG:
+                median, _ = lager.omsetning(o.symbol)
+                rader.append(
+                    {
+                        "symbol": o.symbol,
+                        "navn": o.navn,
+                        "sektor": o.sektor,
+                        "status": "venter",
+                        "oenske": o.id,
+                        "utenfor": valg.utenfor_maalingen(median),
+                    }
+                )
+        folg = sum(o.handling == valg.FOLG for o in ventende)
+        antall = len(lista) + folg - len(fjernes)
+        sist, neste, igjen = valg.kallene(len(lista), folg, len(fjernes))
+        # Gjennomgangen (VG4): neste henting med én aksje til, regnet her og
+        # ikke i malen.
+        _, med_en, igjen_med_en = valg.kallene(len(lista), folg + 1, len(fjernes))
+        utenfor_tekst = {}
+        for rad in rader:
+            if rad["utenfor"]:
+                median, maalt = lager.omsetning(rad["symbol"])
+                utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt)
+        egne_i_lista = len(egne)
+        return {
+            "rader": rader,
+            "symboler": frozenset(r["symbol"] for r in rader if r["status"] != "venter"),
+            "utenfor": frozenset(r["symbol"] for r in rader if r["utenfor"]),
+            "utenfor_tekst": utenfor_tekst,
+            "antall_egne": sum(r["status"] != "fjernes" for r in rader),
+            "antall": antall,
+            "tak": valg.TAK,
+            "full": antall >= valg.TAK,
+            "lista": lista,
+            "fjernes": fjernes,
+            "kall": {
+                "faste": len(lista) - egne_i_lista,
+                "egne": egne_i_lista,
+                "indeks": valg.INDEKSKALL,
+                "margin": valg.KVOTE - len(lista) - valg.INDEKSKALL,
+                "sist": sist,
+                "neste": neste,
+                "igjen": igjen,
+                "med_en": med_en,
+                "igjen_med_en": igjen_med_en,
+            },
+        }
+    except (*BASEFEIL, ValueError) as feil:
+        app.logger.warning("Valget kunne ikke leses: %s: %s", type(feil).__name__, feil)
+        return None
+
+
+# Bare oversikten og Min liste er maal etter et valg.
+VALG_TILBAKE = {"oversikten": "/#dine-egne-aksjer", "min_liste": "/min-liste#din-egen-liste"}
+
+
+def _samme_side() -> None:
+    """Som bryteren og stjernen: kommer forespoerselen med Origin, maa den
+    vaere denne siden."""
+    opphav = request.headers.get("Origin")
+    if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
+        abort(403)
+
+
+@app.route("/folg")
+def folg_side():
+    """«Følg en aksje» og «Bytt ut» - story 2.12, utdraget §1 og §2. En side
+    med skjema, ikke en dialog med skript (spørsmål 8). Bare lesing."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    egne = _egne()
+    kode = (request.args.get("kode") or "").strip().upper()
+    bytt = (request.args.get("bytt") or "").strip().upper() or None
+    sok = (request.args.get("q") or "").strip()[:40]
+    i_lista = {a.symbol: a for a in egne["lista"]} if egne else {}
+    gammel = i_lista.get(bytt) if bytt else None
+    valgt = lager.boersaksje(kode) if kode else None
+    omsetning = None
+    if valgt is not None:
+        median, maalt = lager.omsetning(valgt.kode)
+        omsetning = {
+            "median": median / 1_000_000 if median is not None else None,
+            "maalt": maalt,
+            "utenfor": valg.utenfor_maalingen(median),
+        }
+    treff = []
+    if sok and valgt is None:
+        for aksje in lager.sok(sok):
+            median, maalt = lager.omsetning(aksje.kode)
+            treff.append({"kode": aksje.kode, "navn": aksje.navn, "median": median, "maalt": maalt})
+    # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
+    # ikke følges, og siden sier det før skjemaet sendes.
+    alt_fulgt = valgt is not None and (
+        valgt.kode in i_lista or any(o.symbol == valgt.kode and o.handling == valg.FOLG for o in lager.ventende())
+    )
+    return render_template(
+        "folg.html",
+        aktiv="min_liste" if gammel else "oversikt",
+        sidesti="/folg",
+        sok=sok,
+        treff=treff,
+        alt_fulgt=alt_fulgt,
+        mill=1_000_000,
+        valgt=valgt,
+        omsetning=omsetning,
+        gammel=gammel,
+        egne=egne,
+        bransjene=valg.BRANSJENE,
+        grense=valg.GRENSE_MNOK,
+        tilbake="min_liste" if gammel else "oversikten",
+        feil=request.args.get("feil"),
+    )
+
+
+@app.post("/folg")
+def folg():
+    """Ønsket om å følge en aksje, eller et bytte. Webserveren skriver bare
+    oenske (AD-3) og henter aldri (AD-10)."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    kode = (request.form.get("kode") or "").strip().upper()
+    bytt = (request.form.get("bytt") or "").strip().upper() or None
+    try:
+        lager.folg(kode, request.form.get("sektor", ""), bytt)
+    except (valg.UgyldigValg, valg.ListaErFull) as feil:
+        # Gjennomgangen (BH9, ECH9): samme side, med aksjen og byttet, og
+        # grunnen. Kode og bytt er sjekket mot lista og tegnene foer de
+        # settes i adressen.
+        deler = {"feil": str(feil)}
+        if lager.boersaksje(kode) is not None:
+            deler["kode"] = kode
+        if bytt and re.fullmatch(r"[A-Z0-9-]{1,20}", bytt):
+            deler["bytt"] = bytt
+        return redirect("/folg?" + urlencode(deler), code=303)
+    return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
+
+
+@app.post("/fjern")
+def fjern_egen():
+    """Ønsket om å fjerne en aksje fra lista ved neste henting."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    try:
+        lager.fjern((request.form.get("symbol") or "").strip().upper())
+    except valg.UgyldigValg:
+        abort(400)
+    return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
+
+
+@app.post("/angre")
+def angre():
+    """Angrer et ønske som ikke er tatt i bruk: raden i oenske slettes."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    try:
+        lager.angre(int(request.form.get("id", "")))
+    except valg.ListaErFull as feil:
+        return redirect("/folg?" + urlencode({"feil": str(feil)}), code=303)
+    except (ValueError, valg.UgyldigValg):
+        abort(400)
+    return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
+
+
+# --- Story 8.10: «Innstillinger» -----------------------------------------
+
+
+def _ki_er_paa() -> bool:
+    """Story 8.10b: KI-teksten er på når raden i innstilling sier det. Uten
+    raden (en base fra før 8.10b, eller ingen base) gjelder kapselen fra
+    bryteren, som før, så valget ikke går tapt (spørsmål 1)."""
+    rader = innstillinger.les_rader(g.get("tilkobling"))
+    if innstillinger.VIS_KI_TEKST in rader:
+        return rader[innstillinger.VIS_KI_TEKST]
+    return ki_paa(request.cookies.get(KAPSEL))
+
+
+def _lagre_ki(til: str) -> bool:
+    """Valget i basen når den har tabellen. Bryteren og Innstillinger
+    skriver begge her (FR-110). Gir False bare når basen har tabellen og
+    skrivingen feilet; uten tabellen gjelder kapselen alene, som før 8.10b."""
+    tilkobling = g.get("tilkobling")
+    if not innstillinger.har_tabellen(tilkobling):
+        return True
+    try:
+        innstillinger.sett(tilkobling, innstillinger.VIS_KI_TEKST, til == PAA)
+    except sqlite3.Error as feil:
+        app.logger.warning("KI-valget kunne ikke lagres: %s", type(feil).__name__)
+        return False
+    return True
+
+
+@app.route("/innstillinger")
+def innstillinger_side():
+    """«Innstillinger» med «Vis hjelp» (FR-110, utdraget 08.11 §4). Bare lesing."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    return render_template(
+        "innstillinger.html",
+        aktiv="innstillinger",
+        kan_lagres=innstillinger.har_tabellen(g.get("tilkobling")),
+        # Story 8.10b: samme verdi som bryteren ved KI-teksten.
+        ki_er_paa=_ki_er_paa(),
+    )
+
+
+@app.post("/innstillinger")
+def lagre_innstilling():
+    """Lagrer ett valg i tabellen innstilling, og sender tilbake til siden.
+    Webserveren skriver bare den tabellen her (AD-3)."""
+    _samme_side()
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    tilkobling = g.get("tilkobling")
+    if not innstillinger.har_tabellen(tilkobling):
+        abort(404)
+    navn = request.form.get("navn", "")
+    til = request.form.get("til")
+    # Gjennomgangen (BH7, ECH3): bare valgene siden viser. «Vis KI-tekst»
+    # kommer i 8.10b.
+    if navn not in innstillinger.PAA_SIDEN or til not in (PAA, AV):
+        abort(400)
+    innstillinger.sett(tilkobling, navn, til == PAA)
+    svar = redirect("/innstillinger", code=303)
+    if navn == innstillinger.VIS_KI_TEKST:
+        # Story 8.10b: kapselen også, som bryteren ved teksten.
+        svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)
+    return svar
 
 
 if __name__ == "__main__":
