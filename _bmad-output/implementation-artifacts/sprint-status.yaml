@@ -28,8 +28,10 @@
 # - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
+# Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
+# «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 11-08-2026 22:20
+last_updated: 11-09-2026 00:47
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -84,7 +86,7 @@ development_status:
   2-9b-søylene-under-hovedindeksen: done
   2-9c-hovedindeksen-i-kursgrafen: done
   2-10-høy-og-lav-lagres-med-kursene: backlog
-  2-11-lista-leses-fra-basen: review
+  2-11-lista-leses-fra-basen: done
   2-12-velge-og-bytte-aksjer: review
   2-13-kommandoen-som-måler-omsetning: done
   2-14-eksdatoer-føres-inn-for-hånd: backlog
@@ -172,7 +174,7 @@ development_status:
   8-5-endring-i-kroner-og-høy-og-lav-i-aksjedetaljen: backlog
   8-6-børsometeret: done
   8-7-sjekk-2-og-3-i-kursgrafen: backlog
-  8-8-signaldager-i-kursgrafen: backlog
+  8-8-signaldager-i-kursgrafen: done
   8-9-vis-meg-rundt: backlog
   8-10-innstillinger-øverst: backlog
   8-10b-vis-ki-tekst-i-innstillinger: backlog

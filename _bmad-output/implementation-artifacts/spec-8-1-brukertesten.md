@@ -114,3 +114,15 @@ Ikke avgjort av gruppen, og ikke i instruksjonen kl. 14:38:
 
 - Koden, testene og basen. Bare dokumenter endres. Ingen API-kall utover kvotesjekken i regel 15, og `src/fetch_prices.py` kjøres ikke.
 - `data/db/ose.db` røres ikke av dette opplegget (regel 22). Testen bruker den ekte versjonen fra main, og merkingen i Min liste er det eneste webserveren skriver (regel 22, tillegget 19.10).
+
+*Lagt til 2026-11-09 (story 10.6, flettet 08.11 i `c517e460`; slått opp i `src/templates/index.html`, `src/app.py` og `src/ki_visning.py` på `673230d9`):* under tabellen på oversikten står «Børsdagen kort fortalt», med bryteren «Vis KI-tekst». Den bruker samme informasjonskapsel som bryteren på aksjesiden (FR-601), så KI av før del A gjelder begge. Med KI av står «KI-teksten er slått av. Tabellen over viser bare det reglene har regnet ut.» Slås KI på i del B, kommer også teksten om dagen på oversikten.
+
+*Lagt til 2026-11-09 (story 2.12, PR #124, ikke flettet; spørsmål 1 og 8 i `spec-2-12-velge-og-bytte-aksjer.md`):* over «Børsdagen kort fortalt» står «Dine egne aksjer» med «+ Følg en aksje», og i Min liste «Din egen liste» med «Bytt ut». Valg som bytter aksjer, også «Bruk denne lista» fra 8.11, gjøres bare i demoen, så den ekte lista ikke endres.
+
+*Lagt til 2026-11-09 (story 8.10 og 8.10b, PR #125 og #126 på grenene `8-10-innstillinger-oeverst` og `8-10b-vis-ki-tekst`, ikke flettet; slått opp i `src/templates/innstillinger.html` på `95e0d5d7` og i spørsmål 2 og 4 i `spec-8-10-innstillinger-oeverst.md`):* «Innstillinger» i stripa etter «Min liste» åpner en side med «Vis hjelp» og «Vis KI-tekst». «Vis KI-tekst» er det samme valget som bryteren ved KI-teksten, så KI av før del A kan settes der eller ved teksten. «Vis hjelp» skal stå på, så «?»-knappene finnes; uten valg er den på.
+
+*Lagt til 2026-11-09 (story 8.8, PR #127; spørsmål 1 og 3 i `spec-8-8-signaldager-i-kursgrafen.md`):* kursgrafen på aksjesiden har prikker på dagene med signalstyrke 2 eller mer, og under grafen står «Prikkene på kurslinja viser dagene med signalstyrke 2 eller mer, fra ‹dato›.»
+
+*Lagt til 2026-11-09 (slått opp i `src/app.py`, `src/lagring_sqlite.py` og `start/kveldshenting.ps1` på `673230d9`):* slik får `data/db/ose.db` migrasjonen 0011 (8.10) før testen tirsdag 10.11. 0011 flettes mandag 09.11 kl. 23:50, etter 0010 (2.12). Jobben kl. 22:15 mandag bruker commiten origin/main hadde ved midnatt søndag–mandag (steg 1 i `kveldshenting.ps1`), så den gir basen 0009 (2.11, flettet 08.11 kl. 23:50), ikke 0010 og 0011. Startes den ekte versjonen tirsdag fra repo-mappa på main etter `git pull --ff-only`, kjører `aapne_base` `migrer()` én gang i prosessen, og basen får 0010 og 0011 før siden vises. Ellers får basen dem i jobben tirsdag kl. 22:15, som bruker main fra midnatt mandag–tirsdag. Regel 22 sier at webserveren bare skriver merkingen i Min liste. At den også migrerer basen, er et åpent punkt til gruppen. Er 2.12 og 8.10 ikke flettet mandag, har testen ikke Innstillinger, og KI slås av med bryteren som før.
+
+Linjene over står også i `docs/brukertest.md`, under «Før testen».

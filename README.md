@@ -33,6 +33,9 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![«Din egen liste» i Min liste i demoen: hva du trenger for å følge andre aksjer, kallene lista bruker, og «Bytt ut» ved hver aksje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
 *«Din egen liste» i Min liste i demoen, med kallene lista bruker og «Bytt ut» ved hver aksje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
+![Investorsiden for Brattfjell Energi (BRFE) i demoen, den man kommer til fra aksjesiden, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-demo.png)
+*Investorsiden for BRFE i demoen, fra boblen nederst på aksjesiden, med «Illustrasjon laget av KI» under tegningen, med oppdiktede selskaper («Eksempeltall»).*
+
 </details>
 
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)

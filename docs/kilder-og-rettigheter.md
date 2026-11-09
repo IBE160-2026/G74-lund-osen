@@ -2,10 +2,12 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-07T20:35
+updated: 2026-11-09T00:04
 ---
 
 # Kilder og rettigheter
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Oversikt over datakildene OSE Signal bruker eller har vurdert, hva vilkårene sier
 om bruken vår, og når vi sist kontrollerte det. Formålet er at kildevalgene skal

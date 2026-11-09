@@ -2,10 +2,12 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-07T16:54
+updated: 2026-11-09T00:04
 ---
 
 # Designregler
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics.md`, og her står hvordan de vises. En regel endres bare her, med dato og grunn, og ingen linje fjernes uten «Her sto» eller «Rettet» (regel 13).
 

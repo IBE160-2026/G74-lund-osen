@@ -2,10 +2,12 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-08T15:21
+updated: 2026-11-09T00:04
 ---
 
 # Målinger — grunnlaget for PRD-en
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Alle tall PRD-en bygger på, med metode og dato, slik at de kan etterprøves eller
 kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
