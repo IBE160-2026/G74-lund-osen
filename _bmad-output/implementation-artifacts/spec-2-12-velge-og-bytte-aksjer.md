@@ -2,7 +2,7 @@
 title: 'Story 2.12: Velge og bytte aksjer, «Dine egne aksjer» og «Din egen liste»'
 type: 'feature'
 created: '2026-11-08'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '4594dfa2'
 context:
@@ -87,3 +87,5 @@ Grenen `2-12-velge-og-bytte-aksjer` er ikke flettet. Den bygger på 2.11 (PR #12
 *Svar 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–11 er godtatt, og rådet anbefalte alt. BH6 og ECH5 (middels) lukkes med spørsmål 6 i 2.11, som gruppen godtok samme kveld: en aksje som tas inn igjen, får `ut` nullstilt, og en egen tabell med periodene venter til det trengs. Graden på funnene er ikke endret (regel 25). Med det står ingen funn på middels eller over åpne. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
 
 *Svar 2026-11-09 kl. 10:23 (gruppens svar):* 2.12, 8.10 og 8.10b squash-flettes samlet fra PR #126 (grenen `8-10b-vis-ki-tekst`) kl. 23:50, og PR #124 og #125 lukkes som tatt med i flettecommiten. Rådet anbefalte det. Webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), med en Lagt til-linje under regel 22 i `CLAUDE.md`. Rådet anbefalte at `--les-boerslista` migrerer først tirsdag, ikke mandag som avsnittet «Bygget og ikke flettet» sier. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
+*Lagt til 2026-11-10:* 2.12, 8.10 og 8.10b er flettet samlet med PR #126 i `edf4bc6b` 09.11 kl. 23:50, låst til head-en `1a72810a`, etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`. PR #124 (2.12) og #125 (8.10) er lukket som tatt med i flettecommiten. Main (svaret kl. 10:23 i `a371e45d`) ble flettet inn i `1a72810a`. Hele settet alene 10:33–10:50: 4764 bestått, 24 hoppet over og 0 feilet. CI var grønn på head-en (run 42596414573) og på main etter flettingen (run 42715469226). Treet på main etter `git pull --ff-only` er likt treet på `1a72810a`. Ingen funn på middels eller over sto åpne.

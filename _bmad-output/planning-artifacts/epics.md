@@ -4142,6 +4142,8 @@ NFR-01, NFR-06
 
 *Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt. Spørsmål 9, å bruke medianen av kursene også i merket «Utenfor målingen», blir et punkt i `issues.md` til senere. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
+*Avgjort 2026-11-09 kl. 10:55 (gruppens svar):* 8.11 (PR #128) og 8.11b (PR #129) flettes «alt så tidlig som mulig», etter flettingen av #126 kl. 23:50, og 8.11 før 8.11b. Svaret er ført etter nattflettingen (kl. 12:00) i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 8.12: Endret signalstyrke siden forrige børsdag
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
