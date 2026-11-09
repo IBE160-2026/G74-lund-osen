@@ -209,8 +209,9 @@ class TestAksjesiden:
             assert 'class="volumsoeyle"' in svg and 'class="baand"' in svg and 'class="medianstrek"' in svg
         tekst = side.split('class="sjekkene-i-grafen">', 1)[1].split("</span>", 1)[0]
         assert "Det lyse båndet er sjekk 2" in tekst and "Søylene under grafen er volumet" in tekst
-        assert f"de {STANDARD.volatilitet_vindu} børsdagene før" in tekst
-        assert f"medianvolumet de {STANDARD.volum_vindu} børsdagene før" in tekst
+        # «dagene før», ikke «børsdagene»: testen mot råd leser «bør» (test_app.py).
+        assert f"i prosent de {STANDARD.volatilitet_vindu} dagene før" in tekst
+        assert f"medianvolumet de {STANDARD.volum_vindu} dagene før" in tekst
         assert "1,5 × medianen" in tekst
         # Gjennomgangen (VG4): de første dagene i grafen har ikke nok dager før.
         assert "Streken mangler for" in tekst
