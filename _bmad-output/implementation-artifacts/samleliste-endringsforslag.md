@@ -2,10 +2,12 @@
 title: "Samleliste til neste endringsforslag"
 status: aktiv
 created: 2026-10-12
-updated: 2026-10-13T23:39
+updated: 2026-11-09T00:04
 ---
 
 # Samleliste til neste endringsforslag
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Punkter som dukker opp, samles her og tas i ett endringsforslag med bmad-correct-course, ikke ett og ett (Marian 12.10 kl. 12:21). Rekkefølgen tas opp samtidig, etter README-prøven 13.–16.10. Et punkt som er tatt, får en datert linje om hvor det ble tatt.
 

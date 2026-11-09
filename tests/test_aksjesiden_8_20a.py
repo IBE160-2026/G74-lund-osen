@@ -478,4 +478,10 @@ def test_de_gamle_ordene_staar_ikke_igjen(klient):
             ("installasjon.md", installasjonen()),
             ("sidene", sidene),
         ):
+            # Story 10.6 (utdraget 08.11 §3, spørsmål 11 i spesifikasjonen):
+            # «Børsdagen kort fortalt» på oversikten heter slik i
+            # designforslaget. Ordet som er tatt bort, er «‹navn› kort
+            # fortalt» på aksjesiden.
+            if ord_ == "kort fortalt":
+                tekst = tekst.replace("Børsdagen kort fortalt", "")
             assert ord_ not in tekst, (ord_, navn)

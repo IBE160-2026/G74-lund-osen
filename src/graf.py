@@ -169,6 +169,23 @@ class Dag:
 
 
 @dataclass(frozen=True)
+class Signaldag:
+    """Story 8.8 (FR-206): en dag aksjen skilte seg ut, slik vurderingen er
+    lagret, med punktet på kurslinja. retning er Positiv, Negativ eller
+    Blandet, og alle er sant ved 3 av 3."""
+
+    dato: date
+    x: float
+    y: float
+    retning: str
+    styrke: int
+    alle: bool
+    # Gjennomgangen (BH5, ECH3): radien etter avstanden mellom dagene, så
+    # prikkene ikke blir et bånd over kurslinja i lange perioder.
+    r: float = 4.0
+
+
+@dataclass(frozen=True)
 class Graf:
     bredde: int
     hoyde: int
@@ -201,6 +218,8 @@ class Graf:
     smal: bool = False
     # Story 8.20a (del C): dagene med lappen ved musepekeren.
     dager: tuple[Dag, ...] = ()
+    # Story 8.8: dagene aksjen skilte seg ut, lest og aldri regnet.
+    signaldager: tuple[Signaldag, ...] = ()
 
     # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
     # rutenettet og merkene etter.
@@ -503,6 +522,8 @@ def bygg_graf(
     merker: str = MAANEDSNAVN,
     merket: date | None = None,
     smal: bool = False,
+    signal: dict[date, tuple[int, str]] | None = None,
+    alle: int = 3,
 ) -> Graf | None:
     """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
     {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne.
@@ -541,6 +562,25 @@ def bygg_graf(
     if merket in datoene:
         i = datoene.index(merket)
         punktet = Navn(_x(i, len(punkter), bredde, hoeyre), _y(punkter[i].kurs, lav, hoy, hoyde, bunn))
+    # Story 8.8: signal er {dato: (styrke, retning)} for dagene som skilte seg
+    # ut, lest fra vurdering (les_periode). Bare dager grafen har, får en prikk.
+    avstand = (
+        abs(_x(1, len(punkter), bredde, hoeyre) - _x(0, len(punkter), bredde, hoeyre)) if len(punkter) > 1 else 8.0
+    )
+    radius = min(4.0, max(2.0, avstand / 2))
+    signaldager = tuple(
+        Signaldag(
+            dato=d,
+            x=_x(i, len(punkter), bredde, hoeyre),
+            y=_y(punkter[i].kurs, lav, hoy, hoyde, bunn),
+            retning=signal[d][1],
+            styrke=signal[d][0],
+            alle=signal[d][0] >= alle,
+            r=radius + (1.0 if signal[d][0] >= alle else 0.0),
+        )
+        for i, d in enumerate(datoene)
+        if signal and d in signal
+    )
 
     return Graf(
         bredde=bredde,
@@ -566,4 +606,5 @@ def bygg_graf(
         forklaring=forklaring,
         smal=smal,
         dager=_dagene(punkter, lav, hoy, bredde, hoyde, hoeyre, bunn),
+        signaldager=signaldager,
     )

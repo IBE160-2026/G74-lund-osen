@@ -435,3 +435,28 @@ def test_en_egen_aksje_staar_i_tabellen_med_merket(stier, monkeypatch):
     assert '<a href="/aksje/NYA">Ny Aksje ASA</a> <span class="egenmerke">Egen</span>' in side
     assert "Hentet. Står i tabellen over." in side and "1 egne · 16 av 18 aksjer i lista" in side
     assert 'class="utenformerke" title="Omsetningen er ikke målt ennå.' in side
+
+
+def test_dine_egne_aksjer_staar_foer_boersdagen_kort_fortalt(tmp_path, monkeypatch):
+    """Designutdraget 08.11 §1 (rekkefølgen i §11 i utdraget 13.10): tabellen,
+    så «Dine egne aksjer», så «Børsdagen kort fortalt». Ville feilet hvis
+    «Børsdagen kort fortalt» sto over «Dine egne aksjer» på oversikten, eller
+    en av delene manglet i demoen."""
+    import shutil
+
+    import demo
+    from lagring_sqlite import demo_sti
+
+    mal = tmp_path / "demo.db"
+    demo.lag_demobase(mal, skriv=lambda _: None)
+    sti = demo_sti()
+    sti.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(mal, sti)
+    monkeypatch.setenv(app_modul.I_DEMO, "1")
+    monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+    monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
+    side = app_modul.app.test_client().get("/").data.decode("utf-8")
+    tabellen = side.index("</table>")
+    egne = side.index('id="dine-egne-aksjer"')
+    boersdagen = side.index('id="boersdagen-kort-fortalt"')
+    assert tabellen < egne < boersdagen
