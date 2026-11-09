@@ -331,8 +331,9 @@ def bygg_punkter(
             continue
         # Story 8.7: tallene sjekk 2 og 3 ville brukt den dagen, med de samme
         # funksjonene (signalberegning.standardavvik og medianvolum).
-        median = medianvolum(volumer[: i + 1], p) if i >= p.volum_vindu else None
-        avvik = standardavvik(kurser[: i + 1], p) if i >= p.volatilitet_vindu + 1 else None
+        # Gjennomgangen (BH1): bare vinduet og dagen, ikke hele serien foran.
+        median = medianvolum(volumer[i - p.volum_vindu : i + 1], p) if i >= p.volum_vindu else None
+        avvik = standardavvik(kurser[i - p.volatilitet_vindu - 1 : i + 1], p) if i >= p.volatilitet_vindu + 1 else None
         punkter.append(
             Punkt(
                 dato=rad.dato,

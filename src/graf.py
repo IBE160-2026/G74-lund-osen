@@ -234,6 +234,8 @@ class Graf:
     medianstreker: tuple[str, ...] = ()
     grensestreker: tuple[str, ...] = ()
     uten_median: int = 0
+    # Gjennomgangen (ECH4): feltet står også når alle dagene har volum 0.
+    volumfelt: bool = False
     volumtopp: float = 0.0
     volumbunn: float = 0.0
 
@@ -258,7 +260,7 @@ class Graf:
     @property
     def totalhoyde(self) -> int:
         """Story 8.7: SVG-en med feltet for volumet under kursgrafen."""
-        return self.hoyde + (VOLUMFELT if self.volumsoeyler else 0)
+        return self.hoyde + (VOLUMFELT if self.volumfelt else 0)
 
     @property
     def har_ma50(self) -> bool:
@@ -573,20 +575,28 @@ def _volumet(punkter: tuple[Punkt, ...], faktor: float, bredde, hoyde, hoeyre):
         if p.volum
     )
     median, grense, stykke_m, stykke_g = [], [], [], []
+    # Gjennomgangen (ECH5, BH6): en dag med median alene mellom to hull gir
+    # ingen strek, og telles med dagene uten.
+    uten = sum(1 for p in punkter if not p.median)
+
+    def avslutt() -> int:
+        if len(stykke_m) > 1:
+            median.append(" ".join(stykke_m))
+            grense.append(" ".join(stykke_g))
+        alene = len(stykke_m) == 1
+        stykke_m.clear()
+        stykke_g.clear()
+        return 1 if alene else 0
+
     for i, p in enumerate(punkter):
         if p.median:
             x = _x(i, antall, bredde, hoeyre)
             stykke_m.append(f"{x:.1f},{y(p.median):.1f}")
             stykke_g.append(f"{x:.1f},{y(faktor * p.median):.1f}")
-            continue
-        for stykker, stykke in ((median, stykke_m), (grense, stykke_g)):
-            if len(stykke) > 1:
-                stykker.append(" ".join(stykke))
-            stykke.clear()
-    for stykker, stykke in ((median, stykke_m), (grense, stykke_g)):
-        if len(stykke) > 1:
-            stykker.append(" ".join(stykke))
-    return soeyler, tuple(median), tuple(grense), sum(1 for p in punkter if not p.median), topp, bunn
+        else:
+            uten += avslutt()
+    uten += avslutt()
+    return soeyler, tuple(median), tuple(grense), uten, topp, bunn
 
 
 def bygg_graf(
@@ -697,6 +707,7 @@ def bygg_graf(
         medianstreker=medianstreker,
         grensestreker=grensestreker,
         uten_median=uten_median,
+        volumfelt=volumfaktor is not None,
         volumtopp=volumtopp,
         volumbunn=volumbunn,
     )

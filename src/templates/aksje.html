@@ -181,7 +181,7 @@
       {#- Gjennomgangen av 8.2c (BH5): bare grafene som finnes. #}
       {% for g in (graf, graf_smal) if g %}
       <svg class="graf{% if g.smal %} smal{% endif %}" viewBox="0 0 {{ g.bredde }} {{ g.totalhoyde }}" role="img"
-           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er kursen justert for utbytte{% if g.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if g.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ g.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}{% if g.baand %}. Båndet er sjekk 2{% endif %}{% if g.volumsoeyler %}. Søylene under er volumet, med medianen og grensen for sjekk 3{% endif %}">
+           aria-label="Kursutvikling for {{ detalj.aksje.navn }}: den tykke linja er kursen justert for utbytte{% if g.har_ma50 %}, og den tynne er {{ parametre.ma_vindu }}-dagers snitt (sjekk 1){% endif %}{% if g.har_indeks %}. Den stiplede er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ g.indeksstart|dato }}{% elif indeks_feilet %}. Hovedindeksen kunne ikke leses{% else %}. Hovedindeksen mangler for perioden{% endif %}{% if g.baand %}. Båndet er sjekk 2{% endif %}{% if g.volumfelt %}. Søylene under er volumet, med medianen og grensen for sjekk 3{% endif %}">
         {% for linje in g.rutenett %}
           {#- Story 8.2b, b (U41): tallene står i feltet til venstre, ikke
               inne i grafen. #}
@@ -257,7 +257,7 @@
             norsk (regel 21). Skjermleseren får tallene i kortene. #}
         {#- Story 8.7 (FR-202, tillegget): volumet under kursgrafen, med
             streken for medianvolumet og for grensen sjekk 3 slår ut ved. #}
-        {% if g.volumsoeyler %}
+        {% if g.volumfelt %}
         <g class="volumfelt">
           <text class="volumnavn" x="{{ g.venstre }}" y="{{ "%.1f"|format(g.volumtopp - 8) }}">Volum</text>
           {% for x, y, b, h in g.volumsoeyler %}<rect class="volumsoeyle" x="{{ "%.1f"|format(x) }}" y="{{ "%.1f"|format(y) }}" width="{{ "%.1f"|format(b) }}" height="{{ "%.1f"|format(h) }}"></rect>{% endfor %}
@@ -308,7 +308,7 @@
         samme skala.
         {% endif %}
         {#- Story 8.7: sjekk 2 og 3 i grafen, med tallene fra Parametre. #}
-        <span class="sjekkene-i-grafen">{% if graf.baand %}Det lyse båndet er sjekk 2: forrige dags kurs pluss og minus standardavviket for de {{ parametre.volatilitet_vindu }} børsdagene før. En kurs utenfor båndet er en endring større enn ett standardavvik. {% endif %}{% if graf.volumsoeyler %}Søylene under grafen er volumet. Den heltrukne streken er medianvolumet de {{ parametre.volum_vindu }} børsdagene før, og den stiplede er grensen for sjekk 3, {{ parametre.volumfaktor|tall('faktor') }} × medianen.{% if graf.uten_median %} Streken mangler for {{ graf.uten_median }} {{ "dag" if graf.uten_median == 1 else "dager" }} i grafen, fordi det var for få dager før, eller medianvolumet var 0.{% endif %}{% endif %}</span>
+        <span class="sjekkene-i-grafen">{% if graf.baand %}Det lyse båndet er sjekk 2: forrige dags kurs pluss og minus ett standardavvik av endringene i prosent de {{ parametre.volatilitet_vindu }} børsdagene før. En kurs utenfor båndet er en endring større enn ett standardavvik. {% endif %}{% if graf.volumfelt %}Søylene under grafen er volumet. Den heltrukne streken er medianvolumet de {{ parametre.volum_vindu }} børsdagene før, og den stiplede er grensen for sjekk 3, {{ parametre.volumfaktor|tall('faktor') }} × medianen.{% if graf.uten_median %} Streken mangler for {{ graf.uten_median }} {{ "dag" if graf.uten_median == 1 else "dager" }} i grafen, fordi det var for få dager før, eller medianvolumet var 0.{% endif %}{% endif %}</span>
         {% if graf.har_indeks %}
         <span class="indeksforklaring">Den stiplede linja er hovedindeksen {{ indeks_symbol }}, regnet om så den starter på aksjens kurs {{ graf.indeksstart|dato }}. Ligger aksjens linje over den stiplede, har aksjen gått bedre enn indeksen fra startdagen til den dagen.{% if graf.indeksslutt and graf.indeksslutt < graf.siste_dato %} Indeksen går bare til {{ graf.indeksslutt|dato }}.{% endif %}</span>
         {% elif indeks_feilet %}

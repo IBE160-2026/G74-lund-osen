@@ -66,6 +66,14 @@ class TestTalleneErSjekkenes:
         assert g_vanlig.medianstreker != g_kort.medianstreker
         assert g_vanlig.baand != g_kort.baand
 
+    def test_vinduene_er_dagene_foer_uten_dagen_selv(self):
+        """Gjennomgangen (VG3): ville feilet hvis medianen eller
+        standardavviket tok med dagen selv, og ikke bare dagene før."""
+        volumer = [1.0] * (STANDARD.volum_vindu // 2) + [5.0] * (STANDARD.volum_vindu // 2) + [1000.0]
+        assert medianvolum(volumer) == 3.0
+        kurser = [100.0 + (i % 2) for i in range(STANDARD.volatilitet_vindu + 1)] + [150.0]
+        assert standardavvik(kurser) == standardavvik(kurser[:-1] + [kurser[-3]])
+
     def test_dagene_foer_vinduet_har_ingen_median(self):
         """Ville feilet hvis en dag uten nok dager før fikk en median eller et
         standardavvik regnet av færre dager enn vinduet."""
@@ -112,6 +120,43 @@ class TestGrafen:
         ):
             ventet = _y(min(max(verdi, g.lav), g.hoy), g.lav, g.hoy, g.hoyde, g.bunnfelt)
             assert y == pytest.approx(ventet, abs=0.06)
+
+    def test_baandet_og_grensen_holder_seg_i_feltet(self):
+        """Gjennomgangen (VG2): ville feilet hvis båndet gikk utenfor grafen
+        når standardavviket er stort, eller grensen for sjekk 3 gikk over
+        feltet for volumet."""
+        serie = _serie(volum=lambda i: 1000 if i % 10 else 50)
+        serie = [
+            replace(r, slutt=r.slutt * (1.5 if i % 2 else 1), justert_slutt=r.justert_slutt * (1.5 if i % 2 else 1))
+            for i, r in enumerate(serie)
+        ]
+        g = bygg_graf(bygg_punkter(serie), volumfaktor=STANDARD.volumfaktor)
+        for hjoerne in g.baand.split():
+            y = float(hjoerne.split(",")[1])
+            assert g.topp - 0.06 <= y <= g.bunn + 0.06
+        for strek in g.grensestreker + g.medianstreker:
+            for punkt in strek.split():
+                assert g.volumtopp - 0.06 <= float(punkt.split(",")[1]) <= g.volumbunn + 0.06
+
+    def test_volum_null_i_hele_grafen(self):
+        """Gjennomgangen (ECH4): ville feilet hvis feltet, strekene og teksten
+        forsvant når alle dagene i grafen hadde volum 0, men medianen ikke var 0."""
+        serie = _serie(volum=lambda i: 0 if i >= 100 else 800)
+        punkter = bygg_punkter(serie, start=serie[100].dato)
+        g = bygg_graf(punkter, volumfaktor=STANDARD.volumfaktor)
+        assert g.volumfelt and not g.volumsoeyler and g.medianstreker and g.totalhoyde == g.hoyde + VOLUMFELT
+
+    def test_en_dag_alene_telles_uten_strek(self):
+        """Gjennomgangen (ECH5, BH6): ville feilet hvis en dag med median alene
+        mellom to hull ikke ble talt med dagene uten strek."""
+        from aksjedetalj import Punkt
+
+        punkter = tuple(
+            Punkt(dato=START + timedelta(days=i), kurs=100.0, ma50=None, volum=10, median=m)
+            for i, m in enumerate([None, 5.0, None, 5.0, 5.0])
+        )
+        g = bygg_graf(punkter, volumfaktor=STANDARD.volumfaktor)
+        assert g.uten_median == 3 and len(g.medianstreker) == 1
 
     def test_uten_volumfaktor_som_foer(self):
         """Ville feilet hvis en graf uten volumfaktoren fikk feltet for
@@ -167,6 +212,23 @@ class TestAksjesiden:
         assert f"de {STANDARD.volatilitet_vindu} børsdagene før" in tekst
         assert f"medianvolumet de {STANDARD.volum_vindu} børsdagene før" in tekst
         assert "1,5 × medianen" in tekst
+        # Gjennomgangen (VG4): de første dagene i grafen har ikke nok dager før.
+        assert "Streken mangler for" in tekst
+
+    def test_grafen_faar_volumfaktoren_fra_parametre(self, klient, monkeypatch):
+        """Gjennomgangen (VG1): ville feilet hvis grafen tegnet grensen med en
+        annen faktor enn den teksten og sjekk 3 bruker."""
+        k, _ = klient
+        kall = []
+        ekte = app_modul.bygg_graf
+
+        def spion(*a, **kw):
+            kall.append(kw.get("volumfaktor"))
+            return ekte(*a, **kw)
+
+        monkeypatch.setattr(app_modul, "bygg_graf", spion)
+        assert k.get("/aksje/EQNR").status_code == 200
+        assert kall and set(kall) == {STANDARD.volumfaktor}
 
     def test_siste_dag_som_vurderingen(self, klient):
         """Ville feilet hvis den siste dagen i grafen ga et annet utslag enn
@@ -181,5 +243,7 @@ class TestAksjesiden:
         finally:
             t.close()
         siste = bygg_punkter(serie)[-1]
+        # Gjennomgangen (BH11): verdiene finnes, så testen ikke består med to None.
+        assert siste.avvik is not None and siste.median and vurdering.volumforhold is not None
         assert siste.avvik == vurdering.standardavvik
         assert (siste.volum / siste.median if siste.median else None) == vurdering.volumforhold
