@@ -113,6 +113,10 @@ class TestTekstene:
             assert tall in tekst, tall
         vanlig = " ".join(s.tekst for steg in ht.rundturer().values() for s in steg)
         assert "37-dagers" not in vanlig
+        # Hvert steg med tall for seg, så ett steg med tallet ikke dekker et annet.
+        aksje = {s.tittel: s.tekst for s in ht.rundturer(endret)["aksje"]}
+        assert "37-dagers" in aksje["Tallene bak"] and "37-dagers" in aksje["Kursgrafen"]
+        assert "23 dager" in aksje["Tallene bak"] and "17 dager" in aksje["Tallene bak"]
 
     def test_samme_tekster_som_hjelpen(self):
         """Ville feilet hvis stegene om signalstyrken, retningen og sjekkene
