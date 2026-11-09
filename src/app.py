@@ -38,6 +38,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 from flask import Flask, abort, g, redirect, render_template, request
 
 import ferdige_lister
+import innstillinger
 import lagring_sqlite
 import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
@@ -281,6 +282,11 @@ _RUTER_MED_BASE = {
     "demoselskap",
     # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
     "folg_side",
+    # Story 8.10: «Innstillinger».
+    "innstillinger_side",
+    "lagre_innstilling",
+    # Story 8.10b: bryteren ved KI-teksten skriver valget i basen.
+    "ki_bryter",
     "folg",
     "fjern_egen",
     "angre",
@@ -292,7 +298,7 @@ _RUTER_MED_BASE = {
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
-_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste"))
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -473,6 +479,14 @@ def _utenfor_maalingen():
         return {"utenfor": {}}
     egne = _egne()
     return {"utenfor": egne["utenfor_tekst"] if egne else {}}
+
+
+@app.context_processor
+def _innstillingene():
+    """Story 8.10 (FR-110): valgene i «Innstillinger», på hver side. Bare
+    lesing. Uten basen er alt på."""
+    valgene = innstillinger.les(g.get("tilkobling"))
+    return {"valgene": valgene, "vis_hjelp": valgene[innstillinger.VIS_HJELP]}
 
 
 @app.context_processor
@@ -1255,7 +1269,7 @@ def aksjedetalj(symbol: str):
 
     # Story 10.3: KI-teksten under regelforklaringen, bare naar det er en
     # vurdering aa forklare og bryteren er paa (FR-601, FR-602).
-    ki_er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ki_er_paa = _ki_er_paa()
     ki = _ki_visning(post, detalj, rader[-1].dato) if ki_er_paa and detalj.sjekker else None
     # Gruppens svar 25.10 kl. 00:51: setningen om dagene under KI-teksten,
     # ogsaa naar KI er av eller teksten er stoppet. «I dag» bare naar dagen
@@ -1475,8 +1489,10 @@ def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste:
     grunnlaget i raden er det samme som grunnlaget regnet her av det siden
     viser: vurderingene som er lagret, kursene og hovedindeksen, for aksjene
     i lista (dagsgrunnlag.py). Webserveren leser bare (AD-10). En periode har
-    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det."""
-    er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det.
+    Story 8.10b (BH3, ECH3): paa eller av leses med _ki_er_paa(), som paa
+    aksjesiden, saa valget i Innstillinger gjelder begge."""
+    er_paa = _ki_er_paa()
     bryter = {
         "er_paa": er_paa,
         "til": AV if er_paa else PAA,
@@ -1536,6 +1552,13 @@ def ki_bryter():
     if opphav is not None and opphav.rstrip("/") != request.host_url.rstrip("/"):
         abort(403)
     til = AV if request.form.get("til") == AV else PAA
+    # Story 8.10b (FR-110, FR-601): valget i basen, som Innstillinger viser,
+    # så de to aldri viser hver sin verdi. Kapselen skrives fortsatt.
+    # Gjennomgangen (BH1, ECH1, ECH2): kan valget ikke skrives i basen,
+    # settes heller ikke kapselen, og siden sier at basen ikke kan brukes, så
+    # bryteren og Innstillinger aldri viser hver sin verdi.
+    if g.get("basefeil") or not _lagre_ki(til):
+        return _basen_kan_ikke_aapnes()
     tilbake = request.form.get("tilbake", "/")
     # Gjennomgangen av 10.6 (ECH12): uten tilbake gaar bryteren til / som foer.
     if "tilbake" not in request.form:
@@ -1882,6 +1905,72 @@ def angre():
     except (ValueError, valg.UgyldigValg):
         abort(400)
     return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
+
+
+# --- Story 8.10: «Innstillinger» -----------------------------------------
+
+
+def _ki_er_paa() -> bool:
+    """Story 8.10b: KI-teksten er på når raden i innstilling sier det. Uten
+    raden (en base fra før 8.10b, eller ingen base) gjelder kapselen fra
+    bryteren, som før, så valget ikke går tapt (spørsmål 1)."""
+    rader = innstillinger.les_rader(g.get("tilkobling"))
+    if innstillinger.VIS_KI_TEKST in rader:
+        return rader[innstillinger.VIS_KI_TEKST]
+    return ki_paa(request.cookies.get(KAPSEL))
+
+
+def _lagre_ki(til: str) -> bool:
+    """Valget i basen når den har tabellen. Bryteren og Innstillinger
+    skriver begge her (FR-110). Gir False bare når basen har tabellen og
+    skrivingen feilet; uten tabellen gjelder kapselen alene, som før 8.10b."""
+    tilkobling = g.get("tilkobling")
+    if not innstillinger.har_tabellen(tilkobling):
+        return True
+    try:
+        innstillinger.sett(tilkobling, innstillinger.VIS_KI_TEKST, til == PAA)
+    except sqlite3.Error as feil:
+        app.logger.warning("KI-valget kunne ikke lagres: %s", type(feil).__name__)
+        return False
+    return True
+
+
+@app.route("/innstillinger")
+def innstillinger_side():
+    """«Innstillinger» med «Vis hjelp» (FR-110, utdraget 08.11 §4). Bare lesing."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    return render_template(
+        "innstillinger.html",
+        aktiv="innstillinger",
+        kan_lagres=innstillinger.har_tabellen(g.get("tilkobling")),
+        # Story 8.10b: samme verdi som bryteren ved KI-teksten.
+        ki_er_paa=_ki_er_paa(),
+    )
+
+
+@app.post("/innstillinger")
+def lagre_innstilling():
+    """Lagrer ett valg i tabellen innstilling, og sender tilbake til siden.
+    Webserveren skriver bare den tabellen her (AD-3)."""
+    _samme_side()
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    tilkobling = g.get("tilkobling")
+    if not innstillinger.har_tabellen(tilkobling):
+        abort(404)
+    navn = request.form.get("navn", "")
+    til = request.form.get("til")
+    # Gjennomgangen (BH7, ECH3): bare valgene siden viser. «Vis KI-tekst»
+    # kommer i 8.10b.
+    if navn not in innstillinger.PAA_SIDEN or til not in (PAA, AV):
+        abort(400)
+    innstillinger.sett(tilkobling, navn, til == PAA)
+    svar = redirect("/innstillinger", code=303)
+    if navn == innstillinger.VIS_KI_TEKST:
+        # Story 8.10b: kapselen også, som bryteren ved teksten.
+        svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)
+    return svar
 
 
 if __name__ == "__main__":
