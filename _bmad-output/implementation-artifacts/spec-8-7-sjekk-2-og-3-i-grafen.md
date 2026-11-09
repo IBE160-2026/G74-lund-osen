@@ -50,3 +50,30 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 ## Grenser
 
 Ingen API-kall, `src/fetch_prices.py` kjøres bare i testene med en falsk henter, og `data/db/ose.db` røres ikke. Ingen migrasjon. Bildet av aksjesiden i demoen er tatt på nytt.
+
+## Bygget 09.11 (ekstravinduet)
+
+Bygget på grenen `8-7-sjekk-2-og-3-i-grafen`, i worktreen `G74-lund-osen-8-7`, fra `1a72810a`. Filene: `src/signalberegning.py`, `src/aksjedetalj.py`, `src/graf.py`, `src/app.py`, `src/templates/aksje.html`, `src/static/stil.css`, «Hva er båndet og søylene i kursgrafen?» i `docs/hjelp.md`, og testene i `tests/test_sjekk_2_og_3_i_grafen_8_7.py`. `test_den_smale_grafen_har_det_samme_som_den_brede` i `tests/test_kursgrafen_smal.py` venter nå høyden med feltet for volumet, med en kommentar om det. Bildet av aksjesiden i demoen er tatt på nytt med DevTools-protokollen, og de åtte andre er byte for byte de samme. Avtrykkene er regnet ut på nytt.
+
+## Mutantene
+
+Én per del på `482ab6dc`, med kopi før og fila lik HEAD etterpå: A (medianen med vinduet fra `STANDARD`, ikke fra `p`) fanget av `test_streken_foelger_vinduet_i_parametre`, B (båndet med to standardavvik) av `test_baandet_er_forrige_kurs_pluss_og_minus_avviket`, C (grensen to ganger medianen) av `test_baand_soeyler_og_streker`, og D (teksten om båndet tatt bort) av `test_i_samme_svg_og_teksten`. Testene for B og D ble skjerpet før mutantene (`482ab6dc`), fordi en dobbel bredde på båndet og en tekst uten båndet ellers ville sluppet gjennom.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `1a72810a..482ab6dc`, uten `tests/test_docker.py` og bildet: Blind Hunter med bare diffen (13 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (6 og 4 funn, med 19 mutanter i en kopi utenfor worktreen). Ingen høye.
+
+**Middels**
+- *ECH1, rettet.* Hjelpen sa at den siste dagen i grafen alltid gir det samme utslaget som kortene. Kortene leser vurderingen som ble lagret den kvelden (AD-7), mens grafen regner av kursene som er lagret nå, og kilden justerer dem ved hvert utbytte (FR-406). Hjelpen sier nå at de to er like den kvelden kursene hentes, men kan skille seg litt for en eldre dag.
+- *VG1 og BH2, rettet.* At grafen får volumfaktoren fra `Parametre`, var ikke prøvd på siden. Nå `test_grafen_faar_volumfaktoren_fra_parametre`, og mutanten M7 (faktoren 2,0) ble fanget. `parametre` i malene er `STANDARD`, som grafen får.
+- *VG2, rettet.* At båndet klippes og at skalaen tar med grensen, var ikke testet. Nå `test_baandet_og_grensen_holder_seg_i_feltet`, og M4 og M15 ble fanget.
+- *VG3, rettet.* At vinduene er dagene før, uten dagen selv, ble prøvd med funksjonen mot seg selv. Nå `test_vinduene_er_dagene_foer_uten_dagen_selv`. M13 (medianen med dagen selv) overlevde først, fordi tallene ga samme median, og ble fanget med andre tall.
+- *BH1, rettet.* Hver dag regnet av hele serien foran seg. Nå bare vinduet og dagen, med det samme resultatet.
+- *BH3 og ECH3, rettet.* Teksten og hjelpen sier nå at standardavviket er av endringene i prosent, ikke i kroner.
+- *BH8, ikke reelt.* `Kursrad.volum` er et heltall og kan ikke være `None` (`kursdata.py`).
+
+**Lav**
+- *Rettet:* ECH4 (feltet, strekene og teksten står også når alle dagene i grafen har volum 0, `volumfelt`, `test_volum_null_i_hele_grafen`), ECH5 og BH6 (en dag med median alene mellom to hull telles med dagene uten strek), BH4 og ECH2 («ikke noe bånd»), BH11 (testen av siste dag krever at verdiene finnes), VG4 (setningen om dagene uten strek er testet).
+- *Ført:* BH5 (båndet brytes ikke ved et hull midt i serien; hull finnes bare i starten, fordi `Kursrad` avviser kurser på null), BH7 (dekket av ECH4), BH9 (feltet har ingen akse og ingen lapp ved musepekeren, og strekene skilles bare ved stipling; skjermleseren får hva feltet viser, og tallene står i kortene), BH10 (testen av `medianvolum` mot seg selv er nå supplert av testen av vinduene), BH12 (båndet prøves ved siste dag og i feltet), BH13 og ECH (den smale grafen: forklaringen slutter over feltet, kontrollert av Edge Case Hunter), ECH6 og VG4 (tallene 20 og 1,5 står i hjelpen som ellers i fila; stiplingen, bredden på søylene og aria-teksten er ikke testet).
+
+Etter rettingen er bildet av aksjesiden tatt på nytt (teksten under grafen er endret), og avtrykkene er regnet ut på nytt.
