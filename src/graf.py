@@ -220,6 +220,9 @@ class Graf:
     dager: tuple[Dag, ...] = ()
     # Story 8.8: dagene aksjen skilte seg ut, lest og aldri regnet.
     signaldager: tuple[Signaldag, ...] = ()
+    # Story 8.14 (FR-407): x for justeringsdagene grafen har, regnet av
+    # kursserien (justeringsdager.py), og datoene i samme rekkefølge.
+    justeringsdager: tuple[tuple[date, float], ...] = ()
 
     # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
     # rutenettet og merkene etter.
@@ -524,6 +527,7 @@ def bygg_graf(
     smal: bool = False,
     signal: dict[date, tuple[int, str]] | None = None,
     alle: int = 3,
+    justeringer: tuple[date, ...] = (),
 ) -> Graf | None:
     """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
     {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne.
@@ -582,6 +586,7 @@ def bygg_graf(
         if signal and d in signal
     )
 
+    justeringene = set(justeringer)
     return Graf(
         bredde=bredde,
         hoyde=hoyde,
@@ -607,4 +612,7 @@ def bygg_graf(
         smal=smal,
         dager=_dagene(punkter, lav, hoy, bredde, hoyde, hoeyre, bunn),
         signaldager=signaldager,
+        justeringsdager=tuple(
+            (d, _x(i, len(punkter), bredde, hoeyre)) for i, d in enumerate(datoene) if d in justeringene
+        ),
     )
