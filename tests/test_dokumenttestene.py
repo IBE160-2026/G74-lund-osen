@@ -56,7 +56,7 @@ def test_bare_koden_teller(tmp_path):
     _skriv(
         tmp_path,
         "test_melding.py",
-        'def test_x(n):\n    assert n, "står ikke i README.md"\n    print(f"se {n} i docs/")\n',
+        'def test_x(n):\n    assert n, "står ikke i README.md"\n    print(f"se README.md for {n}")\n',
     )
     funnet = dokumenttestene.modulene.__wrapped__(tmp_path)
     assert funnet == {"test_leser.py", "test_readme_sti.py", "test_bmad.py"}
