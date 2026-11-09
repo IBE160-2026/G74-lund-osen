@@ -15,7 +15,9 @@ ikke står her, kommer ikke i noen liste.
 
 import sqlite3
 from dataclasses import dataclass
+from datetime import date
 
+from omsetningsregning import regn_ut, vindu
 from valg import BRANSJENE, TAK
 
 # Sjekket av gruppen 08.11 kl. 22:01 og 22:03. Bransjene er de 13 i designregler.md §4.
@@ -121,24 +123,62 @@ class Ferdigaksje:
     median: float
 
 
+def _aksjene_i_lista(tilkobling: sqlite3.Connection) -> list[tuple[str, str, float, str]]:
+    """Story 8.11b (svaret 08.11 kl. 22:06): aksjene i lista, de 15 og de
+    egne, maales ikke i 2.13. Medianen regnes her, naar siden vises, av
+    kursene i basen med samme vindu og utregning som 2.13 (omsetningsregning),
+    til den siste dagen med kurser i basen. Bransjen er den i aksje, og bare
+    aksjer som staar i boersliste er med. [(symbol, navn, median, bransje)]."""
+    siste = tilkobling.execute("SELECT max(dato) FROM kurs").fetchone()[0]
+    if siste is None:
+        return []
+    fra, til = vindu(date.fromisoformat(siste))
+    dag = til.isoformat()
+    lista = tilkobling.execute(
+        "SELECT a.symbol, b.navn, a.sektor FROM aksje a JOIN boersliste b ON b.kode = a.symbol "
+        "WHERE (a.inn IS NULL OR a.inn <= ?) AND (a.ut IS NULL OR a.ut > ?) AND a.sektor IS NOT NULL",
+        (dag, dag),
+    ).fetchall()
+    ut = []
+    for symbol, navn, sektor in lista:
+        rader = [
+            {"date": dato, "close": slutt, "volume": volum}
+            for dato, slutt, volum in tilkobling.execute(
+                "SELECT dato, slutt, volum FROM kurs WHERE symbol = ? AND dato BETWEEN ? AND ?",
+                (symbol, fra.isoformat(), til.isoformat()),
+            )
+        ]
+        median = regn_ut(symbol, rader, fra, til).median
+        if median is not None:
+            ut.append((symbol, navn, median, sektor))
+    return ut
+
+
 def lister(tilkobling: sqlite3.Connection | None) -> dict[str, list[Ferdigaksje]]:
     """{bransje: opptil TAK aksjer}, med høyest omsetning først, i
     rekkefølgen bransjene har i BRANSJENE. En bransje uten målte aksjer har
-    ingen liste. Bare lesing. Mangler tabellene, er det ingen lister."""
+    ingen liste. Bare lesing. Mangler tabellene, er det ingen lister.
+    Story 8.11b: aksjene i lista er med, med medianen regnet av kursene."""
     if tilkobling is None:
         return {}
     try:
-        rader = tilkobling.execute(
+        maalte = tilkobling.execute(
             "SELECT o.symbol, b.navn, o.median_omsetning FROM omsetning o JOIN boersliste b ON b.kode = o.symbol "
             "WHERE o.maalt = (SELECT max(maalt) FROM omsetning WHERE symbol = o.symbol) "
-            "AND o.median_omsetning IS NOT NULL ORDER BY o.median_omsetning DESC, o.symbol"
+            "AND o.median_omsetning IS NOT NULL"
         ).fetchall()
+        i_lista = _aksjene_i_lista(tilkobling)
     except sqlite3.Error:
         return {}
+    # Story 8.11b: for en aksje i lista gjelder medianen regnet av kursene,
+    # ogsaa om den har en eldre maaling i omsetning (spoersmaal 4).
+    regnet = {symbol for symbol, *_ in i_lista}
+    rader = [(s, n, float(m), BRANSJE.get(s)) for s, n, m in maalte if s not in regnet]
+    rader += [(s, n, float(m), b) for s, n, m, b in i_lista]
+    rader.sort(key=lambda r: (-r[2], r[0]))
     etter_bransje: dict[str, list[Ferdigaksje]] = {}
-    for symbol, navn, median in rader:
-        bransje = BRANSJE.get(symbol)
-        if bransje is None:
+    for symbol, navn, median, bransje in rader:
+        if bransje not in BRANSJENE:
             continue
         liste = etter_bransje.setdefault(bransje, [])
         if len(liste) < TAK:

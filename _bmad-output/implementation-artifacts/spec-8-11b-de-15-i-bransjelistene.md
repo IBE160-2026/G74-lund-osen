@@ -1,0 +1,68 @@
+---
+title: 'Story 8.11b: de 15 i bransjelistene'
+type: 'feature'
+created: '2026-11-09'
+status: 'in-progress'
+route: 'dispatch'
+baseline_commit: 'aec052e0'
+context:
+  - '{project-root}/CLAUDE.md'
+  - '{project-root}/_bmad-output/planning-artifacts/epics.md'
+  - '{project-root}/_bmad-output/implementation-artifacts/spec-8-11-ferdige-lister.md'
+---
+
+Skrevet 09.11 i instruksjonen kl. 00:30 (`docs/ai-prompts/2026-11-09.md`, steg 5), etter gruppens svar 08.11 kl. 22:06 under story 8.11 i `epics.md`: «8.11b tar de 15 inn i bransjelistene». Storyen står ikke ellers i `epics.md`. Den bygges på grenen for 8.11 (`8-11-ferdige-lister`, `aec052e0`), i worktreen `G74-lund-osen-8-11b`, og stoppes før flettingen. Spørsmålene står åpne til gruppen har svart; forslaget er det som er bygget.
+
+## Spørsmål til gruppen før flettingen
+
+1. **Hvilke aksjer?** Svaret sier «de 15». *Forslag:* alle aksjene i lista den siste dagen med kurser i basen, både de 15 og egne aksjer fra 2.12, fordi 2.13 hopper over alle aksjene i appens liste (docstringen i `src/omsetning.py`), så ingen av dem har en måling.
+2. **Vinduet.** *Forslag:* tre måneder til og med den siste dagen med kurser i basen (`vindu` fra 2.13), det samme for alle aksjene.
+3. **Utregningen.** *Forslag:* median av volum × sluttkurs per dag, med `regn_ut` fra 2.13 og `slutt` (ujustert) som `close`. `Maaling`, `vindu`, `_tall`, `regn_ut` og `MAANEDER` er flyttet uendret fra `src/omsetning.py` til en ny modul, `src/omsetningsregning.py`, som `omsetning.py` importerer dem fra. Da bruker webserveren dem uten å importere `fetch_prices` (AD-10, `test_webserveren_henter_aldri` i `tests/test_valg.py`).
+4. **En eldre måling.** En egen aksje kan ha en rad i `omsetning` fra før den kom i lista. *Forslag:* for en aksje i lista gjelder medianen av kursene.
+5. **Bransjen.** *Forslag:* bransjen i `aksje` (`sektor`), ikke `BRANSJE` i `ferdige_lister.py`, som bare har de målte.
+6. **Lista over Oslo Børs.** *Forslag:* bare aksjer som står i `boersliste`, som de andre i de ferdige listene (spørsmål 3 i 8.11) og valideringen i `bruk_liste`.
+7. **Ingen tall i koden eller repoet (regel 16).** *Forslag:* medianene regnes når siden vises og lagres ikke. Prøven på `ose.db` står bare med antall i spesifikasjonen.
+8. **Demoen.** Demobasen har de 15 oppdiktede selskapene i `boersliste` (`lag_demobase` i `src/demo.py`). *Forslag:* demoen får bransjelister også for dem, som den ekte versjonen, og bildet av «Din egen liste» tas på nytt.
+9. **«Utenfor målingen».** Merket fra 2.12 leser `omsetning`. *Forslag:* uendret i 8.11b, så de 15 merkes som før; å bruke medianen av kursene også der er en egen endring.
+
+## Intent
+
+**Problem:** De ferdige listene i 8.11 tar bare med aksjer som er målt i `omsetning` (2.13), og 2.13 måler aldri aksjene i appens liste. De 15 står derfor ikke i noen bransjeliste.
+
+**Approach:** `lister()` i `src/ferdige_lister.py` regner medianen for aksjene i lista av kursene i basen når siden vises, med samme utregning som 2.13, og tar dem med i bransjen de har i `aksje`.
+
+## Delene
+
+### A) Aksjene i lista
+`_aksjene_i_lista` leser aksjene i lista den siste dagen med kurser (`inn` og `ut`, som `les_lista`), som står i `boersliste`.
+- **Ville feilet hvis:** de 15 manglet i bransjelistene, eller en aksje som er tatt ut, var med.
+
+### B) Vinduet
+Tre måneder til den siste dagen med kurser i basen.
+- **Ville feilet hvis:** en kurs eldre enn vinduet var med i medianen.
+
+### C) Kursene foran en eldre måling
+- **Ville feilet hvis:** en eldre rad i `omsetning` ble brukt for en aksje i lista.
+
+### D) Lista over Oslo Børs
+- **Ville feilet hvis:** en aksje utenfor `boersliste` kom i en ferdig liste.
+
+### E) Samme utregning, uten hentingen
+- **Ville feilet hvis:** 2.13 og 8.11b regnet hver sin måte, eller webserveren importerte `fetch_prices`.
+
+## Grenser
+
+Ingen API-kall, `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` leses bare med `mode=ro` (regel 22). Ingen migrasjon. Ingen tall fra kildene i koden, testene eller spesifikasjonen (regel 16).
+
+## Bygget 09.11 (instruksjonen kl. 00:30)
+
+Bygget på grenen `8-11b-de-15-i-bransjelistene`, i worktreen `G74-lund-osen-8-11b`, fra `aec052e0`, med 8.11 flettet inn igjen etter rettingen av hjelpen (`ae003568`).
+
+- **Filene.** `src/omsetningsregning.py` (ny, med `Maaling`, `vindu`, `_tall`, `regn_ut` og `MAANEDER` flyttet uendret fra `src/omsetning.py`, som importerer dem derfra), `_aksjene_i_lista` og `lister` i `src/ferdige_lister.py`, teksten under «Start fra en ferdig liste» i `src/templates/_egne.html`, og «Hva er de ferdige listene og filteret?» i `docs/hjelp.md` (regel 19). Ordlista forbyr «de tre» på sidene, så teksten sier «for tre måneder bakover».
+- **Tester («Ville feilet hvis» i hver):** `tests/test_ferdige_lister_8_11b.py`. `test_demoen_har_kraft_og_eiendom` i `tests/test_ferdige_lister.py` krever nå de ni bransjelistene i demoen, i rekkefølgen fra `designregler.md` §4 (spørsmål 8). `omsetningsregning.py` står bak bildene i `tests/test_docker.py`, og bildet av «Din egen liste» er tatt på nytt (1432 px).
+- **Prøven på `ose.db`:** basen ble kopiert med SQLite sin backup fra en tilkobling med `mode=ro` til en midlertidig mappe og migrert der, og `boersliste` ble fylt fra `data/proever/symbolliste-OL-2026-10-22.json` med `les_boerslista`, uten kall og uten `fetch_prices.py`. Lista har 15 aksjer. Alle 15 fikk en median av kursene og står i en ferdig liste, og det er 13 bransjelister. Bare antallene står her (regel 16). Den midlertidige mappa er slettet, og sha256 for `data/db/ose.db` var den samme før og etter.
+
+## Mutantene
+
+Én per del på arbeidskopien, med kopi før og sha256 lik etter: A (ingen aksjer fra lista) fanget av `test_en_aksje_i_lista_er_med_med_medianen_av_kursene`, A2 (`ut` ignoreres) av `test_en_aksje_som_er_tatt_ut_er_ikke_med`, C (en eldre måling går foran) av `test_kursene_gaar_foran_en_eldre_maaling`, D (uten `boersliste`) av `test_bare_aksjer_i_boerslista`, og E (`ferdige_lister` importerer `omsetning`) av `TestSammeUtregning`. B (uten `BETWEEN` i SQL-en) overlevde, fordi `regn_ut` selv bare tar med radene i vinduet, så `BETWEEN` bare gjør spørringen mindre. B2 (vinduet fra `date.min`) ble fanget av `test_vinduet_er_tre_maaneder_til_siste_kursdag`.
+

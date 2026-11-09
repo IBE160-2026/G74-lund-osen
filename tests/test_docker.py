@@ -1008,6 +1008,8 @@ MALENE_BAK_BILDET = (
     "src/valg.py",
     # Story 8.11: de ferdige listene i «Din egen liste».
     "src/ferdige_lister.py",
+    # Story 8.11b: utregningen av omsetningen, som ferdige_lister bruker.
+    "src/omsetningsregning.py",
     # Story 10.6: «Børsdagen kort fortalt» under tabellen, med grunnlaget som
     # siden regner og demoteksten om dagen.
     "src/dagsgrunnlag.py",
@@ -1270,7 +1272,9 @@ HOEYDE_PAA_BILDET = 1864
 # liste» er nye; de andre er byte for byte de samme.
 # Flettingen av 2.12 (med main) inn i 8.11: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "2eb89c403470c0af7d7be7bdf46ffcb08f1ac72c916945e8bbc08348bf7e3659"
+# Story 8.11b: omsetningsregning.py bak bildene, og «Din egen liste» med de ni ferdige listene i
+# demoen (1432 px). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
+AVTRYKK_BAK_BILDET = "5d7120b3a58259a8051e05a9b7de72de82a6382b688c4a8060d0a0783dfa32bf"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1304,6 +1308,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/valg.py",
     # Story 8.11: de ferdige listene.
     "src/ferdige_lister.py",
+    # Story 8.11b: utregningen av omsetningen, som ferdige_lister bruker.
+    "src/omsetningsregning.py",
     # Story 10.6: teksten om dagen i demoen, og grunnlaget webserveren regner.
     "src/demo_ki_dagen.json",
     "src/dagsgrunnlag.py",
@@ -1671,7 +1677,9 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # liste» er nye; de andre er byte for byte de samme.
 # Flettingen av 2.12 (med main) inn i 8.11: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "9003d7ab7af81207050b049b3d5bee915e36470711436d3e597622373fd132f8"
+# Story 8.11b: omsetningsregning.py bak bildene, og «Din egen liste» med de ni ferdige listene i
+# demoen (1432 px). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
+AVTRYKK_BAK_AKSJESIDEN = "46d54722a355ef2e6930437e52f1b5424f454ef9e29150e4528de5cd87d4845d"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1728,7 +1736,8 @@ DE_NYE_BILDENE = {
     # Story 8.11: 1216, med «Start fra en ferdig liste» nederst.
     # Gruppens ønske 08.11 kl. 23:59: investorsiden for BRFE, 948 px, hele siden.
     # Flettingen av 2.12 inn i 8.11: 1216 som i 8.11, med «Start fra en ferdig liste».
-    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1216, FILENE_BAK_MIN_LISTE),
+    # Story 8.11b: 1432, med de ni ferdige listene i demoen.
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1432, FILENE_BAK_MIN_LISTE),
     "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 948, FILENE_BAK_INVESTORSIDEN),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
@@ -1807,14 +1816,16 @@ DE_NYE_BILDENE = {
 # de andre er byte for byte de samme.
 # Flettingen av 2.12 (med main) inn i 8.11: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
+# Story 8.11b: omsetningsregning.py bak bildene, og «Din egen liste» med de ni ferdige listene i
+# demoen (1432 px). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "2eb89c403470c0af7d7be7bdf46ffcb08f1ac72c916945e8bbc08348bf7e3659",
-    "docs/appen/boersometeret-demo.png": "ec23d7376fd88d457ff744f948a74232be72522e4e78066366bf458623f8c5bf",
-    "docs/appen/min-liste-demo.png": "51ef498e68e56810bfa8c00943878ff742b3251a5cdc28186fad3e384ff79e63",
-    "docs/appen/oversikten-390-demo.png": "2eb89c403470c0af7d7be7bdf46ffcb08f1ac72c916945e8bbc08348bf7e3659",
-    "docs/appen/boersometeret-390-demo.png": "ec23d7376fd88d457ff744f948a74232be72522e4e78066366bf458623f8c5bf",
-    "docs/appen/din-egen-liste-demo.png": "51ef498e68e56810bfa8c00943878ff742b3251a5cdc28186fad3e384ff79e63",
-    "docs/appen/investorsiden-brfe-demo.png": "5ad906128054de287879f2fcfcec4e571ca3a6c335d906ac6c9cb153a0a65a22",
+    TOPPEN_AV_OVERSIKTEN: "5d7120b3a58259a8051e05a9b7de72de82a6382b688c4a8060d0a0783dfa32bf",
+    "docs/appen/boersometeret-demo.png": "ed5cbf7345b880756e42934989cd23780758b3b05fc2e92e0a8d000e8e8a13f6",
+    "docs/appen/min-liste-demo.png": "d803929b9d92edfc4b66e29562a9684a1f7bce6b804ec9b17ccd6c9324e53c24",
+    "docs/appen/oversikten-390-demo.png": "5d7120b3a58259a8051e05a9b7de72de82a6382b688c4a8060d0a0783dfa32bf",
+    "docs/appen/boersometeret-390-demo.png": "ed5cbf7345b880756e42934989cd23780758b3b05fc2e92e0a8d000e8e8a13f6",
+    "docs/appen/din-egen-liste-demo.png": "d803929b9d92edfc4b66e29562a9684a1f7bce6b804ec9b17ccd6c9324e53c24",
+    "docs/appen/investorsiden-brfe-demo.png": "b7d725dfc06abfcb44230ba237597c451fafbe8dd2bf6eb9f00441e071a6ffc4",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
