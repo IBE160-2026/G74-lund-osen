@@ -1274,7 +1274,9 @@ HOEYDE_PAA_BILDET = 1864
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
 # Story 8.11b: omsetningsregning.py bak bildene, og «Din egen liste» med de ni ferdige listene i
 # demoen (1432 px). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "5d7120b3a58259a8051e05a9b7de72de82a6382b688c4a8060d0a0783dfa32bf"
+# Gjennomgangen av 8.11b: teksten under «Start fra en ferdig liste» er rettet (BH1, VG4), saa «Din
+# egen liste» er tatt paa nytt (fortsatt 1432 px); de andre er byte for byte de samme.
+AVTRYKK_BAK_BILDET = "7d2701a39757d76c71bd91d18d75700bc8cb8bbbcfa76d59ae06c1160d39a300"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1679,7 +1681,9 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
 # Story 8.11b: omsetningsregning.py bak bildene, og «Din egen liste» med de ni ferdige listene i
 # demoen (1432 px). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "46d54722a355ef2e6930437e52f1b5424f454ef9e29150e4528de5cd87d4845d"
+# Gjennomgangen av 8.11b: teksten under «Start fra en ferdig liste» er rettet (BH1, VG4), saa «Din
+# egen liste» er tatt paa nytt (fortsatt 1432 px); de andre er byte for byte de samme.
+AVTRYKK_BAK_AKSJESIDEN = "3002d4e7a6e66265ebf103765c562ad5441b82ae1f887db6f0b07ae2e8bd3e27"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1818,14 +1822,16 @@ DE_NYE_BILDENE = {
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
 # Story 8.11b: omsetningsregning.py bak bildene, og «Din egen liste» med de ni ferdige listene i
 # demoen (1432 px). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
+# Gjennomgangen av 8.11b: teksten under «Start fra en ferdig liste» er rettet (BH1, VG4), saa «Din
+# egen liste» er tatt paa nytt (fortsatt 1432 px); de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "5d7120b3a58259a8051e05a9b7de72de82a6382b688c4a8060d0a0783dfa32bf",
-    "docs/appen/boersometeret-demo.png": "ed5cbf7345b880756e42934989cd23780758b3b05fc2e92e0a8d000e8e8a13f6",
-    "docs/appen/min-liste-demo.png": "d803929b9d92edfc4b66e29562a9684a1f7bce6b804ec9b17ccd6c9324e53c24",
-    "docs/appen/oversikten-390-demo.png": "5d7120b3a58259a8051e05a9b7de72de82a6382b688c4a8060d0a0783dfa32bf",
-    "docs/appen/boersometeret-390-demo.png": "ed5cbf7345b880756e42934989cd23780758b3b05fc2e92e0a8d000e8e8a13f6",
-    "docs/appen/din-egen-liste-demo.png": "d803929b9d92edfc4b66e29562a9684a1f7bce6b804ec9b17ccd6c9324e53c24",
-    "docs/appen/investorsiden-brfe-demo.png": "b7d725dfc06abfcb44230ba237597c451fafbe8dd2bf6eb9f00441e071a6ffc4",
+    TOPPEN_AV_OVERSIKTEN: "7d2701a39757d76c71bd91d18d75700bc8cb8bbbcfa76d59ae06c1160d39a300",
+    "docs/appen/boersometeret-demo.png": "8e312d15d50a81c6fefdd7ad90793866dcb803a54f094cf232d3287ca20c71dc",
+    "docs/appen/min-liste-demo.png": "8d2c8aae5d73e7ae25cfa4d3d4c620be07fad9d420bbd6ee2c27f9ee3bfa48e4",
+    "docs/appen/oversikten-390-demo.png": "7d2701a39757d76c71bd91d18d75700bc8cb8bbbcfa76d59ae06c1160d39a300",
+    "docs/appen/boersometeret-390-demo.png": "8e312d15d50a81c6fefdd7ad90793866dcb803a54f094cf232d3287ca20c71dc",
+    "docs/appen/din-egen-liste-demo.png": "8d2c8aae5d73e7ae25cfa4d3d4c620be07fad9d420bbd6ee2c27f9ee3bfa48e4",
+    "docs/appen/investorsiden-brfe-demo.png": "a05d019e7d2e1b8b463648311b6f5b4a9666fb3a1e49920e1553f481be73c85b",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

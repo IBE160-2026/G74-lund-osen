@@ -66,3 +66,26 @@ Bygget på grenen `8-11b-de-15-i-bransjelistene`, i worktreen `G74-lund-osen-8-1
 
 Én per del på arbeidskopien, med kopi før og sha256 lik etter: A (ingen aksjer fra lista) fanget av `test_en_aksje_i_lista_er_med_med_medianen_av_kursene`, A2 (`ut` ignoreres) av `test_en_aksje_som_er_tatt_ut_er_ikke_med`, C (en eldre måling går foran) av `test_kursene_gaar_foran_en_eldre_maaling`, D (uten `boersliste`) av `test_bare_aksjer_i_boerslista`, og E (`ferdige_lister` importerer `omsetning`) av `TestSammeUtregning`. B (uten `BETWEEN` i SQL-en) overlevde, fordi `regn_ut` selv bare tar med radene i vinduet, så `BETWEEN` bare gjør spørringen mindre. B2 (vinduet fra `date.min`) ble fanget av `test_vinduet_er_tre_maaneder_til_siste_kursdag`.
 
+## Spørsmål etter gjennomgangen
+
+10. **Ulike vinduer (BH2).** De målte medianene er fra vinduet den dagen de ble målt, og medianene regnet av kursene fra vinduet til siste dag med kurser. Begge rangeres sammen. *Forslag:* godta det, fordi målingene i 2.13 er av aksjer som ellers ikke ville vært med, og teksten sier nå hvor hver median kommer fra. Funnet er middels og står åpent til gruppen har svart (regel 25).
+
+*Lagt til 2026-11-09 (gjennomgangen, ECH1):* spørsmål 1 er utvidet i det som er bygget: medianen regnes for alle aksjene appen følger eller har fulgt som har kurser i vinduet, ikke bare dem i lista, så en aksje som er tatt ut, ikke faller ut av bransjelistene før 2.13 har målt den.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+To gjennomganger av byggingen før `a08a7f6a`, i parallell med hele settet: Blind Hunter med bare diffen (7 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (5 og 4 funn). Ingen høye.
+
+**Middels**
+- *ECH1, rettet.* En aksje som ble tatt ut av lista, falt ut av alle bransjelister, fordi 2.13 hopper over aksjene i lista. Nå regnes medianen for alle aksjene i `aksje` som står i `boersliste` og har kurser i vinduet, og en målt aksje uten bransje i `BRANSJE` får bransjen i `aksje` (`test_en_aksje_som_er_tatt_ut_er_med_saa_lenge_den_har_kurser`, `test_en_aksje_tatt_ut_uten_kurser_i_vinduet_bruker_maalingen`).
+- *BH1 og VG4, rettet.* Hjelpen sa at gruppen har sjekket bransjen for hver aksje, og at listene er de som ble omsatt for mest da omsetningen sist ble målt. Nå sier hjelpen og teksten under «Start fra en ferdig liste» hvor medianen kommer fra, og at bransjen for en aksje brukeren følger selv, er den brukeren valgte.
+- *ECH2, åpent* med spørsmål 9 (regel 25): merket «Utenfor målingen» leser `omsetning`, så en egen aksje kan stå som ikke målt i tabellen og med en median i den ferdige lista.
+- *BH2, åpent* som spørsmål 10 (regel 25).
+
+**Lav**
+- *Rettet:* BH3 og VG1 (en aksje i lista uten kurser i vinduet bruker ikke en eldre måling), BH5 (en dato i `kurs` som ikke kan leses, gir ingen lister herfra i stedet for en feil), BH6 (en test for dagen vinduet begynner og dagen før), ECH3 og VG2 (regelen for `inn` og `ut` bestemmer nå bare hvilke aksjer som aldri bruker en eldre måling).
+- *Ført:* BH4 og ECH4 (`max(dato)` over hele `kurs` og én spørring per aksje, for hver side med basen), ECH5 (ingen minste antall dager i vinduet, som i 2.13), VG3 (ingen test for merket «Utenfor målingen» for de 15, venter på spørsmål 9), B-mutanten.
+- *Ikke reelt:* BH7 (`kode` er primærnøkkel i `boersliste`).
+
+**Mutantene for rettingene:** F1 (bare aksjene i lista regnes), F2 (bare de med median går foran målingen), F3 (ingen bransje fra `aksje` for de målte) og F4 (`ValueError` fanges ikke), hver fanget av sin test, med fila lik etterpå.
+

@@ -88,14 +88,49 @@ class TestDeFemten:
         alle = {a.symbol for liste in _lister(base).values() for a in liste}
         assert "KOG" not in alle and {"EQNR", "DNB"} <= alle
 
-    def test_en_aksje_som_er_tatt_ut_er_ikke_med(self, base):
-        """Del A: ville feilet hvis en aksje med ut før siste kursdag var med
-        som om den var i lista."""
+    def test_en_aksje_som_er_tatt_ut_er_med_saa_lenge_den_har_kurser(self, base):
+        """Gjennomgangen (ECH1): ville feilet hvis en aksje som er tatt ut av
+        lista, falt ut av bransjelistene mens den har kurser i vinduet, før
+        2.13 har målt den."""
         t = sqlite3.connect(base)
         with t:
             t.execute("UPDATE aksje SET ut = '2026-10-01' WHERE symbol = 'DNB'")
         t.close()
+        assert [(a.symbol, a.median) for a in _lister(base)["Finans"]] == [("DNB", _median(DNB_RADER))]
+
+    def test_en_aksje_tatt_ut_uten_kurser_i_vinduet_bruker_maalingen(self, base):
+        """Gjennomgangen (ECH1): ville feilet hvis en aksje som er tatt ut og
+        ikke har kurser i vinduet, mistet en måling fra 2.13."""
+        t = sqlite3.connect(base)
+        with t:
+            t.execute("UPDATE aksje SET ut = '2026-06-01' WHERE symbol = 'DNB'")
+            t.execute("DELETE FROM kurs WHERE symbol = 'DNB'")
+        t.close()
+        maal(base, [("DNB", 7e6)])
+        assert [(a.symbol, a.median) for a in _lister(base)["Finans"]] == [("DNB", 7e6)]
+
+    def test_en_aksje_i_lista_uten_kurser_i_vinduet_bruker_ikke_en_eldre_maaling(self, base):
+        """Gjennomgangen (BH3, VG1): ville feilet hvis en aksje i lista uten
+        kurser i vinduet ble vist med en eldre måling (spørsmål 4)."""
+        t = sqlite3.connect(base)
+        with t:
+            t.execute("DELETE FROM kurs WHERE symbol = 'DNB'")
+        t.close()
+        maal(base, [("DNB", 7e6)])
         assert "Finans" not in _lister(base)
+
+    def test_vinduet_tar_med_den_foerste_dagen(self, base):
+        """Gjennomgangen (BH6): ville feilet hvis dagen vinduet begynner, var
+        utenfor, eller dagen før var innenfor."""
+        _kurser(base, "DNB", [("2026-07-22", 100.0, 100), ("2026-07-21", 1e9, 1_000_000)])
+        assert _lister(base)["Finans"][0].median == _median([*DNB_RADER, ("2026-07-22", 100.0, 100)])
+
+    def test_en_dato_som_ikke_kan_leses_gir_ingen_feil(self, base):
+        """Gjennomgangen (BH5): ville feilet hvis en dato i kurs som ikke kan
+        leses, ga en feil på siden i stedet for ingen lister herfra."""
+        _kurser(base, "EQNR", [("ikke en dato", 1.0, 1)])
+        maal(base, [("NHY", 9e6)])
+        assert _lister(base) == {}
 
     def test_ingen_kurser_gir_ingen_lister_fra_lista(self, tmp_path, monkeypatch):
         """Ville feilet hvis en base uten kurser ga en feil eller en liste."""
