@@ -1436,8 +1436,10 @@ def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste:
     grunnlaget i raden er det samme som grunnlaget regnet her av det siden
     viser: vurderingene som er lagret, kursene og hovedindeksen, for aksjene
     i lista (dagsgrunnlag.py). Webserveren leser bare (AD-10). En periode har
-    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det."""
-    er_paa = ki_paa(request.cookies.get(KAPSEL))
+    ingen tekst (spoersmaal 1), og med KI av staar bare linja om det.
+    Story 8.10b (BH3, ECH3): paa eller av leses med _ki_er_paa(), som paa
+    aksjesiden, saa valget i Innstillinger gjelder begge."""
+    er_paa = _ki_er_paa()
     bryter = {
         "er_paa": er_paa,
         "til": AV if er_paa else PAA,

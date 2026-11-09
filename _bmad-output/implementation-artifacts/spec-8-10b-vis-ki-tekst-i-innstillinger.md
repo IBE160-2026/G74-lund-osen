@@ -74,3 +74,6 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 Grenen `8-10b-vis-ki-tekst` er ikke flettet. Den bygger på 8.10 (PR #125), og flettes etter 2.11, 2.12 og 8.10. Flettes 10.6 (PR #122) også, må `_boersdagen` bruke `_ki_er_paa()` (BH3, ECH3).
 
 *Svar 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spørsmål 1–3 er godtatt, og rådet anbefalte det. BH3 og ECH3 (middels) rettes nå som 10.6 er flettet: `_boersdagen` bruker `_ki_er_paa()`, med en test. Svaret er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
+
+*Lagt til 2026-11-09 (instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`, steg 4):* 8.10 (med 2.12 og main, også 10.6) er flettet inn. BH3 og ECH3 er rettet: `_boersdagen` i `src/app.py` leser på eller av med `_ki_er_paa()`, som aksjesiden. `TestBoersdagen` i `tests/test_innstillinger_ki.py` viser at bryteren på oversikten, ved teksten og i Innstillinger sier det samme som raden i basen når kapselen sier noe annet. Mutanten «`_boersdagen` leser kapselen direkte» fikk begge tilfellene til å feile, og `src/app.py` var lik som før etterpå. Med det står ingen funn på middels eller over åpne.
+

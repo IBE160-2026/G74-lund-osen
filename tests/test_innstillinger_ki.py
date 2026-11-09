@@ -129,3 +129,23 @@ class TestEtterGjennomgangen:
         svar = klient.post("/ki", data={"til": "paa", "tilbake": "/aksje/EQNR"})
         assert svar.status_code == 503 and "Set-Cookie" not in svar.headers
         assert raden(lagring_sqlite.BASE_STI) == (0,)
+
+
+def ki_paa_oversikten(klient) -> str:
+    side = klient.get("/").data.decode("utf-8")
+    knapp = re.search(r'<form class="dagsbryter".*?aria-checked="(true|false)"', side, re.S)
+    return knapp.group(1)
+
+
+class TestBoersdagen:
+    """BH3 og ECH3 i gjennomgangen, rettet etter at 10.6 er flettet:
+    «Børsdagen kort fortalt» på oversikten leser valget med _ki_er_paa(),
+    som aksjesiden."""
+
+    @pytest.mark.parametrize(("raden", "kapselen", "vist"), [("paa", "av", "true"), ("av", "paa", "false")])
+    def test_oversikten_foelger_raden_som_aksjesiden(self, klient, raden, kapselen, vist):
+        """Ville feilet hvis _boersdagen leste kapselen direkte, så forsiden
+        og aksjesiden kunne vise hver sin verdi."""
+        klient.post("/innstillinger", data={"navn": "vis_ki_tekst", "til": raden})
+        klient.set_cookie(KAPSEL, kapselen)
+        assert ki_paa_oversikten(klient) == ki_ved_teksten(klient) == ki_i_innstillinger(klient) == vist
