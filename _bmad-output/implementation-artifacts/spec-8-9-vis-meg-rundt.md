@@ -50,3 +50,27 @@ Ingen KI og ingen nettkall. `data/db/ose.db` røres ikke. Ingen migrasjon.
 Bygget på grenen `8-9-vis-meg-rundt`, i worktreen `G74-lund-osen-8-9`, fra `1a72810a`. Filene: `src/hjelpetekster.py`, `src/app.py` (stegene til malene), `src/templates/_rundtur.html` (ny), `_ramme.html`, `index.html`, `boersometer.html`, `aksje.html` (to tomme ankre, `noekkeltallene` og `sjekkene`, så malen ellers er som før), `innstillinger.html` (id-ene `hjelp-valget` og `ki-valget`), `folg.html`, `src/static/stil.css`, «Hva er «Vis meg rundt»?» i `docs/hjelp.md`, og testene i `tests/test_vis_meg_rundt_8_9.py`. Bildene er tatt på nytt med DevTools-protokollen: åtte er endret med knappen i toppen, og investorsiden er byte for byte den samme. Avtrykkene er regnet ut på nytt.
 
 Under byggingen: knappen sto først i innholdet, og sju eksisterende tester som leser teksten på aksjesiden, feilet. Den står nå i toppen. Den lukkede lista ble regnet som synlig tekst under hjelpefeltet i `test_hjelpefeltet.py`, så den har `display: none` når den er lukket.
+
+## Mutantene
+
+Én per del og regel på `d20090b6`, med kopi før og fila lik HEAD etterpå: A1 (et tall skrevet for hånd i «Tallene bak») overlevde først, fordi det samme tallet sto i steget om kursgrafen, og ble fanget da testen så på hvert steg for seg (`a4111592`). A2 (en egen tekst for signalstyrken) fanget av `test_samme_tekster_som_hjelpen`, B1 (børsometeret uten knappen) av `test_knappen_og_stegene_peker_paa_noe_som_finnes`, B2 (aksjesiden alltid med sjekkene) av `test_aksjesiden_uten_sjekker`, og B3 (knappen uten «Vis hjelp») av `test_borte_naar_hjelpen_er_av`.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `1a72810a..a4111592`, uten `tests/test_docker.py` og bildene: Blind Hunter med bare diffen (12 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (5 og 4 funn; om lag 40 tilstander av sidene, også demoen, og 6 mutanter i en kopi utenfor worktreen). Ingen høye.
+
+**Middels**
+- *ECH1, rettet.* Når lista er full, viser «Følg en aksje» ikke søket, men knappen sto, og «Søk» pekte på `#q`, som ikke finnes. Knappen står nå bare når søket står.
+- *VG1 og BH2, rettet.* Testene så bare standardtilstandene. Nå `test_ikke_der_stegene_ikke_passer`: «Bytt ut», en full liste og Min liste uten merkede aksjer. Edge Case Hunter fant alle ankrene i de andre tilstandene (periode, valgt dag, sortering, KI av, kort serie, uten hovedindeks, søk, demoen).
+- *ECH5, rettet.* Stegene om retningen, styrken og sjekkene brukte tekstene bak «?», ikke tekstene fra tavla som tillegget 13.10 i epics.md krever. Nå er de ordrett fra «Kan tas som de står» i punkt 4.2 i endringsforslaget 13.10 (`TAVLA_RETNING`, `TAVLA_STYRKEN`, `TAVLA_SJEKKENE`), og `test_tekstene_fra_tavla` leser dem i forslaget. Retningen står uten «Ikke et råd om å kjøpe eller selge.», som etter merknaden der ikke kan bli en vanlig hjelpetekst. Mutanten med den gamle teksten ble fanget.
+- *BH3, rettet.* Testen av ankrene godtok `data-id="q"` og to like id-er. Nå en hel id, og nøyaktig én. Det samme i `test_utseende.py`.
+- *BH1, ført.* På en dag uten sjekker står fortsatt overskriften og «?» for sjekkene, med teksten for en side uten sjekker. Spørsmål 4 og hjelpen sier at sjekkene ikke vises, og det gjelder kortene; stegene om dem står ikke.
+- *BH4, ført.* Signalstyrken og retningen peker på tabellen, og «Tallene bak» på sjekkene, som «Sjekkene». Det er delen de forklarer.
+- *BH5, ikke reelt.* Tekstene er vanlige strenger uten HTML.
+
+**Lav**
+- *Rettet:* ECH2 («Tabellen» sier at «Skilte seg ut» gjelder siste børsdag uten sortering), ECH3 («Kursgrafen» sier snittet og hovedindeksen når serien og indeksen har dem), ECH4 (Min liste har knappen når du har merket en aksje, og «Aksjene dine» nevner «Alle»), VG2 og BH8 (volumfaktoren er med i testen av tallene), BH11 (hjelpen sier når «Følg en aksje» har knappen).
+- *Ført:* BH6 (ankrene er tomme `span`, så malen ellers er som før), BH7 (pila i `summary` er borte med `inline-block`; knappen har ramme og står alene), BH9 (`assert` for antallet steg; testen `test_hoeyst_sju_steg` er vakten), BH10 (en ny side uten `vis_hjelp` i konteksten; alle sidene får den fra innstillingene), BH12 (filteret i `test_boersometer.py` er den eksakte strengen), VG3 (demoen er prøvd av Edge Case Hunter, ikke i testene), VG4 (tekstene fra tavla er nå like, ikke `in`).
+- *Spesifikasjonen:* spørsmål 7 sier tre tester er endret, men nevner to; den tredje er avtrykkene i `tests/test_docker.py`.
+
+*Lagt til 2026-11-09 under spørsmål 3 (gjennomgangen, ECH5):* stegene bruker nå tekstene fra tavla, ikke tekstene bak «?». Forslaget er det samme: godta.
