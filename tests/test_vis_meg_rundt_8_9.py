@@ -145,7 +145,8 @@ class TestTekstene:
         alle = {s.tittel: s.tekst for steg in ht.rundturer().values() for s in steg}
         assert alle["Signalstyrken"] == ht.TAVLA_STYRKEN and f"«{ht.TAVLA_STYRKEN}»" in forslaget
         assert alle["Retningen"] == ht.TAVLA_RETNING and f"Retning: «{ht.TAVLA_RETNING} " in forslaget
-        assert alle["Sjekkene"] == ht.TAVLA_SJEKKENE and f"«{ht.TAVLA_SJEKKENE}»" in forslaget
+        # Uten den siste setningen, som 8.20a flyttet fra siden.
+        assert alle["Sjekkene"] == ht.TAVLA_SJEKKENE and f"«{ht.TAVLA_SJEKKENE} Ingen vekting" in forslaget
 
     def test_ingen_ki_og_ingen_nett(self):
         """Ville feilet hvis hjelpetekster.py, der stegene står, importerte

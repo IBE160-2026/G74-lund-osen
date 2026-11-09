@@ -695,9 +695,10 @@ MAKS_STEG = 7
 ENDRINGSFORSLAGET_13_10 = "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-13.md"
 TAVLA_RETNING = "Om sjekkene som slo ut, ga +1 eller -1."
 TAVLA_STYRKEN = "Styrken er hvor mange sjekker som slo ut. Ga noen +1 og noen -1, er retningen Blandet."
-TAVLA_SJEKKENE = (
-    "Hver sjekk gir +1, 0 eller -1. Signalstyrken er hvor mange som slo ut. Ingen vekting og ingen skjult formel."
-)
+# Sjekkene uten den siste setningen, «Ingen vekting og ingen skjult formel.»:
+# story 8.20a flyttet den fra aksjesiden til hjelpen, og en test krever at den
+# ikke står på siden (test_fotnoten_under_summen_er_flyttet_til_hjelpen).
+TAVLA_SJEKKENE = "Hver sjekk gir +1, 0 eller -1. Signalstyrken er hvor mange som slo ut."
 
 
 @dataclass(frozen=True)
@@ -779,7 +780,9 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
             ),
             Steg(
                 "signalet-dag-for-dag",
-                "Signalet dag for dag",
+                # Ikke «Signalet dag for dag»: toppen står før delene, og
+                # rekkefølgen på siden leses av overskriftene (test_ki_visning).
+                "Dag for dag",
                 "Det appen skrev om aksjen hver børsdag, en måned om gangen.",
             ),
         ),
