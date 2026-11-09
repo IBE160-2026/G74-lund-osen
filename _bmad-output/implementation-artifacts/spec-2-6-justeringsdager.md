@@ -54,3 +54,28 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 ## Grenser
 
 Ingen API-kall, `src/fetch_prices.py` kjøres bare i testene med en falsk henter, og `data/db/ose.db` leses bare med `mode=ro` for antallet. Ingen migrasjon: dagene regnes når siden vises, og lagres ikke.
+
+## Bygget 09.11 (ekstravinduet)
+
+Bygget på grenen `2-6-justeringsdager`, i worktreen `G74-lund-osen-2-6`, fra `1a72810a`. Filene: `src/justeringsdager.py` (ny), `src/markedsoversikt.py`, `src/aksjedetalj.py`, `src/graf.py`, `src/app.py`, `src/templates/index.html`, `src/templates/aksje.html`, `src/static/stil.css`, «Hva er en justeringsdag?» i `docs/hjelp.md` og testene i `tests/test_justeringsdager_2_6_8_14.py`. Bildet av aksjesiden er tatt på nytt med DevTools-protokollen. Det nye er setningen «Ingen justeringsdager det siste året.» under grafen. De åtte andre bildene er byte for byte de samme. `src/justeringsdager.py` står bak begge bildene i `tests/test_docker.py`, og avtrykkene er regnet ut på nytt.
+
+## Mutantene
+
+Én per del på `37468807`, med kopi før og fila lik HEAD etterpå: A (terskelen 1,0) fanget av `test_terskelen`, B (merket står ved en periode) av `test_ikke_for_en_periode`, C (kortet merker hver dag med to rader) av `test_kortet_sier_justeringsdag`, og D (året til siste rad, ikke dagen siden viser) av `test_dagene_er_de_samme_som_2_6_finner`.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `1a72810a..37468807`, uten `tests/test_docker.py` og bildet: Blind Hunter med bare diffen (12 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (4 og 7 funn, med 11 mutanter i en kopi utenfor worktreen). Ingen høye.
+
+**Middels**
+- *VG1, VG2 og VG3, rettet.* Testene så bare antallet streker, én justeringsdag og et oppsett der alle radene før siste dag var justert. Nå har EQNR to justeringsdager, 15.09 og 22.09, strekene står ved dagene (`test_strekene_staar_ved_dagene`), den siste dagen er 22.09, og en valgt dag 16.09 er ikke merket. Mutantene M2, M3 og M11, som overlevde, ble fanget.
+- *BH1, rettet.* Grafen fikk bare dagene det siste året. Nå får den alle justeringsdagene i serien og merker dem den har. Mutanten der grafen får dagene for året, overlever, fordi serien aldri er lengre enn ett år (`DAGER_TILBAKE`), så de to dekker de samme dagene.
+- *BH4, rettet.* Skjermleseren får datoene for strekene, som for signaldagene (8.8).
+- *BH2, ikke reelt.* `rader` er hele kursserien, ikke perioden i grafen.
+- *BH3, ikke reelt.* Linja under i «Sammenlign med» bygges av `bygg_sammenligning` uten merket, og malen viser det ikke der (Edge Case Hunter kontrollerte det samme).
+
+**Lav**
+- *Rettet:* ECH1 og BH11 (året begynner på samme dato året før, som «1 år» i grafen, ikke 365 dager tilbake, `aaret_foer`), ECH2 og VG4 (kortet sier «Justeringsdag» bare når det har en endring), ECH3 (hjelpen sa at en splitt gir samme utslag; det er ikke målt, så hjelpen sier bare «for eksempel etter et utbytte»), ECH4 (hjelpen sier at kortet på aksjesiden alltid gjelder én dag), VG6 (forklaringen ved musepekeren og setningen om strekene er testet).
+- *Ført:* BH5 (en rad som mangler: merket følger det samme radparet som endringen, som `endring_med_datoer` viser), BH6 (kortet på aksjesiden gjelder alltid én dag), BH7 og VG5 (en forskjell på nøyaktig 0,1 pp kan ikke lages med flyttall; testen prøver like under og like over), BH8 (testen av importene viser at modulen ikke leser noe annet enn kursradene den får), BH9 (testene leter etter klassen slik malen skriver den), BH10 (bildet og avtrykkene er i commiten `37468807`), BH12 (stilen for merket gjelder tabellene i oversikten og Min liste), VG6 (Min liste er ikke hentet i testene; den bruker samme mal og samme `Rad`), VG7 (grensen for året er testet i `test_det_siste_aaret`).
+
+*Lagt til 2026-11-09 under spørsmål 1 (gjennomgangen, ECH3):* om en splitt gir samme utslag, er en påstand i `begrunnelser.md` §11, forbehold 1, og ikke målt. Det endrer ikke forslaget.
