@@ -7,9 +7,10 @@ regnes når siden vises, så en ny måling gir nye lister uten at koden endres.
 Ingen tall herfra står i koden (regel 16), bare bransjen for hver aksje.
 
 BRANSJE er Claude Codes forslag 08.11, ut fra navnet og det vi vet om
-selskapet, og er ikke sjekket av gruppen (spesifikasjonen, spørsmål 1). De
-som er merket «usikker», er de vi vet minst om. En målt aksje som ikke står
-her, kommer ikke i noen liste.
+selskapet, sjekket av gruppen: godtatt kl. 22:01 (spørsmål 1), og kl. 22:03
+ble VOIM Energi, NOSN, NTG og MVW Industri, PLCAN Shipping og NORTH Finans,
+og SCOIN er tatt ut, fordi selskapet er under avvikling. En målt aksje som
+ikke står her, kommer ikke i noen liste.
 """
 
 import sqlite3
@@ -17,7 +18,7 @@ from dataclasses import dataclass
 
 from valg import BRANSJENE, TAK
 
-# Forslag, ikke sjekket (spørsmål 1). Bransjene er de 13 i designregler.md §4.
+# Sjekket av gruppen 08.11 kl. 22:01 og 22:03. Bransjene er de 13 i designregler.md §4.
 BRANSJE: dict[str, str] = {
     "AKER": "Finans",
     "STB": "Finans",
@@ -36,7 +37,7 @@ BRANSJE: dict[str, str] = {
     "ODFB": "Shipping",
     "SOFTX": "Helse",
     "NOM": "Materialer",
-    "LOKO": "Teknologi",  # usikker
+    "LOKO": "Teknologi",
     "ONCIN": "Helse",
     "QEC": "Energi",
     "LIFE": "Helse",
@@ -58,22 +59,22 @@ BRANSJE: dict[str, str] = {
     "HYPRO": "Energi",
     "JIN": "Shipping",
     "WEST": "Shipping",
-    "VOIM": "Industri",  # usikker
+    "VOIM": "Energi",
     "STST": "Shipping",
     "NCOD": "Sjømat",
     "VISTN": "Helse",
     "STRO": "Teknologi",
     "PSE": "Energi",
     "MPCES": "Kraft",
-    "OCEAN": "Industri",  # usikker
+    "OCEAN": "Industri",
     "HUDL": "Teknologi",
     "WSTEP": "Teknologi",
     "LYTIX": "Helse",
-    "PLGC": "Finans",  # usikker
+    "PLGC": "Finans",
     "NEXT": "Teknologi",
-    "NORTH": "Energi",
+    "NORTH": "Finans",
     "KRAB": "Finans",
-    "PLCAN": "Sjømat",  # usikker
+    "PLCAN": "Shipping",
     "VVL": "Finans",
     "ITERA": "Teknologi",
     "KLDVK": "Sjømat",
@@ -85,18 +86,18 @@ BRANSJE: dict[str, str] = {
     "NOFIN": "Finans",
     "ROMER": "Finans",
     "SAGA": "Finans",
-    "NTG": "Teknologi",  # usikker
+    "NTG": "Industri",
     "TINDE": "Finans",
     "KING": "Sjømat",
     "OSUN": "Energi",
-    "POLAR": "Materialer",  # usikker
-    "LUMI": "Forbruk",  # usikker
-    "MVW": "Kraft",
+    "POLAR": "Materialer",
+    "LUMI": "Forbruk",
+    "MVW": "Industri",
     "HGSB": "Finans",
     "HSPG": "Finans",
     "MELG": "Finans",
-    "ININ": "Industri",  # usikker
-    "NOSN": "Finans",  # usikker
+    "ININ": "Industri",
+    "NOSN": "Industri",
     "REFL": "Energi",
     "SB68": "Finans",
     "TRSB": "Finans",
@@ -104,9 +105,8 @@ BRANSJE: dict[str, str] = {
     "NISB": "Finans",
     "SDSD": "Energi",
     "ROM": "Eiendom",
-    "HYN": "Energi",  # usikker
+    "HYN": "Energi",
     "RIVER": "Teknologi",
-    "SCOIN": "Finans",
     # Demoen: to av de oppdiktede selskapene som er målt (demo.DEMOMAALT).
     "HVLK": "Kraft",
     "NRDE": "Eiendom",

@@ -15,7 +15,7 @@ import app as app_modul
 import ferdige_lister
 from lagring_sqlite import aapne_base
 from test_valg import klient, lager, med_boersen, stier  # noqa: F401  (fiksturene)
-from valg import BRANSJENE, TAK, ListaErFull
+from valg import BRANSJENE, TAK, ListaErFull, UgyldigValg
 
 NITTEN = [(f"T{i:02d}", f"Test {i} ASA") for i in range(1, 20)]
 
@@ -93,6 +93,47 @@ class TestBrukeLista:
     def test_mer_enn_18_avvises(self, nitten):
         with pytest.raises(ListaErFull):
             lager(nitten).bruk_liste([(k, "Kraft") for k, _ in NITTEN])
+
+
+class TestValideringenIBrukListe:
+    """VG6 i gjennomgangen, rettet etter gruppens svar 08.11 kl. 22:06:
+    valideringen i bruk_liste prøvd direkte, ikke bare gjennom ruta. Et
+    avvist valg skal ikke endre noe, så ønsket som venter, står etterpå."""
+
+    @staticmethod
+    def _oenskene(l):
+        return l._t.execute("SELECT handling, symbol FROM oenske ORDER BY id").fetchall()
+
+    def test_samme_aksje_to_ganger_avvises(self, nitten):
+        """Ville feilet hvis en ferdig liste med samme kode to ganger ble
+        tatt i bruk."""
+        l = lager(nitten)
+        l.folg("T19", "Helse")
+        foer = self._oenskene(l)
+        with pytest.raises(ListaErFull):
+            l.bruk_liste([("T01", "Kraft"), ("T01", "Kraft")])
+        assert self._oenskene(l) == foer
+
+    def test_en_bransje_utenfor_de_13_avvises(self, nitten):
+        """Ville feilet hvis bruk_liste godtok en bransje som ikke er blant
+        de 13 i designregler.md §4, eller skrev noe før den avviste."""
+        l = lager(nitten)
+        l.folg("T19", "Helse")
+        foer = self._oenskene(l)
+        assert "Ukjent" not in BRANSJENE
+        with pytest.raises(UgyldigValg):
+            l.bruk_liste([("T01", "Kraft"), ("T02", "Ukjent")])
+        assert self._oenskene(l) == foer
+
+    def test_en_kode_utenfor_boerslista_avvises(self, nitten):
+        """Ville feilet hvis bruk_liste godtok en kode som ikke står i lista
+        over Oslo Børs (boersliste), eller skrev noe før den avviste."""
+        l = lager(nitten)
+        l.folg("T19", "Helse")
+        foer = self._oenskene(l)
+        with pytest.raises(UgyldigValg):
+            l.bruk_liste([("T01", "Kraft"), ("FINNESIKKE", "Kraft")])
+        assert self._oenskene(l) == foer
 
 
 class TestSiden:
