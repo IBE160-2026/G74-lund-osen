@@ -194,3 +194,24 @@ def lister(tilkobling: sqlite3.Connection | None) -> dict[str, list[Ferdigaksje]
         if len(liste) < TAK:
             liste.append(Ferdigaksje(symbol, navn, float(median)))
     return {b: etter_bransje[b] for b in BRANSJENE if b in etter_bransje}
+
+
+def medianene(tilkobling: sqlite3.Connection | None) -> dict[str, tuple[float | None, date]]:
+    """Story 8.11c (spoersmaal 9 i 8.11b): medianen lister() bruker for hver
+    aksje som regnes av kursene i basen, med den siste dagen med kurser:
+    {symbol: (median i NOK eller None, dagen)}. En aksje som ikke staar her,
+    har bare den siste maalingen i omsetning (2.13), som foer. Merket
+    «Utenfor målingen» bruker dette, saa merket og de ferdige listene regner
+    likt. Bare lesing. Mangler tabellene, er den tom."""
+    if tilkobling is None:
+        return {}
+    try:
+        regnet, i_lista = _aksjene_i_lista(tilkobling)
+        siste = tilkobling.execute("SELECT max(dato) FROM kurs").fetchone()[0]
+    except sqlite3.Error:
+        return {}
+    if not regnet:
+        return {}
+    dag = date.fromisoformat(siste)
+    medianer = {symbol: median for symbol, _, median, _ in i_lista}
+    return {symbol: (medianer.get(symbol), dag) for symbol in regnet}

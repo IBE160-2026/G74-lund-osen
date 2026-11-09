@@ -434,7 +434,12 @@ def test_en_egen_aksje_staar_i_tabellen_med_merket(stier, monkeypatch):
     side = app_modul.app.test_client().get("/").data.decode("utf-8")
     assert '<a href="/aksje/NYA">Ny Aksje ASA</a> <span class="egenmerke">Egen</span>' in side
     assert "Hentet. Står i tabellen over." in side and "1 egne · 16 av 18 aksjer i lista" in side
-    assert 'class="utenformerke" title="Omsetningen er ikke målt ennå.' in side
+    # Story 8.11c (spørsmål 9 i 8.11b): etter hentingen regnes medianen av
+    # kursene, som i de ferdige listene. Her sto «Omsetningen er ikke målt ennå.»
+    assert (
+        'class="utenformerke" title="Median daglig omsetning de 3 siste månedene er 0,1 MNOK, '
+        "regnet av kursene til 22.09.2026." in side
+    )
 
 
 def test_dine_egne_aksjer_staar_foer_boersdagen_kort_fortalt(tmp_path, monkeypatch):

@@ -86,13 +86,16 @@ def utenfor_maalingen(median_nok: float | None) -> bool:
     return median_nok is None or median_nok < GRENSE_MNOK * 1_000_000
 
 
-def utenfor_tekst(median_nok: float | None, maalt: date | None) -> str:
-    """Teksten bak merket «Utenfor målingen» (utdraget 08.11 §2)."""
+def utenfor_tekst(median_nok: float | None, maalt: date | None, *, kursene: bool = False) -> str:
+    """Teksten bak merket «Utenfor målingen» (utdraget 08.11 §2). Story
+    8.11c: er medianen regnet av kursene i appen, som i de ferdige listene,
+    står dagen som den siste dagen med kurser."""
     if median_nok is None or maalt is None:
         return "Omsetningen er ikke målt ennå. Signalet er målt på aksjer som omsettes for over 32 MNOK om dagen."
     mnok = f"{median_nok / 1_000_000:.1f}".replace(".", ",")
+    kilde = f"regnet av kursene til {maalt:%d.%m.%Y}" if kursene else f"målt {maalt:%d.%m.%Y}"
     return (
-        f"Median daglig omsetning de 3 siste månedene er {mnok} MNOK, målt {maalt:%d.%m.%Y}. Signalet er målt på "
+        f"Median daglig omsetning de 3 siste månedene er {mnok} MNOK, {kilde}. Signalet er målt på "
         "aksjer som omsettes for over 32 MNOK om dagen, og er ikke prøvd på en aksje som omsettes så lite."
     )
 
