@@ -32,7 +32,17 @@ from markedsoversikt import (
 )
 from oversiktsdata import Oversiktspost
 from perioder import SEKS_MND, startdag
-from signalberegning import NEGATIV, POSITIV, STANDARD, Parametre, bevegelsesdesimaler, nodvendige_dager, sjekker_fra
+from signalberegning import (
+    NEGATIV,
+    POSITIV,
+    STANDARD,
+    Parametre,
+    bevegelsesdesimaler,
+    medianvolum,
+    nodvendige_dager,
+    sjekker_fra,
+    standardavvik,
+)
 from tallformat import desimaler_uten_null, fortegn, tall
 from tilstand import Art, Tilstand
 from vurderingsdata import Grunn, Vurdering
@@ -144,6 +154,14 @@ class Punkt:
     dato: date
     kurs: float
     ma50: float | None
+    # Story 8.7 (FR-202, tillegget): volumet, medianvolumet og
+    # standardavviket fra sjekk 3 og 2 for dagen, regnet med de samme
+    # funksjonene og vinduene, og forrige dags justerte kurs, som baandet for
+    # sjekk 2 staar rundt. None foer vinduet er fullt.
+    volum: int | None = None
+    median: float | None = None
+    avvik: float | None = None
+    forrige: float | None = None
 
 
 @dataclass(frozen=True)
@@ -306,9 +324,27 @@ def bygg_punkter(
     if start is None:
         start = startdag(SEKS_MND, rader[-1].dato)
 
-    return tuple(
-        Punkt(dato=rad.dato, kurs=kurs, ma50=ma) for rad, kurs, ma in zip(rader, kurser, snitt) if rad.dato >= start
-    )
+    volumer = [float(rad.volum) for rad in rader]
+    punkter = []
+    for i, (rad, kurs, ma) in enumerate(zip(rader, kurser, snitt, strict=True)):
+        if rad.dato < start:
+            continue
+        # Story 8.7: tallene sjekk 2 og 3 ville brukt den dagen, med de samme
+        # funksjonene (signalberegning.standardavvik og medianvolum).
+        median = medianvolum(volumer[: i + 1], p) if i >= p.volum_vindu else None
+        avvik = standardavvik(kurser[: i + 1], p) if i >= p.volatilitet_vindu + 1 else None
+        punkter.append(
+            Punkt(
+                dato=rad.dato,
+                kurs=kurs,
+                ma50=ma,
+                volum=rad.volum,
+                median=median,
+                avvik=avvik,
+                forrige=kurser[i - 1] if i else None,
+            )
+        )
+    return tuple(punkter)
 
 
 def boersdag_mellom(fra: date, til: date) -> bool:

@@ -1246,6 +1246,8 @@ def aksjedetalj(symbol: str):
         merket=dagen.dato if dagen else None,
         signal=signal,
         alle=ANTALL_SJEKKER,
+        # Story 8.7: baandet for sjekk 2 og volumet for sjekk 3.
+        volumfaktor=STANDARD.volumfaktor,
     )
     svar = app.make_response(
         render_template(
