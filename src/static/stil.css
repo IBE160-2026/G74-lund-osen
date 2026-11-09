@@ -1231,3 +1231,12 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                            text-underline-offset: 3px; }
 :where(.side-oversikt) .boersdagen p.modell { color: var(--dempet); font-size: 12.5px; margin: 8px 0 0; }
 :where(.side-oversikt) .boersdagen .uten { color: var(--dempet); margin: 0; }
+
+/* Story 8.9 (FR-109): «Vis meg rundt», en knapp som åpner stegene. */
+.rundtur { margin: 0.5rem 0 0.25rem; max-width: 46rem; }
+.rundtur summary { display: inline-block; cursor: pointer; padding: 0.3rem 0.8rem; border: 1px solid currentColor; border-radius: 999px; font-size: 14px; font-weight: 600; }
+.rundtur-steg a { color: inherit; }
+.rundtur-steg { margin: 0.6rem 0 0; padding-left: 1.4rem; font-size: 14px; line-height: 1.5; }
+.rundtur-steg li { margin-bottom: 0.3rem; }
+/* Lukket: lista har ingen boks, så ingenting regnes som synlig tekst (test_hjelpefeltet). */
+.rundtur:not([open]) .rundtur-steg { display: none; }

@@ -332,6 +332,8 @@ class TestRammen:
                     or (re.fullmatch(r"/investorside/[A-Z0-9]+", href) and 'class="eksempeltall"' in html)
                     # Story 3.3i (U51): den ekte versjonen i README-en, bare i demoen.
                     or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
+                    # Story 8.9: stegene i «Vis meg rundt» peker på en id på samme side.
+                    or (href.startswith("#") and f'id="{href[1:]}"' in html)
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
                     or re.fullmatch(
                         r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",

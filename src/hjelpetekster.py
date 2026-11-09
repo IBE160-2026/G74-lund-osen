@@ -679,3 +679,113 @@ class Hjelp:
             return self._tekster[noekkel]
         except KeyError:
             raise KeyError(f"Ingen hjelpetekst med nøkkelen {noekkel!r} i hjelpetekster.py") from None
+
+
+# Story 8.9 (FR-109): «Vis meg rundt», i samme fil som hjelpen (8.0b). Høyst
+# 7 steg per side (endringsforslaget 13.10, punkt 4.1). Hvert steg peker på
+# en id siden har, og tallene kommer fra Parametre. Stegene om signalstyrken,
+# retningen og sjekkene bruker tekstene fra hjelpen over.
+MAKS_STEG = 7
+
+
+@dataclass(frozen=True)
+class Steg:
+    """Ett steg i «Vis meg rundt»: id-en på siden det peker på, et navn og
+    en tekst."""
+
+    anker: str
+    tittel: str
+    tekst: str
+
+
+def _fra_hjelpen(tekst: Hjelpetekst) -> str:
+    return f"{tekst.tittel} {tekst.tekst}".strip() if tekst.tittel and not tekst.tittel.endswith(":") else tekst.tekst
+
+
+def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
+    """Stegene for hver side, med tallene fra p. Nøkkelen er siden, som
+    malene gir til makroen i _rundtur.html."""
+    h = hjelpetekster(p)
+    ma = _vis(p.ma_vindu, "heltall")
+    volatilitet = _vis(p.volatilitet_vindu, "heltall")
+    volum = _vis(p.volum_vindu, "heltall")
+    faktor = _vis(p.volumfaktor, "faktor")
+    terskel = _vis(p.terskel, "heltall")
+    styrke = Steg("aksjene", "Signalstyrken", _fra_hjelpen(h["signalstyrke"]))
+    retning = Steg("aksjene", "Retningen", _fra_hjelpen(h["retning"]))
+    sider = {
+        "oversikt": (
+            Steg(
+                "velg-dag", "Dagen og perioden", "Knappene og datoen velger hvilken dag eller periode tabellen viser."
+            ),
+            Steg(
+                "hovedindeks-tittel",
+                "Hovedindeksen",
+                "Søylene viser endringen for hver aksje, og den stiplede linja hovedindeksen.",
+            ),
+            Steg(
+                "aksjene",
+                "Tabellen",
+                f"Aksjene med signalstyrke {terskel} eller mer står øverst, under «Skilte seg ut».",
+            ),
+            styrke,
+            retning,
+            Steg("slik-leser", "Slik leser du tabellen", "Fargene, strekene og merkene forklart."),
+        ),
+        "min_liste": (
+            Steg(
+                "aksjene",
+                "Aksjene dine",
+                "Aksjene du har merket med stjernen ☆, med de samme kolonnene som i oversikten.",
+            ),
+            styrke,
+            retning,
+        ),
+        "boersometer": (
+            Steg("velg-dag", "Dagen og perioden", "Knappene og datoen velger hvilken dag eller periode rutene viser."),
+            Steg(
+                "maal-tittel", "Mål mot børsen", "Endringen i hovedindeksen, og hvor mange av aksjene som gikk bedre."
+            ),
+            Steg("slik-leser", "Slik leser du børsometeret", "Fargene, rammene og størrelsen på rutene forklart."),
+            Steg(
+                "bransje-1", "Bransjene", "Én rute per aksje, samlet etter bransje. Klikk på en rute for å se aksjen."
+            ),
+        ),
+        "aksje": (
+            Steg(
+                "noekkeltallene",
+                "Nøkkeltallene",
+                "Sluttkursen, endringen, signalstyrken og retningen for dagen siden viser.",
+            ),
+            Steg("sjekkene", "Sjekkene", _fra_hjelpen(h["sjekkene"])),
+            Steg(
+                "sjekkene",
+                "Tallene bak",
+                f"Sjekk 1 måler kursen mot {ma}-dagers snitt, sjekk 2 endringen mot standardavviket for "
+                f"{volatilitet} dager, og sjekk 3 volumet mot {faktor} × medianen for {volum} dager.",
+            ),
+            Steg("kursgrafen", "Kursgrafen", f"Kursen justert for utbytte, {ma}-dagers snitt og hovedindeksen."),
+            Steg(
+                "signalet-dag-for-dag",
+                "Signalet dag for dag",
+                "Det appen skrev om aksjen hver børsdag, en måned om gangen.",
+            ),
+        ),
+        "innstillinger": (
+            Steg("innstillinger-tittel", "Innstillinger", "Valgene her gjelder alle sidene og huskes på maskinen."),
+            Steg("hjelp-valget", "Hjelp", "Slår spørsmålstegnene ved overskriftene av og på."),
+            Steg("ki-valget", "KI-tekst", "Slår tekstene skrevet av KI av og på."),
+        ),
+        "folg": (
+            Steg(
+                "folg-tittel", "Følg en aksje", "Her velger du en aksje fra Oslo Børs som appen skal hente og vurdere."
+            ),
+            Steg("q", "Søk", "Skriv navnet eller symbolet for å finne aksjen."),
+        ),
+    }
+    # Aksjesiden uten sjekker (signalet kunne ikke regnes, eller dagen er
+    # ikke vurdert): stegene om sjekkene forklarer noe siden ikke viser.
+    sider["aksje_uten_sjekker"] = tuple(s for s in sider["aksje"] if s.anker != "sjekkene")
+    for side, steg in sider.items():
+        assert len(steg) <= MAKS_STEG, side
+    return sider
