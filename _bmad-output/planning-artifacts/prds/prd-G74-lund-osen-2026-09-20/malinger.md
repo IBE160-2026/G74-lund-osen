@@ -2,10 +2,12 @@
 title: "Målinger — grunnlaget for PRD-en"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-07T12:10
+updated: 2026-11-09T00:04
 ---
 
 # Målinger — grunnlaget for PRD-en
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Alle tall PRD-en bygger på, med metode og dato, slik at de kan etterprøves eller
 kjøres på nytt. PRD-en beholder konklusjonene; detaljene ligger her.
@@ -6156,3 +6158,24 @@ riktig felt. sha256 for `ose.db` var den samme før og etter (`cf1aace4…7228`)
 Demotekstene ble laget på nytt kl. 11:52 med det samme avtrykket: 13 av 13
 besto, men 6 av 13 deler mønstrene i to setninger (VG4, et spørsmål til
 gruppen i spesifikasjonen 10.9).
+
+## 57. Prøvekjøringen av prompten for dagen, `dag-1`, for 26.10–06.11 (2026-11-08)
+
+**Metode.** Story 10.6 (spesifikasjonen `spec-10-6-ki-teksten-om-dagen-paa-forsiden.md`, gruppens svar 08.11 kl. 11:57): teksten om hele børsdagen på forsiden, med en egen prompt, versjonen `dag-1`. Grunnlaget er antallet aksjer i lista, ukedagen, retningen på hovedindeksen, hvor mange som gikk bedre enn indeksen, hvor mange som skilte seg ut og retningene blant dem, og hvor mange som steg i hver bransje med minst to aksjer med endring (`dagsgrunnlag.py`). Kontrollen (`kontroller_dagen` i `ki_dagen.py`) leser tallene bare i formene, ved feltet sitt.
+
+Kjørt fra et skript utenfor repoet, med koden i worktreen for grenen: `data/db/ose.db` ble åpnet med `mode=ro`, og ingenting ble skrevet. Dagene er de 10 siste med vurderinger i basen, 26.10–06.11. Grunnlaget ble regnet som på forsiden, av aksjene i basen, vurderingene, kursene og hovedindeksen. Hvert grunnlag gikk gjennom `lag_dagsrad` med Gemma i Ollama og så gjennom `bygg_dagsvisning` (samsvaret i FR-607 og vakta). Tekstene står bare i scratchpad (regel 16). Ingen kall til EODHD utover kvotesjekken kl. 14:05. sha256 for `data/db/ose.db` var den samme før og etter (`795f4b39…3c6f`).
+
+| | §57, `dag-1` |
+|---|---:|
+| Kjørt | 14:28:52–14:29:01 |
+| Børsdager | 10 |
+| Besto kontrollen | 10 |
+| Stoppet av kontrollen | 0 |
+| Modellen feilet | 0 |
+| Ville blitt vist (samsvar og vakta) | 10 |
+| Median tid per tekst | 0,72 s |
+| Lengste kall | 1,89 s (kall nr. 1) |
+
+`maskinvare` `gpu` for alle 10, `gemma4:e4b` med `modell_id` `dc35e8d9c606`, og Ollama 0.35.1. Alle 10 tekstene har fem setninger. Klassene for tekstene er ikke satt; det er ikke gjort i denne prøven. Demoteksten ble laget kl. 14:28 med samme prompt og besto (13,5 s, første kall etter at Ollama startet).
+
+*Lagt til 2026-11-08 (gjennomgangen av 10.6, VG8):* raden «Ville blitt vist» over sammenlignet grunnlaget med seg selv, fordi skriptet regnet det én gang og ga det både til `lag_dagsrad` og `bygg_dagsvisning`. Den måler bare at teksten besto og at vakta ikke stoppet den, ikke at grunnlaget stemmer med det siden regner. Skriptet lå utenfor repoet. Etter gjennomgangen kan resten av teksten bare være bindeord og tegnsetting når formene er tatt ut. De 10 tekstene ble kontrollert på nytt med den kontrollen, med grunnlaget regnet på nytt fra `ose.db` med `mode=ro`, uten nye kall til modellen: 10 av 10 besto, og sha256 for basen var den samme før og etter.

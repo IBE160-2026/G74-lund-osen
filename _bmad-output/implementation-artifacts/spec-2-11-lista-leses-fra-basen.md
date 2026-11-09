@@ -2,7 +2,7 @@
 title: 'Story 2.11: Lista leses fra basen'
 type: 'feature'
 created: '2026-11-08'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '907393d6'
 context:
@@ -117,3 +117,7 @@ På `4594dfa2` sju (A, A2, B, B2, C, C2 og D), alle fanget. På `db9e4ab9`, ette
 ## Bygget og ikke flettet
 
 Grenen `2-11-lista-leses-fra-basen` er ikke flettet. Gruppen går gjennom spørsmålene over før flettingen, og 6 og 7 er middels funn som står åpne (regel 25). 2.12 bygger på grenen.
+
+*Svar 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–7 er godtatt, og rådet anbefalte alt. ECH6 (spørsmål 6, middels) lukkes som avgjort av gruppen: en aksje som kommer inn igjen, får `ut` nullstilt, og en egen tabell med periodene venter til det trengs. BH3, ECH3 og VG3 (spørsmål 7, middels) lukkes som avgjort av gruppen: hentingen går videre med de 15 når basen ikke kan leses, som før 2.11 (AD-6). Graden på funnene er ikke endret (regel 25). Med det står ingen funn på middels eller over åpne. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
+
+*Lagt til 2026-11-08:* 2.11 er flettet med PR #123 i `ac8147a0` kl. 23:50, låst til head-en `9594043a`, etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`. Oppgaven «OSE Signal kveldshenting» sto som «Klar» kl. 23:50:06. Før flettingen ble main (med 10.6) flettet inn i grenen i `9594043a`, med konfliktene i `sprint-status.yaml` og avtrykkene i `tests/test_docker.py` løst og alle sju bildene tatt på nytt, byte for byte de samme. Hele settet alene på grenen 21:54:47–22:08:40: 4683 bestått, 24 hoppet over og 0 feilet. CI var grønn på head-en (run 42524716038, 4676 bestått og 31 hoppet over i `pytest`). Treet på main etter `git pull --ff-only` er likt treet på `9594043a`. Ingen funn på middels eller over sto åpne etter svaret kl. 21:35.

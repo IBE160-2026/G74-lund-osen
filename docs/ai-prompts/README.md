@@ -1,5 +1,7 @@
 # AI-prompts – IBE160
 
+*Lagt til 2026-11-09 (gruppens svar 08.11 kl. 22:14):* instruksjonene i dagsfilene står ordrett, også der en avgjørelse står som én persons, som «Marians beslutning». Avgjørelsene var gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post, var personens.
+
 Denne mappen brukes til å lagre viktige KI-prompts og arbeidsøkter som senere kan brukes som dokumentasjon i refleksjonsrapporten.
 
 ## Hva bør lagres?

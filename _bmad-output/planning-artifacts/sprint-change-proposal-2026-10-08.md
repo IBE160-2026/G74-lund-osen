@@ -2,10 +2,12 @@
 title: "Endringsforslag 08.10: femten idéer inn i v1"
 status: final
 created: 2026-10-08
-updated: 2026-10-08T21:56
+updated: 2026-11-09T00:04
 ---
 
 # Endringsforslag 08.10: femten idéer inn i v1
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Laget med `bmad-correct-course` i modusen Batch, etter instruksjonen kl. 07:32 i
 `docs/ai-prompts/2026-10-08.md`. Bygd opp som

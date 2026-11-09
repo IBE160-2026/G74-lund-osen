@@ -1,5 +1,7 @@
 # Refleksjonslogg – IBE160 Programmering med KI
 
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
+
 Denne loggen føres kort underveis for å dokumentere arbeidsprosess, valg, KI-bruk, utfordringer og læring. Viktige KI-prompts lagres separat i `docs/ai-prompts/`.
 
 *Lagt til 2026-10-22 (gruppens svar kl. 20:25):* fra oppføringen for 22.10 har hver utfordring «Problem», «Løsning» og «KI sin rolle», slik refleksjonsmalen fra faglærer spør. Malen ligger ikke i repoet.

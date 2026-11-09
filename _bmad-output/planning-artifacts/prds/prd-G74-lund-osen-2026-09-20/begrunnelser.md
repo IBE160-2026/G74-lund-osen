@@ -2,10 +2,12 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-10-03T14:47
+updated: 2026-11-09T00:04
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 `prd.md` er et kravregister: hva løsningen skal gjøre. Dette dokumentet bærer
 resonnementet: hvorfor grensene går der de går, hvilke alternativer som ble
