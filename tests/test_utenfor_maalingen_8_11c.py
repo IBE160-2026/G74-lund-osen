@@ -197,3 +197,27 @@ class TestTeksten:
         assert "regnet av kursene til 22.10.2026." in valg.utenfor_tekst(5e6, dag, kursene=True)
         assert "målt 22.10.2026." in valg.utenfor_tekst(5e6, dag)
         assert valg.utenfor_tekst(None, dag, kursene=True).startswith("Omsetningen er ikke målt ennå.")
+
+
+class TestEnGangPerSide:
+    def test_listene_og_medianene_regnes_en_gang_per_side(self, egen, monkeypatch):
+        """Gjennomgangen (BH4, ECH2): ville feilet hvis oversikten regnet
+        medianene og de ferdige listene flere ganger per side, fordi _egne()
+        kjøres både i ruta og i context processoren."""
+        kall = []
+        ekte = ferdige_lister._aksjene_i_lista
+
+        def tell(t):
+            kall.append(1)
+            return ekte(t)
+
+        monkeypatch.setattr(ferdige_lister, "_aksjene_i_lista", tell)
+        _side()
+        assert len(kall) == 2, kall
+
+
+def test_teksten_med_tusenskille():
+    """Gjennomgangen (BH5): ville feilet hvis teksten bak merket regnet tallet
+    selv, uten tusenskille, i stedet for med tall() (regel 21)."""
+    tekst = valg.utenfor_tekst(1_234_560_000, date(2026, 10, 22), kursene=True)
+    assert "er 1\u00a0234,6 MNOK, regnet av kursene til 22.10.2026." in tekst
