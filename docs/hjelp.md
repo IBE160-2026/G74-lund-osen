@@ -205,7 +205,7 @@ Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en f
 
 ### Hva er «Vis meg rundt»?
 
-Øverst på oversikten, Min liste, børsometeret, aksjesiden, Innstillinger og «Følg en aksje» står knappen «Vis meg rundt». Den åpner en kort liste, høyst sju steg, over delene av siden, og hvert steg er en lenke som går til delen det forklarer. Stegene om signalstyrken, retningen og sjekkene er de samme tekstene som bak «?», og tallene i stegene er de som gjelder i appen. På aksjesiden for en dag uten vurdering står ikke stegene om sjekkene, fordi siden ikke viser dem. Oversikten, Min liste og børsometeret har knappen når de har aksjer å vise. Knappen følger «Vis hjelp» i Innstillinger: med hjelpen av står den ikke. Det gjelder både demoen og den ekte versjonen.
+Øverst på oversikten, Min liste, børsometeret, aksjesiden, Innstillinger og «Følg en aksje» står knappen «Vis meg rundt». Den åpner en kort liste, høyst sju steg, over delene av siden, og hvert steg er en lenke som går til delen det forklarer. Stegene om signalstyrken, retningen og sjekkene er tekstene fra tavla 12.10, og tallene i stegene er de som gjelder i appen. På aksjesiden for en dag uten vurdering står ikke stegene om sjekkene, fordi siden ikke viser dem. Oversikten og børsometeret har knappen når de har aksjer å vise, og Min liste når du har merket en aksje. «Følg en aksje» har den på søket, ikke når lista er full eller en aksje er valgt. Knappen følger «Vis hjelp» i Innstillinger: med hjelpen av står den ikke. Det gjelder både demoen og den ekte versjonen.
 
 ### Hva er «Innstillinger»?
 

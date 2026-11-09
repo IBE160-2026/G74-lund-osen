@@ -7,7 +7,8 @@
 {% block tittel %}{% if gammel %}Bytt ut {{ gammel.navn }}{% else %}Følg en aksje{% endif %} — OSE Signal{% endblock %}
 {% block side %}side-oversikt{% endblock %}
 {#- Story 8.9: «Vis meg rundt», på søket. #}
-{% block rundtur %}{% if not gammel and not valgt %}{{ rundtur("folg") }}{% endif %}{% endblock %}
+{#- Gjennomgangen (ECH1): bare når søket står, ikke når lista er full. #}
+{% block rundtur %}{% if not gammel and not valgt and not (egne and egne.full) %}{{ rundtur("folg") }}{% endif %}{% endblock %}
 {% block innhold %}
 <section class="folg" aria-labelledby="folg-tittel">
   {% if gammel %}

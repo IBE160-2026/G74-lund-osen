@@ -687,6 +687,18 @@ class Hjelp:
 # retningen og sjekkene bruker tekstene fra hjelpen over.
 MAKS_STEG = 7
 
+# Gjennomgangen av 8.9 (ECH5): stegene om retningen, styrken og sjekkene
+# bruker tekstene fra tavla, ordrett fra «Kan tas som de står» i punkt 4.2 i
+# endringsforslaget 13.10. Retningen uten den andre setningen, «Ikke et råd om
+# å kjøpe eller selge.», som etter merknaden der ikke kan bli en vanlig
+# hjelpetekst (RAADSORD).
+ENDRINGSFORSLAGET_13_10 = "_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-13.md"
+TAVLA_RETNING = "Om sjekkene som slo ut, ga +1 eller -1."
+TAVLA_STYRKEN = "Styrken er hvor mange sjekker som slo ut. Ga noen +1 og noen -1, er retningen Blandet."
+TAVLA_SJEKKENE = (
+    "Hver sjekk gir +1, 0 eller -1. Signalstyrken er hvor mange som slo ut. Ingen vekting og ingen skjult formel."
+)
+
 
 @dataclass(frozen=True)
 class Steg:
@@ -698,21 +710,16 @@ class Steg:
     tekst: str
 
 
-def _fra_hjelpen(tekst: Hjelpetekst) -> str:
-    return f"{tekst.tittel} {tekst.tekst}".strip() if tekst.tittel and not tekst.tittel.endswith(":") else tekst.tekst
-
-
 def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
     """Stegene for hver side, med tallene fra p. Nøkkelen er siden, som
     malene gir til makroen i _rundtur.html."""
-    h = hjelpetekster(p)
     ma = _vis(p.ma_vindu, "heltall")
     volatilitet = _vis(p.volatilitet_vindu, "heltall")
     volum = _vis(p.volum_vindu, "heltall")
     faktor = _vis(p.volumfaktor, "faktor")
     terskel = _vis(p.terskel, "heltall")
-    styrke = Steg("aksjene", "Signalstyrken", _fra_hjelpen(h["signalstyrke"]))
-    retning = Steg("aksjene", "Retningen", _fra_hjelpen(h["retning"]))
+    styrke = Steg("aksjene", "Signalstyrken", TAVLA_STYRKEN)
+    retning = Steg("aksjene", "Retningen", TAVLA_RETNING)
     sider = {
         "oversikt": (
             Steg(
@@ -726,7 +733,8 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
             Steg(
                 "aksjene",
                 "Tabellen",
-                f"Aksjene med signalstyrke {terskel} eller mer står øverst, under «Skilte seg ut».",
+                f"Aksjene, med kursen, endringen og signalet. For siste børsdag og uten sortering står de med "
+                f"signalstyrke {terskel} eller mer øverst, under «Skilte seg ut».",
             ),
             styrke,
             retning,
@@ -736,7 +744,7 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
             Steg(
                 "aksjene",
                 "Aksjene dine",
-                "Aksjene du har merket med stjernen ☆, med de samme kolonnene som i oversikten.",
+                "Aksjene du har merket med stjernen ☆, eller alle med «Alle», med de samme kolonnene som i oversikten.",
             ),
             styrke,
             retning,
@@ -757,14 +765,18 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
                 "Nøkkeltallene",
                 "Sluttkursen, endringen, signalstyrken og retningen for dagen siden viser.",
             ),
-            Steg("sjekkene", "Sjekkene", _fra_hjelpen(h["sjekkene"])),
+            Steg("sjekkene", "Sjekkene", TAVLA_SJEKKENE),
             Steg(
                 "sjekkene",
                 "Tallene bak",
                 f"Sjekk 1 måler kursen mot {ma}-dagers snitt, sjekk 2 endringen mot standardavviket for "
                 f"{volatilitet} dager, og sjekk 3 volumet mot {faktor} × medianen for {volum} dager.",
             ),
-            Steg("kursgrafen", "Kursgrafen", f"Kursen justert for utbytte, {ma}-dagers snitt og hovedindeksen."),
+            Steg(
+                "kursgrafen",
+                "Kursgrafen",
+                f"Kursen justert for utbytte, med {ma}-dagers snitt og hovedindeksen når serien og indeksen har dem.",
+            ),
             Steg(
                 "signalet-dag-for-dag",
                 "Signalet dag for dag",

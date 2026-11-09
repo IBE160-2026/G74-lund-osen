@@ -71,7 +71,8 @@ class TestHverSide:
         ankrene = re.findall(r'<a href="#([^"]+)">', rundtur)
         assert ankrene == [s.anker for s in ht.rundturer()[side]]
         for anker in ankrene:
-            assert f'id="{anker}"' in html, (side, anker)
+            # Gjennomgangen (BH3): en hel id, ikke data-id, og bare én.
+            assert len(re.findall(rf'(?<![\w-])id="{re.escape(anker)}"', html)) == 1, (side, anker)
 
     def test_borte_naar_hjelpen_er_av(self, klient):
         """Ville feilet hvis «Vis meg rundt» sto når «Vis hjelp» er slått av
@@ -80,6 +81,20 @@ class TestHverSide:
         assert svar.status_code in (302, 303)
         for adresse in SIDENE.values():
             assert 'class="rundtur"' not in klient.get(adresse).data.decode("utf-8"), adresse
+
+    def test_ikke_der_stegene_ikke_passer(self, klient, monkeypatch):
+        """Gjennomgangen (ECH1, ECH4, VG1): ville feilet hvis knappen sto på
+        «Følg en aksje» når lista er full eller en aksje skal byttes, så
+        «Søk» pekte på et søkefelt som ikke finnes, eller i Min liste uten
+        merkede aksjer."""
+        import valg
+
+        assert 'class="rundtur"' not in klient.get("/folg?bytt=EQNR").data.decode("utf-8")
+        monkeypatch.setattr(valg, "TAK", 0)
+        full = klient.get("/folg").data.decode("utf-8")
+        assert 'id="q"' not in full and 'class="rundtur"' not in full
+        klient.post("/min-liste/merk", data={"symbol": "EQNR", "til": "fjern", "tilbake": "/"})
+        assert 'class="rundtur"' not in klient.get("/min-liste").data.decode("utf-8")
 
     def test_alle_sidene_har_steg(self):
         """Ville feilet hvis en side i lista ikke hadde steg i hjelpetekster.py."""
@@ -95,7 +110,7 @@ class TestHverSide:
         assert ankrene == [s.anker for s in ht.rundturer()["aksje_uten_sjekker"]]
         assert "sjekkene" not in ankrene
         for anker in ankrene:
-            assert f'id="{anker}"' in html, anker
+            assert len(re.findall(rf'(?<![\w-])id="{re.escape(anker)}"', html)) == 1, anker
 
 
 class TestTekstene:
@@ -107,7 +122,7 @@ class TestTekstene:
     def test_tallene_kommer_fra_parametre(self):
         """Ville feilet hvis et tall i stegene var skrevet inn for hånd og ikke
         hentet fra Parametre."""
-        endret = replace(STANDARD, ma_vindu=37, volatilitet_vindu=23, volum_vindu=17, terskel=3)
+        endret = replace(STANDARD, ma_vindu=37, volatilitet_vindu=23, volum_vindu=17, terskel=3, volumfaktor=2.5)
         tekst = " ".join(s.tekst for steg in ht.rundturer(endret).values() for s in steg)
         for tall in ("37-dagers", "23 dager", "17 dager", "signalstyrke 3 eller mer"):
             assert tall in tekst, tall
@@ -117,15 +132,20 @@ class TestTekstene:
         aksje = {s.tittel: s.tekst for s in ht.rundturer(endret)["aksje"]}
         assert "37-dagers" in aksje["Tallene bak"] and "37-dagers" in aksje["Kursgrafen"]
         assert "23 dager" in aksje["Tallene bak"] and "17 dager" in aksje["Tallene bak"]
+        # Gjennomgangen (VG2, BH8): også volumfaktoren.
+        assert "2,5 ×" in aksje["Tallene bak"] and "1,5 ×" not in aksje["Tallene bak"]
 
-    def test_samme_tekster_som_hjelpen(self):
-        """Ville feilet hvis stegene om signalstyrken, retningen og sjekkene
-        hadde egne tekster og ikke tekstene fra hjelpen (8.0b)."""
-        h = ht.hjelpetekster()
+    def test_tekstene_fra_tavla(self):
+        """Gjennomgangen (ECH5): ville feilet hvis stegene om signalstyrken,
+        retningen og sjekkene ikke var tekstene fra tavla, ordrett fra punkt
+        4.2 i endringsforslaget 13.10 (tillegget i epics.md 13.10)."""
+        from pathlib import Path
+
+        forslaget = (Path(__file__).resolve().parent.parent / ht.ENDRINGSFORSLAGET_13_10).read_text(encoding="utf-8")
         alle = {s.tittel: s.tekst for steg in ht.rundturer().values() for s in steg}
-        assert h["signalstyrke"].tekst in alle["Signalstyrken"]
-        assert alle["Retningen"] == h["retning"].tekst
-        assert h["sjekkene"].tekst in alle["Sjekkene"]
+        assert alle["Signalstyrken"] == ht.TAVLA_STYRKEN and f"«{ht.TAVLA_STYRKEN}»" in forslaget
+        assert alle["Retningen"] == ht.TAVLA_RETNING and f"Retning: «{ht.TAVLA_RETNING} " in forslaget
+        assert alle["Sjekkene"] == ht.TAVLA_SJEKKENE and f"«{ht.TAVLA_SJEKKENE}»" in forslaget
 
     def test_ingen_ki_og_ingen_nett(self):
         """Ville feilet hvis hjelpetekster.py, der stegene står, importerte
