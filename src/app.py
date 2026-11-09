@@ -37,6 +37,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
+import ferdige_lister
 import innstillinger
 import lagring_sqlite
 import valg
@@ -289,13 +290,15 @@ _RUTER_MED_BASE = {
     "folg",
     "fjern_egen",
     "angre",
+    # Story 8.11: en ferdig liste.
+    "bruk_ferdig_liste",
 }
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
-_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "lagre_innstilling", "ki_bryter"))
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -1012,6 +1015,21 @@ def _tabellsiden(aktiv: str):
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
         if sortert is not None:
             sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
+    # Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
+    # lista som vises, og etter at radene er delt eller sortert, så
+    # rekkefølgen fortsatt er FR-102. Bare 3 av 3 i retningen som er valgt.
+    signalfilter = _signalfilteret()
+    # Gjennomgangen (ECH1, ECH2, ECH3): overskriften, innledningen og om
+    # tabellen vises, regnes av lista før filteret, så filteret bare skjuler
+    # rader og aldri endrer det siden sier.
+    overskrift_ut = skilte_seg_ut
+    foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
+    if signalfilter is not None:
+        skilte_seg_ut = [rad for rad in skilte_seg_ut if _passer(rad, signalfilter)]
+        oevrige = [rad for rad in oevrige if _passer(rad, signalfilter)]
+        mangler = []
+        if sortert is not None:
+            sortert = [rad for rad in sortert if _passer(rad, signalfilter)]
     hovedindeks, indeks_feilet = (
         (None, False)
         if i_lista
@@ -1071,10 +1089,45 @@ def _tabellsiden(aktiv: str):
         # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
         # Min liste, og merket «Egen» i tabellen.
         egne=_egne(),
+        # Story 8.11: filteret på signalet, og lenkene til det.
+        signalfilter=signalfilter,
+        filterlenker=_filterlenkene(signalfilter),
+        overskrift_ut=overskrift_ut,
+        foer_filter=foer_filter,
+        filter_tomt=signalfilter is not None and not (skilte_seg_ut or oevrige or sortert),
         # Story 10.6: «Børsdagen kort fortalt», bare paa oversikten.
         boersdagen=None if i_lista else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd),
         **felles,
     )
+
+
+# Story 8.11: filteret på signalet (FR-412, tillegget).
+SIGNALFILTER = {"positiv": "Positiv", "negativ": "Negativ"}
+
+
+def _signalfilteret() -> str | None:
+    """Retningen i ?signal=, eller None. En verdi som ikke er en av de to,
+    gir ingen filtrering."""
+    verdi = request.args.get("signal")
+    return verdi if verdi in SIGNALFILTER else None
+
+
+def _passer(rad, signalfilter: str) -> bool:
+    vurdering = rad.vurdering
+    return (
+        vurdering is not None and vurdering.styrke == ANTALL_SJEKKER and vurdering.retning == SIGNALFILTER[signalfilter]
+    )
+
+
+def _filterlenkene(signalfilter: str | None) -> list[tuple[str, str, bool]]:
+    """(teksten, adressen, aktiv) for «Alle», «3 av 3 positiv» og «3 av 3
+    negativ», med resten av adressen som den er."""
+    ledd = [(k, v) for k, v in request.args.items(multi=True) if k != "signal"]
+    lenker = []
+    for verdi, tekst in ((None, "Alle"), ("positiv", "3 av 3 positiv"), ("negativ", "3 av 3 negativ")):
+        deler = ledd + ([("signal", verdi)] if verdi else [])
+        lenker.append((tekst, request.path + ("?" + urlencode(deler) if deler else ""), verdi == signalfilter))
+    return lenker
 
 
 def sidens_siste(rader: list) -> date | None:
@@ -1682,7 +1735,13 @@ def _egne() -> dict | None:
                 median, maalt = lager.omsetning(rad["symbol"])
                 utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt)
         egne_i_lista = len(egne)
+        # Story 8.11: de ferdige listene, med merket for omsetningen.
+        ferdige = ferdige_lister.lister(g.tilkobling)
         return {
+            "ferdige": ferdige,
+            "ferdige_utenfor": frozenset(
+                a.symbol for liste in ferdige.values() for a in liste if valg.utenfor_maalingen(a.median)
+            ),
             "rader": rader,
             "symboler": frozenset(r["symbol"] for r in rader if r["status"] != "venter"),
             "utenfor": frozenset(r["symbol"] for r in rader if r["utenfor"]),
@@ -1798,6 +1857,24 @@ def folg():
             deler["bytt"] = bytt
         return redirect("/folg?" + urlencode(deler), code=303)
     return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
+
+
+@app.post("/ferdig-liste")
+def bruk_ferdig_liste():
+    """Story 8.11 (FR-108): en ferdig liste blir lista ved neste henting.
+    Bare oenske skrives (AD-3), og ingenting hentes (AD-10)."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    lista = ferdige_lister.lister(g.tilkobling).get(request.form.get("bransje", ""))
+    if not lista:
+        abort(400)
+    try:
+        lager.bruk_liste([(a.symbol, request.form["bransje"]) for a in lista])
+    except (valg.UgyldigValg, valg.ListaErFull):
+        abort(400)
+    return redirect(VALG_TILBAKE["min_liste"], code=303)
 
 
 @app.post("/fjern")
