@@ -95,6 +95,24 @@ class TestGrafen:
             assert xm == xg
             assert (bunn - yg) == pytest.approx(STANDARD.volumfaktor * (bunn - ym), abs=0.15)
 
+    def test_baandet_er_forrige_kurs_pluss_og_minus_avviket(self):
+        """Ville feilet hvis båndet ikke var forrige dags justerte kurs pluss
+        og minus standardavviket fra sjekk 2, for den siste dagen."""
+        from graf import _y
+
+        punkter = bygg_punkter(_serie())
+        g = bygg_graf(punkter, volumfaktor=STANDARD.volumfaktor)
+        hjoerner = [tuple(map(float, h.split(","))) for h in g.baand.split()]
+        halv = len(hjoerner) // 2
+        over_siste, under_siste = hjoerner[halv - 1], hjoerner[halv]
+        siste = punkter[-1]
+        for (_, y), verdi in (
+            (over_siste, siste.forrige * (1 + siste.avvik)),
+            (under_siste, siste.forrige * (1 - siste.avvik)),
+        ):
+            ventet = _y(min(max(verdi, g.lav), g.hoy), g.lav, g.hoy, g.hoyde, g.bunnfelt)
+            assert y == pytest.approx(ventet, abs=0.06)
+
     def test_uten_volumfaktor_som_foer(self):
         """Ville feilet hvis en graf uten volumfaktoren fikk feltet for
         volumet, som de andre kallene av bygg_graf ikke ber om."""
@@ -145,6 +163,7 @@ class TestAksjesiden:
             svg = side.split(klasse, 1)[1].split("</svg>", 1)[0]
             assert 'class="volumsoeyle"' in svg and 'class="baand"' in svg and 'class="medianstrek"' in svg
         tekst = side.split('class="sjekkene-i-grafen">', 1)[1].split("</span>", 1)[0]
+        assert "Det lyse båndet er sjekk 2" in tekst and "Søylene under grafen er volumet" in tekst
         assert f"de {STANDARD.volatilitet_vindu} børsdagene før" in tekst
         assert f"medianvolumet de {STANDARD.volum_vindu} børsdagene før" in tekst
         assert "1,5 × medianen" in tekst
