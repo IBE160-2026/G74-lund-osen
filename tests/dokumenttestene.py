@@ -1,13 +1,16 @@
 """Dokumenttestene: testene som leser README-en, docs/ eller _bmad-output/.
 
-Ekstravinduet 09.11 (spec-dokumenttestene.md). Kjøres med
+Story 9.9, ekstravinduet 09.11 (spec-9-9-dokumenttestene.md). Kjøres med
 
     uv run pytest --dokumentene
 
 Modulene finnes uten å endre testfilene. En testmodul er med når en
-strengkonstant i koden peker på README-en, docs/ eller _bmad-output/, eller
-når den importerer en hjelpemodul i tests/ som gjør det (som dokumentene.py).
-Docstrings og kommentarer teller ikke, fordi de bare nevner dokumentene.
+strengkonstant i koden er en sti til README.md, docs/ eller _bmad-output/,
+eller når den importerer en hjelpemodul i tests/ som gjør det (som
+dokumentene.py). Docstrings, kommentarer, f-strenger og meldingene i assert
+teller ikke, fordi de bare nevner dokumentene (gjennomgangen, BH1). En modul
+som leser dokumentene på en måte koden ikke viser, som gjennom src/ eller en
+fixture i conftest.py, føres i TILLEGG (BH2, BH3).
 
 Under hver kjøring noterer conftest.py hvilke dokumenter hver testmodul
 åpner. test_dokumenttestene.py kjøres sist og feiler hvis en modul som åpnet
@@ -42,18 +45,35 @@ def er_dokument(sti) -> bool:
     return full == _README or full.startswith(_MAPPENE)
 
 
+# Moduler som leser dokumentene uten at det står i koden deres (BH2, BH3).
+# Tom 09.11: hele settet fant ingen.
+TILLEGG: frozenset[str] = frozenset()
+
+
 def _peker_paa_dokumentene(tekst: str) -> bool:
     t = tekst.replace("\\", "/")
-    return "README" in t or "_bmad-output" in t or t == "docs" or t.startswith("docs/") or "/docs/" in t
+    return (
+        "README.md" in t
+        or t in ("docs", "_bmad-output")
+        or t.startswith(("docs/", "_bmad-output/"))
+        or "/docs/" in t
+        or "/_bmad-output" in t
+    )
 
 
 def _docstringene(tre: ast.AST) -> set[int]:
-    """id-ene til strengene som står alene som en setning (docstrings)."""
-    return {
-        id(node.value)
-        for node in ast.walk(tre)
-        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str)
-    }
+    """id-ene til strengene som ikke er stier: de som står alene som en
+    setning (docstrings), delene av en f-streng og meldingen i en assert
+    (gjennomgangen, BH1)."""
+    ut = set()
+    for node in ast.walk(tre):
+        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+            ut.add(id(node.value))
+        elif isinstance(node, ast.JoinedStr):
+            ut.update(id(del_) for del_ in node.values)
+        elif isinstance(node, ast.Assert) and node.msg is not None:
+            ut.update(id(del_) for del_ in ast.walk(node.msg))
+    return ut
 
 
 def _importene(tre: ast.AST) -> set[str]:
@@ -90,4 +110,10 @@ def modulene(mappe: Path = TESTMAPPA) -> frozenset[str]:
             if sti.stem not in leser and _importene(tre) & hjelperne & leser:
                 leser.add(sti.stem)
                 endret = True
-    return frozenset(f"{stem}.py" for stem in leser if stem.startswith("test_"))
+    return frozenset(f"{stem}.py" for stem in leser if stem.startswith("test_")) | TILLEGG
+
+
+def utenfor(aapnet: dict[str, set[str]], med: frozenset[str]) -> dict[str, list[str]]:
+    """Modulene som åpnet et dokument uten å være med, med opptil tre av
+    dokumentene. Vakten i test_dokumenttestene.py feiler når den ikke er tom."""
+    return {modul: sorted(filer)[:3] for modul, filer in aapnet.items() if modul not in med}

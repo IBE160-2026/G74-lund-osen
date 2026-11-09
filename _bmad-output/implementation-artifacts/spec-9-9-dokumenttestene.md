@@ -45,3 +45,30 @@ Audit-hooken og testen som kjøres sist.
 ## Grenser
 
 Ingen testfil endres, utenom `tests/conftest.py`. Ingen API-kall, `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke.
+
+## Bygget 09.11 (ekstravinduet)
+
+Bygget på grenen `dokumenttestene`, i worktreen `G74-lund-osen-dokumenttestene`, fra `78a45186`.
+
+- **Filene.** `tests/dokumenttestene.py` (ny: `modulene()`, `er_dokument()`, `utenfor()` og `TILLEGG`), `tests/conftest.py` (valget `--dokumentene`, audit-hooken og flyttingen av vakten), `tests/test_dokumenttestene.py` (ny), «Tester» i README-en og en Lagt til-linje under linja fra 24.10 i `docs/kvalitetssikring.md` (regel 19). Ingen annen testfil er endret.
+- **Kommandoen** finner 25 moduler, med de seks fra 24.10 og `test_aksjesiden_8_20a.py`. `uv run pytest --dokumentene` tok 7:20 (kl. 11:56:05–12:03:26): 1838 bestått og 7 hoppet over. Hele settet tok 16:39 samme dag.
+- **Hele settet alene** kl. 11:37–11:54 på `b47a6bc3`: 4814 bestått, 24 hoppet over og 0 feilet. Vakten fant ingen modul utenfor, så `TILLEGG` er tom.
+
+## Mutantene
+
+Én per del på `b47a6bc3`, med kopi før og fila lik HEAD etterpå (`git hash-object` mot `git rev-parse HEAD:<fil>`, fordi arbeidskopien har CRLF): A (docstringer teller som stier) fanget av `test_bare_koden_teller`, B (`--dokumentene` hopper ikke over noe) av `test_kommandoen_kjoerer_bare_dokumenttestene`, og C (lytteren noterer ingenting) av `test_lytteren_noterer_en_aapning`.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `78a45186..b47a6bc3`: Blind Hunter med bare diffen (12 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (6 og 5 funn). Ingen høye.
+
+**Middels**
+- *BH1, rettet.* `"README" in t` gjorde en melding som nevner README-en, til en sti. Nå teller bare stier (`README.md`, `docs`, `_bmad-output`), og delene av en f-streng og meldingen i en assert teller ikke (`test_bare_koden_teller` med `test_melding.py`). Kommandoen fant de samme 25 modulene etterpå.
+- *BH2, BH3 og ECH5, rettet.* En modul som leser dokumentene gjennom `src/`, en fixture i `conftest.py` eller en import, kunne ikke tas med uten å endre testfila. Nå føres den i `TILLEGG` i `tests/dokumenttestene.py`, og vaktens melding sier det. Tom i dag.
+- *BH5 og ECH1, rettet.* `--ff` og `--nf` sorterte etter conftest-hooken, og med `--lf` kunne vakten kjøre alene og bestå tomt. Nå er hooken en wrapper med `tryfirst`, som flytter vakten etter de andre, og vakten hopper over når ingen andre moduler er med.
+- *VG1, rettet.* Ingen test viste at vakten kan feile. Nå er sammenligningen `utenfor()`, testet med en modul som ikke er med (`test_utenfor_finner_en_modul_som_ikke_er_med`).
+
+**Lav**
+- *Rettet:* ECH2 (`test_vakten_kjoeres_sist` hopper over når vakten ikke er med), ECH3 (`--dokumentene` tar også ut filer gitt på kommandolinja, `test_kommandoen_tar_ut_en_fil_paa_kommandolinja`), BH7 (en klasse noteres under innsamlingen som modulen sin), BH8 (testen av kommandoen tåler en modul som hoppes over på en maskintype), VG3 (`test_en_test_uten_dokumentene_er_ikke_med`), BH12 og ECH6 (navnet på spesifikasjonen i docstringene).
+- *Ført:* BH4 (relative importer og `importlib` følges ikke; ingen i `tests/`), BH6 og ECH4 (bare hendelsen «open» noteres, ikke `stat`, `glob` eller `scandir`, og ikke underprosesser; spørsmål 4), BH9 (undermapper i `tests/`; det er ingen), BH10 (`abspath`, ikke `realpath`; `realpath` på hver åpning koster), BH11 (valget gjelder bare med `tests/conftest.py`, som er der pytest starter fra rota), VG2 (at kommandoen ikke mangler en modul, hviler på vakten i del C), VG4 (innsamlingen er sjekket for hånd av Edge Case Hunter: `test_investorsidene_demo.py` ble notert under `--collect-only`), VG5 (`test_app.py` og `test_kveldshenting.py` er med gjennom en hjelpemodul, ikke ført som kjente).
+- **Etter gjennomgangen:** hele settet alene kl. 12:04:24–12:21:02: 4817 bestått, 24 hoppet over og 0 feilet. Vakten fant ingen modul utenfor.
