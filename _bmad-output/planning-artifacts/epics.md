@@ -649,6 +649,8 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-11-08 kl. 23:12 (gruppens svar):* alt gjøres i natt: svarene, 8.11 og 8.8, navnet i dokumentene, brukertesten, 8.10 og 8.10b uten fletting, og 8.11b. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
 
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt, og spørsmål 9 blir et punkt i `issues.md` til senere. Webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), med en Lagt til-linje under regel 22 i `CLAUDE.md`. Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. 2.12, 8.10 og 8.10b squash-flettes samlet fra PR #126 kl. 23:50, og PR #124 og #125 lukkes som tatt med. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -2056,6 +2058,8 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–11 i spesifikasjonen 2.12 (`spec-2-12-velge-og-bytte-aksjer.md`) er godtatt, og storyen flettes i kveld, etter 2.11. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* 2.12, 8.10 og 8.10b squash-flettes samlet fra PR #126 kl. 23:50, og PR #124 lukkes som tatt med. Rådet anbefalte det. Webserveren migrerer basen når den startes, og skriver også ønskene (regel 22). Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -3713,6 +3717,8 @@ noteres det, med tidspunkt.
 
 *Avgjort 2026-11-08 kl. 11:51 (gruppens svar):* brukertesten, story 8.1 og 10.4, tas tirsdag 10.11, ikke onsdag, som svaret kl. 11:47 sa. Det endrer svaret 07.11 kl. 22:51, som ga tirsdag 10.11 eller onsdag 11.11, eller begge dagene. Svaret kl. 11:47 står ikke ellers i repoet. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), så det åpne punktet om migreringen i `spec-8-1-brukertesten.md` og `docs/brukertest.md` er besvart (regel 22). Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 
 Som **gruppe**, vil vi at de to skjermbildene er vurdert som design, så
@@ -4075,6 +4081,8 @@ gjelder alle sidene og huskes.
 
 *Avgjort 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spesifikasjonen for 8.8, 8.10 og 8.10b er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
 
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* 8.10 squash-flettes samlet med 2.12 og 8.10b fra PR #126 kl. 23:50, og PR #125 lukkes som tatt med. Rådet anbefalte det. Webserveren migrerer basen når den startes, og skriver også innstillingene (regel 22). Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 8.10b: «Vis KI-tekst» i Innstillinger
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -4098,6 +4106,8 @@ gjelder alle sidene og huskes.
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spesifikasjonen for 8.8, 8.10 og 8.10b er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* 8.10b squash-flettes kl. 23:50 fra PR #126, samlet med 2.12 og 8.10. Rådet anbefalte det. Webserveren skriver innstillingene til basen (regel 22). Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 8.11: Ferdige lister og filter på signalet
 
@@ -4129,6 +4139,8 @@ NFR-01, NFR-06
 *Avgjort 2026-11-08 kl. 22:03 (gruppens svar):* gruppen tok rådets råd for sju av dem: VOIM blir Energi, NOSN, NTG og MVW blir Industri, PLCAN blir Shipping, NORTH blir Finans, og SCOIN tas ut, fordi selskapet er under avvikling. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-08 kl. 22:06 (gruppens svar):* forslagene i spørsmål 2, 4, 5 og 6 i spesifikasjonen 8.11 er godtatt, og story 8.11b tar de 15 inn i bransjelistene. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt. Spørsmål 9, å bruke medianen av kursene også i merket «Utenfor målingen», blir et punkt i `issues.md` til senere. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 8.12: Endret signalstyrke siden forrige børsdag
 

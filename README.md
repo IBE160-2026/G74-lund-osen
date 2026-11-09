@@ -90,7 +90,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Periodevalget på alle sidene, og hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen
 - På aksjesiden: periodene i kursgrafen med «Vis dagen», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
-- Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene «Markedsoversikt», «Børsometer» og «Min liste» øverst
+- Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene øverst og «Innstillinger» med «Vis hjelp»
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 

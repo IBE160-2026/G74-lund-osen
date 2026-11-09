@@ -1008,6 +1008,8 @@ MALENE_BAK_BILDET = (
     "src/valg.py",
     # Story 8.11: de ferdige listene i «Din egen liste».
     "src/ferdige_lister.py",
+    # Story 8.10: «Vis hjelp» i Innstillinger.
+    "src/innstillinger.py",
     # Story 10.6: «Børsdagen kort fortalt» under tabellen, med grunnlaget som
     # siden regner og demoteksten om dagen.
     "src/dagsgrunnlag.py",
@@ -1265,12 +1267,25 @@ HOEYDE_PAA_BILDET = 1864
 # Main (8.8 og bildet av investorsiden) inn i 2.12, med diffen mot main lik endringene
 # 2.12 hadde mot 9594043a: avtrykkene er regnet ut paa nytt, og alle bildene ble tatt paa nytt
 # med DevTools-protokollen og er byte for byte de samme.
+# Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
+# app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
+# og alle viser knappen; hoeydene er de samme.
+# Flettingen av 2.12 (med main) inn i 8.10: avtrykkene er regnet ut paa nytt. Aksjesiden, oversikten
+# ved 390 px og investorsiden er nye med «Innstillinger» i stripa; de andre er byte for byte de samme.
+# Story 8.10b: «Vis KI-tekst» i Innstillinger (app.py og innstillinger.py). Alle bildene ble
+# tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# Flettingen av 8.10 (med 2.12 og main) inn i 8.10b: avtrykkene er regnet ut paa nytt. Alle
+# bildene ble tatt paa nytt og er byte for byte de samme.
 # Story 8.11: filteret på signalet og de ferdige listene (index.html, _egne.html, app.py og stil.css).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
 # liste» er nye; de andre er byte for byte de samme.
 # Flettingen av 2.12 (med main) inn i 8.11: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "2eb89c403470c0af7d7be7bdf46ffcb08f1ac72c916945e8bbc08348bf7e3659"
+# Flettingen av 8.10b (med svaret kl. 10:23 og main) inn i 8.11: avtrykkene er regnet ut paa nytt.
+# Alle bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene. Aksjesiden, toppen av
+# oversikten, boersometeret og investorsiden er som i 8.10b, «Din egen liste» som i 8.11, og
+# oversikten og Min liste ved 1280 px og oversikten ved 390 px er nye, med filteret og «Innstillinger».
+AVTRYKK_BAK_BILDET = "d56b7d14abf74951ab30448c8cba49895fe55d553dd0ff693c8350d307551889"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1304,6 +1319,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/valg.py",
     # Story 8.11: de ferdige listene.
     "src/ferdige_lister.py",
+    # Story 8.10: «Vis hjelp» i Innstillinger.
+    "src/innstillinger.py",
     # Story 10.6: teksten om dagen i demoen, og grunnlaget webserveren regner.
     "src/demo_ki_dagen.json",
     "src/dagsgrunnlag.py",
@@ -1666,12 +1683,25 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Main (8.8 og bildet av investorsiden) inn i 2.12, med diffen mot main lik endringene
 # 2.12 hadde mot 9594043a: avtrykkene er regnet ut paa nytt, og alle bildene ble tatt paa nytt
 # med DevTools-protokollen og er byte for byte de samme.
+# Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
+# app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
+# og alle viser knappen; hoeydene er de samme.
+# Flettingen av 2.12 (med main) inn i 8.10: avtrykkene er regnet ut paa nytt. Aksjesiden, oversikten
+# ved 390 px og investorsiden er nye med «Innstillinger» i stripa; de andre er byte for byte de samme.
+# Story 8.10b: «Vis KI-tekst» i Innstillinger (app.py og innstillinger.py). Alle bildene ble
+# tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# Flettingen av 8.10 (med 2.12 og main) inn i 8.10b: avtrykkene er regnet ut paa nytt. Alle
+# bildene ble tatt paa nytt og er byte for byte de samme.
 # Story 8.11: filteret på signalet og de ferdige listene (index.html, _egne.html, app.py og stil.css).
 # Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
 # liste» er nye; de andre er byte for byte de samme.
 # Flettingen av 2.12 (med main) inn i 8.11: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "9003d7ab7af81207050b049b3d5bee915e36470711436d3e597622373fd132f8"
+# Flettingen av 8.10b (med svaret kl. 10:23 og main) inn i 8.11: avtrykkene er regnet ut paa nytt.
+# Alle bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene. Aksjesiden, toppen av
+# oversikten, boersometeret og investorsiden er som i 8.10b, «Din egen liste» som i 8.11, og
+# oversikten og Min liste ved 1280 px og oversikten ved 390 px er nye, med filteret og «Innstillinger».
+AVTRYKK_BAK_AKSJESIDEN = "d3082c53b45cc86219a319a5fffe52ae544a6b945976355bb9d3fbfe7c302f95"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1799,22 +1829,35 @@ DE_NYE_BILDENE = {
 # bildene ble tatt paa nytt med DevTools-protokollen. Min liste og oversikten ved 390 px er
 # nye, fordi delene staar der; de andre er byte for byte de samme. Bildet av «Din egen
 # liste» er nytt.
-# Story 8.11: filteret på signalet og de ferdige listene (index.html, _egne.html, app.py og stil.css).
-# Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
-# liste» er nye; de andre er byte for byte de samme.
+# Story 8.10: knappen «Innstillinger» i stripa og «Vis hjelp» (_ramme.html, _hjelp.html,
+# app.py, innstillinger.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen,
+# og alle viser knappen; hoeydene er de samme.
+# Story 8.10b: «Vis KI-tekst» i Innstillinger (app.py og innstillinger.py). Alle bildene ble
+# tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
 # Flettingen av 2.11 (med 10.6) inn i 2.12: avtrykkene er regnet ut paa nytt. Alle bildene
 # ble tatt paa nytt med DevTools-protokollen. Bare oversikten ved 390 px er ny (4120 px hoey);
 # de andre er byte for byte de samme.
+# Flettingen av 2.12 (med main) inn i 8.10: avtrykkene er regnet ut paa nytt. Aksjesiden, oversikten
+# ved 390 px og investorsiden er nye med «Innstillinger» i stripa; de andre er byte for byte de samme.
+# Flettingen av 8.10 (med 2.12 og main) inn i 8.10b: avtrykkene er regnet ut paa nytt. Alle
+# bildene ble tatt paa nytt og er byte for byte de samme.
+# Story 8.11: filteret på signalet og de ferdige listene (index.html, _egne.html, app.py og stil.css).
+# Alle bildene ble tatt paa nytt med DevTools-protokollen. Oversikten, Min liste og «Din egen
+# liste» er nye; de andre er byte for byte de samme.
 # Flettingen av 2.12 (med main) inn i 8.11: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt
 # paa nytt; bare oversikten ved 390 px er ny (4240 px), de andre er byte for byte de samme.
+# Flettingen av 8.10b (med svaret kl. 10:23 og main) inn i 8.11: avtrykkene er regnet ut paa nytt.
+# Alle bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene. Aksjesiden, toppen av
+# oversikten, boersometeret og investorsiden er som i 8.10b, «Din egen liste» som i 8.11, og
+# oversikten og Min liste ved 1280 px og oversikten ved 390 px er nye, med filteret og «Innstillinger».
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "2eb89c403470c0af7d7be7bdf46ffcb08f1ac72c916945e8bbc08348bf7e3659",
-    "docs/appen/boersometeret-demo.png": "ec23d7376fd88d457ff744f948a74232be72522e4e78066366bf458623f8c5bf",
-    "docs/appen/min-liste-demo.png": "51ef498e68e56810bfa8c00943878ff742b3251a5cdc28186fad3e384ff79e63",
-    "docs/appen/oversikten-390-demo.png": "2eb89c403470c0af7d7be7bdf46ffcb08f1ac72c916945e8bbc08348bf7e3659",
-    "docs/appen/boersometeret-390-demo.png": "ec23d7376fd88d457ff744f948a74232be72522e4e78066366bf458623f8c5bf",
-    "docs/appen/din-egen-liste-demo.png": "51ef498e68e56810bfa8c00943878ff742b3251a5cdc28186fad3e384ff79e63",
-    "docs/appen/investorsiden-brfe-demo.png": "5ad906128054de287879f2fcfcec4e571ca3a6c335d906ac6c9cb153a0a65a22",
+    TOPPEN_AV_OVERSIKTEN: "d56b7d14abf74951ab30448c8cba49895fe55d553dd0ff693c8350d307551889",
+    "docs/appen/boersometeret-demo.png": "aae9d57c3a42691c027ec21918a9e5098b24abdb7069248d4ae72d458971d21d",
+    "docs/appen/min-liste-demo.png": "a0755ad58d01ff0c7bef514de304f04814657eef01bad6aec9bef338e6bdf030",
+    "docs/appen/oversikten-390-demo.png": "d56b7d14abf74951ab30448c8cba49895fe55d553dd0ff693c8350d307551889",
+    "docs/appen/boersometeret-390-demo.png": "aae9d57c3a42691c027ec21918a9e5098b24abdb7069248d4ae72d458971d21d",
+    "docs/appen/din-egen-liste-demo.png": "a0755ad58d01ff0c7bef514de304f04814657eef01bad6aec9bef338e6bdf030",
+    "docs/appen/investorsiden-brfe-demo.png": "f53c90552c1e8680625f8617eb977de8f5577ce7d431f2e1746e299e92288d14",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

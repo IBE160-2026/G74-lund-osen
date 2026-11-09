@@ -321,8 +321,9 @@ class TestRammen:
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
                     href in ("/", "/min-liste", "/min-liste?vis=alle")
-                    # Story 8.6: børsometeret, fra knappen i stripa.
-                    or href == "/boersometer"
+                    # Story 8.6: børsometeret, fra knappen i stripa. Story 8.10:
+                    # «Innstillinger», fra knappen i stripa.
+                    or href in ("/boersometer", "/innstillinger")
                     # Story 8.11: filteret på signalet, med resten av adressen.
                     or re.fullmatch(r"/(min-liste)?\?([a-z]+=[A-Za-z0-9-]+&amp;)*signal=(positiv|negativ)", href)
                     # Story 2.12: «Følg en aksje» og «Bytt ut».
@@ -957,8 +958,9 @@ class TestStilarket:
         # Story 8.6: børsometeret er den fjerde siden, og aksjesiden for en
         # aksje uten kurser den femte (gruppens svar 23.10 kl. 09:24, b).
         # Story 3.4h: siden for et selskap i demoen er den sjette.
-        # Story 2.12: «Følg en aksje» (folg.html) er den sjuende.
-        assert sider == 7
+        # Story 2.12: «Følg en aksje» (folg.html) er den sjuende, og story
+        # 8.10: «Innstillinger» (innstillinger.html) den åttende.
+        assert sider == 8
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,
