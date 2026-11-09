@@ -14,6 +14,8 @@ excludedDocuments:
 
 # G74-lund-osen — Epic Breakdown
 
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
+
 ## Overview
 
 Nedbryting av OSE Signal i epics og stories, fra en PRD og en arkitekturspine
@@ -640,6 +642,12 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-08 kl. 12:46 (gruppens svar):* story 8.11 bygges i dag, etter de seks andre. Rådet foreslo mandag til onsdag. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* alle forslagene i spesifikasjonene for 10.6, 2.11 og 2.12 er godtatt, også navnet «Børsdagen kort fortalt» i 10.6 og spørsmål 6 og 7 i 2.11. 10.6, 2.11 og 2.12 flettes i kveld, og 8.10, 8.10b, 8.8 og 8.11 mandag. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 22:14 (gruppens svar):* avgjørelser som står i én persons navn i dokumentene, var gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post, står. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-08 kl. 23:12 (gruppens svar):* alt gjøres i natt: svarene, 8.11 og 8.8, navnet i dokumentene, brukertesten, 8.10 og 8.10b uten fletting, og 8.11b. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
@@ -1966,6 +1974,8 @@ byttes uten at koden endres.
 
 *Avgjort 2026-11-08 kl. 11:57 (gruppens svar):* å bytte aksjer (2.12) tas i bruk fra mandag 09.11. Rådet foreslo etter tellingen for 10.4. Brukeren velger bransjen, «Ollama i dag», og prøvekjøringer på `data/db/ose.db` skjer med `mode=ro`. Rådet anbefalte alle tre. Regel 22 i `CLAUDE.md`, som sier at kjøringer på en gren aldri rører `data/db/ose.db`, er ikke endret med svaret. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–7 i spesifikasjonen 2.11 (`spec-2-11-lista-leses-fra-basen.md`) er godtatt. Spørsmål 6: en aksje som kommer inn igjen, får `ut` nullstilt, og en egen tabell med periodene venter til det trengs. Spørsmål 7: hentingen går videre med de 15 når basen ikke kan leses, som før 2.11. Storyen flettes i kveld. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
+
 ### Story 2.12: Velge og bytte aksjer
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -2044,6 +2054,8 @@ følger aksjene jeg bryr meg om.
 *Avgjort 2026-11-08 kl. 11:57 (gruppens svar):* å bytte aksjer (2.12) tas i bruk fra mandag 09.11. Rådet foreslo etter tellingen for 10.4. Brukeren velger bransjen, «Ollama i dag», og prøvekjøringer på `data/db/ose.db` skjer med `mode=ro`. Rådet anbefalte alle tre. Regel 22 i `CLAUDE.md`, som sier at kjøringer på en gren aldri rører `data/db/ose.db`, er ikke endret med svaret. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–11 i spesifikasjonen 2.12 (`spec-2-12-velge-og-bytte-aksjer.md`) er godtatt, og storyen flettes i kveld, etter 2.11. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
 
 ### Story 2.13: Kommandoen som måler omsetning
 
@@ -2563,6 +2575,8 @@ Oppsettet, de 15 tegningene, skriftene og plassen til snakkeboblene står i `doc
 *Svar 2026-11-07 kl. 10:33 (gruppens svar):* forslagene i spørsmål 1–10 i `spec-3-4h-investorsidene-i-demoen.md` er godtatt, og teksten nederst på investorsiden blir «Oppdiktet selskap i demoen. I den ekte versjonen åpner lenken på aksjesiden selskapets egen investorside i en ny fane.», fordi kortet ble en boble 07.11 kl. 08:57. Rådet anbefalte begge. Svaret er ført etter instruksjonen kl. 10:38 i `docs/ai-prompts/2026-11-07.md`.
 
 *Lagt til 2026-11-07:* 3.4h er flettet med PR #120 i `7565651f` kl. 23:33, låst til head-en `c994f368` (main flettet inn), etter instruksjonen kl. 23:27 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42420820179) og på flettecommiten (run 42421144454), med 4562 bestått og 31 hoppet over i jobben `pytest` på flettecommiten. Hele settet lokalt på grenen: 4568 bestått, 24 hoppet over og 0 feilet før `ac0944f9`, og fil for fil 4569 bestått, 24 hoppet over og 0 feilet før `72efb6e8`. Story 3.4h er done.
+
+*Ønske 2026-11-08 kl. 23:59 (gruppens ønske):* README-en mangler et bilde av investorsiden i demoen, den man kommer til fra aksjesiden. Bildet tas som de andre i `docs/appen/` og står under «Bilder av appen (demoen)». Ønsket er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
 
 ---
 
@@ -3232,6 +3246,8 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 *Lagt til 2026-10-08, endringsforslaget 08.10 (punkt 4.5), godkjent av Marian kl. 08:04:*
 - Teksten gjelder lista som er aktiv (FR-412), og tallet på aksjer telles. Testen prøver en liste med færre enn 15 og en med 18
 - **Ville feilet hvis:** grunnlaget sa «av 15» når lista hadde et annet antall
+
+*Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–12 i spesifikasjonen 10.6 (`spec-10-6-ki-teksten-om-dagen-paa-forsiden.md`) er godtatt, også navnet «Børsdagen kort fortalt» (spørsmål 11), og storyen flettes i kveld. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
 
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 
@@ -4003,6 +4019,8 @@ signalet har oppført seg over tid.
 
 **Avhenger av:** 2.7. **Én økt:** ja.
 
+*Avgjort 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spesifikasjonen for 8.8, 8.10 og 8.10b er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 8.9: «Vis meg rundt»
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -4055,6 +4073,8 @@ gjelder alle sidene og huskes.
 
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spesifikasjonen for 8.8, 8.10 og 8.10b er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 8.10b: «Vis KI-tekst» i Innstillinger
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -4076,6 +4096,8 @@ gjelder alle sidene og huskes.
 **Avhenger av:** 8.10 og 10.3. **Én økt:** ja.
 
 *Avgjort 2026-11-08 kl. 12:39 (gruppens svar):* egne aksjer bygges som i designforslaget, og Innstillinger har bare hjelpen og KI-teksten. Rådet anbefalte det. Rådets utdrag fra designtavla står i `designutdrag-2026-11-08.md`. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spesifikasjonen for 8.8, 8.10 og 8.10b er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 8.11: Ferdige lister og filter på signalet
 
@@ -4101,6 +4123,12 @@ NFR-01, NFR-06
 **Avhenger av:** 2.12, og 2.13 for listene som må måles. **Én økt:** ja.
 
 *Avgjort 2026-11-08 kl. 12:46 (gruppens svar):* story 8.11 bygges i dag, etter de seks andre. Rådet foreslo mandag til onsdag. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
+
+*Avgjort 2026-11-08 kl. 22:01 (gruppens svar):* bransjen Claude Code foreslo for hver av de 88 aksjene i 8.11 (spørsmål 1 i `spec-8-11-ferdige-lister.md`) er godtatt. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-08 kl. 22:03 (gruppens svar):* gruppen tok rådets råd for sju av dem: VOIM blir Energi, NOSN, NTG og MVW blir Industri, PLCAN blir Shipping, NORTH blir Finans, og SCOIN tas ut, fordi selskapet er under avvikling. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-08 kl. 22:06 (gruppens svar):* forslagene i spørsmål 2, 4, 5 og 6 i spesifikasjonen 8.11 er godtatt, og story 8.11b tar de 15 inn i bransjelistene. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 00:01 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 8.12: Endret signalstyrke siden forrige børsdag
 

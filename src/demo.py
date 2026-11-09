@@ -80,7 +80,7 @@ from zoneinfo import ZoneInfo
 
 import lagring_sqlite
 from boersdag import er_boersdag
-from demo_ki import les_radene, sjekk_radene, skriv_radene
+from demo_ki import les_dagsraden, les_radene, sjekk_radene, skriv_radene
 from indeksdata import Indeks
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import (
@@ -311,7 +311,10 @@ def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
         "ikke data fra Oslo Børs. Ingen nettkall."
     )
     if radene:
-        skriv(f"KI-tekst for {len(radene)} aksjer på siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
+        aksjene = [rad for rad in radene if rad.emne.slag == "aksje"]
+        skriv(f"KI-tekst for {len(aksjene)} aksjer på siste dag, fra demo_ki_tekster.json. Ingen kall til modellen.")
+        if len(aksjene) < len(radene):
+            skriv("KI-tekst om dagen på forsiden, fra demo_ki_dagen.json.")
 
 
 def gammel_demobase(tilkobling) -> bool:
@@ -332,7 +335,16 @@ def _ki_radene(skriv) -> list:
     except (OSError, ValueError) as feil:
         skriv(f"KI-tekstene i demoen kunne ikke leses ({type(feil).__name__}: {feil}). Demoen lages uten KI-tekst.")
         return []
-    return radene
+    # Story 10.6: teksten om dagen, fra sin egen fil. Kan den ikke leses,
+    # staar tekstene for aksjene, og forsiden sier at dagen er uten KI-tekst.
+    try:
+        dagen = les_dagsraden()
+        if dagen.emne.dato != SLUTTDATO:
+            raise ValueError(f"teksten om dagen gjelder {dagen.emne.dato}, ikke {SLUTTDATO}")
+    except (OSError, ValueError) as feil:
+        skriv(f"Teksten om dagen i demoen kunne ikke leses ({type(feil).__name__}: {feil}). Forsiden er uten den.")
+        return radene
+    return [*radene, dagen]
 
 
 def _med_hjelpefiler(sti: Path) -> list[Path]:

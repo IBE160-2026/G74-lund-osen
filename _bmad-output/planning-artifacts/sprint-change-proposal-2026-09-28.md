@@ -2,10 +2,12 @@
 title: "Endringsforslag 28.09: databasen i bruk i Epic 2"
 status: final
 created: 2026-09-28
-updated: 2026-10-01T23:43
+updated: 2026-11-09T00:04
 ---
 
 # Endringsforslag 28.09: databasen i bruk i Epic 2
+
+*Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14):* der en avgjørelse i dette dokumentet står som én persons, som «Marians beslutning», «godkjent av Marian» eller «Marian bestemte», var den gruppens, og svaret ble gitt i økta for gruppen. Det en person gjorde selv, som å sende en e-post eller regne for hånd, står som før.
 
 Laget med `bmad-correct-course` i modusen Batch, etter instruksjonen kl. 17:32 i
 `docs/ai-prompts/2026-09-28.md`. **Godkjent av gruppen 28.09**, med endringene
