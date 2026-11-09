@@ -25,6 +25,8 @@ Skrevet 09.11 i instruksjonen kl. 00:30 (`docs/ai-prompts/2026-11-09.md`, steg 5
 8. **Demoen.** Demobasen har de 15 oppdiktede selskapene i `boersliste` (`lag_demobase` i `src/demo.py`). *Forslag:* demoen får bransjelister også for dem, som den ekte versjonen, og bildet av «Din egen liste» tas på nytt.
 9. **«Utenfor målingen».** Merket fra 2.12 leser `omsetning`. *Forslag:* uendret i 8.11b, så de 15 merkes som før; å bruke medianen av kursene også der er en egen endring.
 
+*Svar 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 er godtatt, også spørsmål 10 under «Spørsmål etter gjennomgangen» og utvidelsen av spørsmål 1 etter ECH1. Spørsmål 9: merket «Utenfor målingen» er uendret i 8.11b, og å bruke medianen av kursene også der er et punkt i `issues.md` til senere. Koden er ikke endret med svaret. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
 ## Intent
 
 **Problem:** De ferdige listene i 8.11 tar bare med aksjer som er målt i `omsetning` (2.13), og 2.13 måler aldri aksjene i appens liste. De 15 står derfor ikke i noen bransjeliste.
@@ -70,6 +72,8 @@ Bygget på grenen `8-11b-de-15-i-bransjelistene`, i worktreen `G74-lund-osen-8-1
 
 10. **Ulike vinduer (BH2).** De målte medianene er fra vinduet den dagen de ble målt, og medianene regnet av kursene fra vinduet til siste dag med kurser. Begge rangeres sammen. *Forslag:* godta det, fordi målingene i 2.13 er av aksjer som ellers ikke ville vært med, og teksten sier nå hvor hver median kommer fra. Funnet er middels og står åpent til gruppen har svart (regel 25).
 
+*Svar 2026-11-09 kl. 10:23 (gruppens svar):* forslaget er godtatt. BH2 er besvart og lukket, med graden middels som før (regel 25). Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
 *Lagt til 2026-11-09 (gjennomgangen, ECH1):* spørsmål 1 er utvidet i det som er bygget: medianen regnes for alle aksjene appen følger eller har fulgt som har kurser i vinduet, ikke bare dem i lista, så en aksje som er tatt ut, ikke faller ut av bransjelistene før 2.13 har målt den.
 
 ## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
@@ -81,6 +85,9 @@ To gjennomganger av byggingen før `a08a7f6a`, i parallell med hele settet: Blin
 - *BH1 og VG4, rettet.* Hjelpen sa at gruppen har sjekket bransjen for hver aksje, og at listene er de som ble omsatt for mest da omsetningen sist ble målt. Nå sier hjelpen og teksten under «Start fra en ferdig liste» hvor medianen kommer fra, og at bransjen for en aksje brukeren følger selv, er den brukeren valgte.
 - *ECH2, åpent* med spørsmål 9 (regel 25): merket «Utenfor målingen» leser `omsetning`, så en egen aksje kan stå som ikke målt i tabellen og med en median i den ferdige lista.
 - *BH2, åpent* som spørsmål 10 (regel 25).
+
+- *ECH2, lukket 2026-11-09 med spørsmål 9* (gruppens svar kl. 10:23), middels som før (regel 25): merket er uendret i 8.11b, og endringen er et punkt i `issues.md` til senere. VG3 venter på den samme endringen.
+- *BH2, lukket 2026-11-09 med spørsmål 10* (gruppens svar kl. 10:23), middels som før (regel 25): forslaget om å godta ulike vinduer er godtatt.
 
 **Lav**
 - *Rettet:* BH3 og VG1 (en aksje i lista uten kurser i vinduet bruker ikke en eldre måling), BH5 (en dato i `kurs` som ikke kan leses, gir ingen lister herfra i stedet for en feil), BH6 (en test for dagen vinduet begynner og dagen før), ECH3 og VG2 (regelen for `inn` og `ut` bestemmer nå bare hvilke aksjer som aldri bruker en eldre måling).
