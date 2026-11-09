@@ -70,7 +70,7 @@
   {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. #}
   {% if egne.ferdige %}
   <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Hver ferdige liste er de opptil {{ egne.tak }} aksjene i en bransje som ble omsatt for mest da omsetningen sist ble målt. Bare målte aksjer er med. Listene er ordnet etter omsetning, ikke etter signalet, og er ikke et råd om hva du bør følge. Velger du en, blir den hele lista di ved neste henting: alle de andre aksjene i lista fjernes, og ønskene som venter, forsvinner.</p>
+  <p>Hver ferdige liste er de opptil {{ egne.tak }} aksjene i en bransje med høyest omsetning: for aksjene appen følger eller har fulgt, regnet av kursene for tre måneder bakover fra siste dag med kurser, og for de andre den siste målingen. Listene er ordnet etter omsetning, ikke etter signalet, og er ikke et råd om hva du bør følge. Velger du en, blir den hele lista di ved neste henting: alle de andre aksjene i lista fjernes, og ønskene som venter, forsvinner.</p>
   {% for bransje, aksjene in egne.ferdige.items() %}
     <details class="ferdig-liste">
       <summary>{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></summary>

@@ -284,10 +284,14 @@ class TestEtterGjennomgangen:
         assert 'href="/min-liste?sorter=endring&amp;orden=synkende">Alle' in nav
 
     def test_demoen_har_kraft_og_eiendom(self, demoklient):
-        """VG10: hjelpen og README-en sier det."""
+        """VG10: hjelpen og README-en sier det. Story 8.11b (spørsmål 8):
+        demoen har også listene for bransjene til de 15 oppdiktede
+        selskapene, i rekkefølgen fra designregler.md §4."""
         side, _ = demoklient
         html = side.get("/min-liste").data.decode("utf-8").split('id="ferdige-lister"', 1)[1]
-        assert re.findall(r"</svg>(\w+) <span class=\"antall\">", html) == ["Eiendom", "Kraft"]
+        navn = re.findall(r"</svg>(\w+) <span class=\"antall\">", html)
+        assert {"Eiendom", "Kraft"} <= set(navn) and len(navn) == 9
+        assert navn == [b for b in BRANSJENE if b in navn]
 
 
 def test_bare_siste_maaling_og_bare_boerslista(tmp_path, monkeypatch):
