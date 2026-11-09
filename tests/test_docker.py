@@ -1275,6 +1275,7 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av 8.10 (med 2.12 og main) inn i 8.10b: avtrykkene er regnet ut paa nytt. Alle
 # bildene ble tatt paa nytt og er byte for byte de samme.
 # Story 8.7: sjekk 2 og 3 i kursgrafen
+# Story 8.7: sjekk 2 og 3 i kursgrafen
 AVTRYKK_BAK_BILDET = "39fbf5c150996d3963deb61ad5c33eb7ec2fa660e18534ca2d847ae9fa48e4e9"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
@@ -1680,7 +1681,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
 # Flettingen av 8.10 (med 2.12 og main) inn i 8.10b: avtrykkene er regnet ut paa nytt. Alle
 # bildene ble tatt paa nytt og er byte for byte de samme.
-AVTRYKK_BAK_AKSJESIDEN = "8326b11c10b4ad0d9ef2dfcefad591c7c16306e6e66d0b724377cda2decbeb83"
+AVTRYKK_BAK_AKSJESIDEN = "99b3dc96bee004212e2a97762acba0e1f650929d31620f7e7e06beea001ea3ab"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1818,11 +1819,11 @@ DE_NYE_BILDENE = {
 # bildene ble tatt paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "39fbf5c150996d3963deb61ad5c33eb7ec2fa660e18534ca2d847ae9fa48e4e9",
-    "docs/appen/boersometeret-demo.png": "50fea3616962b29ce11026c53fb2f617ce4ef6ad85b51d469415df47826493db",
-    "docs/appen/min-liste-demo.png": "d935697a841bab418b441c00b45137a7319e2e0f8100bd26410330b004fddd6d",
+    "docs/appen/boersometeret-demo.png": "0235c1e1bcf0237ff908569f4e09f29161b7be6a6e96924327ac751e81ce2189",
+    "docs/appen/min-liste-demo.png": "8fcd3faa53b691f5764aabb935a74bf0d58e7cb02e45d7e4ad81dc2788b3ae3f",
     "docs/appen/oversikten-390-demo.png": "39fbf5c150996d3963deb61ad5c33eb7ec2fa660e18534ca2d847ae9fa48e4e9",
-    "docs/appen/boersometeret-390-demo.png": "50fea3616962b29ce11026c53fb2f617ce4ef6ad85b51d469415df47826493db",
-    "docs/appen/din-egen-liste-demo.png": "d935697a841bab418b441c00b45137a7319e2e0f8100bd26410330b004fddd6d",
+    "docs/appen/boersometeret-390-demo.png": "0235c1e1bcf0237ff908569f4e09f29161b7be6a6e96924327ac751e81ce2189",
+    "docs/appen/din-egen-liste-demo.png": "8fcd3faa53b691f5764aabb935a74bf0d58e7cb02e45d7e4ad81dc2788b3ae3f",
     "docs/appen/investorsiden-brfe-demo.png": "3132c4cc4b984b082b35d150ceb0b8b33a7f3377642a33054ccf9ffccb2f884a",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
