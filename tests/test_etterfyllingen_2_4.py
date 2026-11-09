@@ -7,7 +7,7 @@ og kursene er oppdiktet (regel 16). Fire dagers opphold med 16 kall står
 alt i K9 i test_fetch_prices.py (2.1b); her er resten av kontrollen.
 """
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
@@ -101,8 +101,12 @@ class TestDeSammeKallene:
         assert len(vanlig) == len(etter_hullet) == len(AKSJEUNIVERS) + 1
         assert [k[0] for k in vanlig] == [k[0] for k in etter_hullet]
         # Intervallet er et år til dagen, for begge (DAGER_TILBAKE).
-        assert {k[1:] for k in etter_hullet} == {fp.bygg_intervall(FREDAG)}
-        assert {k[1:] for k in vanlig} == {fp.bygg_intervall(TIRSDAG)}
+        assert {k[1:] for k in etter_hullet} == {
+            ((FREDAG - timedelta(days=fp.DAGER_TILBAKE)).isoformat(), FREDAG.isoformat())
+        }
+        assert {k[1:] for k in vanlig} == {
+            ((TIRSDAG - timedelta(days=fp.DAGER_TILBAKE)).isoformat(), TIRSDAG.isoformat())
+        }
 
 
 class TestIngenVurderingerEtterfylles:
