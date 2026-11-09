@@ -1557,7 +1557,8 @@ _TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}(\?dag=[0-9]{4}-[0-9]{2}-[0-9
 # «Børsdagen kort fortalt».
 # Gjennomgangen av 10.6 (BH7, ECH11): ogsaa sorteringen, sorter= og orden=.
 _TILBAKE_OVERSIKTEN = re.compile(
-    r"/(\?(periode=[a-z0-9\-]{1,10}(&dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?)?(&?sorter=[a-z_]{1,20}&orden=[a-z]{1,10})?)?"
+    r"/(\?(periode=[a-z0-9\-]{1,10}(&dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?(&sorter=[a-z_]{1,20}&orden=[a-z]{1,10})?"
+    r"|sorter=[a-z_]{1,20}&orden=[a-z]{1,10}))?"
 )
 BOERSDAGEN_ANKER = "boersdagen-kort-fortalt"
 # Story 8.2a, a (U35, U36, gruppens svar 24.10 kl. 11:21): knappene som

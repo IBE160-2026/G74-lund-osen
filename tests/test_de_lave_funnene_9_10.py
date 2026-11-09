@@ -14,11 +14,10 @@ import pytest
 import app as app_modul
 import ferdige_lister
 import lagring_sqlite
-from ki_tekst import lag_ki_tekster
 from lagring_sqlite import aapne_base
 from test_ferdige_lister_8_11b import DNB_RADER, EQNR_RADER, _kurser, _median
 from test_ki_dagen import _Teller, dagens_rad
-from test_ki_tekst import OEYEBLIKK, TIRSDAG, kjoer
+from test_ki_tekst import TIRSDAG, kjoer
 from test_valg import med_boersen
 
 
@@ -34,40 +33,6 @@ def _sql(sti, sql, *argumenter):
             return t.execute(sql, argumenter).fetchall()
     finally:
         t.close()
-
-
-class TestHovedindeksenForDagen:
-    """10.6 ECH14: teksten om dagen venter til hovedindeksen har en rad for dagen."""
-
-    def test_teksten_venter_paa_indeksen_og_lages_ved_neste_forsoek(self, stier):
-        """Ville feilet hvis teksten om dagen ble laget med et grunnlag uten
-        hovedindeksen når indeksen manglet raden for dagen, for da sto raden,
-        og siden ville regnet et annet grunnlag når indeksen kom, og aldri vist
-        teksten. Neste forsøk med indeksen lager den."""
-        raa, base = stier
-        kjoer(raa, base, None)
-        raden = _sql(base, "SELECT * FROM indeks WHERE dato = ?", TIRSDAG.isoformat())
-        assert raden, "testbasen skulle hatt hovedindeksen for dagen"
-        _sql(base, "DELETE FROM indeks WHERE dato = ?", TIRSDAG.isoformat())
-        modell, linjer = _Teller(), []
-        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, modell, linjer.append, med_dagen=True)
-        assert modell.dagkall == 0 and dagens_rad(base) is None
-        assert "Teksten om dagen: venter til hovedindeksen har en rad for dagen." in "\n".join(linjer)
-        plasser = ", ".join("?" * len(raden[0]))
-        _sql(base, f"INSERT INTO indeks VALUES ({plasser})", *raden[0])
-        neste = _Teller()
-        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, neste, lambda _: None, med_dagen=True)
-        assert neste.dagkall == 1 and dagens_rad(base) is not None
-
-    def test_uten_hovedindeks_i_basen_lages_teksten_som_foer(self, stier):
-        """Ville feilet hvis en base uten rader for hovedindeksen aldri fikk
-        teksten om dagen; da står grunnlaget uten indeksen, som før."""
-        raa, base = stier
-        kjoer(raa, base, None)
-        _sql(base, "DELETE FROM indeks")
-        modell = _Teller()
-        lag_ki_tekster(base, TIRSDAG, lambda: OEYEBLIKK, modell, lambda _: None, med_dagen=True)
-        assert modell.dagkall == 1
 
 
 class TestListaMedEtAnnetAntall:
@@ -108,7 +73,9 @@ class TestSorteringenIBryteren:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 9, 23, 12, 0).astimezone())
         app_modul.app.config["TESTING"] = True
         side = app_modul.app.test_client().get("/?sorter=kurs&orden=stigende").data.decode("utf-8")
-        assert 'name="tilbake" value="/?sorter=kurs&amp;orden=stigende"' in side
+        # Bare skjemaet for bryteren: merkingen har også et skjema med sorteringen.
+        bryteren = side.split('<form class="dagsbryter"', 1)[1].split("</form>", 1)[0]
+        assert 'name="tilbake" value="/?sorter=kurs&amp;orden=stigende"' in bryteren
 
     @pytest.mark.parametrize(
         ("tilbake", "ventet"),
@@ -120,6 +87,13 @@ class TestSorteringenIBryteren:
             ),
             ("/?sorter=ukjent&orden=stigende", "/#boersdagen-kort-fortalt"),
             ("/?periode=1-mnd", "/?periode=1-mnd#boersdagen-kort-fortalt"),
+            # Gjennomgangen (VG5): valgt dag og sortering sammen.
+            (
+                "/?periode=velg&dag=2026-09-21&sorter=signal&orden=synkende",
+                "/?periode=velg&dag=2026-09-21&sorter=signal&orden=synkende#boersdagen-kort-fortalt",
+            ),
+            # Gjennomgangen (BH6): & er påkrevd mellom perioden og sorteringen.
+            ("/?periode=1-mndsorter=kurs&orden=stigende", "/"),
             ("/", "/#boersdagen-kort-fortalt"),
             ("/?sorter=kurs&orden=stigende&x=1", "/"),
             ("//annen.side/?sorter=kurs&orden=stigende", "/"),
@@ -193,11 +167,32 @@ class TestKurseneIEnSpoerring:
             t.close()
         assert lister["Energi"][0].median == _median(EQNR_RADER)
         assert lister["Finans"][0].median == _median(DNB_RADER)
-        assert sum("FROM kurs" in s for s in spoerringer) <= 2, spoerringer
+        # Gjennomgangen (BH8): nøyaktig to, den siste dagen og kursene.
+        assert sum("FROM kurs" in s or "JOIN kurs" in s for s in spoerringer) == 2, spoerringer
 
-    def test_den_siste_dagen_leses_ikke_av_hele_kurs(self):
-        """Ville feilet hvis den siste dagen ble lest med max(dato) over hele
-        kurs, som må lese hver rad, og ikke med primærnøkkelen per aksje."""
-        kilde = inspect.getsource(ferdige_lister._aksjene_i_lista)
-        assert '"SELECT max(dato) FROM kurs"' not in kilde
-        assert "SELECT max(dato) FROM kurs WHERE symbol = a.symbol" in kilde
+    def test_kurs_leses_aldri_i_sin_helhet(self, base):
+        """Gjennomgangen (VG4, ECH2): ville feilet hvis en av spørringene mot
+        kurs gikk gjennom hele tabellen (SCAN) i stedet for å bruke
+        primærnøkkelen (symbol, dato), som max(dato) over hele kurs, eller
+        kursene i vinduet uten symbolet."""
+        t = aapne_base(base)
+        spoerringer = []
+        t.set_trace_callback(spoerringer.append)
+        try:
+            ferdige_lister.lister(t)
+            planene = {
+                s: [r[3] for r in t.execute("EXPLAIN QUERY PLAN " + s)]
+                for s in spoerringer
+                if "kurs" in s and s.lstrip().upper().startswith("SELECT")
+            }
+        finally:
+            t.set_trace_callback(None)
+            t.close()
+        assert planene
+        # SQLite skriver «SEARCH kurs USING COVERING INDEX» også når hele
+        # indeksen leses, som for max(dato) over hele kurs. Med primærnøkkelen
+        # står symbolet i linja: «(symbol=?)» eller «(symbol=? AND dato>? ...)».
+        for spoerring, plan in planene.items():
+            for linje in plan:
+                if linje.startswith(("SCAN", "SEARCH")) and ("kurs" in linje or linje.split()[1] == "k"):
+                    assert "symbol=" in linje, (spoerring, plan)

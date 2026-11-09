@@ -470,8 +470,10 @@ class TestLesingen:
         maaneden = (SYMBOL, date(2026, 10, 1), date(2026, 10, 31))
         # Story 8.8: og én lesing til, for signaldagene i kursgrafen, også
         # den for hele perioden, aldri dag for dag.
+        # Story 9.10 (gjennomgangen av 8.8, BH8, ECH8): nå én lesing for begge,
+        # til siste dag i grafen. Her sto [dagene, dagene, maaneden].
         dagene = (SYMBOL, date.min, date(2026, 10, 9))
-        assert sorted(kall) == [dagene, dagene, maaneden], kall
+        assert sorted(kall) == [dagene, maaneden], kall
 
 
 class TestVurderKallesIkke:

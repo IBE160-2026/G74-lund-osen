@@ -149,11 +149,13 @@ def _aksjene_i_lista(tilkobling: sqlite3.Connection) -> tuple[set[str], list[tup
         (dag, dag),
     ).fetchall()
     # Gjennomgangen av 8.11b (BH4, ECH4): kursene i vinduet for alle aksjene
-    # i én spoerring, ikke én per aksje.
+    # i én spoerring, ikke én per aksje. CROSS JOIN holder rekkefoelgen, saa
+    # kurs leses med primaernoekkelen (symbol, dato) for hver aksje og ikke
+    # gaas gjennom i sin helhet (gjennomgangen av 9.10, ECH2).
     kursene: dict[str, list[dict]] = {}
     for symbol, dato, slutt, volum in tilkobling.execute(
-        "SELECT k.symbol, k.dato, k.slutt, k.volum FROM kurs k JOIN aksje a ON a.symbol = k.symbol "
-        "JOIN boersliste b ON b.kode = a.symbol WHERE k.dato BETWEEN ? AND ?",
+        "SELECT k.symbol, k.dato, k.slutt, k.volum FROM aksje a JOIN boersliste b ON b.kode = a.symbol "
+        "CROSS JOIN kurs k ON k.symbol = a.symbol WHERE k.dato BETWEEN ? AND ?",
         (fra.isoformat(), til.isoformat()),
     ):
         kursene.setdefault(symbol, []).append({"date": dato, "close": slutt, "volume": volum})

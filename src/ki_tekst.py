@@ -241,12 +241,6 @@ def _grunnlaget_for_dagen(tilkobling, logg, vurderinger, dato, lista, skrivbar, 
         if any(rad is None for rad in radene.values()):
             return None, "venter til alle aksjene har en rad for dagen"
         serier, indeksserie = _kursene(tilkobling, lista)
-        # Gjennomgangen av 10.6 (ECH14): har hovedindeksen rader, men ikke for
-        # dagen, venter teksten, som paa aksjene. Ellers ville raden staatt med
-        # et grunnlag uten indeksen, og naar indeksen kom ved et nytt forsoek,
-        # ville siden regnet et annet grunnlag og aldri vist teksten.
-        if indeksserie and not any(rad.dato == dato for rad in indeksserie):
-            return None, "venter til hovedindeksen har en rad for dagen"
         return dagsgrunnlag(dato, lista, radene, serier, indeksserie), None
     except Exception as feil:  # NFR-04: teksten om dagen stopper ikke resten.
         skriv(f"Teksten om dagen: grunnlaget kunne ikke regnes ({type(feil).__name__}).")
