@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-10T00:01
+updated: 2026-11-10T00:25
 ---
 
 # Kvalitetssikring
@@ -405,6 +405,7 @@ sist i dokumentet.
 | 2.12 Velge og bytte aksjer, «Dine egne aksjer» og «Din egen liste»: svarene 8.11 kl. 21:35 og 9.11 kl. 10:23 | `edf4bc6` (#126, med #124) | 1 (20: A–H på `f87c29e`, og A, A2, A3 og B–J på `1f936f3`) | – | `S/spec-2-12-velge-og-bytte-aksjer.md` |
 | 8.10 Innstillinger øverst, med «Vis hjelp»: svarene 8.11 kl. 22:53 og 9.11 kl. 10:23 | `edf4bc6` (#126, med #125) | 1 (12: A, B, B2, C, D og E på `d9f2aaf` og på nytt på `1b9b742`) | – | `S/spec-8-10-innstillinger-oeverst.md` |
 | 8.10b «Vis KI-tekst» i Innstillinger: svarene 8.11 kl. 22:53 og 9.11 kl. 10:23 | `edf4bc6` (#126) | 1 (10: A–D på `5f98fe8`, A–E på `b870f69` og én for `_boersdagen` etter flettingen av 10.6) | – | `S/spec-8-10b-vis-ki-tekst-i-innstillinger.md` |
+| 8.11 Ferdige lister og filter på signalet: svarene 8.11 kl. 22:01, 22:03 og 22:06 og 9.11 kl. 10:23 og 10:55 | `b5e423f` (#128) | 1 (13: A–E på `713a5fd`, A–G på `48f4b3e` og én for `bruk_liste`) | E overlevde først på `713a5fd`, fanget på `48f4b3e` | `S/spec-8-11-ferdige-lister.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -671,6 +672,7 @@ funn. Antall rader i loggen:
 | 2.12, gjennomgangen 08.11 (34 funn, telt per funn; BH6 og ECH5 lukket med gruppens svar kl. 21:35, talt som avvist; BH7 står både som rettet og ført og er talt som rettet) | 34 | 26 | 2 | 6 |
 | 8.10, gjennomgangen 08.11 (23 funn, telt per funn; BH2, BH3 og BH4 delvis rettet og ført, godtatt med gruppens svar kl. 22:53, talt som utsatt) | 23 | 19 | 0 | 4 |
 | 8.10b, gjennomgangen 08.11 (19 funn, 18 i triagen, telt per funn; ECH5 står ikke i spesifikasjonen, og BH3 og ECH3 ble rettet 09.11) | 18 | 10 | 0 | 8 |
+| 8.11, gjennomgangen 08.11 (37 funn, telt per funn; BH1, BH2 og BH5 ikke reelle, talt som avvist; BH11, VG6 og VG10 rettet etter triagen) | 37 | 18 | 3 | 16 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1508,6 +1510,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.12, svarene 8.11 kl. 21:35 og 9.11 kl. 10:23 | 8 på `f87c29e` (A–H) og 12 på `1f936f3` (A, A2, A3 og B–J) | alle fanget. På `1f936f3`: A 2, A2 (angre sjekker ikke taket) 1, A3 (hentingen tar inn mer enn 18) 1, B 1, C 4, D (en aksje med rader samme dag får ut samme dag) 1, E 1, F 1, G 1, H 1, I (et bytte angres bare halvveis) 1 og J («Utenfor målingen» mangler i tabellen) 1 test. Kilden beskriver ikke de andre og navngir ikke testene. Hver fil var lik HEAD etterpå | `S/spec-2-12-velge-og-bytte-aksjer.md` |
 | 8.10, svarene 8.11 kl. 22:53 og 9.11 kl. 10:23 | 6 på `d9f2aaf` og de samme 6 på `1b9b742`: A, B, B2, C, D og E | alle fanget. A (tabellen godtar en annen verdi), B («?» står med hjelpen av), B2 (hjelpevinduet står), C (knappen mangler i stripa), D (valget lagres ikke) og E (en annen side kan endre), med 1 test hver på `d9f2aaf`, og på `1b9b742` A 1, B 3, B2 1, C 1, D 4 og E 3 tester. Kilden navngir ikke testene. Hver fil var lik HEAD etterpå | `S/spec-8-10-innstillinger-oeverst.md` |
 | 8.10b, svarene 8.11 kl. 22:53 og 9.11 kl. 10:23 | 4 på `5f98fe8` (A–D), 5 på `b870f69` (A–E) og én for `_boersdagen` | alle fanget. På `5f98fe8`: A (bryteren ved teksten skriver ikke raden) 1, B (siden leser bare kapselen) 2, C (Innstillinger kan ikke lagre KI-teksten) 2 og D (uten rad gjelder ikke kapselen) 1 test. På `b870f69`: A 2, B 2, C 3, D 1 og E (kapselen settes når raden ikke kan skrives) 1 test. «`_boersdagen` leser kapselen direkte» ble fanget av begge tilfellene i `TestBoersdagen` i `tests/test_innstillinger_ki.py`. Kilden navngir ikke de andre testene. Hver fil var lik HEAD etterpå | `S/spec-8-10b-vis-ki-tekst-i-innstillinger.md` |
+| 8.11, svarene 8.11 kl. 22:01–22:06 og 9.11 kl. 10:23 | 5 på `713a5fd` (A–E), 7 på `48f4b3e` (A–G) og én for `bruk_liste` | alle fanget til slutt. På `713a5fd`: A (en ferdig liste får 19) 1, B (en aksje målt med feil er med) 1, C (`bruk_liste` skriver ikke fjern) 1 og D (filteret slipper inn 2 av 3) 2 tester. E (filteret uten teksten om råd) overlevde, fordi testen bare så etter en del av setningen, som også står et annet sted på siden; testen sjekker nå hele setningen. På `48f4b3e`: A 1, B 2, C 2, D 2, E 2, F («overskriften regnes etter filteret») 1 og G («Min liste viser alle med 3 av 3») 1 test. «Bransjen sjekkes ikke i `bruk_liste`» ble fanget av `test_en_bransje_utenfor_de_13_avvises`. Kilden navngir ikke de andre testene. Hver fil var lik HEAD etterpå | `S/spec-8-11-ferdige-lister.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
