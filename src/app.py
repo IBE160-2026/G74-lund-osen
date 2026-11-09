@@ -1697,7 +1697,24 @@ def _omsetningen(lager: valg.Valglager, medianene: dict, symbol: str) -> tuple[f
     return median, maalt, False
 
 
+def _medianene() -> dict:
+    """Story 8.11c: medianene av kursene, regnet én gang per forespørsel
+    (gjennomgangen, BH4, ECH2)."""
+    if "medianene" not in g:
+        g.medianene = ferdige_lister.medianene(g.get("tilkobling"))
+    return g.medianene
+
+
 def _egne() -> dict | None:
+    """«Dine egne aksjer» og «Din egen liste», regnet én gang per forespørsel.
+    Gjennomgangen av 8.11c (BH4, ECH2): siden og context processoren brukte
+    hver sin utregning, med de ferdige listene og medianene to ganger."""
+    if "egne" not in g:
+        g.egne = _egne_regnet()
+    return g.egne
+
+
+def _egne_regnet() -> dict | None:
     """«Dine egne aksjer» og «Din egen liste» - story 2.12 (utdraget 08.11
     §1 og §2). Bare lesing (AD-10): aksjene i lista, ønskene som venter, og
     omsetningen fra 2.13."""
@@ -1709,11 +1726,11 @@ def _egne() -> dict | None:
         ventende = lager.ventende()
         egne = lager.egne()
         fjernes = {o.symbol: o.id for o in ventende if o.handling == valg.FJERN}
-        medianene = ferdige_lister.medianene(g.tilkobling)
+        medianene = _medianene()
         rader = []
         for aksje in lista:
             if aksje.symbol in egne:
-                median, _, _ = _omsetningen(lager, medianene, aksje.symbol)
+                omsetningen = _omsetningen(lager, medianene, aksje.symbol)
                 rader.append(
                     {
                         "symbol": aksje.symbol,
@@ -1721,12 +1738,13 @@ def _egne() -> dict | None:
                         "sektor": aksje.sektor,
                         "status": "fjernes" if aksje.symbol in fjernes else "hentet",
                         "oenske": fjernes.get(aksje.symbol),
-                        "utenfor": valg.utenfor_maalingen(median),
+                        "utenfor": valg.utenfor_maalingen(omsetningen[0]),
+                        "omsetningen": omsetningen,
                     }
                 )
         for o in ventende:
             if o.handling == valg.FOLG:
-                median, _, _ = _omsetningen(lager, medianene, o.symbol)
+                omsetningen = _omsetningen(lager, medianene, o.symbol)
                 rader.append(
                     {
                         "symbol": o.symbol,
@@ -1734,7 +1752,8 @@ def _egne() -> dict | None:
                         "sektor": o.sektor,
                         "status": "venter",
                         "oenske": o.id,
-                        "utenfor": valg.utenfor_maalingen(median),
+                        "utenfor": valg.utenfor_maalingen(omsetningen[0]),
+                        "omsetningen": omsetningen,
                     }
                 )
         folg = sum(o.handling == valg.FOLG for o in ventende)
@@ -1746,7 +1765,8 @@ def _egne() -> dict | None:
         utenfor_tekst = {}
         for rad in rader:
             if rad["utenfor"]:
-                median, maalt, kursene = _omsetningen(lager, medianene, rad["symbol"])
+                # Gjennomgangen (BH6): omsetningen fra raden, ikke lest på nytt.
+                median, maalt, kursene = rad["omsetningen"]
                 utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt, kursene=kursene)
         egne_i_lista = len(egne)
         # Story 8.11: de ferdige listene, med merket for omsetningen.
@@ -1812,8 +1832,9 @@ def folg_side():
     gammel = i_lista.get(bytt) if bytt else None
     valgt = lager.boersaksje(kode) if kode else None
     omsetning = None
-    # Story 8.11c: samme median som i de ferdige listene og merket.
-    medianene = ferdige_lister.medianene(g.tilkobling)
+    # Story 8.11c: samme median som i de ferdige listene og merket. Bare når
+    # siden viser en omsetning (gjennomgangen, BH4).
+    medianene = _medianene() if valgt is not None or sok else {}
     if valgt is not None:
         median, maalt, kursene = _omsetningen(lager, medianene, valgt.kode)
         omsetning = {

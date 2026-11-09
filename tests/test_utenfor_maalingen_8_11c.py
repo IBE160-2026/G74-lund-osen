@@ -83,6 +83,15 @@ class TestMedianene:
         finally:
             t.close()
 
+    def test_en_base_uten_tabellene_gir_ingen_medianer(self, tmp_path):
+        """Gjennomgangen (VG4): ville feilet hvis en base uten tabellene, som
+        en base fra før migreringen, ga en feil i stedet for ingen medianer."""
+        t = sqlite3.connect(tmp_path / "tom.db")
+        try:
+            assert ferdige_lister.medianene(t) == {}
+        finally:
+            t.close()
+
     def test_uten_basen_og_uten_kurser_er_den_tom(self, tmp_path):
         """Ville feilet hvis en base uten kurser eller uten tilkobling ga en
         feil i stedet for ingen medianer."""
@@ -128,6 +137,29 @@ class TestMerket:
         assert treff and treff.group(1), "NYA skulle hatt merket i tabellen"
 
 
+class TestMerketEtterGjennomgangen:
+    def test_en_aksje_i_lista_uten_kurser_bruker_ikke_maalingen(self, egen):
+        """Spørsmål 5 (gjennomgangen, VG2): ville feilet hvis en egen aksje i
+        lista uten kurser i vinduet fikk medianen fra en eldre måling, så
+        merket og den ferdige lista, der den ikke står, var uenige."""
+        _sql(egen, "DELETE FROM kurs WHERE symbol = 'NYA'")
+        maal(egen, [("NYA", 500e6)])
+        assert 'class="utenformerke" title="Omsetningen er ikke målt ennå.' in _side()
+
+    def test_begge_uten_merket(self, egen):
+        """Gjennomgangen (BH10): ville feilet hvis tabellen eller den ferdige
+        lista ga merket når medianen av kursene er over 32 MNOK."""
+        maal(egen, [("NYA", 1e6)])
+        _sql(egen, "UPDATE kurs SET volum = 1000000000 WHERE symbol = 'NYA'")
+        treff = MERKET.search(_side())
+        assert treff and not treff.group(1), "NYA skulle vært uten merket i tabellen"
+        ferdig = re.search(
+            r"NYA</span>( <span class=\"utenformerke\">Utenfor målingen)?",
+            _side("/min-liste").split("Start fra en ferdig liste")[1],
+        )
+        assert ferdig and not ferdig.group(1), "NYA skulle vært uten merket i den ferdige lista"
+
+
 class TestFoelgSiden:
     def test_en_aksje_som_er_tatt_ut_viser_kursene(self, egen):
         """Del C: ville feilet hvis «Følg en aksje» viste målingen i 2.13 for
@@ -135,9 +167,20 @@ class TestFoelgSiden:
         _sql(egen, "UPDATE aksje SET ut = '2026-09-23' WHERE symbol = 'DNB'")
         maal(egen, [("DNB", 500e6)])
         side = _side("/folg?kode=DNB")
-        assert "MNOK om dagen, regnet av kursene til 22.09." in side
+        # Gjennomgangen (VG1, VG3): tallet uten fortegn og %, og begge linjene.
+        assert "ca. 0,1 MNOK om dagen, regnet av kursene til 22.09." in side
+        assert "omsetning de 3 siste månedene er 0,1 MNOK, regnet av kursene til 22.09." in side
         assert "så den merkes «Utenfor målingen»" in side
         assert "MNOK om dagen, regnet av kursene til 22.09</span>" in _side("/folg?q=DnB")
+
+    def test_dagen_er_aksjens_siste_dag_med_kurser(self, egen):
+        """Gjennomgangen (BH1, ECH1, BH10): ville feilet hvis teksten sa den
+        siste dagen med kurser i basen om en aksje som er tatt ut og har sin
+        siste kurs en dag før."""
+        _sql(egen, "UPDATE aksje SET ut = '2026-09-22' WHERE symbol = 'DNB'")
+        _sql(egen, "DELETE FROM kurs WHERE symbol = 'DNB' AND dato = '2026-09-22'")
+        side = _side("/folg?kode=DNB")
+        assert "regnet av kursene til 21.09." in side and "til 22.09." not in side
 
     def test_en_aksje_uten_kurser_viser_maalingen(self, egen):
         """Del C: ville feilet hvis en aksje appen aldri har hentet, mistet

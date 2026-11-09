@@ -27,6 +27,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from kursdata import Aksje
+from tallformat import tall
 
 TAK = 18
 # Dagskvoten hos EODHD (gratisnivået) og kallet til hovedindeksen.
@@ -92,7 +93,8 @@ def utenfor_tekst(median_nok: float | None, maalt: date | None, *, kursene: bool
     står dagen som den siste dagen med kurser."""
     if median_nok is None or maalt is None:
         return "Omsetningen er ikke målt ennå. Signalet er målt på aksjer som omsettes for over 32 MNOK om dagen."
-    mnok = f"{median_nok / 1_000_000:.1f}".replace(".", ",")
+    # Gjennomgangen av 8.11c (BH5): tallet med tall(), som på «Følg en aksje» (regel 21).
+    mnok = tall(median_nok / 1_000_000, "mnok")
     kilde = f"regnet av kursene til {maalt:%d.%m.%Y}" if kursene else f"målt {maalt:%d.%m.%Y}"
     return (
         f"Median daglig omsetning de 3 siste månedene er {mnok} MNOK, {kilde}. Signalet er målt på "

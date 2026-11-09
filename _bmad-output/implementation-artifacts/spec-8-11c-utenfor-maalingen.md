@@ -50,3 +50,30 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 ## Grenser
 
 Ingen API-kall, `src/fetch_prices.py` kjøres ikke, og `data/db/ose.db` røres ikke. Ingen migrasjon. Medianene regnes når siden vises og lagres ikke, og ingen tall fra kildene står i koden, testene eller spesifikasjonen (regel 16).
+
+## Bygget 09.11 (ekstravinduet)
+
+Bygget på grenen `8-11c-utenfor-maalingen`, i worktreen `G74-lund-osen-8-11c`, fra `78a45186`.
+
+- **Filene.** `medianene()` i `src/ferdige_lister.py`, `_medianene()`, `_omsetningen()` og `_egne()` i `src/app.py`, `utenfor_tekst()` i `src/valg.py`, `src/templates/folg.html`, slaget `mnok` i `src/tallformat.py` (`e5d456a2`), og «Hvordan følger jeg andre aksjer?» i `docs/hjelp.md` (regel 19). Testene: `tests/test_utenfor_maalingen_8_11c.py`, `test_mnok_uten_fortegn_og_prosent` i `tests/test_tallformat.py`, og testen for merket i `tests/test_valg.py`, som nå venter «regnet av kursene til» etter svaret.
+- **Bildene.** `app.py`, `valg.py`, `ferdige_lister.py`, `tallformat.py` og `folg.html` står bak bildene i `docs/appen/`. Avtrykkene er regnet ut på nytt, og alle ni bildene er tatt på nytt med DevTools-protokollen, med de samme høydene. Alle var byte for byte de samme. Fremgangsmåten ble først prøvd mot `78a45186`, der alle ni ble like.
+
+## Mutantene
+
+Én per del på `a1914c9b`, med kopi før og fila lik HEAD etterpå (`git hash-object` mot `git rev-parse HEAD:<fil>`): A (medianene doblet) fanget av `TestMedianene`, B (`_omsetningen` bruker aldri medianene) av `TestMerket`, C (`kursene` alltid usann på «Følg en aksje») av `TestFoelgSiden`, D (teksten sier alltid «målt») av `TestTeksten`, og `mnok` med % av `test_mnok_uten_fortegn_og_prosent` og `TestFoelgSiden`.
+
+## Gjennomgangen 09.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `78a45186..a1914c9b`: Blind Hunter med bare diffen, uten `tests/test_docker.py` (10 funn), og Edge Case Hunter og Verification Gap i samme agent med repoet (5 og 6 funn, med mutanter i en kopi utenfor worktreen). Ingen høye.
+
+**Middels**
+- *BH1 og ECH1, rettet.* Dagen i teksten var den siste dagen med kurser i basen, også for en aksje som er tatt ut og har sin siste kurs før. Nå er dagen aksjens egen siste dag med kurser (`test_dagen_er_aksjens_siste_dag_med_kurser`). Spørsmål 4 over sier «den siste dagen med kurser i basen»; det gjelder nå vinduet, som fortsatt er tre måneder til basens siste dag, som i de ferdige listene. For en aksje som er tatt ut, kan medianen derfor være av færre dager enn tre måneder.
+- *BH4 og ECH2, rettet.* Medianene og de ferdige listene ble regnet 4–5 ganger per side, fordi `_egne()` kjøres både i ruta og i context processoren, og «Følg en aksje» regnet medianene i tillegg. Nå regnes `_egne()` og medianene én gang per forespørsel (`g`), og «Følg en aksje» regner medianene bare når siden viser en omsetning.
+- *VG1, rettet.* Rettingen av «+0,1 % MNOK» var bare testet i søket. Nå også for en valgt aksje (`ca. 0,1 MNOK om dagen`).
+- *VG2, rettet.* Spørsmål 5 var ikke testet. Nå `test_en_aksje_i_lista_uten_kurser_bruker_ikke_maalingen`.
+- *BH3, står med spørsmål 5.* En aksje i lista uten kurser i vinduet står som «ikke målt ennå», også med en måling i 2.13. En aksje som er tatt ut og ikke har kurser i vinduet, er ikke regnet av kursene og bruker målingen, så den delen av funnet holder ikke.
+- *BH2, ikke reelt.* Er `regnet` ikke tom, har `_aksjene_i_lista` alt lest en dato (Edge Case Hunter kontrollerte det samme). Dagen leses nå per aksje og tåler at den mangler.
+
+**Lav**
+- *Rettet:* BH5 (teksten bak merket bruker `tall(…, "mnok")`, regel 21), BH6 (omsetningen leses én gang per rad), BH8 (hjelpen sier aksjens siste dag, at en aksje i lista uten kurser står som ikke målt, og at en aksje som venter, har målingen), BH9 og ECH5 (testen av `mnok` står for seg, med null og avrundingen), BH10 (`test_begge_uten_merket` og dagen for en aksje som er tatt ut), VG3 (den andre linja på «Følg en aksje»), VG4 (en base uten tabellene).
+- *Ført:* BH7 (ordene «regnet av kursene til» står i malen og i `utenfor_tekst`), ECH3 (spørsmål 2 sier at en aksje som venter, har målingen fordi den ikke er i `aksje`; en aksje som er tatt ut og følges på nytt, står i `aksje` og bruker medianen av kursene mens den venter, som i de ferdige listene), ECH4 (en feil i basen gir stille målingen; `lister()` gjør det samme, så de er enige), VG5 (en aksje som følges på nytt, er ikke testet), VG6 (merket på aksjesiden og i børsometeret kommer fra samme context processor og er ikke testet på nytt).
