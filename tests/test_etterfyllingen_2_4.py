@@ -10,6 +10,7 @@ alt i K9 i test_fetch_prices.py (2.1b); her er resten av kontrollen.
 from datetime import date, datetime, timedelta, timezone
 
 import pytest
+import requests
 
 import fetch_prices as fp
 from indeksdata import HOVEDINDEKS
@@ -75,16 +76,86 @@ class TestSerienByttesIHelhet:
 
     def test_hullet_i_hovedindeksen_fylles_ogsaa(self, stier):
         """Ville feilet hvis bare aksjene ble fylt, og hovedindeksen sto med
-        hullet, så grafen og søylene manglet indeksen de dagene."""
+        hullet, så grafen og søylene manglet indeksen de dagene, eller
+        indeksserien ble skjøtet og ikke byttet (gjennomgangen, BH5, VG1)."""
         raa, base = stier
         _kjoer(raa, base, MANDAG, _hent(MANDAG))
-        _kjoer(raa, base, FREDAG, _hent(FREDAG))
+        _kjoer(raa, base, FREDAG, _hent(FREDAG, endret=True))
+        ventet = {date.fromisoformat(r["date"]): r["adjusted_close"] - 1.0 for r in serie_til(FREDAG, dager=64)[1:]}
         t = aapne_base(base)
         try:
-            datoer = {r.dato for r in SqliteIndekslager(t).serie(HOVEDINDEKS.symbol)}
+            serie = SqliteIndekslager(t).serie(HOVEDINDEKS.symbol)
         finally:
             t.close()
-        assert HULLET | {FREDAG} <= datoer
+        assert HULLET | {FREDAG} <= {r.dato for r in serie}
+        # Bare kildens nye rader: ingen eldre dag og ingen gammel justert kurs.
+        assert all(ventet.get(r.dato) == r.justert_slutt for r in serie), serie[:3]
+
+    def test_en_uke_med_helgen(self, stier):
+        """Gjennomgangen (BH4): ville feilet hvis en hel uke borte, over en
+        helg, ikke ble fylt av den første hentingen etter."""
+        raa, base = stier
+        forrige_mandag = MANDAG - timedelta(days=7)
+        _kjoer(raa, base, forrige_mandag, _hent(forrige_mandag))
+        _kjoer(raa, base, MANDAG, _hent(MANDAG))
+        uka = {forrige_mandag + timedelta(days=d) for d in range(1, 5)} | {MANDAG}
+        t = aapne_base(base)
+        try:
+            lager = SqliteKurslager(t)
+            for aksje in AKSJEUNIVERS:
+                assert uka <= {r.dato for r in lager.serie(aksje.symbol)}, aksje.symbol
+        finally:
+            t.close()
+
+
+class TestNaarHentingenFeiler:
+    """Gjennomgangen (ECH1, ECH2, VG2): det som feiler i hentingen etter
+    hullet, står med hullet, som hjelpen sier."""
+
+    @staticmethod
+    def _feiler(ticker_som_feiler):
+        ekte = _hent(FREDAG)
+
+        def hent(ticker, *resten):
+            if ticker == ticker_som_feiler:
+                raise requests.ConnectionError("ConnectionError")
+            return ekte(ticker, *resten)
+
+        return hent
+
+    def test_en_aksje_som_feiler_staar_med_hullet(self, stier):
+        """Ville feilet hvis en aksje som feilet, fikk serien sin rørt, eller
+        de andre ikke ble fylt fordi én feilet (AD-15)."""
+        raa, base = stier
+        _kjoer(raa, base, MANDAG, _hent(MANDAG))
+        feilet = AKSJEUNIVERS[1]
+        with pytest.raises(SystemExit) as slutt:
+            _kjoer(raa, base, FREDAG, self._feiler(feilet.ticker))
+        assert slutt.value.code == 1
+        t = aapne_base(base)
+        try:
+            lager = SqliteKurslager(t)
+            assert not HULLET & {r.dato for r in lager.serie(feilet.symbol)}
+            for aksje in AKSJEUNIVERS:
+                if aksje is not feilet:
+                    assert HULLET <= {r.dato for r in lager.serie(aksje.symbol)}, aksje.symbol
+        finally:
+            t.close()
+
+    def test_hovedindeksen_som_feiler_staar_med_hullet(self, stier):
+        """Ville feilet hvis hovedindeksen ble fylt uten å være hentet, eller
+        aksjene ikke ble fylt fordi indeksen feilet."""
+        raa, base = stier
+        _kjoer(raa, base, MANDAG, _hent(MANDAG))
+        with pytest.raises(SystemExit) as slutt:
+            _kjoer(raa, base, FREDAG, self._feiler(HOVEDINDEKS.ticker))
+        assert slutt.value.code == fp.KODE_BARE_INDEKSEN
+        t = aapne_base(base)
+        try:
+            assert not HULLET & {r.dato for r in SqliteIndekslager(t).serie(HOVEDINDEKS.symbol)}
+            assert HULLET <= {r.dato for r in SqliteKurslager(t).serie(AKSJEUNIVERS[0].symbol)}
+        finally:
+            t.close()
 
 
 class TestDeSammeKallene:

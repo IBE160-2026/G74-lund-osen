@@ -231,7 +231,7 @@ Hent etter kl. 22 og før midnatt på en børsdag. Første gang, når basen er t
 
 ### Jeg har ikke hentet på noen dager.
 
-Neste henting fyller hullet. Hver henting tar et år bakover for hver aksje i lista og for hovedindeksen, med ett kall hver som en vanlig kveld, og erstatter kursene som er lagret. Etter den er kursgrafen hel igjen, også for hovedindeksen. Signalet for dagene uten henting står som «ikke vurdert», fordi det bare lagres for inneværende børsdag og aldri regnes bakover. Til neste henting går kurslinja rett over dagene som mangler.
+Neste henting som henter kursene, fyller hullet, altså etter kl. 22 på en børsdag, eller i helgen når basen mangler forrige børsdag (se «Når kan jeg hente?»). Hver henting tar et år bakover for hver aksje i lista og for hovedindeksen, med ett kall hver som en vanlig kveld, og erstatter kursene som er lagret, så kursgrafen er hel igjen for det som ble hentet. Feiler en aksje, står hullet i den til et nytt forsøk samme kveld eller neste henting. Feiler hovedindeksen, står hullet i den til neste kveld som henter, fordi indeksen ikke prøves på nytt samme kveld, og en henting som finner kursene for aksjene i basen, henter ikke indeksen heller. En aksje som er tatt ut av lista, hentes ikke, så et hull i den står. Signalet lagres bare for børsdagen hentingen gjelder, så de andre dagene i hullet står som «ikke vurdert», og det regnes aldri bakover.
 
 ### Kan hentingen gå av seg selv hver kveld?
 
