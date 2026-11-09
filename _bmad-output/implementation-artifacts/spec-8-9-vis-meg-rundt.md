@@ -74,3 +74,7 @@ Diffen `1a72810a..a4111592`, uten `tests/test_docker.py` og bildene: Blind Hunte
 - *Spesifikasjonen:* spørsmål 7 sier tre tester er endret, men nevner to; den tredje er avtrykkene i `tests/test_docker.py`.
 
 *Lagt til 2026-11-09 under spørsmål 3 (gjennomgangen, ECH5):* stegene bruker nå tekstene fra tavla, ikke tekstene bak «?». Forslaget er det samme: godta.
+
+*Lagt til 2026-11-09 (hele settet i deler):* to tester feilet etter gjennomgangen, og begge hadde rett. `test_fotnoten_under_summen_er_flyttet_til_hjelpen` (8.20a) krever at «Ingen vekting og ingen skjult formel» ikke står på aksjesiden, og den setningen er den siste i teksten fra tavla om sjekkene. Steget har nå teksten uten den, som retningen uten rådsetningen. `test_ki_teksten_under_regelforklaringen` leser rekkefølgen av overskriftene, og «Signalet dag for dag» i toppen sto før «Signalet forklart»; steget heter nå «Dag for dag». Ingen test er svekket.
+
+8. **Tavla og 8.20a.** Tillegget 13.10 sier at stegene bruker tekstene fra tavla, og 8.20a tok «Ingen vekting og ingen skjult formel.» bort fra aksjesiden. *Forslag:* stegene har tavlas tekster uten de setningene som er tatt bort fra sidene eller ikke kan stå i en hjelpetekst (rådsetningen i retningen). Dette er et svar gruppen må gi før flettingen (regel 25).
