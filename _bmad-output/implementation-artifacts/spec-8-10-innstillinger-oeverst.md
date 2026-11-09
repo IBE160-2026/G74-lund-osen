@@ -87,3 +87,5 @@ Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme ag
 Grenen `8-10-innstillinger-oeverst` er ikke flettet. Den bygger på 2.12 (PR #124), som bygger på 2.11 (PR #123), så de flettes i den rekkefølgen. 8.10b bygger på denne.
 
 *Svar 2026-11-08 kl. 22:53 (gruppens svar):* forslagene i spørsmål 1–5 er godtatt, og rådet anbefalte det. BH2, BH3 og BH4 (middels) er delvis rettet og ført, som triagen sier; 8.10 flettes ikke før mandag kl. 23:50 (0011). Svaret er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
+
+*Svar 2026-11-09 kl. 10:23 (gruppens svar):* 2.12, 8.10 og 8.10b squash-flettes samlet fra PR #126 (grenen `8-10b-vis-ki-tekst`) kl. 23:50, og PR #124 og #125 lukkes som tatt med i flettecommiten. Rådet anbefalte det. Webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), med en Lagt til-linje under regel 22 i `CLAUDE.md`. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
