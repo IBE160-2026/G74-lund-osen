@@ -190,6 +190,19 @@ def trend(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
     )
 
 
+def standardavvik(kurser: list[float], p: Parametre = STANDARD) -> float:
+    """Standardavviket sjekk 2 maaler dagens endring mot: endringene de
+    p.volatilitet_vindu dagene foer, uten dagens. Story 8.7: grafen tegner
+    baandet med denne, saa den viser regelen som ble brukt (FR-202)."""
+    return stdev(_endringer(kurser)[-(p.volatilitet_vindu + 1) : -1])
+
+
+def medianvolum(volumer: list[float], p: Parametre = STANDARD) -> float:
+    """Medianvolumet sjekk 3 maaler dagens volum mot: de p.volum_vindu dagene
+    foer, uten dagens. Story 8.7: grafen tegner streken med denne."""
+    return median(volumer[-(p.volum_vindu + 1) : -1])
+
+
 def bevegelse(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
     """Sjekk 2: dagens endring mot aksjens egen volatilitet.
 
@@ -199,8 +212,7 @@ def bevegelse(kurser: list[float], p: Parametre = STANDARD) -> Sjekk:
     """
     endringer = _endringer(kurser)
     dagens = endringer[-1]
-    historikk = endringer[-(p.volatilitet_vindu + 1) : -1]
-    avvik = stdev(historikk)
+    avvik = standardavvik(kurser, p)
 
     verdi = _fortegn(dagens) if abs(dagens) > avvik else 0
     return Sjekk(
@@ -223,7 +235,7 @@ def interesse(kurser: list[float], volumer: list[float], p: Parametre = STANDARD
     sjekken gir 0.
     """
     dagens_volum = volumer[-1]
-    median_volum = median(volumer[-(p.volum_vindu + 1) : -1])
+    median_volum = medianvolum(volumer, p)
     dagens_endring = _endringer(kurser)[-1]
 
     volumforhold = dagens_volum / median_volum if median_volum > 0 else None

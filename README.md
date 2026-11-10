@@ -95,7 +95,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
 - Periodevalget, hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen, og KI-teksten om dagen
-- På aksjesiden: periodene i kursgrafen med «Vis dagen», signaldagene, datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
+- Periodene i kursgrafen med «Vis dagen», sjekkene, justeringsdagene, signaldagene, datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
 - Min liste, med stjernen foran hvert selskap, ferdige lister, egne aksjer og «Innstillinger», og børsometeret som et kart, med knappene
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
@@ -107,17 +107,13 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Ekstra, hvis tiden rekker**
 
-- Dokumenttestene i én kommando
-- «Utenfor målingen» med samme median som bransjelistene
-- De lave funnene fra gjennomgangene
-- Etterfylling av hull i kursserien
-- Justeringsdagene, regnet av kursserien alene
-- Sjekk 2 og 3 i kursgrafen
-- «Vis meg rundt»
+- Målingen av omsetning for aksjene som ikke er målt ennå
+- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+- Egne notater på aksjesiden, med tenkte kjøp og salg
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
-«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
@@ -243,7 +239,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i [`docs/installasjon.md`](docs/installasjon.md): [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
 - [`docs/skisser/2026-11-06/`](docs/skisser/2026-11-06/) — skissene av aksjesiden og børsometeret laget av KI i chatten 06.11, etter gruppens gjennomgang, med oppdiktede selskaper og tall: fem PNG-er og [`docs/skisser/2026-11-06/LESMEG.md`](docs/skisser/2026-11-06/LESMEG.md) med svarene de bygger på. Bygget 07.11 i 8.20a, 8.20b og 3.4h
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png) og [`investorsiden-brfe-390-demo.png`](docs/appen/investorsiden-brfe-390-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`investorsiden-brfe-demo.png`](docs/appen/investorsiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`din-egen-liste-demo.png`](docs/appen/din-egen-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png) og [`investorsiden-brfe-390-demo.png`](docs/appen/investorsiden-brfe-390-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår

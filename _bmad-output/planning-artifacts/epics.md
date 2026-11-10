@@ -1746,6 +1746,10 @@ jeg kommer tilbake, så hullet ikke ser ut som en kursbevegelse.
 
 *Avgjort 2026-11-10 kl. 11:52 og 15:30 (gruppens svar):* kl. 11:52 ble forslagene i spørsmål 1–5 i spesifikasjonen godtatt. Spørsmål 6 (hovedindeksen etter en feil) sto under funnene og kom ikke med da. Kl. 15:30 svarte gruppen på det: hovedindeksen hentes også når bare den mangler. Rådet anbefalte forslaget om å la det være som før, men gruppen valgte dette, og det bygges på grenen før flettingen. Rådet anbefalte resten. Svarene er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
+*Avgjort 2026-11-10 kl. 17:43 (gruppens svar):* BH2 og ECH7 fra gjennomgangen av svaret kl. 15:30 lukkes som avgjort av gruppen, med graden urørt (regel 25): en base én versjon bak migreres når indeksen skrives, som ved all henting som skriver. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `2c1a17af`, PR #133.
+
 ### Story 2.5: Vurderingen skrives i samme kjøring
 
 Som **gruppe**, vil jeg at vurderingen regnes av kursene som nettopp ble lagret,
@@ -1800,6 +1804,8 @@ forutsetter den målte veien.
 *Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 8.14 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `a2427bee`, PR #134.
 
 ### Story 2.7: Historikken i aksjedetaljen
 
@@ -4029,6 +4035,8 @@ sjekk 2 og 3 slo ut, slik MA50-linjen viser sjekk 1.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
+*Ferdig 2026-11-10:* flettet i `2d0cfc8b`, PR #135.
+
 ### Story 8.8: Signaldager i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -4081,6 +4089,8 @@ del er før jeg leser tallene.
 *Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 (PR #136, med spesifikasjonen `spec-8-9-vis-meg-rundt.md` på grenen), og flettes onsdag 11.11 etter brukertesten, så den ikke påvirker det testen måler. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle åtte forslagene i spesifikasjonen er godtatt, også spørsmål 8 (tavla mot 8.20a). BH1 og BH4 lukkes som avgjort av gruppen, med graden urørt (regel 25). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `eb3ba928`, PR #136.
 
 ### Story 8.10: Innstillinger øverst
 
@@ -4268,6 +4278,8 @@ NFR-06, NFR-08
 *Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 2.6 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen for 2.6 og 8.14 er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `a2427bee`, PR #134.
 
 ### Story 8.15: Sortering ved klikk i kolonneraden
 

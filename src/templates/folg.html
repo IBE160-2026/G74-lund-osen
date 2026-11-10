@@ -1,4 +1,5 @@
 {% extends "_ramme.html" %}
+{% from "_rundtur.html" import rundtur with context -%}
 {#- Story 2.12 (utdraget 08.11 §1 og §2): «Følg en aksje» og «Bytt ut», som
     en side med skjema i stedet for en dialog, så den virker med tastatur og
     uten skript (spørsmål 8). Tekstene står ordrett fra utdraget. Siden leser
@@ -7,6 +8,9 @@
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% block tittel %}{% if gammel %}Bytt ut {{ gammel.navn }}{% else %}Følg en aksje{% endif %} — OSE Signal{% endblock %}
 {% block side %}side-oversikt{% endblock %}
+{#- Story 8.9: «Vis meg rundt», på søket. #}
+{#- Gjennomgangen (ECH1): bare når søket står, ikke når lista er full. #}
+{% block rundtur %}{% if not gammel and not valgt and not (egne and egne.full) %}{{ rundtur("folg") }}{% endif %}{% endblock %}
 {% block innhold %}
 <section class="folg" aria-labelledby="folg-tittel">
   {% if gammel %}

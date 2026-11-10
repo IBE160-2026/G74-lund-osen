@@ -17,6 +17,9 @@ kursen for boersdagen, stopper valget med 0 kall, saa kallene staar til et
 nytt forsoek. Paa en boersdag foer hentingen er det dagens kurs som mangler.
 Fra kl. 23:45 i Oslo, jobbens siste kjoering, gaar maalingen likevel med
 kallene som er igjen etter de nye forsoekene (avgjoerelsen kl. 23:19, d).
+Story 2.4 (gruppens svar 10.11 kl. 15:30): mangler bare hovedindeksen
+boersdagen, venter maalingen paa samme maate, fordi en ny kjoering av
+hentingen da henter indeksen alene med ett kall.
 
 Kvoten leses med /api/user (gratis) foer og etter hvert kall, som i §51.
 Valget stopper hvis extraLimit endrer seg, hvis apiRequestsDate ikke er
@@ -28,10 +31,17 @@ Denne modulen gjoer ingen nettkall selv. hent og les_kvote gis inn av main i
 fetch_prices.py, som har de to nettfunksjonene (AD-2), og testene gir falske
 (AD-8). Raadataene skrives til data/raa/ foer radene i basen (AD-6), og
 utskriften har verken kurser, volumer eller medianene.
+
+Story 2.13b (gruppens svar 10.11 kl. 13:48 og 16:31): med med_bonus maales
+bare aksjene uten en rad i tabellen omsetning, i samme rekkefoelge, med
+kallene som er igjen av dagens og saa bonuskvoten, og valget stopper foer
+extraLimit blir under BONUSGULV. De 214 i malinger.md har ingen tall i basen
+og regnes da ikke som maalt. Uten med_bonus er alt som foer, og bonuskvoten
+brukes aldri.
 """
 
 import json
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 
@@ -41,11 +51,13 @@ from fetch_prices import (
     BASEFEIL,
     UlesbarKvote,
     _uten_noekkel,
+    indeksen_mangler,
     les_kvotetall,
     lista_fra_basen,
     manglende_i_basen,
     nekt_demobase,
 )
+from indeksdata import HOVEDINDEKS
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import PROSJEKTROT
 
@@ -64,6 +76,15 @@ PREFIKS = "omsetning"
 # Jobbens siste kjoering. Fra da stopper ikke en manglende kurs maalingen
 # (avgjoerelsen 28.10 kl. 23:19, d).
 KL_23_45 = time(23, 45)
+
+# Story 2.13b: saa mange kall staar alltid igjen i bonuskvoten med med_bonus.
+BONUSGULV = 200
+# Story 2.13b (gjennomgangen, ECH1): startes valget foer kl. 06:00 i Oslo,
+# gjelder boersdagen foer, saa kjoeringen etter midnatt maaler til kvelden foer.
+KL_06 = time(6, 0)
+# Story 2.13b (gjennomgangen, ECH2): saa mange feil paa rad som ikke er 404,
+# stopper valget, saa bonuskvoten ikke brukes paa kall som feiler.
+FEIL_PAA_RAD = 3
 
 # De 214 som er rangert i malinger.md: paragrafen, datoen i overskriften til
 # paragrafen og symbolene som ble maalt der («Maalt i» i «Alle 206, rangert»
@@ -432,6 +453,7 @@ def maal_omsetning(
     klokke: Callable[[], datetime],
     skriv: Callable[[str], None] = print,
     lista: tuple[Aksje, ...] | None = None,
+    med_bonus: bool = False,
 ) -> int:
     """Maalingen. Gir 0 naar den er ferdig eller ingen kall er igjen, og 1
     naar den stoppet. Stopper den etter et kall, eller avbrytes den, lagres
@@ -440,12 +462,19 @@ def maal_omsetning(
     hent, les_kvote og klokke har ingen standardverdi, saa en test som
     glemmer dem, feiler i stedet for aa gaa mot nettet (AD-8). Klokka leses
     rett foer hvert kall (gjennomgangen, ECH6).
+
+    Med med_bonus (story 2.13b) maales bare aksjene uten en rad i omsetning,
+    og kallene etter dagens tas fra bonuskvoten til BONUSGULV staar igjen.
     """
     nekt_demobase(base_sti, skriv)
     start = klokke().astimezone(timezone.utc)
     i_dag_gmt = start.date()
+    # Story 2.13b (gjennomgangen, ECH1): med valget etter midnatt i Oslo gjelder
+    # kvelden foer, som om klokka var 23:45 eller senere.
+    natt = med_bonus and start.astimezone(OSLO).time() < KL_06
     try:
-        boersdag = innevaerende_boersdag(norsk_dato(start))
+        dag = norsk_dato(start)
+        boersdag = innevaerende_boersdag(dag - timedelta(days=1) if natt else dag)
     except UtenforKalenderen as feil:
         skriv(f"{feil}. Målingen gjetter ikke på børsdagen (NFR-08). 0 kall brukt.")
         return 1
@@ -465,10 +494,19 @@ def maal_omsetning(
             f"Basen finnes ikke, så ingen henting er gjort for {boersdag.isoformat()}. Målingen venter. 0 kall brukt."
         )
         return 1
-    if mangler and start.astimezone(OSLO).time() < KL_23_45:
+    if mangler and not natt and start.astimezone(OSLO).time() < KL_23_45:
         skriv(
             f"{', '.join(mangler)} mangler kursen for {boersdag.isoformat()}. Hentingen og nye forsøk får "
             "kallene først, så målingen venter. 0 kall brukt."
+        )
+        return 1
+    # Story 2.4 (gjennomgangen, ECH1): mangler bare hovedindeksen dagen,
+    # henter en ny kjoering den alene med ett kall, og maalingen venter paa
+    # samme maate, saa den ikke bruker kallet foerst.
+    if not mangler and start.astimezone(OSLO).time() < KL_23_45 and indeksen_mangler(base_sti, boersdag):
+        skriv(
+            f"{HOVEDINDEKS.navn} mangler kursen for {boersdag.isoformat()}. Hentingen får kallet først "
+            "(story 2.4), så målingen venter. 0 kall brukt."
         )
         return 1
     if mangler:
@@ -486,7 +524,8 @@ def maal_omsetning(
         )
         return 1
     try:
-        plan = rekkefoelge(lista_over_boersen, sist_maalt_i_basen(base_sti), lista)
+        i_basen = sist_maalt_i_basen(base_sti)
+        plan = rekkefoelge(lista_over_boersen, i_basen, lista)
     except (*BASEFEIL, ValueError) as feil:
         skriv(f"Basen kan ikke leses ({type(feil).__name__}). 0 kall brukt.")
         return 1
@@ -503,37 +542,74 @@ def maal_omsetning(
     if dato < i_dag_gmt:
         brukt = 0
     igjen = max(grense - brukt, 0)
-    plan = plan[:igjen]
-    if not plan:
-        skriv(f"Ingen kall igjen av dagens {grense} i GMT, eller ingen aksje å måle. 0 kall brukt.")
-        return 0
+    if med_bonus:
+        # Story 2.13b: bare aksjene uten en rad i omsetning, i samme rekkefoelge.
+        uten_maaling = [kode for kode in plan if kode not in i_basen]
+        plan = uten_maaling[: igjen + max(bonus - BONUSGULV, 0)]
+        # Gjennomgangen (BH1, ECH7): hver grunn for seg.
+        if not uten_maaling:
+            skriv("Ingen aksje i lista over Oslo Børs mangler en måling i basen. 0 kall brukt.")
+            return 0
+        if not plan:
+            skriv(
+                f"Ingen kall igjen av dagens {grense} i GMT, og bonuskvoten har {bonus}, ikke over "
+                f"{BONUSGULV}. {len(uten_maaling)} aksjer uten måling venter. 0 kall brukt."
+            )
+            return 0
+    else:
+        plan = plan[:igjen]
+        if not plan:
+            skriv(f"Ingen kall igjen av dagens {grense} i GMT, eller ingen aksje å måle. 0 kall brukt.")
+            return 0
 
     fra, til = vindu(boersdag)
-    rest = igjen - len(plan)
-    skriv(
-        f"Måler omsetningen for {len(plan)} aksjer med {len(plan)} av de {igjen} kallene som er igjen av dagens, "
-        f"fra {fra.isoformat()} til {til.isoformat()}. Bonuskvoten brukes aldri. "
-        + ("Ingen kall blir igjen i dag." if rest == 0 else f"{rest} kall blir igjen i dag.")
-    )
+    if med_bonus:
+        av_dagens = min(len(plan), igjen)
+        skriv(
+            f"Måler omsetningen for {len(plan)} av de {len(uten_maaling)} aksjene uten måling i basen, med "
+            f"{av_dagens} av de {igjen} kallene som er igjen av dagens og inntil {len(plan) - av_dagens} fra "
+            f"bonuskvoten, som har {bonus}, fra {fra.isoformat()} til {til.isoformat()}. Målingen stopper før "
+            f"bonuskvoten er under {BONUSGULV}."
+            + (
+                ""
+                if len(plan) == len(uten_maaling)
+                else f" {len(uten_maaling) - len(plan)} aksjer uten måling venter til en senere kjøring."
+            )
+        )
+    else:
+        rest = igjen - len(plan)
+        skriv(
+            f"Måler omsetningen for {len(plan)} aksjer med {len(plan)} av de {igjen} kallene som er igjen av "
+            f"dagens, fra {fra.isoformat()} til {til.isoformat()}. Bonuskvoten brukes aldri. "
+            + ("Ingen kall blir igjen i dag." if rest == 0 else f"{rest} kall blir igjen i dag.")
+        )
 
     serier: dict[str, object] = {}
     feil_ved: dict[str, str] = {}
     maalinger: list[Maaling] = []
     kall = 0
+    fra_bonus = 0
+    feil_paa_rad = 0
     kode = 0
     etter: tuple[int, int, int, date] | None = None
     avbrutt: BaseException | None = None
     try:
         for symbol in plan:
             brukt, grense_naa, bonus_naa, dato = _les(les_kvote, nokkel)
-            if bonus_naa != bonus:
+            if not med_bonus and bonus_naa != bonus:
                 raise Stopp(f"extraLimit er endret fra {bonus} til {bonus_naa}, så bonuskvoten kan være brukt.")
             if dato > i_dag_gmt or (kall and dato != i_dag_gmt):
                 raise Stopp(f"Kvoten står på {dato.isoformat()}, ikke {i_dag_gmt.isoformat()} i GMT.")
             # Gjennomgangen (BH10, ECH10): den laveste grensen som er lest.
             grense = min(grense, grense_naa)
-            if dato == i_dag_gmt and brukt >= grense:
+            fra_bonusen = dato == i_dag_gmt and brukt >= grense
+            if fra_bonusen and not med_bonus:
                 raise Stopp(f"Alle de {grense} kallene i dag er brukt. Kall nummer {grense + 1} går fra bonuskvoten.")
+            # Story 2.13b: ingen kall fra bonusen naar extraLimit da ville blitt
+            # under BONUSGULV. Et kall av dagens trekker ikke fra den.
+            if med_bonus and fra_bonusen and bonus_naa - 1 < BONUSGULV:
+                raise Stopp(f"extraLimit er {bonus_naa}, og neste kall ville gitt under {BONUSGULV} i bonuskvoten.")
+            bonus_foer = bonus_naa
             if klokke().astimezone(timezone.utc).date() != i_dag_gmt:
                 raise Stopp(f"Datoen i GMT er ikke lenger {i_dag_gmt.isoformat()}.")
             try:
@@ -553,6 +629,8 @@ def maal_omsetning(
             else:
                 maaling = None
                 skriv(f"{symbol}: kallet feilet ({feil_ved[symbol]}). Ingen rad, så den måles først neste gang.")
+            # Gjennomgangen (ECH2): feil paa rad som ikke er 404, telles.
+            feil_paa_rad = feil_paa_rad + 1 if maaling is None else 0
             if maaling is not None:
                 maalinger.append(maaling)
                 if maaling.feil:
@@ -562,9 +640,18 @@ def maal_omsetning(
             etter = brukt, grense_naa, bonus_naa, dato = _les(les_kvote, nokkel)
             if dato != i_dag_gmt:
                 raise Stopp(f"Kvoten står på {dato.isoformat()} etter kallet, ikke {i_dag_gmt.isoformat()} i GMT.")
-            if bonus_naa != bonus:
+            if med_bonus:
+                # Gjennomgangen (BH3, ECH6): det extraLimit sank under kallet.
+                fra_bonus += max(bonus_foer - bonus_naa, 0)
+                # Sank extraLimit under BONUSGULV under kallet, har noe annet
+                # brukt bonusen, og valget stopper.
+                if bonus_naa < min(BONUSGULV, bonus_foer):
+                    raise Stopp(f"extraLimit er {bonus_naa} etter kallet, under {BONUSGULV}.")
+                if feil_paa_rad >= FEIL_PAA_RAD:
+                    raise Stopp(f"{feil_paa_rad} kall på rad feilet uten svar om at tickeren ikke finnes.")
+            elif bonus_naa != bonus:
                 raise Stopp(f"extraLimit er endret fra {bonus} til {bonus_naa}, så bonuskvoten kan være brukt.")
-            if brukt > min(grense, grense_naa):
+            elif brukt > min(grense, grense_naa):
                 raise Stopp(f"apiRequests er {brukt}, over dagens {min(grense, grense_naa)}.")
     except Stopp as stopp:
         skriv(f"STOPP: {stopp}")
@@ -584,6 +671,8 @@ def maal_omsetning(
         }
         kode = _lagre(data_katalog, base_sti, bilde, boersdag, start.isoformat(), fra, til, maalinger, skriv) or kode
     skriv(f"API-kall brukt: {kall}.")
+    if med_bonus and etter is not None:
+        skriv(f"Kall fra bonuskvoten: {fra_bonus}.")
     if etter is not None:
         skriv(f"Kvoten etter: {etter[0]} av {etter[1]} brukt {etter[3].isoformat()} i GMT, extraLimit {etter[2]}.")
     if avbrutt is not None:

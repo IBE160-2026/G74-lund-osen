@@ -63,9 +63,10 @@ from dagsgrunnlag import dagsgrunnlag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
-from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
+from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, rundturer
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
+from justeringsdager import justeringsdager
 from ki_visning import (
     AV,
     DAGEN_AV,
@@ -498,6 +499,8 @@ def _hjelp():
     antall_sjekker er «3» i «N av 3» (story 8.0c), fra samme sted som hjelpen."""
     return {
         "hjelp": Hjelp(hjelpetekster(STANDARD)),
+        # Story 8.9: stegene i «Vis meg rundt», fra samme fil.
+        "rundturer": rundturer(STANDARD),
         "parametre": STANDARD,
         "antall_sjekker": ANTALL_SJEKKER,
         "blandet": BLANDET,
@@ -1303,12 +1306,19 @@ def aksjedetalj(symbol: str):
     # Story 8.2c: den brede og den smale grafen av de samme valgene
     # (gjennomgangen, BH6).
     signal, signal_fra = _signaldagene(rader, vurderingene)
+    # Story 8.14 (FR-407): justeringsdagene det siste året til dagen siden
+    # viser, regnet av kursserien alene. Grafen får alle dagene i serien og
+    # merker dem den har (gjennomgangen, BH1).
+    justeringer = justeringsdager(rader, til=slutt)
     grafvalg = dict(
+        justeringer=justeringsdager(rader),
         indeks=indeks,
         merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
         merket=dagen.dato if dagen else None,
         signal=signal,
         alle=ANTALL_SJEKKER,
+        # Story 8.7: baandet for sjekk 2 og volumet for sjekk 3.
+        volumfaktor=STANDARD.volumfaktor,
     )
     svar = app.make_response(
         render_template(
@@ -1322,6 +1332,7 @@ def aksjedetalj(symbol: str):
             graf_smal=bygg_graf(detalj.punkter, smal=True, **grafvalg),
             # Story 8.8: dagen markeringene starter.
             signal_fra=signal_fra,
+            justeringer=justeringer,
             valg=valg,
             dagen=dagen,
             # Story 8.16b: merket øverst bare for en dag før siste børsdag.
