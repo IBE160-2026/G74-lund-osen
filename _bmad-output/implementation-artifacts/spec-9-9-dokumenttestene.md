@@ -2,7 +2,7 @@
 title: 'Story 9.9: dokumenttestene i én kommando'
 type: 'chore'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '78a45186'
 context:
@@ -75,3 +75,5 @@ Diffen `78a45186..b47a6bc3`: Blind Hunter med bare diffen (12 funn), og Edge Cas
 - *Ført:* BH4 (relative importer og `importlib` følges ikke; ingen i `tests/`), BH6 og ECH4 (bare hendelsen «open» noteres, ikke `stat`, `glob` eller `scandir`, og ikke underprosesser; spørsmål 4), BH9 (undermapper i `tests/`; det er ingen), BH10 (`abspath`, ikke `realpath`; `realpath` på hver åpning koster), BH11 (valget gjelder bare med `tests/conftest.py`, som er der pytest starter fra rota), VG2 (at kommandoen ikke mangler en modul, hviler på vakten i del C), VG4 (innsamlingen er sjekket for hånd av Edge Case Hunter: `test_investorsidene_demo.py` ble notert under `--collect-only`), VG5 (`test_app.py` og `test_kveldshenting.py` er med gjennom en hjelpemodul, ikke ført som kjente).
 - **Etter gjennomgangen:** hele settet alene kl. 12:04:24–12:21:02: 4817 bestått, 24 hoppet over og 0 feilet. Vakten fant ingen modul utenfor.
 - **Mutantene for rettingene** på `5f5b4118`, med kopi før og fila lik HEAD etterpå: VG1 (`utenfor()` gir alltid tom) fanget av `test_utenfor_finner_en_modul_som_ikke_er_med`, ECH3 (filene på kommandolinja tas ikke ut) av `test_kommandoen_tar_ut_en_fil_paa_kommandolinja`, og BH1 (delene av en f-streng teller som stier) overlevde, fordi f-strengen i testen ikke så ut som en sti. Testen har nå `f"se README.md for {n}"`, og mutanten ble fanget av `test_bare_koden_teller`.
+
+*Lagt til 2026-11-10:* 9.9 er flettet med PR #130 i `26496be9` kl. 02:12, låst til head-en `a772ccaf`, etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md` og gruppens svar 09.11 kl. 17:37. Main, med 8.11c og 9.10, ble flettet inn i `a772ccaf` uten konflikter, og diffen mot main er endringene grenen hadde mot `78a45186`. Grenen endrer ingen filer bak bildene. Hele settet alene i fire deler 01:56:24–02:08:32: 4848 bestått, 24 hoppet over og 0 feilet, til sammen de 4872 som `pytest --collect-only` finner. CI var grønn på head-en (run 42733625252). Treet på main etter `git pull --ff-only` er likt treet på `a772ccaf`. Ingen funn på middels eller over sto åpne. Fra nå er testene for dokumentene `uv run pytest --dokumentene`.
