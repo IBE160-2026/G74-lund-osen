@@ -18,6 +18,9 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med kursgrafen og rammen «Signalet forklart»: setningen om hvor lenge signalet har vært slik, setningen om hva hovedindeksen, bransjen og aksjene i lista gjorde samme dag, og KI-teksten, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
 *Aksjesiden for BRFE i demoen, med grafen og rammen «Signalet forklart», med setningene om dagene og om samme dag først og KI-teksten under, med oppdiktede tall («Eksempeltall»).*
 
+![Investorsiden for Brattfjell Energi (BRFE) i demoen, den man kommer til fra aksjesiden, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-demo.png)
+*Investorsiden for BRFE i demoen, fra boblen nederst på aksjesiden, med «Illustrasjon laget av KI» under tegningen, med oppdiktede selskaper («Eksempeltall»).*
+
 ![Børsometeret i demoen, et kart med én rute per aksje etter bransje, farget etter endringen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-demo.png)
 *Børsometeret i demoen, med kortene «Mål mot børsen» og «Slik leser du børsometeret» øverst, antallet og snittet under hver bransje, og navnet og endringen i stor skrift i de største rutene, med oppdiktede tall («Eksempeltall»).*
 
@@ -30,11 +33,11 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Børsometeret i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-390-demo.png)
 *Børsometeret i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
 
-![«Din egen liste» i Min liste i demoen: hva du trenger for å følge andre aksjer, kallene lista bruker, og «Bytt ut» ved hver aksje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
-*«Din egen liste» i Min liste i demoen, med kallene lista bruker og «Bytt ut» ved hver aksje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
+![Investorsiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-390-demo.png)
+*Investorsiden for BRFE i demoen ved 390 px, som på en mobil, med oppdiktede selskaper («Eksempeltall»).*
 
-![Investorsiden for Brattfjell Energi (BRFE) i demoen, den man kommer til fra aksjesiden, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-demo.png)
-*Investorsiden for BRFE i demoen, fra boblen nederst på aksjesiden, med «Illustrasjon laget av KI» under tegningen, med oppdiktede selskaper («Eksempeltall»).*
+![«Din egen liste» i Min liste i demoen: hva du trenger for å følge andre aksjer, kallene lista bruker, «Bytt ut» ved hver aksje og de ferdige listene per bransje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
+*«Din egen liste» i Min liste i demoen, med kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én liste per bransje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
 </details>
 
@@ -88,9 +91,9 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - De tre sjekkene, trend, bevegelse og interesse, styrken for hver aksje hver børsdag, også fra 2027, og regelforklaringen på aksjesiden
 - Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
-- Periodevalget på alle sidene, og hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen
-- På aksjesiden: periodene i kursgrafen med «Vis dagen», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
-- Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene øverst og «Innstillinger» med «Vis hjelp»
+- Periodevalget, hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen, og KI-teksten om dagen
+- På aksjesiden: periodene i kursgrafen med «Vis dagen», signaldagene, datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
+- Min liste, med stjernen foran hvert selskap, ferdige lister, egne aksjer og «Innstillinger», og børsometeret som et kart, med knappene
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 
@@ -101,10 +104,13 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Ekstra, hvis tiden rekker**
 
-- Signaldagene i kursgrafen
-- Innstillingene, med «Vis KI-tekst»
-- KI-teksten om dagen på forsiden
-- Til slutt å velge og bytte aksjer
+- Dokumenttestene i én kommando
+- «Utenfor målingen» med samme median som bransjelistene
+- De lave funnene fra gjennomgangene
+- Etterfylling av hull i kursserien
+- Justeringsdagene, regnet av kursserien alene
+- Sjekk 2 og 3 i kursgrafen
+- «Vis meg rundt»
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
@@ -146,6 +152,8 @@ uv run pytest
 ```
 
 Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 10 og 14 minutter på maskinen vår 08.11.
+
+Er bare dokumentene endret, kjører `uv run pytest --dokumentene` testene som leser README-en, `docs/` eller `_bmad-output/`. Hvilke det er, finnes i koden, og en test i hele settet feiler hvis en test som leser dem, ikke er med.
 
 Alle testene skal bestå. Noen hoppes over fordi de gjelder en annen type maskin, men alle kjøres minst ett sted.
 
@@ -231,7 +239,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i [`docs/installasjon.md`](docs/installasjon.md): [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
 - [`docs/skisser/2026-11-06/`](docs/skisser/2026-11-06/) — skissene av aksjesiden og børsometeret laget av KI i chatten 06.11, etter gruppens gjennomgang, med oppdiktede selskaper og tall: fem PNG-er og [`docs/skisser/2026-11-06/LESMEG.md`](docs/skisser/2026-11-06/LESMEG.md) med svarene de bygger på. Bygget 07.11 i 8.20a, 8.20b og 3.4h
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png) og [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png) og [`investorsiden-brfe-390-demo.png`](docs/appen/investorsiden-brfe-390-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår
