@@ -64,8 +64,14 @@ ett kall, med samme intervall. Raadataene staar i samme oeyeblikksbilde,
 under noekkelen indeks, og indeksen lagres i tabellen indeks gjennom
 SqliteIndekslager, aldri i kurs eller vurdering (AD-21). Feiler kallet,
 lagres og vurderes aksjene som vanlig, og indeksen faar ingen ny sjanse
-(AD-15). Nye forsoek henter bare aksjene. Feilet bare indeksen, gir
-kjoeringen kode 3 (KODE_BARE_INDEKSEN, beslutningen 17.10 kl. 11:58).
+i samme kjoering (AD-15). Nye forsoek henter bare aksjene. Feilet bare
+indeksen, gir kjoeringen kode 3 (KODE_BARE_INDEKSEN, beslutningen 17.10
+kl. 11:58).
+
+Story 2.4 (gruppens svar 10.11 kl. 15:30): har basen kursen for
+boersdagen for alle aksjene, men hovedindeksen mangler dagen, henter en
+ny kjoering samme kveld eller i helgen indeksen alene med ett kall
+(hent_bare_indeksen), med kall som er igjen av dagens og aldri bonuskvoten.
 
 Story 2.13: --maal-omsetning maaler omsetningen for de neste aksjene i lista
 over Oslo Boers med kallene som er igjen av dagens, og aldri bonuskvoten.
@@ -879,6 +885,31 @@ def manglende_i_basen(base_sti: Path, dato: date, lista: tuple[Aksje, ...] = AKS
         tilkobling.close()
 
 
+def indeksen_mangler(base_sti: Path, dato: date, indeks: Indeks = HOVEDINDEKS) -> bool:
+    """Om basen mangler raden for dato i indeks - story 2.4, gruppens svar
+    10.11 kl. 15:30.
+
+    Basen aapnes med _aapne_for_sjekken, saa ingenting skrives. Finnes ikke
+    basen, eller kan den ikke aapnes eller leses (ogsaa en base uten tabellen
+    indeks), er svaret False, og kjoeringen gjoer som foer: ingen kall.
+    """
+    if not base_sti.exists():
+        return False
+    try:
+        tilkobling = _aapne_for_sjekken(base_sti)
+    except BASEFEIL:
+        return False
+    try:
+        rad = tilkobling.execute(
+            "SELECT 1 FROM indeks WHERE symbol = ? AND dato = ?", (indeks.symbol, dato.isoformat())
+        ).fetchone()
+    except sqlite3.Error:
+        return False
+    finally:
+        tilkobling.close()
+    return rad is None
+
+
 def base_er_tom(base_sti: Path) -> bool:
     """Om basen er tom - story 2.3c: fila finnes ikke, eller kurs og
     vurdering har ingen rader. Basen aapnes med _aapne_for_sjekken, saa
@@ -994,6 +1025,13 @@ def kjoer(
     0 (alt i orden, eller ingenting aa gjoere), 1 (noe mangler eller feilet,
     eller kjoeringen ble stoppet), 2 (feil i argumentene, fra argparse) og 3.
 
+    Story 2.4 (gruppens svar 10.11 kl. 15:30): har basen kursen for
+    boersdagen for alle aksjene i lista, men hovedindeksen mangler dagen
+    (indeksen_mangler), hentes indeksen alene med ett kall
+    (hent_bare_indeksen), ogsaa i helgen. Har basen ikke dagen i indeks
+    etterpaa, gir kjoeringen kode 3. Mangler ogsaa en aksje dagens kurs,
+    gaar kjoeringen som foer, og et nytt forsoek henter bare aksjene.
+
     Alt om tid utledes av oeyeblikk, som maa ha sone (AD-20, story 2.1):
     dagen er norsk kalenderdato (boersdag.norsk_dato) og gir filnavnet og
     til-datoen i intervallet, og hentet er oeyeblikket i UTC med offset.
@@ -1106,11 +1144,22 @@ def kjoer(
         )
     else:
         if not mangler:
-            skriv(
-                f"Basen har alt kursene for børsdagen {dato.isoformat()} for "
-                f"alle {len(lista)} aksjene. Ingenting å hente (FR-402). "
-                "0 kall brukt."
-            )
+            # Story 2.4, gruppens svar 10.11 kl. 15:30: mangler bare
+            # hovedindeksen dagen, hentes den alene med ett kall.
+            indeksen_hentes = indeksen_mangler(base_sti, dato)
+            if indeksen_hentes:
+                skriv(
+                    f"Basen har alt kursene for børsdagen {dato.isoformat()} for "
+                    f"alle {len(lista)} aksjene, men {HOVEDINDEKS.navn.lower()} mangler "
+                    "den dagen. Den hentes alene, med ett kall, når klokka og kvoten "
+                    "tillater det (story 2.4)."
+                )
+            else:
+                skriv(
+                    f"Basen har alt kursene for børsdagen {dato.isoformat()} for "
+                    f"alle {len(lista)} aksjene. Ingenting å hente (FR-402). "
+                    "0 kall brukt."
+                )
             # Story 2.3b, svar 6 (ECH8 i 2.3): radene i vurdering som mangler,
             # skrives av kursene i basen, uten kall.
             try:
@@ -1138,8 +1187,25 @@ def kjoer(
                     bare=set(uten_rad),
                 ):
                     sys.exit(1)
-            # Story 10.2: KI-radene som mangler, uten kall til EODHD.
-            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, med_dagen=True)
+            # Story 2.4: indeksen foer KI-tekstene, saa teksten om dagen kan
+            # lages med den (10.6) naar den ogsaa mangler. Gjennomgangen
+            # (ECH2): KI-tekstene lages ogsaa naar hentingen av indeksen
+            # stopper kjoeringen (for eksempel uten noekkel).
+            raad = ""
+            try:
+                if indeksen_hentes:
+                    raad = hent_bare_indeksen(
+                        data_katalog, base_sti, oeyeblikk, dag, dato, api_nokkel, hent, skriv, klokke, les_kvote
+                    )
+            finally:
+                # Story 10.2: KI-radene som mangler, uten kall til EODHD.
+                lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, med_dagen=True)
+            if raad:
+                skriv(
+                    f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} mangler børsdagen "
+                    f"{dato.isoformat()}. Kode {KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). {raad}"
+                )
+                sys.exit(KODE_BARE_INDEKSEN)
             return None
 
     # Filvakten (AD-6, K8): fila heter etter boersdagen, ikke kjoeredagen.
@@ -1285,9 +1351,11 @@ def kjoer(
         indeksen_feilet = True
         skriv(
             f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i hentingen "
-            f"({indeks.feil[HOVEDINDEKS.symbol]}) og får ingen ny sjanse i kveld "
-            "(AD-15). Aksjene lagres og vurderes som vanlig, og et nytt forsøk "
-            "henter bare aksjene. Neste henting bytter ut hele serien."
+            f"({indeks.feil[HOVEDINDEKS.symbol]}) og får ingen ny sjanse i denne "
+            "kjøringen (AD-15). Aksjene lagres og vurderes som vanlig, og et nytt "
+            "forsøk for aksjene henter bare aksjene. Når alle aksjene har kursen, "
+            "henter en ny kjøring samme kveld, eller en dag børsen er stengt, indeksen "
+            "alene med ett kall (story 2.4)."
         )
 
     # Vurderingene etter kursene (AD-17), med datoen fra oeyeblikket.
@@ -1346,8 +1414,8 @@ def kjoer(
     if indeksen_feilet:
         skriv(
             f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} feilet. Kode "
-            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Indeksen prøves "
-            "ikke igjen i kveld (AD-15), og neste henting bytter ut hele serien."
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Kjør samme kommando "
+            "igjen senere, så hentes indeksen alene med ett kall (story 2.4)."
         )
         sys.exit(KODE_BARE_INDEKSEN)
     return fil
@@ -1592,11 +1660,130 @@ def nytt_forsoek(
     if _indeksen_feilet_i_kveld(kursfil, base_sti):
         skriv(
             f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i kveldens henting, "
-            "og et nytt forsøk henter den ikke (AD-15). Kode "
-            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58)."
+            "og et nytt forsøk for aksjene henter den ikke (AD-15). Kode "
+            f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Kjør samme kommando "
+            "igjen senere, så hentes indeksen alene med ett kall (story 2.4)."
         )
         sys.exit(KODE_BARE_INDEKSEN)
     return fil
+
+
+# Story 2.4 (gjennomgangen, BH3): hva utskriften raader til naar indeksen
+# ikke ble hentet. En ny kjoering hjelper bare naar kallet ble gjort.
+PROEV_INDEKSEN_IGJEN = "Kjør samme kommando igjen senere, så hentes den alene med ett kall."
+VENT_PAA_INDEKSEN = (
+    "En ny kjøring henter den alene når det er kall igjen av dagens og klokka er før 23:50, "
+    "og neste vanlige henting bytter ut hele serien."
+)
+
+
+def hent_bare_indeksen(
+    data_katalog: Path,
+    base_sti: Path,
+    oeyeblikk: datetime,
+    dag: date,
+    dato: date,
+    api_nokkel: str | Callable[[], str],
+    hent: Callable[[str, str, str, str], list[dict]],
+    skriv: Callable[[str], None],
+    klokke: Callable[[], datetime],
+    les_kvote: Callable[[str], object],
+    indeks: Indeks = HOVEDINDEKS,
+) -> str:
+    """Hovedindeksen alene, med ett kall - story 2.4, gruppens svar 10.11
+    kl. 15:30 (spoersmaal 6 i spesifikasjonen).
+
+    kjoer kaller den naar basen har kursen for dato for alle aksjene i lista,
+    men indeksen mangler dagen (indeksen_mangler): kallet feilet i kveldens
+    hovedhenting, eller svaret manglet dagen. Kvotereglene er de samme som
+    for et nytt forsoek (2.3b), uten taket fra kall_til_nye_forsoek, fordi
+    aksjene alt har kursene: ingen kall fra kl. 23:50 i Oslo eller etter
+    midnatt (sjekket ogsaa rett foer kallet), bare kall som er igjen av
+    dagens, aldri bonuskvoten (NFR-01), og kan kvoten ikke leses, blir det 0
+    kall. Kallet har samme intervall som en vanlig kveld. Svaret skrives
+    foerst til en egen forsoeksfil (AD-6), og kursfila roeres aldri.
+    Indeksen lagres gjennom skriv_indeksen_til_basen, aldri i kurs eller
+    vurdering (AD-21).
+
+    Returnerer en tom tekst naar basen har raden for dato i indeks etterpaa.
+    Ellers raadet til utskriften (PROEV_INDEKSEN_IGJEN naar kallet ble gjort,
+    VENT_PAA_INDEKSEN naar klokka, kvoten eller noekkelen sa nei), og
+    utskriften har sagt hvorfor.
+    """
+    navn = f"{indeks.navn} {indeks.symbol}"
+    if grunn := _for_sent(klokke(), dag):
+        skriv(f"{grunn} {navn} hentes ikke så sent. 0 kall brukt.")
+        return VENT_PAA_INDEKSEN
+    if callable(api_nokkel):
+        api_nokkel = api_nokkel()
+    hentet_tid = oeyeblikk.astimezone(timezone.utc)
+    try:
+        brukt, grense, _ = les_kvotetall(les_kvote(api_nokkel), hentet_tid.date())
+    except requests.HTTPError as feil:
+        if str(feil).startswith(("HTTP 401", "HTTP 403")):
+            skriv(f"EODHD avviste nøkkelen ved /api/user ({feil}). Sjekk EODHD_API_KEY i .env. 0 kall brukt.")
+        else:
+            skriv(
+                f"Kvoten kunne ikke leses fra /api/user ({feil}). {navn} hentes bare med "
+                "kall som er igjen av dagens, aldri bonuskvoten, så det blir ingen kall. 0 kall brukt."
+            )
+        return VENT_PAA_INDEKSEN
+    except (requests.RequestException, ValueError) as feil:
+        skriv(
+            f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). {navn} hentes bare "
+            "med kall som er igjen av dagens, aldri bonuskvoten, så det blir ingen kall. 0 kall brukt."
+        )
+        return VENT_PAA_INDEKSEN
+    igjen = max(grense - brukt, 0)
+    if igjen < 1:
+        skriv(f"Kvoten: 0 kall igjen av dagens. {navn} hentes aldri med bonuskvoten (NFR-01). 0 kall brukt.")
+        return VENT_PAA_INDEKSEN
+    # Gjennomgangen (ECH4): klokka igjen rett foer kallet, som i nytt_forsoek.
+    if grunn := _for_sent(klokke(), dag):
+        skriv(f"{grunn} {navn} hentes ikke så sent. 0 kall brukt.")
+        return VENT_PAA_INDEKSEN
+    skriv(f"Kvoten: {igjen} kall igjen av dagens. Bonuskvoten brukes ikke. Henter {navn} med ett kall.\n")
+    fra, til = bygg_intervall(dag)
+    resultat = hent_indeksen(api_nokkel, fra, til, hent, skriv, indeks)
+    tekst = json.dumps(lag_oyeblikksbilde(Resultat(), fra, til, hentet_tid.isoformat(), resultat), ensure_ascii=False)
+    try:
+        data_katalog.mkdir(parents=True, exist_ok=True)
+        # Navnet er fritt, saa en fil som dukker opp underveis, gir neste n.
+        for _ in range(10):
+            fil = forsoeksfil(data_katalog, dato)
+            try:
+                with open(fil, "x", encoding="utf-8") as ut:
+                    ut.write(tekst)
+                break
+            except FileExistsError:
+                continue
+        else:
+            skriv(
+                f"Ingen ledig fil for forsøket i {data_katalog.name}/ (AD-6). "
+                f"{resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+            )
+            return PROEV_INDEKSEN_IGJEN
+    except OSError as feil:
+        # Gjennomgangen (ECH2): en fil som ikke kan skrives, stopper ikke
+        # KI-tekstene etter.
+        skriv(
+            f"Fila for forsøket kunne ikke skrives i {data_katalog.name}/ ({type(feil).__name__}). "
+            f"{resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+        )
+        return PROEV_INDEKSEN_IGJEN
+    skriv(f"\nLagret {fil.name} i {data_katalog.name}/")
+    skriv(f"API-kall brukt: {resultat.kall_brukt}")
+    if indeks.symbol not in resultat.serier:
+        skriv(f"{navn} feilet i hentingen ({resultat.feil[indeks.symbol]}).")
+        return PROEV_INDEKSEN_IGJEN
+    if not skriv_indeksen_til_basen(
+        base_sti, serie_fra_eodhd(resultat.serier[indeks.symbol]), hentet_tid, fil, skriv, indeks
+    ):
+        return PROEV_INDEKSEN_IGJEN
+    if indeksen_mangler(base_sti, dato, indeks):
+        skriv(f"Svaret har ikke {indeks.navn.lower()} for børsdagen {dato.isoformat()} (FR-402).")
+        return PROEV_INDEKSEN_IGJEN
+    return ""
 
 
 def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> None:
