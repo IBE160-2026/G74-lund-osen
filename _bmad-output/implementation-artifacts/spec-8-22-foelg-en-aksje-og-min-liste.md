@@ -72,3 +72,46 @@ Tre stegkort etter utdraget §2: en gratis nøkkel hos eodhd.com, nøkkelen lime
 - Ingen rangering etter kursen eller signalet, og ingen anbefaling (NFR-06).
 - Ingen kurser, volum eller målte omsetningstall fra kildene i sporede filer (regel 16). Kontrollsjekken har bare ticker, bransje og kilde.
 - Tester bare med testbaser og demobaser i midlertidige mapper (regel 22).
+
+## Tilleggene 10.11
+
+- **Kl. 17:16, om demoen (gruppens svar kl. 15:57):** gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel. «Demo Børs» har fått sju oppdiktede selskaper til (`demo.DEMOBOERSEN`), seks av dem med en oppdiktet måling (`DEMOMAALT`), med bransjen i navnet (`DEMOBRANSJE`). I demoen kan derfor 12 aksjer følges: Kraft har tre målte (forslagene) og én som ikke er målt, og alle fire valgene i filteret på omsetning gir treff. Siden sier «Demo Børs» i demoen, og stripa har merket «Eksempeltall». Steg 2 i «Din egen liste» sier i demoen at demoen ikke trenger nøkkel. Demoen har nå 11 bransjelister (var 9). Testene: `TestDemoen` i `test_foelg_en_aksje_8_22.py` og `test_demoen_viser_kortene_og_trenger_ingen_noekkel`. Bildene i PR-en og i `docs/appen/` er tatt fra demoen.
+- **Kl. 17:46, om testene i kveld (gruppens svar kl. 17:42):** ingen pytest i dette vinduet før 2.13b er flettet eller klokka er 22:00, og ikke kl. 22:15–23:50.
+- **Kl. 17:47:** vindu 4 ble lukket ved en feil. Tilstanden ble sjekket før arbeidet fortsatte (sesjonsloggen).
+
+Spørsmål 7 er bygget med teksten «Velg en bransje, så står de mest omsatte du ikke følger, her, høyst tre.», fordi «de tre» er et ord ordlista har valgt bort (`VALGT_BORT` i `test_hjelpetekster.py`). Spørsmål 8 er endret etter gjennomgangen: et klikk på en bransje eller en omsetning sender skjemaet, men et piltrykk gjør det ikke; med tastaturet sendes valget med «Vis».
+
+## Gjennomgangen 10.11
+
+Gjennomgangen av `53ff012c..59a84ee4` ga 12 funn fra Blind Hunter, 14 fra Edge Case Hunter og 10 fra Verification Gap. Funn som er de samme, står på én rad.
+
+| Funn | Grad | Utfall |
+|---|---|---|
+| BH1, ECH1, BH2, BH10, VG7 (forslagene skjules av søket eller filteret på omsetning) | høy | Rettet: forslagene skjules aldri (`rad(a, false)`), og testene teller bare forslag som vises. |
+| BH4, ECH2 (hvert piltrykk sender skjemaet) | middels | Rettet: bare et klikk sender skjemaet. Spørsmål 8 er oppdatert. |
+| BH3, ECH3, ECH4 (MULTI og SCOIN slipper inn via `aksje.sektor` eller et ønske fra før 8.22) | middels | Rettet: `UTE` i `ferdige_lister.py`. `bransjen`, `foelgbare` og `ta_i_bruk` avviser dem. Den ekte basen (lest med `mode=ro`) har ingen av dem i `aksje` eller blant de 3 ventende ønskene. |
+| VG1 (skriptet er bare sjekket som tekst) | middels | Delvis rettet: testen sjekker nå at feltet lytter på `input`, at radene skjules og at bare et klikk sender skjemaet. Skriptet kjøres ikke i en nettleser i testene. Bildene er tatt med skriptet i Edge. |
+| VG2 (intet bilde av «Følg en aksje») | middels | Rettet: `docs/appen/folg-en-aksje-demo.png`, i knappen i README-en, med avtrykk. |
+| VG3 («aldri ekte navn» bare sjekket på tickere) | middels | Rettet: ingen navn fra `AKSJEUNIVERS` og ingen ekte ticker på seks demosider. Antallet sier «Demo Børs» i demoen. |
+| VG4 (kallene i steg 3 er bare sjekket med tom liste) | middels | Rettet: test med én egen aksje (1 kall og 3 i margin). |
+| BH5, ECH7 (skriptet og serveren søker ulikt) | lav | Rettet: `data-kode` og `data-navn` hver for seg, som `filtrer`. |
+| BH6, BH7, VG7 (grensen på to steder, og 32 skrevet inn) | lav | Rettet: `Foelgbar.utenfor` og `OMSETNINGSFILTER` fra `GRENSE_MNOK`, og test på nøyaktig 32 MNOK. Hjelpeteksten sier 32 MNOK, som `dine_egne_aksjer`. |
+| ECH8 (Æ, Ø og Å i feil rekkefølge) | lav | Rettet: `_norsk` i `ferdige_lister.py`, med test. |
+| VG5 (en egen aksje som er tatt ut) | lav | Rettet: testen viser at den ikke røres. |
+| VG6 (GET `/folg` skriver ikke) | lav | Rettet: `/folg` med filter, søk og bytte i `test_sidene_skriver_aldri`. |
+| VG8, VG9 (ordlyden i spørsmål 7, Kilde-kolonnen, 157 og 53) | lav | Rettet: ordlyden står over, Kilde-kolonnen har bare seks kjente verdier, og docstringen forklarer 141 + 15 + MULTI = 157 og 52 + SCOIN = 53. |
+| VG10 («Ville feilet hvis» mangler i to tester) | lav | Rettet. Byttet er også sjekket i forslagene og filterskjemaet. |
+| ECH5, BH11 (medianene regnes ved hver GET `/folg`) | middels/lav | Står: lista viser omsetningen for alle, så den trengs. Klikkene laster ikke lenger siden ved hvert piltrykk (BH4). Ikke målt; spørsmål til gruppen. |
+| ECH14 (full liste viser «Følg» for alle) | lav | Avvist: med full liste og uten bytte viser `/folg` bare «Lista er full …» (den første grenen i `folg.html`). |
+| BH8 (`fetchone()[0]` uten rad) | lav | Avvist: `egne_i_lista` velger fra `aksje` med `ut IS NULL`, så raden finnes, og en aksje som er tatt ut, er ikke med. |
+| BH9, ECH6, ECH9 (avvisning og tom lista ved feil) | lav | Står: `Valglager.folg` avviser en ukjent kode først, og en base uten `boersliste` viser 0, som før 8.22. |
+| ECH10, ECH11 (bransjen skrives om uten historikk) | lav | Står, som spørsmål 3. |
+| ECH12 (demotickerne gjelder også i den ekte versjonen) | lav | Står: ingen av dem er på Oslo Børs 10.11. En ny notering med samme ticker vil få en oppdiktet bransje; spørsmål til gruppen. |
+| BH12, ECH13 (`maalt` uten tidssone) | lav | Avvist for 8.22: `omsetning.maalt` skrives med tidssone av 2.13, og det samme gjelder `Valglager.omsetning` fra før. |
+
+Ingen funn på middels eller over står åpne uten spørsmål. ECH5 er middels hos Edge Case Hunter og står som spørsmål 12 (regel 25).
+
+## Spørsmål etter gjennomgangen
+
+12. **Medianene ved hver visning av «Følg en aksje» (ECH5).** *Forslag:* som bygget. Lista trenger omsetningen for alle, og medianene regnes én gang per forespørsel, som på Min liste. Det er ikke målt hvor lang tid det tar med den ekte basen.
+13. **Demotickerne i den ekte versjonen (ECH12).** *Forslag:* som bygget, fordi ingen av dem er på Oslo Børs 10.11. Kommer en av dem på børsen, sjekkes bransjen på nytt.
