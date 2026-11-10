@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-10T19:53
+updated: 2026-11-10T21:12
 ---
 
 # Kvalitetssikring
@@ -416,6 +416,7 @@ sist i dokumentet.
 | 2.6 og 8.14 Justeringsdagene: svaret 10.11 kl. 11:52 | `a2427be` (#134) | 1 (15: A–D på `3746880` 09.11, og 11 i gjennomgangen 09.11) | M2, M3 og M11 overlevde i gjennomgangen og ble fanget etter rettingen; mutanten for BH1 (grafen får dagene for året) overlever, fordi serien aldri er lengre enn ett år (`DAGER_TILBAKE`) | `S/spec-2-6-justeringsdager.md` |
 | 8.7 Sjekk 2 og 3 i kursgrafen: svaret 10.11 kl. 11:52 | `2d0cfc8` (#135) | 1 (23: A–D på `482ab6d` 09.11, og 19 i gjennomgangen 09.11) | M4, M7, M13 og M15 overlevde i gjennomgangen og ble fanget etter rettingen av VG1–VG3 | `S/spec-8-7-sjekk-2-og-3-i-grafen.md` |
 | 8.9 «Vis meg rundt»: svaret 10.11 kl. 11:52 | `eb3ba92` (#136) | 1 (14: A1, A2 og B1–B3 på `d20090b`, 6 i gjennomgangen og 3 etter rettingen 09.11) | A1 (et tall skrevet for hånd i «Tallene bak») overlevde først, fordi det samme tallet sto i steget om kursgrafen, og ble fanget da testen så på hvert steg for seg (`a411159`) | `S/spec-8-9-vis-meg-rundt.md` |
+| 2.13b Målingen av aksjene uten måling, med bonuskvoten: svarene 10.11 kl. 13:48, 16:31 og 17:42 | `178107d` (#137) | 1 (8: A–D på `97f0fdc`, ECH1, ECH2 og BH1 på `36bca8c`, BH3 på `36bca8c` og `39c89eb`) | BH3 (forskjellen fra starten i «Kall fra bonuskvoten») overlevde først på `36bca8c`, fanget etter `test_kallene_fra_bonusen_telles_uten_det_andre_bruker_mellom_kallene` (`39c89eb`) | `S/spec-2-13b-maal-alle-med-bonuskvoten.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -537,6 +538,7 @@ resultatene ligger i `data/`, som aldri committes (regel 10 og 16).
 | 01.10 | 2.1c | Signalet før og etter, på et ekte øyeblikksbilde | Styrke, retning og de tre verdiene like for alle 15. Bare teksten for interesse ulik, som ventet | `S/spec-2-1c-…`, linje 107 |
 | 02.10 | 2.5 | `vurder()` på et ekte øyeblikksbilde, uten nett og uten basen | 15 av 15 gir en `Vurdering`, ingen gir en grunn | `S/spec-2-5-…`, Implementation Notes |
 | 02.10 | – | Den første hentingen med vurderinger, etterkontroll | Kopi med samme sha256 som basen. Byttet ut, ikke skjøtt på. 15 vurderinger lest tilbake med `SqliteVurderingslager.les`, ingen med grunn | `D/2026-10-02.md`, kl. 22:37 |
+| 2.13b | «Kall fra bonuskvoten» som forskjellen fra starten (`bonus - etter[2]`): testen der noe annet bruker bonuskvoten, ga samme tall | mutantkjøringen for BH3 | `test_kallene_fra_bonusen_telles_uten_det_andre_bruker_mellom_kallene`, der noe annet bruker 5 mellom to kall | `39c89eb` |
 
 Kontrollregningen fanger ikke alt. I 1.4b ble tilfellet med en `hentet` som
 ikke kan leses, funnet av gjennomgangen og ikke av kontrollregningen
@@ -691,6 +693,7 @@ funn. Antall rader i loggen:
 | 2.6 og 8.14, gjennomgangen 09.11 (23 funn, telt per funn; BH2 og BH3 ikke reelle, talt som avvist; VG6 talt som rettet) | 23 | 12 | 2 | 9 |
 | 8.7, gjennomgangen 09.11 (23 funn, telt per funn; BH8 ikke reelt, talt som avvist) | 23 | 15 | 1 | 7 |
 | 8.9, gjennomgangen 09.11 (21 funn, telt per funn; BH5 ikke reelt, talt som avvist; BH1 og BH4 lukket med gruppens svar 10.11 kl. 11:52, talt som utsatt) | 21 | 11 | 1 | 9 |
+| 2.13b, gjennomgangen 10.11 (18 funn, telt per funn; ECH1, ECH2 og ECH3 lukket med gruppens svar kl. 17:42; ECH3, BH2, ECH4, ECH5, BH7 og VG4 ført, talt som utsatt) | 18 | 12 | 0 | 6 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1537,6 +1540,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 2.6 og 8.14, svaret 10.11 kl. 11:52 | 4 på `3746880` (A–D) og 11 i gjennomgangen 09.11 | A (terskelen 1,0) `test_terskelen`, B (merket ved en periode) `test_ikke_for_en_periode`, C (kortet merker hver dag med to rader) `test_kortet_sier_justeringsdag`, D (året til siste rad) `test_dagene_er_de_samme_som_2_6_finner`. I gjennomgangen overlevde M2, M3 og M11 og ble fanget etter rettingen av VG1–VG3; mutanten for BH1 overlever og er forklart. Hver fil var lik HEAD etterpå | `S/spec-2-6-justeringsdager.md` |
 | 8.7, svaret 10.11 kl. 11:52 | 4 på `482ab6d` (A–D) og 19 i gjennomgangen 09.11 | A (medianen med vinduet fra `STANDARD`) `test_streken_foelger_vinduet_i_parametre`, B (båndet med to standardavvik) `test_baandet_er_forrige_kurs_pluss_og_minus_avviket`, C (grensen to ganger medianen) `test_baand_soeyler_og_streker`, D (teksten om båndet tatt bort) `test_i_samme_svg_og_teksten`. I gjennomgangen: M7 (faktoren 2,0) `test_grafen_faar_volumfaktoren_fra_parametre`, M4 og M15 `test_baandet_og_grensen_holder_seg_i_feltet`, M13 (medianen med dagen selv) `test_vinduene_er_dagene_foer_uten_dagen_selv`, etter at den først overlevde. Hver fil var lik HEAD etterpå | `S/spec-8-7-sjekk-2-og-3-i-grafen.md` |
 | 8.9, svaret 10.11 kl. 11:52 | 5 på `d20090b` (A1, A2 og B1–B3), og mutantene i og etter gjennomgangen 09.11 | A1 (et tall skrevet for hånd) overlevde først og ble fanget da testen så på hvert steg for seg; A2 (en egen tekst for signalstyrken) av testen for tekstene, som etter ECH5 heter `test_tekstene_fra_tavla`, B1 (børsometeret uten knappen) `test_knappen_og_stegene_peker_paa_noe_som_finnes`, B2 (aksjesiden alltid med sjekkene) `test_aksjesiden_uten_sjekker`, B3 (knappen uten «Vis hjelp») `test_borte_naar_hjelpen_er_av`. Etter gjennomgangen ble mutanten med den gamle teksten fanget av `test_tekstene_fra_tavla`. Hver fil var lik HEAD etterpå | `S/spec-8-9-vis-meg-rundt.md` |
+| 2.13b, svarene 10.11 kl. 13:48, 16:31 og 17:42 | 4 på `97f0fdc` (A–D) og 4 for rettingene (ECH1, ECH2, BH1 og BH3) | A (filteret tatt bort) `TestUtvalget`, B (taket ett for høyt) `TestTaket`, C (kontrollen før kallet tatt bort) `TestKontrollenFoerHvertKall`, D (`med_bonus=False` i `main()`) `TestUtenValget`, ECH1 og ECH2 `TestGjennomgangen`, BH1 `TestUtvalget`; BH3 overlevde først og ble fanget etter den nye testen. Hver fil var lik HEAD etterpå (`git hash-object`) | `S/spec-2-13b-maal-alle-med-bonuskvoten.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
