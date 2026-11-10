@@ -36,7 +36,7 @@
     <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
   {% elif valgt %}
     {#- Story 8.22 (svaret 10.11 kl. 13:38): bransjen er fast, med symbolet. #}
-    <p class="aksjetype">Aksje på Oslo Børs · {{ valgt.kode }} · {{ bransjesymbol(bransje) }}{{ bransje }}</p>
+    <p class="aksjetype">Aksje på {{ 'Demo Børs' if eksempeltall else 'Oslo Børs' }} · {{ valgt.kode }} · {{ bransjesymbol(bransje) }}{{ bransje }}</p>
     {% if omsetning and omsetning.median is not none %}
       <p class="omsetning">Median omsetning de 3 siste månedene: ca. {{ omsetning.median|tall('mnok') }} MNOK om dagen, {{ 'regnet av kursene til' if omsetning.kursene else 'målt' }} {{ omsetning.maalt|dato }}.
       {% if omsetning.utenfor %}Det er under de {{ grense|tall('heltall') }} MNOK signalet er målt på, så den merkes «Utenfor målingen».{% else %}Det er over de {{ grense|tall('heltall') }} MNOK signalet er målt på.{% endif %}</p>

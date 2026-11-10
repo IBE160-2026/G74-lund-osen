@@ -284,7 +284,12 @@ class TestDemoen:
             html = k.get(adresse).data.decode("utf-8").split("<main>", 1)[1]
             for aksje in AKSJEUNIVERS:
                 assert aksje.navn not in html, (adresse, aksje.symbol)
-            koder = set(re.findall(r"kode=([A-Z0-9]+)", html)) | set(
-                re.findall(r'<span class="linje">([A-Z0-9]+)', html)
+            # Bekreftelsen har koden i det skjulte feltet, ikke i en lenke.
+            koder = (
+                set(re.findall(r"kode=([A-Z0-9]+)", html))
+                | set(re.findall(r'<span class="linje">([A-Z0-9]+)', html))
+                | set(re.findall(r'name="kode" value="([A-Z0-9]+)"', html))
             )
             assert koder and koder <= oppdiktet and not koder & ekte, adresse
+            if "kode=" in adresse:
+                assert "Aksje på Demo Børs · HVLK · " in html and "Oslo Børs" not in html, adresse

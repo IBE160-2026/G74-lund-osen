@@ -1824,7 +1824,8 @@ DE_NYE_BILDENE = {
     # Story 8.22: 1628, med de tre stegkortene og 11 ferdige lister i demoen.
     "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1628, FILENE_BAK_MIN_LISTE),
     # Story 8.22: «Følg en aksje» i demoen med Kraft valgt, hele siden (1326 px), sist i knappen.
-    # Flettingen av main (8.9, «Vis meg rundt») inn i 8.22: 1368.
+    # Flettingen av main (8.9, «Vis meg rundt») inn i 8.22: 1368. Bekreftelsen sier «Demo Børs» i
+    # demoen (folg.html); bildet er byte for byte det samme.
     "docs/appen/folg-en-aksje-demo.png": ("/folg?bransje=Kraft", 1280, 1368, FILENE_BAK_FOLG),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
@@ -1930,7 +1931,7 @@ DE_NYE_BILDENE = {
 # Gjennomgangen av 8.22: ferdige_lister.py, valg.py, folg.html, hjelp.js og stil.css, og det nye
 # bildet av «Følg en aksje» (VG2). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "3b6980b41dd7152567560fd1706a869247d7b1907e14abf3db8bc5f70209a748",
+    "docs/appen/folg-en-aksje-demo.png": "ca98d98bfd7828ba58b90f7653c80814ef3495b1345f9d29b0afdd1b2b937480",
     TOPPEN_AV_OVERSIKTEN: "1c5ae0dc90f75ec7cbba08b192e478bfbbe812e41893ff82442ea8b9ebc379cf",
     "docs/appen/boersometeret-demo.png": "c03b76cb4f4799375dbd12225852e350c8ffe4790104c516224b54d3b8ccae77",
     "docs/appen/min-liste-demo.png": "3755b6046091905f29a5674ad5751c582288c44b625bcf0d6a6160d365deeee8",
