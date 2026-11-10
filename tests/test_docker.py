@@ -1769,6 +1769,10 @@ FILENE_BAK_INVESTORSIDEN = (
 TOPPEN_AV_OVERSIKTEN = "docs/appen/oversikten-topp-demo.png"
 DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
+    # Gruppens ønske 09.11 kl. 22:01 (tillegg 5 til ekstravinduet): investorsiden
+    # står rett under aksjesiden i knappen, fordi man kommer dit fra aksjesiden.
+    # Rekkefølgen her er rekkefølgen i knappen.
+    "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 948, FILENE_BAK_INVESTORSIDEN),
     # Story 8.20b: 1682, med kortene «Mål mot børsen» og «Slik leser du
     # børsometeret» øverst og to linjer i bransjeoverskriftene. Var 1329.
     "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 1682, FILENE_BAK_BOERSOMETERET),
@@ -1784,6 +1788,9 @@ DE_NYE_BILDENE = {
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 3327, FILENE_BAK_BOERSOMETERET),
+    # Gruppens ønske 09.11 kl. 22:01: investorsiden for BRFE ved 390 px, sist
+    # blant bildene ved 390 px, hele siden (1117 px).
+    "docs/appen/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1117, FILENE_BAK_INVESTORSIDEN),
     # Story 2.12: «Din egen liste» i Min liste, bare delen (id-en
     # din-egen-liste), klippet ut med 16 px over og under.
     # Story 8.11: 1216, med «Start fra en ferdig liste» nederst.
@@ -1791,7 +1798,6 @@ DE_NYE_BILDENE = {
     # Flettingen av 2.12 inn i 8.11: 1216 som i 8.11, med «Start fra en ferdig liste».
     # Story 8.11b: 1432, med de ni ferdige listene i demoen.
     "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1432, FILENE_BAK_MIN_LISTE),
-    "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 948, FILENE_BAK_INVESTORSIDEN),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1897,6 +1903,7 @@ AVTRYKK_BAK_DE_NYE_BILDENE = {
     "docs/appen/boersometeret-390-demo.png": "f177f7e5c7266521f707ff23fcadd22335f234ed8419b3a24746ca3a6305456b",
     "docs/appen/din-egen-liste-demo.png": "8105d95c08e33e00d48ee95d07c9612463c7181fc62739f4c26612b661487599",
     "docs/appen/investorsiden-brfe-demo.png": "c014f914e3b9f870ea94ff1b70e3c1f212f07ddaefb7db99697be9de078bc018",
+    "docs/appen/investorsiden-brfe-390-demo.png": "c014f914e3b9f870ea94ff1b70e3c1f212f07ddaefb7db99697be9de078bc018",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3550,8 +3557,9 @@ class TestReadmeForNybegynnere:
         # nye bildene i docs/appen/. Instruksjonen 07.11 kl. 09:10: 38 med
         # docs/skisser/2026-11-06/ og LESMEG.md der, med hele stien. Story
         # 3.5i: 40 med docs/installasjon.md i punktet for docs/ og i punktet
-        # for skjermbildene, som staar der.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 40, lenker
+        # for skjermbildene, som staar der. Gruppens ønske 09.11 kl. 22:01: 41
+        # med investorsiden ved 390 px i punktet for docs/appen/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 41, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -4006,7 +4014,9 @@ AVTRYKK_I_PILENE = {
     "Dokumentene": "cd15079ad259593d86543f04e0c4e020f642f76dae09ec611547acad5e6e774b",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
-    "Mappestruktur": "2b26269852ce7a454d02c54179eb21f53651f2c761be8069ef6de1279e483091",
+    # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i
+    # punktet for docs/appen/. Var 2b262698....
+    "Mappestruktur": "bea5b6e14201cab4cd7798391d3e802931245473802cf771fc9a43a2acc31694",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye

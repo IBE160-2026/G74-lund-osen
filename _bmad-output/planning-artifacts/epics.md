@@ -2598,6 +2598,8 @@ Oppsettet, de 15 tegningene, skriftene og plassen til snakkeboblene står i `doc
 
 *Ønske 2026-11-08 kl. 23:59 (gruppens ønske):* README-en mangler et bilde av investorsiden i demoen, den man kommer til fra aksjesiden. Bildet tas som de andre i `docs/appen/` og står under «Bilder av appen (demoen)». Ønsket er ført etter instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`.
 
+*Ønske 2026-11-09 kl. 22:01 (gruppens ønske):* bildet av investorsiden for BRFE står rett under bildet av aksjesiden i «Bilder av appen (demoen)», fordi man kommer dit fra aksjesiden, og et nytt bilde av investorsiden ved 390 px står sist blant bildene ved 390 px, med bildetekst og alt-tekst som de andre der. Ønsket er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`, i tillegg 5 kl. 22:08.
+
 ---
 
 ### Story 3.5: Start med dobbeltklikk
