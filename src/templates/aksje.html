@@ -3,6 +3,7 @@
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_brikker.html" import brikker, retningspille -%}
 {% from "_perioder.html" import periodevalg with context -%}
+{% from "_rundtur.html" import rundtur with context -%}
 {% from "_investorboble.html" import investorboble -%}
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
 {#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
@@ -10,6 +11,8 @@
 {% block oppdatert_hjelp %}{% if hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
 {% block side %}side-aksje{% endblock %}
 
+{#- Story 8.9: «Vis meg rundt». Uten sjekker på siden står ikke stegene om dem. #}
+{% block rundtur %}{{ rundtur("aksje" if detalj.sjekker else "aksje_uten_sjekker") }}{% endblock %}
 {% block innhold %}
   <a class="tilbake" href="/">Markedsoversikt</a>
 
@@ -46,6 +49,8 @@
   {#- Gjennomgangen av 8.20a (BH11, ECH1): 2 av 3 merkes bare for siste
       børsdag (designregler §3), som overskriften over. #}
   {%- set ringen = "tre-av-tre" if detalj.styrke == antall_sjekker else "to-av-tre" if detalj.styrke is not none and detalj.styrke >= parametre.terskel and not tidligere_dag else "" %}
+  {#- Story 8.9: ankrene for «Vis meg rundt», tomme, så malen ellers er som før. #}
+  <span id="noekkeltallene"></span>
   <div class="sammendrag">
     <div class="noekkeltall">
       <span class="etikett">Sluttkurs {{ hjelpeknapp("hjelp-kurs", "Hjelp: sluttkurs") }}</span>
@@ -88,6 +93,7 @@
   </div>
 
   {#- Del 5: de 3 sjekkene står foran grafen. #}
+  <span id="sjekkene"></span>
   <h2>Hvorfor signalet ble {% if detalj.styrke is not none %}{{ detalj.styrke }}{% else %}ukjent{% endif %} {{ hjelpeknapp("hjelp-sjekkene", "Hjelp: sjekkene") }}</h2>
 
   {% if detalj.sjekker %}

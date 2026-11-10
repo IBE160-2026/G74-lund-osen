@@ -67,6 +67,9 @@
       <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se <a href="{{ ekte_versjonen_url }}">Den ekte versjonen</a>.</p>
     </div>
     {% endif %}
+    {#- Story 8.9 (FR-109): «Vis meg rundt», som hver side fyller med sine
+        steg, øverst, så den ikke står inne i innholdet. #}
+    {% block rundtur %}{% endblock %}
   </header>
 
   <main>

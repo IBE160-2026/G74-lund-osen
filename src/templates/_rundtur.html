@@ -1,0 +1,19 @@
+{#- Story 8.9 (FR-109): «Vis meg rundt». Stegene står i hjelpetekster.py,
+    som hjelpen, og lenker til delene av siden. Uten skript: en knapp som
+    åpner lista. #}
+{% macro rundtur(side) -%}
+{%- set steg = rundturer.get(side) -%}
+{#- Som «?»: borte når «Vis hjelp» er av i Innstillinger. #}
+{%- if steg and (vis_hjelp is not defined or vis_hjelp) %}
+<div class="rad rundtur-rad">
+<details class="rundtur">
+  <summary>Vis meg rundt</summary>
+  <ol class="rundtur-steg">
+    {%- for s in steg %}
+    <li><a href="#{{ s.anker }}">{{ s.tittel }}</a> {{ s.tekst }}</li>
+    {%- endfor %}
+  </ol>
+</details>
+</div>
+{%- endif %}
+{%- endmacro %}
