@@ -22,6 +22,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tillegget k
 5. **Antallet.** Kommandoen finner 25 moduler, ikke 6. Mange av dem leser README-en eller hjelpen for å sjekke at sidene og dokumentene sier det samme, og de er også de tregeste (`test_dobbeltklikk.py`, `test_app.py`). *Forslag:* godta det, fordi det er nettopp de testene som kan bli røde når bare et dokument endres. Tiden står under «Bygget».
 6. **De seks.** *Forslag:* linja fra 24.10 i `docs/kvalitetssikring.md` blir stående, med en Lagt til-linje under om at «testene for dokumentene» fra nå er kommandoen. README-en får kommandoen under «Tester» (regel 19).
 
+*Svar 2026-11-09 kl. 17:37 (gruppens svar):* alle seks forslagene er godtatt, så testene for dokumentene er `uv run pytest --dokumentene` fra flettingen av #130. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`, og storyen står i `epics.md` i Epic 9.
+
 ## Intent
 
 **Problem:** «Testene for dokumentene» er seks filer skrevet ned for hånd 24.10. En test som leser README-en uten å stå blant dem, ble ikke kjørt før en commit som bare endret dokumentene, og CI ble rød på `00b56821`.
