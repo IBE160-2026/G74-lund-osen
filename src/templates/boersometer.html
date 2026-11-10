@@ -2,6 +2,7 @@
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_perioder.html" import periodevalg with context -%}
+{% from "_rundtur.html" import rundtur with context -%}
 {#- Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret som på
     tavla. Én rute per aksje, ordnet etter bransje med symbolet. Fargen er
     endringen slik den vises, størrelsen volumforholdet, og rammen signalet:
@@ -19,6 +20,8 @@
 {#- Samme klasse som oversikten, så hovedindeksen får samme stil. Reglene
     for rutene har egne klassenavn. #}
 {% block side %}side-oversikt{% endblock %}
+{#- Story 8.9: «Vis meg rundt», når børsometeret har bransjer. #}
+{% block rundtur %}{% if bransjer %}{{ rundtur("boersometer") }}{% endif %}{% endblock %}
 {% block innhold %}
   <h1 class="overskrift">Børsometer {{ hjelpeknapp("hjelp-boersometer", "Hjelp: børsometeret") }}</h1>
   {% if bransjer %}

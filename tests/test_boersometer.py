@@ -616,7 +616,8 @@ class TestSiden:
         utenfor details, eller med fotnoten inne i den lukkede delen."""
         for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?dag=2026-09-18"):
             html = _side(klient, adresse)
-            details = re.findall(r"<details[^>]*>", html)
+            # Story 8.9: «Vis meg rundt» øverst er også en details, og står for seg.
+            details = [d for d in re.findall(r"<details[^>]*>", html) if d != '<details class="rundtur">']
             assert details == ['<details class="tallene">'], (adresse, details)
             tallene = html.split('<details class="tallene">', 1)[1].split("</details>", 1)
             assert tallene[0].lstrip().startswith("<summary>Se tallene som tabell</summary>")

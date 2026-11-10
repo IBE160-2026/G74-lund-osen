@@ -17,6 +17,9 @@ kursen for boersdagen, stopper valget med 0 kall, saa kallene staar til et
 nytt forsoek. Paa en boersdag foer hentingen er det dagens kurs som mangler.
 Fra kl. 23:45 i Oslo, jobbens siste kjoering, gaar maalingen likevel med
 kallene som er igjen etter de nye forsoekene (avgjoerelsen kl. 23:19, d).
+Story 2.4 (gruppens svar 10.11 kl. 15:30): mangler bare hovedindeksen
+boersdagen, venter maalingen paa samme maate, fordi en ny kjoering av
+hentingen da henter indeksen alene med ett kall.
 
 Kvoten leses med /api/user (gratis) foer og etter hvert kall, som i §51.
 Valget stopper hvis extraLimit endrer seg, hvis apiRequestsDate ikke er
@@ -48,11 +51,13 @@ from fetch_prices import (
     BASEFEIL,
     UlesbarKvote,
     _uten_noekkel,
+    indeksen_mangler,
     les_kvotetall,
     lista_fra_basen,
     manglende_i_basen,
     nekt_demobase,
 )
+from indeksdata import HOVEDINDEKS
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import PROSJEKTROT
 
@@ -493,6 +498,15 @@ def maal_omsetning(
         skriv(
             f"{', '.join(mangler)} mangler kursen for {boersdag.isoformat()}. Hentingen og nye forsøk får "
             "kallene først, så målingen venter. 0 kall brukt."
+        )
+        return 1
+    # Story 2.4 (gjennomgangen, ECH1): mangler bare hovedindeksen dagen,
+    # henter en ny kjoering den alene med ett kall, og maalingen venter paa
+    # samme maate, saa den ikke bruker kallet foerst.
+    if not mangler and start.astimezone(OSLO).time() < KL_23_45 and indeksen_mangler(base_sti, boersdag):
+        skriv(
+            f"{HOVEDINDEKS.navn} mangler kursen for {boersdag.isoformat()}. Hentingen får kallet først "
+            "(story 2.4), så målingen venter. 0 kall brukt."
         )
         return 1
     if mangler:

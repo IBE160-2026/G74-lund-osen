@@ -47,7 +47,9 @@ def er_dokument(sti) -> bool:
 
 # Moduler som leser dokumentene uten at det står i koden deres (BH2, BH3).
 # Tom 09.11: hele settet fant ingen.
-TILLEGG: frozenset[str] = frozenset()
+# Story 8.9 (flettingen 10.11): test_vis_meg_rundt_8_9.py leser endringsforslaget
+# 13.10 gjennom ENDRINGSFORSLAGET_13_10 i src/hjelpetekster.py (test_tekstene_fra_tavla).
+TILLEGG: frozenset[str] = frozenset({"test_vis_meg_rundt_8_9.py"})
 
 
 def _peker_paa_dokumentene(tekst: str) -> bool:
@@ -114,7 +116,9 @@ def modulene(mappe: Path = TESTMAPPA) -> frozenset[str]:
             if sti.stem not in leser and _importene(tre) & hjelperne & leser:
                 leser.add(sti.stem)
                 endret = True
-    return frozenset(f"{stem}.py" for stem in leser if stem.startswith("test_")) | TILLEGG
+    # Flettingen av 8.9 (10.11): bare modulene i TILLEGG som finnes i mappa.
+    tillegg = frozenset(navn for navn in TILLEGG if (mappe / navn).is_file())
+    return frozenset(f"{stem}.py" for stem in leser if stem.startswith("test_")) | tillegg
 
 
 def utenfor(aapnet: dict[str, set[str]], med: frozenset[str]) -> dict[str, list[str]]:
