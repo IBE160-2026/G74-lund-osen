@@ -2,7 +2,7 @@
 title: 'Story 2.13b: målingen av aksjene uten måling, med bonuskvoten'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '53ff012c'
 context:
@@ -108,3 +108,5 @@ Diffen `53ff012c..97f0fdc4`. Blind Hunter så bare diffen og fant 7 funn. Edge C
 ## Testene
 
 Hele settet på `39c89ebf`, alene i fire deler, 16:53:07–17:11:01: 4872 bestått, 24 hoppet over og 0 feilet. Det er til sammen de 4896 som `pytest --collect-only` finner. ruff er kjørt før hver commit.
+
+*Lagt til 2026-11-10:* 2.13b er flettet med PR #137 i `178107d9` kl. 21:10:39, låst til head-en `7d61de0e`, etter instruksjonen kl. 16:20 og gruppens svar kl. 13:48, 16:31 og 17:42. Main, med 2.4, 2.6, 8.14, 8.7 og 8.9, ble flettet inn i `7964277e` og igjen i `7d61de0e` etter Utført-linja for de fem storyene, uten konflikter. Hele settet på `7d61de0e`, alene i fire deler 20:48:26–21:05:42: 4946 bestått, 24 hoppet over og 0 feilet, til sammen de 4970 som `pytest --collect-only` finner. CI var grønn på head-en (run 42891875216). Treet på main etter `git pull --ff-only` er likt treet på `7d61de0e`. Ingen funn på middels eller over sto åpne: ECH1, ECH2 og ECH3 er lukket med svaret kl. 17:42.
