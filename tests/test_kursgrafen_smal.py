@@ -44,10 +44,12 @@ def test_den_smale_grafen_har_det_samme_som_den_brede(aksjesiden, side):
     """Ville feilet hvis den smale grafen manglet en linje, et merke på
     aksen, rutenettet, punktet ved enden eller et navn på en linje, eller
     hvis den hadde de brede målene, så den ble skalert ned som før."""
-    from graf import SMAL_BREDDE, SMAL_HOYDE
+    from graf import SMAL_BREDDE, SMAL_HOYDE, VOLUMFELT
 
     bred, smal = _svg(aksjesiden, "graf"), _svg(aksjesiden, "graf smal")
-    assert f'viewBox="0 0 {SMAL_BREDDE} {SMAL_HOYDE}"' in smal
+    # Story 8.7: feltet for volumet står under grafen, i samme SVG. Her sto
+    # SMAL_HOYDE alene.
+    assert f'viewBox="0 0 {SMAL_BREDDE} {SMAL_HOYDE + VOLUMFELT}"' in smal
     for teller in (
         r'<polyline class="kurslinje"',
         r'<polyline class="ma50linje"',

@@ -1144,6 +1144,13 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .signaldag { stroke: var(--kort); stroke-width: 1.5; }
 /* Story 8.14 (FR-407): justeringsdagene, en kort strek nederst i grafen. */
 :where(.side-aksje) line.justeringsdag { stroke: var(--tekst); stroke-width: 2; }
+/* Story 8.7 (FR-202, tillegget): båndet for sjekk 2 og volumet for sjekk 3. */
+:where(.side-aksje) .baand { fill: var(--kurs); fill-opacity: 0.08; stroke: none; }
+:where(.side-aksje) .volumsoeyle { fill: var(--dempet); fill-opacity: 0.45; }
+:where(.side-aksje) .medianstrek { fill: none; stroke: var(--tekst); stroke-width: 1.5; }
+/* Heltrukket og gul: stiplet er bare hovedindeksen (designregler §5). */
+:where(.side-aksje) .grensestrek { fill: none; stroke: var(--gul-symbol); stroke-width: 2; }
+:where(.side-aksje) .volumnavn { font-size: 12px; fill: var(--dempet); }
 :where(.side-aksje) .signaldag.positiv { fill: var(--opp); }
 :where(.side-aksje) .signaldag.negativ { fill: var(--ned); }
 :where(.side-aksje) .signaldag.blandet { fill: var(--blandet); }

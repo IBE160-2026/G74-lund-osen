@@ -146,6 +146,11 @@ class Forklaring:
 # avstanden fra punktet.
 # Gjennomgangen av 8.20a (ECH8): bred nok til «Snitt 50 dager» og et tall med
 # tusenskille, som «1 234,56», i 12 px. Var 132.
+# Story 8.7 (FR-202, tillegget): feltet med volumsoeylene under kursgrafen,
+# i samme SVG. VOLUMFELT er hele feltet, VOLUMLUFT luften over soeylene.
+VOLUMFELT = 84
+VOLUMLUFT = 22
+
 LAPPBREDDE = 176
 LAPPHOYDE = 58
 LAPPLUFT = 10
@@ -223,6 +228,19 @@ class Graf:
     # Story 8.14 (FR-407): x for justeringsdagene grafen har, regnet av
     # kursserien (justeringsdager.py), og datoene i samme rekkefølge.
     justeringsdager: tuple[tuple[date, float], ...] = ()
+    # Story 8.7 (FR-202, tillegget): baandet for sjekk 2 som punktstreng for
+    # en polygon, volumsoeylene (x, y, bredde, hoeyde), strekene for
+    # medianvolumet og grensen for sjekk 3 i stykker der de finnes, og hvor
+    # mange av dagene i grafen som mangler streken (NFR-08).
+    baand: str = ""
+    volumsoeyler: tuple[tuple[float, float, float, float], ...] = ()
+    medianstreker: tuple[str, ...] = ()
+    grensestreker: tuple[str, ...] = ()
+    uten_median: int = 0
+    # Gjennomgangen (ECH4): feltet står også når alle dagene har volum 0.
+    volumfelt: bool = False
+    volumtopp: float = 0.0
+    volumbunn: float = 0.0
 
     # Story 8.2b, b (U41): kantene paa tegneflaten, som malen tegner
     # rutenettet og merkene etter.
@@ -241,6 +259,11 @@ class Graf:
     @property
     def bunn(self) -> float:
         return self.hoyde - self.bunnfelt
+
+    @property
+    def totalhoyde(self) -> int:
+        """Story 8.7: SVG-en med feltet for volumet under kursgrafen."""
+        return self.hoyde + (VOLUMFELT if self.volumfelt else 0)
 
     @property
     def har_ma50(self) -> bool:
@@ -517,6 +540,68 @@ def _dagene(punkter: tuple[Punkt, ...], lav, hoy, bredde, hoyde, hoeyre, bunn) -
     return tuple(dager)
 
 
+def _baandet(punkter: tuple[Punkt, ...], lav, hoy, bredde, hoyde, hoeyre, bunn) -> str:
+    """Story 8.7: baandet for sjekk 2, forrige dags justerte kurs pluss og
+    minus standardavviket fra sjekk 2, for dagene som har det. Klippet til
+    grafen, saa skalaen er den samme som foer."""
+    antall = len(punkter)
+    over, under = [], []
+    for i, p in enumerate(punkter):
+        if p.avvik is None or p.forrige is None:
+            continue
+        x = _x(i, antall, bredde, hoeyre)
+        for liste, verdi in ((over, p.forrige * (1 + p.avvik)), (under, p.forrige * (1 - p.avvik))):
+            liste.append(f"{x:.1f},{_y(min(max(verdi, lav), hoy), lav, hoy, hoyde, bunn):.1f}")
+    if len(over) < 2:
+        return ""
+    return " ".join(over + under[::-1])
+
+
+def _volumet(punkter: tuple[Punkt, ...], faktor: float, bredde, hoyde, hoeyre):
+    """Story 8.7: volumsoeylene og strekene for medianvolumet og grensen
+    (faktor ganger medianen) i feltet under kursgrafen. En dag uten median,
+    eller med median 0, bryter strekene (NFR-08)."""
+    antall = len(punkter)
+    topp, bunn = hoyde + VOLUMLUFT, hoyde + VOLUMFELT - 6
+    hoeyest = max([p.volum or 0 for p in punkter] + [faktor * (p.median or 0) for p in punkter])
+    if hoeyest <= 0:
+        return (), (), (), sum(1 for p in punkter if not p.median), topp, bunn
+
+    def y(verdi: float) -> float:
+        return bunn - (bunn - topp) * verdi / hoeyest
+
+    steg = (bredde - VENSTRE - hoeyre) / max(antall - 1, 1)
+    soeylebredde = max(1.0, min(8.0, steg * 0.7))
+    soeyler = tuple(
+        (_x(i, antall, bredde, hoeyre) - soeylebredde / 2, y(p.volum), soeylebredde, bunn - y(p.volum))
+        for i, p in enumerate(punkter)
+        if p.volum
+    )
+    median, grense, stykke_m, stykke_g = [], [], [], []
+    # Gjennomgangen (ECH5, BH6): en dag med median alene mellom to hull gir
+    # ingen strek, og telles med dagene uten.
+    uten = sum(1 for p in punkter if not p.median)
+
+    def avslutt() -> int:
+        if len(stykke_m) > 1:
+            median.append(" ".join(stykke_m))
+            grense.append(" ".join(stykke_g))
+        alene = len(stykke_m) == 1
+        stykke_m.clear()
+        stykke_g.clear()
+        return 1 if alene else 0
+
+    for i, p in enumerate(punkter):
+        if p.median:
+            x = _x(i, antall, bredde, hoeyre)
+            stykke_m.append(f"{x:.1f},{y(p.median):.1f}")
+            stykke_g.append(f"{x:.1f},{y(faktor * p.median):.1f}")
+        else:
+            uten += avslutt()
+    uten += avslutt()
+    return soeyler, tuple(median), tuple(grense), uten, topp, bunn
+
+
 def bygg_graf(
     punkter: tuple[Punkt, ...],
     bredde: int = BREDDE,
@@ -528,6 +613,7 @@ def bygg_graf(
     signal: dict[date, tuple[int, str]] | None = None,
     alle: int = 3,
     justeringer: tuple[date, ...] = (),
+    volumfaktor: float | None = None,
 ) -> Graf | None:
     """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
     {dato: verdi} (story 2.9c). None naar det ikke er noe aa tegne.
@@ -587,6 +673,15 @@ def bygg_graf(
     )
 
     justeringene = set(justeringer)
+    # Story 8.7: baandet for sjekk 2 og feltet for sjekk 3, naar kalleren gir
+    # volumfaktoren fra Parametre (aksjesiden).
+    baand = ""
+    soeyler, medianstreker, grensestreker, uten_median, volumtopp, volumbunn = (), (), (), 0, 0.0, 0.0
+    if volumfaktor is not None:
+        baand = _baandet(punkter, lav, hoy, bredde, hoyde, hoeyre, bunn)
+        soeyler, medianstreker, grensestreker, uten_median, volumtopp, volumbunn = _volumet(
+            punkter, volumfaktor, bredde, hoyde, hoeyre
+        )
     return Graf(
         bredde=bredde,
         hoyde=hoyde,
@@ -615,4 +710,12 @@ def bygg_graf(
         justeringsdager=tuple(
             (d, _x(i, len(punkter), bredde, hoeyre)) for i, d in enumerate(datoene) if d in justeringene
         ),
+        baand=baand,
+        volumsoeyler=soeyler,
+        medianstreker=medianstreker,
+        grensestreker=grensestreker,
+        uten_median=uten_median,
+        volumfelt=volumfaktor is not None,
+        volumtopp=volumtopp,
+        volumbunn=volumbunn,
     )
