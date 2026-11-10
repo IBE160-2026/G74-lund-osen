@@ -12,7 +12,8 @@ Spesifikasjonen er spec-2-12-velge-og-bytte-aksjer.md:
   fila fra malinger.md §40, uten kall (spørsmål 2).
 - Taket er TAK aksjer: lista, pluss ønskene om å følge, minus ønskene om å
   fjerne (spørsmål 5, avgjørelsen 21.10 kl. 16:47).
-- Brukeren velger bransjen blant de 13 (spørsmål 4, svaret 08.11 kl. 11:57).
+- Bransjen er den faste i ferdige_lister.BRANSJE, og brukeren velger den ikke
+  selv (story 8.22, svaret 10.11 kl. 13:38, som erstatter svaret 08.11 kl. 11:57).
 - Omsetningen er den siste målingen i omsetning (2.13). Under GRENSE_MNOK,
   eller ikke målt, er aksjen «Utenfor målingen» (spørsmål 7).
 """
@@ -350,7 +351,15 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
 
     Å følge legger aksjen inn med inn = dato, eller tar den inn igjen (ut blir
     NULL). Gjennomgangen (BH1, VG1): har lista alt TAK aksjer, avvises ønsket
-    med grunnen. Gir linjene til utskriften."""
+    med grunnen. Gir linjene til utskriften.
+
+    Story 8.22 (spørsmål 3): bransjen er den faste i ferdige_lister.BRANSJE
+    når aksjen står der, ikke den i ønsket, og en egen aksje i lista med en
+    annen bransje i aksje får den faste. De 15 og aksjer som er tatt ut,
+    røres ikke."""
+    # Inne i funksjonen, fordi ferdige_lister importerer valg.
+    from ferdige_lister import fast_bransje
+
     linjer: list[str] = []
     dag = dato.isoformat()
     neste = (dato + timedelta(days=1)).isoformat()
@@ -360,6 +369,7 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
             "WHERE tatt_i_bruk IS NULL AND avvist IS NULL ORDER BY handling = 'folg', id"
         ).fetchall()
         for id_, handling, symbol, navn, sektor in ventende:
+            sektor = fast_bransje(symbol) or sektor
             rad = tilkobling.execute("SELECT inn, ut FROM aksje WHERE symbol = ?", (symbol,)).fetchone()
             if handling == FJERN:
                 if rad is None or rad[1] is not None:
@@ -390,6 +400,12 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
                     tilkobling.execute("UPDATE aksje SET ut = NULL, sektor = ? WHERE symbol = ?", (sektor, symbol))
                 linjer.append(f"{symbol} er tatt inn i lista fra {dag}.")
             tilkobling.execute("UPDATE oenske SET tatt_i_bruk = ? WHERE id = ?", (dag, id_))
+        for symbol in sorted(egne_i_lista(tilkobling)):
+            fast = fast_bransje(symbol)
+            gammel = tilkobling.execute("SELECT sektor FROM aksje WHERE symbol = ?", (symbol,)).fetchone()[0]
+            if fast is not None and fast != gammel:
+                tilkobling.execute("UPDATE aksje SET sektor = ? WHERE symbol = ?", (fast, symbol))
+                linjer.append(f"{symbol} har fått bransjen {fast} fra kontrollsjekken (var {gammel}).")
     return linjer
 
 

@@ -1171,6 +1171,8 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .demoboks { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--strek-2); border-radius: 10px;
                                    color: var(--dempet); font-size: 14px; }
 :where(.side-oversikt) .folg { max-width: 720px; }
+/* Story 8.22: bransjen med symbolet ved aksjen, i tekstfargen og 15 px, som i tabellen. */
+:where(.side-oversikt) .folg .bransjesymbol { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
 :where(.side-oversikt) .folgskjema { display: grid; gap: 10px; margin: 16px 0; }
 :where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }
 :where(.side-oversikt) .folgskjema select, :where(.side-oversikt) .sok input { min-height: 44px; font: inherit; padding: 0 10px; }

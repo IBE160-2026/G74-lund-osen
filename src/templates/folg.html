@@ -3,6 +3,7 @@
     en side med skjema i stedet for en dialog, så den virker med tastatur og
     uten skript (spørsmål 8). Tekstene står ordrett fra utdraget. Siden leser
     bare, og skjemaet skriver bare ønsket (AD-3, AD-10). #}
+{% from "_bransjer.html" import bransjesymbol -%}
 {% block tittel %}{% if gammel %}Bytt ut {{ gammel.navn }}{% else %}Følg en aksje{% endif %} — OSE Signal{% endblock %}
 {% block side %}side-oversikt{% endblock %}
 {% block innhold %}
@@ -24,8 +25,13 @@
   {% elif valgt and alt_fulgt %}
     <p class="feil">{{ valgt.navn }} er alt i lista, eller venter på hentingen.</p>
     <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
+  {% elif valgt and not bransje %}
+    {#- Story 8.22 (spørsmål 1): uten bransje i lista kan aksjen ikke følges. #}
+    <p class="feil">{{ valgt.navn }} har ingen bransje i lista over Oslo Børs, så den kan ikke følges.</p>
+    <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
   {% elif valgt %}
-    <p class="aksjetype">Aksje på Oslo Børs · {{ valgt.kode }}</p>
+    {#- Story 8.22 (svaret 10.11 kl. 13:38): bransjen er fast, med symbolet. #}
+    <p class="aksjetype">Aksje på Oslo Børs · {{ valgt.kode }} · {{ bransjesymbol(bransje) }}{{ bransje }}</p>
     {% if omsetning and omsetning.median is not none %}
       <p class="omsetning">Median omsetning de 3 siste månedene: ca. {{ omsetning.median|tall('mnok') }} MNOK om dagen, {{ 'regnet av kursene til' if omsetning.kursene else 'målt' }} {{ omsetning.maalt|dato }}.
       {% if omsetning.utenfor %}Det er under de {{ grense|tall('heltall') }} MNOK signalet er målt på, så den merkes «Utenfor målingen».{% else %}Det er over de {{ grense|tall('heltall') }} MNOK signalet er målt på.{% endif %}</p>
@@ -44,13 +50,6 @@
     <form class="folgskjema" method="post" action="/folg">
       <input type="hidden" name="kode" value="{{ valgt.kode }}">
       {% if gammel %}<input type="hidden" name="bytt" value="{{ gammel.symbol }}">{% endif %}
-      {#- Spørsmål 4 (svaret 08.11 kl. 11:57): brukeren velger bransjen, og
-          appen foreslår ingen (NFR-06). #}
-      <label for="sektor">Bransje</label>
-      <select id="sektor" name="sektor" required>
-        <option value="">Velg bransje</option>
-        {% for bransje in bransjene %}<option value="{{ bransje }}">{{ bransje }}</option>{% endfor %}
-      </select>
       <div class="knapper">
         <a class="knapp" href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Avbryt</a>
         {% if omsetning and omsetning.utenfor and omsetning.median is not none and not gammel %}<a class="knapp" href="/folg">Velg en annen</a>{% endif %}

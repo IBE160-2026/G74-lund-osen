@@ -1764,7 +1764,8 @@ def _egne_regnet() -> dict | None:
                     {
                         "symbol": aksje.symbol,
                         "navn": aksje.navn,
-                        "sektor": aksje.sektor,
+                        # Story 8.22 (spørsmål 3): den faste bransjen med en gang.
+                        "sektor": ferdige_lister.fast_bransje(aksje.symbol) or aksje.sektor,
                         "status": "fjernes" if aksje.symbol in fjernes else "hentet",
                         "oenske": fjernes.get(aksje.symbol),
                         "utenfor": valg.utenfor_maalingen(omsetningen[0]),
@@ -1778,7 +1779,7 @@ def _egne_regnet() -> dict | None:
                     {
                         "symbol": o.symbol,
                         "navn": o.navn,
-                        "sektor": o.sektor,
+                        "sektor": ferdige_lister.fast_bransje(o.symbol) or o.sektor,
                         "status": "venter",
                         "oenske": o.id,
                         "utenfor": valg.utenfor_maalingen(omsetningen[0]),
@@ -1844,6 +1845,10 @@ def _samme_side() -> None:
         abort(403)
 
 
+# Story 8.22 (spørsmål 1): grunnen når en aksje ikke har en bransje i lista.
+INGEN_BRANSJE = "Aksjen har ingen bransje i lista over Oslo Børs, så den kan ikke følges."
+
+
 @app.route("/folg")
 def folg_side():
     """«Følg en aksje» og «Bytt ut» - story 2.12, utdraget §1 og §2. En side
@@ -1882,6 +1887,9 @@ def folg_side():
     alt_fulgt = valgt is not None and (
         valgt.kode in i_lista or any(o.symbol == valgt.kode and o.handling == valg.FOLG for o in lager.ventende())
     )
+    # Story 8.22 (svaret 10.11 kl. 13:38): bransjen er fast, og en aksje uten
+    # bransje kan ikke følges (spørsmål 1).
+    bransje = ferdige_lister.bransjen(g.tilkobling, valgt.kode) if valgt is not None else None
     return render_template(
         "folg.html",
         aktiv="min_liste" if gammel else "oversikt",
@@ -1889,12 +1897,12 @@ def folg_side():
         sok=sok,
         treff=treff,
         alt_fulgt=alt_fulgt,
+        bransje=bransje,
         mill=1_000_000,
         valgt=valgt,
         omsetning=omsetning,
         gammel=gammel,
         egne=egne,
-        bransjene=valg.BRANSJENE,
         grense=valg.GRENSE_MNOK,
         tilbake="min_liste" if gammel else "oversikten",
         feil=request.args.get("feil"),
@@ -1912,7 +1920,12 @@ def folg():
     kode = (request.form.get("kode") or "").strip().upper()
     bytt = (request.form.get("bytt") or "").strip().upper() or None
     try:
-        lager.folg(kode, request.form.get("sektor", ""), bytt)
+        # Story 8.22 (svaret 10.11 kl. 13:38): bransjen er den faste, ikke et
+        # felt i skjemaet. En aksje uten bransje avvises med grunnen.
+        sektor = ferdige_lister.bransjen(g.tilkobling, kode)
+        if sektor is None and lager.boersaksje(kode) is not None:
+            raise valg.UgyldigValg(INGEN_BRANSJE)
+        lager.folg(kode, sektor or "", bytt)
     except (valg.UgyldigValg, valg.ListaErFull) as feil:
         # Gjennomgangen (BH9, ECH9): samme side, med aksjen og byttet, og
         # grunnen. Kode og bytt er sjekket mot lista og tegnene foer de
