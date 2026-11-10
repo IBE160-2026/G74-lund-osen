@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-08T12:31
+updated: 2026-11-10T16:20
 ---
 
 # Hjelp til «Kom i gang»
@@ -206,6 +206,10 @@ Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en f
 ### Hva er «Innstillinger»?
 
 Knappen «Innstillinger» står øverst på alle sidene, etter «Min liste». Der slår du «Vis hjelp» av og på: hjelpen er de faste forklaringene bak «?», som vi har skrevet og sjekket, om hva tallene, bokstavene og fargene betyr. Med hjelpen av står ingen «?» på noen side. Der slår du også «Vis KI-tekst» av og på. Det er det samme valget som bryteren ved hver KI-tekst, så de viser alltid det samme, og et trykk på det ene stedet endrer det andre. Valgene gjelder alle sidene og lagres på denne maskinen, i basen, så de huskes neste gang. Det er ingen innlogging. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter.
+
+### Hva er «Mine notater»?
+
+Nederst på aksjesiden, under «Signalet dag for dag», står «Mine notater». Der skriver du et kort notat, høyst 280 tegn, om aksjen. Notatet får dagen siden viser: siste børsdag, eller dagen du har valgt med «Vis dagen». Under hvert notat står «Etterpå»: hvor mye aksjen og hovedindeksen endret seg fra notatdagen til siste dag med kurser for aksjen, på kurs justert for utbytte som endringen ellers, og signalet som er lagret for de to dagene, som i «Signalet dag for dag». Mangler en kurs, står «–» med grunnen, og er notatdagen den siste dagen, står det at det ikke er børsdager med kurs etter den ennå. Appen sier aldri om et notat var riktig eller galt, og gir ingen råd; det er bare tallene. «Slett» ved et notat sletter det med en gang, og et notat kan ikke endres. Notatene lagres på denne maskinen, i basen, og ingen kall brukes. For en aksje som er tatt ut av lista, står notatene, men du kan ikke skrive nye. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter, så notatene er borte neste gang.
 
 ### Hvordan følger jeg andre aksjer?
 

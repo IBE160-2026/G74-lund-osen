@@ -61,6 +61,7 @@ from boersometer import (
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from dagsgrunnlag import dagsgrunnlag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
+from etterpaa import bygg_etterpaa
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
@@ -91,6 +92,7 @@ from lagring_sqlite import (
     SqliteKILogg,
     SqliteKurslager,
     SqliteMinlistelager,
+    SqliteNotatlager,
     SqliteOversiktsleser,
     SqliteVurderingslager,
     aapne_base,
@@ -122,6 +124,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from minliste import UkjentAksje
+from notater import MAKS_TEGN, UgyldigNotat
 from oversiktsdata import Oversiktsleser
 from perioder import (
     AKSEMERKER,
@@ -295,6 +298,9 @@ _RUTER_MED_BASE = {
     "angre",
     # Story 8.11: en ferdig liste.
     "bruk_ferdig_liste",
+    # Story 8.21: «Mine notater» på aksjesiden.
+    "skriv_notat",
+    "slett_notat",
 }
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
@@ -302,6 +308,9 @@ _RUTER_MED_BASE = {
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
 _SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
+# Story 8.21 (gruppens svar 10.11 kl. 14:32): rutene som skriver notatene, og
+# bare tabellen notat (AD-3).
+_SKRIVERE |= {"skriv_notat", "slett_notat"}
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -1354,12 +1363,127 @@ def aksjedetalj(symbol: str):
             # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
             historikk=historikk,
             pil=pil,
+            # Story 8.21: «Mine notater», med dagen et nytt notat får.
+            notatene=_notatene(post, rader, indeks, vurderingene, i_dag),
+            notatdag=slutt,
+            kan_skrive_notat=post.ut is None,
+            notat_maks=MAKS_TEGN,
+            notat_anker=NOTATANKER,
             **_fotnoten([detalj.dato] if detalj.ikke_vurdert else [], i_dag),
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
     svar.vary.add("Cookie")
     return svar
+
+
+# --- Story 8.21: «Mine notater» på aksjesiden ------------------------------
+
+NOTATANKER = "mine-notater"
+
+
+def _notatene(post, rader, indeks: dict | None, vurderingene: dict | None, i_dag: date) -> list | None:
+    """Notatene for aksjen, hvert med «Etterpå» (etterpaa.py), den nyeste
+    notatdagen først. Indeksen og vurderingene er de siden alt har lest, så
+    ingenting leses to ganger, og signalet regnes aldri (AD-7). None når
+    notatene ikke kan leses; da står delen uten skjema."""
+    try:
+        notatene = SqliteNotatlager(g.tilkobling).notater(post.aksje.symbol)
+    except (*BASEFEIL, ValueError) as feil:
+        app.logger.warning("Notatene kunne ikke leses: %s", type(feil).__name__)
+        return None
+    return [
+        (notat, bygg_etterpaa(notat, rader, indeks, vurderingene, i_dag, STANDARD.terskel, post.ut))
+        for notat in notatene
+    ]
+
+
+def _tilbake_til_notatene(symbol: str, dag: date | None, siste: date | None) -> str:
+    """Samme side og samme dag, ved «Mine notater» (del B)."""
+    adresse_ = f"/aksje/{symbol}"
+    if dag is not None and siste is not None and dag != siste:
+        adresse_ += f"?dag={dag.isoformat()}"
+    return adresse_ + f"#{NOTATANKER}"
+
+
+def _notatsiden(symbol: str):
+    """Aksjen og kursdagene for skjemaene, eller abort. Symbolet slås opp i
+    aksje i basen, som aksjesiden (404 for et symbol utenfor lista)."""
+    _samme_side()
+    if g.get("basefeil"):
+        return None, None, _basen_kan_ikke_aapnes()
+    if g.get("tilkobling") is None:
+        abort(404)
+    try:
+        post = SqliteOversiktsleser(g.tilkobling).post(normaliser_symbol(symbol))
+        rader = SqliteKurslager(g.tilkobling).serie(post.aksje.symbol) if post else []
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return None, None, _basen_kan_ikke_aapnes()
+    if post is None:
+        abort(404)
+    return post, [rad.dato for rad in rader], None
+
+
+def _skjemadag(verdi: str | None, kursdager: list[date]) -> date:
+    """Dagen fra skjemaet, som må være en dag aksjen har kurs (del B). 400
+    ellers, så et notat aldri får en dag siden ikke kunne vise."""
+    if not verdi or not _DAG.fullmatch(verdi):
+        abort(400)
+    try:
+        dag = date.fromisoformat(verdi)
+    except ValueError:
+        abort(400)
+    if dag not in kursdager:
+        abort(400)
+    return dag
+
+
+@app.post("/aksje/<symbol>/notat")
+def skriv_notat(symbol: str):
+    """Lagrer et notat med dagen siden viste (spørsmål 3), og sender tilbake
+    til samme side og dag (303). Webserveren skriver bare tabellen notat her
+    (AD-3), og henter aldri noe (AD-10)."""
+    post, kursdager, feilside = _notatsiden(symbol)
+    if feilside is not None:
+        return feilside
+    dag = _skjemadag(request.form.get("dag"), kursdager)
+    try:
+        SqliteNotatlager(g.tilkobling).skriv(post.aksje.symbol, dag, request.form.get("tekst", ""), naa())
+    except UgyldigNotat:
+        abort(400)
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, dag, kursdager[-1]), code=303)
+
+
+@app.post("/aksje/<symbol>/notat/slett")
+def slett_notat(symbol: str):
+    """Sletter ett notat for aksjen (spørsmål 7), og sender tilbake til samme
+    side og dag (303). Et notat for en annen aksje slettes ikke."""
+    post, kursdager, feilside = _notatsiden(symbol)
+    if feilside is not None:
+        return feilside
+    notat_id = request.form.get("id", "")
+    if not notat_id.isdigit() or not notat_id.isascii():
+        abort(400)
+    dag = request.form.get("dag")
+    tilbake = date.fromisoformat(dag) if dag and _DAG.fullmatch(dag) and _gyldig_dato(dag) else None
+    try:
+        SqliteNotatlager(g.tilkobling).slett(post.aksje.symbol, int(notat_id))
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, tilbake, kursdager[-1] if kursdager else None), code=303)
+
+
+def _gyldig_dato(verdi: str) -> bool:
+    try:
+        date.fromisoformat(verdi)
+    except ValueError:
+        return False
+    return True
 
 
 @app.route("/investorside/<symbol>")

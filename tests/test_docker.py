@@ -1307,7 +1307,9 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av main (8.11c) inn i 9.10: begge endret app.py og ferdige_lister.py. Avtrykkene er
 # regnet ut paa nytt, og alle bildene er tatt paa nytt med DevTools-protokollen og er byte for byte
 # de samme.
-AVTRYKK_BAK_BILDET = "27a2f279ea494657acdd7868aaf6f213ffcf1f2c0c4c0bf8c746d2972be21a26"
+# Story 8.21: avtrykkene er regnet ut paa nytt (stilarket, 0012, notater.py og etterpaa.py). Alle
+# bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene, og var byte for byte de samme.
+AVTRYKK_BAK_BILDET = "fabb20c44636b30ff338450c916b50a8d063adab63f03624ae2fd17d067d7f24"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1370,6 +1372,9 @@ FILENE_BAK_AKSJESIDEN = (
     "src/migrering.py",
     # Story 8.3: porten for Min liste, som lagring_sqlite importerer.
     "src/minliste.py",
+    # Story 8.21: porten for notatene, som lagring_sqlite importerer, og «Etterpå».
+    "src/notater.py",
+    "src/etterpaa.py",
     # Story 3.4h: app.py importerer sidene for selskapene i demoen.
     "src/investorsider.py",
     *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
@@ -1732,7 +1737,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Flettingen av 8.11 (med 8.10b, svaret kl. 10:23 og main) inn i 8.11b: avtrykkene er regnet ut paa nytt,
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
-AVTRYKK_BAK_AKSJESIDEN = "640f468f08e122c19a2201ac5cdc64da94685ed632e440dadffd30295d82597d"
+AVTRYKK_BAK_AKSJESIDEN = "b72951083e4fc7f81f92f59441b15e57a99560f8cd21e7a2d40982b994504d92"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1896,14 +1901,14 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "27a2f279ea494657acdd7868aaf6f213ffcf1f2c0c4c0bf8c746d2972be21a26",
-    "docs/appen/boersometeret-demo.png": "f177f7e5c7266521f707ff23fcadd22335f234ed8419b3a24746ca3a6305456b",
-    "docs/appen/min-liste-demo.png": "8105d95c08e33e00d48ee95d07c9612463c7181fc62739f4c26612b661487599",
-    "docs/appen/oversikten-390-demo.png": "27a2f279ea494657acdd7868aaf6f213ffcf1f2c0c4c0bf8c746d2972be21a26",
-    "docs/appen/boersometeret-390-demo.png": "f177f7e5c7266521f707ff23fcadd22335f234ed8419b3a24746ca3a6305456b",
-    "docs/appen/din-egen-liste-demo.png": "8105d95c08e33e00d48ee95d07c9612463c7181fc62739f4c26612b661487599",
-    "docs/appen/investorsiden-brfe-demo.png": "c014f914e3b9f870ea94ff1b70e3c1f212f07ddaefb7db99697be9de078bc018",
-    "docs/appen/investorsiden-brfe-390-demo.png": "c014f914e3b9f870ea94ff1b70e3c1f212f07ddaefb7db99697be9de078bc018",
+    TOPPEN_AV_OVERSIKTEN: "fabb20c44636b30ff338450c916b50a8d063adab63f03624ae2fd17d067d7f24",
+    "docs/appen/boersometeret-demo.png": "d01c522ee948f7c06598dac190b5811305208c9b29b4b408cc3337f134bb240f",
+    "docs/appen/min-liste-demo.png": "9c16ecc8e8ffffb182dda3fdb76dea55da24f5fec9bba48abecc092cef70500c",
+    "docs/appen/oversikten-390-demo.png": "fabb20c44636b30ff338450c916b50a8d063adab63f03624ae2fd17d067d7f24",
+    "docs/appen/boersometeret-390-demo.png": "d01c522ee948f7c06598dac190b5811305208c9b29b4b408cc3337f134bb240f",
+    "docs/appen/din-egen-liste-demo.png": "9c16ecc8e8ffffb182dda3fdb76dea55da24f5fec9bba48abecc092cef70500c",
+    "docs/appen/investorsiden-brfe-demo.png": "77467fe497ab232255bd4c07d94b03acdb3074d4c0d0722747fa6a2ce882f11d",
+    "docs/appen/investorsiden-brfe-390-demo.png": "77467fe497ab232255bd4c07d94b03acdb3074d4c0d0722747fa6a2ce882f11d",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
