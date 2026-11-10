@@ -26,6 +26,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 6. **BH4 og ECH4 i 8.11b.** *Forslag:* kursene i vinduet leses i én spørring for alle aksjene, og den siste dagen med primærnøkkelen for hver aksje, ikke med `max(dato)` over hele `kurs`. 8.11c endrer ikke `_aksjene_i_lista`, så de to PR-ene endrer ulike deler av `ferdige_lister.py`.
 7. **ECH7 og BH16 i 3.4h.** *Forslag:* kommentaren om U66 i `aksje.html` og kommentaren ved `_RUTER_MED_BASE` i `app.py` rettes med en Rettet-linje i kommentaren. Begge filene står bak bildene i `docs/appen/`, så avtrykkene regnes ut på nytt og bildene tas på nytt.
 
+*Svar 2026-11-09 kl. 17:37 (gruppens svar):* forslagene i spørsmål 1 og 3–7 er godtatt. På spørsmål 2 anbefalte rådet a, men gruppen valgte c: neste kveld lages teksten for forrige børsdag når den mangler og hovedindeksen nå er der. Det bygges senere, og ECH14 i 10.6 står åpent som lav, med et punkt i `issues.md`. Rådet anbefalte resten. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`, og storyen står i `epics.md` i Epic 9.
+
 ## Delene
 
 ### A) Hovedindeksen for dagen (10.6 ECH14)
@@ -75,6 +77,7 @@ Diffen `78a45186..05e3e864`, uten `tests/test_docker.py`: Blind Hunter med bare 
 
 **Middels**
 - *ECH1, rettet ved å ta del A ut, og ECH14 står åpent.* Premisset i spørsmål 2 var feil: hentingen prøver ikke hovedindeksen på nytt samme kveld (AD-15, kommentarene i `fetch_prices.py`), så teksten om dagen ville aldri blitt laget den kvelden indeksen feilet, og det er verre enn før. Koden i `ki_tekst.py` er som på `78a45186`. BH5 (ventingen har ingen grense) og VG2 (testen prøvde en vei som ikke finnes) følger med.
+- *ECH1, besvart 2026-11-09 med spørsmål 2* (gruppens svar kl. 17:37), middels som før (regel 25): del A er tatt ut, og gruppen valgte c for ECH14, som bygges senere. ECH14 står åpent som lav.
 - *ECH2, rettet.* Kursene i vinduet ble lest ved å gå gjennom hele `kurs`. Nå med `CROSS JOIN`, så primærnøkkelen brukes for hver aksje (`test_kurs_leses_aldri_i_sin_helhet`, som krever `symbol=` i hver linje i spørringsplanen som gjelder `kurs`).
 - *BH1, ikke reelt.* `kode` er primærnøkkel i `boersliste`, så en kursrad kommer ikke med to ganger.
 - *BH2, ikke reelt.* `aksjedetalj` returnerer før `rader[-1]` når aksjen ikke har kurser.
