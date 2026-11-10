@@ -146,8 +146,27 @@ DEMOBOERSEN: tuple[tuple[str, str], ...] = (
     ("SKRH", "Skarvik Helse"),
     ("TNDT", "Tindtopp Teknologi"),
     ("VKVF", "Vikvåg Forbruk"),
+    # Story 8.22 (tillegget 10.11 kl. 17:16, svaret kl. 15:57): sju til, så
+    # søket, filtrene, antallet, forslagene og «ikke målt ennå» kan ses i
+    # demoen. Kraft har tre målte (forslagene) og én som ikke er målt.
+    ("BRKR", "Breivik Kraft"),
+    ("STRM", "Strømsvik Kraft"),
+    ("LYSV", "Lysvann Kraft"),
+    ("KVEI", "Kvernvik Eiendom"),
+    ("FJHE", "Fjordlys Helse"),
+    ("DATN", "Datanes Teknologi"),
+    ("HAVR", "Havrand Shipping"),
 )
-DEMOMAALT = {"HVLK": 85.0, "NRDE": 12.4}
+DEMOMAALT = {
+    "HVLK": 85.0,
+    "NRDE": 12.4,
+    "BRKR": 48.0,
+    "STRM": 21.5,
+    "KVEI": 37.0,
+    "FJHE": 64.0,
+    "DATN": 55.0,
+    "HAVR": 90.0,
+}
 
 NYLIG_NOTERT = "VRDS"
 UTEN_KURSER = "MTFJ"

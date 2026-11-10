@@ -172,3 +172,62 @@ def test_skriptet_filtrerer_paa_det_samme_som_serveren():
     assert "toLowerCase()" in del_ and 'getElementById("antall-vist")' in del_
     mal = (ROT / "src" / "templates" / "folg.html").read_text(encoding="utf-8")
     assert "data-sok=\"{{ (a.kode ~ ' ' ~ a.navn)|lower }}\"" in mal and "data-folgsok" in mal
+
+
+class TestDemoen:
+    """Tillegget 10.11 kl. 17:16 (svaret kl. 15:57): alt nytt kan ses i
+    demoen uten nøkkel, bare med oppdiktede selskaper merket «Eksempeltall»."""
+
+    @staticmethod
+    def _klient(tmp_path, monkeypatch):
+        import shutil
+        from datetime import datetime
+
+        import app as app_modul
+        import demo
+        from lagring_sqlite import demo_sti
+
+        mal = tmp_path / "demo.db"
+        demo.lag_demobase(mal, skriv=lambda _: None)
+        sti = demo_sti()
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(mal, sti)
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+        monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
+        return app_modul.app.test_client()
+
+    def test_lista_filtrene_og_forslagene_i_demoen(self, tmp_path, monkeypatch):
+        """Ville feilet hvis demoen hadde for få oppdiktede selskaper til at
+        antallet, filtrene, forslagene og «ikke målt ennå» kunne ses, eller
+        siden manglet merket «Eksempeltall»."""
+        import demo
+
+        k = self._klient(tmp_path, monkeypatch)
+        html = _side(k)
+        alle = _rader(html)
+        assert len(alle) == len(demo.DEMOBOERSEN) == 12
+        assert f'<span id="antall-alle">{len(alle)}</span> aksjer på Oslo Børs kan følges.' in html
+        assert 'class="eksempeltall"' in html and "Eksempeltall: oppdiktede selskaper" in html
+        assert "ikke målt ennå" in html
+        kraft = _side(k, "/folg?bransje=Kraft")
+        assert _forslagene(kraft) == ["HVLK", "BRKR", "STRM"]
+        assert _rader(kraft) == ["BRKR", "HVLK", "LYSV", "STRM"]
+        assert _rader(_side(k, "/folg?omsetning=under")) == ["NRDE", "STRM"]
+        assert set(_rader(_side(k, "/folg?omsetning=ikke"))) == {"LYSV", "SKRH", "TNDT", "VKVF"}
+        assert _rader(_side(k, "/folg?q=fjord")) == ["FJHE"]
+
+    def test_bare_oppdiktede_selskaper_i_demoen(self, tmp_path, monkeypatch):
+        """Ville feilet hvis en ekte ticker fra BRANSJE sto i «Følg en aksje»
+        eller i de ferdige listene i demoen."""
+        import demo
+
+        oppdiktet = {s for s, _ in demo.DEMOBOERSEN} | {a.symbol for a in demo.DEMOUNIVERS}
+        ekte = set(ferdige_lister.BRANSJE) - oppdiktet
+        k = self._klient(tmp_path, monkeypatch)
+        for adresse in ("/folg", "/folg?bransje=Kraft", "/min-liste"):
+            html = k.get(adresse).data.decode("utf-8").split("<main>", 1)[1]
+            koder = set(re.findall(r"kode=([A-Z0-9]+)", html)) | set(
+                re.findall(r'<span class="linje">([A-Z0-9]+)', html)
+            )
+            assert koder and koder <= oppdiktet and not koder & ekte, adresse

@@ -334,7 +334,19 @@ BRANSJE: dict[str, str] = {
 # Story 8.22 (spørsmål 2): de tre andre oppdiktede selskapene på «Demo Børs»
 # (demo.DEMOBOERSEN), med bransjen som står i navnet. Ingen av dem er en
 # ticker på Oslo Børs (CSV-fila 10.11).
-DEMOBRANSJE: dict[str, str] = {"SKRH": "Helse", "TNDT": "Teknologi", "VKVF": "Forbruk"}
+DEMOBRANSJE: dict[str, str] = {
+    "SKRH": "Helse",
+    "TNDT": "Teknologi",
+    "VKVF": "Forbruk",
+    # Tillegget 10.11 kl. 17:16: de sju nye i demoen, med bransjen i navnet.
+    "BRKR": "Kraft",
+    "STRM": "Kraft",
+    "LYSV": "Kraft",
+    "KVEI": "Eiendom",
+    "FJHE": "Helse",
+    "DATN": "Teknologi",
+    "HAVR": "Shipping",
+}
 assert set(BRANSJE.values()) <= set(BRANSJENE)
 assert set(DEMOBRANSJE.values()) <= set(BRANSJENE) and not set(DEMOBRANSJE) & set(BRANSJE)
 
