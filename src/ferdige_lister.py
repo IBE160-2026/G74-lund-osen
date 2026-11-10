@@ -15,15 +15,16 @@ ikke står her, kommer ikke i noen liste.
 Story 8.22 (gruppens svar 10.11 kl. 13:38, 14:43 og 15:22): BRANSJE har nå
 alle aksjene i lista over Oslo Børs, utenom MULTI (en fusjon gjør det usikkert
 hva som skjer) og SCOIN, og brukeren velger ikke bransjen selv. Kontrollsjekken
-står i bransjesjekk-2026-11-10.md.
+står i bransjesjekk-2026-11-10.md. Her står også lista «Følg en aksje» viser.
 """
 
 import sqlite3
+from collections.abc import Collection
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 
 from omsetningsregning import regn_ut, vindu
-from valg import BRANSJENE, TAK
+from valg import BRANSJENE, OSLO, TAK, utenfor_maalingen
 
 # Story 8.22 (gruppens svar 10.11 kl. 13:38, 14:43 og 15:22): alle aksjene i
 # lista over Oslo Børs, utenom MULTI og SCOIN, med bransjen fra kontrollsjekken
@@ -337,6 +338,13 @@ DEMOBRANSJE: dict[str, str] = {"SKRH": "Helse", "TNDT": "Teknologi", "VKVF": "Fo
 assert set(BRANSJE.values()) <= set(BRANSJENE)
 assert set(DEMOBRANSJE.values()) <= set(BRANSJENE) and not set(DEMOBRANSJE) & set(BRANSJE)
 
+# Story 8.22 (spørsmål 6): filteret på omsetning i «Følg en aksje».
+OVER = "over"
+UNDER = "under"
+IKKE_MAALT = "ikke"
+OMSETNINGSFILTER = (("", "Alle"), (OVER, "Over 32 MNOK"), (UNDER, "Under 32 MNOK"), (IKKE_MAALT, "Ikke målt ennå"))
+FORSLAG = 3
+
 
 def fast_bransje(kode: str) -> str | None:
     """Story 8.22: bransjen fra kontrollsjekken (BRANSJE), eller fra
@@ -357,6 +365,98 @@ def bransjen(tilkobling: sqlite3.Connection | None, kode: str) -> str | None:
     except sqlite3.Error:
         return None
     return rad[0] if rad is not None and rad[0] in BRANSJENE else None
+
+
+@dataclass(frozen=True)
+class Foelgbar:
+    """Story 8.22: en aksje «Følg en aksje» viser. median er i NOK, eller
+    None når omsetningen ikke er målt; dag er dagen den ble målt i Oslo,
+    eller den siste dagen med kurser når kursene er True (8.11c)."""
+
+    kode: str
+    navn: str
+    bransje: str
+    median: float | None
+    dag: date | None
+    kursene: bool
+
+
+def foelgbare(
+    tilkobling: sqlite3.Connection | None,
+    opptatt: Collection[str],
+    medianer: dict[str, tuple[float | None, date | None]],
+) -> list[Foelgbar]:
+    """Story 8.22: alle aksjene i lista over Oslo Børs som kan følges, uten
+    dem i opptatt (i lista eller venter på å bli fulgt), sortert etter navnet
+    (spørsmål 5, NFR-06). Medianen er den samme som i bransjelistene og
+    merket: regnet av kursene for aksjene i medianer (medianene()), ellers
+    den siste målingen i omsetning (2.13). Har den siste målingen feil, er
+    aksjen ikke målt, som i Valglager.omsetning. Bare lesing."""
+    if tilkobling is None:
+        return []
+    try:
+        boersen = tilkobling.execute("SELECT kode, navn FROM boersliste").fetchall()
+        sektorer = dict(tilkobling.execute("SELECT symbol, sektor FROM aksje").fetchall())
+        maalt = {
+            s: (m, t)
+            for s, m, t in tilkobling.execute(
+                "SELECT o.symbol, o.median_omsetning, o.maalt FROM omsetning o "
+                "WHERE o.maalt = (SELECT max(maalt) FROM omsetning WHERE symbol = o.symbol)"
+            )
+        }
+    except sqlite3.Error:
+        return []
+    ut = []
+    for kode, navn in boersen:
+        if kode in opptatt:
+            continue
+        bransje = fast_bransje(kode) or (sektorer.get(kode) if sektorer.get(kode) in BRANSJENE else None)
+        if bransje is None:
+            continue
+        if kode in medianer:
+            median, dag = medianer[kode]
+            ut.append(Foelgbar(kode, navn, bransje, median, dag, True))
+            continue
+        median, dag = None, None
+        if kode in maalt:
+            m, t = maalt[kode]
+            try:
+                dag = datetime.fromisoformat(t).astimezone(OSLO).date()
+                median = float(m) if m is not None else None
+            except (TypeError, ValueError):
+                median, dag = None, None
+        ut.append(Foelgbar(kode, navn, bransje, median, dag if median is not None else None, False))
+    ut.sort(key=lambda a: (a.navn.casefold(), a.kode))
+    return ut
+
+
+def filtrer(rader: list[Foelgbar], tekst: str, bransje: str, omsetning: str) -> list[Foelgbar]:
+    """Story 8.22: søket (ticker eller navn, uten forskjell på store og små
+    bokstaver), bransjen og omsetningen (spørsmål 6). Det samme gjør
+    hjelp.js i nettleseren mens man skriver; dette er veien uten skript."""
+    tekst = tekst.strip().lower()
+    ut = []
+    for a in rader:
+        if tekst and tekst not in a.kode.lower() and tekst not in a.navn.lower():
+            continue
+        if bransje and a.bransje != bransje:
+            continue
+        if omsetning == IKKE_MAALT and a.median is not None:
+            continue
+        if omsetning in (OVER, UNDER) and (a.median is None or utenfor_maalingen(a.median) != (omsetning == UNDER)):
+            continue
+        ut.append(a)
+    return ut
+
+
+def forslagene(rader: list[Foelgbar], bransje: str) -> list[Foelgbar]:
+    """Story 8.22 (spørsmål 7): de tre med høyest median omsetning blant de
+    målte i bransjen, av radene som kan følges. Ordnet etter omsetningen,
+    aldri etter kursen eller signalet (NFR-06). Uten bransje: ingen."""
+    if not bransje:
+        return []
+    maalte = [a for a in rader if a.bransje == bransje and a.median is not None]
+    return sorted(maalte, key=lambda a: (-a.median, a.kode))[:FORSLAG]
 
 
 @dataclass(frozen=True)

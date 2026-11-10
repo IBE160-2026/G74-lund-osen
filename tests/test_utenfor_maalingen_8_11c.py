@@ -20,7 +20,7 @@ from lagring_sqlite import aapne_base
 from test_ferdige_lister import maal
 from test_ferdige_lister_8_11b import base  # noqa: F401 (fixturen)
 from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
-from test_valg import BOERSEN, lager, med_boersen
+from test_valg import BOERSEN, faste_bransjer, lager, med_boersen  # noqa: F401 (story 8.22: de faste bransjene)
 
 MERKET = re.compile(
     r'<a href="/aksje/NYA">Ny Aksje ASA</a> <span class="egenmerke">Egen</span>( <span class="utenformerke")?'
