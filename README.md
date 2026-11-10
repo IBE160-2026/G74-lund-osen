@@ -206,6 +206,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Designregler](_bmad-output/planning-artifacts/designregler.md)
 - [Utdrag fra designtavla 13.10](_bmad-output/planning-artifacts/designutdrag-2026-10-13.md): grunnlaget for planen til story 8.0d
 - [Utdrag fra designtavla 08.11](_bmad-output/planning-artifacts/designutdrag-2026-11-08.md): egne aksjer, KI-teksten om dagen og Innstillinger, til story 2.12, 8.10, 8.10b og 10.6
+- [Kontrollsjekken av bransjene 10.11](_bmad-output/planning-artifacts/bransjesjekk-2026-11-10.md): den faste bransjen for hver aksje på Oslo Børs, til story 8.22
 - [Endringsforslag 28.09](_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md), godkjent samme dag
 - [Endringsforslag 08.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md): femten idéer inn i v1, godkjent samme dag
 - [Endringsforslag 13.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-13.md): den samlede endringen fra samlelista, godkjent samme dag
