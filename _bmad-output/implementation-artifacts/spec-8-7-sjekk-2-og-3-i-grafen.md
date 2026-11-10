@@ -2,7 +2,7 @@
 title: 'Story 8.7: sjekk 2 og 3 i kursgrafen'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '1a72810a'
 context:
@@ -81,3 +81,5 @@ Diffen `1a72810a..482ab6dc`, uten `tests/test_docker.py` og bildet: Blind Hunter
 Etter rettingen er bildet av aksjesiden tatt på nytt (teksten under grafen er endret), og avtrykkene er regnet ut på nytt.
 
 *Lagt til 2026-11-09 (hele settet i deler, del 1):* to tester i `tests/test_app.py` feilet etter gjennomgangen, og begge hadde rett. `test_grafen_har_heltrukket_snitt_og_navnene_ved_enden` krever at bare hovedindeksen er stiplet (designregler §5), så grensen for sjekk 3 er nå en gul, heltrukken strek, og teksten og hjelpen sier «den gule». Den samme testen krever aria-teksten slik den var, så setningen om båndet og volumet står bare i teksten under grafen. `test_teksten_sier_hva_linja_er_uten_raad` fant «bør» i «børsdagene» i teksten under grafen; teksten sier nå «dagene før». Ingen test er svekket. Bildet og avtrykkene er tatt og regnet ut på nytt.
+
+*Lagt til 2026-11-10:* 8.7 er flettet med PR #135 i `2d0cfc8b` kl. 19:01, låst til head-en `199a3ee8`, etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md` og gruppens svar 10.11 kl. 11:52. Main, med 2.4, 2.6 og 8.14, ble flettet inn i `199a3ee8`. Konfliktene i `src/graf.py`, `src/static/stil.css` og `docs/hjelp.md` var justeringsdagene fra main og båndet og volumet fra grenen på samme sted, og begge står; i `tests/test_docker.py` gjaldt de avtrykkene. Diffen mot main er endringene grenen hadde mot `1a72810a` (spørsmål 7). Avtrykkene er regnet ut på nytt, og alle de ti bildene er tatt på nytt fra demoen med DevTools-protokollen: aksjesiden er ny, med båndet, volumet og justeringsdagene, og de andre er byte for byte de samme. Før flettingen: vurderingen for hver aksje og hver dag i en kopi av `data/db/ose.db` i en midlertidig mappe, regnet med koden på main (`5c08697a`) og på grenen, er lik, 3750 vurderinger og 0 ulike, og sha256 for basen var lik før og etter. Hele settet alene i ni deler 18:44:54–18:57:34: 4907 bestått, 25 hoppet over og 0 feilet, til sammen de 4932 som `pytest --collect-only` finner. CI var grønn på head-en (run 42870268837). Treet på main etter `git pull --ff-only` er likt treet på `199a3ee8`. Ingen funn på middels eller over sto åpne.
