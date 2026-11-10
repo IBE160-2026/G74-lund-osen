@@ -896,8 +896,12 @@ def _tabellsiden(aktiv: str):
     den samme som i oversikten, ogsaa sortert (FR-102, story 8.15)."""
     i_lista = aktiv == MIN_LISTE_SIDE
     alle = i_lista and request.args.get("vis") == ALLE
+    # Story 8.23 (tillegg 2): «Min liste» over «Aksjene» på oversikten.
+    bare_min = not i_lista and request.args.get("vis") == BARE_MIN
+    # De merkede alene: Min liste uten «Alle», eller oversikten med «Min liste».
+    bare_merkede = (i_lista and not alle) or bare_min
     sti = MIN_LISTE if i_lista else OVERSIKTEN
-    felles = {"aktiv": aktiv, "sidesti": sti, "alle": alle}
+    felles = {"aktiv": aktiv, "sidesti": sti, "alle": alle, "bare_min": bare_min}
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     if g.get("demo_mangler"):
@@ -1015,7 +1019,7 @@ def _tabellsiden(aktiv: str):
     # ut» gjelder siste børsdag (gruppens svar 23.10 kl. 12:35, a).
     if annen_dag and sortert is None:
         sortert = [*vist, *alle_uten_data]
-    if i_lista and not alle:
+    if bare_merkede:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
@@ -1030,6 +1034,9 @@ def _tabellsiden(aktiv: str):
     # rader og aldri endrer det siden sier.
     overskrift_ut = skilte_seg_ut
     foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
+    # Story 8.23 (A8): radene i lista som vises, før filteret, til antallet
+    # på knappene og 2 av 3 ved et tomt filter.
+    rader_foer = sortert if sortert is not None else [*skilte_seg_ut, *oevrige]
     if signalfilter is not None:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if _passer(rad, signalfilter)]
         oevrige = [rad for rad in oevrige if _passer(rad, signalfilter)]
@@ -1070,7 +1077,7 @@ def _tabellsiden(aktiv: str):
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
         # oversikten, ogsaa naar ingen skilte seg ut.
-        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not (i_lista and not alle),
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not bare_merkede,
         antall_vurdert=antall_vurdert(rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
@@ -1081,7 +1088,7 @@ def _tabellsiden(aktiv: str):
         merkede=merkede,
         antall_merket=antall_merket,
         vurdert_i_lista=vurdert_i_lista,
-        tilbake=side_adresse(sti, sortering, alle, ledd),
+        tilbake=side_adresse(sti, sortering, alle, ledd, bare_min),
         # Story 8.17a: periodevalget, og perioden og dagen i lenkene.
         valg=valg,
         knapper=knappene(sidens_siste(rader), i_dag) if valg else (),
@@ -1091,13 +1098,17 @@ def _tabellsiden(aktiv: str):
         foerste_valgbare=_foerste_valgbare(serier),
         siste_dag=sidens_siste(rader),
         periodeledd=ledd,
-        standard_adresse=side_adresse(sti, None, alle, ledd),
+        standard_adresse=side_adresse(sti, None, alle, ledd, bare_min),
         # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
         # Min liste, og merket «Egen» i tabellen.
         egne=_egne(),
         # Story 8.11: filteret på signalet, og lenkene til det.
         signalfilter=signalfilter,
-        filterlenker=_filterlenkene(signalfilter),
+        filterlenker=_filterlenkene(signalfilter, rader_foer),
+        nest_beste=_nest_beste(signalfilter, rader_foer),
+        filter_retning_og_styrke=_filterets_retning_og_styrke(signalfilter) if signalfilter else None,
+        # Story 8.23 (tillegg 1): overskriften i Min liste med «Alle».
+        antall_ut=len(overskrift_ut),
         overskrift_ut=overskrift_ut,
         foer_filter=foer_filter,
         filter_tomt=signalfilter is not None and not (skilte_seg_ut or oevrige or sortert),
@@ -1111,31 +1122,58 @@ def _tabellsiden(aktiv: str):
 
 # Story 8.11: filteret på signalet (FR-412, tillegget).
 SIGNALFILTER = {"positiv": "Positiv", "negativ": "Negativ"}
+# Story 8.23 (A8): dem som fikk én sjekk mindre i samme retning, som lenken
+# ved et tomt filter viser. Ingen knapp har dem.
+NEST_BESTE = {"positiv-2": "positiv", "negativ-2": "negativ"}
 
 
 def _signalfilteret() -> str | None:
-    """Retningen i ?signal=, eller None. En verdi som ikke er en av de to,
-    gir ingen filtrering."""
+    """Verdien i ?signal=, eller None. En verdi som ikke er kjent, gir ingen
+    filtrering."""
     verdi = request.args.get("signal")
-    return verdi if verdi in SIGNALFILTER else None
+    return verdi if verdi in SIGNALFILTER or verdi in NEST_BESTE else None
+
+
+def _filterets_retning_og_styrke(signalfilter: str) -> tuple[str, int]:
+    """(retningen som ord, styrken) for en verdi i ?signal= - story 8.23."""
+    if signalfilter in NEST_BESTE:
+        return NEST_BESTE[signalfilter], ANTALL_SJEKKER - 1
+    return signalfilter, ANTALL_SJEKKER
 
 
 def _passer(rad, signalfilter: str) -> bool:
     vurdering = rad.vurdering
-    return (
-        vurdering is not None and vurdering.styrke == ANTALL_SJEKKER and vurdering.retning == SIGNALFILTER[signalfilter]
-    )
+    retning, styrke = _filterets_retning_og_styrke(signalfilter)
+    return vurdering is not None and vurdering.styrke == styrke and vurdering.retning == SIGNALFILTER[retning]
 
 
-def _filterlenkene(signalfilter: str | None) -> list[tuple[str, str, bool]]:
-    """(teksten, adressen, aktiv) for «Alle», «3 av 3 positiv» og «3 av 3
-    negativ», med resten av adressen som den er."""
+def _filteradresse(verdi: str | None) -> str:
+    """Adressen med ?signal=verdi og resten av adressen som den er, til
+    tabellen (story 8.23, A2)."""
     ledd = [(k, v) for k, v in request.args.items(multi=True) if k != "signal"]
-    lenker = []
-    for verdi, tekst in ((None, "Alle"), ("positiv", "3 av 3 positiv"), ("negativ", "3 av 3 negativ")):
-        deler = ledd + ([("signal", verdi)] if verdi else [])
-        lenker.append((tekst, request.path + ("?" + urlencode(deler) if deler else ""), verdi == signalfilter))
+    deler = ledd + ([("signal", verdi)] if verdi else [])
+    return request.path + ("?" + urlencode(deler) if deler else "") + "#aksjene"
+
+
+def _filterlenkene(signalfilter: str | None, rader_foer: list) -> list[tuple[str, str, bool]]:
+    """(teksten, adressen, aktiv) for «Alle», «3 av 3 positiv» og «3 av 3
+    negativ», med resten av adressen som den er. Story 8.23 (A8): med
+    antallet i lista som vises, før filteret, i parentes."""
+    lenker = [("Alle", _filteradresse(None), signalfilter is None)]
+    for verdi in ("positiv", "negativ"):
+        antall = sum(1 for rad in rader_foer if _passer(rad, verdi))
+        tekst = f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} {verdi} ({antall})"
+        lenker.append((tekst, _filteradresse(verdi), verdi == signalfilter))
     return lenker
+
+
+def _nest_beste(signalfilter: str | None, rader_foer: list) -> tuple[int, str] | None:
+    """Story 8.23 (A8): når «3 av 3» i en retning gir 0, (hvor mange som fikk
+    2 av 3 i samme retning, adressen som viser dem). None ellers."""
+    if signalfilter not in SIGNALFILTER or any(_passer(rad, signalfilter) for rad in rader_foer):
+        return None
+    verdi = f"{signalfilter}-2"
+    return sum(1 for rad in rader_foer if _passer(rad, verdi)), _filteradresse(verdi)
 
 
 def sidens_siste(rader: list) -> date | None:
@@ -1623,6 +1661,9 @@ _TILBAKE_TEGN = re.compile(r"[A-Za-z0-9/?=&\-]{1,100}")
 OVERSIKTEN = "/"
 MIN_LISTE = "/min-liste"
 ALLE = "alle"
+# Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): «Min liste» over
+# «Aksjene» filtrerer tabellen på oversikten, med ?vis=min.
+BARE_MIN = "min"
 # Det skjemaet sender i «til»: merk aksjen, eller ta merket bort.
 MERK = "merk"
 FJERN = "fjern"
@@ -1641,6 +1682,7 @@ def tilbake_etter_merking(tekst: str | None) -> str:
         Sortering.fra_adressen(_ett(valg, "sorter"), _ett(valg, "orden")),
         deler.path == MIN_LISTE and _ett(valg, "vis") == ALLE,
         _periodeledd_fra(deler.path, _ett(valg, "periode"), _ett(valg, "dag")),
+        deler.path == OVERSIKTEN and _ett(valg, "vis") == BARE_MIN,
     )
 
 
@@ -1662,12 +1704,17 @@ def _ett(valg: dict[str, list[str]], navn: str) -> str | None:
     return verdier[0] if len(verdier) == 1 else None
 
 
-def side_adresse(sti: str, sortering: Sortering | None, alle: bool = False, periode: tuple[str, ...] = ()) -> str:
+def side_adresse(
+    sti: str, sortering: Sortering | None, alle: bool = False, periode: tuple[str, ...] = (), bare_min: bool = False
+) -> str:
     """Adressen til oversikten eller Min liste, med «Alle», perioden og
-    dagen (story 8.17a) og sorteringen."""
+    dagen (story 8.17a) og sorteringen. Story 8.23: med «Min liste» på
+    oversikten (bare_min)."""
     valg = []
     if alle:
         valg.append(f"vis={ALLE}")
+    if bare_min and sti == OVERSIKTEN:
+        valg.append(f"vis={BARE_MIN}")
     valg += periode
     if sortering is not None:
         valg += [f"sorter={sortering.kolonne}", f"orden={sortering.orden}"]
@@ -1708,7 +1755,11 @@ def merk():
     # Story 8.2b, a (U29): tas aksjen ut av Min liste uten «Alle», er raden
     # borte, saa siden sender tilbake til tabellen.
     deler = urlsplit(adresse)
-    borte = til == FJERN and deler.path == MIN_LISTE and _ett(parse_qs(deler.query), "vis") != ALLE
+    vis = _ett(parse_qs(deler.query), "vis")
+    # Story 8.23: også oversikten med «Min liste», der raden forsvinner.
+    borte = til == FJERN and (
+        (deler.path == MIN_LISTE and vis != ALLE) or (deler.path == OVERSIKTEN and vis == BARE_MIN)
+    )
     return redirect(adresse + ("#aksjene" if borte else f"#rad-{symbol}"), code=303)
 
 

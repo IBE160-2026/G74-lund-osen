@@ -275,13 +275,20 @@ class TestEtterGjennomgangen:
 
     def test_knappene_og_lenkene(self, demoklient):
         """VG7: ville feilet hvis knappene fikk andre ord, eller lenkene mistet
-        resten av adressen."""
+        resten av adressen. Story 8.23 (A8 og A2): med antallet i parentes, og
+        lenkene går til tabellen (#aksjene)."""
         side, _ = demoklient
         html = side.get("/min-liste?sorter=endring&orden=synkende&signal=positiv").data.decode("utf-8")
         nav = html.split('<nav class="signalfilter"', 1)[1].split("</nav>", 1)[0]
-        assert re.findall(r">([^<]+)</a>", nav) == ["Alle", "3 av 3 positiv", "3 av 3 negativ"]
-        assert 'href="/min-liste?sorter=endring&amp;orden=synkende&amp;signal=positiv" aria-current="true"' in nav
-        assert 'href="/min-liste?sorter=endring&amp;orden=synkende">Alle' in nav
+        tekster = re.findall(r">([^<]+)</a>", nav)
+        assert tekster[0] == "Alle" and len(tekster) == 3
+        assert re.fullmatch(r"3 av 3 positiv \(\d+\)", tekster[1]) and re.fullmatch(
+            r"3 av 3 negativ \(\d+\)", tekster[2]
+        )
+        assert (
+            'href="/min-liste?sorter=endring&amp;orden=synkende&amp;signal=positiv#aksjene" aria-current="true"' in nav
+        )
+        assert 'href="/min-liste?sorter=endring&amp;orden=synkende#aksjene">Alle' in nav
 
     def test_demoen_har_kraft_og_eiendom(self, demoklient):
         """VG10: hjelpen og README-en sier det. Story 8.11b (spørsmål 8):

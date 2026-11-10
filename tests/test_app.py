@@ -2434,7 +2434,8 @@ class TestStory815Sortering:
         html = self._side(tabell, "/")
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert "aria-sort" not in thead
-        lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead))
+        # Story 8.23 (A2): lenkene går til tabellen (#aksjene).
+        lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)#aksjene"', thead))
         # Story 8.15b: Selskap A til Å foerst.
         assert lenker == {
             "selskap": "stigende",
@@ -2446,11 +2447,13 @@ class TestStory815Sortering:
         valgt = self._side(tabell, "/?sorter=endring&orden=synkende")
         thead = valgt.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert re.findall(
-            r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead
+            r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)#aksjene"',
+            thead,
         ) == [("descending", "endring", "stigende")]
         stigende = self._side(tabell, "/?sorter=retning&orden=stigende")
         assert re.search(
-            r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende">', stigende
+            r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende#aksjene">',
+            stigende,
         )
 
     def test_skjermleseren_hoerer_kolonnen_og_retningen(self, tabell):
@@ -2469,7 +2472,7 @@ class TestStory815Sortering:
         assert 'class="sortert"' not in self._side(tabell, "/")
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
         assert (
-            '<p class="sortert">Sortert på signalstyrke, stigende, i én liste. <a href="/">Standard rekkefølge</a></p>'
+            '<p class="sortert">Sortert på signalstyrke, stigende, i én liste. <a href="/#aksjene">Standard rekkefølge</a></p>'
         ) in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
         # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9 sa «innenfor
@@ -3966,7 +3969,7 @@ class TestStory815bSelskapOgMarkeringen:
         """Ville feilet hvis lenken på Selskap ikke snudde, eller linja og
         teksten for skjermleseren ikke sa «(A til Å)» som for Retning."""
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=stigende")
-        assert 'href="/?sorter=selskap&amp;orden=synkende"' in thead
+        assert 'href="/?sorter=selskap&amp;orden=synkende#aksjene"' in thead
         assert ", sortert stigende (A til Å). Velg for synkende (Å til A)." in thead
         # Story 8.2a, e: «i én liste».
         assert "Sortert på selskap, stigende (A til Å), i én liste." in html
@@ -3975,7 +3978,7 @@ class TestStory815bSelskapOgMarkeringen:
         # Gjennomgangen (VG7): og synkende.
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=synkende")
         assert "Sortert på selskap, synkende (Å til A), i én liste." in html
-        assert 'href="/?sorter=selskap&amp;orden=stigende"' in thead
+        assert 'href="/?sorter=selskap&amp;orden=stigende#aksjene"' in thead
 
     @pytest.mark.parametrize("orden, aria", [("stigende", "ascending"), ("synkende", "descending")])
     @pytest.mark.parametrize("kolonne", ["selskap", "kurs", "endring", "signal", "retning"])

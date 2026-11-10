@@ -20,11 +20,13 @@
 {#- Story 8.3: lenken sorterer på siden man står på, og «Alle» i Min liste
     står. #}
 {#- Story 8.17a: lenken beholder perioden og dagen (periodeledd). #}
+{#- Story 8.23 (A2): lenken går til tabellen (#aksjene), så siden blir stående
+    ved tabellen, og beholder «Min liste» på oversikten (B7). #}
 {% macro sorterlenke(kolonne, tekst) -%}
   {%- set valgt = sortering and sortering.kolonne == kolonne -%}
   {%- set neste = neste_orden(kolonne, sortering) -%}
   {%- set vist = sortering.orden if valgt else neste -%}
-  <a class="sorter{% if valgt %} valgt{% endif %}" href="{{ sidesti }}?{% if alle %}vis=alle&amp;{% endif %}{% for ledd in periodeledd %}{{ ledd }}&amp;{% endfor %}sorter={{ kolonne }}&amp;orden={{ neste }}">{{ tekst }}<span class="skjult">
+  <a class="sorter{% if valgt %} valgt{% endif %}" href="{{ sidesti }}?{% if alle %}vis=alle&amp;{% endif %}{% if bare_min %}vis=min&amp;{% endif %}{% for ledd in periodeledd %}{{ ledd }}&amp;{% endfor %}sorter={{ kolonne }}&amp;orden={{ neste }}#aksjene">{{ tekst }}<span class="skjult">
   {%- if valgt %}, sortert {{ ordens_ord(kolonne, sortering.orden) }}. Velg for {{ ordens_ord(kolonne, neste) }}.{% else %}, sorter {{ ordens_ord(kolonne, neste) }}{% endif -%}
   </span><svg class="vinkel" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false"><path d="{{ 'M2.5 4.5 6 8l3.5-3.5' if vist == 'synkende' else 'M2.5 7.5 6 4l3.5 3.5' }}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 {%- endmacro %}
@@ -139,7 +141,12 @@
     {#- Story 8.11 (gjennomgangen, ECH1): tallene før filteret. #}
     {% set i_lista = overskrift_ut|map(attribute="aksje.symbol")|select("in", merkede)|list|length %}
     <div class="listetopp">
-    {% if vurdert_i_lista %}
+    {#- Story 8.23 (tillegg 1, gruppens funn kl. 14:15): med «Alle» sier
+        overskriften hvor mange av alle som skilte seg ut, og hvor mange av dem
+        som er i Min liste, så den stemmer med tabellen. #}
+    {% if alle and antall_vurdert %}
+      <h1 class="overskrift"><mark>{{ antall_ut }} av {{ antall_aksjer }}</mark> skilte seg ut {{ dato|ukedag }}, {{ i_lista }} av dem i Min liste</h1>
+    {% elif vurdert_i_lista %}
       <h1 class="overskrift"><mark>{{ i_lista }} av {{ antall_merket }} i Min liste</mark> skilte seg ut {{ dato|ukedag }}</h1>
     {% else %}
       <h1 class="overskrift">Min liste</h1>
@@ -227,7 +234,7 @@
         sier hva tallene gjelder (gruppens svar 23.10 kl. 12:35, a). #}
     {% if valg %}
       {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
-      <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten") }}</div>
+      <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten", ekstra=[("vis", "min")] if bare_min else []) }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Tabellen viser {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen, endringen den dagen og signalet som er lagret for dagen. En oransje strek og «{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag» viser aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag.</p>
@@ -245,8 +252,11 @@
       <h2 class="aksjetittel">Aksjene <span class="antall">{{ antall_aksjer }}</span></h2>
       <nav class="visvalg" aria-label="Vis">
         {#- Gjennomgangen (BH7, ECH7): med sorteringen, som i Min liste. #}
-        <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}" aria-current="true">Alle <span class="antall">{{ antall_aksjer }}</span></a>
-        <a class="visknapp" href="/min-liste{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}">Min liste <span class="antall">{{ antall_merket }}</span></a>
+        {#- Story 8.23 (tillegg 2, B7): «Min liste» filtrerer tabellen her, med
+            ?vis=min, og beholder perioden og sorteringen. Knappen «Min liste»
+            i stripa går til siden. #}
+        <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}#aksjene"{% if not bare_min %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
+        <a class="visknapp" href="{{ sidesti }}?vis=min{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}#aksjene"{% if bare_min %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
       </nav>
     </div>
 
@@ -258,12 +268,15 @@
       {% for tekst, adresse, er_aktiv in filterlenker %}<a class="visknapp" href="{{ adresse }}"{% if er_aktiv %} aria-current="true"{% endif %}>{{ tekst }}</a>{% endfor %}
     </nav>
     {#- Gjennomgangen (BH4, BH11): forbeholdet står også før et klikk. #}
-    <p class="filtertekst">{% if signalfilter %}Bare aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} med retning {{ signalfilter }}.{% if filter_tomt %} Ingen av aksjene her fikk det.{% endif %} {% endif %}Filteret viser hva sjekkene ga, og er ikke et råd om å kjøpe eller selge.</p>
+    {#- Story 8.23 (A8): ved 0 står hvor mange som fikk 2 av 3 i samme
+        retning, med en lenke som viser dem. #}
+    {% if signalfilter %}{% set retning, styrke = filter_retning_og_styrke %}{% endif %}
+    <p class="filtertekst">{% if signalfilter %}Bare aksjene som fikk {{ styrke }} av {{ antall_sjekker }} med retning {{ retning }}.{% if filter_tomt %} Ingen av aksjene her fikk det.{% endif %}{% if nest_beste %} {% if nest_beste[0] %}{{ nest_beste[0] }} fikk {{ antall_sjekker - 1 }} av {{ antall_sjekker }} {{ retning }}: <a href="{{ nest_beste[1] }}">se {{ "den" if nest_beste[0] == 1 else "dem" }}</a>.{% else %}Ingen fikk {{ antall_sjekker - 1 }} av {{ antall_sjekker }} {{ retning }} heller.{% endif %}{% endif %} {% endif %}Filteret viser hva sjekkene ga, og er ikke et råd om å kjøpe eller selge.</p>
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
         8.2a, e: tabellen er da én liste, ikke sortert innenfor hver del. #}
-    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ standard_adresse }}">Standard rekkefølge</a></p>{% endif %}
+    {% if sortering %}<p class="sortert">Sortert på {{ sortering.navn }}, {{ ordens_ord(sortering.kolonne, sortering.orden) }}, i én liste. <a href="{{ standard_adresse }}#aksjene">Standard rekkefølge</a></p>{% endif %}
     {#- Story 8.2b, a (U29): ankeret stjernen sender tilbake til når raden er borte. #}
     <div class="tabellboks" id="aksjene" role="region" aria-label="Aksjene" tabindex="0">
     <table>

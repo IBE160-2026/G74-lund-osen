@@ -582,7 +582,8 @@ class TestGjennomgangen:
         html = demo.get("/min-liste?vis=alle&sorter=kurs&orden=synkende").data.decode("utf-8")
         tilbake = set(re.findall(r'name="tilbake" value="([^"]*)"', html))
         assert tilbake == {"/min-liste?vis=alle&amp;sorter=kurs&amp;orden=synkende"}
-        assert '<a href="/min-liste?vis=alle">Standard rekkefølge</a>' in html
+        # Story 8.23 (A2): lenken går til tabellen.
+        assert '<a href="/min-liste?vis=alle#aksjene">Standard rekkefølge</a>' in html
         assert re.search(r'class="visknapp" href="/min-liste\?sorter=kurs&amp;orden=synkende">Min liste', html)
         assert re.search(
             r'class="visknapp" href="/min-liste\?vis=alle&amp;sorter=kurs&amp;orden=synkende" aria-current', html
@@ -594,7 +595,7 @@ class TestGjennomgangen:
         assert set(re.findall(r'name="tilbake" value="([^"]*)"', lista)) == {
             "/min-liste?sorter=signal&amp;orden=stigende"
         }
-        assert '<a href="/min-liste">Standard rekkefølge</a>' in lista
+        assert '<a href="/min-liste#aksjene">Standard rekkefølge</a>' in lista
 
     def test_fotnotene_i_min_liste_gjelder_bare_lista(self, demo):
         """ECH7, BH9. Ville feilet hvis Min liste viste fotnoten om en aksje
