@@ -44,6 +44,9 @@ class Etterpaa:
 
 INGEN_KURS_PAA_NOTATDAGEN = "aksjen har ingen kurs fra notatdagen"
 INGEN_INDEKS = "hovedindeksen er ikke hentet"
+# Gjennomgangen (BH8): en indeks som ikke kunne leses, er ikke en indeks som
+# ikke er hentet (NFR-08).
+INDEKSEN_KUNNE_IKKE_LESES = "hovedindeksen kunne ikke leses"
 INDEKSEN_MANGLER_DAGEN = "hovedindeksen har ingen kurs fra en av dagene"
 
 
@@ -70,11 +73,14 @@ def bygg_etterpaa(
     idag: date,
     terskel: int,
     ut: date | None = None,
+    *,
+    indeks_feilet: bool = False,
 ) -> Etterpaa:
     """«Etterpå» for et notat. Ren logikk: serien, indeksen ({dato: justert
     slutt}) og radene i vurdering kommer inn som argumenter, og signalet
-    regnes aldri (AD-7). indeks er None når basen ikke har en indeks, og
-    vurderinger None når de ikke kunne leses."""
+    regnes aldri (AD-7). indeks er None når basen ikke har en indeks, eller
+    når den ikke kunne leses (indeks_feilet), og vurderinger None når de
+    ikke kunne leses."""
     kursdager = frozenset(rad.dato for rad in serie)
     foerste = serie[0].dato if serie else notat.dato
     sist = serie[-1].dato if serie else notat.dato
@@ -90,7 +96,7 @@ def bygg_etterpaa(
     aksjen = endring({rad.dato: float(rad.justert_slutt) for rad in serie}, notat.dato, sist)
     aksjen_grunn = None if aksjen is not None else INGEN_KURS_PAA_NOTATDAGEN
     if indeks is None:
-        indeksen, indeksen_grunn = None, INGEN_INDEKS
+        indeksen, indeksen_grunn = None, INDEKSEN_KUNNE_IKKE_LESES if indeks_feilet else INGEN_INDEKS
     else:
         indeksen = endring(indeks, notat.dato, sist)
         indeksen_grunn = None if indeksen is not None else INDEKSEN_MANGLER_DAGEN

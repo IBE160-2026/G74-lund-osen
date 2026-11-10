@@ -1364,9 +1364,13 @@ def aksjedetalj(symbol: str):
             historikk=historikk,
             pil=pil,
             # Story 8.21: «Mine notater», med dagen et nytt notat får.
-            notatene=_notatene(post, rader, indeks, vurderingene, i_dag),
+            notatene=_notatene(post, rader, indeks, indeks_feilet, vurderingene, i_dag),
             notatdag=slutt,
+            # Gjennomgangen (ECH1): «Vis dagen» godtar en dag uten kurs for
+            # aksjen, som en lørdag. Da står ikke skjemaet, bare en linje.
             kan_skrive_notat=post.ut is None,
+            notatdag_har_kurs=any(rad.dato == slutt for rad in rader),
+            notat_visningen=_visningen(valg, slutt, periode),
             notat_maks=MAKS_TEGN,
             notat_anker=NOTATANKER,
             **_fotnoten([detalj.dato] if detalj.ikke_vurdert else [], i_dag),
@@ -1380,11 +1384,20 @@ def aksjedetalj(symbol: str):
 # --- Story 8.21: «Mine notater» på aksjesiden ------------------------------
 
 NOTATANKER = "mine-notater"
+# Gjennomgangen (BH3, ECH3): en id med flere sifre enn SQLite tar (int64),
+# gir 400, ikke OverflowError og 500.
+_NOTAT_ID = re.compile(r"[0-9]{1,18}")
+# Gjennomgangen (ECH2, BH7): visningen skjemaet kom fra, så svaret går tilbake
+# til samme periode eller dag. Bare en dag eller en periode siden kjenner.
+_VISNINGEN = re.compile(r"dag=([0-9]{4}-[0-9]{2}-[0-9]{2})|periode=([a-z0-9-]+)")
 
 
-def _notatene(post, rader, indeks: dict | None, vurderingene: dict | None, i_dag: date) -> list | None:
+def _notatene(
+    post, rader, indeks: dict | None, indeks_feilet: bool, vurderingene: dict | None, i_dag: date
+) -> list | None:
     """Notatene for aksjen, hvert med «Etterpå» (etterpaa.py), den nyeste
-    notatdagen først. Indeksen og vurderingene er de siden alt har lest, så
+    notatdagen først. Serien, indeksen og vurderingene er de siden alt har
+    lest, hele serien til siste dag, også med «Vis dagen» og en periode, så
     ingenting leses to ganger, og signalet regnes aldri (AD-7). None når
     notatene ikke kan leses; da står delen uten skjema."""
     try:
@@ -1393,16 +1406,33 @@ def _notatene(post, rader, indeks: dict | None, vurderingene: dict | None, i_dag
         app.logger.warning("Notatene kunne ikke leses: %s", type(feil).__name__)
         return None
     return [
-        (notat, bygg_etterpaa(notat, rader, indeks, vurderingene, i_dag, STANDARD.terskel, post.ut))
+        (
+            notat,
+            bygg_etterpaa(
+                notat, rader, indeks, vurderingene, i_dag, STANDARD.terskel, post.ut, indeks_feilet=indeks_feilet
+            ),
+        )
         for notat in notatene
     ]
 
 
-def _tilbake_til_notatene(symbol: str, dag: date | None, siste: date | None) -> str:
-    """Samme side og samme dag, ved «Mine notater» (del B)."""
+def _visningen(valg: Valg, slutt: date, periode: str | None) -> str:
+    """Visningen siden har, som skjemaene sender med: dagen fra «Vis dagen»,
+    en periode fra adressen, eller ingenting for standardvisningen."""
+    if valg.periode == VELG:
+        return f"dag={slutt.isoformat()}"
+    return f"periode={periode}" if periode else ""
+
+
+def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
+    """Samme side, med samme periode eller dag, ved «Mine notater» (del B).
+    En visning siden ikke kjenner, gir standardvisningen."""
     adresse_ = f"/aksje/{symbol}"
-    if dag is not None and siste is not None and dag != siste:
-        adresse_ += f"?dag={dag.isoformat()}"
+    treff = _VISNINGEN.fullmatch(visningen or "")
+    if treff and treff.group(1) and _gyldig_dato(treff.group(1)):
+        adresse_ += f"?dag={treff.group(1)}"
+    elif treff and treff.group(2) in PERIODENE and treff.group(2) != VELG:
+        adresse_ += f"?periode={treff.group(2)}"
     return adresse_ + f"#{NOTATANKER}"
 
 
@@ -1428,12 +1458,9 @@ def _notatsiden(symbol: str):
 def _skjemadag(verdi: str | None, kursdager: list[date]) -> date:
     """Dagen fra skjemaet, som må være en dag aksjen har kurs (del B). 400
     ellers, så et notat aldri får en dag siden ikke kunne vise."""
-    if not verdi or not _DAG.fullmatch(verdi):
+    if not verdi or not _DAG.fullmatch(verdi) or not _gyldig_dato(verdi):
         abort(400)
-    try:
-        dag = date.fromisoformat(verdi)
-    except ValueError:
-        abort(400)
+    dag = date.fromisoformat(verdi)
     if dag not in kursdager:
         abort(400)
     return dag
@@ -1455,27 +1482,25 @@ def skriv_notat(symbol: str):
     except BASEFEIL as feil:
         g.basefeil = _basefeil(feil)
         return _basen_kan_ikke_aapnes()
-    return redirect(_tilbake_til_notatene(post.aksje.symbol, dag, kursdager[-1]), code=303)
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
 
 
 @app.post("/aksje/<symbol>/notat/slett")
 def slett_notat(symbol: str):
     """Sletter ett notat for aksjen (spørsmål 7), og sender tilbake til samme
     side og dag (303). Et notat for en annen aksje slettes ikke."""
-    post, kursdager, feilside = _notatsiden(symbol)
+    post, _kursdager, feilside = _notatsiden(symbol)
     if feilside is not None:
         return feilside
     notat_id = request.form.get("id", "")
-    if not notat_id.isdigit() or not notat_id.isascii():
+    if not _NOTAT_ID.fullmatch(notat_id):
         abort(400)
-    dag = request.form.get("dag")
-    tilbake = date.fromisoformat(dag) if dag and _DAG.fullmatch(dag) and _gyldig_dato(dag) else None
     try:
         SqliteNotatlager(g.tilkobling).slett(post.aksje.symbol, int(notat_id))
     except BASEFEIL as feil:
         g.basefeil = _basefeil(feil)
         return _basen_kan_ikke_aapnes()
-    return redirect(_tilbake_til_notatene(post.aksje.symbol, tilbake, kursdager[-1] if kursdager else None), code=303)
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
 
 
 def _gyldig_dato(verdi: str) -> bool:

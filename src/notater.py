@@ -56,7 +56,9 @@ def rens(tekst: object) -> str:
     if not isinstance(tekst, str):
         raise UgyldigNotat("notatet må være tekst")
     renset = " ".join(tekst.split())
-    if not renset:
+    # Gjennomgangen (BH9, ECH5): tegn uten bredde, som U+200B, er ikke
+    # mellomrom for split(), men et notat med bare dem er like tomt.
+    if not any(tegn.isprintable() and not tegn.isspace() for tegn in renset):
         raise UgyldigNotat("notatet er tomt")
     if len(renset) > MAKS_TEGN:
         raise UgyldigNotat(f"notatet har over {MAKS_TEGN} tegn")
@@ -82,6 +84,9 @@ class MinneNotatlager:
     def skriv(self, symbol: str, dato: date, tekst: str, laget: datetime) -> Notat:
         if symbol not in self._symboler:
             raise UgyldigNotat(f"{symbol!r} står ikke i lista")
+        # Gjennomgangen (BH10): samme kontroll av dagen som SQLite-adapteren.
+        if not isinstance(dato, date) or isinstance(dato, datetime):
+            raise UgyldigNotat("dagen må være en dato")
         notat = Notat(self._neste, symbol, dato, rens(tekst), laget)
         self._notater[notat.id] = notat
         self._neste += 1

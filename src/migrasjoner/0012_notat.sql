@@ -13,11 +13,12 @@
 CREATE TABLE notat (
     id INTEGER PRIMARY KEY,
     symbol TEXT NOT NULL CHECK (symbol <> ''),
+    -- Gjennomgangen (BH4): en dato som finnes, ikke bare formen.
     dato TEXT NOT NULL CHECK (
-        length(dato) = 10 AND dato GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+        length(dato) = 10 AND dato GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' AND date(dato) IS dato
     ),
     tekst TEXT NOT NULL CHECK (length(trim(tekst)) >= 1 AND length(tekst) <= 280),
-    laget TEXT NOT NULL
+    laget TEXT NOT NULL CHECK (julianday(laget) IS NOT NULL)
 );
 
 CREATE INDEX notat_symbol ON notat (symbol, dato);

@@ -140,17 +140,40 @@ class TestTabellen:
             (AKSJE, "2026-10-01", "x" * (MAKS_TEGN + 1)),
             (AKSJE, "01.10.2026", "x"),
             (AKSJE, "2026-10-1", "x"),
+            # Gjennomgangen (BH4): en dato som ikke finnes, og et tidspunkt som
+            # ikke kan leses.
+            (AKSJE, "2026-13-45", "x"),
+            (AKSJE, "2026-02-30", "x"),
+            (AKSJE, "2026-10-01", "x", "x"),
         ],
     )
     def test_tabellen_avviser(self, mal, tmp_path, verdier):
         """Ville feilet hvis tabellen godtok et ukjent symbol, en tom tekst,
-        over 280 tegn eller en dato på en annen form enn ÅÅÅÅ-MM-DD."""
+        over 280 tegn, en dato som ikke finnes eller er på en annen form enn
+        ÅÅÅÅ-MM-DD, eller et tidspunkt som ikke kan leses. Hver rad er gyldig
+        utenom den ene verdien."""
+        if len(verdier) == 3:
+            verdier = (*verdier, LAGET.isoformat())
         sti = tmp_path / "demo.db"
         shutil.copy(mal, sti)
         t = sqlite3.connect(sti)
         try:
             with pytest.raises(sqlite3.IntegrityError):
-                t.execute("INSERT INTO notat (symbol, dato, tekst, laget) VALUES (?, ?, ?, 'x')", verdier)
+                t.execute("INSERT INTO notat (symbol, dato, tekst, laget) VALUES (?, ?, ?, ?)", verdier)
+        finally:
+            t.close()
+
+    def test_en_gyldig_rad_godtas(self, mal, tmp_path):
+        """Ville feilet hvis CHECK-ene avviste en gyldig rad, så testen over
+        bare viste at alt avvises."""
+        sti = tmp_path / "demo.db"
+        shutil.copy(mal, sti)
+        t = sqlite3.connect(sti)
+        try:
+            t.execute(
+                "INSERT INTO notat (symbol, dato, tekst, laget) VALUES (?, ?, ?, ?)",
+                (AKSJE, "2026-10-01", "x", LAGET.isoformat()),
+            )
         finally:
             t.close()
 
@@ -221,7 +244,8 @@ class TestPorten:
 
 
 class TestRens:
-    @pytest.mark.parametrize("tekst", ["", "   ", "\n\t", "x" * (MAKS_TEGN + 1), None, 5])
+    # Gjennomgangen (BH9, ECH5): også bare tegn uten bredde.
+    @pytest.mark.parametrize("tekst", ["", "   ", "\n\t", "\u200b", "\u200b \u2060", "x" * (MAKS_TEGN + 1), None, 5])
     def test_avviser(self, tekst):
         with pytest.raises(UgyldigNotat):
             rens(tekst)
@@ -258,7 +282,8 @@ class TestSkjemaet:
         skjemadag = re.search(r'<form class="nytt-notat".*?name="dag" value="([0-9-]+)"', side, re.S).group(1)
         assert skjemadag == dag.isoformat()
         assert "Notatet får datoen" in _tekst(_delen(side))
-        svar = klient.post(f"/aksje/{AKSJE}/notat", data={"dag": skjemadag, "tekst": "Et notat"})
+        vis = re.search(r'<form class="nytt-notat".*?name="vis" value="([^"]*)"', side, re.S).group(1)
+        svar = klient.post(f"/aksje/{AKSJE}/notat", data={"dag": skjemadag, "vis": vis, "tekst": "Et notat"})
         assert svar.status_code == 303
         assert svar.headers["Location"] == adresse + "#mine-notater"
         assert [(s, d, t) for _, s, d, t, _ in _rader(demobase)] == [(AKSJE, dag.isoformat(), "Et notat")]
@@ -307,7 +332,7 @@ class TestSkjemaet:
         assert _rader(demobase) == []
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"})
         (rad,) = _rader(demobase)
-        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0], "dag": "2026-10-09"})
+        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]})
         assert _alle_andre_tabeller(demobase) == foer
 
     def test_slett_sender_tilbake_til_samme_dag(self, klient, demobase):
@@ -318,11 +343,12 @@ class TestSkjemaet:
         annen_id, mitt_id = (rad[0] for rad in _rader(demobase))
         assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": annen_id}).status_code == 303
         assert len(_rader(demobase)) == 2
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": mitt_id, "dag": "2026-10-01"})
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": mitt_id, "vis": "dag=2026-10-01"})
         assert svar.headers["Location"] == f"/aksje/{AKSJE}?dag=2026-10-01#mine-notater"
         assert [rad[3] for rad in _rader(demobase)] == ["annen"]
 
-    @pytest.mark.parametrize("notat_id", ["", "x", "-1", "1.0", "²"])
+    # Gjennomgangen (BH3, ECH3): også en id SQLite ikke kan ta.
+    @pytest.mark.parametrize("notat_id", ["", "x", "-1", "1.0", "²", "9" * 30])
     def test_slett_med_ugyldig_id_gir_400(self, klient, demobase, notat_id):
         assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": notat_id}).status_code == 400
 
@@ -421,8 +447,10 @@ class TestSiden:
         assert re.search(r"Signalet fredag 09\.10: .* [0-3] av 3", tekst)
 
     def test_samme_tall_som_basen(self, klient, demobase):
-        """Ville feilet hvis endringen på siden ikke var regnet fra den
-        justerte kursen i basen på de to dagene."""
+        """Ville feilet hvis endringen på siden ikke var regnet fra kolonnen
+        justert_slutt i basen på de to dagene. Demoen har justert lik slutt
+        (gjennomgangen, VG2), så justert mot ujustert kurs dekkes av
+        test_endringen_er_paa_justert_kurs."""
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "Notatet"})
         c = sqlite3.connect(demobase)
         try:
@@ -470,3 +498,145 @@ class TestDokumentene:
     def test_demokommandoen_skriver_ingen_notater(self, demobase):
         """Spørsmål 9: ville feilet hvis demobasen kom med notater."""
         assert _rader(demobase) == []
+
+
+# --- Etter gjennomgangen ------------------------------------------------------
+
+
+def _skjemaet(side: str) -> dict:
+    skjema = re.search(r'<form class="nytt-notat".*?</form>', side, re.S).group(0)
+    return dict(re.findall(r'name="(dag|vis)" value="([^"]*)"', skjema))
+
+
+class TestEtterGjennomgangen:
+    @pytest.mark.parametrize(
+        "adresse",
+        [f"/aksje/{AKSJE}?periode=1-mnd", f"/aksje/{AKSJE}?dag=2026-10-09", f"/aksje/{AKSJE}?periode=3-mnd"],
+    )
+    def test_tilbake_til_samme_visning(self, klient, demobase, adresse):
+        """ECH2, BH7, VG4: ville feilet hvis svaret etter lagring og sletting
+        ikke gikk tilbake til samme periode eller dag."""
+        felt = _skjemaet(klient.get(adresse).data.decode("utf-8"))
+        svar = klient.post(f"/aksje/{AKSJE}/notat", data={**felt, "tekst": "x"})
+        assert svar.headers["Location"] == adresse + "#mine-notater"
+        (rad,) = _rader(demobase)
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0], "vis": felt["vis"]})
+        assert svar.headers["Location"] == adresse + "#mine-notater"
+
+    @pytest.mark.parametrize("vis", ["periode=velg", "periode=ukjent", "dag=2026-02-30", "https://ond.example", "x"])
+    def test_ukjent_visning_gir_standardvisningen(self, klient, demobase, vis):
+        svar = klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "vis": vis, "tekst": "x"})
+        assert svar.headers["Location"] == f"/aksje/{AKSJE}#mine-notater"
+
+    def test_dag_uten_kurs_har_ikke_skjemaet(self, klient, demobase):
+        """ECH1: ville feilet hvis skjemaet sto på en dag uten kurs for aksjen,
+        der lagringen ville blitt avvist."""
+        delen = _delen(klient.get(f"/aksje/{AKSJE}?dag=2026-10-03").data.decode("utf-8"))
+        assert 'class="nytt-notat"' not in delen
+        assert "har ingen kurs for" in _tekst(delen)
+
+    def test_etterpaa_med_vis_dagen_gaar_til_siste_dag(self, klient, demobase):
+        """BH2: ville feilet hvis «Etterpå» på siden for en tidligere dag
+        sluttet på den dagen i stedet for siste dag med kurser."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-09-01", "tekst": "x"})
+        tekst = _tekst(_delen(klient.get(f"/aksje/{AKSJE}?dag=2026-10-01").data.decode("utf-8")))
+        assert "Aksjen fra tirsdag 01.09 til fredag 09.10:" in tekst
+        assert re.search(r"Hovedindeksen \(DEMIX\) samme dager: [+-]?[0-9]+,[0-9]{2} %", tekst)
+
+    def test_signalet_paa_siden_er_det_som_er_lagret(self, klient, demobase):
+        """BH11: ville feilet hvis siden viste en annen styrke eller retning
+        enn raden i vurdering for dagene."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        c = sqlite3.connect(demobase)
+        try:
+            lagret = {
+                d: c.execute(
+                    "SELECT styrke, retning FROM vurdering WHERE symbol = ? AND dato = ?", (AKSJE, d)
+                ).fetchone()
+                for d in ("2026-10-01", "2026-10-09")
+            }
+        finally:
+            c.close()
+        tekst = _tekst(_delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")))
+        for dag, navn in (("2026-10-01", "torsdag 01.10"), ("2026-10-09", "fredag 09.10")):
+            styrke, retning = lagret[dag]
+            assert re.search(rf"Signalet {navn}: \S+ {retning} .*? {styrke} av 3", tekst), (dag, tekst)
+
+    def test_indeksen_som_ikke_kunne_leses_har_egen_grunn(self):
+        """BH8: ville feilet hvis en indeks som ikke kunne leses, fikk grunnen
+        for en indeks som ikke er hentet."""
+        from etterpaa import INDEKSEN_KUNNE_IKKE_LESES
+
+        serie = _serie((D1, 100.0, 100.0), (D2, 100.0, 100.0))
+        etter = bygg_etterpaa(Notat(1, AKSJE, D1, "x", LAGET), serie, None, {}, D3, 2, indeks_feilet=True)
+        assert etter.indeksen_grunn == INDEKSEN_KUNNE_IKKE_LESES
+
+    def test_aksje_tatt_ut_paa_siden(self, klient, demobase):
+        """VG3, spørsmål 10: ville feilet hvis en aksje som er tatt ut, fikk
+        skjemaet eller nye notater, eller notatene ikke kunne slettes."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "før"})
+        c = sqlite3.connect(demobase)
+        c.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", ("2026-10-12", AKSJE))
+        c.commit()
+        c.close()
+        delen = _delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
+        assert 'class="nytt-notat"' not in delen and "før" in _tekst(delen)
+        assert klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"}).status_code == 400
+        (rad,) = _rader(demobase)
+        assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]}).status_code == 303
+        assert _rader(demobase) == []
+
+    def test_demobase_fra_foer_0012_vises_ikke(self, klient, demobase):
+        """VG3, spørsmål 9: ville feilet hvis en demobase fra før 0012 ga en
+        side med notater eller 500, ikke siden som ber om en ny demobase."""
+        c = sqlite3.connect(demobase)
+        c.execute("DROP TABLE notat")
+        c.execute("DELETE FROM skjema_versjon WHERE versjon = 12")
+        c.commit()
+        c.close()
+        svar = klient.get(f"/aksje/{AKSJE}")
+        assert svar.status_code == 503
+        assert "uv run python src/demo.py" in svar.data.decode("utf-8")
+        assert klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"}).status_code == 503
+
+    def test_notatene_som_ikke_kan_leses(self, klient, demobase, monkeypatch):
+        """VG5: ville feilet hvis en feil i notatene tok ned hele siden."""
+
+        def feiler(self, symbol):
+            raise sqlite3.OperationalError("låst")
+
+        monkeypatch.setattr(SqliteNotatlager, "notater", feiler)
+        svar = klient.get(f"/aksje/{AKSJE}")
+        assert svar.status_code == 200
+        side = svar.data.decode("utf-8")
+        assert "Notatene kan ikke leses fra basen nå." in side and "Signalet dag for dag" in side
+
+    def test_ingen_raad_i_tekstene_for_grunnene(self):
+        """VG1: ville feilet hvis en av tekstene delen kan vise når en kurs,
+        indeksen eller signalet mangler, eller teksten i malen, brukte et av
+        ordene i spørsmål 6."""
+        import etterpaa
+        from markedsoversikt import GRUNNTEKST, IKKE_BOERSDAG, IKKE_I_LISTA, IKKE_VURDERT
+
+        mal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
+        delen = mal[mal.index("{#- Story 8.21") : mal.index("{#- Story 3.4h: boblen")]
+        tekster = [
+            etterpaa.INGEN_KURS_PAA_NOTATDAGEN,
+            etterpaa.INGEN_INDEKS,
+            etterpaa.INDEKSEN_MANGLER_DAGEN,
+            etterpaa.INDEKSEN_KUNNE_IKKE_LESES,
+            IKKE_VURDERT,
+            IKKE_I_LISTA,
+            IKKE_BOERSDAG,
+            *GRUNNTEKST.values(),
+            re.sub(r"\{#.*?#\}", "", delen, flags=re.S),
+        ]
+        for tekst in tekster:
+            for ord_ in ORDENE:
+                assert not re.search(rf"\b{ord_}\b", tekst, re.I), (ord_, tekst[:80])
+
+    def test_siste_dag_sier_at_det_ikke_er_dager_etter(self, klient, demobase):
+        """Spørsmål 5 på siden: ville feilet hvis linja manglet."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"})
+        tekst = _tekst(_delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")))
+        assert "Ingen børsdager med kurs etter notatdagen ennå." in tekst

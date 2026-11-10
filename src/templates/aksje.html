@@ -442,7 +442,7 @@
       hovedindeksen og signalet som er lagret for dagene (spørsmål 4-6). Ingen
       ord om at noe var riktig eller galt, og ingen råd (NFR-06). #}
   {% macro signalet(dag) -%}
-    {% if dag is none %}<span class="tilstand">– signalet kunne ikke leses</span>{% elif dag.vurdering %}{{ retningspille(dag.retning) }} {{ brikker(dag.brikker) }} <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>{% else %}<span class="tilstand">– {{ dag.tekst }}</span>{% endif %}
+    {% if dag is none %}<span class="tilstand">– signalet kunne ikke leses</span>{% elif dag.vurdering %}{{ retningspille(dag.retning) }} {{ brikker(dag.brikker) }} <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>{% else %}<span class="tilstand">–{% if dag.tekst %} {{ dag.tekst }}{% endif %}</span>{% endif %}
   {%- endmacro %}
   <section class="notater" id="{{ notat_anker }}" aria-labelledby="notater-tittel">
     <h2 id="notater-tittel">Mine notater</h2>
@@ -450,9 +450,14 @@
     {% if notatene is none %}
       <p class="uten">Notatene kan ikke leses fra basen nå.</p>
     {% else %}
-      {% if kan_skrive_notat %}
+      {#- Gjennomgangen (ECH1): en dag uten kurs for aksjen fra «Vis dagen»
+          får ikke skjemaet, fordi notatet trenger en kurs fra dagen. #}
+      {% if kan_skrive_notat and not notatdag_har_kurs %}
+        <p class="uten">Et notat får dagen siden viser, og {{ notatdag|ukedag }} {{ notatdag|dato }} har ingen kurs for {{ detalj.aksje.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
+      {% elif kan_skrive_notat %}
         <form class="nytt-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat">
           <input type="hidden" name="dag" value="{{ notatdag.isoformat() }}">
+          <input type="hidden" name="vis" value="{{ notat_visningen }}">
           <label for="notattekst">Notatet får datoen {{ notatdag|ukedag }} {{ notatdag|dato }}.</label>
           <textarea id="notattekst" name="tekst" rows="2" maxlength="{{ notat_maks }}" required></textarea>
           <p class="notatgrense">Høyst {{ notat_maks }} tegn.</p>
@@ -478,7 +483,7 @@
               </div>
               <form class="slett-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat/slett">
                 <input type="hidden" name="id" value="{{ notat.id }}">
-                <input type="hidden" name="dag" value="{{ notatdag.isoformat() }}">
+                <input type="hidden" name="vis" value="{{ notat_visningen }}">
                 <button type="submit" aria-label="Slett notatet fra {{ notat.dato|dato }}">Slett</button>
               </form>
             </li>

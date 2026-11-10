@@ -771,12 +771,14 @@ class SqliteNotatlager:
         renset = rens(tekst)
         if not isinstance(dato, date) or isinstance(dato, datetime):
             raise UgyldigNotat("dagen må være en dato")
-        if (
-            self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
-            is None
-        ):
-            raise UgyldigNotat(f"{symbol!r} står ikke i lista")
+        # Gjennomgangen (ECH8): aksjen sjekkes i samme transaksjon som
+        # innsettingen, så den ikke kan tas ut mellom de to.
         with _Transaksjon(self._tilkobling):
+            if (
+                self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
+                is None
+            ):
+                raise UgyldigNotat(f"{symbol!r} står ikke i lista")
             markoer = self._tilkobling.execute(
                 "INSERT INTO notat (symbol, dato, tekst, laget) VALUES (?, ?, ?, ?)",
                 (symbol, dato.isoformat(), renset, laget.isoformat()),
