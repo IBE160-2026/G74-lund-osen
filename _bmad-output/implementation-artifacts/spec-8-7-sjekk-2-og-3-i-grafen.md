@@ -23,6 +23,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 6. **Andre grafer.** `bygg_graf` tegner båndet og volumet bare når kalleren gir volumfaktoren. *Forslag:* bare aksjesiden, som instruksjonen sier.
 7. **Flettingen med 2.6 og 8.14.** Begge endrer `graf.py`, `aksje.html`, stilarket og avtrykkene. *Forslag:* den som flettes sist, får konfliktene løst og avtrykkene og bildet av aksjesiden laget på nytt.
 
+*Svar 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene er godtatt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
 ## Intent
 
 **Problem:** Grafen viser sjekk 1 med snittet, men sjekk 2 og 3 står bare som tall i kortene (FR-202, FR-706).
