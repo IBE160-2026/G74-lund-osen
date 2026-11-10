@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 11-09-2026 01:25
+last_updated: 11-10-2026 01:12
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -87,7 +87,7 @@ development_status:
   2-9c-hovedindeksen-i-kursgrafen: done
   2-10-høy-og-lav-lagres-med-kursene: backlog
   2-11-lista-leses-fra-basen: done
-  2-12-velge-og-bytte-aksjer: review
+  2-12-velge-og-bytte-aksjer: done
   2-13-kommandoen-som-måler-omsetning: done
   2-14-eksdatoer-føres-inn-for-hånd: backlog
   2-16-børskalenderen-for-alle-år: done
@@ -176,9 +176,11 @@ development_status:
   8-7-sjekk-2-og-3-i-kursgrafen: backlog
   8-8-signaldager-i-kursgrafen: done
   8-9-vis-meg-rundt: backlog
-  8-10-innstillinger-øverst: review
-  8-10b-vis-ki-tekst-i-innstillinger: review
-  8-11-ferdige-lister-og-filter-på-signalet: review
+  8-10-innstillinger-øverst: done
+  8-10b-vis-ki-tekst-i-innstillinger: done
+  8-11-ferdige-lister-og-filter-på-signalet: done
+  8-11b-de-15-i-bransjelistene: done
+  8-11c-utenfor-maalingen: review
   8-12-endret-signalstyrke-siden-forrige-børsdag: backlog
   8-13-lær-noe-nytt: backlog
   8-14-justeringsdager-i-kursgrafen: backlog
@@ -205,6 +207,8 @@ development_status:
   9-6-product-brief-v8-etter-plan-b: done
   9-7-linter-og-formatterer-i-ci: done
   9-8-agents-kopien-bort: done
+  9-9-dokumenttestene: review
+  9-10-de-lave-funnene: review
   epic-9-retrospective: optional
 
   epic-10: in-progress

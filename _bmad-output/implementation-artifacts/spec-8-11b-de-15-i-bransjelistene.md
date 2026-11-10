@@ -2,7 +2,7 @@
 title: 'Story 8.11b: de 15 i bransjelistene'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'aec052e0'
 context:
@@ -96,3 +96,4 @@ To gjennomganger av byggingen før `a08a7f6a`, i parallell med hele settet: Blin
 
 **Mutantene for rettingene:** F1 (bare aksjene i lista regnes), F2 (bare de med median går foran målingen), F3 (ingen bransje fra `aksje` for de målte) og F4 (`ValueError` fanges ikke), hver fanget av sin test, med fila lik etterpå.
 
+*Lagt til 2026-11-10:* 8.11b er flettet med PR #129 i `4d87658d` kl. 00:46, låst til head-en `5fb09223`, etter nattflettingen (kl. 12:00 i `docs/ai-prompts/2026-11-09.md`) og gruppens svar 09.11 kl. 10:55. Main, med squash-flettingen av #128 i `b5e423fe`, ble flettet inn i `5fb09223` uten konflikter, og diffen mot main er endringene grenen hadde mot `a346fd98`. Hele settet alene i fire deler 00:29:50–00:41:44: 4798 bestått, 24 hoppet over og 0 feilet, til sammen de 4822 som `pytest --collect-only` finner. CI var grønn på head-en (run 42722548552). Treet på main etter `git pull --ff-only` er likt treet på `5fb09223`. ECH2 og BH2 er lukket med spørsmål 9 og 10, middels som før (regel 25), og ingen funn på middels eller over sto åpne. 8.11b har fått en egen linje i `sprint-status.yaml`.
