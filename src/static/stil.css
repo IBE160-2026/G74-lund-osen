@@ -1246,7 +1246,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje, .side-oversikt) .notater { margin: 40px 0 8px; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
                                border-radius: 16px; }
 :where(.side-aksje, .side-oversikt) .notater h2 { margin: 0 0 6px; }
-:where(.side-aksje, .side-oversikt) .notater .ingress,
+:where(.side-aksje, .side-oversikt) .notater .notatingress,
 :where(.side-aksje, .side-oversikt) .notater .uten,
 :where(.side-aksje, .side-oversikt) .notater .notatgrense { color: var(--dempet); margin: 0 0 12px; }
 :where(.side-aksje, .side-oversikt) .notater .notatgrense { font-size: 13.5px; margin: 4px 0 8px; }

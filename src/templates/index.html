@@ -349,7 +349,7 @@
     {% if aktiv == "min_liste" and vis_notater and alle_notater is not none %}
     <section class="notater" id="mine-notater" aria-labelledby="notater-tittel">
       <h2 id="notater-tittel">Mine notater</h2>
-      <p class="ingress">Alle notatene dine, den nyeste først. Du skriver og sletter dem på siden for aksjen. Under hvert står hva aksjen, hovedindeksen og signalet gjorde etterpå.</p>
+      <p class="notatingress">Alle notatene dine, den nyeste først. Du skriver og sletter dem på siden for aksjen. Under hvert står hva aksjen, hovedindeksen og signalet gjorde etterpå.</p>
       {% if alle_notater %}
       <ol class="notatliste">
         {% for n in alle_notater %}{{ notatet(n, alle_notater_indeks) }}{% endfor %}
