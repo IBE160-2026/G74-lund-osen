@@ -24,6 +24,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 6. **Demoen.** De oppdiktede kursene i demoen har ingen justeringsdager, så bildet av aksjesiden viser bare «Ingen justeringsdager det siste året.» *Forslag:* som bygget. Å legge en justering inn i demodataene endrer tallene på alle sidene i demoen og bildene.
 7. **Beløpet.** Endringsforslaget 13.10 nevner utbyttet med beløp fra EODHD (2.15), og 8.18 eks.dato i grafen. 2.15 står ikke i epics.md, og 8.18 er utenfor v1 (svaret kl. 10:43). *Forslag:* utenfor denne storyen; grafen sier bare «justeringsdag».
 
+*Svar 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
 ## Intent
 
 **Problem:** Oversikten viser sluttkursen, mens endringen regnes på den justerte kursen. En dag kilden regner de eldre kursene om, stemmer ikke endringen med de to sluttkursene, og det ser ut som en feil (FR-407).
