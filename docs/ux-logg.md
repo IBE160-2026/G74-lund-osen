@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-10T02:33
+updated: 2026-11-11T00:32
 ---
 
 # UX-loggen
@@ -716,3 +716,20 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Lagt til 2026-11-07 (PR #120 flettet i `7565651f`, etter instruksjonen kl. 23:27 i `docs/ai-prompts/2026-11-07.md`):* U84 er rettet i 3.4h. Lenken til investorsiden er boblen nederst på aksjesiden i begge versjonene (`src/templates/_investorboble.html`), fotnoten med klassen `investorside` er borte, og NewsWeb nevnes ikke på aksjesiden. I demoen går boblen til investorsiden for selskapet i appen (`/investorside/<symbol>`), med logoen bare der, i samme fane og uten pil; i den ekte versjonen åpner den selskapets egen investorside i en ny fane. Det følger svarene 06.11 kl. 23:51 og 07.11 kl. 08:57 og 10:33 under story 3.4h i `epics.md`. Testene: `test_boblen_i_demoen`, `test_boblen_i_den_ekte_versjonen` og `test_uten_adresse_ingen_boble`.
 
 *Rettet 2026-11-10 (steg 4 i ekstravinduet, instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`):* statusen for U75–U102 i tabellen er satt etter de to Lagt til-linjene 07.11 over. Før sto «Ikke avgjort» også på de som var rettet. U77 står som før, U82 og U84 har fått PR-en foran det som sto, og U91 og U96 er ikke endret, etter svaret 07.11 kl. 10:33.
+
+## Funnene fra brukertesten 10.11
+
+*Lagt til 2026-11-11 (gruppens notater fra testen og svarene 10.11 kl. 22:26 og 22:30, instruksjonen kl. 22:35 i `docs/ai-prompts/2026-11-10.md`):* de samme funnene som i «Funnene» i [`brukertest.md`](brukertest.md), som den sier. Én testperson, den ekte versjonen og dataene fra 09.11. Ingenting er sitert ordrett, og ingenting kan kjenne personen igjen. «Tas i» er det som endres, eller at det ikke endres.
+
+| # | Sett | Side | Funnet | Kilde | Tas i |
+|---|---|---|---|---|---|
+| U103 | 10.11, brukertesten | Sidene | Han forsto ikke alt og ville ha mer KI-hjelp. | [`brukertest.md`](brukertest.md), «Funnene» | Rikere KI-tekster |
+| U104 | 10.11, brukertesten | Flere sider | Siden hoppet, og han gikk seg vill på noen sider. | [`brukertest.md`](brukertest.md), «Funnene» | Del A, og «Vis meg rundt» fra 8.9 |
+| U105 | 10.11, brukertesten | Min liste | Min liste fikk flest merknader. | [`brukertest.md`](brukertest.md), «Funnene» | Del A og B |
+| U106 | 10.11, brukertesten | Aksjesiden, kursgrafen | Han likte at kursgrafen kunne vise uker og måneder, og overblikket. | [`brukertest.md`](brukertest.md), «Funnene» | Ingen endring |
+| U107 | 10.11, brukertesten | Hjelpen | Hjelpen måtte lukkes med «Lukk». | [`brukertest.md`](brukertest.md), «Funnene» | Del A |
+| U108 | 10.11, brukertesten | Følg en aksje | «Følg en aksje» kunne ikke brukes uten å kjenne navnene. | [`brukertest.md`](brukertest.md), «Funnene» | Del B |
+| U109 | 10.11, brukertesten | Flere sider | Det hakket enkelte steder. | [`brukertest.md`](brukertest.md), «Funnene» | Ført som funn |
+| U110 | 10.11, brukertesten | Flere sider | Feiltolkninger på grunn av feil i appen. | [`brukertest.md`](brukertest.md), «Funnene» | Del A |
+| U111 | 10.11, brukertesten | Aksjesiden | Han ville notere. | [`brukertest.md`](brukertest.md), «Funnene» | Notatene og de tenkte kjøpene (8.21) |
+| U112 | 10.11, brukertesten | Hele appen | Han ønsket anbefalinger og å kunne «spå» hva man bør følge med på, og forsto hvorfor appen ikke gjør det. | [`brukertest.md`](brukertest.md), «Funnene» | Endres ikke (NFR-06) |

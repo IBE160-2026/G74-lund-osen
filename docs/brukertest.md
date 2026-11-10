@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-09T10:31
+updated: 2026-11-11T00:32
 ---
 
 # Brukertesten
@@ -15,19 +15,21 @@ updated: 2026-11-09T10:31
 
 *Rettet 2026-11-08 (gruppens svar 07.11 kl. 22:51):* brukertesten tas tirsdag 10.11 eller onsdag 11.11, eller begge dagene, med den ekte versjonen og dataene fra kvelden før.
 
+*Rettet 2026-11-11 (gruppens notater fra testen og svarene 10.11 kl. 22:26 og 22:30):* «Ikke tatt ennå» gjelder ikke lenger. Testen ble tatt 10.11 med én testperson, med den ekte versjonen og dataene fra 09.11. Feltene under er fylt etter gruppens notater, som de står i instruksjonen kl. 22:35 i `docs/ai-prompts/2026-11-10.md`; det som ikke ble notert, står som «ikke notert», og ingenting er sitert ordrett.
+
 Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller et volum som personen sier høyt, står som [kurs] eller [volum] (regel 16). Originalnotatene ligger i `_privat/` (regel 10).
 
 ## Før testen
 
 | Felt | Notat |
 |---|---|
-| Dato | |
-| Muntlig ja til observasjon og anonyme notater, klokkeslett | |
-| Den ekte versjonen på http://127.0.0.1:8000, uten «Eksempeltall» øverst | |
-| Siste henting, dato | |
-| KI av: knappen sier «Vis KI-teksten» | |
-| Bare oversikten åpen, øverst på siden | |
-| Det som ble sagt, ordrett | |
+| Dato | 10.11.2026 |
+| Muntlig ja til observasjon og anonyme notater, klokkeslett | Ja, klokkeslettet ikke notert |
+| Den ekte versjonen på http://127.0.0.1:8000, uten «Eksempeltall» øverst | Den ekte versjonen; adressen og merket ikke notert |
+| Siste henting, dato | Dataene fra 09.11 |
+| KI av: knappen sier «Vis KI-teksten» | Ikke notert |
+| Bare oversikten åpen, øverst på siden | Ikke notert |
+| Det som ble sagt, ordrett | Ikke notert |
 
 *Rettet 2026-11-07:* knappen «Skjul KI-teksten» og «Vis KI-teksten» finnes ikke lenger. Den er nå bryteren «KI-tekst» med «På» og «Av» (`role="switch"` i makroen `ki_bryter` i `src/templates/aksje.html`), inne i rammen «‹navn› kort fortalt» øverst til høyre når teksten vises, og alene når KI er av. Den kom med story 8.2b (U33, U46 og U67), squash-flettet i `6f62f564`, PR #109, og svaret 04.11 kl. 09:58 på spørsmål 5 og 6 i `spec-8-2b-funnene-fra-ux-loggen.md` holdt den i blekk og utenfor stripa. KI av før del A betyr at bryteren viser «Av», og i del B slås den til «På». Raden «KI av: knappen sier «Vis KI-teksten»» over gjelder bryteren som viser «Av».
 
@@ -53,28 +55,28 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 
 | Felt | Notat |
 |---|---|
-| Klokkeslett da oversikten ble vist | |
-| Forklaringen av hvorfor en aksje skiller seg ut, ordrett | |
-| Tiden fra oversikten ble vist til forklaringen | |
-| Under 5 minutter (ja eller nei) | |
-| Stoppet etter 10 minutter uten forklaring (ja eller nei) | |
-| Stoppet, rullet tilbake eller mistet raden (15 rader), med tidspunkt | |
-| Så hovedindeksen og søylene, med tidspunkt | |
-| Sidene som ble åpnet, i rekkefølge | |
-| Slo på KI-teksten selv, med tidspunkt | |
-| Forklaringen kom før KI-teksten ble slått på (ja eller nei). Kom den etter, teller den ikke for 8.1 (svaret 23.10 kl. 15:53, b) | |
-| Spørsmål personen stilte, og svaret «Gjør det du ville gjort hvis du satt alene.» | |
+| Klokkeslett da oversikten ble vist | Ikke notert |
+| Forklaringen av hvorfor en aksje skiller seg ut, ordrett | Ikke ordrett: Aker BP (AKRBP) skilte seg ut med et stort fall, og han bladde tilbake i uker og måneder i kursgrafen og så endringen |
+| Tiden fra oversikten ble vist til forklaringen | Over 5 minutter; nøyaktig tid ikke notert |
+| Under 5 minutter (ja eller nei) | Nei |
+| Stoppet etter 10 minutter uten forklaring (ja eller nei) | Nei |
+| Stoppet, rullet tilbake eller mistet raden (15 rader), med tidspunkt | Ikke notert |
+| Så hovedindeksen og søylene, med tidspunkt | Ikke notert |
+| Sidene som ble åpnet, i rekkefølge | Ikke notert |
+| Slo på KI-teksten selv, med tidspunkt | Nei |
+| Forklaringen kom før KI-teksten ble slått på (ja eller nei). Kom den etter, teller den ikke for 8.1 (svaret 23.10 kl. 15:53, b) | Ja |
+| Spørsmål personen stilte, og svaret «Gjør det du ville gjort hvis du satt alene.» | Ikke notert |
 
 ## Del B (story 10.4): samme aksje, først KI av og så på
 
 | Felt | Notat |
 |---|---|
-| Aksjen, og om den kom fra forklaringen eller var den første aksjesiden personen åpnet | |
-| Den øverste i tabellen, fordi personen verken forklarte noe eller åpnet en aksjeside (ja eller nei, svaret 23.10 kl. 15:53, a) | |
-| Hoppet over, fordi personen slo på KI-teksten selv i del A. 10.4 tas da med neste person (ja eller nei, svaret 23.10 kl. 15:53, b) | |
-| Klokkeslett da del B startet | |
-| «Hva sier siden om denne aksjen?», KI av, svaret ordrett | |
-| «Hva sier siden om denne aksjen?», KI på, svaret ordrett | |
+| Aksjen, og om den kom fra forklaringen eller var den første aksjesiden personen åpnet | Ikke notert |
+| Den øverste i tabellen, fordi personen verken forklarte noe eller åpnet en aksjeside (ja eller nei, svaret 23.10 kl. 15:53, a) | Ikke notert |
+| Hoppet over, fordi personen slo på KI-teksten selv i del A. 10.4 tas da med neste person (ja eller nei, svaret 23.10 kl. 15:53, b) | Nei |
+| Klokkeslett da del B startet | Ikke notert |
+| «Hva sier siden om denne aksjen?», KI av, svaret ordrett | Ikke notert |
+| «Hva sier siden om denne aksjen?», KI på, svaret ordrett | Ikke ordrett: teksten hjalp ham å forstå helheten i forhold til enkeltaksjen |
 
 ## Funnene
 
@@ -82,4 +84,13 @@ Føres etter testen, med dato, og også i [UX-loggen](ux-logg.md). Et funn om at
 
 | Dato | Funn | Det som endres | Det som ikke endres |
 |---|---|---|---|
-| | | | |
+| 10.11.2026 | Han forsto ikke alt og ville ha mer KI-hjelp. | Rikere KI-tekster | – |
+| 10.11.2026 | Siden hoppet, og han gikk seg vill på noen sider. | Del A, og «Vis meg rundt» fra 8.9 | – |
+| 10.11.2026 | Min liste fikk flest merknader. | Del A og B | – |
+| 10.11.2026 | Han likte at kursgrafen kunne vise uker og måneder, og overblikket. | – | Ingen endring |
+| 10.11.2026 | Hjelpen måtte lukkes med «Lukk». | Del A | – |
+| 10.11.2026 | «Følg en aksje» kunne ikke brukes uten å kjenne navnene. | Del B | – |
+| 10.11.2026 | Det hakket enkelte steder. | Ført som funn | – |
+| 10.11.2026 | Feiltolkninger på grunn av feil i appen. | Del A | – |
+| 10.11.2026 | Han ville notere. | Notatene og de tenkte kjøpene (8.21) | – |
+| 10.11.2026 | Han ønsket anbefalinger og å kunne «spå» hva man bør følge med på, og forsto hvorfor appen ikke gjør det. | – | Endres ikke (NFR-06) |
