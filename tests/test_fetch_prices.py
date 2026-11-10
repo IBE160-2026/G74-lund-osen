@@ -2932,6 +2932,9 @@ class TestVurderingeneSomMangler:
         fil = lag_bilde(raa, OEYEBLIKK_22_09)
         fp.les_inn(fil, base, lambda _: None)
         fil.unlink()
+        # Story 2.4: --les-inn leser ikke indeksen. Med den i basen henter
+        # kjoeringen ingenting, som testene her krever.
+        med_indeksen(base, TIRSDAG_22_09)
         assert antall_rader(base, "vurdering") == 0
 
     def test_radene_skrives_med_0_kall(self, stier):
@@ -3144,6 +3147,7 @@ class TestVurderingeneSomManglerEtterGjennomgangen:
         fil = lag_bilde(raa, _utc(2026, 9, 25, 20, 0), FREDAG_25_09)
         fp.les_inn(fil, base, lambda _: None)
         fil.unlink()
+        med_indeksen(base, FREDAG_25_09, _utc(2026, 9, 25, 20, 0))
         fil_, kall, ut = kjoer_23(raa, base, LOERDAG_26_09_KL_12, ingen_kall, ingen_noekkel, ingen_kall)
         assert fil_ is None and kall == []
         assert datoene_i_vurdering(base) == ["2026-09-25"]
@@ -3269,6 +3273,13 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
         hvis sjekken ga RuntimeError og hentingen gikk videre til filvakten."""
         raa, base = stier
         base_paa_versjon(tmp_path, base, SISTE - 1)
+        # Story 2.4: indeksen har dagen, saa kjoeringen ikke henter den.
+        tilkobling = sqlite3.connect(base, isolation_level=None)
+        try:
+            tilkobling.execute("INSERT INTO indeks VALUES ('OSEBX', '2026-09-22', 1.0, 1.0, 10)")
+            tilkobling.execute("INSERT INTO indeksserie VALUES ('OSEBX', ?)", (_utc(2026, 9, 22, 21, 0).isoformat(),))
+        finally:
+            tilkobling.close()
         foer = sha(base)
 
         fil, kall, ut = kjoer_23(
@@ -3315,6 +3326,19 @@ def indeksen_i(base):
     try:
         lager = SqliteIndekslager(tilkobling)
         return lager.serie("OSEBX"), lager.sist_hentet("OSEBX")
+    finally:
+        tilkobling.close()
+
+
+def med_indeksen(base, dato: date, hentet: datetime = OEYEBLIKK_22_09) -> None:
+    """Hovedindeksen med dato i basen, saa en test som lar aksjene komme inn
+    uten indeksen (--les-inn), ikke faar indekskallet fra 2.4 (gruppens svar
+    10.11 kl. 15:30). Kursene er oppdiktet (regel 16)."""
+    from lagring_sqlite import SqliteIndekslager
+
+    tilkobling = aapne_base(base)
+    try:
+        SqliteIndekslager(tilkobling).erstatt_serie("OSEBX", fp.serie_fra_eodhd(serie_til(dato)), hentet)
     finally:
         tilkobling.close()
 
@@ -3425,18 +3449,14 @@ class TestHovedindeksen:
         assert "Symboler uten data" not in ut and "feilet i hentingen og mangler" not in ut
 
     def test_en_andre_kjoering_samme_boersdag_gjoer_0_kall(self, stier):
-        """Testen i 2.3 med indekskallet, ogsaa naar indeksen feilet: etter
-        kode 3 gir en ny kjoering 0 kall og kode 0, fordi indeksen ikke faar
-        en ny sjanse (AD-15). Ville feilet hvis sjekken av basen krevde
-        indeksen."""
+        """Testen i 2.3 med indekskallet: har basen dagen for aksjene og
+        indeksen, gir en ny kjoering 0 kall. Ville feilet hvis sjekken av
+        basen hentet indeksen som alt er der. *Endret 2026-11-10 (story 2.4,
+        gruppens svar kl. 15:30):* foer prøvde testen at en indeks som
+        feilet, ikke ble hentet igjen samme kveld. Nå hentes den alene med
+        ett kall, og det prøves i tests/test_etterfyllingen_2_4.py."""
         raa, base = stier
-
-        def uten_indeks(ticker, *_):
-            if ticker == "OSEBX.OL":
-                raise RuntimeError("nei")
-            return serie_til(TIRSDAG_22_09)
-
-        assert kjoer_23_kode(raa, base, OEYEBLIKK_22_09, uten_indeks)[0] == 3
+        assert kjoer_23(raa, base, OEYEBLIKK_22_09)[0] is not None
         (raa / "kurser-raa-2026-09-22.json").unlink()
         fil, kall, ut = kjoer_23(
             raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall

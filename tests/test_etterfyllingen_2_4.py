@@ -7,7 +7,9 @@ og kursene er oppdiktet (regel 16). Fire dagers opphold med 16 kall står
 alt i K9 i test_fetch_prices.py (2.1b); her er resten av kontrollen.
 """
 
+import json
 from datetime import date, datetime, timedelta, timezone
+from hashlib import sha256
 
 import pytest
 import requests
@@ -212,3 +214,160 @@ class TestIngenVurderingerEtterfylles:
                 assert lager.les(AKSJEUNIVERS[0].symbol, dag) is None
         finally:
             t.close()
+
+
+LOERDAG_KL_12 = datetime(2026, 9, 26, 10, 0, tzinfo=timezone.utc)
+
+
+def _uten_indeksen(siste: date, ellers=None):
+    """En falsk henter der hovedindeksen feiler, og ellers som _hent."""
+    ekte = ellers or _hent(siste)
+
+    def hent(ticker, *resten):
+        if ticker == HOVEDINDEKS.ticker:
+            raise requests.ConnectionError("ConnectionError")
+        return ekte(ticker, *resten)
+
+    return hent
+
+
+def _kjoering(raa, base, oeyeblikk: datetime, hent, les_kvote=nok_kvote) -> tuple[int, list[str], str]:
+    """(kode, kallene, utskriften). Kode 0 når kjoer kom tilbake."""
+    kall, linjer = [], []
+
+    def tell(ticker, *resten):
+        kall.append(ticker)
+        return hent(ticker, *resten)
+
+    try:
+        fp.kjoer(raa, base, oeyeblikk, NOEKKEL, tell, linjer.append, les_kvote=les_kvote)
+        kode = 0
+    except SystemExit as slutt:
+        kode = slutt.code
+    return kode, kall, "\n".join(linjer)
+
+
+def _indeksdatoer(base) -> set[date]:
+    t = aapne_base(base)
+    try:
+        return {r.dato for r in SqliteIndekslager(t).serie(HOVEDINDEKS.symbol)}
+    finally:
+        t.close()
+
+
+def _tabellene(base) -> tuple[list, list]:
+    t = aapne_base(base)
+    try:
+        return (
+            t.execute("SELECT * FROM kurs ORDER BY symbol, dato").fetchall(),
+            t.execute("SELECT * FROM vurdering ORDER BY symbol, dato").fetchall(),
+        )
+    finally:
+        t.close()
+
+
+class TestHovedindeksenAlene:
+    """Gruppens svar 10.11 kl. 15:30 (spørsmål 6): mangler bare hovedindeksen
+    den siste børsdagen, henter en senere kjøring samme kveld eller i helgen
+    den alene med ett kall, med kall som er igjen av dagens."""
+
+    @staticmethod
+    def _kvelden_uten_indeksen(stier, dag: date = FREDAG) -> None:
+        raa, base = stier
+        _kjoer(raa, base, MANDAG, _hent(MANDAG))
+        kode, kall, _ = _kjoering(raa, base, _kl_22(dag), _uten_indeksen(dag))
+        assert kode == fp.KODE_BARE_INDEKSEN and len(kall) == len(AKSJEUNIVERS) + 1
+        assert dag not in _indeksdatoer(base)
+
+    def test_en_senere_kjoering_samme_kveld_henter_den_med_ett_kall(self, stier):
+        """Ville feilet hvis indeksen ikke ble hentet når bare den manglet,
+        som før 10.11, eller kjøringen tok aksjene på nytt, skrev vurderinger
+        eller rørte kursfila (AD-6)."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        kursfil = raa / fp.filnavn(FREDAG)
+        foer, tabellene = sha256(kursfil.read_bytes()).hexdigest(), _tabellene(base)
+        kode, kall, ut = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=30), _hent(FREDAG))
+        assert kode == 0 and kall == [HOVEDINDEKS.ticker]
+        assert "mangler den dagen. Den hentes alene, med ett kall" in ut
+        assert HULLET | {FREDAG} <= _indeksdatoer(base)
+        assert sha256(kursfil.read_bytes()).hexdigest() == foer
+        assert _tabellene(base) == tabellene
+        bilde = json.loads((raa / f"forsoek2-raa-{FREDAG.isoformat()}.json").read_text(encoding="utf-8"))
+        assert bilde["serier"] == {} and set(bilde["indeks"]["serier"]) == {HOVEDINDEKS.symbol}
+        # Etterpå er det ingenting å hente.
+        kode, kall, ut = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=60), _hent(FREDAG))
+        assert kode == 0 and kall == [] and "Ingenting å hente" in ut
+
+    def test_i_helgen(self, stier):
+        """Ville feilet hvis indeksen bare ble hentet på selve børsdagen."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        kode, kall, _ = _kjoering(raa, base, LOERDAG_KL_12, _hent(FREDAG))
+        assert kode == 0 and kall == [HOVEDINDEKS.ticker]
+        assert FREDAG in _indeksdatoer(base)
+
+    def test_bonuskvoten_brukes_aldri(self, stier):
+        """Ville feilet hvis indeksen alene ble hentet med bonuskvoten når
+        dagens kall er brukt (NFR-01)."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+
+        def brukt_opp(_noekkel):
+            return {"apiRequests": 20, "apiRequestsDate": "2026-09-25", "dailyRateLimit": 20, "extraLimit": 463}
+
+        kode, kall, ut = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=30), _hent(FREDAG), brukt_opp)
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == []
+        assert "hentes aldri med bonuskvoten" in ut and "0 kall brukt" in ut
+
+    def test_kvoten_som_ikke_kan_leses_gir_0_kall(self, stier):
+        """Ville feilet hvis indeksen ble hentet uten at kvoten var lest."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+
+        def ulesbar(_noekkel):
+            raise requests.ConnectionError("ConnectionError")
+
+        kode, kall, _ = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=30), _hent(FREDAG), ulesbar)
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == []
+
+    def test_ikke_fra_kl_23_50(self, stier):
+        """Ville feilet hvis indeksen ble hentet fra kl. 23:50 i Oslo, som et
+        nytt forsøk ikke gjør (2.3b, svar 4)."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        kl_23_55 = datetime(2026, 9, 25, 21, 55, tzinfo=timezone.utc)
+        kode, kall, ut = _kjoering(raa, base, kl_23_55, _hent(FREDAG))
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == [] and "23:50" in ut
+
+    def test_feiler_den_igjen_gir_kode_3(self, stier):
+        """Ville feilet hvis en indeks som feilet igjen, ga kode 0."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        kode, kall, _ = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=30), _uten_indeksen(FREDAG))
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == [HOVEDINDEKS.ticker]
+        assert FREDAG not in _indeksdatoer(base)
+
+    def test_svaret_uten_dagen_gir_kode_3(self, stier):
+        """Ville feilet hvis et svar uten børsdagen ble regnet som hentet."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        torsdag = FREDAG - timedelta(days=1)
+        kode, kall, ut = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=30), _hent(torsdag))
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == [HOVEDINDEKS.ticker]
+        assert "Svaret har ikke hovedindeksen for børsdagen 2026-09-25" in ut
+
+    def test_mangler_ogsaa_en_aksje_tar_forsoeket_bare_aksjen(self, stier):
+        """Ville feilet hvis indeksen ble hentet før aksjene var på plass:
+        forsøket for aksjen tar bare aksjen, og først kjøringen etter tar
+        indeksen."""
+        raa, base = stier
+        _kjoer(raa, base, MANDAG, _hent(MANDAG))
+        feilet = AKSJEUNIVERS[1]
+        begge = TestNaarHentingenFeiler._feiler(feilet.ticker)
+        kode, _, _ = _kjoering(raa, base, _kl_22(FREDAG), _uten_indeksen(FREDAG, begge))
+        assert kode == 1
+        kode, kall, _ = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=30), _hent(FREDAG))
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == [feilet.ticker]
+        kode, kall, _ = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=60), _hent(FREDAG))
+        assert kode == 0 and kall == [HOVEDINDEKS.ticker]

@@ -79,3 +79,17 @@ Diffen `1a72810a..fbf4c7ce`: Blind Hunter med bare diffen (11 funn), og Edge Cas
 6. **Hovedindeksen etter en feil.** *Lagt til 2026-11-09 (gjennomgangen, ECH1):* feiler hovedindeksen i hentingen etter hullet, henter ingen kjøring den før neste kveld der en aksje mangler kursene, fordi `manglende_i_basen` bare ser på aksjene. *Forslag:* som før, og hjelpen sier det. Å hente indeksen i helgen når bare den mangler, ville bruke et kall som i dag ikke brukes.
 
 *Svar 2026-11-10 kl. 15:30 (gruppens svar):* hovedindeksen hentes også når bare den mangler. Rådet anbefalte forslaget om å la det være som før, men gruppen valgte dette. Det bygges på grenen før flettingen. Svarene er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`, med svaret kl. 15:30 under den.
+
+## Hovedindeksen alene (svaret 10.11 kl. 15:30)
+
+Bygget 10.11 på grenen, etter at main ble flettet inn (`53c020ff`), etter instruksjonen kl. 15:24 og svaret kl. 15:30 i `docs/ai-prompts/2026-11-10.md`.
+
+- **Hva:** har basen kursen for børsdagen for alle aksjene i lista, men hovedindeksen mangler dagen (`indeksen_mangler`), henter `kjoer` indeksen alene med ett kall (`hent_bare_indeksen`), også i helgen. Før var svaret «Ingenting å hente» med 0 kall.
+- **Kvoten:** som et nytt forsøk (2.3b): ingen kall fra kl. 23:50 i Oslo eller etter midnatt, bare kall som er igjen av dagens, aldri bonuskvoten (NFR-01), og 0 kall når kvoten ikke kan leses. Intervallet er det samme som en vanlig kveld.
+- **Fila:** svaret skrives først til en egen forsøksfil (`forsoek<n>-raa-<dato>.json`) med indeksen under nøkkelen `indeks` og ingen aksjer (AD-6), og kursfila røres ikke. Indeksen lagres gjennom `skriv_indeksen_til_basen`, aldri i `kurs` eller `vurdering`.
+- **Koden:** har basen ikke dagen i `indeks` etterpå (kallet feilet, svaret manglet dagen, eller kvoten eller klokka sa nei), gir kjøringen kode 3, som før. Indeksen hentes før KI-tekstene, så teksten om dagen (10.6) kan lages med den.
+- **Uendret:** mangler også en aksje dagens kurs, henter et nytt forsøk bare aksjene, som før, og indeksen hentes av kjøringen etter. Utskriften etter en indeks som feilet, sier nå at en ny kjøring samme kveld henter den, ikke at den står til neste kveld.
+- **Hjelpen:** «Når kan jeg hente?» og «Jeg har ikke hentet på noen dager.» i `docs/hjelp.md` sier det nye.
+- **Testene:** `TestHovedindeksenAlene` i `tests/test_etterfyllingen_2_4.py`, åtte tester med «Ville feilet hvis». Seks tester i `tests/test_fetch_prices.py` feilet, fordi basen deres manglet indeksen etter `--les-inn`, som ikke leser den. Fem prøver noe annet (vurderingene uten kall, lørdag og en base en versjon bak) og har fått indeksen i basen (`med_indeksen`), så de prøver det samme som før. `test_en_andre_kjoering_samme_boersdag_gjoer_0_kall` prøvde den gamle regelen, at en indeks som feilet, ikke hentes igjen samme kveld. Den prøver nå at en ny kjøring gjør 0 kall når basen har dagen for aksjene og indeksen, og den nye regelen prøves i `TestHovedindeksenAlene`.
+- **Dokumentene:** PRD-en (FR-410), epics.md (2.8) og arkitekturen (AD-15, 2.8) sier at et indekskall som feiler, «får ingen ny sjanse». Det gjelder fortsatt i samme kjøring; ingen linje er endret der.
+
