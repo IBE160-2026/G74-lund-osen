@@ -10,8 +10,9 @@ videre trekker fra extraLimit. Basen ligger i tmp_path (conftest.py, regel
 22). Ingen test bruker nett (AD-8).
 """
 
+import re
 import sqlite3
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
@@ -20,13 +21,14 @@ import lagring_fil
 import lagring_sqlite
 import omsetning
 from omsetning import BONUSGULV, Maaling, maal_omsetning, skriv_radene
-from test_omsetning import NYE, ONSDAG, Kvote, _fyll, _lista
+from test_omsetning import KURS, NYE, ONSDAG, VOLUM, Kvote, _fyll, _lista
 
 BOERSDAG = date(2026, 10, 28)
 
 
-def _kjoer(tmp_path, kvote, koder, med_bonus=True):
+def _kjoer(tmp_path, kvote, koder, med_bonus=True, klokke=ONSDAG):
     linjer: list[str] = []
+    tider = klokke if callable(klokke) else (lambda: klokke)
     kode = maal_omsetning(
         lagring_fil.RAA_KATALOG,
         lagring_sqlite.BASE_STI,
@@ -34,7 +36,7 @@ def _kjoer(tmp_path, kvote, koder, med_bonus=True):
         lambda: "HEMMELIG",
         hent=kvote.hent,
         les_kvote=kvote.les,
-        klokke=lambda: ONSDAG,
+        klokke=tider,
         skriv=linjer.append,
         med_bonus=med_bonus,
     )
@@ -93,7 +95,8 @@ class TestUtvalget:
         kvote = Kvote(brukt=0)
         kode, ut = _kjoer(tmp_path, kvote, ["NYA", "NYB"])
         assert (kode, kvote.kall) == (0, [])
-        assert "0 kall brukt" in ut
+        # Gjennomgangen (BH1): grunnen er at alle er maalt, ikke kvoten.
+        assert "Ingen aksje i lista over Oslo Børs mangler en måling i basen. 0 kall brukt." in ut
 
 
 class TestTaket:
@@ -108,7 +111,9 @@ class TestTaket:
         assert kode == 0, ut
         assert kvote.kall == [f"{k}.OL" for k in koder[:7]]
         assert (kvote.brukt, kvote.bonus) == (23, BONUSGULV)
-        assert "med 4 av de 4 kallene som er igjen av dagens og 3 fra bonuskvoten" in ut
+        assert "med 4 av de 4 kallene som er igjen av dagens og inntil 3 fra bonuskvoten" in ut
+        assert "Måler omsetningen for 7 av de 10 aksjene uten måling" in ut
+        assert "3 aksjer uten måling venter til en senere kjøring." in ut
         assert "API-kall brukt: 7." in ut and "Kall fra bonuskvoten: 3." in ut
 
     def test_ingen_kall_fra_bonusen_naar_den_er_200(self, tmp_path):
@@ -118,7 +123,7 @@ class TestTaket:
         kvote = Kvote(brukt=20, bonus=BONUSGULV)
         kode, ut = _kjoer(tmp_path, kvote, NYE)
         assert (kode, kvote.kall, kvote.bonus) == (0, [], BONUSGULV)
-        assert "0 kall brukt" in ut
+        assert "bonuskvoten har 200, ikke over 200. 6 aksjer uten måling venter. 0 kall brukt." in ut
 
     def test_dagens_brukes_selv_om_bonusen_er_under_200(self, tmp_path):
         """Ville feilet hvis bonusen under 200 stoppet kallene av dagens,
@@ -150,6 +155,9 @@ class TestKontrollenFoerHvertKall:
         assert kvote.kall == ["NYA.OL"] and kvote.bonus == BONUSGULV
         assert "neste kall ville gitt under 200" in ut
         assert _symbolene_i_basen() == ["NYA"]
+        # Gjennomgangen (BH3, ECH6): det extraLimit sank under kallet, ikke
+        # forskjellen fra starten.
+        assert "Kall fra bonuskvoten: 3." in ut
 
     def test_stopper_naar_bonusen_er_under_200_etter_et_kall(self, tmp_path):
         """Ville feilet hvis valget gikk videre naar extraLimit sto under 200
@@ -174,10 +182,13 @@ class TestUtenValget:
         """Ville feilet hvis maalingen uten valget brukte bonuskvoten eller
         hoppet over en aksje med en rad: som foer, 4 kall med 16 brukt."""
         _fyll(BOERSDAG)
+        _med_rad("NYA")
         kvote = Kvote(brukt=16, bonus=463)
         kode, ut = _kjoer(tmp_path, kvote, [*NYE, "NYG"], med_bonus=False)
         assert kode == 0, ut
-        assert (len(kvote.kall), kvote.bonus) == (4, 463)
+        # Gjennomgangen (BH5): NYA har en rad og maales sist, som foer.
+        assert kvote.kall == ["NYB.OL", "NYC.OL", "NYD.OL", "NYE.OL"]
+        assert kvote.bonus == 463
         assert "Bonuskvoten brukes aldri." in ut and "Kall fra bonuskvoten" not in ut
 
     def test_valget_i_hentekommandoen(self, tmp_path, monkeypatch):
@@ -202,3 +213,126 @@ class TestUtenValget:
         with pytest.raises(SystemExit) as utgang:
             fetch_prices.main(argumenter)
         assert utgang.value.code == 2
+
+
+class TestGjennomgangen:
+    """Funnene fra gjennomgangen 10.11 (BH, ECH og VG i spesifikasjonen)."""
+
+    @pytest.mark.parametrize("oslo", ["00:05", "00:40", "05:59"])
+    def test_etter_midnatt_gjelder_kvelden_foer(self, tmp_path, oslo):
+        """ECH1. Ville feilet hvis valget etter midnatt i Oslo regnet den nye
+        dagen som boersdag og ventet paa kursene for den: torsdag 29.10 etter
+        midnatt i Oslo er kursene for onsdag 28.10 hentet."""
+        _fyll(BOERSDAG)
+        timer, minutter = map(int, oslo.split(":"))
+        klokke = datetime(2026, 10, 28, 23, 0, tzinfo=timezone.utc) + timedelta(hours=timer, minutes=minutter)
+        kvote = Kvote(brukt=0, dato=klokke.date())
+        kode, ut = _kjoer(tmp_path, kvote, ["NYA"], klokke=klokke)
+        assert (kode, kvote.kall) == (0, ["NYA.OL"]), ut
+        assert "til 2026-10-28" in ut
+
+    def test_kl_6_gjelder_dagen_selv(self, tmp_path):
+        """ECH1. Ville feilet hvis kvelden foer gjaldt hele dagen: torsdag kl.
+        06:00 i Oslo er boersdagen torsdag, og kursene for den mangler."""
+        _fyll(BOERSDAG)
+        klokke = datetime(2026, 10, 29, 5, 0, tzinfo=timezone.utc)
+        kvote = Kvote(brukt=0, dato=klokke.date())
+        kode, ut = _kjoer(tmp_path, kvote, ["NYA"], klokke=klokke)
+        assert (kode, kvote.kall) == (1, []), ut
+
+    def test_uten_valget_venter_maalingen_etter_midnatt_som_foer(self, tmp_path):
+        """ECH1. Ville feilet hvis rettingen endret maalingen uten valget, som
+        venter etter midnatt (svaret 29.10 kl. 09:20, b)."""
+        _fyll(BOERSDAG)
+        klokke = datetime(2026, 10, 28, 23, 5, tzinfo=timezone.utc)
+        kvote = Kvote(brukt=0, dato=klokke.date())
+        kode, ut = _kjoer(tmp_path, kvote, ["NYA"], med_bonus=False, klokke=klokke)
+        assert (kode, kvote.kall) == (1, []), ut
+
+    def test_stopper_etter_tre_feil_paa_rad(self, tmp_path):
+        """ECH2. Ville feilet hvis valget brukte bonuskvoten paa kall som
+        feiler: tre feil paa rad som ikke er 404, og valget stopper."""
+        _fyll(BOERSDAG)
+        kvote = Kvote(brukt=20)
+        ekte_hent = kvote.hent
+
+        def hent(ticker, *argumenter):
+            ekte_hent(ticker, *argumenter)
+            raise TimeoutError("tidsavbrudd")
+
+        kvote.hent = hent
+        kode, ut = _kjoer(tmp_path, kvote, NYE)
+        assert kode == 1, ut
+        assert kvote.kall == ["NYA.OL", "NYB.OL", "NYC.OL"]
+        assert "3 kall på rad feilet" in ut
+
+    def test_en_feil_innimellom_stopper_ikke(self, tmp_path):
+        """ECH2. Ville feilet hvis feilene ble talt uten at en maaling
+        nullstilte tellingen."""
+        _fyll(BOERSDAG)
+        kvote = Kvote(brukt=20)
+        ekte_hent = kvote.hent
+
+        def hent(ticker, *argumenter):
+            svar = ekte_hent(ticker, *argumenter)
+            if ticker in {"NYA.OL", "NYB.OL", "NYD.OL", "NYE.OL"}:
+                raise TimeoutError("tidsavbrudd")
+            return svar
+
+        kvote.hent = hent
+        kode, ut = _kjoer(tmp_path, kvote, NYE)
+        assert kode == 0, ut
+        assert len(kvote.kall) == 6
+
+    def test_404_teller_ikke_som_feil_paa_rad(self, tmp_path):
+        """ECH2. Ville feilet hvis et svar om at tickeren ikke finnes, stoppet
+        valget: det gir en rad, som foer."""
+        _fyll(BOERSDAG)
+        kvote = Kvote(brukt=20)
+        ekte_hent = kvote.hent
+
+        def hent(ticker, *argumenter):
+            ekte_hent(ticker, *argumenter)
+            raise RuntimeError("HTTP 404")
+
+        kvote.hent = hent
+        kode, ut = _kjoer(tmp_path, kvote, NYE)
+        assert kode == 0, ut
+        assert len(kvote.kall) == 6 and len(_symbolene_i_basen()) == 6
+
+    def test_stopper_naar_datoen_i_gmt_skifter(self, tmp_path):
+        """VG1. Ville feilet hvis valget gikk videre inn i en ny dag i GMT:
+        klokka passerer midnatt i GMT etter det foerste kallet."""
+        _fyll(BOERSDAG)
+        tider = iter([ONSDAG, ONSDAG])
+        kvote = Kvote(brukt=0)
+        kode, ut = _kjoer(tmp_path, kvote, NYE, klokke=lambda: next(tider, ONSDAG + timedelta(hours=3)))
+        assert kode == 1, ut
+        assert kvote.kall == ["NYA.OL"] and _symbolene_i_basen() == ["NYA"]
+        assert "Datoen i GMT er ikke lenger 2026-10-28." in ut
+
+    def test_gaarsdagens_dato_foer_foerste_kall_er_0_brukt(self, tmp_path):
+        """BH6. Ville feilet hvis apiRequestsDate paa gaarsdagen ga kall fra
+        bonusen: alle 20 av dagens er igjen."""
+        _fyll(BOERSDAG)
+        kvote = Kvote(brukt=20, dato=date(2026, 10, 27), bonus=BONUSGULV)
+
+        def ny_dag(k):
+            if k.dato != BOERSDAG:
+                k.dato, k.brukt = BOERSDAG, 0
+
+        kvote.foer_kall = ny_dag
+        kode, ut = _kjoer(tmp_path, kvote, NYE)
+        assert kode == 0, ut
+        assert len(kvote.kall) == 6 and kvote.bonus == BONUSGULV
+
+    def test_ingen_tall_fra_kildene_i_utskriften(self, tmp_path):
+        """VG2. Ville feilet hvis utskriften med valget hadde en kurs, et
+        volum eller en median fra de falske svarene."""
+        _fyll(BOERSDAG)
+        kode, ut = _kjoer(tmp_path, Kvote(brukt=16), NYE)
+        assert kode == 0, ut
+        for tall in (str(KURS), str(VOLUM), "123", "98765"):
+            assert tall not in ut
+        uten_datoer = re.sub(r"\d{4}-\d{2}-\d{2}", "", ut)
+        assert [int(t) for t in re.findall(r"\d+", uten_datoer) if int(t) >= 100] == [463, 200, 461]
