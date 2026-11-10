@@ -111,6 +111,12 @@ Gjennomgangen av `53ff012c..59a84ee4` ga 12 funn fra Blind Hunter, 14 fra Edge C
 
 Ingen funn på middels eller over står åpne uten spørsmål. ECH5 er middels hos Edge Case Hunter og står som spørsmål 12 (regel 25).
 
+## Flettingen av main 10.11
+
+Instruksjonen kl. 20:43: main ble flettet inn da 2.13b var flettet (kl. 21:14), med 2.4, 2.6, 8.14, 8.7, 8.9 og 2.13b. Konfliktene var avtrykkene i `test_docker.py` og bildet av «Din egen liste». Avtrykkene er regnet ut på nytt, og alle bildene er tatt på nytt med DevTools-protokollen. «Følg en aksje» er 1368 px høy med «Vis meg rundt» fra 8.9 (var 1326), og «Din egen liste» er fortsatt 1628 px.
+
+Testene for rettingene etter gjennomgangen ble kjørt først etter flettingen, på grunn av tillegget kl. 17:46. Én feilet: VG3-testen fant ingen kode på bekreftelsen «Følge …?», fordi koden står i det skjulte feltet og ikke i en lenke. Testen leser nå feltet. Bekreftelsen sa også «Aksje på Oslo Børs» i demoen, og sier nå «Demo Børs» som lista. Mutantene for rettingene ble fanget: forslagene skjules av søket igjen (`rad(a)`), ønsker for MULTI og SCOIN tas i bruk, `bransjen` slipper MULTI og SCOIN gjennom, og bekreftelsen sier «Oslo Børs» i demoen.
+
 ## Spørsmål etter gjennomgangen
 
 12. **Medianene ved hver visning av «Følg en aksje» (ECH5).** *Forslag:* som bygget. Lista trenger omsetningen for alle, og medianene regnes én gang per forespørsel, som på Min liste. Det er ikke målt hvor lang tid det tar med den ekte basen.
