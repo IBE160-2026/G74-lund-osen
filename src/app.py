@@ -62,7 +62,16 @@ from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setnin
 from dagsgrunnlag import dagsgrunnlag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
-from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
+from historikk import (
+    PARAMETER,
+    Maaned,
+    adresse,
+    alle_sjekkene_det_siste_aaret,
+    bygg_maaned,
+    les_maaned,
+    maanedsnavn,
+    perioden,
+)
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, rundturer
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
@@ -1019,6 +1028,9 @@ def _tabellsiden(aktiv: str):
     # ut» gjelder siste børsdag (gruppens svar 23.10 kl. 12:35, a).
     if annen_dag and sortert is None:
         sortert = [*vist, *alle_uten_data]
+    # Gjennomgangen av 8.23 (ECH1, BH2, VG1): overskriften på oversikten
+    # gjelder alle aksjene, også med «Min liste», som bare filtrerer tabellen.
+    alle_som_skilte_seg_ut = skilte_seg_ut
     if bare_merkede:
         skilte_seg_ut = [rad for rad in skilte_seg_ut if rad.aksje.symbol in merkede]
         oevrige = [rad for rad in oevrige if rad.aksje.symbol in merkede]
@@ -1032,7 +1044,7 @@ def _tabellsiden(aktiv: str):
     # Gjennomgangen (ECH1, ECH2, ECH3): overskriften, innledningen og om
     # tabellen vises, regnes av lista før filteret, så filteret bare skjuler
     # rader og aldri endrer det siden sier.
-    overskrift_ut = skilte_seg_ut
+    overskrift_ut = alle_som_skilte_seg_ut if bare_min else skilte_seg_ut
     foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
     # Story 8.23 (A8): radene i lista som vises, før filteret, til antallet
     # på knappene og 2 av 3 ved et tomt filter.
@@ -1402,6 +1414,8 @@ def aksjedetalj(symbol: str):
             investorside=investorside(post.aksje.symbol),
             # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
             historikk=historikk,
+            # Story 8.23 (tillegg 2): 3 av 3 det siste året, av radene som er lagret.
+            alle_sjekkene=alle_sjekkene_det_siste_aaret(vurderingene, rader[-1].dato, ANTALL_SJEKKER),
             pil=pil,
             **_fotnoten([detalj.dato] if detalj.ikke_vurdert else [], i_dag),
         )
@@ -1509,7 +1523,8 @@ def _setningene_om_dagen(
     # samme dag, ikke 500.
     try:
         bildet = lag_dagsbilde(post.aksje, detalj.dato, detalj.vurdering, tidligere, lista, serier, indeksserie)
-        return dagene, setning_om_samme_dag(bildet)
+        # Story 8.23 (tillegg 2): med antallet i lista den dagen.
+        return dagene, setning_om_samme_dag(bildet, len(lista))
     except (UtenforKalenderen, ValueError, ArithmeticError) as feil:
         app.logger.warning("Dagen kunne ikke regnes: %s: %s", type(feil).__name__, feil)
         return dagene, None
@@ -1568,7 +1583,7 @@ def _boersdagen(
     bryter = {
         "er_paa": er_paa,
         "til": AV if er_paa else PAA,
-        "tilbake": side_adresse(OVERSIKTEN, sortering, False, ledd),
+        "tilbake": side_adresse(OVERSIKTEN, sortering, False, ledd, request.args.get("vis") == BARE_MIN),
     }
     if not er_paa:
         return {**bryter, "uten": DAGEN_AV}
@@ -1877,6 +1892,9 @@ def _egne_regnet() -> dict | None:
             "full": antall >= valg.TAK,
             "lista": lista,
             "fjernes": fjernes,
+            # Story 8.23 (tillegg 2): alle endringene som venter på hentingen,
+            # også å fjerne en av de faste og en ferdig liste, til meldingen øverst.
+            "ventende": len(ventende),
             "kall": {
                 "faste": len(lista) - egne_i_lista,
                 "egne": egne_i_lista,
@@ -1887,6 +1905,11 @@ def _egne_regnet() -> dict | None:
                 "igjen": igjen,
                 "med_en": med_en,
                 "igjen_med_en": igjen_med_en,
+                # Story 8.23 (A7): tallene i «Følg flere aksjer» regnes av
+                # kvoten, taket og lista, ikke skrevet for hånd.
+                "kvote": valg.KVOTE,
+                "per_aksje": valg.KALL_PER_AKSJE,
+                "igjen_med_taket": valg.KVOTE - valg.TAK * valg.KALL_PER_AKSJE - valg.INDEKSKALL,
             },
         }
     except (*BASEFEIL, ValueError) as feil:

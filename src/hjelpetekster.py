@@ -200,6 +200,29 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (BOERSOMETER, "def ramme("),
             ),
         ),
+        # Story 8.23 (tillegg 3, gruppens svar kl. 15:54): «?» ved «Endring» og
+        # «Volum mot vanlig» i tabellen på Børsometeret, og snittet i bransjeraden.
+        "boersometer_endring": Hjelpetekst(
+            "Endring:",
+            "endringen i sluttkursen fra børsdagen før, eller for perioden du har valgt, justert for utbytte. "
+            "Snitt i raden for bransjen er gjennomsnittet av endringen for aksjene i bransjen som har kurs, "
+            "uten vekt.",
+            (
+                (BOERSOMETER, "def snitt("),
+                (BOERSOMETER, "endringer = [r.endring for r in ruter if r.endring is not None]"),
+            ),
+        ),
+        "boersometer_volum": Hjelpetekst(
+            "Volum mot vanlig:",
+            f"dagens volum delt på medianen for de {p.volum_vindu} børsdagene før. Lavt er under 1, vanlig fra 1 "
+            f"til og med {faktor}, og høyt over {faktor}, som gir utslag på interesse.",
+            (
+                (BOERSOMETER, "def stoerrelse("),
+                (BOERSOMETER, "if volumforhold > p.volumfaktor:"),
+                (BOERSOMETER, "if volumforhold < 1:"),
+                (SIGNALBEREGNING, "volumfaktor"),
+            ),
+        ),
         # Story 2.9 (FR-104): delen over tabellen.
         "hovedindeksen": Hjelpetekst(
             "Hovedindeksen:",
@@ -341,6 +364,18 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (PRD, "#### FR-705"),
                 (SIGNALBEREGNING, "def finn_styrke("),
                 (INDEX_MAL, "Skilte seg ut <span"),
+            ),
+        ),
+        # Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): hva 3 av 3
+        # betyr, og linja under «Signalet dag for dag».
+        "tre_av_tre": Hjelpetekst(
+            f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER}:",
+            f"alle de {ANTALL_SJEKKER} sjekkene, trend, bevegelse og interesse, slo ut den dagen, med +1 eller -1. "
+            "Under «Signalet dag for dag» står hvor mange ganger det skjedde det siste året, og den siste dagen, "
+            "av det appen lagret. Det sier ikke hva aksjen gjorde etterpå.",
+            (
+                (SIGNALBEREGNING, "def finn_styrke("),
+                (HISTORIKK, "def alle_sjekkene_det_siste_aaret("),
             ),
         ),
         # Story 8.20a (del E): det siste i vinduet for signalstyrken paa

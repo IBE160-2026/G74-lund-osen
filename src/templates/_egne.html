@@ -12,24 +12,32 @@
     <p class="antall-egne">{{ egne.antall_egne }} egne · {{ egne.antall }} av {{ egne.tak }} aksjer i lista</p>
   </div>
   {% if egne.rader %}
-  <ul class="egne-rader">
+  {#- Story 8.23 (A1, brukertesten 10.11): radene har samme utseende som
+      radene i tabellen over, i samme kort med svart kolonnerad, med
+      bransjeikonet foran bransjen. Kursene står i tabellen over. #}
+  <div class="tabellboks egnetabell" role="region" aria-label="Dine egne aksjer" tabindex="0">
+  <table>
+    <thead>
+      <tr><th>Selskap</th><th>Bransje</th><th>Status</th><th><span class="skjult">Valg</span></th></tr>
+    </thead>
+    <tbody>
     {% for rad in egne.rader %}
-    <li class="egen-rad">
-      <span class="navn">{{ rad.navn }}</span> <span class="linje">{{ rad.symbol }} · {{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</span>
-      <span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}
-      {% if rad.status == "hentet" %}
-        <span class="status">Hentet. Står i tabellen over.</span>
-        <form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Fjern</button></form>
-      {% elif rad.status == "venter" %}
-        <span class="status">Venter på henting i kveld etter kl. 22.</span>
-        <form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Angre</button></form>
-      {% else %}
-        <span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>
-        <form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Angre</button></form>
-      {% endif %}
-    </li>
+      <tr class="egen-rad">
+        <td class="selskap">{{ rad.navn }}<span class="skjult">, </span><span class="egen-dag">{{ rad.symbol }}</span></td>
+        <td class="bransje">{{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</td>
+        <td class="status"><span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}
+        {%- if rad.status == "hentet" %} <span class="statustekst">Hentet. Står i tabellen over.</span>
+        {%- elif rad.status == "venter" %} <span class="statustekst">Venter på henting i kveld etter kl. 22.</span>
+        {%- else %} <span class="statustekst">Fjernes ved hentingen i kveld etter kl. 22.</span>{% endif %}</td>
+        <td class="valg">
+        {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Fjern</button></form>
+        {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Angre</button></form>{% endif -%}
+        </td>
+      </tr>
     {% endfor %}
-  </ul>
+    </tbody>
+  </table>
+  </div>
   {% endif %}
   {% if egne.full %}
     <p class="full">Lista er full. Fjern en aksje for å følge en annen.</p>
@@ -45,13 +53,15 @@
   <h3>Din egen liste: kom i gang</h3>
   <p>Appen kjører på din egen maskin, så det finnes ingen innlogging hos oss. Du trenger bare din egen gratiskonto hos EODHD. Da velger du selv hvilke aksjer du følger.</p>
   <ol class="steg">
-    <li><strong>Lag en gratis konto hos EODHD.</strong> Registreringen skjer hos EODHD, ikke hos oss. Gratiskontoen gir 20 kall i døgnet og sluttkurser 1 år tilbake. Kontoen er din egen. Den kan ikke deles med andre, heller ikke i en gruppe. Adressen er eodhd.com.</li>
+    <li><strong>Lag en gratis konto hos EODHD.</strong> Registreringen skjer hos EODHD, ikke hos oss. Gratiskontoen gir {{ egne.kall.kvote }} kall i døgnet og sluttkurser 1 år tilbake. Kontoen er din egen. Den kan ikke deles med andre, heller ikke i en gruppe. Adressen er eodhd.com.</li>
     {#- Avviket i utdraget §2: webserveren rører aldri nøkkelen (AD-10). #}
     <li><strong>Lim inn nøkkelen din.</strong> Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen. Du limer den inn når den ekte versjonen startes første gang, og startskriptet spør etter den.</li>
     <li><strong>Velg aksjene dine.</strong> Du kan søke blant alle aksjene på Oslo Børs. Er omsetningen målt, står den i søket. Omsettes en aksje for mindre enn 32 MNOK om dagen i median de 3 siste månedene, merkes den «Utenfor målingen».</li>
   </ol>
   <h3>Følg flere aksjer</h3>
-  <p>Lista kan ha opptil 18 aksjer. Hver aksje bruker 1 av de 20 kallene i døgnet, og hovedindeksen 1. Med 18 aksjer er 1 kall igjen til et nytt forsøk hvis noe feiler. Vil du følge andre, bytter du dem inn for noen i lista.</p>
+  {#- Story 8.23 (A7, brukertesten 10.11): tallene regnes av kvoten, taket og
+    lista (valg.py), ikke skrevet for hånd. #}
+  <p>Lista kan ha opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Med {{ egne.antall }} aksjer etter neste henting er {{ egne.kall.igjen }} kall igjen til et nytt forsøk hvis noe feiler, og med {{ egne.tak }} aksjer er {{ egne.kall.igjen_med_taket }} igjen. Vil du følge andre, bytter du dem inn for noen i lista.</p>
   <ul class="kallene">
     <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
     <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>

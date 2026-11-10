@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-09T00:04
+updated: 2026-11-10T22:04
 ---
 
 # Designregler
@@ -171,8 +171,10 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Dempet 2 `#70757D`: en sjekk som ga 0.
 - Bakgrunn `#F3F2EE`, Kort `#FFFFFF`, Strek `#E4E2DB`, Strek 2 `#D6D3CA` og Rutenett `#ECEAE4`.
 - Positiv `#13703C` på `#E4F4EA`, Negativ `#B42318` på `#FBE9E6`, Blandet `#6A46A0` på `#F0EBF8` og Ingen `#5F646C` på `#EEEDEA`.
+  *Lagt til 2026-11-10 (story 8.23, tillegg 2, gruppens svar kl. 14:53 og 14:59):* sjekkortene under «Hvorfor signalet ble …» har en tykk kant, 4 px, i fargen for resultatet: Positiv for +1, Negativ for -1 og Dempet 2 for 0. Merket i kortet står som før, så fargen er aldri alene.
 - Gul ring `#a67c00`: ringen rundt «3 av 3» og streken på 4 px til venstre i en rad med 3 av 3, på lys bakgrunn. Kontrasten er 3,82 mot hvitt, 3,41 mot Bakgrunn og 4,65 mot blekk.
 - Lys gul `#F2B53A`: bare på blekk, det vil si logoens høyeste søyle, klokka og fokus i stripa (9,68:1).
+  *Lagt til 2026-11-10 (story 8.23, brukertesten 10.11, A6):* også knappen for siden man er på i stripa, som er blekk, og en bryter som er på, med svart knott, i Innstillinger, ved KI-teksten og ved «Børsdagen kort fortalt», som i designforslaget. Bryteren er et unntak fra «bare på blekk», som streken under den sorterte kolonnen; knotten i blekk gir kontrasten.
 - Båndet «Skilte seg ut» `#ECE9E1`, en nøytral, varm grå, med kant i Strek og tekst i blekk (14,64:1). Radene under er hvite. Båndet «Øvrige aksjer» `#F7F6F2`, med kant i Strek og tekst i Tekst (9,62:1). Gult står ved en aksje bare ved 3 av 3 (§3), og «Skilte seg ut» har også 2 av 3.
 - Hjelp `#6B4E00` på `#FFF1CC`: merket «Hjelp» i hjelpevinduet (6,89:1).
 - Kurs `#1F4E8C`. Snitt `#9A5A0E`, både streken og navnet (5,46:1 mot hvitt).

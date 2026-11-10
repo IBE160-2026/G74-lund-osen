@@ -288,6 +288,29 @@ class TestEttFelt:
             "blar_ikke": True,
         }
 
+    @pytest.mark.parametrize("bredde", [1280, 390])
+    def test_et_nytt_trykk_paa_samme_knapp_lukker(self, sidene, tmp_path, bredde):
+        """Story 8.23 (A3, brukertesten 10.11): et nytt trykk på samme «?»
+        lukker hjelpen, og et tredje åpner den igjen. Ville feilet hvis det
+        andre trykket lot feltet stå åpent (action «show»), plassen under «?»
+        ble stående, eller fokus ikke gikk tilbake til «?»."""
+        r = _kjoer(
+            sidene["/aksje/BRFE"],
+            tmp_path,
+            bredde,
+            """
+          const k = document.querySelector("main button.hjelpeknapp");
+          k.focus(); k.click(); await vent();
+          const foerst = aapne().length;
+          k.click(); await vent();
+          const etter_andre = aapne().length, plasser = document.querySelectorAll(".hjelpeplass").length;
+          const fokus = document.activeElement === k;
+          k.click(); await vent();
+          ferdig({foerst, etter_andre, plasser, fokus, etter_tredje: aapne().length});
+        """,
+        )
+        assert r == {"foerst": 1, "etter_andre": 0, "plasser": 0, "fokus": True, "etter_tredje": 1}
+
 
 class TestKnappenFlytter:
     def test_knappen_bytter_side_og_valget_huskes(self, sidene, tmp_path):

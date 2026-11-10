@@ -121,6 +121,15 @@
 {#- Gjennomgangen (ECH4): Min liste bare med merkede aksjer. #}
 {% block rundtur %}{% if rader and (aktiv != "min_liste" or antall_merket) %}{{ rundtur("min_liste" if aktiv == "min_liste" else "oversikt") }}{% endif %}{% endblock %}
 {% block innhold %}
+  {#- Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): når en endring
+      i lista venter på hentingen etter kl. 22, står det øverst. Demoen henter
+      aldri, så der står et eksempel merket «Eksempeltall» (svaret kl. 15:57). #}
+  {% set venter = egne.ventende if egne else 0 %}
+  {% if venter %}
+    <p class="venter-melding" role="status">{% if eksempeltall %}Eksempeltall: {% endif %}{{ venter }} {{ "endring" if venter == 1 else "endringer" }} i lista tas i bruk ved hentingen etter kl. 22.{% if eksempeltall %} Demoen henter ikke, så {{ "den tas" if venter == 1 else "de tas" }} ikke i bruk her.{% endif %}</p>
+  {% elif eksempeltall and egne %}
+    <p class="venter-melding demo">Eksempeltall: når en endring i lista venter på hentingen etter kl. 22, står det her, for eksempel «1 endring i lista tas i bruk ved hentingen etter kl. 22.». Demoen henter ikke.</p>
+  {% endif %}
   {#- Story 8.3: Min liste har overskriften, en kort tekst, knappen «Alle /
       Min liste» med antallet, og samme tabell i samme rekkefølge (FR-102).
       Uten noe merket står det hvordan man merker. #}
@@ -222,7 +231,7 @@
       <section class="slik-leser" aria-labelledby="slik-leser">
         <h2 id="slik-leser">Slik leser du tabellen</h2>
         <ul>
-          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> <span class="setning">T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1.</span> <span class="setning">Både +1 og -1 teller som utslag.</span> <span class="setning">Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></span></li>
+          <li><span class="symbolfelt" aria-hidden="true"><span class="utslagsfelt"><span class="pluss">+1</span><span class="null">0</span><span class="minus">-1</span></span></span><span><strong>Signalstyrke 0–{{ antall_sjekker }}</strong> <span class="setning">T, B og I er trend, bevegelse og interesse, og hver gir +1, 0 eller -1.</span> <span class="setning">Både +1 og -1 teller som utslag.</span> <span class="setning">Øverst i cellen står hvor mange som slo ut, fra 0 av {{ antall_sjekker }} til {{ antall_sjekker }} av {{ antall_sjekker }}.</span></span></li>
           <li><span class="symbolfelt" aria-hidden="true"><span class="pil opp">↑</span><span class="pil blandet">↔</span><span class="pil ned">↓</span></span><span><strong>Retning</strong> <span class="setning">Om sjekkene som slo ut, ga +1 eller -1.</span> <span class="setning">Ga noen +1 og noen -1, står det {{ blandet }}.</span> <span class="setning">Ikke et råd om å kjøpe eller selge.</span></span></li>
           <li><span class="symbolfelt" aria-hidden="true"><svg class="peker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" focusable="false"><path d="M6 3.5v15.5l4.2-4.1 2.9 6.4 2.6-1.2-2.9-6.3h5.9z"/></svg></span><span><strong>Selskapsnavnet</strong> <span class="setning">Klikk for å se sjekkene, tallene bak og kursgrafen.</span></span></li>
         </ul>
@@ -272,6 +281,11 @@
         retning, med en lenke som viser dem. #}
     {% if signalfilter %}{% set retning, styrke = filter_retning_og_styrke %}{% endif %}
     <p class="filtertekst">{% if signalfilter %}Bare aksjene som fikk {{ styrke }} av {{ antall_sjekker }} med retning {{ retning }}.{% if filter_tomt %} Ingen av aksjene her fikk det.{% endif %}{% if nest_beste %} {% if nest_beste[0] %}{{ nest_beste[0] }} fikk {{ antall_sjekker - 1 }} av {{ antall_sjekker }} {{ retning }}: <a href="{{ nest_beste[1] }}">se {{ "den" if nest_beste[0] == 1 else "dem" }}</a>.{% else %}Ingen fikk {{ antall_sjekker - 1 }} av {{ antall_sjekker }} {{ retning }} heller.{% endif %}{% endif %} {% endif %}Filteret viser hva sjekkene ga, og er ikke et råd om å kjøpe eller selge.</p>
+  {% endif %}
+  {#- Gjennomgangen av 8.23 (ECH2, VG4): «Min liste» på oversikten uten merkede
+      aksjer sier det, med ankeret stjernen og lenkene sender til. #}
+  {% if bare_min and not vist_tabell %}
+    <p class="tom-min-liste" id="aksjene">Ingen aksjer i Min liste ennå. Stjernen foran et selskap under «Alle» legger aksjen i lista.</p>
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
