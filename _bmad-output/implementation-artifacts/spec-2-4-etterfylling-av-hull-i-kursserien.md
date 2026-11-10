@@ -21,6 +21,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 4. **Før neste henting.** Åpnes appen før hullet er fylt, går kurslinja rett over dagene som mangler, og endringen regnes mot forrige rad (gruppens svar 06.11 kl. 09:55 og 12:16). *Forslag:* som før, uten merking av hullet. Det er utenfor kontrollen i 2.4.
 5. **Over et år.** Serien er alltid ett år bakover fra dagen, så etter et opphold på over et år er hele serien ny, og kurser eldre enn et år står ikke i basen, som før. *Forslag:* ingen endring.
 
+*Svar 2026-11-10 kl. 11:52 (gruppens svar):* forslagene i spørsmål 1–5 er godtatt. Rådet anbefalte det. Spørsmål 6 står under funnene og kom ikke med i spørsmålet til gruppen kl. 11:52; svaret på det står under spørsmål 6. Svarene er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`, med svaret kl. 15:30 under den.
+
 ## Intent
 
 **Problem:** En bruker som ikke har hentet på en uke, skal se en hel graf etter neste henting, uten at hullet ser ut som en kursbevegelse, og uten at noen vurdering etterfylles (AD-7).
@@ -66,6 +68,7 @@ Diffen `1a72810a..fbf4c7ce`: Blind Hunter med bare diffen (11 funn), og Edge Cas
 - *VG2, rettet.* `TestNaarHentingenFeiler`: en aksje og hovedindeksen som feiler etter hullet.
 - *BH4, rettet.* `test_en_uke_med_helgen`: en uke borte, over helgen.
 - *BH11, ikke reelt.* K9 og sitatet fra endringsforslaget 28.09, §4.6, er slått opp (Edge Case Hunter gjorde det samme).
+- *ECH1, lagt til 2026-11-10:* det som sto igjen etter rettingen i hjelpen, at hovedindeksen ikke hentes før neste kveld når bare den mangler, ble spørsmål 6. Gruppen avgjorde det kl. 15:30: hovedindeksen hentes også når bare den mangler. Graden er middels som før (regel 25).
 
 **Lav**
 - *Rettet:* ECH4 (signalet lagres bare for børsdagen hentingen gjelder, også i helgen), ECH5 (en aksje som er tatt ut av lista, hentes ikke).
@@ -74,3 +77,5 @@ Diffen `1a72810a..fbf4c7ce`: Blind Hunter med bare diffen (11 funn), og Edge Cas
 *Lagt til 2026-11-09 under spørsmål 4 (gjennomgangen, BH3):* et hull fra dager uten henting står i enden av serien, så grafen slutter på den siste dagen som er hentet, og går ikke over hullet. Forslaget er det samme: ingen merking.
 
 6. **Hovedindeksen etter en feil.** *Lagt til 2026-11-09 (gjennomgangen, ECH1):* feiler hovedindeksen i hentingen etter hullet, henter ingen kjøring den før neste kveld der en aksje mangler kursene, fordi `manglende_i_basen` bare ser på aksjene. *Forslag:* som før, og hjelpen sier det. Å hente indeksen i helgen når bare den mangler, ville bruke et kall som i dag ikke brukes.
+
+*Svar 2026-11-10 kl. 15:30 (gruppens svar):* hovedindeksen hentes også når bare den mangler. Rådet anbefalte forslaget om å la det være som før, men gruppen valgte dette. Det bygges på grenen før flettingen. Svarene er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`, med svaret kl. 15:30 under den.
