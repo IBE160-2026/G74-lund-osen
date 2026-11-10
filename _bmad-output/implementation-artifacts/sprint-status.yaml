@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 11-10-2026 18:02
+last_updated: 11-10-2026 18:33
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -79,7 +79,7 @@ development_status:
   # til 2-14. Briefen v8 lover dem ikke. 2-7 er v1. Statusen staar.
   2-4-etterfylling-av-hull-i-kursserien: done
   2-5-vurderingen-skrives-i-samme-kjøring: done
-  2-6-utbyttedager-merkes: backlog
+  2-6-utbyttedager-merkes: done
   2-7-historikken-i-aksjedetaljen: done
   2-8-hovedindeksen-hentes-i-samme-kjøring: done
   2-9-hovedindeksen-i-markedsoversikten: done
@@ -183,7 +183,7 @@ development_status:
   8-11c-utenfor-maalingen: done
   8-12-endret-signalstyrke-siden-forrige-børsdag: backlog
   8-13-lær-noe-nytt: backlog
-  8-14-justeringsdager-i-kursgrafen: backlog
+  8-14-justeringsdager-i-kursgrafen: done
   8-15-sortering-ved-klikk-i-kolonneraden: done
   8-16-regelen-for-startdagen-og-periodene-i-kursgrafen: done
   8-17-periodevalget-i-oversikten-min-liste-og-børsometeret: done

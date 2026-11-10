@@ -1805,6 +1805,8 @@ forutsetter den målte veien.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
+*Ferdig 2026-11-10:* flettet i `a2427bee`, PR #134.
+
 ### Story 2.7: Historikken i aksjedetaljen
 
 *Lagt til 2026-09-27, fra prioriteringen samme dag.*
@@ -4272,6 +4274,8 @@ NFR-06, NFR-08
 *Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 2.6 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen for 2.6 og 8.14 er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `a2427bee`, PR #134.
 
 ### Story 8.15: Sortering ved klikk i kolonneraden
 

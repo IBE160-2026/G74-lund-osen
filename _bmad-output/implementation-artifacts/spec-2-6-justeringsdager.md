@@ -2,7 +2,7 @@
 title: 'Story 2.6 og 8.14: justeringsdagene, regnet av kursserien alene'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '1a72810a'
 context:
@@ -81,3 +81,5 @@ Diffen `1a72810a..37468807`, uten `tests/test_docker.py` og bildet: Blind Hunter
 - *Ført:* BH5 (en rad som mangler: merket følger det samme radparet som endringen, som `endring_med_datoer` viser), BH6 (kortet på aksjesiden gjelder alltid én dag), BH7 og VG5 (en forskjell på nøyaktig 0,1 pp kan ikke lages med flyttall; testen prøver like under og like over), BH8 (testen av importene viser at modulen ikke leser noe annet enn kursradene den får), BH9 (testene leter etter klassen slik malen skriver den), BH10 (bildet og avtrykkene er i commiten `37468807`), BH12 (stilen for merket gjelder tabellene i oversikten og Min liste), VG6 (Min liste er ikke hentet i testene; den bruker samme mal og samme `Rad`), VG7 (grensen for året er testet i `test_det_siste_aaret`).
 
 *Lagt til 2026-11-09 under spørsmål 1 (gjennomgangen, ECH3):* om en splitt gir samme utslag, er en påstand i `begrunnelser.md` §11, forbehold 1, og ikke målt. Det endrer ikke forslaget.
+
+*Lagt til 2026-11-10:* 2.6 og 8.14 er flettet med PR #134 i `a2427bee` kl. 18:31, låst til head-en `299cbc1b`, etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md` og gruppens svar 10.11 kl. 11:52. Main, med 2.4, ble flettet inn i `299cbc1b`. Konfliktene i `src/app.py` (kallet til `_signaldagene` fra main og justeringsdagene fra grenen) og i avtrykkene i `tests/test_docker.py` er løst, og diffen mot main er endringene grenen hadde mot `1a72810a`. Avtrykkene er regnet ut på nytt, og alle de ti bildene er tatt på nytt fra demoen med DevTools-protokollen og er byte for byte de samme, fordi demoen ikke har justeringsdager. Hele settet alene i ni deler 18:14:25–18:27:08: 4893 bestått, 25 hoppet over og 0 feilet, til sammen de 4918 som `pytest --collect-only` finner. CI var grønn på head-en (run 42865134280). Treet på main etter `git pull --ff-only` er likt treet på `299cbc1b`. Ingen funn på middels eller over sto åpne.
