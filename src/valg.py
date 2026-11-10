@@ -111,6 +111,36 @@ def kallene(i_lista: int, folg: int, fjern: int) -> tuple[int, int, int]:
     return sist, neste, KVOTE - neste
 
 
+@dataclass(frozen=True)
+class SisteHenting:
+    """Story 8.22, tillegg 4 (svaret 10.11 kl. 22:50): dagen for den siste
+    hentingen og kallene den brukte, regnet av seriene den lagret."""
+
+    dag: date
+    kall: int
+
+
+def siste_henting(tilkobling: sqlite3.Connection) -> SisteHenting | None:
+    """Den siste hentingen, regnet av basen alene: uten kall og uten å lese
+    .env (AD-10). Dagen er den siste i kursserie.hentet og
+    indeksserie.hentet, i Europe/Oslo, og kallene er seriene som ble hentet
+    den dagen, ett kall per serie. Et nytt forsøk som feilet, lagret ingen
+    serie og telles ikke. None: ingen henting har gått, eller basen kan ikke
+    leses."""
+    try:
+        hentet = [
+            datetime.fromisoformat(rad[0]).astimezone(OSLO).date()
+            for tabell in ("kursserie", "indeksserie")
+            for rad in tilkobling.execute(f"SELECT hentet FROM {tabell}")
+        ]
+    except (sqlite3.Error, ValueError, TypeError):
+        return None
+    if not hentet:
+        return None
+    dag = max(hentet)
+    return SisteHenting(dag, sum(d == dag for d in hentet))
+
+
 def har_tabellene(tilkobling: sqlite3.Connection) -> bool:
     """Har basen tabellene fra 0010? En base en versjon bak har dem ikke, og
     da viser siden ikke valget. En base som ikke kan leses, gir False."""

@@ -39,13 +39,17 @@ def test_tre_stegkort_i_rekkefoelgen_fra_utdraget(klient):  # noqa: F811
 
 
 def test_noekkelen_har_ikke_noe_felt(klient):  # noqa: F811
-    """AD-10 og svaret 08.11 kl. 12:39: ville feilet hvis siden fikk et felt
-    for nøkkelen, eller steg 2 ikke sa at den limes inn ved oppstart."""
+    """AD-10 og svaret 08.11 kl. 12:39, som står etter tillegg 4: ville feilet
+    hvis siden fikk et felt eller en knapp for nøkkelen, eller steg 2 ikke
+    sa hvordan nøkkelen byttes med startskriptet."""
     html = klient.get("/min-liste").data.decode("utf-8")
     andre = _kortene(html)[1]
-    assert "startskriptet spør etter den" in andre and "<input" not in andre
+    assert "<input" not in andre and "<button" not in andre and "Sjekk nøkkelen" not in andre
     assert not re.search(r'<input[^>]*type="(text|password)"', _delen(html))
     assert "Demoen trenger ingen nøkkel" not in andre
+    assert "<h5>Slik bytter du nøkkel</h5>" in andre
+    assert "Neste gang den ekte versjonen startes, spør startskriptet etter nøkkelen og lagrer den nye." in andre
+    assert "Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen." in andre
 
 
 def test_kallene_og_knappene_i_steg_3(klient):  # noqa: F811
@@ -110,3 +114,125 @@ def test_kallene_i_steg_3_er_regnet_av_lista(klient, stier):  # noqa: F811
     tredje = _kortene(klient.get("/min-liste").data.decode("utf-8"))[2]
     assert "<li>15 kall: de 15 aksjene</li>" in tredje and "<li>1 kall: din egen aksje</li>" in tredje
     assert "<li>3 kall: margin</li>" in tredje
+
+
+# Tillegg 4 (svaret 10.11 kl. 22:50): steg 2 som på designtavla, uten felt.
+# Der tavla har feltet og «Sjekk nøkkelen», står statusen regnet av siste
+# henting, uten kall og uten å lese .env.
+
+
+def _klient_med_henting(stier, monkeypatch):  # noqa: F811
+    """Som klient i test_valg, men med kallene fra hentingen talt."""
+    import lagring_sqlite
+    from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
+    from test_valg import med_boersen
+
+    raa, base = stier
+    _, kall, _ = kjoer_23(raa, base, OEYEBLIKK_22_09)
+    med_boersen(base)
+    monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
+    monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 9, 23, 12, 0).astimezone())
+    app_modul.app.config["TESTING"] = True
+    return app_modul.app.test_client(), kall
+
+
+def test_statusen_er_kallene_hentingen_brukte(stier, monkeypatch):  # noqa: F811
+    """Ville feilet hvis statusen i steg 2 ikke var kallene den siste
+    hentingen faktisk brukte, talt i hentingen selv, med dagen."""
+    k, kall = _klient_med_henting(stier, monkeypatch)
+    andre = _kortene(k.get("/min-liste").data.decode("utf-8"))[1]
+    assert kall
+    assert (
+        f'<p class="noekkelstatus virker">Nøkkelen virker: siste henting 22.09 brukte {len(kall)} av 20 kall.</p>'
+        in andre
+    )
+    assert "Ingen henting har gått ennå" not in andre
+
+
+def test_uten_henting_staar_hva_man_gjoer(klient, stier):  # noqa: F811
+    """Ville feilet hvis steg 2 sa at nøkkelen virker uten at noen henting
+    har gått, eller ikke sa hva man gjør."""
+    from lagring_sqlite import aapne_base
+
+    t = aapne_base(stier[1])
+    try:
+        with t:
+            t.execute("DELETE FROM kursserie")
+            t.execute("DELETE FROM indeksserie")
+    finally:
+        t.close()
+    andre = _kortene(klient.get("/min-liste").data.decode("utf-8"))[1]
+    assert "Nøkkelen virker" not in andre
+    assert (
+        "Ingen henting har gått ennå. Start den ekte versjonen med startskriptet: første gang spør det etter "
+        "nøkkelen, og du limer den inn der. Aksjene hentes ved neste henting etter kl. 22."
+    ) in andre
+
+
+def test_statusen_leser_aldri_noekkelen(klient, monkeypatch):  # noqa: F811
+    """AD-10: ville feilet hvis siden leste nøkkelen fra miljøet eller .env,
+    eller viste den."""
+    import os
+
+    hemmelig = "IKKE-EN-EKTE-NOEKKEL-8-22"
+    monkeypatch.setenv("EODHD_API_KEY", hemmelig)
+    lest = []
+    ekte_getenv = os.getenv
+    monkeypatch.setattr(os, "getenv", lambda n, *a: lest.append(n) or ekte_getenv(n, *a))
+    html = klient.get("/min-liste").data.decode("utf-8")
+    assert hemmelig not in html and "EODHD_API_KEY" not in lest
+    import valg
+
+    assert "environ" not in valg.siste_henting.__code__.co_names
+    assert ".env" not in valg.siste_henting.__code__.co_consts
+
+
+def test_siste_henting_er_dagen_i_oslo(tmp_path):
+    """Ville feilet hvis dagen ble regnet i UTC, eller kallene fra en eldre
+    henting ble talt med. 23:30 UTC 09.11 er 10.11 i Oslo."""
+    from datetime import date
+
+    import valg
+    from lagring_sqlite import aapne_base
+
+    base = tmp_path / "db" / "ose.db"
+    base.parent.mkdir(parents=True)
+    t = aapne_base(base)
+    try:
+        assert valg.siste_henting(t) is None
+        with t:
+            t.executemany(
+                "INSERT INTO kursserie (symbol, hentet) VALUES (?, ?)",
+                [
+                    ("AAA", "2026-11-09T23:30:00+00:00"),
+                    ("BBB", "2026-11-09T23:31:00+00:00"),
+                    ("CCC", "2026-11-09T21:00:00+00:00"),
+                ],
+            )
+            t.execute("INSERT INTO indeksserie (symbol, hentet) VALUES (?, ?)", ("OSEBX", "2026-11-09T23:32:00+00:00"))
+        assert valg.siste_henting(t) == valg.SisteHenting(date(2026, 11, 10), 3)
+    finally:
+        t.close()
+
+
+def test_demoen_har_det_samme_kortet(tmp_path, monkeypatch):
+    """Tillegg 4: ville feilet hvis steg 2 i demoen var et annet kort enn i
+    den ekte versjonen, eller sa noe om nøkkelen virker."""
+    import demo
+    from lagring_sqlite import demo_sti
+
+    mal = tmp_path / "demo.db"
+    demo.lag_demobase(mal, skriv=lambda _: None)
+    sti = demo_sti()
+    sti.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(mal, sti)
+    monkeypatch.setenv(app_modul.I_DEMO, "1")
+    monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+    monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
+    andre = _kortene(app_modul.app.test_client().get("/min-liste").data.decode("utf-8"))[1]
+    assert (
+        '<p class="noekkelstatus">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>'
+        in andre
+    )
+    assert "Nøkkelen virker" not in andre and "Ingen henting har gått ennå" not in andre
+    assert "<h5>Slik bytter du nøkkel</h5>" in andre and "<input" not in andre

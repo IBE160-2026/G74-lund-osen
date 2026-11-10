@@ -1838,6 +1838,9 @@ def _egne_regnet() -> dict | None:
                 "med_en": med_en,
                 "igjen_med_en": igjen_med_en,
             },
+            # Story 8.22, tillegg 4 (svaret kl. 22:50): status for nøkkelen i
+            # steg 2, regnet av siste henting, uten kall og uten .env (AD-10).
+            "henting": valg.siste_henting(g.tilkobling),
         }
     except (*BASEFEIL, ValueError) as feil:
         app.logger.warning("Valget kunne ikke leses: %s: %s", type(feil).__name__, feil)

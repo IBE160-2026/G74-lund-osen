@@ -20,6 +20,7 @@ Skrevet 10.11 kl. 16:32 i instruksjonen kl. 16:26 («Del B 10.11», vindu 4). In
 - **Kl. 14:43:** gruppen sjekket lista på en delt side. Alle 195 forslag og usikre er avgjort: 194 som foreslått, og MULTI er tatt ut, fordi en fusjon gjør det usikkert hva som skjer. De 195 er de 210 forslagene minus de 15 aksjene i lista, som har bransjen fra `designregler.md` §4. Kilden er svarene kl. 16:22 og 16:25 i vindu 2, i den samme mappa.
 - **Kl. 15:22:** SCOIN er ute, som 08.11 kl. 22:03, fordi selskapet er under avvikling. Kilden er den samme.
 - **Kl. 14:59:** ingen fletting. Storyen stopper når PR-en er grønn (steg 3 i instruksjonen).
+- **Kl. 22:50 (tillegg 4, instruksjonen kl. 22:52):** steg 2 i «Din egen liste» blir som på designtavla, men uten felt, og AD-10 og svaret 08.11 kl. 12:39 står. Rådet anbefalte det. Svaret føres i `epics.md` med de andre svarene når del B flettes. Se «Tillegg 4: steg 2 som på tavla» nedenfor.
 - **Kl. 13:54 og 14:53:** instruksjonen viser til dem, men ordlyden er ikke funnet i repoet eller i scratchpad-mappene 10.11 (regel 11). Storyen bygger på det instruksjonen sier om «Følg en aksje» og Min liste, og siterer dem ikke.
 
 ## Slått opp 10.11 på `53ff012c` (regel 3)
@@ -116,6 +117,22 @@ Ingen funn på middels eller over står åpne uten spørsmål. ECH5 er middels h
 Instruksjonen kl. 20:43: main ble flettet inn da 2.13b var flettet (kl. 21:14), med 2.4, 2.6, 8.14, 8.7, 8.9 og 2.13b. Konfliktene var avtrykkene i `test_docker.py` og bildet av «Din egen liste». Avtrykkene er regnet ut på nytt, og alle bildene er tatt på nytt med DevTools-protokollen. «Følg en aksje» er 1368 px høy med «Vis meg rundt» fra 8.9 (var 1326), og «Din egen liste» er fortsatt 1628 px.
 
 Testene for rettingene etter gjennomgangen ble kjørt først etter flettingen, på grunn av tillegget kl. 17:46. Én feilet: VG3-testen fant ingen kode på bekreftelsen «Følge …?», fordi koden står i det skjulte feltet og ikke i en lenke. Testen leser nå feltet. Bekreftelsen sa også «Aksje på Oslo Børs» i demoen, og sier nå «Demo Børs» som lista. Mutantene for rettingene ble fanget: forslagene skjules av søket igjen (`rad(a)`), ønsker for MULTI og SCOIN tas i bruk, `bransjen` slipper MULTI og SCOIN gjennom, og bekreftelsen sier «Oslo Børs» i demoen.
+
+## Tillegg 4: steg 2 som på tavla
+
+Svaret 10.11 kl. 22:50. Steg 2 er det samme kortet i demoen og i den ekte versjonen, med overskriften og teksten fra `designutdrag-2026-11-08.md` §2: «Lim inn nøkkelen din» og «Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen.»
+
+**Avvik fra tavla:** tavla har feltet «API-nøkkel», knappen «Sjekk nøkkelen» og «Nøkkelen virker. 20 kall igjen i dag.». Webserveren rører aldri nøkkelen og henter aldri (AD-10, svaret 08.11 kl. 12:39), så der står i stedet en status regnet av siste henting:
+
+- **Den ekte versjonen, etter en henting:** «Nøkkelen virker: siste henting 10.11 brukte 19 av 20 kall.» `valg.siste_henting` leser bare basen, uten kall og uten `.env`. Dagen er den siste i `kursserie.hentet` og `indeksserie.hentet`, i Europe/Oslo. Kallene er seriene som ble lagret den dagen, ett kall per serie. Et nytt forsøk som feilet, lagret ingen serie og telles ikke, og det gjør heller ikke målingen av omsetningen med bonuskvoten (2.13b). Den ekte basen ga 10.11 kl. 22:57 «10.11» og 19, lest med `mode=ro`, med samme sha256 før og etter.
+- **Den ekte versjonen, før første henting:** «Ingen henting har gått ennå. Start den ekte versjonen med startskriptet: første gang spør det etter nøkkelen, og du limer den inn der. Aksjene hentes ved neste henting etter kl. 22.»
+- **Demoen:** «Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.» på samme plass.
+
+Under står «Slik bytter du nøkkel», med det startskriptet gjør (`start/start.ps1` og `start/start.sh`): «Slett det som står etter `EODHD_API_KEY=` i fila `.env` i mappa til appen. Neste gang den ekte versjonen startes, spør startskriptet etter nøkkelen og lagrer den nye. Siden her har ikke noe felt for nøkkelen.»
+
+**Grense:** statusen sier at nøkkelen virket ved siste henting, ikke at den virker nå. Er nøkkelen slettet eller byttet etter hentingen, ser siden det ikke før neste henting. Dagen står i teksten, så en gammel henting synes.
+
+Testene står i `test_din_egen_liste_8_22.py`. Kallene sammenlignes med kallene hentingen selv talte (`kjoer_23`). Det er også tester for siden uten henting, for at nøkkelen aldri leses, for dagen i Oslo og for demoen.
 
 ## Spørsmål etter gjennomgangen
 

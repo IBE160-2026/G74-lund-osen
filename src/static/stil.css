@@ -1218,6 +1218,11 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                      border-radius: 50%; background: var(--blekk); color: var(--hvit); font-weight: 600; }
 :where(.side-oversikt) .kort-steg .adresse { color: var(--dempet); }
 :where(.side-oversikt) .kort-steg .kallene { margin: 8px 0; padding-left: 20px; }
+/* Tillegg 4 (svaret 10.11 kl. 22:50): statusen der tavla har feltet, som en boks i samme stil
+   som demoboksen, men uten fargen til signalet. */
+:where(.side-oversikt) .kort-steg .noekkelstatus { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--strek-2);
+                                                   border-radius: 10px; font-size: 14px; }
+:where(.side-oversikt) .kort-steg h5 { margin: 12px 0 4px; font-size: 14px; }
 :where(.side-oversikt) .stegknapper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 :where(.side-oversikt) .folgskjema { display: grid; gap: 10px; margin: 16px 0; }
 :where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }
