@@ -102,7 +102,11 @@ def modulene(mappe: Path = TESTMAPPA) -> frozenset[str]:
     """Filnavnene til testmodulene i mappa som leser dokumentene."""
     trær = {sti: ast.parse(sti.read_text(encoding="utf-8"), filename=str(sti)) for sti in sorted(mappe.glob("*.py"))}
     leser = {sti.stem for sti, tre in trær.items() if _leser_selv(tre)}
-    hjelperne = {sti.stem for sti in trær if not sti.stem.startswith("test_") and sti.stem != "conftest"}
+    # Lagt til 10.11 (hele settet i deler, steg 4 i ekstravinduet): også en
+    # testmodul som importeres, teller. test_utseende.py importerer
+    # test_investorsidene_demo, som leser docs/kilder-og-rettigheter.md når den
+    # lastes; i en del uten den modulen ble lesingen notert på test_utseende.py.
+    hjelperne = {sti.stem for sti in trær if sti.stem != "conftest"}
     endret = True
     while endret:
         endret = False
