@@ -23,3 +23,4 @@ Instruksjonen kl. 16:20 10.11 i vindu 2, etter gruppens svar kl. 13:48. Aksjene 
 
 ### Åpne punkter
 - `apiRequests` sto på 20 av 20 også etter 167 kall fra bonuskvoten. Bare `extraLimit` sank, fra 463 til 296. Kontrollen etter hvert kall bruker `extraLimit` med valget, så den holdt. §7.1 og §11 i `malinger.md` sier ikke om `apiRequests` stopper på grensen.
+- *Rettet samme kveld:* punktet over er ikke åpent. §11 i `malinger.md` viser at `apiRequests` sto på 20 også etter kall 21 23.09, mens `extraLimit` sank fra 485 til 484. Det ble skrevet før §11 var lest (regel 3), og er lukket i issues.md.
