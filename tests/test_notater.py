@@ -537,7 +537,8 @@ class TestDokumentene:
         # så README-en nevner «Mine notater» ved bildene i knappen (flettingen
         # av main med «Status» 10.11), og hjelpen har et eget avsnitt.
         readme = (ROT / "README.md").read_text(encoding="utf-8")
-        assert "«Mine notater» på aksjesiden" in readme and "Notatene samlet nederst i Min liste" in readme
+        # Teksten under bildet, ikke bare alt-teksten (mutant D overlevde først).
+        assert "\n*«Mine notater» på aksjesiden" in readme and "\n*Notatene samlet nederst i Min liste" in readme
         assert "### Hva er «Mine notater»?" in (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
 
     def test_testene_begynner_uten_notater(self, demobase):
