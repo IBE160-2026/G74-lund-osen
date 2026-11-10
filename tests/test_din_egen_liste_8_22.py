@@ -169,19 +169,15 @@ def test_to_hentinger_samme_dag_gir_minst(stier, monkeypatch):  # noqa: F811
     assert 0 < tall <= len(kall) + len(kall2)
 
 
-def test_uten_henting_staar_hva_man_gjoer(klient, stier):  # noqa: F811
+def test_uten_henting_staar_hva_man_gjoer(klient, monkeypatch):  # noqa: F811
     """Ville feilet hvis steg 2 sa at nøkkelen virket uten at noen henting
     har lagret kurser, eller ikke pekte på byttet når hentingen har feilet
-    (gjennomgangen, ECH2)."""
-    from lagring_sqlite import aapne_base
+    (gjennomgangen, ECH2). Uten serier i basen viser Min liste ikke delen,
+    så siste_henting gir None her; at den gir None uten serier, står i
+    test_siste_henting_er_dagen_i_oslo."""
+    import valg
 
-    t = aapne_base(stier[1])
-    try:
-        with t:
-            t.execute("DELETE FROM kursserie")
-            t.execute("DELETE FROM indeksserie")
-    finally:
-        t.close()
+    monkeypatch.setattr(valg, "siste_henting", lambda _t: None)
     andre = _kortene(klient.get("/min-liste").data.decode("utf-8"))[1]
     assert "Nøkkelen virket" not in andre
     assert (
@@ -220,6 +216,7 @@ def test_statusen_leser_aldri_noekkelen(klient, monkeypatch, tmp_path):  # noqa:
             Spion.lest.append(n)
             return super().get(n, *a)
 
+    (tmp_path / ".env").write_text("EODHD_API_KEY=IKKE-EN-EKTE-NOEKKEL-8-22", encoding="utf-8")
     monkeypatch.setattr(os, "environ", Spion(os.environ, EODHD_API_KEY="IKKE-EN-EKTE-NOEKKEL-8-22"))
     aapnet = []
     ekte_open, ekte_path_open = builtins.open, pathlib.Path.open
@@ -227,7 +224,6 @@ def test_statusen_leser_aldri_noekkelen(klient, monkeypatch, tmp_path):  # noqa:
     monkeypatch.setattr(
         pathlib.Path, "open", lambda self, *a, **k: aapnet.append(str(self)) or ekte_path_open(self, *a, **k)
     )
-    (tmp_path / ".env").write_text("EODHD_API_KEY=IKKE-EN-EKTE-NOEKKEL-8-22", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
     html = klient.get("/min-liste").data.decode("utf-8")
     assert "IKKE-EN-EKTE-NOEKKEL-8-22" not in html
@@ -243,8 +239,11 @@ def test_siste_henting_er_dagen_i_oslo(tmp_path):
     from datetime import date
 
     import valg
+    from kursdata import AKSJEUNIVERS
     from lagring_sqlite import aapne_base
 
+    # kursserie godtar bare aksjer i aksje, så de fire er fra de 15.
+    a, b, c, d = (aksje.symbol for aksje in AKSJEUNIVERS[:4])
     base = tmp_path / "db" / "ose.db"
     base.parent.mkdir(parents=True)
     t = aapne_base(base)
@@ -254,10 +253,10 @@ def test_siste_henting_er_dagen_i_oslo(tmp_path):
             t.executemany(
                 "INSERT INTO kursserie (symbol, hentet) VALUES (?, ?)",
                 [
-                    ("AAA", "2026-11-09T23:30:00+00:00"),
-                    ("BBB", "2026-11-09T23:31:00+00:00"),
-                    ("CCC", "2026-11-09T21:00:00+00:00"),
-                    ("DDD", "ikke en dato"),
+                    (a, "2026-11-09T23:30:00+00:00"),
+                    (b, "2026-11-09T23:31:00+00:00"),
+                    (c, "2026-11-09T21:00:00+00:00"),
+                    (d, "ikke en dato"),
                 ],
             )
             t.execute("INSERT INTO indeksserie (symbol, hentet) VALUES (?, ?)", ("OSEBX", "2026-11-09T23:32:00+00:00"))
