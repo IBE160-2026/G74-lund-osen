@@ -64,7 +64,7 @@ from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from etterpaa import brikkene, bygg_etterpaa, bygg_handelen
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
-from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
+from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, rundturer
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
 from justeringsdager import justeringsdager
@@ -519,6 +519,8 @@ def _hjelp():
     antall_sjekker er «3» i «N av 3» (story 8.0c), fra samme sted som hjelpen."""
     return {
         "hjelp": Hjelp(hjelpetekster(STANDARD)),
+        # Story 8.9: stegene i «Vis meg rundt», fra samme fil.
+        "rundturer": rundturer(STANDARD),
         "parametre": STANDARD,
         "antall_sjekker": ANTALL_SJEKKER,
         "blandet": BLANDET,
@@ -1339,6 +1341,8 @@ def aksjedetalj(symbol: str):
         merket=dagen.dato if dagen else None,
         signal=signal,
         alle=ANTALL_SJEKKER,
+        # Story 8.7: baandet for sjekk 2 og volumet for sjekk 3.
+        volumfaktor=STANDARD.volumfaktor,
     )
     svar = app.make_response(
         render_template(

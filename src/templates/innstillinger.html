@@ -1,17 +1,20 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
+{% from "_rundtur.html" import rundtur with context -%}
 {#- Story 8.10 (FR-110, utdraget 08.11 §4): «Innstillinger» med «Vis hjelp».
     Et skjema per valg, som virker uten skript. Skjemaet skriver bare
     tabellen innstilling (AD-3), og ingenting hentes (AD-10). Tekstene står
     ordrett fra utdraget. #}
 {% block tittel %}Innstillinger — OSE Signal{% endblock %}
 {% block side %}side-oversikt{% endblock %}
+{#- Story 8.9: «Vis meg rundt». #}
+{% block rundtur %}{{ rundtur("innstillinger") }}{% endblock %}
 {% block innhold %}
 <section class="innstillinger" aria-labelledby="innstillinger-tittel">
   <h1 class="overskrift" id="innstillinger-tittel">Innstillinger</h1>
   {#- Gjennomgangen (ECH1): også en base, eller en demobase, fra før 0011. #}
   {% if not kan_lagres %}<p class="feil">Valgene kan ikke lagres i denne basen ennå. Kjør hentingen, eller lag demobasen på nytt, så har den tabellen for valgene.</p>{% endif %}
-  <div class="valg">
+  <div class="valg" id="hjelp-valget">
     <h2>Hjelp</h2>
     <form method="post" action="/innstillinger">
       <input type="hidden" name="navn" value="vis_hjelp">
@@ -22,7 +25,7 @@
   </div>
   {#- Story 8.10b (utdraget 08.11 §4): «Vis KI-tekst», samme valg som
       bryteren ved hver KI-tekst (FR-601). #}
-  <div class="valg">
+  <div class="valg" id="ki-valget">
     <h2>KI-tekst</h2>
     <form method="post" action="/innstillinger">
       <input type="hidden" name="navn" value="vis_ki_tekst">

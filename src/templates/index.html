@@ -4,6 +4,7 @@
 {% from "_brikker.html" import brikker, retningspille -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% from "_notat.html" import notatet with context -%}
+{% from "_rundtur.html" import rundtur with context -%}
 {#- Story 8.15: navnet i kolonneraden er en lenke som sorterer, med en vinkel
     som SVG (pilene er bare for retning, designregler §4). Vinkelen viser
     retningen et klikk gir, eller den som gjelder når kolonnen er valgt.
@@ -115,6 +116,9 @@
 {% block oppdatert_hjelp %}{% if rader and hentet %} {{ hjelpeknapp("hjelp-hentet", "Hjelp: oppdatert") }}{% endif %}{% endblock %}
 {% block tittel %}{% if aktiv == "min_liste" %}Min liste — OSE Signal{% else %}OSE Signal{% endif %}{% endblock %}
 {% block side %}side-oversikt{% endblock %}
+{#- Story 8.9: «Vis meg rundt», når siden har aksjer å vise. #}
+{#- Gjennomgangen (ECH4): Min liste bare med merkede aksjer. #}
+{% block rundtur %}{% if rader and (aktiv != "min_liste" or antall_merket) %}{{ rundtur("min_liste" if aktiv == "min_liste" else "oversikt") }}{% endif %}{% endblock %}
 {% block innhold %}
   {#- Story 8.3: Min liste har overskriften, en kort tekst, knappen «Alle /
       Min liste» med antallet, og samme tabell i samme rekkefølge (FR-102).
