@@ -29,7 +29,7 @@ import sqlite3
 import sys
 import threading
 from collections.abc import Callable
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from pathlib import Path
@@ -42,7 +42,7 @@ import innstillinger
 import lagring_sqlite
 import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
-from boersdag import UtenforKalenderen, innevaerende_boersdag, norsk_dato
+from boersdag import UtenforKalenderen, forrige_boersdag, innevaerende_boersdag, norsk_dato
 from boersometer import (
     GRENSE_STERK,
     annen_grunn_i_kartet,
@@ -61,6 +61,7 @@ from boersometer import (
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from dagsgrunnlag import dagsgrunnlag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
+from etterpaa import brikkene, bygg_etterpaa, bygg_handelen
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maanedsnavn, perioden
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, rundturer
@@ -92,6 +93,7 @@ from lagring_sqlite import (
     SqliteKILogg,
     SqliteKurslager,
     SqliteMinlistelager,
+    SqliteNotatlager,
     SqliteOversiktsleser,
     SqliteVurderingslager,
     aapne_base,
@@ -123,6 +125,7 @@ from markedsoversikt import (
 )
 from migrering import MigrasjonsFeil
 from minliste import UkjentAksje
+from notater import MAKS_TEGN, UgyldigNotat
 from oversiktsdata import Oversiktsleser
 from perioder import (
     AKSEMERKER,
@@ -218,6 +221,8 @@ app.jinja_env.filters["prikkede_tall"] = prikkede_tall
 app.jinja_env.filters["ki_tekst"] = ki_tekst
 # Story 2.7b: «oktober 2026» ved pilene i historikken.
 app.jinja_env.filters["maanedsnavn"] = maanedsnavn
+# Story 8.21 (tillegget kl. 14:44): sjekkene ved et tenkt kjøp eller salg.
+app.jinja_env.filters["brikkene"] = brikkene
 # Story 8.15: retningen et klikk på en kolonne gir.
 app.jinja_env.globals["neste_orden"] = neste_orden
 # Story 8.20a (del B): dagen i datofeltet og pilene ved den.
@@ -296,6 +301,12 @@ _RUTER_MED_BASE = {
     "angre",
     # Story 8.11: en ferdig liste.
     "bruk_ferdig_liste",
+    # Story 8.21: «Mine notater» på aksjesiden.
+    "skriv_notat",
+    "slett_notat",
+    # Tillegget kl. 14:44: tenkte kjøp og salg.
+    "noter_tenkt_kjoep",
+    "noter_tenkt_salg",
 }
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
@@ -303,6 +314,9 @@ _RUTER_MED_BASE = {
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
 _SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
+# Story 8.21 (gruppens svar 10.11 kl. 14:32): rutene som skriver notatene, og
+# bare tabellen notat (AD-3).
+_SKRIVERE |= {"skriv_notat", "slett_notat", "noter_tenkt_kjoep", "noter_tenkt_salg"}
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -490,7 +504,13 @@ def _innstillingene():
     """Story 8.10 (FR-110): valgene i «Innstillinger», på hver side. Bare
     lesing. Uten basen er alt på."""
     valgene = innstillinger.les(g.get("tilkobling"))
-    return {"valgene": valgene, "vis_hjelp": valgene[innstillinger.VIS_HJELP]}
+    # Story 8.21 (tillegget kl. 14:44): «Notater» skjuler notatene på
+    # aksjesidene og i Min liste, men sletter ingenting.
+    return {
+        "valgene": valgene,
+        "vis_hjelp": valgene[innstillinger.VIS_HJELP],
+        "vis_notater": valgene[innstillinger.VIS_NOTATER],
+    }
 
 
 @app.context_processor
@@ -1051,6 +1071,10 @@ def _tabellsiden(aktiv: str):
 
     return render_template(
         "index.html",
+        # Story 8.21 (tillegget kl. 14:44): alle notatene samlet nederst i Min
+        # liste, nyeste først, med lenke til aksjen. Bare med bryteren på.
+        alle_notater=_alle_notatene() if i_lista else None,
+        alle_notater_indeks=_indeksen_for_grafen()[0] if i_lista else None,
         rader=rader,
         hovedindeks=hovedindeks,
         indeks_feilet=indeks_feilet,
@@ -1365,12 +1389,319 @@ def aksjedetalj(symbol: str):
             # Story 2.7b: maaneden for dagen siden viser, eller den i adressen.
             historikk=historikk,
             pil=pil,
+            # Story 8.21: «Mine notater», med dagen et nytt notat får.
+            # Tillegget kl. 14:44: bryteren «Notater» skjuler delen, og
+            # notatene leses da ikke.
+            notatene=_notatene(post, rader, indeks, indeks_feilet, vurderingene, i_dag)
+            if innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_NOTATER]
+            else None,
+            notatdag=slutt,
+            # Tillegget kl. 14:44: et tenkt kjøp eller salg noteres bare fra
+            # siden for siste dag med kurser, med sjekkene slik de står der.
+            kan_handle=post.ut is None
+            and bool(rader)
+            and slutt == rader[-1].dato
+            and post.aksje.symbol not in _fjernes_i_kveld(),
+            # Gjennomgangen av tilleggene (ECH1, BH3): siden sier hvorfor.
+            fjernes_i_kveld=post.aksje.symbol in _fjernes_i_kveld(),
+            # Gjennomgangen (ECH1): «Vis dagen» godtar en dag uten kurs for
+            # aksjen, som en lørdag. Da står ikke skjemaet, bare en linje.
+            kan_skrive_notat=post.ut is None,
+            notatdag_har_kurs=any(rad.dato == slutt for rad in rader),
+            notat_visningen=_visningen(valg, slutt, periode),
+            notat_maks=MAKS_TEGN,
+            notat_anker=NOTATANKER,
             **_fotnoten([detalj.dato] if detalj.ikke_vurdert else [], i_dag),
         )
     )
     # Siden avhenger av bryteren (gjennomgangen av 10.3, BH10).
     svar.vary.add("Cookie")
     return svar
+
+
+# --- Story 8.21: «Mine notater» på aksjesiden ------------------------------
+
+NOTATANKER = "mine-notater"
+# Gjennomgangen (BH3, ECH3): en id med flere sifre enn SQLite tar (int64),
+# gir 400, ikke OverflowError og 500.
+_NOTAT_ID = re.compile(r"[0-9]{1,18}")
+# Gjennomgangen (ECH2, BH7): visningen skjemaet kom fra, så svaret går tilbake
+# til samme periode eller dag. Bare en dag eller en periode siden kjenner.
+_VISNINGEN = re.compile(r"dag=([0-9]{4}-[0-9]{2}-[0-9]{2})|periode=([a-z0-9-]+)")
+
+
+def _notatene(
+    post, rader, indeks: dict | None, indeks_feilet: bool, vurderingene: dict | None, i_dag: date
+) -> list | None:
+    """Notatene for aksjen, hvert med «Etterpå» (etterpaa.py), den nyeste
+    notatdagen først. Serien, indeksen og vurderingene er de siden alt har
+    lest, hele serien til siste dag, også med «Vis dagen» og en periode, så
+    ingenting leses to ganger, og signalet regnes aldri (AD-7). None når
+    notatene ikke kan leses; da står delen uten skjema."""
+    try:
+        lager = SqliteNotatlager(g.tilkobling)
+        notatene = lager.notater(post.aksje.symbol)
+        kjoepene = lager.kjoepene()
+    except (*BASEFEIL, ValueError) as feil:
+        app.logger.warning("Notatene kunne ikke leses: %s", type(feil).__name__)
+        return None
+    # Tillegget kl. 14:44: høyst ett åpent tenkt kjøp per aksje.
+    aapent = any(k.aapent and k.symbol == post.aksje.symbol for k in kjoepene.values())
+    return [
+        _Notatet(
+            notat,
+            bygg_etterpaa(
+                notat, rader, indeks, vurderingene, i_dag, STANDARD.terskel, post.ut, indeks_feilet=indeks_feilet
+            ),
+            bygg_handelen(kjoepene[notat.id], rader, indeks, indeks_feilet=indeks_feilet)
+            if notat.id in kjoepene
+            else None,
+            kan_kjoepe=notat.id not in kjoepene and not aapent and post.ut is None,
+            aksje=post.aksje,
+        )
+        for notat in notatene
+    ]
+
+
+@dataclass(frozen=True)
+class _Notatet:
+    """Et notat slik malen _notat.html viser det: «Etterpå», det tenkte
+    kjøpet, om et kjøp kan noteres ved det, og aksjen, for Min liste."""
+
+    notat: object
+    etter: object
+    handelen: object
+    kan_kjoepe: bool
+    aksje: object
+
+
+def _alle_notatene() -> list | None:
+    """Alle notatene i basen, for «Mine notater» nederst i Min liste, den
+    nyeste notatdagen først, hvert med «Etterpå» og det tenkte kjøpet, som på
+    aksjesiden. Serien og vurderingene leses én gang per aksje med notater.
+    None når bryteren «Notater» er av, eller notatene ikke kan leses."""
+    tilkobling = g.get("tilkobling")
+    if tilkobling is None or not innstillinger.les(tilkobling)[innstillinger.VIS_NOTATER]:
+        return None
+    try:
+        lager = SqliteNotatlager(tilkobling)
+        notatene = lager.alle_notater()
+        kjoepene = lager.kjoepene()
+        if not notatene:
+            return []
+        _symbol, indeks, indeks_feilet = _indeksen_for_grafen()
+        oversiktsleser = SqliteOversiktsleser(tilkobling)
+        kursleser = SqliteKurslager(tilkobling)
+        i_dag = idag()
+        per_aksje = {}
+        for symbol in {n.symbol for n in notatene}:
+            post = oversiktsleser.post(symbol)
+            if post is None:
+                continue
+            rader = kursleser.serie(symbol)
+            vurderingene = _vurderingene(post, rader[-1].dato) if rader else None
+            per_aksje[symbol] = (post, rader, vurderingene)
+    except (*BASEFEIL, ValueError) as feil:
+        app.logger.warning("Notatene kunne ikke leses: %s", type(feil).__name__)
+        return None
+    ut = []
+    for notat in notatene:
+        if notat.symbol not in per_aksje:
+            continue
+        post, rader, vurderingene = per_aksje[notat.symbol]
+        ut.append(
+            _Notatet(
+                notat,
+                bygg_etterpaa(
+                    notat, rader, indeks, vurderingene, i_dag, STANDARD.terskel, post.ut, indeks_feilet=indeks_feilet
+                ),
+                bygg_handelen(kjoepene[notat.id], rader, indeks, indeks_feilet=indeks_feilet)
+                if notat.id in kjoepene
+                else None,
+                kan_kjoepe=False,
+                aksje=post.aksje,
+            )
+        )
+    return ut
+
+
+def _visningen(valg: Valg, slutt: date, periode: str | None) -> str:
+    """Visningen siden har, som skjemaene sender med: dagen fra «Vis dagen»,
+    en periode fra adressen, eller ingenting for standardvisningen."""
+    if valg.periode == VELG:
+        return f"dag={slutt.isoformat()}"
+    return f"periode={periode}" if periode else ""
+
+
+def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
+    """Samme side, med samme periode eller dag, ved «Mine notater» (del B).
+    En visning siden ikke kjenner, gir standardvisningen."""
+    adresse_ = f"/aksje/{symbol}"
+    treff = _VISNINGEN.fullmatch(visningen or "")
+    if treff and treff.group(1) and _gyldig_dato(treff.group(1)):
+        adresse_ += f"?dag={treff.group(1)}"
+    elif treff and treff.group(2) in PERIODENE and treff.group(2) != VELG:
+        adresse_ += f"?periode={treff.group(2)}"
+    return adresse_ + f"#{NOTATANKER}"
+
+
+def _notatsiden(symbol: str):
+    """Aksjen og kursdagene for skjemaene, eller abort. Symbolet slås opp i
+    aksje i basen, som aksjesiden (404 for et symbol utenfor lista)."""
+    _samme_side()
+    if g.get("basefeil"):
+        return None, None, _basen_kan_ikke_aapnes()
+    if g.get("tilkobling") is None:
+        abort(404)
+    try:
+        post = SqliteOversiktsleser(g.tilkobling).post(normaliser_symbol(symbol))
+        rader = SqliteKurslager(g.tilkobling).serie(post.aksje.symbol) if post else []
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return None, None, _basen_kan_ikke_aapnes()
+    if post is None:
+        abort(404)
+    return post, [rad.dato for rad in rader], None
+
+
+def _skjemadag(verdi: str | None, kursdager: list[date]) -> date:
+    """Dagen fra skjemaet, som må være en dag aksjen har kurs (del B). 400
+    ellers, så et notat aldri får en dag siden ikke kunne vise."""
+    if not verdi or not _DAG.fullmatch(verdi) or not _gyldig_dato(verdi):
+        abort(400)
+    dag = date.fromisoformat(verdi)
+    if dag not in kursdager:
+        abort(400)
+    return dag
+
+
+@app.post("/aksje/<symbol>/notat")
+def skriv_notat(symbol: str):
+    """Lagrer et notat med dagen siden viste (spørsmål 3), og sender tilbake
+    til samme side og dag (303). Webserveren skriver bare tabellen notat her
+    (AD-3), og henter aldri noe (AD-10)."""
+    post, kursdager, feilside = _notatsiden(symbol)
+    if feilside is not None:
+        return feilside
+    dag = _skjemadag(request.form.get("dag"), kursdager)
+    try:
+        SqliteNotatlager(g.tilkobling).skriv(post.aksje.symbol, dag, request.form.get("tekst", ""), naa())
+    except UgyldigNotat:
+        abort(400)
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
+
+
+@app.post("/aksje/<symbol>/notat/slett")
+def slett_notat(symbol: str):
+    """Sletter ett notat for aksjen (spørsmål 7), og sender tilbake til samme
+    side og dag (303). Et notat for en annen aksje slettes ikke."""
+    post, _kursdager, feilside = _notatsiden(symbol)
+    if feilside is not None:
+        return feilside
+    notat_id = request.form.get("id", "")
+    if not _NOTAT_ID.fullmatch(notat_id):
+        abort(400)
+    try:
+        SqliteNotatlager(g.tilkobling).slett(post.aksje.symbol, int(notat_id))
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
+
+
+def _sjekkene_paa_siden(post, dag: date):
+    """Sjekkene som er lagret for dagen siden viste, (trend, bevegelse,
+    interesse), eller None når dagen ikke var vurdert. Lest, aldri regnet
+    (AD-7)."""
+    innhold = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,)).les_periode(post.aksje.symbol, dag, dag).get(dag)
+    if isinstance(innhold, Vurdering):
+        return (innhold.trend, innhold.bevegelse, innhold.interesse)
+    return None
+
+
+def _sluttkursen_etter(kursdager: list[date], i_dag: date) -> date:
+    """Dagen sluttkursen for et tenkt kjøp eller salg må være etter: den
+    siste dagen med kurs da brukeren trykket, eller børsdagen før i dag om
+    den er senere. Kursen er da den første appen henter etter trykket
+    (tillegget kl. 14:44, spørsmål 15)."""
+    try:
+        foer = forrige_boersdag(i_dag)
+    except UtenforKalenderen:
+        foer = None
+    siste = kursdager[-1] if kursdager else None
+    kandidater = [d for d in (siste, foer) if d is not None]
+    if not kandidater:
+        abort(400)
+    return max(kandidater)
+
+
+def _handelen(symbol: str, salg: bool):
+    post, kursdager, feilside = _notatsiden(symbol)
+    if feilside is not None:
+        return feilside
+    notat_id = request.form.get("id", "")
+    if not _NOTAT_ID.fullmatch(notat_id):
+        abort(400)
+    # Bare fra siden for siste dag med kurser, så sjekkene er de siden viste.
+    dag = _skjemadag(request.form.get("dag"), kursdager)
+    if dag != kursdager[-1]:
+        abort(400)
+    # Gjennomgangen av tilleggene (ECH1, BH3): en aksje med et ønske om å
+    # fjernes tas ut før kursene hentes i kveld, så et kjøp eller salg
+    # ville aldri fått sluttkursen.
+    if post.aksje.symbol in _fjernes_i_kveld():
+        abort(400)
+    try:
+        lager = SqliteNotatlager(g.tilkobling)
+        sjekkene = _sjekkene_paa_siden(post, dag)
+        etter = _sluttkursen_etter(kursdager, idag())
+        kjoep = lager.kjoepene().get(int(notat_id))
+        if salg:
+            # Gjennomgangen (ECH3): et salg som alt er notert (dobbeltklikk),
+            # sender tilbake uten å skrive noe.
+            if kjoep is not None and kjoep.solgt is not None:
+                return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
+            # Salget først når kjøpet har fått sluttkursen (spørsmål 16).
+            if kjoep is None or not any(d > kjoep.kjoep_etter for d in kursdager):
+                abort(400)
+            lager.noter_salg(post.aksje.symbol, int(notat_id), naa(), etter, sjekkene)
+        elif kjoep is None:
+            # Et kjøp som alt er notert ved notatet (dobbeltklikk), skrives
+            # ikke på nytt.
+            lager.noter_kjoep(post.aksje.symbol, int(notat_id), naa(), etter, sjekkene)
+    except UgyldigNotat:
+        abort(400)
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
+
+
+@app.post("/aksje/<symbol>/notat/kjoep")
+def noter_tenkt_kjoep(symbol: str):
+    """«Noter et tenkt kjøp» ved et notat (tillegget 10.11 kl. 14:44). Lagrer
+    tidspunktet, sjekkene slik de sto på siden, og dagen sluttkursen må være
+    etter. Bare tabellen tenkt_kjoep skrives (AD-3), og ingenting hentes
+    (AD-10)."""
+    return _handelen(symbol, salg=False)
+
+
+@app.post("/aksje/<symbol>/notat/salg")
+def noter_tenkt_salg(symbol: str):
+    """«Noter et tenkt salg» ved et notat med et åpent tenkt kjøp som har
+    fått sluttkursen. Som kjøpet."""
+    return _handelen(symbol, salg=True)
+
+
+def _gyldig_dato(verdi: str) -> bool:
+    try:
+        date.fromisoformat(verdi)
+    except ValueError:
+        return False
+    return True
 
 
 @app.route("/investorside/<symbol>")
@@ -1962,11 +2293,65 @@ def fjern_egen():
     lager = _valglager()
     if lager is None:
         abort(404)
+    symbol = (request.form.get("symbol") or "").strip().upper()
+    tilbake = request.form.get("tilbake")
+    # Story 8.21 (tillegget kl. 14:44): har aksjen et åpent tenkt kjøp, sier
+    # appen først at kursene for den stopper, og ingenting skrives før
+    # «Fjern likevel».
+    if symbol in _aapne_kjoep() and request.form.get("bekreftet") != "1":
+        return render_template(
+            "bekreft_fjern.html",
+            symbol=symbol,
+            tilbake=tilbake if tilbake in VALG_TILBAKE else "oversikten",
+            tilbake_adresse=VALG_TILBAKE.get(tilbake, VALG_TILBAKE["oversikten"]),
+        )
     try:
-        lager.fjern((request.form.get("symbol") or "").strip().upper())
+        lager.fjern(symbol)
     except valg.UgyldigValg:
         abort(400)
-    return redirect(VALG_TILBAKE.get(request.form.get("tilbake"), VALG_TILBAKE["oversikten"]), code=303)
+    return redirect(VALG_TILBAKE.get(tilbake, VALG_TILBAKE["oversikten"]), code=303)
+
+
+def _aapne_kjoep() -> frozenset[str]:
+    """Aksjene med et åpent tenkt kjøp, eller et salg som venter på
+    sluttkursen (story 8.21, gjennomgangen BH6). Tom uten basen, og for en
+    base fra før 0012."""
+    tilkobling = g.get("tilkobling")
+    if tilkobling is None:
+        return frozenset()
+    try:
+        kjoepene = SqliteNotatlager(tilkobling).kjoepene().values()
+        kursleser = SqliteKurslager(tilkobling)
+        ut = set()
+        for k in kjoepene:
+            if k.aapent:
+                ut.add(k.symbol)
+            elif k.salg_etter is not None:
+                serie = kursleser.serie(k.symbol)
+                if not serie or serie[-1].dato <= k.salg_etter:
+                    ut.add(k.symbol)
+        return frozenset(ut)
+    except (*BASEFEIL, ValueError):
+        return frozenset()
+
+
+def _fjernes_i_kveld() -> frozenset[str]:
+    """Aksjene med et ønske om å fjernes som ikke er tatt i bruk. Hentingen
+    tar ønsket i bruk før kursene hentes, så de får ingen kurs i kveld."""
+    try:
+        lager = _valglager()
+        if lager is None:
+            return frozenset()
+        return frozenset(o.symbol for o in lager.ventende() if o.handling == valg.FJERN)
+    except (*BASEFEIL, ValueError):
+        return frozenset()
+
+
+@app.context_processor
+def _aapne_tenkte_kjoep():
+    """Story 8.21: «Bytt ut» og de ferdige listene sier fra om en aksje som
+    tas ut, har et åpent tenkt kjøp."""
+    return {"aapne_kjoep": _aapne_kjoep()}
 
 
 @app.post("/angre")
@@ -2024,6 +2409,8 @@ def innstillinger_side():
         kan_lagres=innstillinger.har_tabellen(g.get("tilkobling")),
         # Story 8.10b: samme verdi som bryteren ved KI-teksten.
         ki_er_paa=_ki_er_paa(),
+        # Story 8.21: «Notater», i tabellen notatvalg fra 0012.
+        notater_kan_lagres=innstillinger.har_tabellen(g.get("tilkobling"), "notatvalg"),
     )
 
 
@@ -2043,6 +2430,9 @@ def lagre_innstilling():
     # kommer i 8.10b.
     if navn not in innstillinger.PAA_SIDEN or til not in (PAA, AV):
         abort(400)
+    # Story 8.21: «Notater» står i notatvalg, som en base fra før 0012 mangler.
+    if not innstillinger.har_tabellen(tilkobling, innstillinger.TABELL[navn]):
+        abort(404)
     innstillinger.sett(tilkobling, navn, til == PAA)
     svar = redirect("/innstillinger", code=303)
     if navn == innstillinger.VIS_KI_TEKST:

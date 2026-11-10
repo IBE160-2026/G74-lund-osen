@@ -22,6 +22,9 @@
   {% endif %}
 
   {% if feil %}<p class="feil" role="alert">{{ feil }}</p>{% endif %}
+  {#- Story 8.21 (tillegget kl. 14:44): før byttet sier siden at kursene
+      stopper for en aksje med et åpent tenkt kjøp. #}
+  {% if gammel and gammel.symbol in aapne_kjoep %}<p class="bytte">{{ gammel.navn }} har et åpent tenkt kjøp. Etter byttet hentes ingen nye kurser for den, så endringen siden kjøpet stopper på den siste dagen med kurser.</p>{% endif %}
 
   {% if egne and egne.full and not gammel %}
     <p class="full">Lista er full. Fjern en aksje for å følge en annen.</p>

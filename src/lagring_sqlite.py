@@ -33,6 +33,7 @@ from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
 from minliste import UkjentAksje, kontroller_symbol
+from notater import Notat, Sjekker, TenktKjoep, UgyldigNotat, kontroller_sjekker, rens, sorter
 from oversiktsdata import Oversiktspost
 from vurderingsdata import Grunn, Vurdering
 
@@ -741,6 +742,162 @@ class SqliteMinlistelager:
     def _rull_tilbake(self) -> None:
         if self._tilkobling.in_transaction:
             self._tilkobling.execute("ROLLBACK")
+
+
+class SqliteNotatlager:
+    """Notatlager i SQLite, tabellen notat fra 0012 - story 8.21, AD-3,
+    AD-10, AD-16 (gruppens svar 10.11 kl. 14:32).
+
+    Samme kontrakt som MinneNotatlager. Webserveren er eneste skriver, og den
+    skriver bare denne tabellen. Et symbol som ikke står i aksje, eller en
+    aksje som er tatt ut, avvises her før noe skrives (spørsmål 10), og
+    triggeren i 0012 avviser et symbol som ikke står i aksje hvis noe annet
+    prøver. Teksten renskes med rens() før den lagres.
+    """
+
+    def __init__(self, tilkobling: sqlite3.Connection):
+        _krev_siste_versjon(tilkobling)
+        self._tilkobling = tilkobling
+
+    def notater(self, symbol: str) -> list[Notat]:
+        return sorter(
+            Notat(id_, s, date.fromisoformat(dato), tekst, datetime.fromisoformat(laget))
+            for id_, s, dato, tekst, laget in self._tilkobling.execute(
+                "SELECT id, symbol, dato, tekst, laget FROM notat WHERE symbol = ?", (symbol,)
+            )
+        )
+
+    def skriv(self, symbol: str, dato: date, tekst: str, laget: datetime) -> Notat:
+        renset = rens(tekst)
+        if not isinstance(dato, date) or isinstance(dato, datetime):
+            raise UgyldigNotat("dagen må være en dato")
+        # Gjennomgangen (ECH8): aksjen sjekkes i samme transaksjon som
+        # innsettingen, så den ikke kan tas ut mellom de to.
+        with _Transaksjon(self._tilkobling):
+            if (
+                self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
+                is None
+            ):
+                raise UgyldigNotat(f"{symbol!r} står ikke i lista")
+            markoer = self._tilkobling.execute(
+                "INSERT INTO notat (symbol, dato, tekst, laget) VALUES (?, ?, ?, ?)",
+                (symbol, dato.isoformat(), renset, laget.isoformat()),
+            )
+        return Notat(markoer.lastrowid, symbol, dato, renset, laget)
+
+    def slett(self, symbol: str, notat_id: int) -> bool:
+        with _Transaksjon(self._tilkobling):
+            markoer = self._tilkobling.execute("DELETE FROM notat WHERE id = ? AND symbol = ?", (notat_id, symbol))
+        return markoer.rowcount == 1
+
+    # --- Tillegget kl. 14:44: tenkte kjøp og salg ---
+
+    def alle_notater(self) -> list[Notat]:
+        """Alle notatene, for «Mine notater» samlet i Min liste."""
+        return sorter(
+            Notat(id_, s, date.fromisoformat(dato), tekst, datetime.fromisoformat(laget))
+            for id_, s, dato, tekst, laget in self._tilkobling.execute(
+                "SELECT id, symbol, dato, tekst, laget FROM notat"
+            )
+        )
+
+    def kjoepene(self) -> dict[int, TenktKjoep]:
+        """De tenkte kjøpene, etter notatet de hører til."""
+        return {
+            rad[1]: _tenkt_kjoep(rad)
+            for rad in self._tilkobling.execute("SELECT " + ", ".join(_KJOEPSKOLONNER) + " FROM tenkt_kjoep")
+        }
+
+    def noter_kjoep(self, symbol: str, notat_id: int, kjoept: datetime, etter: date, sjekker: Sjekker) -> TenktKjoep:
+        sjekker = kontroller_sjekker(sjekker)
+        with _Transaksjon(self._tilkobling):
+            if (
+                self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
+                is None
+            ):
+                raise UgyldigNotat(f"{symbol!r} står ikke i lista")
+            markoer = self._tilkobling.execute(
+                "INSERT INTO tenkt_kjoep (notat, symbol, kjoept, kjoep_etter, kjoep_trend, kjoep_bevegelse,"
+                " kjoep_interesse) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (notat_id, symbol, kjoept.isoformat(), etter.isoformat(), *(sjekker or (None, None, None))),
+            )
+        return TenktKjoep(markoer.lastrowid, notat_id, symbol, kjoept, etter, sjekker)
+
+    def noter_salg(self, symbol: str, notat_id: int, solgt: datetime, etter: date, sjekker: Sjekker) -> TenktKjoep:
+        sjekker = kontroller_sjekker(sjekker)
+        with _Transaksjon(self._tilkobling):
+            # Gjennomgangen av tilleggene (VG6): som kjøpet, bare for en aksje
+            # i lista.
+            if (
+                self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
+                is None
+            ):
+                raise UgyldigNotat(f"{symbol!r} står ikke i lista")
+            markoer = self._tilkobling.execute(
+                "UPDATE tenkt_kjoep SET solgt = ?, salg_etter = ?, salg_trend = ?, salg_bevegelse = ?,"
+                " salg_interesse = ? WHERE notat = ? AND symbol = ? AND solgt IS NULL",
+                (solgt.isoformat(), etter.isoformat(), *(sjekker or (None, None, None)), notat_id, symbol),
+            )
+            if markoer.rowcount != 1:
+                raise UgyldigNotat("notatet har ikke et åpent tenkt kjøp")
+        return self.kjoepene()[notat_id]
+
+
+_KJOEPSKOLONNER = (
+    "id",
+    "notat",
+    "symbol",
+    "kjoept",
+    "kjoep_etter",
+    "kjoep_trend",
+    "kjoep_bevegelse",
+    "kjoep_interesse",
+    "solgt",
+    "salg_etter",
+    "salg_trend",
+    "salg_bevegelse",
+    "salg_interesse",
+)
+
+
+def _tenkt_kjoep(rad) -> TenktKjoep:
+    id_, notat, symbol, kjoept, kjoep_etter, kt, kb, ki, solgt, salg_etter, st, sb, si = rad
+    return TenktKjoep(
+        id_,
+        notat,
+        symbol,
+        datetime.fromisoformat(kjoept),
+        date.fromisoformat(kjoep_etter),
+        None if kt is None else (kt, kb, ki),
+        datetime.fromisoformat(solgt) if solgt else None,
+        date.fromisoformat(salg_etter) if salg_etter else None,
+        None if st is None else (st, sb, si),
+    )
+
+
+class _Transaksjon:
+    """BEGIN og COMMIT, eller ROLLBACK ved en feil, som _skriv i
+    SqliteMinlistelager. En IntegrityError blir UgyldigNotat."""
+
+    def __init__(self, tilkobling: sqlite3.Connection):
+        self._tilkobling = tilkobling
+
+    def __enter__(self) -> None:
+        if self._tilkobling.in_transaction:
+            raise RuntimeError(
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
+            )
+        self._tilkobling.execute("BEGIN")
+
+    def __exit__(self, slag, feil, spor) -> bool:
+        if slag is None:
+            self._tilkobling.execute("COMMIT")
+            return False
+        if self._tilkobling.in_transaction:
+            self._tilkobling.execute("ROLLBACK")
+        if isinstance(feil, sqlite3.IntegrityError):
+            raise UgyldigNotat(f"notatet ble avvist av basen: {feil}") from feil
+        return False
 
 
 def andre_aksjer_har_ki_rad(tilkobling: sqlite3.Connection, dato: date, symbol: str) -> bool:

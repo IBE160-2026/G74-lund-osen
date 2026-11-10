@@ -1314,7 +1314,11 @@ HOEYDE_PAA_BILDET = 1864
 # Story 8.9: «Vis meg rundt» på hver side (hjelpetekster.py, _ramme.html, _rundtur.html, malene og
 # stil.css). Flettingen av main (med 2.4, 2.6, 8.14 og 8.7) inn i 8.9: avtrykkene er regnet ut paa nytt,
 # og bildene er tatt paa nytt.
-AVTRYKK_BAK_BILDET = "428ff85fb553f804e9dcc269cd3e855383b7561bcfca6b74d980d8c267088246"
+# Story 8.21: avtrykkene er regnet ut paa nytt (stilarket, 0012, notater.py og etterpaa.py). Alle
+# bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene, og var byte for byte de samme.
+# Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
+# Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_BILDET = "9a94d49e682c0d9e989363163801d445a43cff7376e875ef07740f5ddaf1fee3"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1379,6 +1383,9 @@ FILENE_BAK_AKSJESIDEN = (
     "src/migrering.py",
     # Story 8.3: porten for Min liste, som lagring_sqlite importerer.
     "src/minliste.py",
+    # Story 8.21: porten for notatene, som lagring_sqlite importerer, og «Etterpå».
+    "src/notater.py",
+    "src/etterpaa.py",
     # Story 3.4h: app.py importerer sidene for selskapene i demoen.
     "src/investorsider.py",
     *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
@@ -1744,7 +1751,11 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 8.7: båndet og volumet i kursgrafen (graf.py, aksjedetalj.py, signalberegning.py, aksje.html og
 # stil.css). Flettingen av main (med 2.4, 2.6 og 8.14) inn i 8.7: avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "6819e8696b2b2db203ae0cb33e6b9766bb9a949d971d1c6e49dfc074615b9a94"
+# Story 8.21: regnet ut paa nytt med notatene. Bildet slutter ved «Signalet forklart», over
+# «Mine notater», og var byte for byte det samme (gjennomgangen, VG6).
+# Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
+# Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "14bc9836cbdec032805aa1b4f7c20623c0ddbc09f0e96728710a2071b29dbda3"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1768,6 +1779,8 @@ SLIK_TAS_AKSJESIDEN = (
 # over periodeknappene, som står 632 px ned.
 FILENE_BAK_BOERSOMETERET = (*FILENE_BAK_AKSJESIDEN, "src/boersometer.py", "src/templates/boersometer.html")
 FILENE_BAK_MIN_LISTE = (*FILENE_BAK_AKSJESIDEN, "src/templates/index.html")
+# Story 8.21: Innstillinger med bryteren «Notater».
+FILENE_BAK_INNSTILLINGER = (*FILENE_BAK_AKSJESIDEN, "src/templates/innstillinger.html")
 # Gruppens ønske 08.11 kl. 23:59 (story 3.4h): investorsiden for BRFE i demoen,
 # med tegningen og boblen. demo.py gir navnene (DEMOUNIVERS).
 FILENE_BAK_INVESTORSIDEN = (
@@ -1810,6 +1823,14 @@ DE_NYE_BILDENE = {
     # Flettingen av 2.12 inn i 8.11: 1216 som i 8.11, med «Start fra en ferdig liste».
     # Story 8.11b: 1432, med de ni ferdige listene i demoen.
     "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1432, FILENE_BAK_MIN_LISTE),
+    # Story 8.21 (tillegg 2, gruppens svar 10.11 kl. 15:57): «Mine notater» på
+    # aksjesiden for BRFE og samlet i Min liste, bare delen (id-en
+    # mine-notater), klippet ut med 16 px over og under, og Innstillinger med
+    # bryteren «Notater», hele siden.
+    "docs/appen/notatene-brfe-demo.png": ("/aksje/BRFE", 1280, 942, FILENE_BAK_AKSJESIDEN),
+    "docs/appen/notatene-min-liste-demo.png": ("/min-liste", 1280, 1182, FILENE_BAK_MIN_LISTE),
+    # Flettingen av main (8.9) inn i 8.21: 1062, med «Vis meg rundt» øverst. Var 1021.
+    "docs/appen/innstillinger-demo.png": ("/innstillinger", 1280, 1062, FILENE_BAK_INNSTILLINGER),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1908,14 +1929,17 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "428ff85fb553f804e9dcc269cd3e855383b7561bcfca6b74d980d8c267088246",
-    "docs/appen/boersometeret-demo.png": "3015fbc4466484c20198e51c2f27875c71717b256e91b4cb22b213b3a691db21",
-    "docs/appen/min-liste-demo.png": "3134bfe39119a3aa3074a39262a5490437eb9d15d603a23b774a3523ca472567",
-    "docs/appen/oversikten-390-demo.png": "428ff85fb553f804e9dcc269cd3e855383b7561bcfca6b74d980d8c267088246",
-    "docs/appen/boersometeret-390-demo.png": "3015fbc4466484c20198e51c2f27875c71717b256e91b4cb22b213b3a691db21",
-    "docs/appen/din-egen-liste-demo.png": "3134bfe39119a3aa3074a39262a5490437eb9d15d603a23b774a3523ca472567",
-    "docs/appen/investorsiden-brfe-demo.png": "e8acd47948fab59ce33e694fe498e347512a17155539f97bb90cccd97da6b704",
-    "docs/appen/investorsiden-brfe-390-demo.png": "e8acd47948fab59ce33e694fe498e347512a17155539f97bb90cccd97da6b704",
+    TOPPEN_AV_OVERSIKTEN: "9a94d49e682c0d9e989363163801d445a43cff7376e875ef07740f5ddaf1fee3",
+    "docs/appen/boersometeret-demo.png": "e8be6754aa7d20542c77ad724fbbe0a159b8b48c33372da7c74e560679de3b58",
+    "docs/appen/min-liste-demo.png": "f8158a9a6cfb9e0f4e2083e9de0074d1c799d2582a9530f0640ac478107457ec",
+    "docs/appen/oversikten-390-demo.png": "9a94d49e682c0d9e989363163801d445a43cff7376e875ef07740f5ddaf1fee3",
+    "docs/appen/boersometeret-390-demo.png": "e8be6754aa7d20542c77ad724fbbe0a159b8b48c33372da7c74e560679de3b58",
+    "docs/appen/din-egen-liste-demo.png": "f8158a9a6cfb9e0f4e2083e9de0074d1c799d2582a9530f0640ac478107457ec",
+    "docs/appen/investorsiden-brfe-demo.png": "2ebc420d2a5c2b6a79a1885aa553a55c0aefce7ba1ccc5635a1de7e157a449b4",
+    "docs/appen/investorsiden-brfe-390-demo.png": "2ebc420d2a5c2b6a79a1885aa553a55c0aefce7ba1ccc5635a1de7e157a449b4",
+    "docs/appen/notatene-brfe-demo.png": "14bc9836cbdec032805aa1b4f7c20623c0ddbc09f0e96728710a2071b29dbda3",
+    "docs/appen/notatene-min-liste-demo.png": "f8158a9a6cfb9e0f4e2083e9de0074d1c799d2582a9530f0640ac478107457ec",
+    "docs/appen/innstillinger-demo.png": "b7927659fde27b352963f09bbc73a54631a9e0c1536481492b81e7baa09d176b",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3574,7 +3598,8 @@ class TestReadmeForNybegynnere:
         # for skjermbildene, som staar der. Gruppens ønske 09.11 kl. 22:01: 41
         # med investorsiden ved 390 px i punktet for docs/appen/.
         # Flettingen av de fem storyene 10.11: «Din egen liste» og investorsiden ved 1280 px (regel 19).
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 43, lenker
+        # Story 8.21 (tillegg 2): 46, med de tre nye bildene i docs/appen/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 46, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -4031,7 +4056,8 @@ AVTRYKK_I_PILENE = {
     # punktet for docs/appen/. Var 2b262698....
     # Flettingen av de fem storyene 10.11 (regel 19): «Din egen liste» og
     # investorsiden ved 1280 px i punktet for docs/appen/. Var bea5b6e1....
-    "Mappestruktur": "cd526f3e2bd6148bfebb83b15c9f34d90886388f6803ac98e3ebf3f9f03e7e70",
+    # Story 8.21 (tillegg 2): og de tre nye bildene. Var cd526f3e....
+    "Mappestruktur": "e4171fa95aba3be40915855c4d57d6189e96f36db42225c10780cf44f8c11322",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye

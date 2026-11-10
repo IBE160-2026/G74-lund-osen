@@ -715,7 +715,7 @@ class TestMaalingene0004:
 
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 11
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 12
 
             assert kolonner(tilkobling, "vurdering")[-4:] == list(MAALINGENE)
             assert tilkobling.execute(
@@ -754,7 +754,7 @@ class TestMaalingene0004:
         try:
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 11
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 12
         finally:
             tilkobling.close()
         ny = sqlite3.connect(tmp_path / "v3.db")
