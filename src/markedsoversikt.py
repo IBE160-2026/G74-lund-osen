@@ -19,6 +19,7 @@ from zoneinfo import ZoneInfo
 
 import boersdag
 from boersdag import UtenforKalenderen
+from justeringsdager import er_justeringsdag
 from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, nodvendige_dager
@@ -181,6 +182,9 @@ class Rad:
     # Story 8.17b: linja under i Min liste, dagen man sammenligner med
     # («Sammenlign med», beslutningen 08.10 kl. 21:48). None uten.
     under: "Rad | None" = None
+    # Story 2.6 (FR-407): endringen for dagen er fra en justeringsdag, så
+    # sluttkursen og endringen stemmer ikke helt. Usann for en periode.
+    justeringsdag: bool = False
 
     @property
     def vurdering(self) -> Vurdering | None:
@@ -261,7 +265,8 @@ def med_perioden(rader: list[Rad], serier: dict[str, list[Kursrad]], start: date
     for rad in rader:
         utfall = periodeendring(serier.get(rad.aksje.symbol, []), start, rad.dato)
         endring, fra = utfall if utfall is not None else (None, None)
-        nye.append(replace(rad, endring_prosent=endring, fra=fra))
+        # Story 2.6: merket gjelder endringen for én dag, ikke perioden.
+        nye.append(replace(rad, endring_prosent=endring, fra=fra, justeringsdag=False))
     return sorted(nye, key=_sorteringsnokkel)
 
 
@@ -298,6 +303,7 @@ def bygg_rad_for_dag(
         tekst=tekst,
         sist_hentet=post.hentet,
         annen_dag=True,
+        justeringsdag=paa_dagen is not None and len(foer) >= 2 and er_justeringsdag(foer[-2], foer[-1]),
         tre_av_tre_siste=tre_av_tre_siste,
     )
 
@@ -387,6 +393,7 @@ def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD, antall_da
         tekst=tekst,
         skiller_seg_ut=styrke is not None and styrke >= p.terskel,
         sist_hentet=post.hentet,
+        justeringsdag=len(rader) == 2 and er_justeringsdag(*rader),
     )
 
 

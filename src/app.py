@@ -66,6 +66,7 @@ from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maane
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
+from justeringsdager import justeringsdager
 from ki_visning import (
     AV,
     DAGEN_AV,
@@ -1303,7 +1304,12 @@ def aksjedetalj(symbol: str):
     # Story 8.2c: den brede og den smale grafen av de samme valgene
     # (gjennomgangen, BH6).
     signal, signal_fra = _signaldagene(rader, vurderingene)
+    # Story 8.14 (FR-407): justeringsdagene det siste året til dagen siden
+    # viser, regnet av kursserien alene. Grafen får alle dagene i serien og
+    # merker dem den har (gjennomgangen, BH1).
+    justeringer = justeringsdager(rader, til=slutt)
     grafvalg = dict(
+        justeringer=justeringsdager(rader),
         indeks=indeks,
         merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
         merket=dagen.dato if dagen else None,
@@ -1322,6 +1328,7 @@ def aksjedetalj(symbol: str):
             graf_smal=bygg_graf(detalj.punkter, smal=True, **grafvalg),
             # Story 8.8: dagen markeringene starter.
             signal_fra=signal_fra,
+            justeringer=justeringer,
             valg=valg,
             dagen=dagen,
             # Story 8.16b: merket øverst bare for en dag før siste børsdag.
