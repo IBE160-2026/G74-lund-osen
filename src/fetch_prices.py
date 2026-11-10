@@ -1875,6 +1875,14 @@ def main(argv: list[str] | None = None) -> None:
         ),
     )
     parser.add_argument(
+        "--med-bonuskvoten",
+        action="store_true",
+        help=(
+            "sammen med --maal-omsetning: mål bare aksjene uten en måling i basen, med kallene som er igjen "
+            "av dagens og så bonuskvoten, og stopp før den er under 200 (story 2.13b, for kjøringen 10.11)"
+        ),
+    )
+    parser.add_argument(
         "--les-boerslista",
         action="store_true",
         help=(
@@ -1883,6 +1891,8 @@ def main(argv: list[str] | None = None) -> None:
         ),
     )
     argumenter = parser.parse_args(argv)
+    if argumenter.med_bonuskvoten and not argumenter.maal_omsetning:
+        parser.error("--med-bonuskvoten gjelder bare sammen med --maal-omsetning")
     if argumenter.les_boerslista:
         # Story 2.12, spørsmål 2: ingen kall, bare fila fra malinger.md §40.
         import omsetning
@@ -1905,6 +1915,7 @@ def main(argv: list[str] | None = None) -> None:
                 hent=hent_ett_symbol,
                 les_kvote=hent_kvote,
                 klokke=naa,
+                med_bonus=argumenter.med_bonuskvoten,
             )
         )
     if argumenter.les_inn is not None:
