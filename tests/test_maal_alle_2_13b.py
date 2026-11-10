@@ -155,8 +155,27 @@ class TestKontrollenFoerHvertKall:
         assert kvote.kall == ["NYA.OL"] and kvote.bonus == BONUSGULV
         assert "neste kall ville gitt under 200" in ut
         assert _symbolene_i_basen() == ["NYA"]
-        # Gjennomgangen (BH3, ECH6): det extraLimit sank under kallet, ikke
-        # forskjellen fra starten.
+        assert "Kall fra bonuskvoten: 3." in ut
+
+    def test_kallene_fra_bonusen_telles_uten_det_andre_bruker_mellom_kallene(self, tmp_path):
+        """BH3, ECH6 og VG3. Ville feilet hvis linja talte forskjellen fra
+        starten: noe annet bruker 5 fra bonusen mellom det foerste og det andre
+        kallet, og valget tok selv 3."""
+        _fyll(BOERSDAG)
+        kvote = Kvote(brukt=20, bonus=BONUSGULV + 10)
+        ekte_les = kvote.les
+        lest = []
+
+        def les(nokkel):
+            lest.append(1)
+            if len(lest) == 4:
+                kvote.bonus -= 5
+            return ekte_les(nokkel)
+
+        kvote.les = les
+        kode, ut = _kjoer(tmp_path, kvote, ["NYA", "NYB", "NYC"])
+        assert kode == 0, ut
+        assert len(kvote.kall) == 3 and kvote.bonus == BONUSGULV + 2
         assert "Kall fra bonuskvoten: 3." in ut
 
     def test_stopper_naar_bonusen_er_under_200_etter_et_kall(self, tmp_path):
