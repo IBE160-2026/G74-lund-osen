@@ -23,6 +23,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 6. **«+0,1 % MNOK» på «Følg en aksje».** Siden fra 2.12 viste omsetningen med slaget for målingene, med fortegn og %. Funnet under byggingen. *Forslag:* rettet i en egen commit i samme PR (`e5d456a2`), med et nytt slag `mnok` i `tallformat.py` (regel 21) og en test. Rettingen følger med i natt, ellers står feilen i 2.12 etter flettingen kl. 23:50.
 7. **Samspillet med de lave funnene.** BH4/ECH4 i 8.11b (`max(dato)` over hele `kurs` og én spørring per aksje) rettes i PR-en for de lave funnene, i `_aksjene_i_lista`. *Forslag:* 8.11c endrer ikke `_aksjene_i_lista`, men kaller den fra en ny funksjon, `medianene()`, nederst i `ferdige_lister.py`, så de to PR-ene endrer ulike deler av fila og kan flettes etter hverandre i natt.
 
+*Svar 2026-11-09 kl. 17:37 (gruppens svar):* alle sju forslagene er godtatt, og BH3 lukkes med spørsmål 5. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`, og storyen står i `epics.md` etter 8.11.
+
 ## Intent
 
 **Problem:** Merket «Utenfor målingen» fra 2.12 leser den siste målingen i `omsetning`, mens de ferdige listene i 8.11b regner medianen av kursene for aksjene appen henter. En egen aksje kunne stå som ikke målt i tabellen og med en median i den ferdige lista (ECH2 i 8.11b).
@@ -72,6 +74,7 @@ Diffen `78a45186..a1914c9b`: Blind Hunter med bare diffen, uten `tests/test_dock
 - *VG1, rettet.* Rettingen av «+0,1 % MNOK» var bare testet i søket. Nå også for en valgt aksje (`ca. 0,1 MNOK om dagen`).
 - *VG2, rettet.* Spørsmål 5 var ikke testet. Nå `test_en_aksje_i_lista_uten_kurser_bruker_ikke_maalingen`.
 - *BH3, står med spørsmål 5.* En aksje i lista uten kurser i vinduet står som «ikke målt ennå», også med en måling i 2.13. En aksje som er tatt ut og ikke har kurser i vinduet, er ikke regnet av kursene og bruker målingen, så den delen av funnet holder ikke.
+- *BH3, lukket 2026-11-09 med spørsmål 5* (gruppens svar kl. 17:37), middels som før (regel 25): forslaget i spørsmål 5 er godtatt.
 - *BH2, ikke reelt.* Er `regnet` ikke tom, har `_aksjene_i_lista` alt lest en dato (Edge Case Hunter kontrollerte det samme). Dagen leses nå per aksje og tåler at den mangler.
 
 **Lav**
