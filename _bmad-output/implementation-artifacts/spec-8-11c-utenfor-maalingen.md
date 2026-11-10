@@ -2,7 +2,7 @@
 title: 'Story 8.11c: «Utenfor målingen» med medianen av kursene'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '78a45186'
 context:
@@ -81,3 +81,5 @@ Diffen `78a45186..a1914c9b`: Blind Hunter med bare diffen, uten `tests/test_dock
 - *Rettet:* BH5 (teksten bak merket bruker `tall(…, "mnok")`, regel 21), BH6 (omsetningen leses én gang per rad), BH8 (hjelpen sier aksjens siste dag, at en aksje i lista uten kurser står som ikke målt, og at en aksje som venter, har målingen), BH9 og ECH5 (testen av `mnok` står for seg, med null og avrundingen), BH10 (`test_begge_uten_merket` og dagen for en aksje som er tatt ut), VG3 (den andre linja på «Følg en aksje»), VG4 (en base uten tabellene).
 - *Ført:* BH7 (ordene «regnet av kursene til» står i malen og i `utenfor_tekst`), ECH3 (spørsmål 2 sier at en aksje som venter, har målingen fordi den ikke er i `aksje`; en aksje som er tatt ut og følges på nytt, står i `aksje` og bruker medianen av kursene mens den venter, som i de ferdige listene), ECH4 (en feil i basen gir stille målingen; `lister()` gjør det samme, så de er enige), VG5 (en aksje som følges på nytt, er ikke testet), VG6 (merket på aksjesiden og i børsometeret kommer fra samme context processor og er ikke testet på nytt).
 - **Mutantene for rettingene** på `ec21d3fd`, med kopi før og fila lik HEAD etterpå: BH1 (dagen er basens siste dag) fanget av `test_dagen_er_aksjens_siste_dag_med_kurser`. BH4 (`_egne()` uten bufferen) og BH5 (teksten regner tallet selv) overlevde, fordi ingen test talte utregningene eller hadde en median over 1000 MNOK. Nå `TestEnGangPerSide` og `test_teksten_med_tusenskille`, og begge mutantene ble fanget.
+
+*Lagt til 2026-11-10:* 8.11c er flettet med PR #131 i `d12301a8` kl. 01:29, låst til head-en `a1eb278f`, etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md` og gruppens svar 09.11 kl. 17:37. Main, med 8.11 og 8.11b og README-en, ble flettet inn i `a1eb278f` uten konflikter, og diffen mot main er endringene grenen hadde mot `78a45186`. Main hadde ikke endret sidene siden `78a45186`, og avtrykkene i `tests/test_docker.py` besto, så bildene er ikke tatt på nytt. Hele settet alene i fire deler 01:13:39–01:25:28: 4814 bestått, 24 hoppet over og 0 feilet, til sammen de 4838 som `pytest --collect-only` finner. CI var grønn på head-en (run 42728220170). Treet på main etter `git pull --ff-only` er likt treet på `a1eb278f`. Ingen funn på middels eller over sto åpne.
