@@ -33,8 +33,14 @@ def _rader(html: str, synlige: bool = True) -> list[str]:
 
 
 def _forslagene(html: str) -> list[str]:
+    """Tickerne i forslagskortet som vises. Gjennomgangen (BH10): et skjult
+    forslag telles ikke."""
     del_ = html.split('<section class="forslagene"', 1)[1].split("</section>", 1)[0]
-    return re.findall(r'href="/folg\?kode=([A-Z0-9]+)', del_)
+    return [
+        re.search(r'href="/folg\?kode=([A-Z0-9]+)', li).group(1)
+        for li in re.findall(r"<li class=\"foelgbar\"[^>]*>.*?</li>", del_, re.S)
+        if " hidden>" not in li.split("\n", 1)[0]
+    ]
 
 
 class TestLista:
@@ -64,17 +70,24 @@ class TestLista:
         «ikke målt ennå»."""
         maal(stier[1], [("NYA", 50e6), ("NYB", 10e6)])
         html = _side(klient)
-        rad_c = html.split('data-sok="nyc ny c asa"', 1)[1].split("</li>", 1)[0]
+        rad_c = html.split('data-kode="nyc" data-navn="ny c asa"', 1)[1].split("</li>", 1)[0]
         assert "ikke målt ennå" in rad_c and '<a class="knapp" href="/folg?kode=NYC"' in rad_c
         assert ">Følg</a>" in rad_c
-        rad_a = html.split('data-sok="nya ny aksje asa"', 1)[1].split("</li>", 1)[0]
+        rad_a = html.split('data-kode="nya" data-navn="ny aksje asa"', 1)[1].split("</li>", 1)[0]
         assert "ca. 50,0 MNOK om dagen, målt 22.10</span>" in rad_a and "Utenfor målingen" not in rad_a
-        rad_b = html.split('data-sok="nyb ny b asa"', 1)[1].split("</li>", 1)[0]
+        rad_b = html.split('data-kode="nyb" data-navn="ny b asa"', 1)[1].split("</li>", 1)[0]
         assert "Utenfor målingen" in rad_b and "</svg>Helse</span>" in rad_b
 
-    def test_bytt_ut_bruker_den_samme_lista(self, klient):  # noqa: F811
-        html = _side(klient, "/folg?bytt=DNB")
+    def test_bytt_ut_bruker_den_samme_lista(self, klient, stier):  # noqa: F811
+        """Ville feilet hvis «Bytt ut» mistet byttet i en rad, i forslagene
+        eller i filterskjemaet (gjennomgangen, VG10)."""
+        maal(stier[1], [("NYA", 50e6)])
+        html = _side(klient, "/folg?bytt=DNB&bransje=Kraft")
         assert '<a class="knapp" href="/folg?kode=NYA&amp;bytt=DNB" aria-label="Bytt inn Ny Aksje ASA">' in html
+        forslag = html.split('<section class="forslagene"', 1)[1].split("</section>", 1)[0]
+        assert 'href="/folg?kode=NYA&amp;bytt=DNB"' in forslag
+        skjema = html.split('<form class="folgfilter"', 1)[1].split("</form>", 1)[0]
+        assert '<input type="hidden" name="bytt" value="DNB">' in skjema
 
     def test_hjelpen_ved_spoersmaalstegnet(self, klient):  # noqa: F811
         """Ville feilet hvis «?» manglet, eller hjelpen ikke sa at forslagene
@@ -111,6 +124,18 @@ class TestFilteret:
         assert _rader(_side(klient, "/folg?omsetning=over")) == ["NYA"]
         assert _rader(_side(klient, "/folg?omsetning=under")) == ["NYB"]
         assert _rader(_side(klient, "/folg?omsetning=ikke")) == ["NYC", "NYD"]
+
+    def test_forslagene_skjules_ikke_av_soeket_eller_omsetningen(self, klient, stier):  # noqa: F811
+        """Gjennomgangen (BH1, ECH1, VG7): ville feilet hvis forslagene i valgt
+        bransje ble skjult av et søk eller et filter på omsetning, så kortet
+        sto med overskriften og uten aksjer."""
+        maal(stier[1], [("NYA", 50e6), ("NYC", 40e6), ("NYD", 20e6)])
+        for adresse in (
+            "/folg?bransje=Kraft&q=zzz",
+            "/folg?bransje=Kraft&omsetning=ikke",
+            "/folg?bransje=Kraft&omsetning=under",
+        ):
+            assert _forslagene(_side(klient, adresse)) == ["NYA", "NYC", "NYD"], adresse
 
 
 class TestForslagene:
@@ -157,21 +182,48 @@ class TestFunksjonene:
         assert filtrer(rader, "", "Kraft", "under") == [self.B]
         assert filtrer(rader, "", "", "ikke") == [self.C]
         assert filtrer(rader, " ", "", "") == rader
+        # Gjennomgangen (BH5, ECH7): ticker og navn hver for seg, som skriptet.
+        assert filtrer(rader, "a al", "", "") == []
+
+    def test_grensen_er_32_mnok_som_merket(self):
+        """Gjennomgangen (BH6, VG7): ville feilet hvis en aksje på nøyaktig 32
+        MNOK sto under «Over» med merket, eller filteret og merket regnet
+        grensen ulikt."""
+        paa = Foelgbar("PP", "På grensen", "Kraft", 32e6, date(2026, 10, 22), False)
+        under = Foelgbar("UU", "Under", "Kraft", 32e6 - 1, date(2026, 10, 22), False)
+        assert filtrer([paa, under], "", "", "over") == [paa] and not paa.utenfor
+        assert filtrer([paa, under], "", "", "under") == [under] and under.utenfor
+
+    def test_norsk_alfabet(self):
+        """Gjennomgangen (ECH8): ville feilet hvis Å sto foran Æ og Ø, eller
+        Æ, Ø og Å foran Z."""
+        from ferdige_lister import _norsk
+
+        assert sorted(["Å", "Ø", "Z", "Æ", "A"], key=_norsk) == ["A", "Z", "Æ", "Ø", "Å"]
 
     def test_forslagene_uten_bransje_er_ingen(self):
+        """Spørsmål 7: ville feilet hvis det var forslag uten valgt bransje,
+        eller en aksje uten måling ble foreslått (VG10)."""
         assert forslagene([self.A, self.B, self.C], "") == []
         assert forslagene([self.A, self.B, self.C], "Kraft") == [self.A, self.B]
 
 
 def test_skriptet_filtrerer_paa_det_samme_som_serveren():
-    """Spørsmål 8: ville feilet hvis skriptet lette i noe annet enn
-    data-sok (ticker og navn med små bokstaver), som serveren lager."""
+    """Spørsmål 8: ville feilet hvis skriptet lette i noe annet enn data-kode
+    og data-navn hver for seg (små bokstaver, som serveren lager), ikke
+    filtrerte mens man skriver, ikke skjulte radene, eller sendte skjemaet
+    ved et piltrykk (gjennomgangen, BH4, ECH2, VG1). Det kjøres ikke i en
+    nettleser i testene; bildene er tatt med skriptet i Edge."""
     js = (ROT / "src" / "static" / "hjelp.js").read_text(encoding="utf-8")
     del_ = js.split("Story 8.22", 1)[1]
-    assert 'querySelector("input[data-folgsok]")' in del_ and "rad.dataset.sok.includes(tekst)" in del_
+    assert 'querySelector("input[data-folgsok]")' in del_
+    assert "rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst)" in del_
+    assert 'felt.addEventListener("input", filtrer)' in del_ and "rad.hidden = !med" in del_
     assert "toLowerCase()" in del_ and 'getElementById("antall-vist")' in del_
+    assert 'addEventListener("pointerdown"' in del_ and "if (klikk) felt.form.submit()" in del_
+    assert 'addEventListener("keydown"' in del_ and "requestSubmit" not in del_
     mal = (ROT / "src" / "templates" / "folg.html").read_text(encoding="utf-8")
-    assert "data-sok=\"{{ (a.kode ~ ' ' ~ a.navn)|lower }}\"" in mal and "data-folgsok" in mal
+    assert 'data-kode="{{ a.kode|lower }}" data-navn="{{ a.navn|lower }}"' in mal and "data-folgsok" in mal
 
 
 class TestDemoen:
@@ -207,7 +259,7 @@ class TestDemoen:
         html = _side(k)
         alle = _rader(html)
         assert len(alle) == len(demo.DEMOBOERSEN) == 12
-        assert f'<span id="antall-alle">{len(alle)}</span> aksjer på Oslo Børs kan følges.' in html
+        assert f'<span id="antall-alle">{len(alle)}</span> aksjer på Demo Børs kan følges.' in html
         assert 'class="eksempeltall"' in html and "Eksempeltall: oppdiktede selskaper" in html
         assert "ikke målt ennå" in html
         kraft = _side(k, "/folg?bransje=Kraft")
@@ -218,15 +270,20 @@ class TestDemoen:
         assert _rader(_side(k, "/folg?q=fjord")) == ["FJHE"]
 
     def test_bare_oppdiktede_selskaper_i_demoen(self, tmp_path, monkeypatch):
-        """Ville feilet hvis en ekte ticker fra BRANSJE sto i «Følg en aksje»
-        eller i de ferdige listene i demoen."""
+        """Ville feilet hvis en ekte ticker fra BRANSJE, eller navnet på en av
+        de 15 ekte aksjene, sto i «Følg en aksje», forslagene, de ferdige
+        listene eller «Dine egne aksjer» i demoen (gjennomgangen, VG3)."""
         import demo
+        from kursdata import AKSJEUNIVERS
 
         oppdiktet = {s for s, _ in demo.DEMOBOERSEN} | {a.symbol for a in demo.DEMOUNIVERS}
         ekte = set(ferdige_lister.BRANSJE) - oppdiktet
         k = self._klient(tmp_path, monkeypatch)
-        for adresse in ("/folg", "/folg?bransje=Kraft", "/min-liste"):
+        sidene = ("/folg", "/folg?bransje=Kraft", "/folg?omsetning=ikke", "/folg?kode=HVLK", "/min-liste", "/")
+        for adresse in sidene:
             html = k.get(adresse).data.decode("utf-8").split("<main>", 1)[1]
+            for aksje in AKSJEUNIVERS:
+                assert aksje.navn not in html, (adresse, aksje.symbol)
             koder = set(re.findall(r"kode=([A-Z0-9]+)", html)) | set(
                 re.findall(r'<span class="linje">([A-Z0-9]+)', html)
             )

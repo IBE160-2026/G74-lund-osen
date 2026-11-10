@@ -356,9 +356,9 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
     Story 8.22 (spørsmål 3): bransjen er den faste i ferdige_lister.BRANSJE
     når aksjen står der, ikke den i ønsket, og en egen aksje i lista med en
     annen bransje i aksje får den faste. De 15 og aksjer som er tatt ut,
-    røres ikke."""
+    røres ikke. Et ønske om å følge MULTI eller SCOIN avvises (gjennomgangen, ECH4)."""
     # Inne i funksjonen, fordi ferdige_lister importerer valg.
-    from ferdige_lister import fast_bransje
+    from ferdige_lister import UTE, fast_bransje
 
     linjer: list[str] = []
     dag = dato.isoformat()
@@ -384,6 +384,14 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
                 tilkobling.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", (ut, symbol))
                 linjer.append(f"{symbol} er tatt ut av lista fra {ut}. Det som er lagret, står.")
             else:
+                # Gjennomgangen av 8.22 (ECH4): et ønske fra før 8.22 om å
+                # følge en aksje gruppen har tatt ut, avvises med grunnen.
+                if symbol in UTE:
+                    tilkobling.execute(
+                        "UPDATE oenske SET avvist = ? WHERE id = ?", (f"{dag}: kan ikke følges (story 8.22)", id_)
+                    )
+                    linjer.append(f"{symbol} er ikke tatt inn: aksjen kan ikke følges.")
+                    continue
                 i_lista = tilkobling.execute("SELECT count(*) FROM aksje WHERE ut IS NULL").fetchone()[0]
                 if i_lista >= TAK:
                     tilkobling.execute(

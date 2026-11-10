@@ -88,3 +88,25 @@ def test_demoen_viser_kortene_og_trenger_ingen_noekkel(tmp_path, monkeypatch):
     assert "Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri." in kortene[1]
     assert '<a class="knapp" href="#ferdige-lister">Velg en bransjeliste</a>' in kortene[2]
     assert 'id="ferdige-lister"' in html
+
+
+def test_kallene_i_steg_3_er_regnet_av_lista(klient, stier):  # noqa: F811
+    """Gjennomgangen (VG4): ville feilet hvis kallene i steg 3 sto fast i
+    malen. Med én egen aksje tatt inn er det 1 kall til den og 3 i margin."""
+    from datetime import date
+
+    import valg
+    from lagring_sqlite import aapne_base
+    from test_valg import lager
+
+    l = lager(stier[1])
+    l.folg("NYA", "Kraft")
+    l._t.close()
+    t = aapne_base(stier[1])
+    try:
+        valg.ta_i_bruk(t, date(2026, 9, 23))
+    finally:
+        t.close()
+    tredje = _kortene(klient.get("/min-liste").data.decode("utf-8"))[2]
+    assert "<li>15 kall: de 15 aksjene</li>" in tredje and "<li>1 kall: din egen aksje</li>" in tredje
+    assert "<li>3 kall: margin</li>" in tredje

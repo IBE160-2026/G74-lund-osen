@@ -184,22 +184,24 @@
 
 // Story 8.22 (spørsmål 8): søket i «Følg en aksje» mens man skriver. Alle
 // radene står i siden; skriptet skjuler dem som ikke har teksten i tickeren
-// eller navnet, og sier hvor mange som vises. Et nytt valg av bransje eller
-// omsetning sender skjemaet. Uten skriptet gjør knappen «Vis» det samme på
-// serveren (ferdige_lister.filtrer). Står her fordi sidene bare har ett
-// skript (8.0f), og gjelder bare siden med lista.
+// eller navnet (hver for seg, som ferdige_lister.filtrer, gjennomgangen BH5),
+// og sier hvor mange som vises. Uten skriptet gjør knappen «Vis» det samme på
+// serveren. Et klikk på en bransje eller en omsetning sender skjemaet; med
+// tastaturet flytter piltastene valget uten å laste siden, og «Vis» sender
+// det (gjennomgangen, BH4, ECH2, WCAG 3.2.2). Står her fordi sidene bare har
+// ett skript (8.0f), og gjelder bare siden med lista.
 (function () {
   const felt = document.querySelector("input[data-folgsok]");
   const lista = document.getElementById("foelgbare");
   if (!felt || !lista) return;
-  const rader = Array.from(lista.querySelectorAll("li[data-sok]"));
+  const rader = Array.from(lista.querySelectorAll("li[data-kode]"));
   const antall = document.getElementById("antall-vist");
   const ingen = document.getElementById("ingen-treff");
   function filtrer() {
     const tekst = felt.value.trim().toLowerCase();
     let vist = 0;
     for (const rad of rader) {
-      const med = !tekst || rad.dataset.sok.includes(tekst);
+      const med = !tekst || rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst);
       rad.hidden = !med;
       if (med) vist += 1;
     }
@@ -207,7 +209,17 @@
     if (ingen) ingen.hidden = vist > 0;
   }
   felt.addEventListener("input", filtrer);
-  for (const valg of felt.form.querySelectorAll("input[type=radio]")) {
-    valg.addEventListener("change", () => felt.form.submit());
+  let klikk = false;
+  for (const gruppe of felt.form.querySelectorAll("fieldset")) {
+    gruppe.addEventListener("pointerdown", () => {
+      klikk = true;
+    });
+    gruppe.addEventListener("keydown", () => {
+      klikk = false;
+    });
+    gruppe.addEventListener("change", () => {
+      if (klikk) felt.form.submit();
+      klikk = false;
+    });
   }
 })();

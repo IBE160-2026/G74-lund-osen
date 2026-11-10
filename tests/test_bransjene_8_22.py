@@ -97,6 +97,36 @@ class TestFoelg:
 
 
 class TestHentingen:
+    def test_et_gammelt_oenske_om_multi_avvises(self, stier, monkeypatch):  # noqa: F811
+        """Gjennomgangen (BH3, ECH3, ECH4): ville feilet hvis et ønske fra før
+        8.22 om å følge MULTI ble tatt inn med bransjen brukeren valgte, eller
+        MULTI kunne følges med en bransje i aksje."""
+        from datetime import date
+
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        med_boersen(base, [("MULTI", "Multi ASA")])
+        t = aapne_base(base)
+        try:
+            with t:
+                t.execute(
+                    "INSERT INTO oenske (handling, symbol, navn, sektor, laget) "
+                    "VALUES ('folg', 'MULTI', 'Multi ASA', 'Finans', '2026-11-09T12:00:00+00:00')"
+                )
+            linjer = valg.ta_i_bruk(t, date(2026, 9, 23))
+            assert "MULTI er ikke tatt inn: aksjen kan ikke følges." in linjer
+            assert t.execute("SELECT count(*) FROM aksje WHERE symbol = 'MULTI'").fetchone()[0] == 0
+            assert "kan ikke følges" in t.execute("SELECT avvist FROM oenske WHERE symbol = 'MULTI'").fetchone()[0]
+            monkeypatch.setattr(ferdige_lister, "BRANSJE", {})
+            assert ferdige_lister.bransjen(t, "MULTI") is None
+            t.execute(
+                "INSERT INTO aksje (symbol, ticker, navn, sektor) VALUES ('MULTI', 'MULTI.OL', 'Multi ASA', 'Finans')"
+            )
+            assert ferdige_lister.bransjen(t, "MULTI") is None
+            assert "MULTI" not in {a.kode for a in ferdige_lister.foelgbare(t, set(), {})}
+        finally:
+            t.close()
+
     def test_oensket_tas_i_bruk_med_den_faste_bransjen(self, stier):  # noqa: F811
         """Spørsmål 3: ville feilet hvis hentingen skrev bransjen fra ønsket,
         også for et ønske som ble laget før 8.22, med en annen bransje."""
@@ -136,6 +166,11 @@ class TestHentingen:
             assert t.execute("SELECT sektor FROM aksje WHERE symbol = 'DNB'").fetchone() == ("Finans",)
             assert linjer == ["NYA har fått bransjen Teknologi fra kontrollsjekken (var Kraft)."]
             assert valg.ta_i_bruk(t, date(2026, 9, 25)) == []
+            # Gjennomgangen (VG5): en egen aksje som er tatt ut, røres ikke.
+            t.execute("UPDATE aksje SET ut = '2026-09-26' WHERE symbol = 'NYA'")
+            monkeypatch.setitem(ferdige_lister.BRANSJE, "NYA", "Helse")
+            assert valg.ta_i_bruk(t, date(2026, 9, 27)) == []
+            assert t.execute("SELECT sektor FROM aksje WHERE symbol = 'NYA'").fetchone() == ("Teknologi",)
         finally:
             t.close()
 

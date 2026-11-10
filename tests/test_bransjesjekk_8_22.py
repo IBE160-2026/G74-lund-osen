@@ -42,16 +42,21 @@ def test_multi_og_scoin_er_ute_med_grunnen():
 
 
 def test_kildene_og_tallene():
-    """Ville feilet hvis antallet per kilde ikke stemte med forslagsfila
-    (87 sjekket 08.11, 157 forslag og 53 usikre, der 15 er de 15 i lista),
-    eller tabellen hadde en kolonne til, som selskapsnavnet."""
+    """Ville feilet hvis antallet per kilde ikke stemte med forslagsfila,
+    eller tabellen hadde en kolonne til, som selskapsnavnet. Forslagsfila
+    hadde 87 sjekket 08.11, 157 forslag og 53 usikre. I tabellen er det 87,
+    141 forslag og 15 av de 15 i lista (157 minus MULTI), og 52 usikre (53
+    minus SCOIN). Gjennomgangen (VG8, VG9): Kilde-kolonnen har bare de kjente
+    verdiene, så et navn der ville feilet."""
     rader = _tabellen()
     assert all(len(r) == 3 for r in rader)
-    kilder = Counter(k.split(":")[0] if k.startswith("tatt ut") else k for _, _, k in rader)
+    kilder = Counter(k.split(": ")[0] if k.startswith("tatt ut") else k for _, _, k in rader)
     assert kilder["sjekket 08.11 kl. 22:01 og 22:03"] == 87
     assert kilder["de 15 i lista, bransjen fra designregler.md §4"] == 15
     assert kilder["forslag, sjekket 10.11 kl. 14:43"] == 141
     assert kilder["forslag merket usikker, sjekket 10.11 kl. 14:43"] == 52
+    assert kilder["tatt ut 10.11 kl. 14:43"] == 1 and kilder["tatt ut 10.11 kl. 15:22, som 08.11 kl. 22:03"] == 1
+    assert sum(kilder.values()) == 297 and len(kilder) == 6
     tekst = SJEKKEN.read_text(encoding="utf-8")
     assert "`302e28433bf582ec9abad65ffde06c2dbcd533cd6130713990e2fa3ed0c6dec9`" in tekst
     assert re.search(r"^status: final$", tekst, re.M)

@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 
 from omsetningsregning import regn_ut, vindu
-from valg import BRANSJENE, OSLO, TAK, utenfor_maalingen
+from valg import BRANSJENE, GRENSE_MNOK, OSLO, TAK, utenfor_maalingen
 
 # Story 8.22 (gruppens svar 10.11 kl. 13:38, 14:43 og 15:22): alle aksjene i
 # lista over Oslo Børs, utenom MULTI og SCOIN, med bransjen fra kontrollsjekken
@@ -349,12 +349,22 @@ DEMOBRANSJE: dict[str, str] = {
 }
 assert set(BRANSJE.values()) <= set(BRANSJENE)
 assert set(DEMOBRANSJE.values()) <= set(BRANSJENE) and not set(DEMOBRANSJE) & set(BRANSJE)
+# Gjennomgangen av 8.22 (BH3, ECH3, ECH4): de to gruppen tok ut, kan ikke
+# følges, heller ikke med en bransje i aksje eller i et ønske fra før 8.22.
+UTE = frozenset({"MULTI", "SCOIN"})
+assert not UTE & set(BRANSJE)
 
 # Story 8.22 (spørsmål 6): filteret på omsetning i «Følg en aksje».
 OVER = "over"
 UNDER = "under"
 IKKE_MAALT = "ikke"
-OMSETNINGSFILTER = (("", "Alle"), (OVER, "Over 32 MNOK"), (UNDER, "Under 32 MNOK"), (IKKE_MAALT, "Ikke målt ennå"))
+# Gjennomgangen av 8.22 (BH7): grensen fra valg.GRENSE_MNOK, ikke skrevet inn.
+OMSETNINGSFILTER = (
+    ("", "Alle"),
+    (OVER, f"Over {GRENSE_MNOK:.0f} MNOK"),
+    (UNDER, f"Under {GRENSE_MNOK:.0f} MNOK"),
+    (IKKE_MAALT, "Ikke målt ennå"),
+)
 FORSLAG = 3
 
 
@@ -368,7 +378,10 @@ def bransjen(tilkobling: sqlite3.Connection | None, kode: str) -> str | None:
     """Story 8.22 (spørsmål 1): bransjen en aksje følges med. Den faste
     bransjen, ellers bransjen i aksje for en aksje appen følger eller har
     fulgt (de 15 i demoen, en aksje som er tatt ut). None: aksjen kan ikke
-    følges. Brukeren velger den aldri selv (svaret 10.11 kl. 13:38)."""
+    følges. Brukeren velger den aldri selv (svaret 10.11 kl. 13:38).
+    MULTI og SCOIN (UTE) kan aldri følges (gjennomgangen, BH3, ECH3)."""
+    if kode in UTE:
+        return None
     fast = fast_bransje(kode)
     if fast is not None or tilkobling is None:
         return fast
@@ -391,6 +404,13 @@ class Foelgbar:
     median: float | None
     dag: date | None
     kursene: bool
+
+    @property
+    def utenfor(self) -> bool:
+        """Merket «Utenfor målingen» i lista, med samme grense som filteret
+        (gjennomgangen, BH6). Ikke målt gir ikke merket her; raden sier
+        «ikke målt ennå»."""
+        return self.median is not None and utenfor_maalingen(self.median)
 
 
 def foelgbare(
@@ -420,7 +440,7 @@ def foelgbare(
         return []
     ut = []
     for kode, navn in boersen:
-        if kode in opptatt:
+        if kode in opptatt or kode in UTE:
             continue
         bransje = fast_bransje(kode) or (sektorer.get(kode) if sektorer.get(kode) in BRANSJENE else None)
         if bransje is None:
@@ -438,14 +458,24 @@ def foelgbare(
             except (TypeError, ValueError):
                 median, dag = None, None
         ut.append(Foelgbar(kode, navn, bransje, median, dag if median is not None else None, False))
-    ut.sort(key=lambda a: (a.navn.casefold(), a.kode))
+    ut.sort(key=lambda a: (_norsk(a.navn), a.kode))
     return ut
 
 
+# Gjennomgangen av 8.22 (ECH8): Æ, Ø og Å sist og i den rekkefølgen, som i
+# norsk alfabet. Kodepunktene gir Å foran Æ og Ø.
+_ALFABETET = str.maketrans({"æ": "{0", "ø": "{1", "å": "{2"})
+
+
+def _norsk(navn: str) -> str:
+    return navn.casefold().translate(_ALFABETET)
+
+
 def filtrer(rader: list[Foelgbar], tekst: str, bransje: str, omsetning: str) -> list[Foelgbar]:
-    """Story 8.22: søket (ticker eller navn, uten forskjell på store og små
-    bokstaver), bransjen og omsetningen (spørsmål 6). Det samme gjør
-    hjelp.js i nettleseren mens man skriver; dette er veien uten skript."""
+    """Story 8.22: søket (ticker eller navn, hver for seg og uten forskjell
+    på store og små bokstaver), bransjen og omsetningen (spørsmål 6). Det
+    samme gjør hjelp.js i nettleseren mens man skriver, med data-kode og
+    data-navn (gjennomgangen, BH5, ECH7); dette er veien uten skript."""
     tekst = tekst.strip().lower()
     ut = []
     for a in rader:

@@ -39,6 +39,9 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![«Din egen liste» i Min liste i demoen: de tre stegene som kort, med kallene lista bruker, «Bytt ut» ved hver aksje og de ferdige listene per bransje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
 *«Din egen liste» i Min liste i demoen, med de tre stegene som kort, kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én liste per bransje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
+![«Følg en aksje» i demoen med bransjen Kraft valgt: antallet, søket, filteret på bransje og målt omsetning, de mest omsatte i bransjen og alle som kan følges, med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/folg-en-aksje-demo.png)
+*«Følg en aksje» i demoen med Kraft valgt, med de mest omsatte i bransjen øverst, ordnet etter omsetningen og ikke etter kursen eller signalet, og «ikke målt ennå» der omsetningen ikke er målt, med oppdiktede selskaper («Eksempeltall»).*
+
 </details>
 
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)

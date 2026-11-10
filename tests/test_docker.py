@@ -1309,7 +1309,8 @@ HOEYDE_PAA_BILDET = 1864
 # de samme.
 # Story 8.22: _egne.html, app.py, valg.py, ferdige_lister.py, demo.py, hjelpetekster.py og stil.css.
 # Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
-AVTRYKK_BAK_BILDET = "074e0c00bf21c6941ed9e227cfc0ed3e7006960ab996ba9162a771c45a8a712e"
+# Gjennomgangen av 8.22: ferdige_lister.py, valg.py, stil.css og hjelp.js. Bildet er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "0e9590ad6918e5cc118bb313ce22769d8cdcee35b4a4d19f18768802551053ed"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1735,7 +1736,8 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 # Story 8.22: de samme filene. Bildet ble tatt paa nytt og er byte for byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "9968b383b0a0e91675bf2c2cdb532a03277c391dd06ecf3b569490fe7609dc00"
+# Gjennomgangen av 8.22: de samme filene. Bildet er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "0e9bd4033abe2aa0610fe17b96e4df8cfce68fdb6905eb3de4cfcad2827ca055"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1769,6 +1771,9 @@ FILENE_BAK_INVESTORSIDEN = (
     "src/static/investorsider/brfe.svg",
     "src/static/investorsider/bobler.json",
 )
+# Story 8.22 (gjennomgangen, VG2, og tillegget 10.11 kl. 17:16): «Følg en aksje»
+# med Kraft valgt i demoen, med forslagene, filteret og lista.
+FILENE_BAK_FOLG = (*FILENE_BAK_AKSJESIDEN, "src/templates/folg.html", "src/static/hjelp.js")
 TOPPEN_AV_OVERSIKTEN = "docs/appen/oversikten-topp-demo.png"
 DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
@@ -1802,6 +1807,8 @@ DE_NYE_BILDENE = {
     # Story 8.11b: 1432, med de ni ferdige listene i demoen.
     # Story 8.22: 1628, med de tre stegkortene og 11 ferdige lister i demoen.
     "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1628, FILENE_BAK_MIN_LISTE),
+    # Story 8.22: «Følg en aksje» i demoen med Kraft valgt, hele siden (1326 px), sist i knappen.
+    "docs/appen/folg-en-aksje-demo.png": ("/folg?bransje=Kraft", 1280, 1326, FILENE_BAK_FOLG),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1903,15 +1910,18 @@ DE_NYE_BILDENE = {
 # sju oppdiktede selskaper til i demoen (_egne.html, folg.html, app.py, valg.py, ferdige_lister.py,
 # demo.py, hjelpetekster.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen.
 # «Din egen liste» er ny (1628 px, med stegkortene og 11 ferdige lister); de andre er byte for byte de samme.
+# Gjennomgangen av 8.22: ferdige_lister.py, valg.py, folg.html, hjelp.js og stil.css, og det nye
+# bildet av «Følg en aksje» (VG2). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "074e0c00bf21c6941ed9e227cfc0ed3e7006960ab996ba9162a771c45a8a712e",
-    "docs/appen/boersometeret-demo.png": "80810ce6e7342862fa747cd2a1a58c4ba21d9da83374375dc5a63363082992cb",
-    "docs/appen/min-liste-demo.png": "c82f627a863d1541101057b1552b98f12a747639c29352e408e86f56713a4f93",
-    "docs/appen/oversikten-390-demo.png": "074e0c00bf21c6941ed9e227cfc0ed3e7006960ab996ba9162a771c45a8a712e",
-    "docs/appen/boersometeret-390-demo.png": "80810ce6e7342862fa747cd2a1a58c4ba21d9da83374375dc5a63363082992cb",
-    "docs/appen/din-egen-liste-demo.png": "c82f627a863d1541101057b1552b98f12a747639c29352e408e86f56713a4f93",
-    "docs/appen/investorsiden-brfe-demo.png": "dea8e83368a5c5534274ddd169ce91d0c3e609207fb2cf2b6fd6a08da52ff6a7",
-    "docs/appen/investorsiden-brfe-390-demo.png": "dea8e83368a5c5534274ddd169ce91d0c3e609207fb2cf2b6fd6a08da52ff6a7",
+    "docs/appen/folg-en-aksje-demo.png": "9ebf06aa8078511f10986d4e87756952c8a2d771bf7d91871d8f2e3270241d19",
+    TOPPEN_AV_OVERSIKTEN: "0e9590ad6918e5cc118bb313ce22769d8cdcee35b4a4d19f18768802551053ed",
+    "docs/appen/boersometeret-demo.png": "ee363218761888b60e8cf8cd6b722e79f113acc30226bd7d7dd28c0dddedaf04",
+    "docs/appen/min-liste-demo.png": "12415cd93df0c44271523baab3a88b705b2e78ff53d61c8da080397bd45053ea",
+    "docs/appen/oversikten-390-demo.png": "0e9590ad6918e5cc118bb313ce22769d8cdcee35b4a4d19f18768802551053ed",
+    "docs/appen/boersometeret-390-demo.png": "ee363218761888b60e8cf8cd6b722e79f113acc30226bd7d7dd28c0dddedaf04",
+    "docs/appen/din-egen-liste-demo.png": "12415cd93df0c44271523baab3a88b705b2e78ff53d61c8da080397bd45053ea",
+    "docs/appen/investorsiden-brfe-demo.png": "fa71f1244bb072129a65cbbd7e9e8f26f6afcee4b737a71c150da739ed23caea",
+    "docs/appen/investorsiden-brfe-390-demo.png": "fa71f1244bb072129a65cbbd7e9e8f26f6afcee4b737a71c150da739ed23caea",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
