@@ -1294,7 +1294,12 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av 8.11 (med 8.10b, svaret kl. 10:23 og main) inn i 8.11b: avtrykkene er regnet ut paa nytt,
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
-AVTRYKK_BAK_BILDET = "2363e01290051e8cc70260ac3da80ed506dc7ad98a2eff51610f73a33705ec1b"
+# Story 8.11c: app.py, valg.py, ferdige_lister.py, tallformat.py og folg.html. Avtrykkene er regnet
+# ut paa nytt, og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene.
+# Alle er byte for byte de samme.
+# Gjennomgangen av 8.11c: app.py, valg.py og ferdige_lister.py. Avtrykkene er regnet ut paa nytt, og
+# alle bildene er tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+AVTRYKK_BAK_BILDET = "3b2ddb844df97a542770799f0c80ca262bb4b70edc65711b47cf48f93f33bc95"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1719,7 +1724,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Flettingen av 8.11 (med 8.10b, svaret kl. 10:23 og main) inn i 8.11b: avtrykkene er regnet ut paa nytt,
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
-AVTRYKK_BAK_AKSJESIDEN = "07a676992a1f6eddcbf13c31bf5ef926c696f2731fd6d2d967eae143fe22fd21"
+AVTRYKK_BAK_AKSJESIDEN = "87077166fbdac78342ddda61d604b5e33febde7ba58d8dde83e4c662c84ea89f"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1877,13 +1882,13 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "2363e01290051e8cc70260ac3da80ed506dc7ad98a2eff51610f73a33705ec1b",
-    "docs/appen/boersometeret-demo.png": "f477e9f3195cddb727e62a7701992235d94a9649e98c2961642f8133d83e90b7",
-    "docs/appen/min-liste-demo.png": "ee2394c7aa1f0712cf868f12f7c1002636c5bc73bbb573410a2f24aea6025363",
-    "docs/appen/oversikten-390-demo.png": "2363e01290051e8cc70260ac3da80ed506dc7ad98a2eff51610f73a33705ec1b",
-    "docs/appen/boersometeret-390-demo.png": "f477e9f3195cddb727e62a7701992235d94a9649e98c2961642f8133d83e90b7",
-    "docs/appen/din-egen-liste-demo.png": "ee2394c7aa1f0712cf868f12f7c1002636c5bc73bbb573410a2f24aea6025363",
-    "docs/appen/investorsiden-brfe-demo.png": "13db4fcb1a9c40b3acb6eb36ce3ac67b6906ccc0ec05d060931804d8a8d107de",
+    TOPPEN_AV_OVERSIKTEN: "3b2ddb844df97a542770799f0c80ca262bb4b70edc65711b47cf48f93f33bc95",
+    "docs/appen/boersometeret-demo.png": "3715b2bbe6efbfc951c4b07160c92e97bd9ed0942ebc2f4570241eeeb4815f78",
+    "docs/appen/min-liste-demo.png": "4aa6e4a09cff608f0f335da8b1055e8b1448ba426a809a3fcf24154306cc210d",
+    "docs/appen/oversikten-390-demo.png": "3b2ddb844df97a542770799f0c80ca262bb4b70edc65711b47cf48f93f33bc95",
+    "docs/appen/boersometeret-390-demo.png": "3715b2bbe6efbfc951c4b07160c92e97bd9ed0942ebc2f4570241eeeb4815f78",
+    "docs/appen/din-egen-liste-demo.png": "4aa6e4a09cff608f0f335da8b1055e8b1448ba426a809a3fcf24154306cc210d",
+    "docs/appen/investorsiden-brfe-demo.png": "080b2747c592d0299c6e3b63f3ca23a9256efee8ef45aa6e89f22039dab15fc8",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

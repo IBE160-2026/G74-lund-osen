@@ -27,9 +27,9 @@
   {% elif valgt %}
     <p class="aksjetype">Aksje på Oslo Børs · {{ valgt.kode }}</p>
     {% if omsetning and omsetning.median is not none %}
-      <p class="omsetning">Median omsetning de 3 siste månedene: ca. {{ omsetning.median|tall('maaling') }} MNOK om dagen, målt {{ omsetning.maalt|dato }}.
+      <p class="omsetning">Median omsetning de 3 siste månedene: ca. {{ omsetning.median|tall('mnok') }} MNOK om dagen, {{ 'regnet av kursene til' if omsetning.kursene else 'målt' }} {{ omsetning.maalt|dato }}.
       {% if omsetning.utenfor %}Det er under de {{ grense|tall('heltall') }} MNOK signalet er målt på, så den merkes «Utenfor målingen».{% else %}Det er over de {{ grense|tall('heltall') }} MNOK signalet er målt på.{% endif %}</p>
-      {% if omsetning.utenfor %}<p>Median daglig omsetning de 3 siste månedene er {{ omsetning.median|tall('maaling') }} MNOK, målt {{ omsetning.maalt|dato }}. Signalet er målt på aksjer som omsettes for over {{ grense|tall('heltall') }} MNOK om dagen, og er ikke prøvd på en aksje som omsettes så lite.</p>{% endif %}
+      {% if omsetning.utenfor %}<p>Median daglig omsetning de 3 siste månedene er {{ omsetning.median|tall('mnok') }} MNOK, {{ 'regnet av kursene til' if omsetning.kursene else 'målt' }} {{ omsetning.maalt|dato }}. Signalet er målt på aksjer som omsettes for over {{ grense|tall('heltall') }} MNOK om dagen, og er ikke prøvd på en aksje som omsettes så lite.</p>{% endif %}
     {% else %}
       {#- Avvik fra utdraget (gjennomgangen, VG4, BH7): hentingen måler ikke
           omsetningen med det samme kallet, så teksten sier ikke det. #}
@@ -72,7 +72,7 @@
           {% for aksje in treff %}
             <li><a href="/folg?kode={{ aksje.kode }}{% if gammel %}&amp;bytt={{ gammel.symbol }}{% endif %}">{{ aksje.navn }}</a> <span class="linje">{{ aksje.kode }}</span>
               {#- Gjennomgangen (VG3): er omsetningen målt, står den i søket. #}
-              {% if aksje.median is not none %}<span class="linje">ca. {{ (aksje.median / mill)|tall('maaling') }} MNOK om dagen, målt {{ aksje.maalt|dato }}</span>{% if aksje.median < grense * mill %} <span class="utenformerke">Utenfor målingen</span>{% endif %}{% endif %}</li>
+              {% if aksje.median is not none %}<span class="linje">ca. {{ (aksje.median / mill)|tall('mnok') }} MNOK om dagen, {{ 'regnet av kursene til' if aksje.kursene else 'målt' }} {{ aksje.maalt|dato }}</span>{% if aksje.median < grense * mill %} <span class="utenformerke">Utenfor målingen</span>{% endif %}{% endif %}</li>
           {% endfor %}
         </ul>
       {% else %}
