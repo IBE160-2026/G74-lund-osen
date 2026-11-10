@@ -2,7 +2,7 @@
 title: 'Story 2.4: etterfylling av hull i kursserien'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '1a72810a'
 context:
@@ -122,3 +122,4 @@ Diffen `53c020ff..72aa38d4`: Blind Hunter med bare diffen (14 funn), og Edge Cas
 
 Ti mutanter mot `tests/test_etterfyllingen_2_4.py` og `tests/test_omsetning.py`, med kopi før og fila lik før og etter (sha256): de sju som overlevde i gjennomgangen og ikke er ført (M5, M6, M7, M8, M11, M12 og M4), og én for hver av BH3, ECH2 og ECH1. Alle ble fanget. M4 (KI-tekstene før indeksen) slo også av hentingen av indeksen, så den ble fanget av `test_en_senere_kjoering_samme_kveld_henter_den_med_ett_kall`; rekkefølgen prøves av `test_ki_tekstene_etter_indeksen_ogsaa_naar_den_stopper`. Vinduet ble lukket ved en feil kl. 16:42 midt i første kjøring av mutantene; ingen mutant ble liggende, og alle ti ble kjørt på nytt etterpå.
 
+*Lagt til 2026-11-10:* 2.4 er flettet med PR #133 i `2c1a17af` kl. 18:00, låst til head-en `07a3380f`, etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md` og gruppens svar 10.11 kl. 11:52, 15:30 og 17:43. Main ble flettet inn i `53c020ff`, og diffen mot main var endringene grenen hadde mot `1a72810a`. Avtrykkene i `tests/test_docker.py` besto, så bildene er ikke tatt på nytt. Hele settet alene i ni deler 17:46:07–18:00:29: 4869 bestått, 31 hoppet over og 0 feilet, til sammen de 4900 som `pytest --collect-only` finner. CI var grønn på head-en (run 42857890383). Treet på main etter `git pull --ff-only` er likt treet på `07a3380f`. Ingen funn på middels eller over sto åpne.
