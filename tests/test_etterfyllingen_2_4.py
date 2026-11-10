@@ -8,6 +8,8 @@ alt i K9 i test_fetch_prices.py (2.1b); her er resten av kontrollen.
 """
 
 import json
+import sqlite3
+import sys
 from datetime import date, datetime, timedelta, timezone
 from hashlib import sha256
 
@@ -371,3 +373,153 @@ class TestHovedindeksenAlene:
         assert kode == fp.KODE_BARE_INDEKSEN and kall == [feilet.ticker]
         kode, kall, _ = _kjoering(raa, base, _kl_22(FREDAG) + timedelta(minutes=60), _hent(FREDAG))
         assert kode == 0 and kall == [HOVEDINDEKS.ticker]
+
+
+def _kvote(brukt: int, dato: str = "2026-09-25", bonus: int = 463):
+    def les(_noekkel):
+        return {"apiRequests": brukt, "apiRequestsDate": dato, "dailyRateLimit": 20, "extraLimit": bonus}
+
+    return les
+
+
+class TestHovedindeksenAleneEtterGjennomgangen:
+    """Gjennomgangen 10.11 av svaret kl. 15:30 (Blind Hunter, Edge Case
+    Hunter og Verification Gap)."""
+
+    _kvelden_uten_indeksen = staticmethod(TestHovedindeksenAlene._kvelden_uten_indeksen)
+    SENERE = _kl_22(FREDAG) + timedelta(minutes=30)
+
+    def test_ett_kall_igjen_holder(self, stier):
+        """BH12: ville feilet hvis det trengtes mer enn ett kall igjen av
+        dagens (for eksempel igjen < 2)."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        kode, kall, _ = _kjoering(raa, base, self.SENERE, _hent(FREDAG), _kvote(19))
+        assert kode == 0 and kall == [HOVEDINDEKS.ticker]
+
+    def test_noekkelen_som_funksjon(self, stier):
+        """VG1: main gir nøkkelen som en funksjon. Ville feilet hvis den ikke
+        ble kalt før kvoten og kallet."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        sett = []
+
+        def les(noekkel):
+            sett.append(noekkel)
+            return nok_kvote(noekkel)
+
+        def hent(ticker, noekkel, *resten):
+            sett.append(noekkel)
+            return _hent(FREDAG)(ticker, noekkel, *resten)
+
+        fp.kjoer(raa, base, self.SENERE, lambda: NOEKKEL, hent, lambda _: None, les_kvote=les)
+        assert sett == [NOEKKEL, NOEKKEL]
+        assert FREDAG in _indeksdatoer(base)
+
+    def test_kvoten_fra_gaarsdagen_er_0_brukt_i_dag(self, stier):
+        """VG2 og regel 15: lørdag står apiRequestsDate på fredag med 20
+        brukt, og det er 0 brukt i dag i GMT. Ville feilet hvis datoen ikke
+        ble regnet i GMT for dagen kjøringen gjelder."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        kode, kall, _ = _kjoering(raa, base, LOERDAG_KL_12, _hent(FREDAG), _kvote(20, "2026-09-25"))
+        assert kode == 0 and kall == [HOVEDINDEKS.ticker]
+
+    @pytest.mark.parametrize(
+        "feilen",
+        [
+            requests.HTTPError("HTTP 401 Unauthorized"),
+            requests.HTTPError("HTTP 500 Internal Server Error"),
+            fp.UlesbarKvote("dailyRateLimit mangler"),
+        ],
+        ids=["401", "500", "ulesbar"],
+    )
+    def test_kvoten_som_ikke_kan_leses_gir_0_kall_og_ingen_krasj(self, stier, feilen):
+        """VG5: ville feilet hvis en avvist nøkkel, en annen HTTP-feil eller et
+        svar som ikke kan leses, ga et kall eller en krasj."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+
+        def les(_noekkel):
+            raise feilen
+
+        kode, kall, ut = _kjoering(raa, base, self.SENERE, _hent(FREDAG), les)
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == [] and "0 kall brukt" in ut
+
+    def test_raadet_foelger_grunnen(self, stier):
+        """BH3: ville feilet hvis utskriften ba om en ny kjøring når klokka
+        eller kvoten sa nei, eller ikke ba om den når kallet feilet."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+        _, _, ut = _kjoering(raa, base, self.SENERE, _hent(FREDAG), _kvote(20))
+        assert fp.VENT_PAA_INDEKSEN in ut and fp.PROEV_INDEKSEN_IGJEN not in ut
+        _, _, ut = _kjoering(raa, base, self.SENERE, _uten_indeksen(FREDAG))
+        assert fp.PROEV_INDEKSEN_IGJEN in ut and fp.VENT_PAA_INDEKSEN not in ut
+        assert "i kveld" not in fp.PROEV_INDEKSEN_IGJEN + fp.VENT_PAA_INDEKSEN
+
+    def test_ki_tekstene_etter_indeksen_ogsaa_naar_den_stopper(self, tmp_path, monkeypatch):
+        """VG3 og ECH2: ville feilet hvis KI-tekstene ble laget før indeksen
+        var hentet, eller ikke ble laget når nøkkelen mangler og hentingen av
+        indeksen stopper kjøringen."""
+        raa, base = tmp_path / "a" / "raa", tmp_path / "a" / "ose.db"
+        self._kvelden_uten_indeksen((raa, base))
+        kalt = []
+        monkeypatch.setattr(fp, "lag_ki_tekster", lambda b, d, *_a, **_k: kalt.append(FREDAG in _indeksdatoer(b)))
+        _kjoering(raa, base, self.SENERE, _hent(FREDAG))
+        assert kalt == [True]
+
+        def uten_noekkel():
+            sys.exit("EODHD_API_KEY mangler")
+
+        raa, base = tmp_path / "b" / "raa", tmp_path / "b" / "ose.db"
+        self._kvelden_uten_indeksen((raa, base))
+        kalt.clear()
+        with pytest.raises(SystemExit):
+            fp.kjoer(raa, base, self.SENERE, uten_noekkel, _hent(FREDAG), lambda _: None, les_kvote=nok_kvote)
+        assert kalt == [False]
+
+    def test_en_fil_som_ikke_kan_skrives_gir_kode_3(self, stier, monkeypatch):
+        """ECH2: ville feilet hvis en OSError fra fila stoppet kjøringen med
+        en krasj i stedet for kode 3."""
+        raa, base = stier
+        self._kvelden_uten_indeksen(stier)
+
+        def feiler(*_a, **_k):
+            raise PermissionError("nei")
+
+        monkeypatch.setattr(fp, "forsoeksfil", feiler)
+        kode, kall, ut = _kjoering(raa, base, self.SENERE, _hent(FREDAG))
+        assert kode == fp.KODE_BARE_INDEKSEN and kall == [HOVEDINDEKS.ticker]
+        assert "kunne ikke skrives" in ut
+
+    def test_basen_som_feiler_gir_ikke_hentet(self, stier, monkeypatch):
+        """VG4: ville feilet hvis hent_bare_indeksen sa at indeksen var hentet
+        når basen ikke kunne skrives, også når basen har en eldre rad for
+        dagen."""
+        raa, base = stier
+        _kjoer(raa, base, FREDAG, _hent(FREDAG))
+        monkeypatch.setattr(fp, "skriv_indeksen_til_basen", lambda *_a, **_k: False)
+        raad = fp.hent_bare_indeksen(
+            raa,
+            base,
+            self.SENERE,
+            FREDAG,
+            FREDAG,
+            NOEKKEL,
+            _hent(FREDAG),
+            lambda _: None,
+            lambda: self.SENERE,
+            nok_kvote,
+        )
+        assert raad == fp.PROEV_INDEKSEN_IGJEN
+
+    def test_en_base_uten_tabellen_indeks(self, tmp_path):
+        """VG6: ville feilet hvis en base uten tabellen indeks ga et kall for
+        indeksen ved hver kjøring."""
+        base = tmp_path / "gammel.db"
+        t = sqlite3.connect(base)
+        t.execute("CREATE TABLE kurs (symbol TEXT)")
+        t.commit()
+        t.close()
+        assert fp.indeksen_mangler(base, FREDAG) is False
+        assert fp.indeksen_mangler(tmp_path / "finnes-ikke.db", FREDAG) is False

@@ -3457,6 +3457,8 @@ class TestHovedindeksen:
         ett kall, og det prøves i tests/test_etterfyllingen_2_4.py."""
         raa, base = stier
         assert kjoer_23(raa, base, OEYEBLIKK_22_09)[0] is not None
+        # Gjennomgangen 10.11 (BH13): indeksen har dagen etter den foerste.
+        assert TIRSDAG_22_09 in {rad.dato for rad in indeksen_i(base)[0]}
         (raa / "kurser-raa-2026-09-22.json").unlink()
         fil, kall, ut = kjoer_23(
             raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall

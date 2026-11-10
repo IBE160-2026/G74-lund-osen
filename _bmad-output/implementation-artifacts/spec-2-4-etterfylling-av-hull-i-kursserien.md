@@ -88,8 +88,36 @@ Bygget 10.11 på grenen, etter at main ble flettet inn (`53c020ff`), etter instr
 - **Kvoten:** som et nytt forsøk (2.3b): ingen kall fra kl. 23:50 i Oslo eller etter midnatt, bare kall som er igjen av dagens, aldri bonuskvoten (NFR-01), og 0 kall når kvoten ikke kan leses. Intervallet er det samme som en vanlig kveld.
 - **Fila:** svaret skrives først til en egen forsøksfil (`forsoek<n>-raa-<dato>.json`) med indeksen under nøkkelen `indeks` og ingen aksjer (AD-6), og kursfila røres ikke. Indeksen lagres gjennom `skriv_indeksen_til_basen`, aldri i `kurs` eller `vurdering`.
 - **Koden:** har basen ikke dagen i `indeks` etterpå (kallet feilet, svaret manglet dagen, eller kvoten eller klokka sa nei), gir kjøringen kode 3, som før. Indeksen hentes før KI-tekstene, så teksten om dagen (10.6) kan lages med den.
+  *Lagt til 2026-11-10 (gjennomgangen, ECH3):* det hjelper bare når teksten om dagen også mangler; en tekst som alt er laget uten indeksen, lages ikke på nytt.
 - **Uendret:** mangler også en aksje dagens kurs, henter et nytt forsøk bare aksjene, som før, og indeksen hentes av kjøringen etter. Utskriften etter en indeks som feilet, sier nå at en ny kjøring samme kveld henter den, ikke at den står til neste kveld.
 - **Hjelpen:** «Når kan jeg hente?» og «Jeg har ikke hentet på noen dager.» i `docs/hjelp.md` sier det nye.
 - **Testene:** `TestHovedindeksenAlene` i `tests/test_etterfyllingen_2_4.py`, åtte tester med «Ville feilet hvis». Seks tester i `tests/test_fetch_prices.py` feilet, fordi basen deres manglet indeksen etter `--les-inn`, som ikke leser den. Fem prøver noe annet (vurderingene uten kall, lørdag og en base en versjon bak) og har fått indeksen i basen (`med_indeksen`), så de prøver det samme som før. `test_en_andre_kjoering_samme_boersdag_gjoer_0_kall` prøvde den gamle regelen, at en indeks som feilet, ikke hentes igjen samme kveld. Den prøver nå at en ny kjøring gjør 0 kall når basen har dagen for aksjene og indeksen, og den nye regelen prøves i `TestHovedindeksenAlene`.
 - **Dokumentene:** PRD-en (FR-410), epics.md (2.8) og arkitekturen (AD-15, 2.8) sier at et indekskall som feiler, «får ingen ny sjanse». Det gjelder fortsatt i samme kjøring; ingen linje er endret der.
+
+### Mutanten (10.11)
+
+Én mutant på `72aa38d4`, med kopi før og fila lik HEAD etterpå (samme blob-hash, og sha256 lik når CRLF i arbeidskopien regnes som LF): `indeksen_mangler` gir alltid `False`, som før svaret. Fanget av alle åtte testene i `TestHovedindeksenAlene`.
+
+### Gjennomgangen 10.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `53c020ff..72aa38d4`: Blind Hunter med bare diffen (14 funn), og Edge Case Hunter og Verification Gap i samme agent med worktreen (7 og 7 funn, med 14 mutanter i en kopi utenfor worktreen; 8 overlevde). Én høy.
+
+**Høy**
+- *ECH1, rettet.* Kveldsjobben kjører `--maal-omsetning` etter hver henting, og målingen ventet bare når en aksje manglet kursen. Etter en kjøring med kode 3 brukte den kallene som var igjen, så en ny kjøring samme kveld fikk aldri kallet for indeksen. Målingen venter nå også når bare hovedindeksen mangler dagen, til kl. 23:45 som for en aksje (`omsetning.py`), og hjelpen sier det. `test_maaler_ikke_naar_bare_hovedindeksen_mangler`.
+
+**Middels**
+- *ECH2 og BH7, rettet.* Hentingen av indeksen leser nøkkelen og kvoten i en kjøring som før bare lagde KI-tekstene. Nå lages KI-tekstene i en `finally`, også når nøkkelen mangler, og en `OSError` fra forsøksfila gir kode 3 i stedet for en krasj. `test_ki_tekstene_etter_indeksen_ogsaa_naar_den_stopper` og `test_en_fil_som_ikke_kan_skrives_gir_kode_3`.
+- *BH3, BH4 og BH11, rettet.* Utskriften ba om en ny kjøring «i kveld» også når klokka, kvoten eller nøkkelen sa nei. Nå følger rådet grunnen (`PROEV_INDEKSEN_IGJEN` når kallet ble gjort, `VENT_PAA_INDEKSEN` ellers), og ingen av dem sier «i kveld». Linja før kallet sier «når klokka og kvoten tillater det», og utskriften etter en indeks som feilet, nevner også en dag børsen er stengt. `test_raadet_foelger_grunnen`.
+- *BH1, rettet i hjelpen.* Etter `--les-inn`, som ikke leser indeksen, henter neste kjøring indeksen med ett kall. Det er det svaret kl. 15:30 ber om. Hjelpen sa at hentingen bruker 0 kall når basen har kursene, og sier nå «og hovedindeksen».
+- *BH2 og ECH7, ført.* En base én versjon bak som mangler indeksen for dagen, migreres når indeksen skrives, som ved enhver henting som skriver. Testen for sjekken (`TestSjekkenLeserEnBaseEnVersjonBak`) prøver at sjekken før kallene ikke skriver, og har fått indeksen i basen, så den prøver det samme som før.
+- *VG1, VG2, VG3, VG4 og VG5, rettet med tester.* Nøkkelen som funksjon (`test_noekkelen_som_funksjon`), kvoten fra dagen før i GMT (`test_kvoten_fra_gaarsdagen_er_0_brukt_i_dag`), rekkefølgen indeksen før KI-tekstene (`test_ki_tekstene_etter_indeksen_ogsaa_naar_den_stopper`), basen som feiler (`test_basen_som_feiler_gir_ikke_hentet`), og 401, 500 og et svar som ikke kan leses (`test_kvoten_som_ikke_kan_leses_gir_0_kall_og_ingen_krasj`).
+
+**Lav**
+- *Rettet:* ECH4 (klokka sjekkes også rett før kallet), ECH5 (hjelpen sier bare kall som er igjen av dagens, aldri bonuskvoten og ikke etter kl. 23:50, og ikke «de samme vilkårene»; taket fra `kall_til_nye_forsoek` gjelder ikke, fordi aksjene alt har kursene), ECH3 (spesifikasjonen: indeksen før KI-tekstene hjelper bare når teksten om dagen også mangler), VG6 (`test_en_base_uten_tabellen_indeks`), BH12 (`test_ett_kall_igjen_holder`), BH13 (testen krever at indeksen har dagen etter første kjøring).
+- *Ført:* BH8 og ECH6 (mangler kilden dagen for indeksen, bruker hver kjøring ett kall av dagens og skriver en ny forsøksfil; det er det svaret ber om, og kvoten setter grensen), BH9 (hovedhentingen med et svar uten dagen for indeksen er som før 2.4, og en senere kjøring henter den nå), BH14 (`INSERT` uten kolonnenavn i testen for en base én versjon bak), VG7 (`open(fil, "x")` er ikke prøvd med en fil som dukker opp underveis; det samme gjelder `nytt_forsoek`).
+- *Ikke reelt:* BH5 (`hent_indeksen` fører alltid symbolet i `feil` når det ikke er i `serier`), BH6 (`UlesbarKvote` er en `ValueError`), BH10 (vurderingen bruker ikke indeksen).
+
+### Mutantene etter rettingen (10.11)
+
+Ti mutanter mot `tests/test_etterfyllingen_2_4.py` og `tests/test_omsetning.py`, med kopi før og fila lik før og etter (sha256): de sju som overlevde i gjennomgangen og ikke er ført (M5, M6, M7, M8, M11, M12 og M4), og én for hver av BH3, ECH2 og ECH1. Alle ble fanget. M4 (KI-tekstene før indeksen) slo også av hentingen av indeksen, så den ble fanget av `test_en_senere_kjoering_samme_kveld_henter_den_med_ett_kall`; rekkefølgen prøves av `test_ki_tekstene_etter_indeksen_ogsaa_naar_den_stopper`. Vinduet ble lukket ved en feil kl. 16:42 midt i første kjøring av mutantene; ingen mutant ble liggende, og alle ti ble kjørt på nytt etterpå.
 

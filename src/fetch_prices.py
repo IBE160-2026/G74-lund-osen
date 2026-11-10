@@ -1151,7 +1151,8 @@ def kjoer(
                 skriv(
                     f"Basen har alt kursene for børsdagen {dato.isoformat()} for "
                     f"alle {len(lista)} aksjene, men {HOVEDINDEKS.navn.lower()} mangler "
-                    "den dagen. Den hentes alene, med ett kall (story 2.4)."
+                    "den dagen. Den hentes alene, med ett kall, når klokka og kvoten "
+                    "tillater det (story 2.4)."
                 )
             else:
                 skriv(
@@ -1187,17 +1188,22 @@ def kjoer(
                 ):
                     sys.exit(1)
             # Story 2.4: indeksen foer KI-tekstene, saa teksten om dagen kan
-            # lages med den (10.6).
-            indeksen_feilet = indeksen_hentes and not hent_bare_indeksen(
-                data_katalog, base_sti, oeyeblikk, dag, dato, api_nokkel, hent, skriv, klokke, les_kvote
-            )
-            # Story 10.2: KI-radene som mangler, uten kall til EODHD.
-            lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, med_dagen=True)
-            if indeksen_feilet:
+            # lages med den (10.6) naar den ogsaa mangler. Gjennomgangen
+            # (ECH2): KI-tekstene lages ogsaa naar hentingen av indeksen
+            # stopper kjoeringen (for eksempel uten noekkel).
+            raad = ""
+            try:
+                if indeksen_hentes:
+                    raad = hent_bare_indeksen(
+                        data_katalog, base_sti, oeyeblikk, dag, dato, api_nokkel, hent, skriv, klokke, les_kvote
+                    )
+            finally:
+                # Story 10.2: KI-radene som mangler, uten kall til EODHD.
+                lag_ki_tekster(base_sti, dato, klokke, modell, skriv, lista, med_dagen=True)
+            if raad:
                 skriv(
                     f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} mangler børsdagen "
-                    f"{dato.isoformat()}. Kode {KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). "
-                    "Kjør samme kommando igjen senere i kveld, så hentes den alene med ett kall."
+                    f"{dato.isoformat()}. Kode {KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). {raad}"
                 )
                 sys.exit(KODE_BARE_INDEKSEN)
             return None
@@ -1348,7 +1354,8 @@ def kjoer(
             f"({indeks.feil[HOVEDINDEKS.symbol]}) og får ingen ny sjanse i denne "
             "kjøringen (AD-15). Aksjene lagres og vurderes som vanlig, og et nytt "
             "forsøk for aksjene henter bare aksjene. Når alle aksjene har kursen, "
-            "henter en ny kjøring samme kveld indeksen alene med ett kall (story 2.4)."
+            "henter en ny kjøring samme kveld, eller en dag børsen er stengt, indeksen "
+            "alene med ett kall (story 2.4)."
         )
 
     # Vurderingene etter kursene (AD-17), med datoen fra oeyeblikket.
@@ -1408,7 +1415,7 @@ def kjoer(
         skriv(
             f"Aksjene er i orden, men {HOVEDINDEKS.navn.lower()} feilet. Kode "
             f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Kjør samme kommando "
-            "igjen senere i kveld, så hentes indeksen alene med ett kall (story 2.4)."
+            "igjen senere, så hentes indeksen alene med ett kall (story 2.4)."
         )
         sys.exit(KODE_BARE_INDEKSEN)
     return fil
@@ -1655,10 +1662,19 @@ def nytt_forsoek(
             f"{HOVEDINDEKS.navn} {HOVEDINDEKS.symbol} feilet i kveldens henting, "
             "og et nytt forsøk for aksjene henter den ikke (AD-15). Kode "
             f"{KODE_BARE_INDEKSEN} (beslutningen 17.10 kl. 11:58). Kjør samme kommando "
-            "igjen senere i kveld, så hentes indeksen alene med ett kall (story 2.4)."
+            "igjen senere, så hentes indeksen alene med ett kall (story 2.4)."
         )
         sys.exit(KODE_BARE_INDEKSEN)
     return fil
+
+
+# Story 2.4 (gjennomgangen, BH3): hva utskriften raader til naar indeksen
+# ikke ble hentet. En ny kjoering hjelper bare naar kallet ble gjort.
+PROEV_INDEKSEN_IGJEN = "Kjør samme kommando igjen senere, så hentes den alene med ett kall."
+VENT_PAA_INDEKSEN = (
+    "En ny kjøring henter den alene når det er kall igjen av dagens og klokka er før 23:50, "
+    "og neste vanlige henting bytter ut hele serien."
+)
 
 
 def hent_bare_indeksen(
@@ -1673,27 +1689,31 @@ def hent_bare_indeksen(
     klokke: Callable[[], datetime],
     les_kvote: Callable[[str], object],
     indeks: Indeks = HOVEDINDEKS,
-) -> bool:
+) -> str:
     """Hovedindeksen alene, med ett kall - story 2.4, gruppens svar 10.11
     kl. 15:30 (spoersmaal 6 i spesifikasjonen).
 
     kjoer kaller den naar basen har kursen for dato for alle aksjene i lista,
     men indeksen mangler dagen (indeksen_mangler): kallet feilet i kveldens
     hovedhenting, eller svaret manglet dagen. Kvotereglene er de samme som
-    for et nytt forsoek (2.3b): ingen kall fra kl. 23:50 i Oslo eller etter
-    midnatt, bare kall som er igjen av dagens, aldri bonuskvoten (NFR-01), og
-    kan kvoten ikke leses, blir det 0 kall. Kallet har samme intervall som
-    en vanlig kveld. Svaret skrives foerst til en egen forsoeksfil (AD-6),
-    og kursfila roeres aldri. Indeksen lagres gjennom
-    skriv_indeksen_til_basen, aldri i kurs eller vurdering (AD-21).
+    for et nytt forsoek (2.3b), uten taket fra kall_til_nye_forsoek, fordi
+    aksjene alt har kursene: ingen kall fra kl. 23:50 i Oslo eller etter
+    midnatt (sjekket ogsaa rett foer kallet), bare kall som er igjen av
+    dagens, aldri bonuskvoten (NFR-01), og kan kvoten ikke leses, blir det 0
+    kall. Kallet har samme intervall som en vanlig kveld. Svaret skrives
+    foerst til en egen forsoeksfil (AD-6), og kursfila roeres aldri.
+    Indeksen lagres gjennom skriv_indeksen_til_basen, aldri i kurs eller
+    vurdering (AD-21).
 
-    Returnerer True naar basen har raden for dato i indeks etterpaa, ellers
-    False, og utskriften sier hvorfor.
+    Returnerer en tom tekst naar basen har raden for dato i indeks etterpaa.
+    Ellers raadet til utskriften (PROEV_INDEKSEN_IGJEN naar kallet ble gjort,
+    VENT_PAA_INDEKSEN naar klokka, kvoten eller noekkelen sa nei), og
+    utskriften har sagt hvorfor.
     """
     navn = f"{indeks.navn} {indeks.symbol}"
     if grunn := _for_sent(klokke(), dag):
         skriv(f"{grunn} {navn} hentes ikke så sent. 0 kall brukt.")
-        return False
+        return VENT_PAA_INDEKSEN
     if callable(api_nokkel):
         api_nokkel = api_nokkel()
     hentet_tid = oeyeblikk.astimezone(timezone.utc)
@@ -1707,50 +1727,63 @@ def hent_bare_indeksen(
                 f"Kvoten kunne ikke leses fra /api/user ({feil}). {navn} hentes bare med "
                 "kall som er igjen av dagens, aldri bonuskvoten, så det blir ingen kall. 0 kall brukt."
             )
-        return False
+        return VENT_PAA_INDEKSEN
     except (requests.RequestException, ValueError) as feil:
         skriv(
             f"Kvoten kunne ikke leses fra /api/user ({type(feil).__name__}). {navn} hentes bare "
             "med kall som er igjen av dagens, aldri bonuskvoten, så det blir ingen kall. 0 kall brukt."
         )
-        return False
+        return VENT_PAA_INDEKSEN
     igjen = max(grense - brukt, 0)
     if igjen < 1:
         skriv(f"Kvoten: 0 kall igjen av dagens. {navn} hentes aldri med bonuskvoten (NFR-01). 0 kall brukt.")
-        return False
+        return VENT_PAA_INDEKSEN
+    # Gjennomgangen (ECH4): klokka igjen rett foer kallet, som i nytt_forsoek.
+    if grunn := _for_sent(klokke(), dag):
+        skriv(f"{grunn} {navn} hentes ikke så sent. 0 kall brukt.")
+        return VENT_PAA_INDEKSEN
     skriv(f"Kvoten: {igjen} kall igjen av dagens. Bonuskvoten brukes ikke. Henter {navn} med ett kall.\n")
     fra, til = bygg_intervall(dag)
     resultat = hent_indeksen(api_nokkel, fra, til, hent, skriv, indeks)
     tekst = json.dumps(lag_oyeblikksbilde(Resultat(), fra, til, hentet_tid.isoformat(), resultat), ensure_ascii=False)
-    data_katalog.mkdir(parents=True, exist_ok=True)
-    # Navnet er fritt, saa en fil som dukker opp underveis, gir neste n.
-    for _ in range(10):
-        fil = forsoeksfil(data_katalog, dato)
-        try:
-            with open(fil, "x", encoding="utf-8") as ut:
-                ut.write(tekst)
-            break
-        except FileExistsError:
-            continue
-    else:
+    try:
+        data_katalog.mkdir(parents=True, exist_ok=True)
+        # Navnet er fritt, saa en fil som dukker opp underveis, gir neste n.
+        for _ in range(10):
+            fil = forsoeksfil(data_katalog, dato)
+            try:
+                with open(fil, "x", encoding="utf-8") as ut:
+                    ut.write(tekst)
+                break
+            except FileExistsError:
+                continue
+        else:
+            skriv(
+                f"Ingen ledig fil for forsøket i {data_katalog.name}/ (AD-6). "
+                f"{resultat.kall_brukt} kall er brukt, og ingenting er lagret."
+            )
+            return PROEV_INDEKSEN_IGJEN
+    except OSError as feil:
+        # Gjennomgangen (ECH2): en fil som ikke kan skrives, stopper ikke
+        # KI-tekstene etter.
         skriv(
-            f"Ingen ledig fil for forsøket i {data_katalog.name}/ (AD-6). "
+            f"Fila for forsøket kunne ikke skrives i {data_katalog.name}/ ({type(feil).__name__}). "
             f"{resultat.kall_brukt} kall er brukt, og ingenting er lagret."
         )
-        return False
+        return PROEV_INDEKSEN_IGJEN
     skriv(f"\nLagret {fil.name} i {data_katalog.name}/")
     skriv(f"API-kall brukt: {resultat.kall_brukt}")
     if indeks.symbol not in resultat.serier:
         skriv(f"{navn} feilet i hentingen ({resultat.feil[indeks.symbol]}).")
-        return False
+        return PROEV_INDEKSEN_IGJEN
     if not skriv_indeksen_til_basen(
         base_sti, serie_fra_eodhd(resultat.serier[indeks.symbol]), hentet_tid, fil, skriv, indeks
     ):
-        return False
+        return PROEV_INDEKSEN_IGJEN
     if indeksen_mangler(base_sti, dato, indeks):
         skriv(f"Svaret har ikke {indeks.navn.lower()} for børsdagen {dato.isoformat()} (FR-402).")
-        return False
-    return True
+        return PROEV_INDEKSEN_IGJEN
+    return ""
 
 
 def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> None:
