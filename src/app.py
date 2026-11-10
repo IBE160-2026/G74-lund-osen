@@ -1387,7 +1387,12 @@ def aksjedetalj(symbol: str):
             notatdag=slutt,
             # Tillegget kl. 14:44: et tenkt kjøp eller salg noteres bare fra
             # siden for siste dag med kurser, med sjekkene slik de står der.
-            kan_handle=post.ut is None and bool(rader) and slutt == rader[-1].dato,
+            kan_handle=post.ut is None
+            and bool(rader)
+            and slutt == rader[-1].dato
+            and post.aksje.symbol not in _fjernes_i_kveld(),
+            # Gjennomgangen av tilleggene (ECH1, BH3): siden sier hvorfor.
+            fjernes_i_kveld=post.aksje.symbol in _fjernes_i_kveld(),
             # Gjennomgangen (ECH1): «Vis dagen» godtar en dag uten kurs for
             # aksjen, som en lørdag. Da står ikke skjemaet, bare en linje.
             kan_skrive_notat=post.ut is None,
@@ -1633,17 +1638,28 @@ def _handelen(symbol: str, salg: bool):
     dag = _skjemadag(request.form.get("dag"), kursdager)
     if dag != kursdager[-1]:
         abort(400)
+    # Gjennomgangen av tilleggene (ECH1, BH3): en aksje med et ønske om å
+    # fjernes tas ut før kursene hentes i kveld, så et kjøp eller salg
+    # ville aldri fått sluttkursen.
+    if post.aksje.symbol in _fjernes_i_kveld():
+        abort(400)
     try:
         lager = SqliteNotatlager(g.tilkobling)
         sjekkene = _sjekkene_paa_siden(post, dag)
         etter = _sluttkursen_etter(kursdager, idag())
+        kjoep = lager.kjoepene().get(int(notat_id))
         if salg:
-            kjoep = lager.kjoepene().get(int(notat_id))
+            # Gjennomgangen (ECH3): et salg som alt er notert (dobbeltklikk),
+            # sender tilbake uten å skrive noe.
+            if kjoep is not None and kjoep.solgt is not None:
+                return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
             # Salget først når kjøpet har fått sluttkursen (spørsmål 16).
-            if kjoep is None or not kjoep.aapent or not any(d > kjoep.kjoep_etter for d in kursdager):
+            if kjoep is None or not any(d > kjoep.kjoep_etter for d in kursdager):
                 abort(400)
             lager.noter_salg(post.aksje.symbol, int(notat_id), naa(), etter, sjekkene)
-        else:
+        elif kjoep is None:
+            # Et kjøp som alt er notert ved notatet (dobbeltklikk), skrives
+            # ikke på nytt.
             lager.noter_kjoep(post.aksje.symbol, int(notat_id), naa(), etter, sjekkene)
     except UgyldigNotat:
         abort(400)
@@ -2286,13 +2302,36 @@ def fjern_egen():
 
 
 def _aapne_kjoep() -> frozenset[str]:
-    """Aksjene med et åpent tenkt kjøp (story 8.21). Tom uten basen, og for
-    en base fra før 0012."""
+    """Aksjene med et åpent tenkt kjøp, eller et salg som venter på
+    sluttkursen (story 8.21, gjennomgangen BH6). Tom uten basen, og for en
+    base fra før 0012."""
     tilkobling = g.get("tilkobling")
     if tilkobling is None:
         return frozenset()
     try:
-        return frozenset(k.symbol for k in SqliteNotatlager(tilkobling).kjoepene().values() if k.aapent)
+        kjoepene = SqliteNotatlager(tilkobling).kjoepene().values()
+        kursleser = SqliteKurslager(tilkobling)
+        ut = set()
+        for k in kjoepene:
+            if k.aapent:
+                ut.add(k.symbol)
+            elif k.salg_etter is not None:
+                serie = kursleser.serie(k.symbol)
+                if not serie or serie[-1].dato <= k.salg_etter:
+                    ut.add(k.symbol)
+        return frozenset(ut)
+    except (*BASEFEIL, ValueError):
+        return frozenset()
+
+
+def _fjernes_i_kveld() -> frozenset[str]:
+    """Aksjene med et ønske om å fjernes som ikke er tatt i bruk. Hentingen
+    tar ønsket i bruk før kursene hentes, så de får ingen kurs i kveld."""
+    try:
+        lager = _valglager()
+        if lager is None:
+            return frozenset()
+        return frozenset(o.symbol for o in lager.ventende() if o.handling == valg.FJERN)
     except (*BASEFEIL, ValueError):
         return frozenset()
 

@@ -7,7 +7,9 @@
 {% block innhold %}
 <section class="bekreft" aria-labelledby="bekreft-tittel">
   <h1 class="overskrift" id="bekreft-tittel">Fjern {{ symbol }}?</h1>
-  <p>{{ symbol }} har et åpent tenkt kjøp. Tas aksjen ut av lista, hentes ingen nye kurser for den, så endringen siden kjøpet stopper på den siste dagen med kurser, og et tenkt salg kan ikke få en ny sluttkurs.</p>
+  {#- Gjennomgangen av tilleggene (ECH1, BH7, VG6): hentingen tar ønsket i
+      bruk før kursene hentes, så aksjen får ingen kurs fra og med i kveld. #}
+  <p>{{ symbol }} har et åpent tenkt kjøp, eller et salg som venter på sluttkursen. Tas aksjen ut av lista, hentes ingen kurser for den fra og med hentingen i kveld. Endringen siden kjøpet stopper på den siste dagen med kurser, et kjøp eller salg som venter, får aldri sluttkursen, og et tenkt salg kan ikke noteres.</p>
   <form method="post" action="/fjern">
     <input type="hidden" name="symbol" value="{{ symbol }}">
     <input type="hidden" name="tilbake" value="{{ tilbake }}">

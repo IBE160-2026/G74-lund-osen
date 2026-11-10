@@ -826,6 +826,13 @@ class SqliteNotatlager:
     def noter_salg(self, symbol: str, notat_id: int, solgt: datetime, etter: date, sjekker: Sjekker) -> TenktKjoep:
         sjekker = kontroller_sjekker(sjekker)
         with _Transaksjon(self._tilkobling):
+            # Gjennomgangen av tilleggene (VG6): som kjøpet, bare for en aksje
+            # i lista.
+            if (
+                self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
+                is None
+            ):
+                raise UgyldigNotat(f"{symbol!r} står ikke i lista")
             markoer = self._tilkobling.execute(
                 "UPDATE tenkt_kjoep SET solgt = ?, salg_etter = ?, salg_trend = ?, salg_bevegelse = ?,"
                 " salg_interesse = ? WHERE notat = ? AND symbol = ? AND solgt IS NULL",

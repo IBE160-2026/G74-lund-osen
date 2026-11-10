@@ -140,3 +140,32 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 #### H) Demoen og bildene (tillegg 2)
 
 **Ville feilet hvis:** demoen manglet eksemplene med tall, ett åpent og ett avsluttet kjøp med sjekkene begge gangene, et eksempel ga råd, eller et nytt kjøp i demoen ikke sa at demoen ikke henter kurser.
+
+### Bygget 10.11, tilleggene
+
+Bygget i `89892c52` på grenen `8-21-egne-notater`, etter `05e9a877`.
+
+- **Filene:** `tenkt_kjoep` og `notatvalg` i `0012_notat.sql`, med den unike indeksen for ett åpent kjøp og triggerne. Kjøpene står i porten i `src/notater.py` og i `SqliteNotatlager`, og `Handelen` og `bygg_handelen` i `src/etterpaa.py`. Rutene `POST /aksje/<symbol>/notat/kjoep` og `/notat/salg`, `_sluttkursen_etter`, «Mine notater» i Min liste og bekreftelsen ved «Fjern» er i `src/app.py`. Malene er `src/templates/_notat.html` (notatet, likt på begge sidene), `bekreft_fjern.html`, `aksje.html`, `index.html`, `innstillinger.html`, `folg.html` og `_egne.html`. Bryteren står i `src/innstillinger.py`, hjelpeteksten «notatene» i `src/hjelpetekster.py`, og eksemplene er `DEMONOTATER` i `src/demo.py`.
+- **Avvik fra forslagene:** ingen.
+- **Bildene:** tre nye i `docs/appen/` (`notatene-brfe-demo.png`, `notatene-min-liste-demo.png` og `innstillinger-demo.png`), i knappen i README-en og i «Mappestruktur». De ti andre er tatt på nytt og var byte for byte de samme.
+
+### Mutantene, tilleggene
+
+På `89892c52` fire, én per del: E (bryteren av viser notatene), F (Min liste med den eldste først), G (kjøpet får kursen fra dagen for trykket) og H (demoen uten det avsluttede kjøpet). Alle ble fanget av `tests/test_notater.py`, og hver fil var lik HEAD etterpå (kopi før, sha256 mot HEAD etter).
+
+### Gjennomgangen av tilleggene 10.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen `05e9a877..89892c52`, uten bildene og `tests/test_docker.py`, og Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 14 funn, Edge Case Hunter 7 og Verification Gap 7.
+
+**Middels**
+- *ECH1 og BH3, rettet.* Hentingen tar ønsket om å fjerne en aksje i bruk før kursene hentes samme kveld (`src/fetch_prices.py`). Et kjøp som ventet på dagens kurs, fikk den aldri, og et kjøp kunne noteres for en aksje som skulle fjernes i kveld. Nå kan det ikke noteres et kjøp eller salg for en aksje med et ønske om å fjernes, og siden sier hvorfor. Bekreftelsen ved «Fjern» sier at kursene stopper fra og med hentingen i kveld, og at et kjøp eller salg som venter, aldri får sluttkursen. Testene står i `TestFjernesIKveld`.
+- *ECH2 og BH8, rettet.* Eksemplene i demoen var notert kl. 17:30, før demohentingen kl. 22:30, så dagen stemte ikke med regelen for neste sluttkurs. Nå er de notert kl. 23:00. Test: `test_demoeksemplene_er_notert_etter_hentingen`.
+- *VG1 og BH1, rettet.* `_sluttkursen_etter` hadde ingen test. Nå er de fem tilfellene i spørsmål 15 testet, og ruta lagrer dagen regelen gir.
+- *VG2 og BH2, rettet.* Ingen test noterte et salg gjennom ruta. Nå viser en test at knappen står når kjøpet har kursen, og at salget lagrer sine egne sjekker og sin egen dag.
+- *VG3 og BH13, rettet.* Setningen ved de ferdige listene er testet.
+- *BH4, ikke en feil.* Bildene og `tests/test_docker.py` var holdt utenfor diffen Blind Hunter fikk. Begge er med i `89892c52`.
+
+**Lav**
+- *Rettet:* BH6 (bekreftelsen gjelder også et salg som venter på sluttkursen), BH7 og VG6 (teksten på bekreftelsessiden, og `noter_salg` sjekker at aksjen står i lista), BH9 (minneutgaven bruker aldri en id på nytt), BH10 (grunnen står når en kurs mangler ved kjøpet), BH12 (testen holder kolonnene i `tenkt_kjoep` til listen), BH14 (ordtesten med et kjøp og et salg på siden), ECH3 (et nytt trykk på samme knapp sender tilbake uten å skrive), VG4 (bryteren av sletter ikke kjøpene), VG5 og BH5 (hjelpen sier regelen for sluttkursen presist, også at et trykk før kveldens henting gir sluttkursen samme dag) og VG7 (plasseringen, og en base uten `notatvalg`).
+- *Ført:* ECH4 (mangler en dag etter `kjoep_etter` i hentingen og fylles inn senere, flytter kjøpsdagen seg bakover; et hull til og med `kjoep_etter` kan ikke bli kjøpsdagen), ECH5 (med bryteren av står fortsatt setningene om et åpent kjøp ved «Fjern», «Bytt ut» og de ferdige listene, fordi de handler om kursene, og rutene skriver fortsatt; svaret går da til et anker som ikke finnes), ECH6 (Min liste leser indeksen to ganger) og ECH3 (en side som er åpnet før kveldshentingen, gir 400 uten forklaring når den brukes etter).
+- *Ikke en feil:* ECH7 og BH11 (0012 er endret på grenen før flettingen. En base som er migrert med den første 0012, avvises av `migrer()`, fordi sha256 av fila er lagret. Slike baser finnes bare i testenes midlertidige mapper; den ekte basen og demobasen på main har aldri hatt 0012).

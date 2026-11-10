@@ -304,12 +304,15 @@ def skriv_demonotatene(tilkobling) -> None:
     (spørsmål 21 i spec-8-21-egne-notater-paa-aksjesiden.md)."""
     lager = SqliteNotatlager(tilkobling)
     for symbol, dag, tekst, kjoep, salg in DEMONOTATER:
-        laget = datetime(dag.year, dag.month, dag.day, 17, 30, tzinfo=OSLO)
+        # Gjennomgangen av tilleggene (ECH2, BH8): kl. 23:00, etter hentingen
+        # kl. 22:30, så siden viste dagen, og kursen er den første etter den,
+        # som når brukeren trykker (_sluttkursen_etter i app.py).
+        laget = datetime(dag.year, dag.month, dag.day, 23, 0, tzinfo=OSLO)
         notat = lager.skriv(symbol, dag, tekst, laget)
         if kjoep is not None:
             lager.noter_kjoep(symbol, notat.id, laget, kjoep, _sjekkene(tilkobling, symbol, kjoep))
         if salg is not None:
-            solgt = datetime(salg.year, salg.month, salg.day, 17, 30, tzinfo=OSLO)
+            solgt = datetime(salg.year, salg.month, salg.day, 23, 0, tzinfo=OSLO)
             lager.noter_salg(symbol, notat.id, solgt, salg, _sjekkene(tilkobling, symbol, salg))
 
 

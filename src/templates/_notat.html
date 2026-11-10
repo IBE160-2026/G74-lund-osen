@@ -51,10 +51,10 @@ venter på sluttkursen{% if eksempeltall %}. Demoen henter ikke kurser, så den 
           <p>Sjekkene på siden da salget ble notert: {{ sjekkene(h.kjoep.salg_sjekker|brikkene) }}</p>
         {% else %}
           <p>Salgsdag {{ h.salgsdag|ukedag }} {{ h.salgsdag|dato }}, {{ h.dager }} {{ "børsdag" if h.dager == 1 else "børsdager" }} etter. Sjekkene på siden da salget ble notert: {{ sjekkene(h.kjoep.salg_sjekker|brikkene) }}</p>
-          <p>Aksjen fra kjøpet til salget: {{ prosent(h.aksjen, "") }} · Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(h.indeksen, h.indeksen_grunn) }}</p>
+          <p>Aksjen fra kjøpet til salget: {{ prosent(h.aksjen, "aksjen har ingen kurs fra en av dagene") }} · Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(h.indeksen, h.indeksen_grunn) }}</p>
         {% endif %}
       {% elif h.til %}
-        <p>Aksjen siden kjøpet, til {{ h.til|ukedag }} {{ h.til|dato }}: {{ prosent(h.aksjen, "") }} · Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(h.indeksen, h.indeksen_grunn) }}</p>
+        <p>Aksjen siden kjøpet, til {{ h.til|ukedag }} {{ h.til|dato }}: {{ prosent(h.aksjen, "aksjen har ingen kurs fra en av dagene") }} · Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(h.indeksen, h.indeksen_grunn) }}</p>
       {% else %}
         <p>Ingen børsdager med kurs etter kjøpsdagen ennå.</p>
       {% endif %}

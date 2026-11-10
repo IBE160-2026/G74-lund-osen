@@ -403,7 +403,7 @@
         </form>
       {% endif %}
       {% if notatene %}
-        {% if not kan_handle and kan_skrive_notat %}<p class="notatgrense">Et tenkt kjøp eller salg noteres fra siden for siste dag med kurser.</p>{% endif %}
+        {% if fjernes_i_kveld %}<p class="notatgrense">{{ detalj.aksje.navn }} fjernes fra lista ved hentingen i kveld og får ingen nye kurser, så et tenkt kjøp eller salg kan ikke noteres.</p>{% elif not kan_handle and kan_skrive_notat %}<p class="notatgrense">Et tenkt kjøp eller salg noteres fra siden for siste dag med kurser.</p>{% endif %}
         <ol class="notatliste">
           {% for n in notatene %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle) }}{% endfor %}
         </ol>

@@ -144,6 +144,7 @@ class MinneNotatlagerMedKjoep(MinneNotatlager):
     def __init__(self, symboler: Iterable[str]):
         super().__init__(symboler)
         self._kjoep: dict[int, TenktKjoep] = {}
+        self._neste_kjoep = 1
 
     def alle_notater(self) -> list[Notat]:
         return sorter(self._notater.values())
@@ -165,7 +166,9 @@ class MinneNotatlagerMedKjoep(MinneNotatlager):
             raise UgyldigNotat("notatet har alt et tenkt kjøp")
         if any(k.symbol == symbol and k.aapent for k in self._kjoep.values()):
             raise UgyldigNotat("aksjen har alt et åpent tenkt kjøp")
-        kjoep = TenktKjoep(len(self._kjoep) + 1, notat_id, symbol, kjoept, etter, kontroller_sjekker(sjekker))
+        # Gjennomgangen av tilleggene (BH9): en id som aldri brukes på nytt.
+        neste, self._neste_kjoep = self._neste_kjoep, self._neste_kjoep + 1
+        kjoep = TenktKjoep(neste, notat_id, symbol, kjoept, etter, kontroller_sjekker(sjekker))
         self._kjoep[kjoep.id] = kjoep
         return kjoep
 
