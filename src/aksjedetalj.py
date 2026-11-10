@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 from boersdag import UtenforKalenderen, er_boersdag
+from justeringsdager import er_justeringsdag
 from kursdata import Aksje, Kursrad
 from markedsoversikt import (
     IKKE_VURDERT,
@@ -234,6 +235,8 @@ class Detalj:
     # ligger en børsdag mellom de to kursradene.
     endring_med_datoer: bool = False
     terskel: int = STANDARD.terskel
+    # Story 2.6 (FR-407): endringen er fra en justeringsdag.
+    justeringsdag: bool = False
 
     @property
     def vurdering(self) -> Vurdering | None:
@@ -431,6 +434,7 @@ def bygg_detalj(
         forrige_dato=serie[-2].dato if to_rader else None,
         endring_med_datoer=to_rader and boersdag_mellom(serie[-2].dato, dato),
         terskel=p.terskel,
+        justeringsdag=to_rader and er_justeringsdag(serie[-2], serie[-1]),
     )
 
 

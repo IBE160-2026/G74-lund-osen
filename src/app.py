@@ -37,6 +37,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
+import ferdige_lister
 import innstillinger
 import lagring_sqlite
 import valg
@@ -65,6 +66,7 @@ from historikk import PARAMETER, Maaned, adresse, bygg_maaned, les_maaned, maane
 from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
+from justeringsdager import justeringsdager
 from ki_visning import (
     AV,
     DAGEN_AV,
@@ -269,9 +271,12 @@ def _migrer_en_gang(sti: Path) -> None:
 
 
 # Rutene som leser basen. Andre forespoersler (404, statiske filer) roerer den
-# ikke. Story 8.3: Min liste og merkingen, som er den eneste ruta som skriver.
-# Story 3.4h: siden for et selskap i demoen leser merket i basen, så den
-# bare finnes i demoen.
+# ikke. Story 8.3: Min liste og merkingen, som var den eneste ruta som skrev;
+# fra 2.12, 8.10 og 8.10b skriver ogsaa oensket, innstillingene og bryteren.
+# Story 3.4h: siden for et selskap i demoen leser demomerket i basen (PRAGMA
+# application_id, DEMOMERKE), så den bare finnes i demoen. Rettet 2026-11-09
+# (gjennomgangen av 3.4h, BH16): her sto «merket», som ogsaa er merkingen i
+# Min liste, og at merkingen er den eneste ruta som skriver.
 _RUTER_MED_BASE = {
     "markedsoversikt",
     "aksjedetalj",
@@ -289,13 +294,15 @@ _RUTER_MED_BASE = {
     "folg",
     "fjern_egen",
     "angre",
+    # Story 8.11: en ferdig liste.
+    "bruk_ferdig_liste",
 }
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
-_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "lagre_innstilling", "ki_bryter"))
+_SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -1012,6 +1019,21 @@ def _tabellsiden(aktiv: str):
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
         if sortert is not None:
             sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
+    # Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
+    # lista som vises, og etter at radene er delt eller sortert, så
+    # rekkefølgen fortsatt er FR-102. Bare 3 av 3 i retningen som er valgt.
+    signalfilter = _signalfilteret()
+    # Gjennomgangen (ECH1, ECH2, ECH3): overskriften, innledningen og om
+    # tabellen vises, regnes av lista før filteret, så filteret bare skjuler
+    # rader og aldri endrer det siden sier.
+    overskrift_ut = skilte_seg_ut
+    foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
+    if signalfilter is not None:
+        skilte_seg_ut = [rad for rad in skilte_seg_ut if _passer(rad, signalfilter)]
+        oevrige = [rad for rad in oevrige if _passer(rad, signalfilter)]
+        mangler = []
+        if sortert is not None:
+            sortert = [rad for rad in sortert if _passer(rad, signalfilter)]
     hovedindeks, indeks_feilet = (
         (None, False)
         if i_lista
@@ -1071,10 +1093,47 @@ def _tabellsiden(aktiv: str):
         # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
         # Min liste, og merket «Egen» i tabellen.
         egne=_egne(),
+        # Story 8.11: filteret på signalet, og lenkene til det.
+        signalfilter=signalfilter,
+        filterlenker=_filterlenkene(signalfilter),
+        overskrift_ut=overskrift_ut,
+        foer_filter=foer_filter,
+        filter_tomt=signalfilter is not None and not (skilte_seg_ut or oevrige or sortert),
         # Story 10.6: «Børsdagen kort fortalt», bare paa oversikten.
-        boersdagen=None if i_lista else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd),
+        boersdagen=None
+        if i_lista
+        else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd, sortering),
         **felles,
     )
+
+
+# Story 8.11: filteret på signalet (FR-412, tillegget).
+SIGNALFILTER = {"positiv": "Positiv", "negativ": "Negativ"}
+
+
+def _signalfilteret() -> str | None:
+    """Retningen i ?signal=, eller None. En verdi som ikke er en av de to,
+    gir ingen filtrering."""
+    verdi = request.args.get("signal")
+    return verdi if verdi in SIGNALFILTER else None
+
+
+def _passer(rad, signalfilter: str) -> bool:
+    vurdering = rad.vurdering
+    return (
+        vurdering is not None and vurdering.styrke == ANTALL_SJEKKER and vurdering.retning == SIGNALFILTER[signalfilter]
+    )
+
+
+def _filterlenkene(signalfilter: str | None) -> list[tuple[str, str, bool]]:
+    """(teksten, adressen, aktiv) for «Alle», «3 av 3 positiv» og «3 av 3
+    negativ», med resten av adressen som den er."""
+    ledd = [(k, v) for k, v in request.args.items(multi=True) if k != "signal"]
+    lenker = []
+    for verdi, tekst in ((None, "Alle"), ("positiv", "3 av 3 positiv"), ("negativ", "3 av 3 negativ")):
+        deler = ledd + ([("signal", verdi)] if verdi else [])
+        lenker.append((tekst, request.path + ("?" + urlencode(deler) if deler else ""), verdi == signalfilter))
+    return lenker
 
 
 def sidens_siste(rader: list) -> date | None:
@@ -1223,7 +1282,12 @@ def aksjedetalj(symbol: str):
     # siden viser, er i dag (gjennomgangen, BH1, ECH6, VG1).
     # Gruppens svar 5.11 kl. 19:13 og 23:36: setningen om samme dag rett under
     # setningen om dagene, av det samme dagsbildet som grunnlaget til modellen.
-    dagene, samme_dag = _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag=detalj.dato != i_dag)
+    # Gjennomgangen av 8.8 (BH8, ECH8): vurderingene leses én gang for
+    # setningen om dagene og dagene i grafen.
+    vurderingene = _vurderingene(post, rader[-1].dato)
+    dagene, samme_dag = _setningene_om_dagen(
+        post, detalj, leser, oversiktsleser, annen_dag=detalj.dato != i_dag, vurderingene=vurderingene
+    )
     # Story 8.16b: bryteren tar deg tilbake til den samme dagen.
     tilbake = f"/aksje/{post.aksje.symbol}"
     if valg.periode == VELG:
@@ -1239,8 +1303,13 @@ def aksjedetalj(symbol: str):
 
     # Story 8.2c: den brede og den smale grafen av de samme valgene
     # (gjennomgangen, BH6).
-    signal, signal_fra = _signaldagene(post, rader)
+    signal, signal_fra = _signaldagene(rader, vurderingene)
+    # Story 8.14 (FR-407): justeringsdagene det siste året til dagen siden
+    # viser, regnet av kursserien alene. Grafen får alle dagene i serien og
+    # merker dem den har (gjennomgangen, BH1).
+    justeringer = justeringsdager(rader, til=slutt)
     grafvalg = dict(
+        justeringer=justeringsdager(rader),
         indeks=indeks,
         merker=AKSEMERKER.get(valg.periode, MAANEDSNAVN),
         merket=dagen.dato if dagen else None,
@@ -1261,6 +1330,7 @@ def aksjedetalj(symbol: str):
             graf_smal=bygg_graf(detalj.punkter, smal=True, **grafvalg),
             # Story 8.8: dagen markeringene starter.
             signal_fra=signal_fra,
+            justeringer=justeringer,
             valg=valg,
             dagen=dagen,
             # Story 8.16b: merket øverst bare for en dag før siste børsdag.
@@ -1318,20 +1388,24 @@ def demoselskap(symbol: str):
     return render_template("investorside.html", side=side, aktiv="aksje")
 
 
-def _signaldagene(post, rader) -> tuple[dict[date, tuple[int, str]], date | None]:
+def _vurderingene(post, til: date) -> dict | None:
+    """Gjennomgangen av 8.8 (BH8, ECH8): radene i vurdering for aksjen til og
+    med den siste dagen i grafen, lest én gang per side med les_periode fra
+    2.7 (AD-3), aldri regnet (AD-7). None når de ikke kan leses."""
+    try:
+        return SqliteVurderingslager(g.tilkobling, naa, (post.aksje,)).les_periode(post.aksje.symbol, date.min, til)
+    except (*BASEFEIL, ValueError) as feil:
+        app.logger.warning("Vurderingene kunne ikke leses: %s: %s", type(feil).__name__, feil)
+        return None
+
+
+def _signaldagene(rader, radene: dict | None) -> tuple[dict[date, tuple[int, str]], date | None]:
     """Story 8.8 (FR-206): dagene aksjen skilte seg ut, {dato: (styrke,
     retning)}, og dagen den første raden i vurdering er fra, med vurdering
     eller grunn. Lest med les_periode fra 2.7, aldri regnet av kursene
     (AD-7). En dag med grunn eller uten rad er ikke med. Kan vurderingene
     ikke leses, er det ingen markeringer, og grafen vises som før."""
-    if not rader:
-        return {}, None
-    try:
-        lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
-        radene = lager.les_periode(post.aksje.symbol, date.min, rader[-1].dato)
-    except (*BASEFEIL, ValueError):
-        return {}, None
-    if not radene:
+    if not rader or not radene:
         return {}, None
     signal = {
         dag: (rad.styrke, rad.retning)
@@ -1351,7 +1425,9 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed, ut=post.ut)
 
 
-def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -> tuple[str | None, str | None]:
+def _setningene_om_dagen(
+    post, detalj, leser, oversiktsleser, annen_dag: bool, vurderingene: dict | None
+) -> tuple[str | None, str | None]:
     """Gruppens svar 25.10 kl. 00:51: hvor lenge signalet har vaert slik, med
     tellingen fra svaret 24.10 kl. 16:15 a), lest fra vurdering (AD-3, AD-10).
     None uten en vurdering for dagen, eller naar basen ikke kan leses, ogsaa
@@ -1363,14 +1439,11 @@ def _setningene_om_dagen(post, detalj, leser, oversiktsleser, annen_dag: bool) -
     lag_dagsbilde i dagene.py med lista, kursene og indeksen fra basen, som
     grunnlaget i ki_tekst.py. Kan indeksen ikke leses, staar setningen uten
     den, som i grunnlaget. Gir (dagene, samme_dag)."""
-    if not detalj.vurdering:
+    if not detalj.vurdering or vurderingene is None:
         return None, None
-    try:
-        lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
-        tidligere = lager.les_periode(post.aksje.symbol, date.min, detalj.dato)
-    except (sqlite3.Error, ValueError, RuntimeError) as feil:
-        app.logger.warning("Dagene kunne ikke leses: %s: %s", type(feil).__name__, feil)
-        return None, None
+    # Gjennomgangen av 8.8 (BH8, ECH8): vurderingene er lest én gang i
+    # aksjedetalj, til siste dag i grafen. Her bare til og med dagen siden viser.
+    tidligere = {dag: rad for dag, rad in vurderingene.items() if dag <= detalj.dato}
     try:
         indekser = SqliteIndekslager(g.tilkobling)
         symboler = indekser.symboler()
@@ -1431,7 +1504,15 @@ def _ki_visning(post, detalj, siste: date) -> KIVisning:
     return visning
 
 
-def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste: date | None, oversiktsleser, ledd):
+def _boersdagen(
+    poster: list,
+    serier: dict[str, list],
+    valg: Valg | None,
+    siste: date | None,
+    oversiktsleser,
+    ledd,
+    sortering: Sortering | None = None,
+):
     """«Børsdagen kort fortalt» - story 10.6, FR-607, FR-601.
 
     Teksten er raden i KI-loggen for dagen tabellen viser, og vises bare naar
@@ -1439,13 +1520,15 @@ def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste:
     viser: vurderingene som er lagret, kursene og hovedindeksen, for aksjene
     i lista (dagsgrunnlag.py). Webserveren leser bare (AD-10). En periode har
     ingen tekst (spoersmaal 1), og med KI av staar bare linja om det.
+    Gjennomgangen av 10.6 (BH7, ECH11): bryteren tar med sorteringen
+    tilbake, som perioden og dagen.
     Story 8.10b (BH3, ECH3): paa eller av leses med _ki_er_paa(), som paa
     aksjesiden, saa valget i Innstillinger gjelder begge."""
     er_paa = _ki_er_paa()
     bryter = {
         "er_paa": er_paa,
         "til": AV if er_paa else PAA,
-        "tilbake": "/" + ("?" + "&".join(ledd) if ledd else ""),
+        "tilbake": side_adresse(OVERSIKTEN, sortering, False, ledd),
     }
     if not er_paa:
         return {**bryter, "uten": DAGEN_AV}
@@ -1481,7 +1564,11 @@ def _boersdagen(poster: list, serier: dict[str, list], valg: Valg | None, siste:
 _TILBAKE = re.compile(r"/aksje/[A-Za-z0-9.\-]{1,20}(\?dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?")
 # Story 10.6: ogsaa oversikten, med perioden eller dagen (periodeledd), til
 # «Børsdagen kort fortalt».
-_TILBAKE_OVERSIKTEN = re.compile(r"/(\?periode=[a-z0-9\-]{1,10}(&dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?)?")
+# Gjennomgangen av 10.6 (BH7, ECH11): ogsaa sorteringen, sorter= og orden=.
+_TILBAKE_OVERSIKTEN = re.compile(
+    r"/(\?(periode=[a-z0-9\-]{1,10}(&dag=[0-9]{4}-[0-9]{2}-[0-9]{2})?(&sorter=[a-z_]{1,20}&orden=[a-z]{1,10})?"
+    r"|sorter=[a-z_]{1,20}&orden=[a-z]{1,10}))?"
+)
 BOERSDAGEN_ANKER = "boersdagen-kort-fortalt"
 # Story 8.2a, a (U35, U36, gruppens svar 24.10 kl. 11:21): knappene som
 # endrer noe paa aksjesiden, holder plassen, som pilene i historikken.
@@ -1515,7 +1602,9 @@ def ki_bryter():
     if _TILBAKE.fullmatch(tilbake):
         tilbake += f"#{KI_ANKER}"
     elif _TILBAKE_OVERSIKTEN.fullmatch(tilbake):
-        tilbake += f"#{BOERSDAGEN_ANKER}"
+        # Gjennomgangen av 10.6 (BH7, ECH11): ogsaa sorteringen. Adressen
+        # bygges paa nytt av det som er kjent, som etter merkingen.
+        tilbake = tilbake_etter_merking(tilbake) + f"#{BOERSDAGEN_ANKER}"
     else:
         tilbake = "/"
     svar = redirect(tilbake, code=303)
@@ -1633,7 +1722,37 @@ def _valglager() -> valg.Valglager | None:
     return valg.Valglager(tilkobling, naa)
 
 
+def _omsetningen(lager: valg.Valglager, medianene: dict, symbol: str) -> tuple[float | None, date | None, bool]:
+    """Story 8.11c (spørsmål 9 i 8.11b): medianen for merket «Utenfor
+    målingen», den samme som i de ferdige listene. For en aksje som regnes av
+    kursene, er det medianen av kursene til den siste dagen med kurser;
+    ellers den siste målingen i omsetning (2.13), som før. Gir (median i NOK
+    eller None, dagen, regnet av kursene)."""
+    if symbol in medianene:
+        median, dag = medianene[symbol]
+        return median, dag, True
+    median, maalt = lager.omsetning(symbol)
+    return median, maalt, False
+
+
+def _medianene() -> dict:
+    """Story 8.11c: medianene av kursene, regnet én gang per forespørsel
+    (gjennomgangen, BH4, ECH2)."""
+    if "medianene" not in g:
+        g.medianene = ferdige_lister.medianene(g.get("tilkobling"))
+    return g.medianene
+
+
 def _egne() -> dict | None:
+    """«Dine egne aksjer» og «Din egen liste», regnet én gang per forespørsel.
+    Gjennomgangen av 8.11c (BH4, ECH2): siden og context processoren brukte
+    hver sin utregning, med de ferdige listene og medianene to ganger."""
+    if "egne" not in g:
+        g.egne = _egne_regnet()
+    return g.egne
+
+
+def _egne_regnet() -> dict | None:
     """«Dine egne aksjer» og «Din egen liste» - story 2.12 (utdraget 08.11
     §1 og §2). Bare lesing (AD-10): aksjene i lista, ønskene som venter, og
     omsetningen fra 2.13."""
@@ -1645,10 +1764,11 @@ def _egne() -> dict | None:
         ventende = lager.ventende()
         egne = lager.egne()
         fjernes = {o.symbol: o.id for o in ventende if o.handling == valg.FJERN}
+        medianene = _medianene()
         rader = []
         for aksje in lista:
             if aksje.symbol in egne:
-                median, _ = lager.omsetning(aksje.symbol)
+                omsetningen = _omsetningen(lager, medianene, aksje.symbol)
                 rader.append(
                     {
                         "symbol": aksje.symbol,
@@ -1656,12 +1776,13 @@ def _egne() -> dict | None:
                         "sektor": aksje.sektor,
                         "status": "fjernes" if aksje.symbol in fjernes else "hentet",
                         "oenske": fjernes.get(aksje.symbol),
-                        "utenfor": valg.utenfor_maalingen(median),
+                        "utenfor": valg.utenfor_maalingen(omsetningen[0]),
+                        "omsetningen": omsetningen,
                     }
                 )
         for o in ventende:
             if o.handling == valg.FOLG:
-                median, _ = lager.omsetning(o.symbol)
+                omsetningen = _omsetningen(lager, medianene, o.symbol)
                 rader.append(
                     {
                         "symbol": o.symbol,
@@ -1669,7 +1790,8 @@ def _egne() -> dict | None:
                         "sektor": o.sektor,
                         "status": "venter",
                         "oenske": o.id,
-                        "utenfor": valg.utenfor_maalingen(median),
+                        "utenfor": valg.utenfor_maalingen(omsetningen[0]),
+                        "omsetningen": omsetningen,
                     }
                 )
         folg = sum(o.handling == valg.FOLG for o in ventende)
@@ -1681,10 +1803,17 @@ def _egne() -> dict | None:
         utenfor_tekst = {}
         for rad in rader:
             if rad["utenfor"]:
-                median, maalt = lager.omsetning(rad["symbol"])
-                utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt)
+                # Gjennomgangen (BH6): omsetningen fra raden, ikke lest på nytt.
+                median, maalt, kursene = rad["omsetningen"]
+                utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt, kursene=kursene)
         egne_i_lista = len(egne)
+        # Story 8.11: de ferdige listene, med merket for omsetningen.
+        ferdige = ferdige_lister.lister(g.tilkobling)
         return {
+            "ferdige": ferdige,
+            "ferdige_utenfor": frozenset(
+                a.symbol for liste in ferdige.values() for a in liste if valg.utenfor_maalingen(a.median)
+            ),
             "rader": rader,
             "symboler": frozenset(r["symbol"] for r in rader if r["status"] != "venter"),
             "utenfor": frozenset(r["symbol"] for r in rader if r["utenfor"]),
@@ -1741,18 +1870,22 @@ def folg_side():
     gammel = i_lista.get(bytt) if bytt else None
     valgt = lager.boersaksje(kode) if kode else None
     omsetning = None
+    # Story 8.11c: samme median som i de ferdige listene og merket. Bare når
+    # siden viser en omsetning (gjennomgangen, BH4).
+    medianene = _medianene() if valgt is not None or sok else {}
     if valgt is not None:
-        median, maalt = lager.omsetning(valgt.kode)
+        median, maalt, kursene = _omsetningen(lager, medianene, valgt.kode)
         omsetning = {
             "median": median / 1_000_000 if median is not None else None,
             "maalt": maalt,
+            "kursene": kursene,
             "utenfor": valg.utenfor_maalingen(median),
         }
     treff = []
     if sok and valgt is None:
         for aksje in lager.sok(sok):
-            median, maalt = lager.omsetning(aksje.kode)
-            treff.append({"kode": aksje.kode, "navn": aksje.navn, "median": median, "maalt": maalt})
+            median, maalt, kursene = _omsetningen(lager, medianene, aksje.kode)
+            treff.append({"kode": aksje.kode, "navn": aksje.navn, "median": median, "maalt": maalt, "kursene": kursene})
     # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
     # ikke følges, og siden sier det før skjemaet sendes.
     alt_fulgt = valgt is not None and (
@@ -1800,6 +1933,24 @@ def folg():
             deler["bytt"] = bytt
         return redirect("/folg?" + urlencode(deler), code=303)
     return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
+
+
+@app.post("/ferdig-liste")
+def bruk_ferdig_liste():
+    """Story 8.11 (FR-108): en ferdig liste blir lista ved neste henting.
+    Bare oenske skrives (AD-3), og ingenting hentes (AD-10)."""
+    _samme_side()
+    lager = _valglager()
+    if lager is None:
+        abort(404)
+    lista = ferdige_lister.lister(g.tilkobling).get(request.form.get("bransje", ""))
+    if not lista:
+        abort(400)
+    try:
+        lager.bruk_liste([(a.symbol, request.form["bransje"]) for a in lista])
+    except (valg.UgyldigValg, valg.ListaErFull):
+        abort(400)
+    return redirect(VALG_TILBAKE["min_liste"], code=303)
 
 
 @app.post("/fjern")

@@ -225,6 +225,9 @@ class Graf:
     dager: tuple[Dag, ...] = ()
     # Story 8.8: dagene aksjen skilte seg ut, lest og aldri regnet.
     signaldager: tuple[Signaldag, ...] = ()
+    # Story 8.14 (FR-407): x for justeringsdagene grafen har, regnet av
+    # kursserien (justeringsdager.py), og datoene i samme rekkefølge.
+    justeringsdager: tuple[tuple[date, float], ...] = ()
     # Story 8.7 (FR-202, tillegget): baandet for sjekk 2 som punktstreng for
     # en polygon, volumsoeylene (x, y, bredde, hoeyde), strekene for
     # medianvolumet og grensen for sjekk 3 i stykker der de finnes, og hvor
@@ -609,6 +612,7 @@ def bygg_graf(
     smal: bool = False,
     signal: dict[date, tuple[int, str]] | None = None,
     alle: int = 3,
+    justeringer: tuple[date, ...] = (),
     volumfaktor: float | None = None,
 ) -> Graf | None:
     """Koordinatene for kurs og MA50, og for indeksen naar den er gitt som
@@ -668,6 +672,7 @@ def bygg_graf(
         if signal and d in signal
     )
 
+    justeringene = set(justeringer)
     # Story 8.7: baandet for sjekk 2 og feltet for sjekk 3, naar kalleren gir
     # volumfaktoren fra Parametre (aksjesiden).
     baand = ""
@@ -702,6 +707,9 @@ def bygg_graf(
         smal=smal,
         dager=_dagene(punkter, lav, hoy, bredde, hoyde, hoeyre, bunn),
         signaldager=signaldager,
+        justeringsdager=tuple(
+            (d, _x(i, len(punkter), bredde, hoeyre)) for i, d in enumerate(datoene) if d in justeringene
+        ),
         baand=baand,
         volumsoeyler=soeyler,
         medianstreker=medianstreker,

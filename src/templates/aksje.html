@@ -65,6 +65,9 @@
       <span class="etikett">Endring {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}</span>
       <span class="verdi {% if vist_endring is not none %}{{ 'opp' if vist_endring > 0 else 'ned' if vist_endring < 0 else '' }}{% endif %}">{% if detalj.endring is not none %}{{ detalj.endring|tall('endring') }}{% else %}–{% endif %}</span>
       {% if detalj.forrige_dato %}<span class="forklaring">fra {{ detalj.forrige_dato|ukedag }} {{ detalj.forrige_dato|dato }} til {{ detalj.dato|ukedag }} {{ detalj.dato|dato }}</span>{% endif %}
+      {#- Story 2.6 (FR-407): dagen er en justeringsdag. #}
+      {#- Gjennomgangen (ECH2): bare med en endring å forklare. #}
+      {% if detalj.justeringsdag and detalj.endring is not none %}<span class="forklaring justeringsdag">Justeringsdag: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt.</span>{% endif %}
     </div>
     <div class="noekkeltall">
       <span class="etikett">Signalstyrke {{ hjelpeknapp("hjelp-styrke", "Hjelp: signalstyrken") }}</span>
@@ -241,6 +244,9 @@
         {% endfor %}
         {#- Story 8.2b, b (U41, U47): navnene står i feltet til høyre, ved
             enden av linjene, og den stiplede linja har også navn. #}
+        {#- Story 8.14 (FR-407): en kort strek nederst for hver
+            justeringsdag grafen har. #}
+        {% for d, x in g.justeringsdager %}<line class="justeringsdag" x1="{{ "%.1f"|format(x) }}" y1="{{ g.bunn - 10 }}" x2="{{ "%.1f"|format(x) }}" y2="{{ g.bunn }}"></line>{% endfor %}
         {% if g.kursnavn %}<text class="linjenavn kurs" x="{{ "%.1f"|format(g.kursnavn.x) }}" y="{{ "%.1f"|format(g.kursnavn.y) }}">{{ linjenavn.kurs }}</text>{% endif %}
         {% if g.snittnavn %}<text class="linjenavn snitt" x="{{ "%.1f"|format(g.snittnavn.x) }}" y="{{ "%.1f"|format(g.snittnavn.y) }}">{{ linjenavn.snitt }}</text>{% endif %}
         {% if g.indeksnavn %}<text class="linjenavn indeks" x="{{ "%.1f"|format(g.indeksnavn.x) }}" y="{{ "%.1f"|format(g.indeksnavn.y) }}">{{ linjenavn.indeks }}</text>{% endif %}
@@ -298,6 +304,9 @@
             grafen sies for seg. #}
         {% if signal_fra and signal_fra > graf.siste_dato %}Signalet er lagret fra {{ signal_fra|dato }}, etter den siste dagen i grafen, så grafen har ingen prikker.
         {% elif signal_fra %}{% set n = graf.signaldager|length %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}. {% if n %}Rund prikk er positiv, firkant negativ og rute blandet. {{ n }} {{ "dag" if n == 1 else "dager" }} i grafen{% if n <= 31 %}<span class="skjult">: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}){% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}.{% else %}Ingen av dagene i grafen hadde signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% endif %}
+        {#- Story 8.14 (FR-407): antallet det siste året og den siste dagen,
+            regnet av kursserien. Ordet «utbytte» står ikke her. #}
+        <span class="justeringstekst">{% set nj = justeringer|length %}{% if graf.justeringsdager %}De korte strekene nederst i grafen er justeringsdager<span class="skjult"> ({% for d, x in graf.justeringsdager %}{{ d|dato }}{% if not loop.last %}, {% endif %}{% endfor %})</span>: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt den dagen. {% endif %}{% if nj %}Det siste året var det {{ nj }} {{ "justeringsdag" if nj == 1 else "justeringsdager" }}, den siste {{ justeringer[-1]|dato }}.{% else %}Ingen justeringsdager det siste året.{% endif %}</span>
         {% if dagen and graf.merket %}Dagen er merket med en strek.{% elif dagen %}{{ dagen.dato|dato }} har ingen kurs, så grafen slutter {{ graf.siste_dato|dato }}.{% endif %}
         {#- Story 2.9c (gjennomgangen, BH3): tre linjer når indeksen er med. #}
         {% if graf.har_indeks %}
@@ -340,9 +349,11 @@
       25.10 kl. 11, VG11). #}
   {#- Story 8.2a, a (U35): bryteren sender tilbake til ankeret, på teksten
       når den vises og ellers på bryteren. #}
-  {#- Story 8.2b, c (U66): KI-teksten står etter grafen og lenken til
-      investorsiden, før historikken (utdraget §11, designregler §5), og
-      fortsatt under regelforklaringen (FR-602). U33, U46 og U67: bryteren
+  {#- Story 8.2b, c (U66): KI-teksten står etter grafen, før historikken
+      (utdraget §11, designregler §5), og fortsatt under regelforklaringen
+      (FR-602). Rettet 2026-11-09 (gjennomgangen av 3.4h, ECH7): her sto
+      «etter grafen og lenken til investorsiden»; fra 3.4h er lenken boblen
+      nederst, under «Signalet dag for dag». U33, U46 og U67: bryteren
       står inne i rammen øverst til høyre, som en bryter med «På» og «Av»,
       i blekk, ikke gul (spørsmål 5 i spesifikasjonen). Rammen er et kort
       som de andre, og tallene i teksten har prikket strek (designregler §4).
