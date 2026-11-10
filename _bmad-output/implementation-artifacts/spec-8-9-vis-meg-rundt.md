@@ -2,7 +2,7 @@
 title: 'Story 8.9: «Vis meg rundt»'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '1a72810a'
 context:
@@ -85,3 +85,5 @@ Diffen `1a72810a..a4111592`, uten `tests/test_docker.py` og bildene: Blind Hunte
 *Svar 2026-11-10 kl. 11:52 (gruppens svar):* forslaget i spørsmål 8 er godtatt: stegene har tavlas tekster uten setningene som er tatt bort fra sidene eller ikke kan stå i en hjelpetekst. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-10 (flettingen, main inn i `98f0d024`):* CI feilet på `98f0d024`: vakten fra 9.9, `test_ingen_test_som_leser_dokumentene_faller_utenfor`, fant at `test_vis_meg_rundt_8_9.py` leser endringsforslaget 13.10 gjennom `ENDRINGSFORSLAGET_13_10` i `src/hjelpetekster.py` uten å være med i `--dokumentene`. Vakten kom til main etter at 8.9 ble bygget. Modulen står nå i `TILLEGG` i `tests/dokumenttestene.py`, og `modulene` tar bare med modulene i `TILLEGG` som finnes i mappa den leser, så `test_bare_koden_teller` og `test_en_hjelpemodul_som_leser_tar_med_dem_som_importerer_den` prøver det samme som før. Uten `TILLEGG` feiler vakten (prøvd med `git stash`), og med den består den. Lokalt slapp feilen gjennom, fordi `test_dokumenttestene.py` kjørte alene i siste del av hele settet, og da hopper vakten over seg selv; den prøves bare av CI, som kjører hele settet samlet.
+
+*Lagt til 2026-11-10:* 8.9 er flettet med PR #136 i `eb3ba928` kl. 19:51, låst til head-en `d7818bbd`, etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md` og gruppens svar 10.11 kl. 11:52, etter brukertesten, som spørsmål 6 sa. Main, med 2.4, 2.6, 8.14 og 8.7, ble flettet inn i `98f0d024`; konfliktene var bildene og avtrykkene, og diffen mot main var endringene grenen hadde mot `1a72810a`. Avtrykkene er regnet ut på nytt, og alle de ti bildene er tatt på nytt fra demoen med DevTools-protokollen: oversikten, aksjesiden, Min liste, oversikten ved 390 px og «Din egen liste» er nye, og de andre er byte for byte de samme. CI feilet på `98f0d024` og ble grønn etter `d7818bbd` (over). Hele settet alene i ni deler 19:35:26–19:48:07: 4921 bestått, 25 hoppet over og 0 feilet, til sammen de 4946 som `pytest --collect-only` finner. CI var grønn på head-en (run 42878900090). Treet på main etter `git pull --ff-only` er likt treet på `d7818bbd`. Ingen funn på middels eller over sto åpne: BH1 og BH4 ble lukket av gruppen kl. 11:52.

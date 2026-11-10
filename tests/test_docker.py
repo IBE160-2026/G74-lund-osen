@@ -3394,6 +3394,10 @@ class TestReadmeForNybegynnere:
             "signaldagene",
             "og ki-teksten om dagen",
             "ferdige lister, egne aksjer og «innstillinger»",
+            # Flettingen av de fem storyene 10.11: sjekk 2 og 3 i kursgrafen og
+            # justeringsdagene. «På aksjesiden:» er tatt ut, så punktet har
+            # høyst 20 ord. «Vis meg rundt» står i setningen under listene.
+            "periodene i kursgrafen med «vis dagen», sjekkene, justeringsdagene",
         ):
             assert sak in ferdig, sak
         # Story 3.3h: det rundt appen står i én setning under listene, ikke
@@ -3435,13 +3439,11 @@ class TestReadmeForNybegynnere:
             # Nattflettingen 09.11: signaldagene, «Vis KI-tekst», KI-teksten om
             # dagen og å velge og bytte aksjer er flyttet til «Ferdig», og
             # «Ekstra» har storyene i de åpne PR-ene fra ekstravinduet.
-            "dokumenttestene i én kommando",
-            "«utenfor målingen» med samme median som bransjelistene",
-            "de lave funnene fra gjennomgangene",
-            "etterfylling av hull i kursserien",
-            "justeringsdagene, regnet av kursserien alene",
-            "sjekk 2 og 3 i kursgrafen",
-            "«vis meg rundt»",
+            # Flettingen av de fem storyene 10.11: de sju fra ekstravinduet er
+            # flettet, og «Ekstra» har storyene i de åpne PR-ene, som 09.11.
+            "målingen av omsetning for aksjene som ikke er målt",
+            "faste bransjer, «følg en aksje» med hele lista",
+            "egne notater på aksjesiden",
         )
         assert len(neste_punkter) == len(saker), neste_punkter
         for punkt, sak in zip(neste_punkter, saker):
@@ -3595,8 +3597,9 @@ class TestReadmeForNybegynnere:
         # 3.5i: 40 med docs/installasjon.md i punktet for docs/ og i punktet
         # for skjermbildene, som staar der. Gruppens ønske 09.11 kl. 22:01: 41
         # med investorsiden ved 390 px i punktet for docs/appen/.
-        # Story 8.21 (tillegg 2): 44, med de tre nye bildene i docs/appen/.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 44, lenker
+        # Flettingen av de fem storyene 10.11: «Din egen liste» og investorsiden ved 1280 px (regel 19).
+        # Story 8.21 (tillegg 2): 46, med de tre nye bildene i docs/appen/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 46, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -3732,13 +3735,11 @@ EKSTRA = (
     # flettet og flyttet til «Ferdig». Under «Ekstra» står storyene i de åpne
     # PR-ene fra ekstravinduet, #130–#136. Var signaldagene, «Vis KI-tekst»,
     # KI-teksten om dagen og å velge og bytte aksjer.
-    ("dokumenttestene",),
-    ("«utenfor målingen»",),
-    ("de lave funnene",),
-    ("etterfylling",),
-    ("justeringsdagene",),
-    ("sjekk 2 og 3",),
-    ("«vis meg rundt»",),
+    # Flettingen av de fem storyene 10.11: de sju er flettet, og «Ekstra» har
+    # storyene i de åpne PR-ene #137–#139.
+    ("målingen av omsetning",),
+    ("«følg en aksje»",),
+    ("egne notater",),
 )
 
 
@@ -4053,8 +4054,10 @@ AVTRYKK_I_PILENE = {
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i
     # punktet for docs/appen/. Var 2b262698....
-    # Story 8.21 (tillegg 2): de tre nye bildene i punktet for docs/appen/. Var bea5b6e1....
-    "Mappestruktur": "f24d185ea80a33c46596d10d6575b00462cf3e55ff90fdecf4637824ce01b86f",
+    # Flettingen av de fem storyene 10.11 (regel 19): «Din egen liste» og
+    # investorsiden ved 1280 px i punktet for docs/appen/. Var bea5b6e1....
+    # Story 8.21 (tillegg 2): og de tre nye bildene. Var cd526f3e....
+    "Mappestruktur": "e4171fa95aba3be40915855c4d57d6189e96f36db42225c10780cf44f8c11322",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye

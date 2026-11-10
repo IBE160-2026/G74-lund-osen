@@ -533,9 +533,11 @@ class TestDokumentene:
     def test_readme_og_hjelpen_nevner_notatene(self):
         """Regel 19: ville feilet hvis README-en eller hjelpen ikke nevnte
         notatene."""
-        # Punktet i «Status» har høyst 20 ord (test_docker), så README-en sier
-        # «notater» om aksjesiden, og hjelpen har navnet på delen.
-        assert re.search(r"^- Aksjesiden: .*\bnotater$", (ROT / "README.md").read_text(encoding="utf-8"), re.M)
+        # Punktene i «Status» er fulle (høyst 20 ord, og ordene testene krever),
+        # så README-en nevner «Mine notater» ved bildene i knappen (flettingen
+        # av main med «Status» 10.11), og hjelpen har et eget avsnitt.
+        readme = (ROT / "README.md").read_text(encoding="utf-8")
+        assert "«Mine notater» på aksjesiden" in readme and "Notatene samlet nederst i Min liste" in readme
         assert "### Hva er «Mine notater»?" in (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
 
     def test_testene_begynner_uten_notater(self, demobase):

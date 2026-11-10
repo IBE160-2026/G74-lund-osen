@@ -4090,6 +4090,8 @@ del er før jeg leser tallene.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle åtte forslagene i spesifikasjonen er godtatt, også spørsmål 8 (tavla mot 8.20a). BH1 og BH4 lukkes som avgjort av gruppen, med graden urørt (regel 25). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
+*Ferdig 2026-11-10:* flettet i `eb3ba928`, PR #136.
+
 ### Story 8.10: Innstillinger øverst
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
