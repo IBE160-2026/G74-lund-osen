@@ -36,6 +36,8 @@ Telt med `mode=ro` 10.11, før svaret kl. 16:31: 297 aksjer i `boersliste`, 112 
 10. **Kall som feiler (ECH2, middels).** Uten valget kunne kall som feiler, bruke høyst de 20 kallene av dagens. Med valget kunne de bruke rundt 150 fra bonuskvoten uten en eneste måling. *Forslag:* med valget stopper målingen etter tre kall på rad som feiler uten svar om at tickeren ikke finnes (404). Det som er målt, lagres. Bygget slik.
 11. **Samtidig med jobben (ECH3, middels).** Det finnes ingen lås mellom to kjøringer av `--maal-omsetning`. Går jobbens siste kjøring fortsatt, bruker begge kvoten og måler de samme aksjene. Jobben stopper da med kode 1, fordi extraLimit endrer seg. *Forslag:* ingen lås i koden. Steg 3 i instruksjonen starter bare når oppgaven ikke står som «Kjører», og `docs/installasjon.md` sier at valget ikke skal startes mens jobben kjører.
 
+*Svar 2026-11-10 kl. 17:42 (gruppens svar):* alle de elleve forslagene er godtatt, også 9–11 slik de er bygget. ECH1, ECH2 og ECH3 lukkes som avgjort av gruppen, med graden urørt (regel 25). Rådet anbefalte det. Svaret er ført i `docs/ai-prompts/2026-11-10.md` sammen med målingen, og under 2.13 i `epics.md` i steg 2.
+
 ## Intent
 
 **Problem:** De ferdige listene og filtrene (8.11) kan bare bruke en median som står i tabellen `omsetning`. 185 av de 297 aksjene i børslista har ingen rad der. Målingen fra 2.13 tar 20 om dagen og bruker aldri bonuskvoten, så det ville tatt over en uke.
@@ -81,6 +83,7 @@ Diffen `53ff012c..97f0fdc4`. Blind Hunter så bare diffen og fant 7 funn. Edge C
 **Middels**
 - *ECH2, rettet (spørsmål 10).* Med valget stopper målingen etter tre kall på rad som feiler uten 404. Testene er `test_stopper_etter_tre_feil_paa_rad`, `test_en_feil_innimellom_stopper_ikke` og `test_404_teller_ikke_som_feil_paa_rad`.
 - *ECH3, ført (spørsmål 11).* Det er ingen lås. Steg 3 og `docs/installasjon.md` dekker det.
+- *ECH1, ECH2 og ECH3, lukket 2026-11-10 som avgjort av gruppen* (svaret kl. 17:42), med graden som før (regel 25): forslagene i spørsmål 9–11 er godtatt.
 - *BH1 og ECH7, rettet.* Den tomme planen sier hver grunn for seg. Startlinja sier hvor mange av aksjene uten måling som måles, og hvor mange som venter.
 - *BH5, rettet.* Testen uten valget har nå en aksje med rad og sjekker de eksakte kallene.
 
