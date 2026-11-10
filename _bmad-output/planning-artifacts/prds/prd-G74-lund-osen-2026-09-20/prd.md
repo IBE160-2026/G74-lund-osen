@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-09T00:04
+updated: 2026-11-10T23:51
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -225,6 +225,8 @@ Brukerkontoer, innlogging og personlig portefølje; varsler, betaling,
 mobiltilpasning og meglerintegrasjon; flere børser og flere språk;
 fundamental- og verdimodell; intradag- og sanntidsdata; statistisk studie av om
 signalene slår markedet.
+
+*Lagt til 2026-11-10 (gruppens svar kl. 14:44):* tenkte kjøp og salg ved et notat på aksjesiden (story 8.21) er flyttet inn i v1. Ekte portefølje, kontoer, varsler og statistikk over om signalene slår markedet står utenfor som før.
 
 ### Utsatte vurderinger
 

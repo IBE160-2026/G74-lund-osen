@@ -4493,6 +4493,33 @@ NFR-08, `AD-10`
 
 *Lagt til 2026-11-07:* 8.20b er flettet med PR #119 i `8d89cf8c` kl. 20:08, låst til head-en `3266e7b2` (main flettet inn i `73de46d1`, og svaret kl. 20:01 med BH9 lukket i spesifikasjonen), etter instruksjonen kl. 20:03 i `docs/ai-prompts/2026-11-07.md`. CI var grønn på head-en (run 42404496878) og på flettecommiten (run 42404752485), med 4463 bestått og 31 hoppet over i jobben `pytest` begge gangene. Hele settet lokalt før `2aba7d25`: 4470 bestått, 24 hoppet over og 0 feilet. Med 8.20c (#117), 8.20a (#118) og 8.20b (#119) er 8.20 done; U84 bygges i 3.4h.
 
+### Story 8.21: Egne notater på aksjesiden, med tenkte kjøp og salg
+
+*Lagt til 2026-11-10, etter instruksjonen kl. 16:08 og tilleggene kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.* Spesifikasjonen, med spørsmålene og forslagene, triagen og mutantene, står i `_bmad-output/implementation-artifacts/spec-8-21-egne-notater-paa-aksjesiden.md`.
+
+Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan det gikk etterpå, også med et tenkt kjøp og salg, så jeg kan lære av det jeg selv tenkte, uten at appen sier hva som var riktig.
+
+**Oppfyller:** svarene 10.11 kl. 14:32, 14:44 og 15:57 · **Begrenses av:** NFR-06, NFR-08, `AD-3`, `AD-7`, `AD-10`, `AD-16`
+
+**Kontroll — hva testen ser etter:**
+- Et notat får dagen siden viser, og under det står endringen i aksjen og hovedindeksen fra notatdagen til siste dag med kurser, og signalet som er lagret for de dagene
+- Notatene står under kursgrafen og «Signalet forklart», og samlet nederst i Min liste. Bryteren «Notater» i Innstillinger skjuler dem uten å slette noe
+- Et tenkt kjøp og salg får neste sluttkurs etter trykket, lest fra serien og aldri lagret, med sjekkene slik de sto på siden, bare i prosent og med hovedindeksen ved siden av
+- Notatene, kjøpene og bryteren lagres i nye tabeller i `0012_notat.sql` (`AD-16`), med webserveren som eneste skriver
+- Demoen har oppdiktede eksempler merket «Eksempeltall»
+- Ingen API-kall, og ingen ord om at noe var riktig eller galt (NFR-06)
+- **Ville feilet hvis:** et notat fikk en annen dag enn siden viste, signalet eller kursen ved et kjøp ble regnet eller lagret i stedet for lest, eller siden brukte et av ordene riktig, galt, gevinst, tap eller vant
+
+**Avhenger av:** 2.7b, 8.16b og 8.17b. **Én økt:** ja.
+
+*Avgjort 2026-11-10 kl. 14:32 (gruppens svar):* egne notater på aksjesiden bygges i dag og flettes i natt kl. 23:50–23:58, fordi de trenger en ny tabell. Rådet anbefalte onsdag, men gruppen valgte i natt. Nettsiden får også skrive notatene til basen, som ønskene og innstillingene, og det utvider svaret 09.11 kl. 10:23; rådet anbefalte det. Svaret er ført etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`.
+
+*Avgjort 2026-11-10 kl. 14:44 (gruppens svar):* notatet skrives under signalet og kursgrafen, alle notatene står samlet nederst i Min liste, og Innstillinger får bryteren «Notater», som rådet anbefalte. Tenkte kjøp og salg flyttes inn i v1 og bygges i samme story i natt; rådet anbefalte onsdag, men gruppen valgte i natt. Svaret kl. 14:32 om at nettsiden skriver notatene, gjelder også de tenkte kjøpene og salgene. Svaret er ført etter tillegget kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
+
+*Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel, med oppdiktede eksempler merket «Eksempeltall». Rådet anbefalte det. Svaret er ført etter tillegg 2 kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
+
+*Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

@@ -169,6 +169,10 @@ et sitat som ikke fantes».
     migrerer basen når den startes, og skriver også ønskene (2.12) og
     innstillingene (8.10), ikke bare merkingen i Min liste. Rådet anbefalte
     at `--les-boerslista` migrerer først tirsdag.
+    *Lagt til 2026-11-10 (gruppens svar kl. 14:32 og 14:44):* webserveren
+    fra main skriver også notatene (8.21), og etter svaret kl. 14:44 de
+    tenkte kjøpene og salgene og bryteren «Notater», i tabellene fra
+    `0012_notat.sql`. Rådet anbefalte det.
 23. **ruff før en commit.** `uv run ruff check --fix` og så `uv run ruff format`
     før hver commit som endrer `src/` eller `tests/`. Reglene står i `pyproject.toml`
     og er bare de som finner feil eller rot: pyflakes, importene og bugbear.

@@ -2,7 +2,7 @@
 title: 'Story 8.21: Egne notater på aksjesiden'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '53ff012c'
 context:
@@ -171,3 +171,7 @@ Blind Hunter med bare diffen `05e9a877..89892c52`, uten bildene og `tests/test_d
 - *Ikke en feil:* ECH7 og BH11 (0012 er endret på grenen før flettingen. En base som er migrert med den første 0012, avvises av `migrer()`, fordi sha256 av fila er lagret. Slike baser finnes bare i testenes midlertidige mapper; den ekte basen og demobasen på main har aldri hatt 0012).
 
 *Lagt til 2026-11-10 (flettingen av main med «Status» 10.11):* punktet om aksjesiden i «Status» står som på main, fordi punktene har høyst 20 ord, og de i Min liste og om aksjesiden har ordene testene krever. README-en nevner «Mine notater» ved de tre nye bildene i knappen, og `test_readme_og_hjelpen_nevner_notatene` sjekker det. «Avvik fra delene» under «Bygget 10.11» gjelder dermed ikke lenger.
+
+*Lagt til 2026-11-10:* tallene før flettingen. Hele settet alene i fem deler, summen lik `--collect-only` hver gang: på `199ca4d9` 4971 bestått og 23 hoppet over (4994), på `7573a0d4` 5016 og 24 (5040), på `b03f65bd` 5044 og 24 (5068), på `e59a1093` 5038 og 30 (5068) og på `a8b87de8` 5068 og 24 (5092). PR #139 hadde konflikt med main tre ganger, når 2.4, 2.6 og 8.14, 8.7 og 8.9 og «Status» ble flettet, og CI startet ikke før konflikten var løst. PR-en ble lukket og åpnet igjen to ganger, som instruksjonen sier, før konflikten ble funnet. Main ble flettet inn i `7573a0d4`, `b03f65bd`, `84daf5ac` og, kl. 22:20 etter steg 2, `a8b87de8` (2.13b, uten konflikt). Mutant D ble skrevet om da linja i «Status» gikk ut, overlevde på `84daf5ac` og ble fanget etter `e59a1093`. CI var grønn på head-en `a8b87de8` (run 42907509591).
+
+*Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 og tilleggene kl. 16:52 i `docs/ai-prompts/2026-11-10.md`. Main var ikke endret etter kl. 22:00 (siste commit `86d1fe4f` kl. 21:33), og oppgaven «OSE Signal kveldshenting» sto som «Ready». Treet på main etter `git pull --ff-only` er likt treet på `a8b87de8`. Ingen funn på middels eller over sto åpne.
