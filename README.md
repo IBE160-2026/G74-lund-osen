@@ -150,6 +150,8 @@ uv run pytest
 
 Første `uv sync` laster ned Python og pakkene. Hele testsettet tok mellom 10 og 14 minutter på maskinen vår 08.11.
 
+Er bare dokumentene endret, kjører `uv run pytest --dokumentene` testene som leser README-en, `docs/` eller `_bmad-output/`. Hvilke det er, finnes i koden, og en test i hele settet feiler hvis en test som leser dem, ikke er med.
+
 Alle testene skal bestå. Noen hoppes over fordi de gjelder en annen type maskin, men alle kjøres minst ett sted.
 
 <details>
