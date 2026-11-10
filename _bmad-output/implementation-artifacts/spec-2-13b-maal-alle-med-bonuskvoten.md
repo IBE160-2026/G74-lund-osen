@@ -96,3 +96,12 @@ Diffen `53ff012c..97f0fdc4`. Blind Hunter så bare diffen og fant 7 funn. Edge C
   - ECH5: tellingene, 170 aksjer og kall, er over 100 i utskriften. De er antall, ikke rådata (regel 16).
   - BH7: en 404 gir en rad med feil og regnes som målt (spørsmål 6).
   - VG4: to samtidige kjøringer er ikke testet (ECH3).
+- **Mutantene for rettingene** på `36bca8cf` og `39c89ebf`, med kopi før og fila lik HEAD etterpå (`git hash-object`):
+  - ECH1 (`natt` alltid usann), fanget av `TestGjennomgangen`.
+  - ECH2 (stoppen etter tre feil tatt bort), fanget av `TestGjennomgangen`.
+  - BH1 (grunnen «ingen aksje mangler» tatt bort), fanget av `TestUtvalget`.
+  - BH3 (forskjellen fra starten): overlevde først på `36bca8cf`. Etter `test_kallene_fra_bonusen_telles_uten_det_andre_bruker_mellom_kallene` i `39c89ebf` ble den fanget.
+
+## Testene
+
+Hele settet på `39c89ebf`, alene i fire deler, 16:53:07–17:11:01: 4872 bestått, 24 hoppet over og 0 feilet. Det er til sammen de 4896 som `pytest --collect-only` finner. ruff er kjørt før hver commit.
