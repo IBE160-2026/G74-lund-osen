@@ -23,8 +23,9 @@ import fetch_prices
 import lagring_fil
 import lagring_sqlite
 import omsetning
+from indeksdata import HOVEDINDEKS
 from kursdata import AKSJEUNIVERS, Kursrad
-from lagring_sqlite import SqliteKurslager, aapne_base
+from lagring_sqlite import SqliteIndekslager, SqliteKurslager, aapne_base
 from migrering import migrer, versjon
 from omsetning import MAALT_I_MALINGER, maal_omsetning, maalt_i_malingene, regn_ut, rekkefoelge, vindu
 from test_indeks import katalog_til
@@ -76,14 +77,18 @@ class Kvote:
         ]
 
 
-def _fyll(boersdag: date, uten: tuple[str, ...] = ()) -> None:
+def _fyll(boersdag: date, uten: tuple[str, ...] = (), med_indeksen: bool = True) -> None:
+    """Kursene for boersdagen i basen. Story 2.4: ogsaa hovedindeksen, som
+    hentingen har naar aksjene har kursene, saa maalingen ikke venter paa den."""
     tilkobling = aapne_base(lagring_sqlite.BASE_STI)
     try:
         lager = SqliteKurslager(tilkobling)
+        rad = Kursrad(dato=boersdag, slutt=100.0, justert_slutt=100.0, volum=1000)
         for aksje in AKSJEUNIVERS:
             if aksje.symbol not in uten:
-                rad = Kursrad(dato=boersdag, slutt=100.0, justert_slutt=100.0, volum=1000)
                 lager.erstatt_serie(aksje.symbol, [rad], ONSDAG)
+        if med_indeksen:
+            SqliteIndekslager(tilkobling).erstatt_serie(HOVEDINDEKS.symbol, [rad], ONSDAG)
     finally:
         tilkobling.close()
 
@@ -259,6 +264,19 @@ class TestHentingenFoerst:
         kode, ut = _kjoer(tmp_path, kvote, klokke=ONSDAG.replace(hour=10))
         assert (kode, kvote.kall) == (1, []), ut
         assert "mangler kursen for 2026-10-28" in ut
+
+    def test_maaler_ikke_naar_bare_hovedindeksen_mangler(self, tmp_path):
+        """Story 2.4 (gjennomgangen 10.11, ECH1): ville feilet hvis maalingen
+        brukte kallene mens bare hovedindeksen manglet dagen. Da faar en ny
+        kjoering av hentingen aldri kallet den trenger for indeksen. Fra kl.
+        23:45 gaar maalingen som for en aksje som mangler."""
+        _fyll(date(2026, 10, 28), med_indeksen=False)
+        kvote = Kvote(brukt=16)
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 44, 59, tzinfo=timezone.utc))
+        assert (kode, kvote.kall) == (1, []), ut
+        assert "Hovedindeksen mangler kursen for 2026-10-28" in ut and "0 kall brukt" in ut
+        kode, ut = _kjoer(tmp_path, kvote, klokke=datetime(2026, 10, 28, 22, 45, tzinfo=timezone.utc))
+        assert kode == 0 and len(kvote.kall) == 4, ut
 
     def test_maaler_ikke_uten_base(self, tmp_path):
         kvote = Kvote(brukt=0)

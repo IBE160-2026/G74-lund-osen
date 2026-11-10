@@ -1187,6 +1187,14 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
 :where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
                                     color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
+/* Story 8.11: filteret på signalet og de ferdige listene. */
+:where(.side-oversikt) .signalfilter { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+:where(.side-oversikt) .filtertekst { margin: 4px 0 12px; }
+:where(.side-oversikt) .ferdig-liste { margin: 8px 0; }
+:where(.side-oversikt) .ferdig-liste summary { cursor: pointer; display: flex; align-items: center; gap: 6px; }
+:where(.side-oversikt) .ferdig-liste summary .bransjesymbol { width: 16px; height: 16px; flex: none; }
+:where(.side-oversikt) .ferdig-liste ol { margin: 8px 0; padding-left: 24px; }
+:where(.side-oversikt) .ferdig-liste .foer-knappen { margin: 4px 0 8px; color: var(--dempet); }
 /* Story 8.10 (utdraget 08.11 §4): «Innstillinger», med en bryter per valg. */
 :where(.side-oversikt) .innstillinger { max-width: 720px; }
 :where(.side-oversikt) .innstillinger .valg { margin: 16px 0; padding: 18px 20px; background: var(--kort); border: 1px solid var(--strek);

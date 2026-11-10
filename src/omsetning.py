@@ -17,6 +17,9 @@ kursen for boersdagen, stopper valget med 0 kall, saa kallene staar til et
 nytt forsoek. Paa en boersdag foer hentingen er det dagens kurs som mangler.
 Fra kl. 23:45 i Oslo, jobbens siste kjoering, gaar maalingen likevel med
 kallene som er igjen etter de nye forsoekene (avgjoerelsen kl. 23:19, d).
+Story 2.4 (gruppens svar 10.11 kl. 15:30): mangler bare hovedindeksen
+boersdagen, venter maalingen paa samme maate, fordi en ny kjoering av
+hentingen da henter indeksen alene med ett kall.
 
 Kvoten leses med /api/user (gratis) foer og etter hvert kall, som i §51.
 Valget stopper hvis extraLimit endrer seg, hvis apiRequestsDate ikke er
@@ -30,11 +33,7 @@ fetch_prices.py, som har de to nettfunksjonene (AD-2), og testene gir falske
 utskriften har verken kurser, volumer eller medianene.
 """
 
-import calendar
 import json
-import math
-import statistics
-from dataclasses import dataclass
 from datetime import date, datetime, time, timezone
 from pathlib import Path
 from typing import Callable
@@ -45,13 +44,20 @@ from fetch_prices import (
     BASEFEIL,
     UlesbarKvote,
     _uten_noekkel,
+    indeksen_mangler,
     les_kvotetall,
     lista_fra_basen,
     manglende_i_basen,
     nekt_demobase,
 )
+from indeksdata import HOVEDINDEKS
 from kursdata import AKSJEUNIVERS, Aksje
 from lagring_fil import PROSJEKTROT
+
+# Story 8.11b: utregningen staar i omsetningsregning.py, saa webserveren kan
+# bruke den uten aa importere fetch_prices (AD-10). Navnene importeres her
+# som foer.
+from omsetningsregning import MAANEDER, Maaling, _tall, regn_ut, vindu  # noqa: F401
 
 # Lista over aksjene paa Oslo Boers fra §40, lest lokalt uten kall. Fila er
 # raadata og spores ikke (regel 10).
@@ -59,7 +65,6 @@ LISTEFIL = PROSJEKTROT / "data" / "proever" / "symbolliste-OL-2026-10-22.json"
 AKSJETYPE = "Common Stock"
 
 PREFIKS = "omsetning"
-MAANEDER = 3
 
 # Jobbens siste kjoering. Fra da stopper ikke en manglende kurs maalingen
 # (avgjoerelsen 28.10 kl. 23:19, d).
@@ -268,72 +273,6 @@ def maalt_i_malingene() -> dict[str, date]:
     return {symbol: dato for dato, symboler in MAALT_I_MALINGER.values() for symbol in symboler}
 
 
-@dataclass(frozen=True)
-class Maaling:
-    """En rad i omsetning. median er NOK, uavrundet (regel 21), eller None med
-    feil."""
-
-    symbol: str
-    handelsdager: int
-    dager_uten_volum: int
-    rader_uten_tall: int
-    median: float | None
-    feil: str | None
-
-
-def vindu(boersdag: date) -> tuple[date, date]:
-    """Tre maaneder til og med boersdagen, som i §40 (2026-07-22-2026-10-22).
-
-    Finnes ikke dagen tre maaneder foer, er det siste dag i den maaneden.
-    """
-    aar, maaned = divmod(boersdag.year * 12 + boersdag.month - 1 - MAANEDER, 12)
-    dager = calendar.monthrange(aar, maaned + 1)[1]
-    return date(aar, maaned + 1, min(boersdag.day, dager)), boersdag
-
-
-def _tall(verdi: object) -> bool:
-    """Et endelig tall som ikke er negativt. Gjennomgangen (ECH3): et heltall
-    for stort for float gir OverflowError i isfinite, og er ikke et tall her."""
-    if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
-        return False
-    try:
-        return math.isfinite(verdi) and verdi >= 0
-    except OverflowError:
-        return False
-
-
-def regn_ut(symbol: str, rader: object, fra: date, til: date) -> Maaling:
-    """Median av volume x close per rad i vinduet, som i §3 og §42.
-
-    En rad med volum 0 er med, med omsetning 0, og telles i dager_uten_volum.
-    En rad uten tall for close eller volume er ikke med, men telles.
-    """
-    if not isinstance(rader, list):
-        return Maaling(symbol, 0, 0, 0, None, "svaret er ikke en liste med rader")
-    omsetning, uten_volum, uten_tall = [], 0, 0
-    for rad in rader:
-        try:
-            dag = date.fromisoformat(rad["date"])
-        except (TypeError, KeyError, ValueError):
-            uten_tall += 1
-            continue
-        if not fra <= dag <= til:
-            continue
-        if not (_tall(rad.get("close")) and _tall(rad.get("volume"))):
-            uten_tall += 1
-            continue
-        # Gjennomgangen (BH9): volum 0, ikke omsetning 0, saa en kurs paa 0
-        # ikke telles som en dag uten volum.
-        uten_volum += rad["volume"] == 0
-        omsetning.append(float(rad["volume"]) * float(rad["close"]))
-    if not omsetning:
-        return Maaling(symbol, 0, 0, uten_tall, None, "ingen rader med tall i vinduet")
-    median = float(statistics.median(omsetning))
-    if not math.isfinite(median):
-        return Maaling(symbol, 0, 0, uten_tall, None, "medianen er ikke et endelig tall")
-    return Maaling(symbol, len(omsetning), uten_volum, uten_tall, median, None)
-
-
 def les_lista(sti: Path) -> list[str]:
     """Kodene med typen «Common Stock», i rekkefoelgen i fila, uten doble."""
     rader = json.loads(Path(sti).read_text(encoding="utf-8"))
@@ -535,6 +474,15 @@ def maal_omsetning(
         skriv(
             f"{', '.join(mangler)} mangler kursen for {boersdag.isoformat()}. Hentingen og nye forsøk får "
             "kallene først, så målingen venter. 0 kall brukt."
+        )
+        return 1
+    # Story 2.4 (gjennomgangen, ECH1): mangler bare hovedindeksen dagen,
+    # henter en ny kjoering den alene med ett kall, og maalingen venter paa
+    # samme maate, saa den ikke bruker kallet foerst.
+    if not mangler and start.astimezone(OSLO).time() < KL_23_45 and indeksen_mangler(base_sti, boersdag):
+        skriv(
+            f"{HOVEDINDEKS.navn} mangler kursen for {boersdag.isoformat()}. Hentingen får kallet først "
+            "(story 2.4), så målingen venter. 0 kall brukt."
         )
         return 1
     if mangler:
