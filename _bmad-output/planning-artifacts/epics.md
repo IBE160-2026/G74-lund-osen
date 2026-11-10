@@ -651,6 +651,18 @@ Rekkefølgen tas opp igjen etter README-prøven, når farten er kjent. «Egen» 
 
 *Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt, og spørsmål 9 blir et punkt i `issues.md` til senere. Webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), med en Lagt til-linje under regel 22 i `CLAUDE.md`. Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. 2.12, 8.10 og 8.10b squash-flettes samlet fra PR #126 kl. 23:50, og PR #124 og #125 lukkes som tatt med. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
+*Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* 2.4, 2.6 med 8.14, 8.7 og 8.9 bygges 09.11 og flettes onsdag 11.11 etter brukertesten, 8.9 så den ikke påvirker det testen måler. 3.5b og 3.5c ble valgt bort 24.10, og 8.18 er utenfor v1. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-09 kl. 10:47 og 10:53 (gruppens svar):* de fire små tingene fra `issues.md` tas 09.11, og loggene ryddes etter flettingen. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-09 kl. 10:55 (gruppens svar):* alt tas i ett ekstra vindu, så tidlig som mulig. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-09 kl. 11:24 (gruppens svar):* de tre små PR-ene (9.9, 8.11c og 9.10) bygges først i ekstravinduet og flettes i natt. Rådet anbefalte å flette dem tirsdag morgen, men gruppen valgte natten. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`, i tillegget kl. 11:28.
+
+*Ønske 2026-11-09 kl. 11:30 (gruppens ønske):* ingenting skal stoppe opp, i natt eller ellers, fordi CI står fast. Starter ingen kjøring innen 10 minutter, lukkes og åpnes PR-en igjen, og en jobb som stopper uten at et steg feilet, kjøres på nytt én gang. Ønsket er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`, i tillegg 2 kl. 12:00.
+
+*Avgjort 2026-11-09 kl. 15:41 (gruppens svar):* hele settet kjøres i deler, og ingenting skal stoppe opp fordi minnet er lavt. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`, i tillegg 3 kl. 15:43, og etter nattflettingen (kl. 12:00).
+
 ### Epic 1: Dataene overlever en omstart, og historikken lagres slik at den kan leses tilbake (punkt 20)
 
 Brukeren kan slå av maskinen og finne oversikten igjen — og spørsmålet «hva sa
@@ -1730,6 +1742,8 @@ jeg kommer tilbake, så hullet ikke ser ut som en kursbevegelse.
 
 **Én økt:** ja.
 
+*Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 (PR #133, med spesifikasjonen `spec-2-4-etterfylling-av-hull-i-kursserien.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 2.5: Vurderingen skrives i samme kjøring
 
 Som **gruppe**, vil jeg at vurderingen regnes av kursene som nettopp ble lagret,
@@ -1780,6 +1794,8 @@ utbytte, så avviket mellom vist kurs og vist prosent ikke ser ut som en feil.
 
 **Én økt:** ja. **Merk:** kilden er ikke endelig valgt — åpent punkt 4. Storyen
 forutsetter den målte veien.
+
+*Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 8.14 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 2.7: Historikken i aksjedetaljen
 
@@ -4003,6 +4019,8 @@ sjekk 2 og 3 slo ut, slik MA50-linjen viser sjekk 1.
 
 **Avhenger av:** ingen åpne. **Én økt:** ja.
 
+*Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 (PR #135, med spesifikasjonen `spec-8-7-sjekk-2-og-3-i-grafen.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
+
 ### Story 8.8: Signaldager i kursgrafen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
@@ -4051,6 +4069,8 @@ del er før jeg leser tallene.
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.1), godkjent av Marian kl. 12:46:*
 - «Vis meg rundt» har høyst 7 steg, og stegene om retning, signalstyrke og sjekkene bruker tekstene fra tavla i punkt 4.2
+
+*Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 (PR #136, med spesifikasjonen `spec-8-9-vis-meg-rundt.md` på grenen), og flettes onsdag 11.11 etter brukertesten, så den ikke påvirker det testen måler. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 8.10: Innstillinger øverst
 
@@ -4234,6 +4254,8 @@ NFR-06, NFR-08
   dagene ble lest fra en annen kilde enn kursserien
 
 **Avhenger av:** 2.6. **Én økt:** ja.
+
+*Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 2.6 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 ### Story 8.15: Sortering ved klikk i kolonneraden
 
