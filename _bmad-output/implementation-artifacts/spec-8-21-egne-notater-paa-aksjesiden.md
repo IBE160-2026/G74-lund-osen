@@ -76,3 +76,67 @@ Endringen i aksjen og hovedindeksen fra notatdagen til siste dag med kurser, og 
 Notatene virker i demoen. README-en sier at aksjesiden har «Mine notater», og `docs/hjelp.md` har «Hva er «Mine notater»?» (regel 19). Bildene i `docs/appen/` tas på nytt når sidene de viser, er endret.
 
 **Ville feilet hvis:** et notat i demoen ikke ble lagret, eller README-en eller hjelpen ikke nevnte notatene.
+
+## Bygget 10.11 (instruksjonen kl. 16:08)
+
+Bygget på grenen `8-21-egne-notater`, i worktreen `G74-lund-osen-8-21`, fra origin/main (`53ff012c`).
+
+- **Filene:** `src/migrasjoner/0012_notat.sql`, `src/notater.py` (porten og minneutgaven), `src/etterpaa.py` («Etterpå», ren logikk), `SqliteNotatlager` i `src/lagring_sqlite.py`, rutene `POST /aksje/<symbol>/notat` og `POST /aksje/<symbol>/notat/slett` og delen på aksjesiden i `src/app.py`, `src/templates/aksje.html` og `src/static/stil.css`. `docs/hjelp.md` har «Hva er «Mine notater»?», og punktet om aksjesiden i «Status» i README-en sier «notater».
+- **Avvik fra delene:** README-en sier «notater», ikke «Mine notater», fordi et punkt i «Status» har høyst 20 ord (testen i `tests/test_docker.py`). Navnet på delen står i hjelpen. Signalet og endringen leses fra hele serien til siste dag, også når siden viser en periode eller en dag fra «Vis dagen».
+- **Tester («Ville feilet hvis» i hver):** `tests/test_notater.py`. Testene som teller migrasjonene, sier versjon 12.
+- **Bildene:** alle ti i `docs/appen/` er tatt på nytt med DevTools-protokollen i Edge uten vindu, med de samme høydene, mot en demobase i en midlertidig mappe. Alle var byte for byte de samme, fordi bildet av aksjesiden slutter ved «Signalet forklart», over «Mine notater». Avtrykkene i `tests/test_docker.py` er regnet ut på nytt, og `src/notater.py` og `src/etterpaa.py` står bak bildet av aksjesiden.
+
+## Mutantene
+
+På `5a8816b9` fire, én per del: A (`slett` sletter for en annen aksje), B (en dag uten kurs godtas), C (endringen regnet på sluttkursen, ikke den justerte) og D (README-en nevner ikke notatene). Alle ble fanget av `tests/test_notater.py`, og hver fil var lik HEAD etterpå (kopi før, sha256 mot HEAD etter). På nytt på `05e9a877`, etter rettingene: A 2, B 3, C 2 og D 1 test, alle fanget, og hver fil lik HEAD.
+
+## Gjennomgangen 10.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen, og Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 12 funn, Edge Case Hunter 8 og Verification Gap 6.
+
+**Middels**
+- *ECH1, rettet.* «Vis dagen» godtar en dag uten kurs for aksjen, som en lørdag, og skjemaet sto da, men lagringen ble avvist med 400. Nå står ikke skjemaet en slik dag, bare en linje om at notatet trenger en dag med kurs. Test: `test_dag_uten_kurs_har_ikke_skjemaet`.
+- *BH1, ikke en feil.* `slutt` er en dag fra aksjens egen serie (`rader`, `src/app.py`), ikke siste børsdag for lista, så standardvisningen har alltid kurs for aksjen.
+- *BH2, ikke en feil, test lagt til.* «Etterpå» får hele serien, vurderingene til siste dag og hele indeksen, også med «Vis dagen». `test_etterpaa_med_vis_dagen_gaar_til_siste_dag` viser det.
+
+**Lav**
+- *Rettet:* ECH2 og BH7 (svaret går tilbake til samme periode eller dag, med feltet `vis`), BH3 og ECH3 (en id med over 18 sifre gir 400, ikke 500), BH4 (CHECK for en dato som finnes og et tidspunkt som kan leses; en CHECK som ble NULL, slapp først raden gjennom, og testen fanget det), BH8 (egen grunn når indeksen ikke kunne leses), BH9 og ECH5 (et notat med bare tegn uten bredde avvises), BH10 (minneutgaven sjekker dagen), BH11 (testen sammenligner styrken og retningen på siden med raden i `vurdering`), ECH7 (malen viser ikke «None»), ECH8 (aksjen sjekkes i samme transaksjon som innsettingen), VG1 (tekstene for grunnene og teksten i malen sjekkes mot ordene i spørsmål 6), VG2 (docstringen sier hva testen kan skille), VG3 (en aksje som er tatt ut, og en demobase fra før 0012, på siden), VG4 (perioden og «Vis dagen» for siste dag), VG5 (siden står når notatene ikke kan leses) og VG6 (linja ved avtrykket for aksjesiden).
+- *Ikke en feil:* BH5 (`RuntimeError` står i `BASEFEIL`, så en base på en gammel versjon gir 503, ikke 500; testen for demobasen fra før 0012 viser det) og BH12 (hjelpen sier «justert for utbytte» som tittelen «Kurs justert for utbytte» i `src/hjelpetekster.py`).
+- *Ført:* BH6 (Origin sjekkes bare når den er med, som for stjernen og innstillingene; en POST uten Origin godtas), ECH4 (en POST mot en demobase som mangler, gir 404, mens siden ber om demokommandoen) og ECH6 (mangler indeksen den siste dagen, står grunnen uten å si hvilken dag).
+
+## Tilleggene: svaret kl. 14:44 (plassering, bryter og tenkte kjøp) og kl. 15:57 (demoen)
+
+Limt inn kl. 16:52, etter at delene A-D var bygget og gjennomgått. Storyen blir større, og resten gjelder som før. Svarene kl. 14:44 og 15:57 står ikke i repoet ennå; det som står her om dem, er hentet fra tilleggene. Spørsmål 1 og 9 over er endret av dem, som spørsmål 13 og 21 sier.
+
+### Spørsmål til gruppen før flettingen
+
+Hvert spørsmål har et forslag. Forslaget er det som er bygget.
+
+13. **Hvor står notatene nå?** Tillegget: «under signalet og kursgrafen». *Forslag:* rett under kursgrafen og «Signalet forklart», over «Signalet dag for dag». Det erstatter forslaget i spørsmål 1 (nederst, under «Signalet dag for dag»). Alle notatene står også samlet nederst i Min liste, det nyeste først, med navnet på aksjen som lenke, «Etterpå» og det tenkte kjøpet, men uten skjemaene: de skrives og slettes på aksjesiden. Stripa øverst får ingen ny knapp.
+14. **Bryteren «Notater».** *Forslag:* en tredje bryter i Innstillinger, «Vis notater», på fra start, med «?» og en kort tekst under. Den lagres i en ny tabell, `notatvalg`, i 0012, fordi CHECK i `innstilling` (0011) bare godtar de to valgene der, og en tabell som finnes, endres ikke (`AD-16`). Av skjuler delen på aksjesidene og i Min liste, og sletter ingenting.
+15. **Kursen ved kjøpet og salget, og en serie som hentes på nytt eller justeres.** *Forslag:* kursen lagres ikke. Ved trykket lagres dagen sluttkursen må være etter: den siste dagen med kurs for aksjen da brukeren trykket, eller børsdagen før i dag om den er senere. Sidene leser den første kursen i serien etter den dagen hver gang de vises, og endringen regnes på justert kurs, som ellers (FR-101). Hentes serien på nytt eller justeres for utbytte eller splitt, følger prosenten serien, og et hull som fylles senere, kan ikke bli kjøpsdagen, fordi dagen er minst børsdagen før trykket.
+16. **Når kan det noteres?** *Forslag:* bare fra siden for siste dag med kurser, så sjekkene som lagres, er de siden viser. Ikke ved «Vis dagen» for en tidligere dag. Et salg kan noteres først når kjøpet har fått sluttkursen. Et notat har høyst ett tenkt kjøp, og en aksje høyst ett åpent (en unik indeks i 0012).
+17. **Et tenkt kjøp når notatet slettes.** *Forslag:* kjøpet hører til notatet og slettes med det, av en trigger i 0012. Knappen sier det: «Slett notatet og det tenkte kjøpet».
+18. **Hva står ved kjøpet?** *Forslag:* mens det venter: «Notert <tid>, venter på sluttkursen.» Mens det er åpent: kjøpsdagen, sjekkene på siden da kjøpet ble notert, og «Aksjen siden kjøpet, til <dag>: +x %» med hovedindeksen de samme dagene. Etter salget: kjøpsdagen, salgsdagen, antallet børsdager med kurs etter kjøpsdagen til og med salgsdagen, sjekkene begge gangene, og endringen fra kjøpet til salget med hovedindeksen ved siden av. Bare prosent.
+19. **Ordene.** *Forslag:* knappene heter «Noter et tenkt kjøp» og «Noter et tenkt salg», som i tillegget. Ingen knapp eller tekst sier «Kjøp» eller «Selg» alene, og ordene gevinst, tap, riktig, galt og vant brukes ikke. Testen leser delen etter ordene i spørsmål 6 og disse, med «tenkt kjøp» tatt bort først. Ingen samlet statistikk, treffprosent, snitt, sortering etter resultat eller varsler.
+20. **Når en aksje med et åpent tenkt kjøp tas ut.** *Forslag:* «Fjern» viser først en side som sier at kursene for aksjen stopper, med «Fjern likevel». «Bytt ut» og de ferdige listene sier det samme i teksten før knappen. Ingenting skrives før brukeren trykker.
+21. **Demoen (tillegg 2).** *Forslag:* demokommandoen skriver fire oppdiktede notater fra dager i demoserien etter 21.09 (BRFE to, KVST og NLYS), alle med teksten «Eksempel: …», og ett avsluttet (BRFE) og ett åpent (KVST) tenkt kjøp, med sjekkene som er lagret for dagene, som om brukeren hadde trykket. Hvert notat i demoen er merket «Eksempeltall». Nye notater og tenkte kjøp virker, men demoen henter aldri kurser, så et nytt kjøp venter, og siden sier «Demoen henter ikke kurser, så den kommer ikke her.» Det erstatter forslaget i spørsmål 9 om at demokommandoen ikke skriver notater.
+22. **Bildene (tillegg 2).** *Forslag:* tre nye bilder i `docs/appen/`, fra demoen: «Mine notater» på aksjesiden for BRFE, notatene samlet i Min liste, og Innstillinger med bryteren. De andre bildene tas på nytt.
+
+### Delene
+
+#### E) Bryteren «Notater» (`notatvalg` i 0012)
+
+**Ville feilet hvis:** bryteren manglet, ikke var på fra start, sto uten «?» og teksten, eller av viste notatene eller slettet noe.
+
+#### F) Notatene samlet i Min liste
+
+**Ville feilet hvis:** Min liste ikke viste notatene for alle aksjene, nyeste først, med lenke til aksjen, eller stripa fikk en ny knapp.
+
+#### G) Tenkte kjøp og salg (`tenkt_kjoep` i 0012)
+
+**Ville feilet hvis:** kjøpet ikke lagret sjekkene slik de sto på siden, fikk en annen kurs enn den første etter trykket, en aksje fikk to åpne kjøp, et salg kom før kjøpet hadde kursen, kursen ble lagret, kjøpet ble liggende uten notatet, eller en aksje med et åpent kjøp ble tatt ut uten at appen sa fra.
+
+#### H) Demoen og bildene (tillegg 2)
+
+**Ville feilet hvis:** demoen manglet eksemplene med tall, ett åpent og ett avsluttet kjøp med sjekkene begge gangene, et eksempel ga råd, eller et nytt kjøp i demoen ikke sa at demoen ikke henter kurser.

@@ -1243,31 +1243,48 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.21 (gruppens svar 10.11 kl. 14:32): «Mine notater» under «Signalet
    dag for dag», et kort som «Signalet forklart». «Etterpå» står dempet under
    hvert notat, med pillene som i historikken. */
-:where(.side-aksje) .notater { margin: 40px 0 8px; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
+:where(.side-aksje, .side-oversikt) .notater { margin: 40px 0 8px; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
                                border-radius: 16px; }
-:where(.side-aksje) .notater h2 { margin: 0 0 6px; }
-:where(.side-aksje) .notater .ingress,
-:where(.side-aksje) .notater .uten,
-:where(.side-aksje) .notater .notatgrense { color: var(--dempet); margin: 0 0 12px; }
-:where(.side-aksje) .notater .notatgrense { font-size: 13.5px; margin: 4px 0 8px; }
-:where(.side-aksje) .nytt-notat label { display: block; font-weight: 600; margin: 0 0 6px; }
-:where(.side-aksje) .nytt-notat textarea { box-sizing: border-box; width: 100%; max-width: 640px; font: inherit; padding: 8px 10px;
+:where(.side-aksje, .side-oversikt) .notater h2 { margin: 0 0 6px; }
+:where(.side-aksje, .side-oversikt) .notater .ingress,
+:where(.side-aksje, .side-oversikt) .notater .uten,
+:where(.side-aksje, .side-oversikt) .notater .notatgrense { color: var(--dempet); margin: 0 0 12px; }
+:where(.side-aksje, .side-oversikt) .notater .notatgrense { font-size: 13.5px; margin: 4px 0 8px; }
+:where(.side-aksje, .side-oversikt) .nytt-notat label { display: block; font-weight: 600; margin: 0 0 6px; }
+:where(.side-aksje, .side-oversikt) .nytt-notat textarea { box-sizing: border-box; width: 100%; max-width: 640px; font: inherit; padding: 8px 10px;
                                            border: 1px solid var(--strek-2); border-radius: 10px; }
-:where(.side-aksje) .notater button { font: inherit; padding: 6px 14px; border: 1px solid var(--strek-2); border-radius: 999px;
+:where(.side-aksje, .side-oversikt) .notater button { font: inherit; padding: 6px 14px; border: 1px solid var(--strek-2); border-radius: 999px;
                                       background: var(--hvit); color: var(--blekk); cursor: pointer; }
-:where(.side-aksje) .notater button:focus-visible,
-:where(.side-aksje) .nytt-notat textarea:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
-:where(.side-aksje) .notatliste { list-style: none; margin: 16px 0 0; padding: 0; }
-:where(.side-aksje) .notat { border-top: 1px solid var(--strek); padding: 14px 0; }
-:where(.side-aksje) .notat .notatdag { margin: 0; font-weight: 700; }
-:where(.side-aksje) .notat .notattekst { margin: 4px 0 8px; overflow-wrap: anywhere; }
-:where(.side-aksje) .etterpaa { color: var(--tekst); font-size: 15px; }
-:where(.side-aksje) .etterpaa p { margin: 2px 0; }
-:where(.side-aksje) .etterpaa .etterpaa-tittel { color: var(--dempet); font-weight: 700; font-size: 13.5px; }
-:where(.side-aksje) .etterpaa .opp { color: var(--opp); }
-:where(.side-aksje) .etterpaa .ned { color: var(--ned); }
-:where(.side-aksje) .etterpaa .tilstand { color: var(--dempet); }
-:where(.side-aksje) .etterpaa .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; font-weight: 700;
+:where(.side-aksje, .side-oversikt) .notater button:focus-visible,
+:where(.side-aksje, .side-oversikt) .nytt-notat textarea:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+:where(.side-aksje, .side-oversikt) .notatliste { list-style: none; margin: 16px 0 0; padding: 0; }
+:where(.side-aksje, .side-oversikt) .notat { border-top: 1px solid var(--strek); padding: 14px 0; }
+:where(.side-aksje, .side-oversikt) .notat .notatdag { margin: 0; font-weight: 700; }
+:where(.side-aksje, .side-oversikt) .notat .notattekst { margin: 4px 0 8px; overflow-wrap: anywhere; }
+:where(.side-aksje, .side-oversikt) .etterpaa { color: var(--tekst); font-size: 15px; }
+:where(.side-aksje, .side-oversikt) .etterpaa p { margin: 2px 0; }
+:where(.side-aksje, .side-oversikt) .etterpaa .etterpaa-tittel { color: var(--dempet); font-weight: 700; font-size: 13.5px; }
+:where(.side-aksje, .side-oversikt) .etterpaa .opp { color: var(--opp); }
+:where(.side-aksje, .side-oversikt) .etterpaa .ned { color: var(--ned); }
+:where(.side-aksje, .side-oversikt) .etterpaa .tilstand { color: var(--dempet); }
+:where(.side-aksje, .side-oversikt) .etterpaa .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; font-weight: 700;
                                        border: 1.5px solid var(--strek-2); }
-:where(.side-aksje) .etterpaa .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
-:where(.side-aksje) .slett-notat { margin: 8px 0 0; }
+:where(.side-aksje, .side-oversikt) .etterpaa .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+:where(.side-aksje, .side-oversikt) .slett-notat { margin: 8px 0 0; }
+/* Tillegget kl. 14:44: det tenkte kjøpet under «Etterpå», knappene ved
+   notatet, merket «Eksempeltall» i demoen og siden som spør før «Fjern». */
+:where(.side-aksje, .side-oversikt) .tenkt { color: var(--tekst); font-size: 15px; margin: 8px 0 0; padding: 8px 12px;
+                                             border-left: 3px solid var(--strek-2); }
+:where(.side-aksje, .side-oversikt) .tenkt p { margin: 2px 0; }
+:where(.side-aksje, .side-oversikt) .tenkt .opp { color: var(--opp); }
+:where(.side-aksje, .side-oversikt) .tenkt .ned { color: var(--ned); }
+:where(.side-aksje, .side-oversikt) .tenkt .tilstand { color: var(--dempet); }
+:where(.side-aksje, .side-oversikt) .notatknapper { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+:where(.side-aksje, .side-oversikt) .notatknapper form { margin: 0; }
+:where(.side-aksje, .side-oversikt) .eksempelmerke { font-size: 12.5px; font-weight: 600; color: var(--dempet);
+                                                     border: 1px solid var(--strek-2); border-radius: 999px; padding: 0 8px; }
+:where(.side-oversikt) .bekreft { margin: 24px 0; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
+                                  border-radius: 16px; }
+/* Brikkene og «N av 3» på linje med teksten i «Etterpå» og ved kjøpet. */
+:where(.side-aksje, .side-oversikt) :is(.etterpaa, .tenkt) .sjekker { display: inline-flex; vertical-align: middle; margin: 0 4px; }
+:where(.side-aksje, .side-oversikt) :is(.etterpaa, .tenkt) .pille { display: inline-block; }

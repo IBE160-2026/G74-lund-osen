@@ -4,6 +4,7 @@
 {% from "_brikker.html" import brikker, retningspille -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% from "_investorboble.html" import investorboble -%}
+{% from "_notat.html" import notatet with context -%}
 {% block tittel %}{{ detalj.aksje.navn }} — OSE Signal{% endblock %}
 {#- Story 8.0d, PR 3: tidspunktet står bare i stripa, med «?» ved siden av
     (ECH8 i PR 2). #}
@@ -375,6 +376,44 @@
     </section>
   {% endif %}
 
+  {#- Story 8.21 (gruppens svar 10.11 kl. 14:32 og 14:44): «Mine notater»
+      under kursgrafen og «Signalet forklart», over «Signalet dag for dag».
+      Et notat får dagen siden viser (spørsmål 3), og under hvert står
+      «Etterpå» med bare fakta og det tenkte kjøpet (_notat.html). Bryteren
+      «Notater» i Innstillinger skjuler delen. #}
+  {% if vis_notater %}
+  <section class="notater" id="{{ notat_anker }}" aria-labelledby="notater-tittel">
+    <h2 id="notater-tittel">Mine notater</h2>
+    <p class="ingress">Notatene lagres på denne maskinen. Under hvert notat står hva aksjen, hovedindeksen og signalet gjorde etterpå, og et tenkt kjøp eller salg får den neste sluttkursen appen henter.</p>
+    {% if notatene is none %}
+      <p class="uten">Notatene kan ikke leses fra basen nå.</p>
+    {% else %}
+      {#- Gjennomgangen (ECH1): en dag uten kurs for aksjen fra «Vis dagen»
+          får ikke skjemaet, fordi notatet trenger en kurs fra dagen. #}
+      {% if kan_skrive_notat and not notatdag_har_kurs %}
+        <p class="uten">Et notat får dagen siden viser, og {{ notatdag|ukedag }} {{ notatdag|dato }} har ingen kurs for {{ detalj.aksje.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
+      {% elif kan_skrive_notat %}
+        <form class="nytt-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat">
+          <input type="hidden" name="dag" value="{{ notatdag.isoformat() }}">
+          <input type="hidden" name="vis" value="{{ notat_visningen }}">
+          <label for="notattekst">Notatet får datoen {{ notatdag|ukedag }} {{ notatdag|dato }}.</label>
+          <textarea id="notattekst" name="tekst" rows="2" maxlength="{{ notat_maks }}" required></textarea>
+          <p class="notatgrense">Høyst {{ notat_maks }} tegn.</p>
+          <button type="submit">Lagre notatet</button>
+        </form>
+      {% endif %}
+      {% if notatene %}
+        {% if not kan_handle and kan_skrive_notat %}<p class="notatgrense">Et tenkt kjøp eller salg noteres fra siden for siste dag med kurser.</p>{% endif %}
+        <ol class="notatliste">
+          {% for n in notatene %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle) }}{% endfor %}
+        </ol>
+      {% else %}
+        <p class="uten">Ingen notater for {{ detalj.aksje.navn }} ennå.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+  {% endif %}
+
   {#- Story 2.7b (avgjørelsen 2026-10-21 under story 2.7): historikken, en
       måned om gangen, med det som er lagret i vurdering. Signalet regnes
       aldri (AD-7), og målingene står på siden for dagen (8.16b). 3 av 3
@@ -433,65 +472,6 @@
         {% for navn, antall in historikk.utslag %}{% if loop.first %}{{ navn|capitalize }} slo ut {{ antall }} {{ "dag" if antall == 1 else "dager" }}{% elif loop.last %} og {{ navn }} {{ antall }}{% else %}, {{ navn }} {{ antall }}{% endif %}{% endfor %}.</p>
     {% else %}
       <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} har ingen dager med vurdering.</p>
-    {% endif %}
-  </section>
-
-  {#- Story 8.21 (gruppens svar 10.11 kl. 14:32): «Mine notater» under
-      «Signalet dag for dag». Et notat får dagen siden viser (spørsmål 3), og
-      under hvert står «Etterpå» med bare fakta: endringen i aksjen og
-      hovedindeksen og signalet som er lagret for dagene (spørsmål 4-6). Ingen
-      ord om at noe var riktig eller galt, og ingen råd (NFR-06). #}
-  {% macro signalet(dag) -%}
-    {% if dag is none %}<span class="tilstand">– signalet kunne ikke leses</span>{% elif dag.vurdering %}{{ retningspille(dag.retning) }} {{ brikker(dag.brikker) }} <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>{% else %}<span class="tilstand">–{% if dag.tekst %} {{ dag.tekst }}{% endif %}</span>{% endif %}
-  {%- endmacro %}
-  <section class="notater" id="{{ notat_anker }}" aria-labelledby="notater-tittel">
-    <h2 id="notater-tittel">Mine notater</h2>
-    <p class="ingress">Notatene lagres på denne maskinen. Under hvert notat står hva aksjen, hovedindeksen og signalet gjorde etterpå.</p>
-    {% if notatene is none %}
-      <p class="uten">Notatene kan ikke leses fra basen nå.</p>
-    {% else %}
-      {#- Gjennomgangen (ECH1): en dag uten kurs for aksjen fra «Vis dagen»
-          får ikke skjemaet, fordi notatet trenger en kurs fra dagen. #}
-      {% if kan_skrive_notat and not notatdag_har_kurs %}
-        <p class="uten">Et notat får dagen siden viser, og {{ notatdag|ukedag }} {{ notatdag|dato }} har ingen kurs for {{ detalj.aksje.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
-      {% elif kan_skrive_notat %}
-        <form class="nytt-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat">
-          <input type="hidden" name="dag" value="{{ notatdag.isoformat() }}">
-          <input type="hidden" name="vis" value="{{ notat_visningen }}">
-          <label for="notattekst">Notatet får datoen {{ notatdag|ukedag }} {{ notatdag|dato }}.</label>
-          <textarea id="notattekst" name="tekst" rows="2" maxlength="{{ notat_maks }}" required></textarea>
-          <p class="notatgrense">Høyst {{ notat_maks }} tegn.</p>
-          <button type="submit">Lagre notatet</button>
-        </form>
-      {% endif %}
-      {% if notatene %}
-        <ol class="notatliste">
-          {% for notat, etter in notatene %}
-            <li class="notat">
-              <p class="notatdag">{{ notat.dato|ukedag }} {{ notat.dato|dato }}</p>
-              <p class="notattekst">{{ notat.tekst }}</p>
-              <div class="etterpaa">
-                <p class="etterpaa-tittel">Etterpå</p>
-                {% if etter.siste is none %}
-                  <p>Ingen børsdager med kurs etter notatdagen ennå.</p>
-                {% else %}
-                  <p>Aksjen fra {{ etter.notatdag|ukedag }} {{ etter.notatdag|dato }} til {{ etter.siste|ukedag }} {{ etter.siste|dato }}: {% if etter.aksjen is not none %}<span class="{{ 'opp' if etter.aksjen|avrundet('endring') > 0 else 'ned' if etter.aksjen|avrundet('endring') < 0 else '' }}">{{ etter.aksjen|tall('endring') }}</span>{% else %}– {{ etter.aksjen_grunn }}{% endif %}</p>
-                  <p>Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {% if etter.indeksen is not none %}<span class="{{ 'opp' if etter.indeksen|avrundet('endring') > 0 else 'ned' if etter.indeksen|avrundet('endring') < 0 else '' }}">{{ etter.indeksen|tall('endring') }}</span>{% else %}– {{ etter.indeksen_grunn }}{% endif %}</p>
-                {% endif %}
-                <p>Signalet {{ etter.notatdag|ukedag }} {{ etter.notatdag|dato }}: {{ signalet(etter.paa_dagen) }}</p>
-                {% if etter.siste is not none %}<p>Signalet {{ etter.siste|ukedag }} {{ etter.siste|dato }}: {{ signalet(etter.paa_siste) }}</p>{% endif %}
-              </div>
-              <form class="slett-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat/slett">
-                <input type="hidden" name="id" value="{{ notat.id }}">
-                <input type="hidden" name="vis" value="{{ notat_visningen }}">
-                <button type="submit" aria-label="Slett notatet fra {{ notat.dato|dato }}">Slett</button>
-              </form>
-            </li>
-          {% endfor %}
-        </ol>
-      {% else %}
-        <p class="uten">Ingen notater for {{ detalj.aksje.navn }} ennå.</p>
-      {% endif %}
     {% endif %}
   </section>
 

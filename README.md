@@ -39,6 +39,15 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![«Din egen liste» i Min liste i demoen: hva du trenger for å følge andre aksjer, kallene lista bruker, «Bytt ut» ved hver aksje og de ferdige listene per bransje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
 *«Din egen liste» i Min liste i demoen, med kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én liste per bransje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
+![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-demo.png)
+*«Mine notater» på aksjesiden for BRFE i demoen, med «Etterpå» under hvert notat og et tenkt kjøp og salg, bare i prosent, med oppdiktede selskaper («Eksempeltall»).*
+
+![Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen og ett åpent tenkt kjøp, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-min-liste-demo.png)
+*Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen, med oppdiktede selskaper («Eksempeltall»).*
+
+![Innstillinger i demoen med de tre bryterne «Vis hjelp», «Vis KI-tekst» og «Vis notater», med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/innstillinger-demo.png)
+*Innstillinger i demoen, med bryteren «Notater» og «?» ved den, med oppdiktede selskaper («Eksempeltall»).*
+
 </details>
 
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
@@ -239,7 +248,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i [`docs/installasjon.md`](docs/installasjon.md): [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
 - [`docs/skisser/2026-11-06/`](docs/skisser/2026-11-06/) — skissene av aksjesiden og børsometeret laget av KI i chatten 06.11, etter gruppens gjennomgang, med oppdiktede selskaper og tall: fem PNG-er og [`docs/skisser/2026-11-06/LESMEG.md`](docs/skisser/2026-11-06/LESMEG.md) med svarene de bygger på. Bygget 07.11 i 8.20a, 8.20b og 3.4h
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png) og [`investorsiden-brfe-390-demo.png`](docs/appen/investorsiden-brfe-390-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png), [`investorsiden-brfe-390-demo.png`](docs/appen/investorsiden-brfe-390-demo.png), [`notatene-brfe-demo.png`](docs/appen/notatene-brfe-demo.png), [`notatene-min-liste-demo.png`](docs/appen/notatene-min-liste-demo.png) og [`innstillinger-demo.png`](docs/appen/innstillinger-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår

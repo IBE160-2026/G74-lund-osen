@@ -33,7 +33,7 @@ from kursdata import AKSJEUNIVERS, Aksje, Kursrad, kontroller_skriving
 from lagring_fil import DATA_KATALOG
 from migrering import MigrasjonsFeil, migrer, siste_versjon, versjon
 from minliste import UkjentAksje, kontroller_symbol
-from notater import Notat, UgyldigNotat, rens, sorter
+from notater import Notat, Sjekker, TenktKjoep, UgyldigNotat, kontroller_sjekker, rens, sorter
 from oversiktsdata import Oversiktspost
 from vurderingsdata import Grunn, Vurdering
 
@@ -789,6 +789,83 @@ class SqliteNotatlager:
         with _Transaksjon(self._tilkobling):
             markoer = self._tilkobling.execute("DELETE FROM notat WHERE id = ? AND symbol = ?", (notat_id, symbol))
         return markoer.rowcount == 1
+
+    # --- Tillegget kl. 14:44: tenkte kjøp og salg ---
+
+    def alle_notater(self) -> list[Notat]:
+        """Alle notatene, for «Mine notater» samlet i Min liste."""
+        return sorter(
+            Notat(id_, s, date.fromisoformat(dato), tekst, datetime.fromisoformat(laget))
+            for id_, s, dato, tekst, laget in self._tilkobling.execute(
+                "SELECT id, symbol, dato, tekst, laget FROM notat"
+            )
+        )
+
+    def kjoepene(self) -> dict[int, TenktKjoep]:
+        """De tenkte kjøpene, etter notatet de hører til."""
+        return {
+            rad[1]: _tenkt_kjoep(rad)
+            for rad in self._tilkobling.execute("SELECT " + ", ".join(_KJOEPSKOLONNER) + " FROM tenkt_kjoep")
+        }
+
+    def noter_kjoep(self, symbol: str, notat_id: int, kjoept: datetime, etter: date, sjekker: Sjekker) -> TenktKjoep:
+        sjekker = kontroller_sjekker(sjekker)
+        with _Transaksjon(self._tilkobling):
+            if (
+                self._tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
+                is None
+            ):
+                raise UgyldigNotat(f"{symbol!r} står ikke i lista")
+            markoer = self._tilkobling.execute(
+                "INSERT INTO tenkt_kjoep (notat, symbol, kjoept, kjoep_etter, kjoep_trend, kjoep_bevegelse,"
+                " kjoep_interesse) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (notat_id, symbol, kjoept.isoformat(), etter.isoformat(), *(sjekker or (None, None, None))),
+            )
+        return TenktKjoep(markoer.lastrowid, notat_id, symbol, kjoept, etter, sjekker)
+
+    def noter_salg(self, symbol: str, notat_id: int, solgt: datetime, etter: date, sjekker: Sjekker) -> TenktKjoep:
+        sjekker = kontroller_sjekker(sjekker)
+        with _Transaksjon(self._tilkobling):
+            markoer = self._tilkobling.execute(
+                "UPDATE tenkt_kjoep SET solgt = ?, salg_etter = ?, salg_trend = ?, salg_bevegelse = ?,"
+                " salg_interesse = ? WHERE notat = ? AND symbol = ? AND solgt IS NULL",
+                (solgt.isoformat(), etter.isoformat(), *(sjekker or (None, None, None)), notat_id, symbol),
+            )
+            if markoer.rowcount != 1:
+                raise UgyldigNotat("notatet har ikke et åpent tenkt kjøp")
+        return self.kjoepene()[notat_id]
+
+
+_KJOEPSKOLONNER = (
+    "id",
+    "notat",
+    "symbol",
+    "kjoept",
+    "kjoep_etter",
+    "kjoep_trend",
+    "kjoep_bevegelse",
+    "kjoep_interesse",
+    "solgt",
+    "salg_etter",
+    "salg_trend",
+    "salg_bevegelse",
+    "salg_interesse",
+)
+
+
+def _tenkt_kjoep(rad) -> TenktKjoep:
+    id_, notat, symbol, kjoept, kjoep_etter, kt, kb, ki, solgt, salg_etter, st, sb, si = rad
+    return TenktKjoep(
+        id_,
+        notat,
+        symbol,
+        datetime.fromisoformat(kjoept),
+        date.fromisoformat(kjoep_etter),
+        None if kt is None else (kt, kb, ki),
+        datetime.fromisoformat(solgt) if solgt else None,
+        date.fromisoformat(salg_etter) if salg_etter else None,
+        None if st is None else (st, sb, si),
+    )
 
 
 class _Transaksjon:

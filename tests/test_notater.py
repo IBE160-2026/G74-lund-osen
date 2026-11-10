@@ -33,9 +33,23 @@ ANNEN = "KVST"
 
 
 @pytest.fixture(scope="module")
-def mal(tmp_path_factory):
+def demomal(tmp_path_factory):
+    """Demobasen slik demokommandoen lager den, med eksemplene (tillegg 2)."""
     sti = tmp_path_factory.mktemp("demomal") / "demo.db"
     demo.lag_demobase(sti, skriv=lambda _: None)
+    return sti
+
+
+@pytest.fixture(scope="module")
+def mal(demomal, tmp_path_factory):
+    """Demobasen uten eksemplene, så testene begynner uten notater.
+    Triggeren i 0012 sletter de tenkte kjøpene med notatene."""
+    sti = tmp_path_factory.mktemp("tommal") / "demo.db"
+    shutil.copy(demomal, sti)
+    c = sqlite3.connect(sti)
+    c.execute("DELETE FROM notat")
+    c.commit()
+    c.close()
     return sti
 
 
@@ -193,11 +207,18 @@ class TestTabellen:
         sql = (ROT / "src" / "migrasjoner" / "0012_notat.sql").read_text(encoding="utf-8")
         setninger = [s for s in re.findall(r"^(CREATE|ALTER|DROP|INSERT|UPDATE|DELETE)\b.*$", sql, re.M)]
         assert setninger and all(s == "CREATE" for s in setninger)
-        assert set(re.findall(r"^CREATE (?:TABLE|INDEX|TRIGGER) (\w+)", sql, re.M)) == {
+        # Tillegget kl. 14:44: også de tenkte kjøpene og bryteren «Notater».
+        assert set(re.findall(r"^CREATE (?:UNIQUE )?(?:TABLE|INDEX|TRIGGER) (\w+)", sql, re.M)) == {
             "notat",
             "notat_symbol",
             "notat_kjent_aksje_insert",
             "notat_kjent_aksje_update",
+            "tenkt_kjoep",
+            "tenkt_kjoep_ett_aapent",
+            "tenkt_kjoep_notat_insert",
+            "tenkt_kjoep_notat_update",
+            "notat_slett_tenkt_kjoep",
+            "notatvalg",
         }
 
 
@@ -431,7 +452,28 @@ class TestEtterpaa:
 
 
 # Spørsmål 6: ord som sier at et notat traff eller bommet, eller som er råd.
-ORDENE = ("riktig", "galt", "feil", "traff", "bom", "kjøp", "kjøpe", "selg", "selge", "bør")
+# Tillegget kl. 14:44: også gevinst, tap og vant. «Noter et tenkt kjøp» og
+# «tenkt salg» er navnet på knappene og er lov; «kjøp» alene som oppfordring
+# er det ikke (NFR-06), så «tenkt(e) kjøp» tas bort før ordene telles.
+ORDENE = (
+    "riktig",
+    "galt",
+    "feil",
+    "traff",
+    "bom",
+    "kjøp",
+    "kjøpe",
+    "selg",
+    "selge",
+    "bør",
+    "gevinst",
+    "tap",
+    "vant",
+)
+
+
+def _uten_navnene(tekst: str) -> str:
+    return re.sub(r"\btenkte? kjøp(et)?\b", "", tekst, flags=re.I)
 
 
 class TestSiden:
@@ -469,6 +511,7 @@ class TestSiden:
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "NOTATTEKST"})
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "NOTATTEKST"})
         tekst = _tekst(_delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))).replace("NOTATTEKST", "")
+        tekst = _uten_navnene(tekst)
         for ord_ in ORDENE:
             assert not re.search(rf"\b{ord_}\b", tekst, re.I), ord_
 
@@ -495,9 +538,9 @@ class TestDokumentene:
         assert re.search(r"^- Aksjesiden: .*\bnotater$", (ROT / "README.md").read_text(encoding="utf-8"), re.M)
         assert "### Hva er «Mine notater»?" in (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
 
-    def test_demokommandoen_skriver_ingen_notater(self, demobase):
-        """Spørsmål 9: ville feilet hvis demobasen kom med notater."""
-        assert _rader(demobase) == []
+    def test_testene_begynner_uten_notater(self, demobase):
+        """Malen for testene har ikke eksemplene fra demokommandoen."""
+        assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
 
 
 # --- Etter gjennomgangen ------------------------------------------------------
@@ -619,7 +662,9 @@ class TestEtterGjennomgangen:
         from markedsoversikt import GRUNNTEKST, IKKE_BOERSDAG, IKKE_I_LISTA, IKKE_VURDERT
 
         mal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
-        delen = mal[mal.index("{#- Story 8.21") : mal.index("{#- Story 3.4h: boblen")]
+        delen = mal[mal.index("{#- Story 8.21") : mal.index("{#- Story 2.7b (avgjørelsen")]
+        # Tillegget kl. 14:44: notatet står i delmalen _notat.html.
+        delen += (ROT / "src" / "templates" / "_notat.html").read_text(encoding="utf-8")
         tekster = [
             etterpaa.INGEN_KURS_PAA_NOTATDAGEN,
             etterpaa.INGEN_INDEKS,
@@ -633,10 +678,284 @@ class TestEtterGjennomgangen:
         ]
         for tekst in tekster:
             for ord_ in ORDENE:
-                assert not re.search(rf"\b{ord_}\b", tekst, re.I), (ord_, tekst[:80])
+                assert not re.search(rf"\b{ord_}\b", _uten_navnene(tekst), re.I), (ord_, tekst[:80])
 
     def test_siste_dag_sier_at_det_ikke_er_dager_etter(self, klient, demobase):
         """Spørsmål 5 på siden: ville feilet hvis linja manglet."""
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"})
         tekst = _tekst(_delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")))
         assert "Ingen børsdager med kurs etter notatdagen ennå." in tekst
+
+
+# --- Tillegget kl. 14:44 (del E-G) og tillegg 2 kl. 15:57 (del H) -------------
+
+
+def _kjoepsknapp(side: str) -> dict:
+    """Feltene i skjemaet «Noter et tenkt kjøp» for det første notatet som har det."""
+    treff = re.search(r'<form method="post" action="/aksje/[A-Z]+/notat/kjoep">(.*?)</form>', side, re.S)
+    return dict(re.findall(r'name="(id|dag|vis)" value="([^"]*)"', treff.group(1))) if treff else {}
+
+
+def _salgsknapp(side: str) -> dict:
+    treff = re.search(r'<form method="post" action="/aksje/[A-Z]+/notat/salg">(.*?)</form>', side, re.S)
+    return dict(re.findall(r'name="(id|dag|vis)" value="([^"]*)"', treff.group(1))) if treff else {}
+
+
+def _vurdering_i_basen(sti: Path, symbol: str, dag: str):
+    c = sqlite3.connect(sti)
+    try:
+        return c.execute(
+            "SELECT trend, bevegelse, interesse FROM vurdering WHERE symbol = ? AND dato = ? AND grunn IS NULL",
+            (symbol, dag),
+        ).fetchone()
+    finally:
+        c.close()
+
+
+class TestBryteren:
+    def test_bryteren_staar_i_innstillinger_med_hjelpen(self, klient, demobase):
+        """Del E: ville feilet hvis «Notater» manglet i Innstillinger, ikke var
+        på fra start, eller sto uten «?» og teksten under."""
+        side = klient.get("/innstillinger").data.decode("utf-8")
+        assert 'value="vis_notater"' in side and "Vis notater" in side
+        assert re.search(r'name="navn" value="vis_notater">\s*<input type="hidden" name="til" value="av">', side)
+        assert 'popovertarget="hjelp-notatene"' in side and 'id="hjelp-notatene"' in side
+        assert "Appen sier aldri om noe var riktig." in _tekst(side)
+
+    def test_av_skjuler_notatene_og_sletter_ingenting(self, klient, demobase):
+        """Del E: ville feilet hvis bryteren av viste notatene på aksjesiden
+        eller i Min liste, eller slettet noe."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"})
+        assert klient.post("/innstillinger", data={"navn": "vis_notater", "til": "av"}).status_code == 303
+        assert 'class="notater"' not in klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
+        assert 'id="mine-notater"' not in klient.get("/min-liste").data.decode("utf-8")
+        assert len(_rader(demobase)) == 1
+        klient.post("/innstillinger", data={"navn": "vis_notater", "til": "paa"})
+        assert "x" in _tekst(_delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")))
+
+    def test_bryteren_lagres_i_notatvalg(self, klient, demobase):
+        """Del E: ville feilet hvis valget ikke sto i basen."""
+        klient.post("/innstillinger", data={"navn": "vis_notater", "til": "av"})
+        assert _rader(demobase, "notatvalg") == [("vis_notater", 0)]
+
+
+class TestMinListe:
+    def test_alle_notatene_samlet_nyeste_foerst_med_lenke(self, klient, demobase):
+        """Del F: ville feilet hvis Min liste ikke viste notatene for alle
+        aksjene, nyeste først, med lenke til aksjen, eller hadde skjemaene."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "ELDST"})
+        klient.post(f"/aksje/{ANNEN}/notat", data={"dag": "2026-10-09", "tekst": "NYEST"})
+        side = klient.get("/min-liste").data.decode("utf-8")
+        start = side.index('<section class="notater" id="mine-notater"')
+        delen = side[start : side.index("</section>", start)]
+        assert delen.index("NYEST") < delen.index("ELDST")
+        assert f'href="/aksje/{ANNEN}"' in delen and f'href="/aksje/{AKSJE}"' in delen
+        assert "<form" not in delen
+        assert "Etterpå" in _tekst(delen)
+
+    def test_menyen_faar_ingen_ny_knapp(self, klient, demobase):
+        """Del F: ville feilet hvis stripa øverst fikk en knapp for notatene."""
+        side = klient.get("/min-liste").data.decode("utf-8")
+        stripa = side[: side.index("</nav>")]
+        assert "otater" not in stripa
+
+
+class TestTenkteKjoep:
+    def _notat(self, klient, symbol=AKSJE, dag="2026-10-09"):
+        klient.post(f"/aksje/{symbol}/notat", data={"dag": dag, "tekst": "x"})
+        return _kjoepsknapp(klient.get(f"/aksje/{symbol}").data.decode("utf-8"))
+
+    def test_kjoepet_lagrer_sjekkene_paa_siden_og_venter(self, klient, demobase):
+        """Del G: ville feilet hvis kjøpet ikke lagret sjekkene slik de sto på
+        siden, eller ikke sa at det venter, og at demoen ikke henter kurser."""
+        felt = self._notat(klient)
+        assert felt["dag"] == "2026-10-09"
+        assert klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt).status_code == 303
+        (rad,) = _rader(demobase, "tenkt_kjoep")
+        assert rad[5:8] == _vurdering_i_basen(demobase, AKSJE, "2026-10-09")
+        tekst = _tekst(_delen(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")))
+        assert "venter på sluttkursen. Demoen henter ikke kurser, så den kommer ikke her." in tekst
+
+    def test_kjoep_bare_fra_siste_dag(self, klient, demobase):
+        """Del G: ville feilet hvis et kjøp kunne noteres fra siden for en
+        tidligere dag, med sjekkene for en annen dag."""
+        felt = self._notat(klient)
+        assert not _kjoepsknapp(klient.get(f"/aksje/{AKSJE}?dag=2026-10-01").data.decode("utf-8"))
+        assert klient.post(f"/aksje/{AKSJE}/notat/kjoep", data={**felt, "dag": "2026-10-08"}).status_code == 400
+        assert _rader(demobase, "tenkt_kjoep") == []
+
+    def test_hoeyst_ett_aapent_kjoep_per_aksje(self, klient, demobase):
+        """Del G: ville feilet hvis en aksje kunne få to åpne tenkte kjøp."""
+        foerste = self._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=foerste)
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "y"})
+        side = klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
+        assert not _kjoepsknapp(side)
+        andre = max(rad[0] for rad in _rader(demobase))
+        svar = klient.post(f"/aksje/{AKSJE}/notat/kjoep", data={"id": andre, "dag": "2026-10-09"})
+        assert svar.status_code == 400
+        assert len(_rader(demobase, "tenkt_kjoep")) == 1
+
+    def test_salget_foerst_naar_kjoepet_har_sluttkursen(self, klient, demobase):
+        """Del G: ville feilet hvis et salg kunne noteres før kjøpet hadde
+        fått sluttkursen."""
+        felt = self._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        assert not _salgsknapp(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
+        assert klient.post(f"/aksje/{AKSJE}/notat/salg", data=felt).status_code == 400
+
+    def test_en_aksje_som_er_tatt_ut_faar_ikke_kjoep(self, klient, demobase):
+        felt = self._notat(klient)
+        c = sqlite3.connect(demobase)
+        c.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", ("2026-10-12", AKSJE))
+        c.commit()
+        c.close()
+        assert klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt).status_code == 400
+        assert _rader(demobase, "tenkt_kjoep") == []
+
+    def test_slettes_notatet_slettes_kjoepet(self, klient, demobase):
+        """Spørsmål 17: ville feilet hvis et tenkt kjøp ble liggende uten
+        notatet, eller knappen ikke sa at kjøpet slettes med."""
+        felt = self._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        assert "Slett notatet og det tenkte kjøpet" in klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
+        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": felt["id"]})
+        assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
+
+    def test_tabellen_har_ingen_kurs(self, mal, tmp_path):
+        """Spørsmål 15: ville feilet hvis kursen ble lagret ved trykket, så
+        prosenten ikke fulgte serien når den hentes på nytt eller justeres."""
+        c = sqlite3.connect(mal)
+        try:
+            kolonnene = {rad[1] for rad in c.execute("PRAGMA table_info(tenkt_kjoep)")}
+        finally:
+            c.close()
+        assert not any("kurs" in k or "slutt" in k or "pris" in k for k in kolonnene), kolonnene
+
+
+def _kjoep(etter: date, salg_etter: date | None = None):
+    from notater import TenktKjoep
+
+    return TenktKjoep(
+        1,
+        1,
+        AKSJE,
+        LAGET,
+        etter,
+        (1, 0, 0),
+        LAGET if salg_etter else None,
+        salg_etter,
+        (0, -1, 0) if salg_etter else None,
+    )
+
+
+D4, D5 = date(2026, 10, 8), date(2026, 10, 9)
+
+
+class TestHandelen:
+    def test_kursen_er_den_foerste_etter_trykket(self):
+        """Spørsmål 15: ville feilet hvis kjøpet fikk kursen fra dagen for
+        trykket eller en senere dag enn den første etter."""
+        from etterpaa import bygg_handelen
+
+        serie = _serie((D1, 1.0, 100.0), (D2, 1.0, 110.0), (D3, 1.0, 121.0))
+        h = bygg_handelen(_kjoep(D1), serie, {D2: 10.0, D3: 11.0})
+        assert (h.kjoepsdag, h.til) == (D2, D3)
+        assert h.aksjen == pytest.approx(10.0) and h.indeksen == pytest.approx(10.0)
+        assert h.kan_selges and h.dager is None
+
+    def test_salget_og_dagene(self):
+        """Del G: ville feilet hvis endringen etter salget ikke gikk fra
+        kjøpsdagen til salgsdagen, eller dagene var talt feil."""
+        from etterpaa import bygg_handelen
+
+        serie = _serie((D1, 1.0, 100.0), (D2, 1.0, 100.0), (D3, 1.0, 105.0), (D4, 1.0, 120.0), (D5, 1.0, 130.0))
+        h = bygg_handelen(_kjoep(D1, D3), serie, None)
+        assert (h.kjoepsdag, h.salgsdag, h.til, h.dager) == (D2, D4, D4, 2)
+        assert h.aksjen == pytest.approx(20.0) and h.indeksen is None
+
+    def test_venter_og_justert_serie(self):
+        """Spørsmål 15: ville feilet hvis kjøpet hadde en kurs før serien har
+        en dag etter trykket, eller prosenten ikke fulgte en justert serie."""
+        from etterpaa import bygg_handelen
+
+        serie = _serie((D1, 1.0, 100.0), (D2, 1.0, 110.0))
+        assert bygg_handelen(_kjoep(D2), serie, None).venter_paa_kjoepet
+        justert = _serie((D1, 1.0, 50.0), (D2, 1.0, 50.0), (D3, 1.0, 60.5))
+        assert bygg_handelen(_kjoep(D1), justert, None).aksjen == pytest.approx(21.0)
+
+    def test_sjekkene_som_brikker(self):
+        from etterpaa import brikkene
+
+        assert brikkene((1, 0, -1)) == (("T", "trend", "+1"), ("B", "bevegelse", "0"), ("I", "interesse", "-1"))
+        assert brikkene(None) == ()
+
+
+class TestFjern:
+    def test_fjern_sier_foerst_at_kursene_stopper(self, klient, demobase):
+        """Del G: ville feilet hvis en aksje med et åpent tenkt kjøp ble tatt
+        ut av lista uten at appen først sa at kursene for den stopper."""
+        felt = TestTenkteKjoep()._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        foer = _rader(demobase, "oenske")
+        svar = klient.post("/fjern", data={"symbol": AKSJE, "tilbake": "oversikten"})
+        assert svar.status_code == 200
+        assert "hentes ingen nye kurser" in _tekst(svar.data.decode("utf-8"))
+        assert _rader(demobase, "oenske") == foer
+        svar = klient.post("/fjern", data={"symbol": AKSJE, "tilbake": "oversikten", "bekreftet": "1"})
+        assert svar.status_code == 303 and len(_rader(demobase, "oenske")) == len(foer) + 1
+
+    def test_bytt_ut_sier_det_ogsaa(self, klient, demobase):
+        felt = TestTenkteKjoep()._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        assert "har et åpent tenkt kjøp" in klient.get(f"/folg?bytt={AKSJE}").data.decode("utf-8")
+
+
+class TestDemoen:
+    @pytest.fixture
+    def demoklient(self, demomal, monkeypatch):
+        sti = demo_sti()
+        sti.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(demomal, sti)
+        monkeypatch.setenv(app_modul.I_DEMO, "1")
+        monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+        monkeypatch.setattr(app_modul, "naa", lambda: LAGET)
+        return app_modul.app.test_client()
+
+    def test_eksemplene_har_tall_og_ett_aapent_og_ett_avsluttet_kjoep(self, demoklient, demomal):
+        """Tillegg 2: ville feilet hvis demoen manglet notater fra tidligere
+        dager med tall under «Etterpå», eller ett åpent og ett avsluttet tenkt
+        kjøp med sjekkene begge gangene."""
+        kjoepene = _rader(demomal, "tenkt_kjoep")
+        aapne = [k for k in kjoepene if k[8] is None]
+        lukkede = [k for k in kjoepene if k[8] is not None]
+        assert len(aapne) == 1 and len(lukkede) == 1
+        assert all(k[5] is not None for k in kjoepene) and lukkede[0][10] is not None
+        for symbol in {rad[1] for rad in _rader(demomal)}:
+            tekst = _tekst(_delen(demoklient.get(f"/aksje/{symbol}").data.decode("utf-8")))
+            assert re.search(r"Aksjen fra .* til fredag 09\.10: [+-]?[0-9]+,[0-9]{2} %", tekst), symbol
+            assert "Eksempeltall" in tekst
+        side = _tekst(demoklient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
+        assert re.search(r"Salgsdag .*\d+ børsdager etter\. Sjekkene på siden da salget ble notert: T", side)
+        assert "Aksjen fra kjøpet til salget:" in side
+
+    def test_eksemplene_gir_ingen_raad(self, demomal):
+        """Tillegg 2, NFR-06: ville feilet hvis en eksempeltekst brukte et av
+        ordene i spørsmål 6 og tillegget, og alle er merket som eksempel."""
+        for rad in _rader(demomal):
+            tekst = _uten_navnene(rad[3])
+            assert tekst.startswith("Eksempel:")
+            for ord_ in ORDENE:
+                assert not re.search(rf"\b{ord_}\b", tekst, re.I), (ord_, rad[3])
+
+    def test_notatene_samlet_i_min_liste_i_demoen(self, demoklient, demomal):
+        side = demoklient.get("/min-liste").data.decode("utf-8")
+        assert side.count('<li class="notat">') == len(_rader(demomal))
+
+    def test_ingen_kronebeloep(self, demoklient):
+        """Tillegget kl. 14:44: ville feilet hvis notatene viste et kronebeløp."""
+        for adresse in (f"/aksje/{AKSJE}", "/min-liste"):
+            side = demoklient.get(adresse).data.decode("utf-8")
+            start = side.index('<section class="notater"')
+            delen = _tekst(side[start : side.index("</section>", start)])
+            assert not re.search(r"\b(kr|NOK|kroner)\b", delen), adresse

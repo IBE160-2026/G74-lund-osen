@@ -15,8 +15,9 @@ from datetime import date
 
 from historikk import Dag, _dag
 from kursdata import Kursrad
-from markedsoversikt import endring_i_prosent
-from notater import Notat
+from markedsoversikt import SJEKKBOKSTAVER, endring_i_prosent
+from notater import Notat, TenktKjoep
+from tallformat import fortegn
 from vurderingsdata import Grunn, Vurdering
 
 
@@ -101,3 +102,77 @@ def bygg_etterpaa(
         indeksen = endring(indeks, notat.dato, sist)
         indeksen_grunn = None if indeksen is not None else INDEKSEN_MANGLER_DAGEN
     return Etterpaa(notat.dato, sist, aksjen, aksjen_grunn, indeksen, indeksen_grunn, paa_dagen, dag(sist))
+
+
+# --- Tillegget kl. 14:44: tenkte kjøp og salg --------------------------------
+
+
+@dataclass(frozen=True)
+class Handelen:
+    """Det som står ved et tenkt kjøp (spørsmål 15-19).
+
+    kjoepsdag og salgsdag er den første dagen i serien etter kjoep_etter og
+    salg_etter, eller None mens sluttkursen ikke er hentet. aksjen og
+    indeksen er endringen i prosent fra kjøpsdagen til salgsdagen, eller til
+    siste dag med kurser mens kjøpet er åpent (til). dager er børsdagene med
+    kurs fra kjøpet til salget. Bare prosent, ingen kronebeløp."""
+
+    kjoep: TenktKjoep
+    kjoepsdag: date | None
+    salgsdag: date | None
+    til: date | None
+    aksjen: float | None
+    indeksen: float | None
+    indeksen_grunn: str | None
+    dager: int | None
+
+    @property
+    def venter_paa_kjoepet(self) -> bool:
+        return self.kjoepsdag is None
+
+    @property
+    def venter_paa_salget(self) -> bool:
+        return self.kjoep.solgt is not None and self.salgsdag is None
+
+    @property
+    def kan_selges(self) -> bool:
+        return self.kjoep.aapent and self.kjoepsdag is not None
+
+
+def brikkene(sjekker: tuple[int, int, int] | None) -> tuple[tuple[str, str, str], ...]:
+    """T, B og I som i historikken, fra sjekkene som ble lagret ved trykket."""
+    if sjekker is None:
+        return ()
+    return tuple((bokstav, felt, fortegn(verdi)) for (bokstav, felt), verdi in zip(SJEKKBOKSTAVER, sjekker))
+
+
+def _foerste_etter(serie: list[Kursrad], dag: date | None) -> date | None:
+    if dag is None:
+        return None
+    return next((rad.dato for rad in serie if rad.dato > dag), None)
+
+
+def bygg_handelen(
+    kjoep: TenktKjoep, serie: list[Kursrad], indeks: dict[date, float] | None, *, indeks_feilet: bool = False
+) -> Handelen:
+    """Kjøpet og salget slik serien er nå: kursen leses ved hver visning og
+    lagres aldri, så prosenten følger serien når den hentes på nytt eller
+    justeres (spørsmål 15). Ren logikk."""
+    kjoepsdag = _foerste_etter(serie, kjoep.kjoep_etter)
+    salgsdag = _foerste_etter(serie, kjoep.salg_etter)
+    if kjoepsdag is None:
+        return Handelen(kjoep, None, salgsdag, None, None, None, None, None)
+    if kjoep.solgt is not None:
+        til = salgsdag
+    else:
+        til = serie[-1].dato if serie and serie[-1].dato > kjoepsdag else None
+    if til is None:
+        return Handelen(kjoep, kjoepsdag, salgsdag, None, None, None, None, None)
+    aksjen = endring({rad.dato: float(rad.justert_slutt) for rad in serie}, kjoepsdag, til)
+    if indeks is None:
+        indeksen, grunn = None, INDEKSEN_KUNNE_IKKE_LESES if indeks_feilet else INGEN_INDEKS
+    else:
+        indeksen = endring(indeks, kjoepsdag, til)
+        grunn = None if indeksen is not None else INDEKSEN_MANGLER_DAGEN
+    dager = sum(1 for rad in serie if kjoepsdag < rad.dato <= til) if kjoep.solgt is not None else None
+    return Handelen(kjoep, kjoepsdag, salgsdag, til, aksjen, indeksen, grunn, dager)

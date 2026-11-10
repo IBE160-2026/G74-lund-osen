@@ -56,7 +56,8 @@ class TestTabellen:
             t.close()
 
     def test_uten_tabell_er_alt_paa(self):
-        assert innstillinger.les(None) == {"vis_hjelp": True, "vis_ki_tekst": True}
+        # Story 8.21: også «Notater», som er på fra start.
+        assert innstillinger.les(None) == {"vis_hjelp": True, "vis_ki_tekst": True, "vis_notater": True}
 
 
 class TestSiden:

@@ -88,6 +88,7 @@ from lagring_sqlite import (
     SqliteIndekslager,
     SqliteKurslager,
     SqliteMinlistelager,
+    SqliteNotatlager,
     SqliteVurderingslager,
     aapne_base,
     les_merket,
@@ -156,6 +157,36 @@ SKILLER_SEG_UT = "BRFE"
 # Story 8.3: de fem som er merket i Min liste naar demoen starter. BRFE, KVST
 # og NLYS skiller seg ut paa SLUTTDATO, LSTF og SGNT er blant de oevrige.
 MERKET_I_DEMOEN = ("BRFE", "KVST", "NLYS", "LSTF", "SGNT")
+
+# Story 8.21 (tillegg 2, gruppens svar 10.11 kl. 15:57): oppdiktede notater fra
+# tidligere dager i demoserien, så «Etterpå» har tall, med ett avsluttet og ett
+# åpent tenkt kjøp. (aksje, notatdag, tekst, kjøpet, salget): kjøpet og
+# salget er dagen sluttkursen må være etter, som når brukeren trykker på siden
+# for den dagen. Tekstene gir ingen råd og sier aldri om noe var riktig (NFR-06).
+DEMONOTATER = (
+    (
+        "BRFE",
+        date(2026, 9, 22),
+        "Eksempel: to av sjekkene slo ut samme dag. Ser hva som skjer de neste ukene.",
+        date(2026, 9, 22),
+        date(2026, 10, 2),
+    ),
+    (
+        "BRFE",
+        date(2026, 10, 1),
+        "Eksempel: kursen falt mer enn hovedindeksen i dag. Noterer det for å se det igjen senere.",
+        None,
+        None,
+    ),
+    (
+        "KVST",
+        date(2026, 9, 24),
+        "Eksempel: høyt volum uten nyheter jeg vet om. Noterer et tenkt kjøp for å følge med.",
+        date(2026, 9, 24),
+        None,
+    ),
+    ("NLYS", date(2026, 10, 6), "Eksempel: signalet skiftet retning. Vil se hvordan uka ender.", None, None),
+)
 
 # Siste dag for tre aksjer: (endring fra sluttkursen dagen foer, volumet som
 # faktor av volumnivaaet i START). Regelen staar i modulens docstring.
@@ -257,6 +288,29 @@ def indeksserie(serier: dict[str, list[Kursrad]], dager: list[date]) -> list[Kur
         slutt = round(nivaa, 2)
         rader.append(Kursrad(dato=dag, slutt=slutt, justert_slutt=slutt, volum=sum(d[dag].volum for d in med_kurs)))
     return rader
+
+
+def _sjekkene(tilkobling, symbol: str, dag: date) -> tuple[int, int, int] | None:
+    rad = tilkobling.execute(
+        "SELECT trend, bevegelse, interesse FROM vurdering WHERE symbol = ? AND dato = ? AND grunn IS NULL",
+        (symbol, dag.isoformat()),
+    ).fetchone()
+    return tuple(rad) if rad else None
+
+
+def skriv_demonotatene(tilkobling) -> None:
+    """Story 8.21 (tillegg 2): notatene i DEMONOTATER, med sjekkene som er
+    lagret for dagen kjøpet og salget ble notert, som når brukeren trykker
+    (spørsmål 21 i spec-8-21-egne-notater-paa-aksjesiden.md)."""
+    lager = SqliteNotatlager(tilkobling)
+    for symbol, dag, tekst, kjoep, salg in DEMONOTATER:
+        laget = datetime(dag.year, dag.month, dag.day, 17, 30, tzinfo=OSLO)
+        notat = lager.skriv(symbol, dag, tekst, laget)
+        if kjoep is not None:
+            lager.noter_kjoep(symbol, notat.id, laget, kjoep, _sjekkene(tilkobling, symbol, kjoep))
+        if salg is not None:
+            solgt = datetime(salg.year, salg.month, salg.day, 17, 30, tzinfo=OSLO)
+            lager.noter_salg(symbol, notat.id, solgt, salg, _sjekkene(tilkobling, symbol, salg))
 
 
 def _klokke_for(dag: date):
@@ -407,6 +461,10 @@ def _bygg(sti: Path, radene: list | None = None) -> None:
         minliste = SqliteMinlistelager(tilkobling)
         for symbol in MERKET_I_DEMOEN:
             minliste.merk(symbol)
+
+        # Story 8.21 (tillegg 2): eksemplene på notater og tenkte kjøp,
+        # gjennom porten webserveren bruker.
+        skriv_demonotatene(tilkobling)
 
         # Story 3.4b: KI-radene for siste demodag, fra fila. Alle skal skrives
         # (gjennomgangen, BH3): sjekk_radene har sett at hver aksje har én.
