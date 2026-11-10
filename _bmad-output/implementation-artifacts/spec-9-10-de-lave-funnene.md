@@ -2,7 +2,7 @@
 title: 'Story 9.10: de lave funnene fra 10.6, 8.8, 8.11b og 3.4h'
 type: 'chore'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '78a45186'
 context:
@@ -89,3 +89,5 @@ Diffen `78a45186..05e3e864`, uten `tests/test_docker.py`: Blind Hunter med bare 
 
 *Lagt til 2026-11-09 under spørsmål 2 (gjennomgangen, ECH1):* forslaget i spørsmål 2 er tatt ut igjen og ikke bygget. ECH14 står åpent, og spørsmålet til gruppen er nå: a) som før, teksten lages uten hovedindeksen når den mangler, og dagen står uten tekst når indeksen kommer neste kveld; b) teksten venter bare når hovedindeksen ble lagret i kveldens henting, ellers lages den uten; eller c) neste kveld lages teksten for forrige børsdag når den mangler og indeksen nå er der (ett kall til). *Forslag:* a, til gruppen har svart, fordi b og c endrer når modellen kalles. Hjelpen er som før om dette.
 - **Mutantene for rettingene**, med kopi før og fila lik indeksen etterpå: B for `&` (valgfri igjen) fanget av `TestSorteringenIBryteren`, ECH2 (`JOIN` uten `CROSS`) og den gamle `max(dato)` over hele `kurs` av `test_kurs_leses_aldri_i_sin_helhet`. Den gamle `max(dato)` overlevde først, fordi SQLite skriver «SEARCH … COVERING INDEX» også når hele indeksen leses, og ble fanget da testen krevde `symbol=`. Første runde med kopien feilet fordi en gjennomgangsagent hadde laget en mappe med samme navn som kopifila; filene ble hentet tilbake fra indeksen og kontrollert, og mutantene ble kjørt på nytt.
+
+*Lagt til 2026-11-10:* 9.10 er flettet med PR #132 i `e9638436` kl. 01:51, låst til head-en `f499b878`, etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md` og gruppens svar 09.11 kl. 17:37. Main, med 8.11c, ble flettet inn i `f499b878`. 8.11c og 9.10 endret begge `app.py` og `ferdige_lister.py` uten konflikt i koden; konflikten i avtrykkene i `tests/test_docker.py` er løst med kommentarene for begge, og avtrykkene er regnet ut på nytt. Alle ni bildene er tatt på nytt med DevTools-protokollen og er byte for byte de samme. Utenom avtrykkene er diffen mot main endringene grenen hadde mot `78a45186`. Hele settet alene i fire deler 01:36:08–01:47:42: 4829 bestått, 24 hoppet over og 0 feilet, til sammen de 4853 som `pytest --collect-only` finner. CI var grønn på head-en (run 42731039131). Treet på main etter `git pull --ff-only` er likt treet på `f499b878`. Ingen funn på middels eller over sto åpne. ECH14 med alternativ c er et punkt i `issues.md`.
