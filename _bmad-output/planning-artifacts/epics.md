@@ -2132,6 +2132,14 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Lagt til 2026-11-03:* den første ukas § er skrevet: §53 i `malinger.md`, med de 48 radene i `omsetning` fra 29.10 til 01.11 (svaret 28.10 kl. 23:36, g), i `2abc02c4`. Alle 48 har et annet vindu enn §50–§52, og 0 har feil. `tests/test_omsetning.py` leser nå hver § fram til neste «## », så en ny § ikke telles med (`58382ffb`, svaret 03.11 kl. 00:40). De 4 radene fra 02.11 hører til neste §.
 
+*Avgjort 2026-11-10 kl. 13:48 (gruppens svar):* aksjene i børslista som mangler en måling av omsetningen, måles én gang i natt med bonuskvoten, med et tak så minst 200 kall blir igjen i den. Det endrer regelen om at målingen aldri bruker bonuskvoten (beslutningen 08.10 kl. 08:06), bare for denne kjøringen. Rådet anbefalte det. Bygget som story 2.13b, med valget `--med-bonuskvoten` (`spec-2-13b-maal-alle-med-bonuskvoten.md`).
+
+*Avgjort 2026-11-10 kl. 16:31 (gruppens svar):* 1) «Mangler en måling» betyr ingen rad i tabellen `omsetning`. De 214 i malinger.md ble målt i planleggingen, men tallene ligger ikke i basen. Rekkefølgen er som før. 2) Aksjene i appens liste er ikke med, som i `rekkefoelge()`, fordi appen regner omsetningen deres av kursene (8.11b). Rådet anbefalte begge.
+
+*Avgjort 2026-11-10 kl. 17:42 (gruppens svar):* alle de elleve forslagene i spesifikasjonen for 2.13b er godtatt, også 9–11 slik de er bygget: med valget gjelder børsdagen før når målingen startes før kl. 06:00, tre kall på rad som feiler uten 404 stopper den, og det er ingen lås mot jobben. ECH1, ECH2 og ECH3 er lukket som avgjort av gruppen, med graden urørt (regel 25). Rådet anbefalte det.
+
+*Lagt til 2026-11-10 (flettingen):* 2.13b er flettet med PR #137 i `178107d9` kl. 21:10:39, låst til head-en `7d61de0e`, med CI 42891875216 grønn. Kjøringen i natt føres i `docs/ai-prompts/2026-11-10.md`.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
