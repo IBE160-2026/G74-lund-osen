@@ -1837,6 +1837,8 @@ def _egne_regnet() -> dict | None:
                 "igjen": igjen,
                 "med_en": med_en,
                 "igjen_med_en": igjen_med_en,
+                # Tillegg 4 (gjennomgangen, BH3): kvoten i steg 2.
+                "kvote": valg.KVOTE,
             },
             # Story 8.22, tillegg 4 (svaret kl. 22:50): status for nøkkelen i
             # steg 2, regnet av siste henting, uten kall og uten .env (AD-10).

@@ -114,27 +114,29 @@ def kallene(i_lista: int, folg: int, fjern: int) -> tuple[int, int, int]:
 @dataclass(frozen=True)
 class SisteHenting:
     """Story 8.22, tillegg 4 (svaret 10.11 kl. 22:50): dagen for den siste
-    hentingen og kallene den brukte, regnet av seriene den lagret."""
+    hentingen og seriene som ble lagret den dagen. Hver serie er ett kall,
+    så serier er det minste antallet kall hentingen brukte."""
 
     dag: date
-    kall: int
+    serier: int
 
 
 def siste_henting(tilkobling: sqlite3.Connection) -> SisteHenting | None:
     """Den siste hentingen, regnet av basen alene: uten kall og uten å lese
     .env (AD-10). Dagen er den siste i kursserie.hentet og
-    indeksserie.hentet, i Europe/Oslo, og kallene er seriene som ble hentet
-    den dagen, ett kall per serie. Et nytt forsøk som feilet, lagret ingen
-    serie og telles ikke. None: ingen henting har gått, eller basen kan ikke
-    leses."""
-    try:
-        hentet = [
-            datetime.fromisoformat(rad[0]).astimezone(OSLO).date()
-            for tabell in ("kursserie", "indeksserie")
-            for rad in tilkobling.execute(f"SELECT hentet FROM {tabell}")
-        ]
-    except (sqlite3.Error, ValueError, TypeError):
-        return None
+    indeksserie.hentet, i Europe/Oslo, og serier er seriene som sist ble
+    hentet den dagen. Kallene var minst så mange (gjennomgangen, BH2, ECH3):
+    et kall som feilet, et nytt forsøk, målingen med bonuskvoten og en serie
+    som ble hentet to ganger samme dag, telles ikke. En verdi som ikke kan
+    leses, hoppes over (ECH4). Feil i basen går til kalleren, som skjuler
+    delen som før. None: ingen henting har lagret en serie."""
+    hentet = []
+    for tabell in ("kursserie", "indeksserie"):
+        for (verdi,) in tilkobling.execute(f"SELECT hentet FROM {tabell}"):
+            try:
+                hentet.append(datetime.fromisoformat(verdi).astimezone(OSLO).date())
+            except (ValueError, TypeError):
+                continue
     if not hentet:
         return None
     dag = max(hentet)

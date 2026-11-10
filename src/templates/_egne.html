@@ -65,16 +65,19 @@
           i den ekte versjonen. Der tavla har feltet og «Sjekk nøkkelen», står
           statusen regnet av siste henting (valg.siste_henting), uten kall og
           uten å lese .env (AD-10, svaret 08.11 kl. 12:39). Demoen viser at den
-          ikke trenger nøkkel på samme plass (tillegget kl. 17:16). #}
+          ikke trenger nøkkel på samme plass (tillegget kl. 17:16).
+          Gjennomgangen: «virket» og «minst», fordi siden bare vet hva siste
+          henting lagret (BH1, BH2, ECH3). Byttet står også for Docker og uten
+          startskriptet (ECH1), og teksten uten henting peker på byttet (ECH2). #}
       {% if eksempeltall %}
         <p class="noekkelstatus">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>
       {% elif egne.henting %}
-        <p class="noekkelstatus virker">Nøkkelen virker: siste henting {{ egne.henting.dag|dato }} brukte {{ egne.henting.kall }} av 20 kall.</p>
+        <p class="noekkelstatus virker">Nøkkelen virket ved siste henting {{ egne.henting.dag|dato }}, som brukte minst {{ egne.henting.serier }} av {{ egne.kall.kvote }} kall.</p>
       {% else %}
-        <p class="noekkelstatus">Ingen henting har gått ennå. Start den ekte versjonen med startskriptet: første gang spør det etter nøkkelen, og du limer den inn der. Aksjene hentes ved neste henting etter kl. 22.</p>
+        <p class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel».</p>
       {% endif %}
       <h5>Slik bytter du nøkkel</h5>
-      <p>Slett det som står etter <code>EODHD_API_KEY=</code> i fila <code>.env</code> i mappa til appen. Neste gang den ekte versjonen startes, spør startskriptet etter nøkkelen og lagrer den nye. Siden her har ikke noe felt for nøkkelen.</p>
+      <p>Slett det som står etter <code>EODHD_API_KEY=</code> i fila <code>.env</code> i mappa til appen. Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye. Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter <code>EODHD_API_KEY=</code> selv og starter appen på nytt. Siden her har ikke noe felt for nøkkelen.</p>
     </li>
     <li class="kort-steg">
       <span class="stegnummer" aria-hidden="true">3</span>

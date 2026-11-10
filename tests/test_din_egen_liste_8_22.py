@@ -48,7 +48,9 @@ def test_noekkelen_har_ikke_noe_felt(klient):  # noqa: F811
     assert not re.search(r'<input[^>]*type="(text|password)"', _delen(html))
     assert "Demoen trenger ingen nøkkel" not in andre
     assert "<h5>Slik bytter du nøkkel</h5>" in andre
-    assert "Neste gang den ekte versjonen startes, spør startskriptet etter nøkkelen og lagrer den nye." in andre
+    assert (
+        "Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye." in andre
+    )
     assert "Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen." in andre
 
 
@@ -138,20 +140,39 @@ def _klient_med_henting(stier, monkeypatch):  # noqa: F811
 
 def test_statusen_er_kallene_hentingen_brukte(stier, monkeypatch):  # noqa: F811
     """Ville feilet hvis statusen i steg 2 ikke var kallene den siste
-    hentingen faktisk brukte, talt i hentingen selv, med dagen."""
+    hentingen brukte, talt i hentingen selv, med dagen og kvoten fra
+    valg.KVOTE (gjennomgangen, BH1, BH2, BH3)."""
+    import valg
+
     k, kall = _klient_med_henting(stier, monkeypatch)
     andre = _kortene(k.get("/min-liste").data.decode("utf-8"))[1]
     assert kall
     assert (
-        f'<p class="noekkelstatus virker">Nøkkelen virker: siste henting 22.09 brukte {len(kall)} av 20 kall.</p>'
-        in andre
-    )
-    assert "Ingen henting har gått ennå" not in andre
+        f'<p class="noekkelstatus virker">Nøkkelen virket ved siste henting 22.09, som brukte minst {len(kall)} '
+        f"av {valg.KVOTE} kall.</p>"
+    ) in andre
+    assert "Ingen henting har lagret kurser ennå" not in andre
+    monkeypatch.setattr(valg, "KVOTE", 25)
+    assert f"minst {len(kall)} av 25 kall." in _kortene(k.get("/min-liste").data.decode("utf-8"))[1]
+
+
+def test_to_hentinger_samme_dag_gir_minst(stier, monkeypatch):  # noqa: F811
+    """Gjennomgangen (ECH3, VG2): ville feilet hvis en serie som ble hentet
+    to ganger samme dag, ble talt to ganger, eller tallet ble mer enn
+    kallene. Seriene er det minste antallet kall."""
+    from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
+
+    k, kall = _klient_med_henting(stier, monkeypatch)
+    _, kall2, _ = kjoer_23(stier[0], stier[1], OEYEBLIKK_22_09)
+    andre = _kortene(k.get("/min-liste").data.decode("utf-8"))[1]
+    tall = int(re.search(r"som brukte minst (\d+) av", andre).group(1))
+    assert 0 < tall <= len(kall) + len(kall2)
 
 
 def test_uten_henting_staar_hva_man_gjoer(klient, stier):  # noqa: F811
-    """Ville feilet hvis steg 2 sa at nøkkelen virker uten at noen henting
-    har gått, eller ikke sa hva man gjør."""
+    """Ville feilet hvis steg 2 sa at nøkkelen virket uten at noen henting
+    har lagret kurser, eller ikke pekte på byttet når hentingen har feilet
+    (gjennomgangen, ECH2)."""
     from lagring_sqlite import aapne_base
 
     t = aapne_base(stier[1])
@@ -162,34 +183,63 @@ def test_uten_henting_staar_hva_man_gjoer(klient, stier):  # noqa: F811
     finally:
         t.close()
     andre = _kortene(klient.get("/min-liste").data.decode("utf-8"))[1]
-    assert "Nøkkelen virker" not in andre
+    assert "Nøkkelen virket" not in andre
     assert (
-        "Ingen henting har gått ennå. Start den ekte versjonen med startskriptet: første gang spør det etter "
-        "nøkkelen, og du limer den inn der. Aksjene hentes ved neste henting etter kl. 22."
+        "Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter "
+        "nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se "
+        "«Slik bytter du nøkkel».</p>"
     ) in andre
 
 
-def test_statusen_leser_aldri_noekkelen(klient, monkeypatch):  # noqa: F811
-    """AD-10: ville feilet hvis siden leste nøkkelen fra miljøet eller .env,
-    eller viste den."""
+def test_byttet_staar_ogsaa_for_docker(klient, monkeypatch):  # noqa: F811
+    """Gjennomgangen (ECH1, VG3): ville feilet hvis «Slik bytter du nøkkel»
+    bare gjaldt startskriptet, også når appen kjører i Docker."""
+    monkeypatch.setenv(app_modul.I_DOCKER, "1")
+    andre = _kortene(klient.get("/min-liste").data.decode("utf-8"))[1]
+    assert (
+        "Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter <code>EODHD_API_KEY=</code> "
+        "selv og starter appen på nytt."
+    ) in andre
+
+
+def test_statusen_leser_aldri_noekkelen(klient, monkeypatch, tmp_path):  # noqa: F811
+    """AD-10 (gjennomgangen, VG1): ville feilet hvis siden leste nøkkelen fra
+    miljøet, på noen måte, eller åpnet en fil som heter .env."""
+    import builtins
     import os
+    import pathlib
 
-    hemmelig = "IKKE-EN-EKTE-NOEKKEL-8-22"
-    monkeypatch.setenv("EODHD_API_KEY", hemmelig)
-    lest = []
-    ekte_getenv = os.getenv
-    monkeypatch.setattr(os, "getenv", lambda n, *a: lest.append(n) or ekte_getenv(n, *a))
+    class Spion(dict):
+        lest: list = []
+
+        def __getitem__(self, n):
+            Spion.lest.append(n)
+            return super().__getitem__(n)
+
+        def get(self, n, *a):
+            Spion.lest.append(n)
+            return super().get(n, *a)
+
+    monkeypatch.setattr(os, "environ", Spion(os.environ, EODHD_API_KEY="IKKE-EN-EKTE-NOEKKEL-8-22"))
+    aapnet = []
+    ekte_open, ekte_path_open = builtins.open, pathlib.Path.open
+    monkeypatch.setattr(builtins, "open", lambda f, *a, **k: aapnet.append(str(f)) or ekte_open(f, *a, **k))
+    monkeypatch.setattr(
+        pathlib.Path, "open", lambda self, *a, **k: aapnet.append(str(self)) or ekte_path_open(self, *a, **k)
+    )
+    (tmp_path / ".env").write_text("EODHD_API_KEY=IKKE-EN-EKTE-NOEKKEL-8-22", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
     html = klient.get("/min-liste").data.decode("utf-8")
-    assert hemmelig not in html and "EODHD_API_KEY" not in lest
-    import valg
-
-    assert "environ" not in valg.siste_henting.__code__.co_names
-    assert ".env" not in valg.siste_henting.__code__.co_consts
+    assert "IKKE-EN-EKTE-NOEKKEL-8-22" not in html
+    assert "EODHD_API_KEY" not in Spion.lest
+    assert not [f for f in aapnet if f.endswith(".env")]
+    assert "Nøkkelen virket ved siste henting" in html
 
 
 def test_siste_henting_er_dagen_i_oslo(tmp_path):
-    """Ville feilet hvis dagen ble regnet i UTC, eller kallene fra en eldre
-    henting ble talt med. 23:30 UTC 09.11 er 10.11 i Oslo."""
+    """Ville feilet hvis dagen ble regnet i UTC, seriene fra en eldre
+    henting ble talt med, eller én verdi som ikke kan leses, gjorde hele
+    statusen tom (gjennomgangen, ECH4). 23:30 UTC 09.11 er 10.11 i Oslo."""
     from datetime import date
 
     import valg
@@ -207,6 +257,7 @@ def test_siste_henting_er_dagen_i_oslo(tmp_path):
                     ("AAA", "2026-11-09T23:30:00+00:00"),
                     ("BBB", "2026-11-09T23:31:00+00:00"),
                     ("CCC", "2026-11-09T21:00:00+00:00"),
+                    ("DDD", "ikke en dato"),
                 ],
             )
             t.execute("INSERT INTO indeksserie (symbol, hentet) VALUES (?, ?)", ("OSEBX", "2026-11-09T23:32:00+00:00"))
@@ -234,5 +285,5 @@ def test_demoen_har_det_samme_kortet(tmp_path, monkeypatch):
         '<p class="noekkelstatus">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>'
         in andre
     )
-    assert "Nøkkelen virker" not in andre and "Ingen henting har gått ennå" not in andre
+    assert "Nøkkelen virket" not in andre and "Ingen henting har lagret kurser ennå" not in andre
     assert "<h5>Slik bytter du nøkkel</h5>" in andre and "<input" not in andre

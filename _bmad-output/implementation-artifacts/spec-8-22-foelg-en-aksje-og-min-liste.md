@@ -134,7 +134,30 @@ Under står «Slik bytter du nøkkel», med det startskriptet gjør (`start/star
 
 Testene står i `test_din_egen_liste_8_22.py`. Kallene sammenlignes med kallene hentingen selv talte (`kjoer_23`). Det er også tester for siden uten henting, for at nøkkelen aldri leses, for dagen i Oslo og for demoen.
 
+### Gjennomgangen av tillegg 4
+
+Gjennomgangen av `a251c087..508a3a16` ga 3 funn fra Blind Hunter, 4 fra Edge Case Hunter og 4 fra Verification Gap. Rettingene endrer tekstene over. Det som står på siden nå:
+
+- **Etter en henting:** «Nøkkelen virket ved siste henting 10.11, som brukte minst 19 av 20 kall.»
+- **Før første henting:** «Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel».»
+- **«Slik bytter du nøkkel»** har fått en setning til: «Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter `EODHD_API_KEY=` selv og starter appen på nytt.»
+
+| Funn | Grad | Utfall |
+|---|---|---|
+| BH1 («virker» i presens, men gjelder siste henting) | middels | Rettet: «Nøkkelen virket ved siste henting …». |
+| BH2, ECH3 (seriene er ikke kallene: feilede kall, nye forsøk, bonuskvoten og to hentinger samme dag telles ikke) | middels | Rettet: teksten sier «minst», og `SisteHenting.serier` heter det det er. Test med to hentinger samme dag. |
+| BH3, VG3 («20» skrevet i malen) | lav | Rettet: `valg.KVOTE`, med test. |
+| ECH1, VG3 (startskriptet finnes ikke med Docker eller uten skriptet) | middels | Rettet: setningen for Docker og uten startskriptet, med test med `OSE_I_DOCKER=1`. |
+| ECH2 (teksten uten henting peker feil vei når hentingen ved oppstart har feilet) | middels | Rettet: hentingen går med en gang ved oppstart (`docs/installasjon.md`), og teksten peker på byttet. |
+| ECH4 (én verdi som ikke kan leses, gir «ingen henting») | lav | Rettet: verdien hoppes over. En feil i basen går til `_egne_regnet`, som skjuler delen som før. |
+| VG1 (testen for AD-10 fanget bare `os.getenv`) | middels | Rettet: `os.environ` byttes med en spion, og testen fanger hver fil som heter `.env` og åpnes med `open` eller `Path.open`. |
+| VG2 (`kjoer_23` lar alle kall lykkes) | middels | Delvis rettet: teksten sier «minst», så den stemmer også når et kall feiler, og testen med to hentinger viser at tallet ikke blir for høyt. Ingen test har et kall som feiler. |
+| VG4 (avtrykkene viser ikke at bildet viser statusen) | lav | Står: bildene ble tatt på nytt og sett på, som for de andre bildene, og bildet av «Din egen liste» viser demoboksen og byttet. |
+
+VG2 er middels og bare delvis rettet, så den står som spørsmål 14 (regel 25).
+
 ## Spørsmål etter gjennomgangen
 
 12. **Medianene ved hver visning av «Følg en aksje» (ECH5).** *Forslag:* som bygget. Lista trenger omsetningen for alle, og medianene regnes én gang per forespørsel, som på Min liste. Det er ikke målt hvor lang tid det tar med den ekte basen.
 13. **Demotickerne i den ekte versjonen (ECH12).** *Forslag:* som bygget, fordi ingen av dem er på Oslo Børs 10.11. Kommer en av dem på børsen, sjekkes bransjen på nytt.
+14. **Et kall som feiler, i testen for statusen i steg 2 (VG2, tillegg 4).** *Forslag:* som bygget. Teksten sier «minst», så den stemmer også når kall feiler. En test med et kall som feiler og et nytt forsøk i `kjoer_23` kan legges til, men tester da hentingen mer enn siden.
