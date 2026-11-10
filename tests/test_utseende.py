@@ -959,8 +959,9 @@ class TestStilarket:
         # aksje uten kurser den femte (gruppens svar 23.10 kl. 09:24, b).
         # Story 3.4h: siden for et selskap i demoen er den sjette.
         # Story 2.12: «Følg en aksje» (folg.html) er den sjuende, og story
-        # 8.10: «Innstillinger» (innstillinger.html) den åttende.
-        assert sider == 8
+        # 8.10: «Innstillinger» (innstillinger.html) den åttende. Story 8.21:
+        # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
+        assert sider == 9
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,
