@@ -462,6 +462,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) tr.gul td:first-child { box-shadow: inset 4px 0 0 var(--oransje); }
 :where(.side-oversikt) .merke.gul-siste { display: block; font-size: 12px; font-weight: 400; }
 :where(.side-oversikt) td .fra { display: block; font-size: 12px; font-weight: 400; color: var(--dempet); }
+/* Story 2.6 (FR-407): merket under endringen, i oversikten og Min liste. */
+td .justeringsdag { display: block; font-size: 12px; font-weight: 400; color: var(--dempet); }
 :where(.side-oversikt) .periodelinje { margin: 0 0 12px; }
 /* Story 8.17b: «Sammenlign med» i Min liste. Linja under raden er dempet og
    mindre, uten strek, og datoen står i cellen for selskap. */
@@ -1140,6 +1142,8 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.8 (FR-206): signaldagene i kursgrafen, i fargen for retningen
    (designregler §3), og gul ring ved 3 av 3. */
 :where(.side-aksje) .signaldag { stroke: var(--kort); stroke-width: 1.5; }
+/* Story 8.14 (FR-407): justeringsdagene, en kort strek nederst i grafen. */
+:where(.side-aksje) line.justeringsdag { stroke: var(--tekst); stroke-width: 2; }
 :where(.side-aksje) .signaldag.positiv { fill: var(--opp); }
 :where(.side-aksje) .signaldag.negativ { fill: var(--ned); }
 :where(.side-aksje) .signaldag.blandet { fill: var(--blandet); }

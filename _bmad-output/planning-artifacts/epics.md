@@ -1746,6 +1746,10 @@ jeg kommer tilbake, så hullet ikke ser ut som en kursbevegelse.
 
 *Avgjort 2026-11-10 kl. 11:52 og 15:30 (gruppens svar):* kl. 11:52 ble forslagene i spørsmål 1–5 i spesifikasjonen godtatt. Spørsmål 6 (hovedindeksen etter en feil) sto under funnene og kom ikke med da. Kl. 15:30 svarte gruppen på det: hovedindeksen hentes også når bare den mangler. Rådet anbefalte forslaget om å la det være som før, men gruppen valgte dette, og det bygges på grenen før flettingen. Rådet anbefalte resten. Svarene er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
+*Avgjort 2026-11-10 kl. 17:43 (gruppens svar):* BH2 og ECH7 fra gjennomgangen av svaret kl. 15:30 lukkes som avgjort av gruppen, med graden urørt (regel 25): en base én versjon bak migreres når indeksen skrives, som ved all henting som skriver. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `2c1a17af`, PR #133.
+
 ### Story 2.5: Vurderingen skrives i samme kjøring
 
 Som **gruppe**, vil jeg at vurderingen regnes av kursene som nettopp ble lagret,
@@ -1800,6 +1804,8 @@ forutsetter den målte veien.
 *Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 8.14 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `a2427bee`, PR #134.
 
 ### Story 2.7: Historikken i aksjedetaljen
 
@@ -4268,6 +4274,8 @@ NFR-06, NFR-08
 *Avgjort 2026-11-09 kl. 10:30 og 10:43 (gruppens svar):* bygget i ekstravinduet 09.11 sammen med 2.6 (PR #134, med spesifikasjonen `spec-2-6-justeringsdager.md` på grenen), og flettes onsdag 11.11 etter brukertesten. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-10 kl. 11:52 (gruppens svar):* alle sju forslagene i spesifikasjonen for 2.6 og 8.14 er godtatt, så sidene sier «justeringsdag». Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
+*Ferdig 2026-11-10:* flettet i `a2427bee`, PR #134.
 
 ### Story 8.15: Sortering ved klikk i kolonneraden
 

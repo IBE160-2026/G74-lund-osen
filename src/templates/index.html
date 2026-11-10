@@ -69,6 +69,9 @@
                 {{ rad.endring_prosent|tall('endring') }}
                 {#- Story 8.17a: serien har ikke startdagen for perioden. #}
                 {% if rad.fra %}<span class="fra">fra {{ rad.fra|dato }}</span>{% endif %}
+                {#- Story 2.6 (FR-407): endringen er fra en justeringsdag, regnet
+                    av kursserien alene. Ordet er «justeringsdag» (8.14). #}
+                {% if rad.justeringsdag %}<span class="justeringsdag" title="Justeringsdag: kilden regnet de eldre kursene om denne dagen, så sluttkursen og endringen stemmer ikke helt.">justeringsdag</span>{% endif %}
               {% else %}
                 –
               {% endif %}
