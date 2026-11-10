@@ -22,6 +22,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 6. **Brukertesten.** *Forslag:* flettes onsdag etter brukertesten, som svaret sier, så den ikke er på sidene testen måler.
 7. **Testene som er endret.** Tre eksisterende tester er endret, fordi siden har en ny lenke og en ny `<details>`. `test_hver_lenke_gaar_til_en_side_som_finnes` i `tests/test_utseende.py` godtar nå en lenke til en id på samme side, når id-en finnes på siden. `test_tabellen_er_lukket_bak_se_tallene_som_tabell` i `tests/test_boersometer.py` holder `<details class="rundtur">` utenfor tellingen. *Forslag:* godta. Det testene vakter, at hver lenke går til noe som finnes, og at tabellen står lukket, står som før.
 
+*Svar 2026-11-10 kl. 11:52 (gruppens svar):* alle åtte forslagene er godtatt, også spørsmål 8, som står nederst. BH1 og BH4 lukkes som avgjort av gruppen, med graden urørt (regel 25). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
+
 ## Intent
 
 **Problem:** En ny bruker ser alle delene av siden på en gang og vet ikke hva de er før tallene leses (FR-109).
@@ -66,6 +68,7 @@ Diffen `1a72810a..a4111592`, uten `tests/test_docker.py` og bildene: Blind Hunte
 - *BH3, rettet.* Testen av ankrene godtok `data-id="q"` og to like id-er. Nå en hel id, og nøyaktig én. Det samme i `test_utseende.py`.
 - *BH1, ført.* På en dag uten sjekker står fortsatt overskriften og «?» for sjekkene, med teksten for en side uten sjekker. Spørsmål 4 og hjelpen sier at sjekkene ikke vises, og det gjelder kortene; stegene om dem står ikke.
 - *BH4, ført.* Signalstyrken og retningen peker på tabellen, og «Tallene bak» på sjekkene, som «Sjekkene». Det er delen de forklarer.
+- *BH1 og BH4, lukket 2026-11-10 som avgjort av gruppen* (svaret kl. 11:52), middels som før (regel 25).
 - *BH5, ikke reelt.* Tekstene er vanlige strenger uten HTML.
 
 **Lav**
@@ -78,3 +81,5 @@ Diffen `1a72810a..a4111592`, uten `tests/test_docker.py` og bildene: Blind Hunte
 *Lagt til 2026-11-09 (hele settet i deler):* to tester feilet etter gjennomgangen, og begge hadde rett. `test_fotnoten_under_summen_er_flyttet_til_hjelpen` (8.20a) krever at «Ingen vekting og ingen skjult formel» ikke står på aksjesiden, og den setningen er den siste i teksten fra tavla om sjekkene. Steget har nå teksten uten den, som retningen uten rådsetningen. `test_ki_teksten_under_regelforklaringen` leser rekkefølgen av overskriftene, og «Signalet dag for dag» i toppen sto før «Signalet forklart»; steget heter nå «Dag for dag». Ingen test er svekket.
 
 8. **Tavla og 8.20a.** Tillegget 13.10 sier at stegene bruker tekstene fra tavla, og 8.20a tok «Ingen vekting og ingen skjult formel.» bort fra aksjesiden. *Forslag:* stegene har tavlas tekster uten de setningene som er tatt bort fra sidene eller ikke kan stå i en hjelpetekst (rådsetningen i retningen). Dette er et svar gruppen må gi før flettingen (regel 25).
+
+*Svar 2026-11-10 kl. 11:52 (gruppens svar):* forslaget i spørsmål 8 er godtatt: stegene har tavlas tekster uten setningene som er tatt bort fra sidene eller ikke kan stå i en hjelpetekst. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
