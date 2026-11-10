@@ -44,20 +44,45 @@
   <p>Vil du følge helt andre aksjer, lager du din egen liste. Hver bruker har sin egen gratis nøkkel fra EODHD, som legges inn én gang.</p>
   <h3>Din egen liste: kom i gang</h3>
   <p>Appen kjører på din egen maskin, så det finnes ingen innlogging hos oss. Du trenger bare din egen gratiskonto hos EODHD. Da velger du selv hvilke aksjer du følger.</p>
-  <ol class="steg">
-    <li><strong>Lag en gratis konto hos EODHD.</strong> Registreringen skjer hos EODHD, ikke hos oss. Gratiskontoen gir 20 kall i døgnet og sluttkurser 1 år tilbake. Kontoen er din egen. Den kan ikke deles med andre, heller ikke i en gruppe. Adressen er eodhd.com.</li>
-    {#- Avviket i utdraget §2: webserveren rører aldri nøkkelen (AD-10). #}
-    <li><strong>Lim inn nøkkelen din.</strong> Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen. Du limer den inn når den ekte versjonen startes første gang, og startskriptet spør etter den.</li>
-    <li><strong>Velg aksjene dine.</strong> Du kan søke blant alle aksjene på Oslo Børs. Er omsetningen målt, står den i søket. Omsettes en aksje for mindre enn 32 MNOK om dagen i median de 3 siste månedene, merkes den «Utenfor målingen».</li>
+  {#- Story 8.22 (utdraget §2): de tre stegene som kort, i samme stil som
+      resten av siden. Steg 1 har adressen som tekst, fordi sidene ikke har
+      adresser til nettet (spørsmål 9). Steg 2 er en forklaring, ikke et
+      felt: webserveren rører aldri nøkkelen (AD-10, svaret 08.11 kl.
+      12:39). Steg 3 har kallene regnet av lista (spørsmål 10). #}
+  <ol class="stegkort">
+    <li class="kort-steg">
+      <span class="stegnummer" aria-hidden="true">1</span>
+      <h4>Lag en gratis konto hos EODHD</h4>
+      <p>Registreringen skjer hos EODHD, ikke hos oss. Gratiskontoen gir 20 kall i døgnet og sluttkurser 1 år tilbake.</p>
+      <p>Kontoen er din egen. Den kan ikke deles med andre, heller ikke i en gruppe.</p>
+      <p class="adresse">Adressen er eodhd.com.</p>
+    </li>
+    <li class="kort-steg">
+      <span class="stegnummer" aria-hidden="true">2</span>
+      <h4>Lim inn nøkkelen din</h4>
+      <p>Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen.</p>
+      <p>Du limer den inn når den ekte versjonen startes første gang, og startskriptet spør etter den. Siden her har ikke noe felt for nøkkelen.</p>
+      {#- Tillegget 10.11 kl. 17:16 (svaret kl. 15:57): demoen trenger ingen nøkkel. #}
+      {% if eksempeltall %}<p class="demoboks">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>{% endif %}
+    </li>
+    <li class="kort-steg">
+      <span class="stegnummer" aria-hidden="true">3</span>
+      <h4>Velg aksjene dine</h4>
+      <p>Start med en bransjeliste, eller følg aksjene én og én, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}. I «Følg en aksje» står alle aksjene på Oslo Børs som kan følges, med bransjen og den målte omsetningen.</p>
+      <ul class="kallene">
+        <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
+        <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>
+        {% if egne.kall.egne %}<li>{{ egne.kall.egne }} kall: {{ "din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer" }}</li>{% endif %}
+        <li>{{ egne.kall.margin }} kall: margin</li>
+      </ul>
+      <p class="stegknapper">
+        {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Velg en bransjeliste</a>{% endif %}
+        {% if egne.full %}<span class="full">Lista er full. Fjern en aksje for å følge en annen.</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
+      </p>
+    </li>
   </ol>
   <h3>Følg flere aksjer</h3>
   <p>Lista kan ha opptil 18 aksjer. Hver aksje bruker 1 av de 20 kallene i døgnet, og hovedindeksen 1. Med 18 aksjer er 1 kall igjen til et nytt forsøk hvis noe feiler. Vil du følge andre, bytter du dem inn for noen i lista.</p>
-  <ul class="kallene">
-    <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
-    <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>
-    {% if egne.kall.egne %}<li>{{ egne.kall.egne }} kall: {{ "din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer" }}</li>{% endif %}
-    <li>{{ egne.kall.margin }} kall: margin</li>
-  </ul>
   <p>Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre.</p>
   <p class="antall-egne">{{ egne.antall }} av {{ egne.tak }} aksjer i lista</p>
   <ul class="bytt-lista">
@@ -66,7 +91,6 @@
         {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp" href="/folg?bytt={{ aksje.symbol }}">Bytt ut</a>{% endif %}</li>
     {% endfor %}
   </ul>
-  {% if not egne.full %}<p><a class="knapp hoved" href="/folg">+ Følg en aksje</a></p>{% endif %}
   {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. #}
   {% if egne.ferdige %}
   <h3 id="ferdige-lister">Start fra en ferdig liste</h3>

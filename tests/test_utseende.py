@@ -328,6 +328,9 @@ class TestRammen:
                     or re.fullmatch(r"/(min-liste)?\?([a-z]+=[A-Za-z0-9-]+&amp;)*signal=(positiv|negativ)", href)
                     # Story 2.12: «Følg en aksje» og «Bytt ut».
                     or re.fullmatch(r"/folg(\?bytt=[A-Z0-9-]+)?", href)
+                    # Story 8.22: steg 3 i «Din egen liste» går til bransjelistene
+                    # på samme side, bare når de står der.
+                    or (href == "#ferdige-lister" and 'id="ferdige-lister"' in html)
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
