@@ -3331,6 +3331,13 @@ class TestReadmeForNybegynnere:
             "eller egen nøkkel",
             # Story 2.3c: første henting på dagtid er flettet.
             "første gang på dagtid",
+            # Nattflettingen 09.11: 8.8, 10.6, 2.12, 8.10, 8.10b, 8.11 og 8.11b.
+            # «Periodevalget på alle sidene» er kortet til «Periodevalget», og
+            # «Innstillinger» med «Vis hjelp» står uten valgene, så hvert punkt
+            # har høyst 20 ord.
+            "signaldagene",
+            "og ki-teksten om dagen",
+            "ferdige lister, egne aksjer og «innstillinger»",
         ):
             assert sak in ferdig, sak
         # Story 3.3h: det rundt appen står i én setning under listene, ikke
@@ -3364,15 +3371,21 @@ class TestReadmeForNybegynnere:
             # Gruppens svar 05.11 kl. 12:20: brukertesten står under «Neste i v1».
             "brukertesten med én person",
             "prøven av readme-en på en ren maskin",
-            "signaldagene i kursgrafen",
-            "«vis ki-tekst»",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
             # Story 8.17a: periodevalget i oversikten er flyttet til «Ferdig»,
             # og Min liste og børsometeret (8.17b) står igjen.
             # Story 8.17b: Min liste og børsometeret er flyttet til «Ferdig», og
             # KI-teksten om dagen står igjen.
-            "ki-teksten om dagen på forsiden",
-            "velge og bytte aksjer",
+            # Nattflettingen 09.11: signaldagene, «Vis KI-tekst», KI-teksten om
+            # dagen og å velge og bytte aksjer er flyttet til «Ferdig», og
+            # «Ekstra» har storyene i de åpne PR-ene fra ekstravinduet.
+            "dokumenttestene i én kommando",
+            "«utenfor målingen» med samme median som bransjelistene",
+            "de lave funnene fra gjennomgangene",
+            "etterfylling av hull i kursserien",
+            "justeringsdagene, regnet av kursserien alene",
+            "sjekk 2 og 3 i kursgrafen",
+            "«vis meg rundt»",
         )
         assert len(neste_punkter) == len(saker), neste_punkter
         for punkt, sak in zip(neste_punkter, saker):
@@ -3654,13 +3667,20 @@ class TestReadmeForNybegynnere:
 # VG2, ECH5): alle sakene i punktet, og stammen «signaldag», saa ogsaa
 # «signaldager» fanges.
 EKSTRA = (
-    ("signaldag",),
-    ("«vis ki-tekst»",),
     # Story 8.6: børsometeret er flyttet til «Ferdig».
     # Story 8.17b: periodevalget i Min liste og børsometeret er flyttet til
     # «Ferdig» («Periodevalget på alle sidene»).
-    ("ki-teksten om dagen",),
-    ("velge og bytte aksjer",),
+    # Nattflettingen 09.11: 8.8, 8.10, 8.10b, 10.6, 2.12, 8.11 og 8.11b er
+    # flettet og flyttet til «Ferdig». Under «Ekstra» står storyene i de åpne
+    # PR-ene fra ekstravinduet, #130–#136. Var signaldagene, «Vis KI-tekst»,
+    # KI-teksten om dagen og å velge og bytte aksjer.
+    ("dokumenttestene",),
+    ("«utenfor målingen»",),
+    ("de lave funnene",),
+    ("etterfylling",),
+    ("justeringsdagene",),
+    ("sjekk 2 og 3",),
+    ("«vis meg rundt»",),
 )
 
 
