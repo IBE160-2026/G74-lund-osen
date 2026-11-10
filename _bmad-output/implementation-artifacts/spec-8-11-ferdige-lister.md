@@ -2,7 +2,7 @@
 title: 'Story 8.11: Ferdige lister og filter på signalet'
 type: 'feature'
 created: '2026-11-08'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'f09e0c6f'
 context:
@@ -87,3 +87,4 @@ Grenen `8-11-ferdige-lister` er ikke flettet. Den bygger på 2.12 (PR #124) og f
 
 *Lagt til 2026-11-09 (instruksjonen kl. 00:30 i `docs/ai-prompts/2026-11-09.md`, steg 4):* `BRANSJE` i `src/ferdige_lister.py` følger svarene kl. 22:01 og 22:03: VOIM er Energi, NOSN, NTG og MVW er Industri, PLCAN er Shipping, NORTH er Finans, og SCOIN er tatt ut. Merket «usikker» er tatt bort, og docstringen sier at gruppen har sjekket bransjene. VG6 er rettet: `TestValideringenIBrukListe` i `tests/test_ferdige_lister.py` prøver valideringen i `bruk_liste` direkte, med samme kode to ganger, en bransje utenfor de 13 og en kode utenfor `boersliste`, og at et ønske som venter, står urørt når valget avvises. Mutanten «bransjen sjekkes ikke i `bruk_liste`» ble fanget av `test_en_bransje_utenfor_de_13_avvises`, og `src/valg.py` var lik HEAD etterpå. 2.12 (med main) er flettet inn; oversikten ved 390 px er nå 4240 px.
 
+*Lagt til 2026-11-10:* 8.11 er flettet med PR #128 i `b5e423fe` kl. 00:25, låst til head-en `2886ec60`, etter nattflettingen (kl. 12:00 i `docs/ai-prompts/2026-11-09.md`) og gruppens svar 09.11 kl. 10:55. Main, med squash-flettingen av #126 i `edf4bc6b`, ble flettet inn i `2886ec60`. Konflikten i `sprint-status.yaml` ble løst slik at diffen mot main er endringene grenen hadde mot `1a72810a`, og ikke mer. Hele settet alene i fire deler 00:09:22–00:20:54: 4785 bestått, 24 hoppet over og 0 feilet, til sammen de 4809 som `pytest --collect-only` finner. CI var grønn på head-en (run 42719745296). Treet på main etter `git pull --ff-only` er likt treet på `2886ec60`. Ingen funn på middels eller over sto åpne.
