@@ -1307,7 +1307,9 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av main (8.11c) inn i 9.10: begge endret app.py og ferdige_lister.py. Avtrykkene er
 # regnet ut paa nytt, og alle bildene er tatt paa nytt med DevTools-protokollen og er byte for byte
 # de samme.
-AVTRYKK_BAK_BILDET = "27a2f279ea494657acdd7868aaf6f213ffcf1f2c0c4c0bf8c746d2972be21a26"
+# Story 8.22: _egne.html, app.py, valg.py, ferdige_lister.py, demo.py, hjelpetekster.py og stil.css.
+# Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
+AVTRYKK_BAK_BILDET = "074e0c00bf21c6941ed9e227cfc0ed3e7006960ab996ba9162a771c45a8a712e"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1732,7 +1734,8 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Flettingen av 8.11 (med 8.10b, svaret kl. 10:23 og main) inn i 8.11b: avtrykkene er regnet ut paa nytt,
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
-AVTRYKK_BAK_AKSJESIDEN = "640f468f08e122c19a2201ac5cdc64da94685ed632e440dadffd30295d82597d"
+# Story 8.22: de samme filene. Bildet ble tatt paa nytt og er byte for byte det samme.
+AVTRYKK_BAK_AKSJESIDEN = "9968b383b0a0e91675bf2c2cdb532a03277c391dd06ecf3b569490fe7609dc00"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1797,7 +1800,8 @@ DE_NYE_BILDENE = {
     # Gruppens ønske 08.11 kl. 23:59: investorsiden for BRFE, 948 px, hele siden.
     # Flettingen av 2.12 inn i 8.11: 1216 som i 8.11, med «Start fra en ferdig liste».
     # Story 8.11b: 1432, med de ni ferdige listene i demoen.
-    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1432, FILENE_BAK_MIN_LISTE),
+    # Story 8.22: 1628, med de tre stegkortene og 11 ferdige lister i demoen.
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1628, FILENE_BAK_MIN_LISTE),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -1895,15 +1899,19 @@ DE_NYE_BILDENE = {
 # Flettingen av 8.11 (med 8.10b, svaret kl. 10:23 og main) inn i 8.11b: avtrykkene er regnet ut paa nytt,
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
+# Story 8.22: faste bransjer, «Følg en aksje» med hele lista, «Din egen liste» som tre stegkort og
+# sju oppdiktede selskaper til i demoen (_egne.html, folg.html, app.py, valg.py, ferdige_lister.py,
+# demo.py, hjelpetekster.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen.
+# «Din egen liste» er ny (1628 px, med stegkortene og 11 ferdige lister); de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "27a2f279ea494657acdd7868aaf6f213ffcf1f2c0c4c0bf8c746d2972be21a26",
-    "docs/appen/boersometeret-demo.png": "f177f7e5c7266521f707ff23fcadd22335f234ed8419b3a24746ca3a6305456b",
-    "docs/appen/min-liste-demo.png": "8105d95c08e33e00d48ee95d07c9612463c7181fc62739f4c26612b661487599",
-    "docs/appen/oversikten-390-demo.png": "27a2f279ea494657acdd7868aaf6f213ffcf1f2c0c4c0bf8c746d2972be21a26",
-    "docs/appen/boersometeret-390-demo.png": "f177f7e5c7266521f707ff23fcadd22335f234ed8419b3a24746ca3a6305456b",
-    "docs/appen/din-egen-liste-demo.png": "8105d95c08e33e00d48ee95d07c9612463c7181fc62739f4c26612b661487599",
-    "docs/appen/investorsiden-brfe-demo.png": "c014f914e3b9f870ea94ff1b70e3c1f212f07ddaefb7db99697be9de078bc018",
-    "docs/appen/investorsiden-brfe-390-demo.png": "c014f914e3b9f870ea94ff1b70e3c1f212f07ddaefb7db99697be9de078bc018",
+    TOPPEN_AV_OVERSIKTEN: "074e0c00bf21c6941ed9e227cfc0ed3e7006960ab996ba9162a771c45a8a712e",
+    "docs/appen/boersometeret-demo.png": "80810ce6e7342862fa747cd2a1a58c4ba21d9da83374375dc5a63363082992cb",
+    "docs/appen/min-liste-demo.png": "c82f627a863d1541101057b1552b98f12a747639c29352e408e86f56713a4f93",
+    "docs/appen/oversikten-390-demo.png": "074e0c00bf21c6941ed9e227cfc0ed3e7006960ab996ba9162a771c45a8a712e",
+    "docs/appen/boersometeret-390-demo.png": "80810ce6e7342862fa747cd2a1a58c4ba21d9da83374375dc5a63363082992cb",
+    "docs/appen/din-egen-liste-demo.png": "c82f627a863d1541101057b1552b98f12a747639c29352e408e86f56713a4f93",
+    "docs/appen/investorsiden-brfe-demo.png": "dea8e83368a5c5534274ddd169ce91d0c3e609207fb2cf2b6fd6a08da52ff6a7",
+    "docs/appen/investorsiden-brfe-390-demo.png": "dea8e83368a5c5534274ddd169ce91d0c3e609207fb2cf2b6fd6a08da52ff6a7",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -4011,7 +4019,8 @@ AVTRYKK_I_PILENE = {
     # Instruksjonen 08.11 kl. 13:00 (regel 19): utdraget fra designtavla 08.11
     # i «Dokumentene». Var d80b9ef9..., og cda0d0fd... med «kort fortalt»,
     # som test_de_gamle_ordene_staar_ikke_igjen ikke tillater.
-    "Dokumentene": "cd15079ad259593d86543f04e0c4e020f642f76dae09ec611547acad5e6e774b",
+    # Story 8.22 (regel 19): kontrollsjekken av bransjene 10.11. Var cd15079a....
+    "Dokumentene": "79d0a921c1d032371e8edbd66e512e9c1b4428161007557b7acef7ce68f814cd",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i
