@@ -74,6 +74,16 @@ class TestTall:
         assert tall(60.0, "andel") == f"60,0{NB}%"
         assert tall(29.5, "andel") == f"29,5{NB}%"
 
+    def test_mnok_uten_fortegn_og_prosent(self):
+        """Story 8.11c: ville feilet hvis omsetningen på «Følg en aksje» fikk
+        fortegn og %, som «+0,1 % MNOK» med slaget for målingene.
+        Gjennomgangen (BH9, ECH5): egen test, etter de andre slagene, og med
+        null og avrundingen."""
+        assert tall(0.1234, "mnok") == "0,1"
+        assert tall(1234.56, "mnok") == f"1{NB}234,6"
+        assert tall(0, "mnok") == "0,0"
+        assert tall(31.96, "mnok") == "32,0"
+
     def test_ukjent_slag_avvises(self):
         with pytest.raises(ValueError, match="Ukjent slag"):
             tall(1.0, "pris")

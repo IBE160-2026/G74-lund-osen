@@ -28,6 +28,9 @@ DESIMALER = {
     # og andel er en maalt andel i prosent (60,0 %). Ingen av dem har fortegn.
     "heltall": 0,
     "faktor": 1,
+    # Omsetningen i MNOK på «Følg en aksje» (story 2.12), uten fortegn og
+    # uten %. Lagt til 09.11 (story 8.11c): siden viste «+0,1 % MNOK».
+    "mnok": 1,
     "grense": 0,
     "andel": 1,
 }

@@ -331,3 +331,99 @@ def den_ekte_basen_er_uroert():
     foer = _avtrykk(ekte)
     yield
     assert _avtrykk(ekte) == foer, f"{ekte} ble endret av testkjoeringen (regel 22)"
+
+
+# Dokumenttestene (story 9.9, spec-9-9-dokumenttestene.md): kommandoen
+# `uv run pytest --dokumentene` kjoerer bare testmodulene som leser README-en,
+# docs/ eller _bmad-output/, funnet i koden av dokumenttestene.modulene().
+# Under hver kjoering noterer en audit-hook hvilke dokumenter hver modul
+# aapner, og test_dokumenttestene.py, som kjoeres sist, feiler hvis en modul
+# som aapnet et dokument, ikke er med.
+_modulen_naa = [None]
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--dokumentene",
+        action="store_true",
+        help="Kjoer bare testene som leser README-en, docs/ eller _bmad-output/.",
+    )
+
+
+def _lytt_paa_aapningene(aapnet):
+    import dokumenttestene
+
+    def lytter(hendelse, argumentene):
+        if hendelse != "open" or _modulen_naa[0] is None or not argumentene:
+            return
+        if dokumenttestene.er_dokument(argumentene[0]):
+            aapnet.setdefault(_modulen_naa[0], set()).add(str(argumentene[0]))
+
+    return lytter
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_sessionstart(session):
+    import dokumenttestene
+
+    aapnet: dict[str, set[str]] = {}
+    session.config.stash[dokumenttestene.AAPNET] = aapnet
+    # En audit-hook kan ikke fjernes. Den er billig: alt annet enn «open»
+    # avvises i foerste linje, og den noterer bare naar en testmodul kjoerer.
+    sys.addaudithook(_lytt_paa_aapningene(aapnet))
+
+
+def pytest_ignore_collect(collection_path, config):
+    if not config.getoption("dokumentene"):
+        return None
+    import dokumenttestene
+
+    if collection_path.suffix == ".py" and collection_path.name.startswith("test_"):
+        if collection_path.name not in dokumenttestene.modulene():
+            return True
+    return None
+
+
+@pytest.hookimpl(wrapper=True)
+def pytest_make_collect_report(collector):
+    # Gjennomgangen (BH7): ogsaa en klasse i modulen, under innsamlingen.
+    modul = collector if isinstance(collector, pytest.Module) else collector.getparent(pytest.Module)
+    if modul is None:
+        return (yield)
+    forrige = _modulen_naa[0]
+    _modulen_naa[0] = modul.path.name
+    try:
+        return (yield)
+    finally:
+        _modulen_naa[0] = forrige
+
+
+@pytest.hookimpl(wrapper=True)
+def pytest_runtest_protocol(item, nextitem):
+    _modulen_naa[0] = item.path.name
+    try:
+        return (yield)
+    finally:
+        _modulen_naa[0] = None
+
+
+@pytest.hookimpl(wrapper=True, tryfirst=True)
+def pytest_collection_modifyitems(session, config, items):
+    """Vakten i test_dokumenttestene.py kjoeres sist, etter alle de andre.
+    Gjennomgangen (BH5, ECH1): en wrapper med tryfirst, saa flyttingen skjer
+    etter --ff og --nf, som ogsaa sorterer. Gjennomgangen (ECH3): med
+    --dokumentene tas ogsaa filer som er gitt paa kommandolinja, ut her."""
+    resultat = yield
+    if config.getoption("dokumentene"):
+        import dokumenttestene
+
+        med = dokumenttestene.modulene()
+        bort = [item for item in items if item.path.name not in med]
+        if bort:
+            config.hook.pytest_deselected(items=bort)
+            items[:] = [item for item in items if item.path.name in med]
+    vakten = [item for item in items if item.path.name == "test_dokumenttestene.py" and "faller_utenfor" in item.name]
+    for item in vakten:
+        items.remove(item)
+    items.extend(vakten)
+    return resultat

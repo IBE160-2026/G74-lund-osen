@@ -69,6 +69,9 @@
                 {{ rad.endring_prosent|tall('endring') }}
                 {#- Story 8.17a: serien har ikke startdagen for perioden. #}
                 {% if rad.fra %}<span class="fra">fra {{ rad.fra|dato }}</span>{% endif %}
+                {#- Story 2.6 (FR-407): endringen er fra en justeringsdag, regnet
+                    av kursserien alene. Ordet er «justeringsdag» (8.14). #}
+                {% if rad.justeringsdag %}<span class="justeringsdag" title="Justeringsdag: kilden regnet de eldre kursene om denne dagen, så sluttkursen og endringen stemmer ikke helt.">justeringsdag</span>{% endif %}
               {% else %}
                 –
               {% endif %}
@@ -124,7 +127,8 @@
       «Alle / Min liste» har aria-current="true", fordi knappen i stripa
       alt er siden (BH10). #}
   {#- Story 8.2a, b (U23): en aksje uten kurser har en rad i tabellen. #}
-  {% set vist_tabell = rader and (skilte_seg_ut or oevrige or ingen_skilte_seg_ut or mangler) %}
+  {#- Story 8.11 (gjennomgangen, ECH2, ECH3): lista før filteret. #}
+  {% set vist_tabell = rader and (foer_filter or ingen_skilte_seg_ut) %}
   {% if aktiv == "min_liste" %}
     {#- Story 8.2b, d (U69): tittelen sier hvor mange i lista som skilte seg ut
         siste børsdag, med markeringen fra oversikten (designregler §4), når
@@ -132,7 +136,8 @@
         alle de merkede med en rad. Gjennomgangen (BH2): bare når minst én
         merket aksje er vurdert. Valget «Alle / Min liste» står til høyre
         for tittelen på bred skjerm, og under på smal. #}
-    {% set i_lista = skilte_seg_ut|map(attribute="aksje.symbol")|select("in", merkede)|list|length %}
+    {#- Story 8.11 (gjennomgangen, ECH1): tallene før filteret. #}
+    {% set i_lista = overskrift_ut|map(attribute="aksje.symbol")|select("in", merkede)|list|length %}
     <div class="listetopp">
     {% if vurdert_i_lista %}
       <h1 class="overskrift"><mark>{{ i_lista }} av {{ antall_merket }} i Min liste</mark> skilte seg ut {{ dato|ukedag }}</h1>
@@ -183,7 +188,7 @@
         Story 8.0d, PR 2: overskriften er sidens h1, «Markedsoversikt» uten
         vurdering (svar 3). Tidspunktet står bare i stripa (svar 5).
         PR 2b: M er alle aksjene i lista, også de uten kurser (14.10). #}
-    {% set n = skilte_seg_ut|length %}
+    {% set n = overskrift_ut|length %}
     <div class="topp-del">
       <div>
         {% if antall_vurdert %}
@@ -245,6 +250,15 @@
       </nav>
     </div>
 
+  {% endif %}
+  {#- Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
+      lista som vises. #}
+  {% if rader %}
+    <nav class="signalfilter" aria-label="Filter på signalet">
+      {% for tekst, adresse, er_aktiv in filterlenker %}<a class="visknapp" href="{{ adresse }}"{% if er_aktiv %} aria-current="true"{% endif %}>{{ tekst }}</a>{% endfor %}
+    </nav>
+    {#- Gjennomgangen (BH4, BH11): forbeholdet står også før et klikk. #}
+    <p class="filtertekst">{% if signalfilter %}Bare aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} med retning {{ signalfilter }}.{% if filter_tomt %} Ingen av aksjene her fikk det.{% endif %} {% endif %}Filteret viser hva sjekkene ga, og er ikke et råd om å kjøpe eller selge.</p>
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story

@@ -462,6 +462,8 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 :where(.side-oversikt) tr.gul td:first-child { box-shadow: inset 4px 0 0 var(--oransje); }
 :where(.side-oversikt) .merke.gul-siste { display: block; font-size: 12px; font-weight: 400; }
 :where(.side-oversikt) td .fra { display: block; font-size: 12px; font-weight: 400; color: var(--dempet); }
+/* Story 2.6 (FR-407): merket under endringen, i oversikten og Min liste. */
+td .justeringsdag { display: block; font-size: 12px; font-weight: 400; color: var(--dempet); }
 :where(.side-oversikt) .periodelinje { margin: 0 0 12px; }
 /* Story 8.17b: «Sammenlign med» i Min liste. Linja under raden er dempet og
    mindre, uten strek, og datoen står i cellen for selskap. */
@@ -1140,6 +1142,15 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.8 (FR-206): signaldagene i kursgrafen, i fargen for retningen
    (designregler §3), og gul ring ved 3 av 3. */
 :where(.side-aksje) .signaldag { stroke: var(--kort); stroke-width: 1.5; }
+/* Story 8.14 (FR-407): justeringsdagene, en kort strek nederst i grafen. */
+:where(.side-aksje) line.justeringsdag { stroke: var(--tekst); stroke-width: 2; }
+/* Story 8.7 (FR-202, tillegget): båndet for sjekk 2 og volumet for sjekk 3. */
+:where(.side-aksje) .baand { fill: var(--kurs); fill-opacity: 0.08; stroke: none; }
+:where(.side-aksje) .volumsoeyle { fill: var(--dempet); fill-opacity: 0.45; }
+:where(.side-aksje) .medianstrek { fill: none; stroke: var(--tekst); stroke-width: 1.5; }
+/* Heltrukket og gul: stiplet er bare hovedindeksen (designregler §5). */
+:where(.side-aksje) .grensestrek { fill: none; stroke: var(--gul-symbol); stroke-width: 2; }
+:where(.side-aksje) .volumnavn { font-size: 12px; fill: var(--dempet); }
 :where(.side-aksje) .signaldag.positiv { fill: var(--opp); }
 :where(.side-aksje) .signaldag.negativ { fill: var(--ned); }
 :where(.side-aksje) .signaldag.blandet { fill: var(--blandet); }
@@ -1183,6 +1194,14 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
 :where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
                                     color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
+/* Story 8.11: filteret på signalet og de ferdige listene. */
+:where(.side-oversikt) .signalfilter { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+:where(.side-oversikt) .filtertekst { margin: 4px 0 12px; }
+:where(.side-oversikt) .ferdig-liste { margin: 8px 0; }
+:where(.side-oversikt) .ferdig-liste summary { cursor: pointer; display: flex; align-items: center; gap: 6px; }
+:where(.side-oversikt) .ferdig-liste summary .bransjesymbol { width: 16px; height: 16px; flex: none; }
+:where(.side-oversikt) .ferdig-liste ol { margin: 8px 0; padding-left: 24px; }
+:where(.side-oversikt) .ferdig-liste .foer-knappen { margin: 4px 0 8px; color: var(--dempet); }
 /* Story 8.10 (utdraget 08.11 §4): «Innstillinger», med en bryter per valg. */
 :where(.side-oversikt) .innstillinger { max-width: 720px; }
 :where(.side-oversikt) .innstillinger .valg { margin: 16px 0; padding: 18px 20px; background: var(--kort); border: 1px solid var(--strek);
