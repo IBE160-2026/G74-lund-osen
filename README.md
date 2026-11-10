@@ -88,9 +88,9 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - De tre sjekkene, trend, bevegelse og interesse, styrken for hver aksje hver børsdag, også fra 2027, og regelforklaringen på aksjesiden
 - Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
-- Periodevalget på alle sidene, og hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen
-- På aksjesiden: periodene i kursgrafen med «Vis dagen», datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
-- Min liste, med stjernen foran hvert selskap, og børsometeret som et kart, med knappene øverst og «Innstillinger» med «Vis hjelp»
+- Periodevalget, hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen, og KI-teksten om dagen
+- På aksjesiden: periodene i kursgrafen med «Vis dagen», signaldagene, datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
+- Min liste, med stjernen foran hvert selskap, ferdige lister, egne aksjer og «Innstillinger», og børsometeret som et kart, med knappene
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 
@@ -101,10 +101,13 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 **Ekstra, hvis tiden rekker**
 
-- Signaldagene i kursgrafen
-- Innstillingene, med «Vis KI-tekst»
-- KI-teksten om dagen på forsiden
-- Til slutt å velge og bytte aksjer
+- Dokumenttestene i én kommando
+- «Utenfor målingen» med samme median som bransjelistene
+- De lave funnene fra gjennomgangene
+- Etterfylling av hull i kursserien
+- Justeringsdagene, regnet av kursserien alene
+- Sjekk 2 og 3 i kursgrafen
+- «Vis meg rundt»
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 

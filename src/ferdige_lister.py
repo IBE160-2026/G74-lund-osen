@@ -132,7 +132,11 @@ def _aksjene_i_lista(tilkobling: sqlite3.Connection) -> tuple[set[str], list[tup
     bransjelistene foer 2.13 har maalt den. Bransjen er den i aksje, og bare
     aksjer som staar i boersliste er med. Gir symbolene som er regnet her, og
     [(symbol, navn, median, bransje)] for dem som fikk en median."""
-    siste = tilkobling.execute("SELECT max(dato) FROM kurs").fetchone()[0]
+    # Gjennomgangen av 8.11b (BH4, ECH4): den siste dagen leses med
+    # primaernoekkelen (symbol, dato) for hver aksje, ikke ved aa lese hele kurs.
+    siste = tilkobling.execute(
+        "SELECT max(m) FROM (SELECT (SELECT max(dato) FROM kurs WHERE symbol = a.symbol) AS m FROM aksje a)"
+    ).fetchone()[0]
     try:
         fra, til = vindu(date.fromisoformat(siste))
     except (TypeError, ValueError):
@@ -144,16 +148,20 @@ def _aksjene_i_lista(tilkobling: sqlite3.Connection) -> tuple[set[str], list[tup
         "FROM aksje a JOIN boersliste b ON b.kode = a.symbol",
         (dag, dag),
     ).fetchall()
+    # Gjennomgangen av 8.11b (BH4, ECH4): kursene i vinduet for alle aksjene
+    # i én spoerring, ikke én per aksje. CROSS JOIN holder rekkefoelgen, saa
+    # kurs leses med primaernoekkelen (symbol, dato) for hver aksje og ikke
+    # gaas gjennom i sin helhet (gjennomgangen av 9.10, ECH2).
+    kursene: dict[str, list[dict]] = {}
+    for symbol, dato, slutt, volum in tilkobling.execute(
+        "SELECT k.symbol, k.dato, k.slutt, k.volum FROM aksje a JOIN boersliste b ON b.kode = a.symbol "
+        "CROSS JOIN kurs k ON k.symbol = a.symbol WHERE k.dato BETWEEN ? AND ?",
+        (fra.isoformat(), til.isoformat()),
+    ):
+        kursene.setdefault(symbol, []).append({"date": dato, "close": slutt, "volume": volum})
     ut = []
     for symbol, navn, sektor, _ in lista:
-        rader = [
-            {"date": dato, "close": slutt, "volume": volum}
-            for dato, slutt, volum in tilkobling.execute(
-                "SELECT dato, slutt, volum FROM kurs WHERE symbol = ? AND dato BETWEEN ? AND ?",
-                (symbol, fra.isoformat(), til.isoformat()),
-            )
-        ]
-        median = regn_ut(symbol, rader, fra, til).median
+        median = regn_ut(symbol, kursene.get(symbol, []), fra, til).median
         if median is not None:
             ut.append((symbol, navn, median, sektor))
     # En aksje i lista bruker aldri en eldre maaling (BH3); en som er tatt ut
@@ -194,3 +202,38 @@ def lister(tilkobling: sqlite3.Connection | None) -> dict[str, list[Ferdigaksje]
         if len(liste) < TAK:
             liste.append(Ferdigaksje(symbol, navn, float(median)))
     return {b: etter_bransje[b] for b in BRANSJENE if b in etter_bransje}
+
+
+def medianene(tilkobling: sqlite3.Connection | None) -> dict[str, tuple[float | None, date | None]]:
+    """Story 8.11c (spoersmaal 9 i 8.11b): medianen lister() bruker for hver
+    aksje som regnes av kursene i basen, med den siste dagen med kurser for
+    aksjen: {symbol: (median i NOK eller None, dagen eller None)}. En aksje
+    som ikke staar her, har bare den siste maalingen i omsetning (2.13), som
+    foer. Merket «Utenfor målingen» bruker dette, saa merket og de ferdige
+    listene regner likt. Bare lesing. Mangler tabellene, er den tom.
+    Gjennomgangen (BH1, ECH1): dagen er aksjens egen siste dag med kurser,
+    ikke basens, saa en aksje som er tatt ut, ikke staar med en dag den ikke
+    har kurser for."""
+    if tilkobling is None:
+        return {}
+    try:
+        regnet, i_lista = _aksjene_i_lista(tilkobling)
+        if not regnet:
+            return {}
+        plasser = ", ".join("?" * len(regnet))
+        dagene = dict(
+            tilkobling.execute(
+                f"SELECT symbol, max(dato) FROM kurs WHERE symbol IN ({plasser}) GROUP BY symbol", tuple(regnet)
+            ).fetchall()
+        )
+    except sqlite3.Error:
+        return {}
+    medianer = {symbol: median for symbol, _, median, _ in i_lista}
+    ut = {}
+    for symbol in regnet:
+        try:
+            dag = date.fromisoformat(dagene[symbol]) if dagene.get(symbol) else None
+        except (TypeError, ValueError):
+            dag = None
+        ut[symbol] = (medianer.get(symbol), dag)
+    return ut
