@@ -368,3 +368,143 @@ class TestFotnotenOgDeLoeseTekstene:
         k = request.getfixturevalue(versjon)
         side = _side(k, "/aksje/BRFE" if versjon == "klient" else "/aksje/EQNR")
         assert "Siden viser sjekkene for" not in side and "Siden viser kursgrafen for" not in side
+
+
+# --- 5) Tillegg 3: stjernen ved «Følg», aksjene som venter, og «lista» ------
+
+
+def _foelg_i_demoen(klient) -> str:
+    """Følger den første aksjen på «Følg en aksje» i demoen og gir koden."""
+    kode = re.search(r'href="/folg\?kode=([A-Z0-9-]+)"', _side(klient, "/folg")).group(1)
+    svar = klient.post("/folg", data={"kode": kode})
+    assert svar.status_code == 303 and "feil=" not in svar.headers["Location"], svar.headers["Location"]
+    return kode
+
+
+def _tabellene(sti) -> dict[str, int]:
+    import sqlite3
+
+    t = sqlite3.connect(sti)
+    try:
+        navn = [n for (n,) in t.execute("SELECT name FROM sqlite_master WHERE type = 'table'")]
+        return {n: t.execute(f'SELECT COUNT(*) FROM "{n}"').fetchone()[0] for n in navn}
+    finally:
+        t.close()
+
+
+class TestStjernenOgDeSomVenter:
+    def test_foelg_gir_stjerne_og_rad_i_min_liste(self, klient):
+        """Svaret kl. 17:47: ville feilet hvis en aksje fulgt med «Følg» ikke
+        fikk stjerne og sto i Min liste med en gang, med «venter på henting»
+        nederst i tabellen, uten lenke til en aksjeside som ikke finnes."""
+        kode = _foelg_i_demoen(klient)
+        for sti in ("/?vis=min", "/min-liste", "/"):
+            side = _side(klient, sti)
+            assert f'id="rad-{kode}"' in side, sti
+            rad = side.split(f'id="rad-{kode}"', 1)[1].split("</tr>", 1)[0]
+            assert 'class="stjerneknapp merket" aria-pressed="true"' in rad, sti
+            assert '– <span class="merke mangler">venter på henting</span>' in rad, sti
+            assert f'href="/aksje/{kode}"' not in rad and '<span class="egenmerke">Egen</span>' in rad, sti
+        side = _side(klient, "/")
+        assert "og 1 venter på henting</span>" in side
+
+    def test_bare_oensket_og_stjernen_skrives(self, klient):
+        """Regel 22, AD-3: ville feilet hvis «Følg» skrev noe annet enn
+        ønsket og stjernen."""
+        foer = _tabellene(demo_sti())
+        _foelg_i_demoen(klient)
+        etter = _tabellene(demo_sti())
+        endret = {n for n in foer if foer[n] != etter[n]}
+        assert endret == {"oenske", "min_liste"}, endret
+        assert etter["oenske"] == foer["oenske"] + 1 and etter["min_liste"] == foer["min_liste"] + 1
+
+    def test_stjernen_kan_tas_bort_og_settes_igjen(self, klient):
+        """Ville feilet hvis stjernen på en aksje som venter, ikke kunne tas
+        bort som før, eller ikke settes igjen."""
+        kode = _foelg_i_demoen(klient)
+        klient.post("/min-liste/merk", data={"symbol": kode, "til": "fjern", "tilbake": "/"})
+        assert f'id="rad-{kode}"' not in _side(klient, "/min-liste")
+        assert f'id="rad-{kode}"' in _side(klient, "/")
+        klient.post("/min-liste/merk", data={"symbol": kode, "til": "merk", "tilbake": "/"})
+        assert f'id="rad-{kode}"' in _side(klient, "/min-liste")
+
+    def test_angre_tar_bort_stjernen(self, klient):
+        """Forslaget i spørsmål 7: ville feilet hvis «Angre» lot stjernen stå,
+        så Min liste hadde en aksje appen ikke følger."""
+        kode = _foelg_i_demoen(klient)
+        oenske = re.search(r'name="id" value="(\d+)"', _side(klient, "/").split('id="dine-egne-aksjer"', 1)[1]).group(1)
+        klient.post("/angre", data={"id": oenske, "tilbake": "oversikten"})
+        assert f'id="rad-{kode}"' not in _side(klient, "/") and f'id="rad-{kode}"' not in _side(klient, "/min-liste")
+        assert _tabellene(demo_sti())["min_liste"] == len(demo.MERKET_I_DEMOEN)
+
+    def test_tallet_i_overskriften_teller_ikke_dem_som_venter(self, klient):
+        """Forslaget i spørsmål 7: ville feilet hvis «N av M aksjer» talte en
+        aksje appen ikke følger ennå."""
+        foer = re.search(r"av (\d+) aksjer</mark>", _side(klient, "/")).group(1)
+        _foelg_i_demoen(klient)
+        assert re.search(r"av (\d+) aksjer</mark>", _side(klient, "/")).group(1) == foer
+
+    def test_den_ekte_versjonen_viser_dem_som_venter(self, ekte, tmp_path):
+        """Likt i den ekte versjonen: ville feilet hvis en aksje som venter,
+        ikke fikk stjerne og rad der."""
+        import sqlite3
+
+        import lagring_sqlite
+        import valg
+
+        t = sqlite3.connect(lagring_sqlite.BASE_STI)
+        with t:
+            t.execute("INSERT INTO boersliste (kode, navn) VALUES ('NYA', 'Ny A ASA')")
+        t.close()
+        t = lagring_sqlite.aapne_base(lagring_sqlite.BASE_STI, kjoer_migrasjoner=False)
+        try:
+            valg.Valglager(t, lambda: datetime(2026, 9, 23, 12, 0, tzinfo=timezone.utc)).folg("NYA", "Energi")
+        finally:
+            t.close()
+        rad = _side(ekte, "/min-liste").split('id="rad-NYA"', 1)[1].split("</tr>", 1)[0]
+        assert "merket" in rad and "venter på henting" in rad
+
+
+class TestTriggerenFra0013:
+    def test_et_ukjent_symbol_avvises_fortsatt(self, tmp_path):
+        """0013: ville feilet hvis triggeren godtok et symbol som verken står
+        i aksje eller venter etter «Følg»."""
+        import sqlite3
+
+        from lagring_sqlite import MIGRASJONSKATALOG
+        from migrering import migrer
+
+        t = sqlite3.connect(tmp_path / "b.db")
+        try:
+            assert migrer(t, MIGRASJONSKATALOG) == 13
+            with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i min_liste"):
+                t.execute("INSERT INTO min_liste (symbol) VALUES ('UKJENT')")
+            t.execute(
+                "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', 'NYA', 'Ny A', 'Energi', 'x')"
+            )
+            t.execute("INSERT INTO min_liste (symbol) VALUES ('NYA')")
+            t.execute("UPDATE oenske SET avvist = 'x' WHERE symbol = 'NYA'")
+            with pytest.raises(sqlite3.IntegrityError):
+                t.execute("INSERT INTO min_liste (symbol) VALUES ('NYB')")
+        finally:
+            t.close()
+
+
+class TestOrdeneOmLista:
+    def test_appen_foelger(self, klient):
+        """Svaret kl. 17:47, del 2: ville feilet hvis siden sa «N av 18 aksjer
+        i lista» der «lista» betyr alle aksjene appen følger."""
+        side = _side(klient, "/")
+        assert re.search(r"\d+ egne · appen følger \d+ av 18</p>", side)
+        assert "aksjer i lista</p>" not in side
+        assert re.search(r'<p class="antall-egne">Appen følger \d+ av 18</p>', _side(klient, "/min-liste"))
+
+    def test_full_sier_taket(self, klient, monkeypatch):
+        """Ville feilet hvis beskjeden sa «Lista er full …» i stedet for at
+        appen følger så mange aksjer den kan."""
+        import valg
+
+        assert valg.FULL == "Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen."
+        monkeypatch.setattr(valg, "TAK", 0)
+        side = _side(klient, "/")
+        assert f'<p class="full">{valg.FULL}</p>' in side and "Lista er full" not in side

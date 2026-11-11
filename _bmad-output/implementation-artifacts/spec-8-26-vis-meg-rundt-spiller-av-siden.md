@@ -49,6 +49,12 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 4. **«Vis meg rundt» og en annen side.** *Forslag:* «Vis meg rundt» lagrer ingenting, så boksen lukkes når man går til en annen side, og en omvisning som er i gang, fortsetter ikke av den.
 5. **Ved 390 px.** *Forslag:* knappene brytes over flere linjer som sideknappene i dag, uten rulling.
 6. **Ordene for en aksje uten kurser (tillegg 2).** *Forslag:* rådets ord, «ingen kurser ennå», under «–» i raden på oversikten og i Min liste, og «uten kurser» i båndet over radene. På børsometeret står «Ingen kurs» i ruta, fordi den må få plass i en stor rute (`STOR`, 207 px, som «Uten data»), og «Ingen kurser ennå» i tabellen under kartet og når man peker på ruta. «Ukjent» bak «?» ved Retning sier at det også gjelder en aksje uten kurser. Aksjesiden for en aksje uten kurser sier alt «Det finnes ingen kurser for … ennå», og står som før. «venter på henting» står for aksjene som venter, i del 5.
+7. **Stjernen og aksjene som venter (tillegg 3).** *Forslag:*
+   - **Stjernen** skrives av nettsiden i `min_liste` i samme transaksjon som ønsket i `oenske`, og ingenting annet skrives (regel 22). En aksje som venter, står ikke i `aksje` ennå, og triggerne fra 0007 avviste den, så **migrasjon 0013** lar dem godta et symbol med et ønske om å følge som verken er tatt i bruk eller avvist. Med en migrasjon kan storyen bare flettes kl. 23:50–23:58. Alternativet uten migrasjon er at hentingen setter stjernen når den tar aksjen inn, men da skriver hentingen `min_liste`, mot AD-3 og føringen 30.09, eller at stjernen bare vises og ikke kan tas bort før hentingen.
+   - **Tallet i overskriften** («N av M aksjer») teller ikke en aksje som venter, fordi appen ikke følger den før hentingen. Båndet over radene sier «og N venter på henting», og «Min liste» med antallet teller den, fordi den har stjerne og en rad.
+   - **«Angre»** tar også bort stjernen som «Følg» satte, også i et bytte, så Min liste ikke har en aksje appen ikke følger.
+   - **Børsometeret** viser ikke en aksje som venter, fordi den ikke har kurs eller rute ennå. **Siden Min liste** viser den nederst med «venter på henting», som oversikten. Raden har stjernen, «Egen» og navnet uten lenke, fordi aksjen ikke har en aksjeside før hentingen.
+8. **Ordene om «lista» (tillegg 3, del 2).** *Forslag:* der «lista» betyr alle aksjene appen følger, sier sidene det: «appen følger 16 av 18» (to steder), «Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen.» (tre steder og i `valg.py`, også «… for å angre dette.»), «Appen følger alt …, eller den venter på hentingen.» og «Appen kan følge opptil 18 aksjer …». Ikke endret: «lista di» (stegene i «Din egen liste», som er brukerens egen liste), meldingen «N endringer i lista tas i bruk ved hentingen» og «13 av de 15 aksjene i lista» i «Signalet forklart» og KI-teksten, fordi tillegget sier at bare de setningene endres, og KI-teksten kontrolleres mot ordene.
 
 ## Delene
 
@@ -110,3 +116,11 @@ Hver del har tester med «Ville feilet hvis» i `tests/test_vis_meg_rundt_8_26.p
 | Innstillinger | Forklaringene under bryterne | Behold | De forklarer bryteren rett over. |
 
 **Ville feilet hvis:** fotnoten sto igjen, forbeholdet ikke sto synlig på oversikten og i Min liste, «?» ved kolonnene ikke sa det fotnoten sa, eller innledningen på aksjesiden sto igjen.
+
+### 5) Stjernen ved «Følg», aksjene som venter, og «lista» (tillegg 3, svaret kl. 17:47)
+
+- **Filene:** `src/migrasjoner/0013_stjerne_ved_folg.sql`; `folg()` og `angre()` i `src/valg.py` skriver og sletter stjernen i samme transaksjon som ønsket; `SqliteMinlistelager` godtar og leser stjernen på en aksje som venter (`merkede_som_venter`); `rader_som_venter` og `VENTER_TEKST` i `src/markedsoversikt.py`; radene, tallet og båndet i `src/app.py` og `index.html`; ordene i `_egne.html`, `folg.html` og `valg.py` (`FULL`, `FULL_ANGRE`).
+- **Testene som teller migrasjonene**, sier versjon 13, og testene for hvem som skriver `min_liste`, har `valg.py` med en kommentar: `folg()` og `angre()` kalles bare av webserveren.
+- **Likt i begge versjonene:** demoen henter aldri, så en aksje man følger der, står alltid nederst med «venter på henting». En test viser det samme i den ekte versjonen med en testbase.
+
+**Ville feilet hvis:** «Følg» ikke ga stjerne og rad med en gang, skrev noe annet enn ønsket og stjernen, stjernen ikke kunne tas bort og settes igjen, «Angre» lot stjernen stå, tallet i overskriften talte en aksje som venter, triggeren godtok et ukjent symbol, eller sidene sa «aksjer i lista» og «Lista er full».

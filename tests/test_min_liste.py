@@ -204,7 +204,10 @@ class TestLagringen:
     def test_bare_0007_lager_tabellen(self):
         """AD-16: tabellen lages av en nummerert migrasjon, ikke i koden."""
         filer = sorted(p.name for p in MIGRASJONEN.parent.glob("*.sql") if "min_liste" in p.read_text(encoding="utf-8"))
-        assert filer == ["0007_min_liste.sql"]
+        # Story 8.26 (tillegg 3): 0013 lager ikke tabellen, men endrer
+        # triggerne, så en aksje som venter, kan få stjerne.
+        assert filer == ["0007_min_liste.sql", "0013_stjerne_ved_folg.sql"]
+        assert "CREATE TABLE" not in (MIGRASJONEN.parent / "0013_stjerne_ved_folg.sql").read_text(encoding="utf-8")
         assert "CREATE TABLE" not in (ROT / "src" / "lagring_sqlite.py").read_text(encoding="utf-8")
 
     def test_demoen_merker_fem_fra_begge_delene(self, demo):
@@ -642,7 +645,11 @@ class TestGjennomgangen:
             tekst = fil.read_text(encoding="utf-8")
             if "SqliteMinlistelager(" in tekst or re.search(r"(INSERT INTO|DELETE FROM|UPDATE) min_liste", tekst):
                 brukere.add(fil.name)
-        assert brukere == {"app.py", "demo.py", "lagring_sqlite.py"}
+        # Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): «Følg» og
+        # «Angre» i valg.py skriver stjernen med ønsket. folg() og angre()
+        # kalles bare av webserveren (POST /folg og /angre i app.py); hentingen
+        # bruker andre deler av valg.py og skriver ikke min_liste.
+        assert brukere == {"app.py", "demo.py", "lagring_sqlite.py", "valg.py"}
 
     def test_den_fylte_knappen_er_fylt_i_stilen_og_raden_brytes(self):
         """VG5, VG2. Ville feilet hvis regelen som fyller knappen for siden

@@ -9,7 +9,7 @@
 <section class="egne" id="dine-egne-aksjer" aria-labelledby="egne-tittel">
   <div class="egne-topp">
     <h2><span id="egne-tittel">Dine egne aksjer</span> {{ hjelpeknapp("hjelp-egne", "Hjelp: dine egne aksjer") }}</h2>
-    <p class="antall-egne">{{ egne.antall_egne }} egne · {{ egne.antall }} av {{ egne.tak }} aksjer i lista</p>
+    <p class="antall-egne">{{ egne.antall_egne }} egne · appen følger {{ egne.antall }} av {{ egne.tak }}</p>
   </div>
   {% if egne.rader %}
   {#- Story 8.23 (A1, brukertesten 10.11): radene har samme utseende som
@@ -42,7 +42,7 @@
   </div>
   {% endif %}
   {% if egne.full %}
-    <p class="full">Lista er full. Fjern en aksje for å følge en annen.</p>
+    <p class="full">{{ full_tekst }}</p>
   {% else %}
     <p><a class="knapp hoved" href="/folg">+ Følg en aksje</a></p>
   {% endif %}
@@ -102,16 +102,17 @@
       <p class="stegknapper">
         {#- Tillegg 3: knappen har samme navn som delen den går til. #}
         {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>{% endif %}
-        {% if egne.full %}<span class="full">Lista er full. Fjern en aksje for å følge en annen.</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
+        {% if egne.full %}<span class="full">{{ full_tekst }}</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
       </p>
     </li>
   </ol>
   <h3>Følg flere aksjer</h3>
   {#- Story 8.23 (A7, brukertesten 10.11): tallene regnes av kvoten, taket og
     lista (valg.py), ikke skrevet for hånd. #}
-  <p>Lista kan ha opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Med {{ egne.antall }} aksjer etter neste henting er {{ egne.kall.igjen }} kall igjen til et nytt forsøk hvis noe feiler, og med {{ egne.tak }} aksjer er {{ egne.kall.igjen_med_taket }} igjen. Vil du følge andre, bytter du dem inn for noen i lista.</p>
+  <p>Appen kan følge opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Med {{ egne.antall }} aksjer etter neste henting er {{ egne.kall.igjen }} kall igjen til et nytt forsøk hvis noe feiler, og med {{ egne.tak }} aksjer er {{ egne.kall.igjen_med_taket }} igjen. Vil du følge andre, bytter du dem inn for noen av dem appen følger.</p>
   <p>Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre.</p>
-  <p class="antall-egne">{{ egne.antall }} av {{ egne.tak }} aksjer i lista</p>
+  {#- Story 8.26 (tillegg 3): «appen følger», ikke «aksjer i lista». #}
+  <p class="antall-egne">Appen følger {{ egne.antall }} av {{ egne.tak }}</p>
   <ul class="bytt-lista">
     {% for aksje in egne.lista %}
       <li><span class="navn">{{ aksje.navn }}</span> <span class="linje">{{ aksje.symbol }}</span>

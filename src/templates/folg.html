@@ -29,9 +29,10 @@
   {% if gammel and gammel.symbol in aapne_kjoep %}<p class="bytte">{{ gammel.navn }} har et åpent tenkt kjøp. Etter byttet hentes ingen nye kurser for den, så endringen siden kjøpet stopper på den siste dagen med kurser.</p>{% endif %}
 
   {% if egne and egne.full and not gammel %}
-    <p class="full">Lista er full. Fjern en aksje for å følge en annen.</p>
+    <p class="full">{{ full_tekst }}</p>
   {% elif valgt and alt_fulgt %}
-    <p class="feil">{{ valgt.navn }} er alt i lista, eller venter på hentingen.</p>
+    {#- Story 8.26 (tillegg 3): «appen følger», ikke «i lista». #}
+    <p class="feil">Appen følger alt {{ valgt.navn }}, eller den venter på hentingen.</p>
     <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
   {% elif valgt and not bransje %}
     {#- Story 8.22 (spørsmål 1): uten bransje i lista kan aksjen ikke følges. #}

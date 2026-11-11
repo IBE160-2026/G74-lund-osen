@@ -127,6 +127,7 @@ from markedsoversikt import (
     norsk_tid,
     oppdatert,
     periodeendring,
+    rader_som_venter,
     rader_uten_data,
     sidens_dato,
     sidens_tidsstempel,
@@ -253,6 +254,11 @@ def soeylestyrke(endring: float) -> str:
 
 app.jinja_env.filters["soeylestyrke"] = soeylestyrke
 app.jinja_env.globals["soeylegrense"] = tall(GRENSE_STERK, "grense")
+# Story 8.26 (tillegg 3): beskjeden når appen følger så mange aksjer den kan.
+app.jinja_env.globals["full_tekst"] = valg.FULL
+# Story 8.26 (tillegg 3): ønsket om å følge. Eget navn, fordi oversikten har
+# en parameter som heter valg.
+ONSKE_FOLG = valg.FOLG
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 
@@ -1042,10 +1048,20 @@ def _tabellsiden(aktiv: str):
     annen_dag = not i_lista and valg is not None and valg.periode == VELG
     skilte_seg_ut, oevrige = del_i_to(rader if annen_dag else vist)
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
-    merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
+    minlista = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling))
+    # Story 8.26 (tillegg 3): også stjernen på en aksje som venter.
+    merkede = minlista.merkede() | minlista.merkede_som_venter()
     # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst, ikke
-    # bare navnet i en fotnote.
-    alle_uten_data = rader_uten_data(poster)
+    # bare navnet i en fotnote. Story 8.26 (gruppens svar 11.11 kl. 17:47,
+    # tillegg 3): aksjene som venter på hentingen etter «Følg», står under
+    # dem med «venter på henting», så de også synes under «Min liste». I
+    # demoen står de der alltid, fordi demoen ikke henter.
+    valglager = _valglager()
+    venter = rader_som_venter(
+        [(o.symbol, o.navn, o.sektor) for o in valglager.ventende() if o.handling == ONSKE_FOLG] if valglager else [],
+        {post.aksje.symbol for post in poster},
+    )
+    alle_uten_data = [*rader_uten_data(poster), *venter]
     mangler = alle_uten_data
     # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
@@ -1112,7 +1128,9 @@ def _tabellsiden(aktiv: str):
         # er også antallet rader i tabellen, fordi hver aksje uten kurser nå
         # har en rad, så «7 av 15» stemmer med tabellen. Summen er lik
         # len(poster), og definisjonen fra 14.10 står (gjennomgangen, BH5).
-        antall_aksjer=len(rader) + len(alle_uten_data),
+        # Story 8.26 (tillegg 3, forslaget i spørsmål 7): aksjene som venter,
+        # er ikke med i tallet, fordi appen ikke følger dem før hentingen.
+        antall_aksjer=len(rader) + len(alle_uten_data) - len(venter),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som

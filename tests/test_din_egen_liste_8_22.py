@@ -70,7 +70,10 @@ def test_full_liste_i_steg_3(klient):  # noqa: F811
     for kode, _ in BOERSEN[:3]:
         klient.post("/folg", data={"kode": kode})
     tredje = _kortene(klient.get("/min-liste").data.decode("utf-8"))[2]
-    assert "Lista er full. Fjern en aksje for å følge en annen." in tredje and 'href="/folg"' not in tredje
+    assert (
+        "Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen." in tredje
+        and 'href="/folg"' not in tredje
+    )
 
 
 def test_demoen_viser_kortene_og_trenger_ingen_noekkel(tmp_path, monkeypatch):

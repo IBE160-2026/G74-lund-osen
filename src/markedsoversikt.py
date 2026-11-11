@@ -445,6 +445,9 @@ def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
 # Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 2): sier hvorfor, som
 # «for kort historikk». Var «uten data».
 UTEN_DATA_TEKST = "ingen kurser ennå"
+# Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): en aksje som venter
+# på hentingen etter «Følg», står nederst i tabellen som radene uten kurser.
+VENTER_TEKST = "venter på henting"
 
 
 @dataclass(frozen=True)
@@ -472,11 +475,25 @@ class RadUtenData:
     ikke_vurdert: bool = False
     sjekker: tuple = ()
     retning: Retningsvisning = UKJENT_RETNING
+    # Story 8.26 (tillegg 3): aksjen venter på hentingen og har ingen
+    # aksjeside ennå, så navnet er ikke en lenke.
+    venter: bool = False
 
 
 def rader_uten_data(poster: list[Oversiktspost]) -> list[RadUtenData]:
     """En RadUtenData per aksje uten kurser, i rekkefølgen i lista."""
     return [RadUtenData(aksje) for aksje in uten_kurser(poster)]
+
+
+def rader_som_venter(oensker: list[tuple[str, str, str]], i_lista: set[str]) -> list[RadUtenData]:
+    """Story 8.26 (tillegg 3): en rad per aksje som venter på hentingen etter
+    «Følg», (symbol, navn, bransje) i rekkefølgen ønskene kom, uten dem som
+    alt står i lista."""
+    return [
+        RadUtenData(Aksje(symbol, symbol, navn, sektor), tekst=VENTER_TEKST, venter=True)
+        for symbol, navn, sektor in oensker
+        if symbol not in i_lista
+    ]
 
 
 def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:

@@ -31,6 +31,11 @@ from kursdata import Aksje
 from tallformat import tall
 
 TAK = 18
+# Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): der «lista» betydde
+# alle aksjene appen følger, sies det slik, og ikke i rødt. Var «Lista er
+# full. Fjern en aksje for å følge en annen.» og «… for å angre dette.».
+FULL = f"Appen følger allerede {TAK} aksjer, som er taket. Fjern en for å følge en annen."
+FULL_ANGRE = f"Appen følger allerede {TAK} aksjer, som er taket. Fjern en for å angre dette."
 # Dagskvoten hos EODHD (gratisnivået) og kallet til hovedindeksen.
 KVOTE = 20
 INDEKSKALL = 1
@@ -263,11 +268,15 @@ class Valglager:
             if bytt_ut is not None:
                 self._kan_fjernes(bytt_ut)
             elif self.antall() >= TAK:
-                raise ListaErFull("Lista er full. Fjern en aksje for å følge en annen.")
+                raise ListaErFull(FULL)
             folg_id = self._t.execute(
                 "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, ?, ?)",
                 (kode, aksje.navn, sektor, laget),
             ).lastrowid
+            # Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): aksjen får
+            # stjerne og står i Min liste med en gang, i samme transaksjon som
+            # ønsket. Triggeren i 0013 godtar et symbol som venter.
+            self._t.execute("INSERT INTO min_liste (symbol) VALUES (?) ON CONFLICT (symbol) DO NOTHING", (kode,))
             if bytt_ut is not None:
                 fjern_id = self._t.execute(
                     "INSERT INTO oenske (handling, symbol, laget, par) VALUES ('fjern', ?, ?, ?)",
@@ -333,7 +342,15 @@ class Valglager:
                 raise UgyldigValg("ønsket finnes ikke, eller er alt tatt i bruk")
             handling, par = rad
             if handling == FJERN and par is None and self.antall() + 1 > TAK:
-                raise ListaErFull("Lista er full. Fjern en aksje for å angre dette.")
+                raise ListaErFull(FULL_ANGRE)
+            # Story 8.26 (tillegg 3, forslaget i spørsmål 7): «Angre» tar også
+            # bort stjernen som «Følg» satte, så Min liste ikke har en aksje
+            # appen ikke følger.
+            self._t.execute(
+                "DELETE FROM min_liste WHERE symbol IN (SELECT symbol FROM oenske WHERE id IN (?, ?) "
+                "AND handling = 'folg' AND tatt_i_bruk IS NULL AND avvist IS NULL)",
+                (oenske_id, par if par is not None else oenske_id),
+            )
             self._t.execute(
                 "DELETE FROM oenske WHERE id IN (?, ?) AND tatt_i_bruk IS NULL AND avvist IS NULL",
                 (oenske_id, par if par is not None else oenske_id),

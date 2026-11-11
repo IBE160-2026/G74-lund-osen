@@ -402,7 +402,7 @@ class TestFoelgEnAksje:
         for kode in koder:
             klient.post("/folg", data={"kode": kode})
             side = klient.get("/folg").data.decode("utf-8")
-            if "Lista er full. Fjern en aksje for å følge en annen." in side:
+            if "Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen." in side:
                 break
         else:
             pytest.fail("lista ble aldri full")
