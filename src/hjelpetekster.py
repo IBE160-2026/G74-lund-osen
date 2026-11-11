@@ -239,6 +239,16 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (HOVEDINDEKS, "def er_bedre("),
             ),
         ),
+        # Story 8.26 (gruppens svar 11.11 kl. 17:06): hvilken indeks det er,
+        # i begge versjonene, først i vinduet ved Hovedindeksen.
+        "hovedindeksnavnet": Hjelpetekst(
+            "",
+            "OSEBX er hovedindeksen på Oslo Børs. I demoen heter den oppdiktede indeksen DEMIX.",
+            (
+                ("src/indeksdata.py", 'HOVEDINDEKS = Indeks("OSEBX"'),
+                ("src/demo.py", 'DEMOINDEKS = Indeks("DEMIX"'),
+            ),
+        ),
         # Story 2.9b (FR-105): søylene under indeksen. Story 8.2b, a (U26):
         # i et eget vindu, og kortere, fordi forklaringen under søylene
         # viser linja.

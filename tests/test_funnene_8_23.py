@@ -220,7 +220,10 @@ class TestDineEgneAksjer:
         egne = html.split('id="dine-egne-aksjer"', 1)[1].split("</section>", 1)[0]
         assert '<div class="tabellboks egnetabell"' in egne and "<thead>" in egne
         rad = egne.split('<tr class="egen-rad">', 1)[1].split("</tr>", 1)[0]
-        assert '<td class="bransje"><svg class="bransjesymbol"' in rad and "Energi" in rad
+        # Story 8.26 (gruppens svar 11.11 kl. 17:12): bransjen med ikonet står
+        # under navnet, som på oversikten, ikke i en egen kolonne.
+        assert '<span class="linje">XTEST · <svg class="bransjesymbol"' in rad and "Energi</span>" in rad
+        assert '<td class="bransje">' not in rad
         assert "Venter på henting i kveld etter kl. 22." in rad and "Angre" in rad
 
 
@@ -307,11 +310,14 @@ class TestOransje:
         """Ville feilet hvis en bryter i Innstillinger som er på, var svart som før."""
         assert "background: var(--oransje)" in _regel(velger)
 
-    def test_bryteren_ved_ki_teksten_er_i_blekk(self):
-        """Hele settet, del 3: ville feilet hvis bryterne ved KI-teksten og ved
-        «Børsdagen kort fortalt» ble oransje, mot spørsmål 5 i 8.2b (blekk)."""
+    def test_bryteren_ved_ki_teksten_er_oransje(self):
+        """Story 8.26 (gruppens svar 11.11 kl. 17:21) endrer spørsmål 5 i 8.2b:
+        bryterne ved KI-teksten og ved «Børsdagen kort fortalt» er oransje med
+        blekk-knott, som i Innstillinger. Ville feilet hvis en av dem var i
+        blekk som før."""
         for velger in ('.dagsbryter [aria-checked="true"] .spor', '.ki-bryter [aria-checked="true"] .spor'):
-            assert "background: var(--blekk)" in _regel(velger), velger
+            assert "background: var(--oransje)" in _regel(velger), velger
+            assert "background: var(--blekk)" in _regel(velger + "::after"), velger
 
     def test_siden_man_er_paa(self):
         """Ville feilet hvis knappen for siden man er på, var hvit som før."""
@@ -516,7 +522,13 @@ class TestEtterGjennomgangen:
                 "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES "
                 "('folg', 'XTEST', 'Eksempelselskap', 'Energi', '2026-10-13T12:00:00+00:00')"
             )
-        assert 'Eksempelselskap<span class="skjult">, </span><span class="egen-dag">XTEST</span>' in _html(klient, "/")
+        # Story 8.26: navnet og merkene, så et skilletegn for skjermleseren
+        # og linja med symbolet.
+        assert re.search(
+            r'Eksempelselskap <span class="egenmerke">Egen</span>( <span class="utenformerke">[^<]*</span>)?'
+            r'<span class="skjult">, </span><span class="linje">XTEST · ',
+            _html(klient, "/"),
+        )
 
     def test_en_aksje_i_lista(self):
         """ECH11: ville feilet med «1 av de 1 aksjene»."""

@@ -432,7 +432,8 @@ class TestSidene:
                 # Story 2.9: delen over tabellen.
                 # Story 2.9b: søylene i samme vindu. Story 8.2b, a (U26):
                 # hvert sitt vindu.
-                "hjelp-hovedindeks": ["hovedindeksen"],
+                # Story 8.26 (svaret 11.11 kl. 17:06): navnet på indeksen først.
+                "hjelp-hovedindeks": ["hovedindeksnavnet", "hovedindeksen"],
                 "hjelp-soeylene": ["soeylene"],
                 "hjelp-selskap": ["selskap"],
                 "hjelp-sluttkurs": ["sluttkurs"],
@@ -748,6 +749,8 @@ class TestHjelpefeltet:
             ".hjelpevindu p",
             ".hjelpevindu button.lukk",
             ".hjelpevindu button.flytt",
+            # Story 8.26: linja om hvordan vinduet lukkes, i dempet tekst.
+            ".hjelpevindu .lukkes",
         }, uten_klassen
         assert all("display" not in k for v, k in reglene if v == ".hjelpevindu button.flytt")
         assert re.search(r"\.hjelpefelt body:has\(\.hjelpevindu:popover-open\)", stil)

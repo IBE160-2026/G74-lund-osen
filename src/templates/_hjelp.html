@@ -36,6 +36,9 @@
     {% endfor %}
   {% endfor %}
   {% if vist %}<p class="vist"><strong>Siden viser</strong> {{ vist }}.</p>{% endif %}
+  {#- Story 8.26 (funnene fra demoprøven): hvordan vinduet lukkes. Et nytt
+      trykk på samme «?» og Esc lukker et popover også uten skriptet. #}
+  <p class="lukkes">Lukk med «Lukk», Esc eller et nytt trykk på samme «?».</p>
 </div>
 {%- endif -%}
 {%- endmacro %}

@@ -197,6 +197,7 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
   background: var(--kort); color: var(--tekst);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.30), 0 2px 6px rgba(0, 0, 0, 0.12);
 }
+.hjelpevindu .lukkes { color: var(--dempet); font-size: 13px; margin: 0.75rem 0 0; }
 .hjelpevindu .hjelpetopp { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .hjelpevindu .hjelpemerke {
   display: inline-block; font-size: 12.5px; font-weight: 700; padding: 0.15rem 0.5rem;
@@ -350,6 +351,10 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 /* Story 8.23 (tillegg 2): den blanke 0-brikken, hvit med kant som i tabellen
    (.brikke.null). */
 :where(.side-oversikt) .utslagsfelt .null { background: var(--hvit); color: var(--dempet-2); border: 1px solid var(--strek-2); }
+/* Story 8.26 (funnene fra demoprøven): de tre brikkene er høyere enn 36 px,
+   så feltet vokser med dem og har luft rundt, i stedet for at brikkene står
+   utenfor den grå ruta og inntil overskriften. */
+:where(.side-oversikt) .symbolfelt:has(> .utslagsfelt) { height: auto; padding: 6px 0; }
 :where(.side-oversikt) .symbolfelt .pil { font-size: 16px; font-weight: 700; line-height: 1; }
 :where(.side-oversikt) .symbolfelt svg { width: 22px; height: 22px; }
 
@@ -718,8 +723,10 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
                                        background: var(--strek-2); flex: none; }
 :where(.side-aksje) .ki-bryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
                                               border-radius: 50%; background: var(--hvit); }
-:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: var(--blekk); }
-:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor::after { left: 18px; }
+/* Story 8.26 (gruppens svar 11.11 kl. 17:21): oransje med blekk-knott, som
+   bryterne i Innstillinger, så alle bryterne i appen ser like ut. */
+:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: var(--oransje); }
+:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor::after { left: 18px; background: var(--blekk); }
 :where(.side-aksje) .ki-bryter .verdi { color: var(--dempet); font-weight: 400; }
 /* Gjennomgangen av 8.2b (ECH9): med høy kontrast forsvinner bakgrunnen, så
    sporet og knotten får kant og systemfarger. */
@@ -1215,10 +1222,11 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.23 (A1): «Dine egne aksjer» som tabellen over, med bransjeikonet
    foran bransjen, og status og knappen i hver sin kolonne. */
 :where(.side-oversikt) .egnetabell { margin: 12px 0; }
-:where(.side-oversikt) .egnetabell td.bransje { white-space: nowrap; }
-:where(.side-oversikt) .egnetabell td.bransje svg { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
 :where(.side-oversikt) .egnetabell td.status { color: var(--dempet); font-size: 14px; }
-:where(.side-oversikt) .egnetabell td.status .statustekst { display: block; margin-top: 4px; }
+:where(.side-oversikt) .egnetabell td.status .statustekst { display: block; }
+/* Story 8.26 (svaret kl. 17:12): «Angre» og «Fjern» som en liten knapp til
+   høyre, og merkene små, som på oversikten. */
+:where(.side-oversikt) .egnetabell .knapp.liten { min-height: 32px; padding: 0 12px; font-size: 14px; }
 :where(.side-oversikt) .egnetabell td.valg { text-align: right; }
 :where(.side-oversikt) .egenmerke, :where(.side-oversikt) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px;
                                                                            font-size: 12.5px; font-weight: 600; }
@@ -1300,7 +1308,13 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }
 :where(.side-oversikt) .folgskjema select, :where(.side-oversikt) .sok input { min-height: 44px; font: inherit; padding: 0 10px; }
 :where(.side-oversikt) .sok { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-:where(.side-oversikt) .feil, :where(.side-oversikt) .full { color: var(--ned); font-weight: 600; }
+:where(.side-oversikt) .feil { color: var(--ned); font-weight: 600; }
+/* Story 8.26 (gruppens svar 11.11 kl. 17:12): at appen følger så mange
+   aksjer den kan, står ikke i rødt, fordi rødt betyr negativ, men som de
+   andre beskjedene, i en boks som meldingen om endringer som venter. */
+:where(.side-oversikt) .full { margin: 12px 0; padding: 10px 14px; border: 1px solid var(--strek-2);
+                               border-left: 4px solid var(--oransje); border-radius: 8px; background: var(--kort); color: var(--tekst); }
+:where(.side-oversikt) span.full { display: block; }
 :where(.side-oversikt) .bytt-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 24px; }
 :where(.side-oversikt) .bytt-lista .knapp { margin-left: auto; min-height: 36px; }
 /* Story 2.12 (gjennomgangen, VG2): «Utenfor målingen» på aksjesiden og i
@@ -1340,8 +1354,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                           background: var(--strek-2); flex: none; }
 :where(.side-oversikt) .dagsbryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
                                                  border-radius: 50%; background: var(--hvit); }
-:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: var(--blekk); }
-:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor::after { left: 18px; }
+/* Story 8.26 (svaret kl. 17:21): som bryterne i Innstillinger. */
+:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: var(--oransje); }
+:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor::after { left: 18px; background: var(--blekk); }
 :where(.side-oversikt) .dagsbryter .verdi { color: var(--dempet); font-weight: 400; }
 @media (forced-colors: active) {
   :where(.side-oversikt) .dagsbryter .spor { border: 1px solid CanvasText; }

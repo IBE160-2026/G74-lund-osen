@@ -143,3 +143,79 @@ class TestBoksenForSiden(_Node):
             "if (aktive === steg) skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));" in skriptet
         )
         assert 'document.querySelectorAll("button.vis-meg-rundt[hidden]")' in skriptet
+
+
+# --- 2) Funnene fra demoprøven ----------------------------------------------
+
+STIL = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+
+
+def _regel(velger: str) -> str:
+    m = re.search(r"(?:^|[}\s,])" + re.escape(velger) + r"\s*\{([^}]*)\}", STIL)
+    assert m, velger
+    return m.group(1)
+
+
+class TestFunnene:
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_hjelpevinduet_sier_hvordan_det_lukkes(self, versjon, request):
+        """Ville feilet hvis et hjelpevindu ikke sa at det også lukkes med et
+        nytt trykk på samme «?»."""
+        side = _side(request.getfixturevalue(versjon), "/")
+        vinduer = side.count('class="hjelpevindu" popover>')
+        assert vinduer > 0
+        assert side.count('<p class="lukkes">Lukk med «Lukk», Esc eller et nytt trykk på samme «?».</p>') == vinduer
+
+    def test_brikkene_staar_innenfor_ruta(self):
+        """Ville feilet hvis feltet med de tre brikkene i «Slik leser du
+        tabellen» var låst til 36 px, så brikkene sto utenfor den grå ruta og
+        inntil overskriften."""
+        regel = _regel(":where(.side-oversikt) .symbolfelt:has(> .utslagsfelt)")
+        assert "height: auto" in regel and "padding: 6px 0" in regel
+
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_hovedindeksen_sier_hvilken_indeks(self, versjon, request):
+        """Svaret kl. 17:06: ville feilet hvis «?» ved Hovedindeksen ikke sa
+        først hvilken indeks det er, med den samme teksten i begge versjonene."""
+        side = _side(request.getfixturevalue(versjon), "/")
+        vindu = side.split('id="hjelp-hovedindeks"', 1)[1].split('<p class="lukkes">', 1)[0]
+        tekster = re.findall(r"<p>(?:<strong>[^<]*</strong> )?([^<]*)</p>", vindu)
+        assert tekster[0] == "OSEBX er hovedindeksen på Oslo Børs. I demoen heter den oppdiktede indeksen DEMIX."
+
+    def test_dine_egne_aksjer_som_oversikten(self, klient):
+        """Svaret kl. 17:12: ville feilet hvis «Dine egne aksjer» hadde egen
+        bransjekolonne, ikke hadde ticker og bransjeikon under navnet som på
+        oversikten, eller «Angre» ikke var en liten knapp."""
+        import sqlite3
+
+        t = sqlite3.connect(demo_sti())
+        with t:
+            t.execute(
+                "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES "
+                "('folg', 'XTEST', 'Eksempelselskap', 'Energi', '2026-10-13T12:00:00+00:00')"
+            )
+        t.close()
+        egne = _side(klient, "/").split('id="dine-egne-aksjer"', 1)[1].split("</section>", 1)[0]
+        assert "<th>Selskap</th><th>Status</th>" in egne and "<th>Bransje</th>" not in egne
+        rad = egne.split('<tr class="egen-rad">', 1)[1].split("</tr>", 1)[0]
+        assert re.search(r'<td class="selskap">Eksempelselskap <span class="egenmerke">Egen</span>', rad)
+        assert '<span class="linje">XTEST · <svg class="bransjesymbol"' in rad
+        assert '<button type="submit" class="knapp liten">Angre</button>' in rad
+
+    def test_full_liste_er_ikke_roed(self):
+        """Svaret kl. 17:12: ville feilet hvis beskjeden om full liste sto i
+        rødt (--ned), som betyr negativ."""
+        regel = _regel(":where(.side-oversikt) .full")
+        assert "var(--ned)" not in regel and "color: var(--tekst)" in regel
+        assert ".full" not in _regel(":where(.side-oversikt) .feil")
+
+    def test_ki_bryterne_er_oransje_og_merket_graatt(self):
+        """Svaret kl. 17:21: ville feilet hvis bryteren ved «Børsdagen kort
+        fortalt» eller på aksjesiden ikke var oransje med blekk-knott som i
+        Innstillinger, eller «Laget av KI» ikke sto grått."""
+        for side, velger in ((".side-oversikt", ".dagsbryter"), (".side-aksje", ".ki-bryter")):
+            paa = f':where({side}) {velger} [aria-checked="true"] .spor'
+            assert "background: var(--oransje)" in _regel(paa)
+            assert "background: var(--blekk)" in _regel(paa + "::after")
+        assert "color: var(--dempet)" in _regel(":where(.side-oversikt) .boersdagen .merke-ki")
+        assert "color: var(--dempet)" in _regel(":where(.side-aksje) .ki .merke-ki")

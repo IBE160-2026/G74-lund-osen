@@ -56,3 +56,14 @@ Hver del har tester med «Ville feilet hvis» i `tests/test_vis_meg_rundt_8_26.p
 ### 1) «Vis meg rundt» spiller av siden, og knappene øverst (kl. 16:58 og 17:06)
 
 **Ville feilet hvis:** «Vis meg rundt» hadde andre steg enn sidens egne, et steg sendte brukeren til en annen side, siste steg manglet «Ferdig» eller lenken til hele omvisningen, knappene ikke sto i raden etter «Innstillinger» med hvert sitt ikon, lista fra 8.9 eller raden under demolinja sto igjen, eller det var ulikt i demoen og den ekte versjonen.
+
+### 2) Funnene fra demoprøven (kl. 17:06, 17:12 og 17:21)
+
+- **Hjelpevinduet** har nederst «Lukk med «Lukk», Esc eller et nytt trykk på samme «?».». Et nytt trykk og Esc lukker et popover også uten skriptet, så linja stemmer i begge tilfeller.
+- **«Slik leser du tabellen»:** feltet med de tre brikkene vokser med dem (`:has(> .utslagsfelt)`), med 6 px luft over og under, så brikkene står innenfor den grå ruta og ikke inntil overskriften. De andre feltene, pilene og pekeren, er lavere enn 36 px og står som før.
+- **«?» ved Hovedindeksen** sier først «OSEBX er hovedindeksen på Oslo Børs. I demoen heter den oppdiktede indeksen DEMIX.», som en egen tekst (`hovedindeksnavnet`), fordi en tekst har høyst tre setninger (8.0c). Det står likt i begge versjonene.
+- **«Dine egne aksjer»:** tabellen står på oversikten, også under «Min liste» der, og ikke på siden Min liste, som har «Din egen liste». Den har nå navnet med «Egen» og «Utenfor målingen» og ticker med bransjeikonet under, uten egen bransjekolonne, og «Angre» og «Fjern» som en liten knapp til høyre.
+- **«Lista er full …»** står i en boks som meldingen om endringer som venter, ikke i rødt. Teksten endres i del 5 (tillegg 3).
+- **Bryterne ved KI-teksten** er oransje med blekk-knott, som i Innstillinger, og «Laget av KI» står grått som før. Det endrer spørsmål 5 i 8.2b og testen fra 8.23 (`test_bryteren_ved_ki_teksten_er_oransje`).
+
+**Ville feilet hvis:** et hjelpevindu manglet linja om lukkingen, brikkene sto utenfor ruta, «?» ved Hovedindeksen ikke sa hvilken indeks det er, «Dine egne aksjer» hadde bransjekolonnen eller en stor knapp, beskjeden om full liste var rød, eller en KI-bryter ikke var oransje.

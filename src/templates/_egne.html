@@ -18,20 +18,22 @@
   <div class="tabellboks egnetabell" role="region" aria-label="Dine egne aksjer" tabindex="0">
   <table>
     <thead>
-      <tr><th>Selskap</th><th>Bransje</th><th>Status</th><th><span class="skjult">Valg</span></th></tr>
+      {#- Story 8.26 (gruppens svar 11.11 kl. 17:12): samme stil som
+          oversikten og «Følg en aksje»: navnet med ticker og bransjeikon
+          under, uten egen bransjekolonne, små merker og en liten knapp. #}
+      <tr><th>Selskap</th><th>Status</th><th><span class="skjult">Valg</span></th></tr>
     </thead>
     <tbody>
     {% for rad in egne.rader %}
       <tr class="egen-rad">
-        <td class="selskap">{{ rad.navn }}<span class="skjult">, </span><span class="egen-dag">{{ rad.symbol }}</span></td>
-        <td class="bransje">{{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</td>
-        <td class="status"><span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}
+        <td class="selskap">{{ rad.navn }} <span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}<span class="skjult">, </span><span class="linje">{{ rad.symbol }} · {{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</span></td>
+        <td class="status">
         {%- if rad.status == "hentet" %} <span class="statustekst">Hentet. Står i tabellen over.</span>
         {%- elif rad.status == "venter" %} <span class="statustekst">Venter på henting i kveld etter kl. 22.</span>
         {%- else %} <span class="statustekst">Fjernes ved hentingen i kveld etter kl. 22.</span>{% endif %}</td>
         <td class="valg">
-        {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Fjern</button></form>
-        {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Angre</button></form>{% endif -%}
+        {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Fjern</button></form>
+        {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Angre</button></form>{% endif -%}
         </td>
       </tr>
     {% endfor %}

@@ -335,12 +335,17 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
     assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
     assert html.count('class="ki-bryter"') == 1
     # Gjennomgangen (VG1): gult heter også oransje og baand-ut i stilen.
-    regler = re.findall(r"\.ki-bryter[^{]*\{([^}]*)\}", STIL)
+    # Story 8.26 (gruppens svar 11.11 kl. 17:21): bryteren som er på, er
+    # oransje som i Innstillinger; ellers ingen gul farge i bryteren.
+    paa = '.ki-bryter [aria-checked="true"] .spor'
+    regler = re.findall(r"(\.ki-bryter[^{]*)\{([^}]*)\}", STIL)
     assert len(regler) >= 5
-    for regel in regler:
+    for velger, regel in regler:
         for farge in ("gul", "oransje", "baand-ut", "hjelp-bakgrunn"):
+            if farge == "oransje" and velger.strip().endswith(paa):
+                continue
             assert farge not in regel, (farge, regel)
-    assert "var(--blekk)" in _regel('.ki-bryter [aria-checked="true"] .spor')
+    assert "var(--oransje)" in _regel(paa)
     assert "border-radius: 16px" in _regel(".ki") and "font-size: 17px" in _regel(".ki p.ki-tekst")
 
 

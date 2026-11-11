@@ -438,7 +438,7 @@
     {#- Story 2.9b: teksten om søylene står bare når søylene vises. #}
     {% if aktiv != "min_liste" %}
     {#- Story 8.2b, a (U26): hovedindeksen og søylene har hvert sitt vindu. #}
-    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksen"])]) }}
+    {{ hjelpevindu("hjelp-hovedindeks", "Hovedindeksen", [("", ["hovedindeksnavnet", "hovedindeksen"])]) }}
     {% if hovedindeks and hovedindeks.har_soeyler %}{{ hjelpevindu("hjelp-soeylene", "Søylene", [("", ["soeylene"])]) }}{% endif %}
     {% endif %}
     {#- Story 8.17a: periodevalget over søylene og tabellen. #}
