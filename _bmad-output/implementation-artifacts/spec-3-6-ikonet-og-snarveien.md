@@ -16,9 +16,13 @@ Skrevet 11.11 etter instruksjonen «Del C, ikonet og snarveien 10.11» (limt inn
 
 *Svar 2026-11-10 kl. 15:57 (gruppens svar):* alt nytt skal kunne ses i demoen uten nøkkel, og startskriptet for demoen tilbyr også snarveien, med et eget navn. Rådet anbefalte det.
 
+*Svar 2026-11-11 kl. 13:47 (gruppens svar):* ja til ikonet som bygget (spørsmål 1) og til forslagene i spørsmål 2–7. I spørsmål 8 skal startskriptet spørre om snarveien skal peke hit når den peker på en annen kopi. Del C flettes når svarene er bygget, gjennomgått og CI er grønn, uten at gruppen ser på den igjen. Rådet anbefalte det.
+
+*Svar 2026-11-11 kl. 13:49 (gruppens svar):* README-en får en fjerde liste under «Status», «Ekstra, ferdig», og brukertesten flyttes fra «Neste i v1» til setningen om det som er ferdig rundt appen, fordi «Ferdig» lister det appen kan. Rådet anbefalte det.
+
 ## Spørsmål til gruppen
 
-Forslaget er det som bygges. Spørsmålene står åpne til gruppen har svart.
+Forslaget er det som bygges. *Besvart 2026-11-11 kl. 13:47:* spørsmål 1–7 som foreslått, og spørsmål 8 annerledes enn forslaget (se «Spørsmål 8, slik gruppen svarte»).
 
 1. **Ikonet.** *Forslag:* de tre søylene fra logoen, hvite og den høyeste oransje, på et avrundet kvadrat i blekk, som stripa. Det tegnes av `src/ikon.py` med bare standardbiblioteket (`zlib` og `struct`) og ligger i `src/static` som `ikon.svg`, `ikon-16/32/48/180/192/512.png` og `ikon.ico` med 16, 32, 48 og 256 px.
 2. **Fanen.** *Forslag:* `_ramme.html` har `ikon.svg`, `ikon-32.png` og `ikon-180.png` (for iPhone og iPad), så alle sidene, i demoen og i den ekte versjonen, viser det i fanen.
@@ -70,6 +74,7 @@ Ikke rettet, lave:
 ## Åpent til gruppen har svart
 
 8. **En snarvei til en annen kopi** (BH2 og ECH4, middels). Pakkes en ny ZIP ut i en ny mappe, starter «OSE Signal» fortsatt den gamle kopien, og den nye spør ikke, fordi snarveien finnes. *Forslag:* slik instruksjonen sier. Snarveien rettes bare når mappen den peker på, er slettet, og installasjonen kan si at man sletter snarveien for å få en ny.
+   *Besvart 2026-11-11 kl. 13:47:* ikke som forslaget. Startskriptet spør om snarveien skal peke hit. Se «Spørsmål 8, slik gruppen svarte».
 
 ## Mutantene
 
