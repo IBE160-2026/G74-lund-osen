@@ -4548,6 +4548,38 @@ Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan
 
 *Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
 
+### Story 8.22: Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 16:26 («Del B 10.11», vindu 4) i `docs/ai-prompts/2026-11-10.md`.* 8.22 var neste ledige nummer i Epic 8.
+
+Som **bruker**, vil jeg følge hvilken som helst aksje på Oslo Børs med en fast bransje, finne den i en liste jeg kan sortere og filtrere, og se i tre steg hva den egne lista krever, så jeg kan lage min egen liste uten å gjette.
+
+Spesifikasjonen er `spec-8-22-foelg-en-aksje-og-min-liste.md`, med spørsmålene, triagen av gjennomgangene og målingen av tiden.
+
+*Avgjort 2026-11-10 kl. 13:38 (gruppens svar):* alle aksjene i børslista kobles til en bransje gruppen har sjekket, så den som følger en aksje, ikke velger bransjen selv. Det erstatter svaret 08.11 kl. 11:57.
+
+*Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* ja til del A og B. Bare feltet i steg 2 bygges ikke, fordi nettsiden aldri skal røre nøkkelen (AD-10, svaret 08.11 kl. 12:39), og resten følger designforslaget.
+
+*Avgjort 2026-11-10 kl. 14:43 (gruppens svar):* alle 195 forslag og usikre i kontrollsjekken er avgjort: 194 som foreslått, og MULTI er tatt ut.
+
+*Avgjort 2026-11-10 kl. 14:53 (gruppens svar):* del B startes i et nytt vindu med en gang. Rådet anbefalte vindu 1 etter del C.
+
+*Avgjort 2026-11-10 kl. 14:59 (gruppens svar):* ingen fletting før gruppen har svart.
+
+*Avgjort 2026-11-10 kl. 15:22 (gruppens svar):* SCOIN er ute, som 08.11 kl. 22:03, fordi selskapet er under avvikling.
+
+*Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel, med oppdiktede selskaper merket «Eksempeltall».
+
+*Avgjort 2026-11-10 kl. 22:44 (gruppens svar, tillegg 3):* kortet «Mest omsatt» tas bort, og lista sorteres «Mest omsatt først», «A–Å» eller «Bransje». Flere bransjer kan velges samtidig, og det valgte er oransje med et merke. Radene får stilen fra tabellen på oversikten. «Start fra en ferdig liste» får én knapp per bransje og siden «Er du sikker?». Rådet anbefalte alle fire.
+
+*Avgjort 2026-11-10 kl. 22:50 (gruppens svar, tillegg 4):* steg 2 i «Din egen liste» blir som på designtavla, men uten felt. AD-10 og svaret 08.11 kl. 12:39 står. Der tavla har feltet, står en status regnet av siste henting. Rådet anbefalte det.
+
+*Avgjort 2026-11-10 kl. 22:55 (gruppens svar, tillegg 5):* to nye bilder fra demoen ved 390 px, «Følg en aksje» og notatene for BRFE, i README-en.
+
+*Avgjort 2026-11-11 kl. 14:29 (gruppens svar):* ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. Tiden for medianene måles, og testen for et kall som feiler legges til (spørsmål 12 og 14). Det valgte står i oransje med hakemerket (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet. Rådet anbefalte alt.
+
+*Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43043943092). Tiden for én visning av hele lista var 0,046, 0,014 og 0,014 s, så medianene huskes ikke i minnet.
+
 ### Story 8.23: Funnene fra brukertesten 10.11 (del A)
 
 *Lagt til 2026-11-11, etter instruksjonen om del A (lest 10.11 kl. 21:31) i `docs/ai-prompts/2026-11-10.md`.* 8.21 og 8.22 var tatt av de åpne PR-ene #139 og #138. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-23-funnene-fra-brukertesten.md`, med de 18 spørsmålene og forslagene.

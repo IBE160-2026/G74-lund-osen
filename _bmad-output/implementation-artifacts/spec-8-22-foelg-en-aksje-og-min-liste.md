@@ -2,7 +2,7 @@
 title: 'Story 8.22: Faste bransjer, «Følg en aksje» med hele lista, og «Din egen liste» som tre steg'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '53ff012c'
 context:
@@ -281,3 +281,7 @@ Gjennomgangen av `8b90fb0f..c294a1bc` og det første måleskriptet ga 10 funn fr
 | BH10, ECH5 (samme kveld; et nytt forsøk etter midnatt fordeler seriene på to dager) | lav | Står: ECH fant at forsøket i testen er samme dag i Oslo og UTC. Etter midnatt sier steg 2 den nye dagen og bare seriene den dagen, og det er sant, men lite. |
 
 Ingen funn på middels eller over står åpne.
+
+## Flettingen
+
+*Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 14:29. Hele settet lokalt i fem deler før pushen: 5247, lik `--collect-only`, 0 feilet. CI var grønn på head-en (run 43043943092). README-en har del B under «Ekstra, ferdig» (svaret kl. 13:49). Lista «Ekstra, hvis tiden rekker» ble da tom og står ikke, mens setningen om regelen for det ekstra står.
