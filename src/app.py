@@ -2346,9 +2346,12 @@ def folg_side():
     # Tillegg 3 (svarene 10.11 kl. 22:44): sorteringen i stedet for de tre
     # forslagene. Et ukjent valg i adressen er «Alle», og en ukjent sortering
     # er «Mest omsatt først».
-    valgt_bransje = request.args.get("bransje") or ""
-    if valgt_bransje not in valg.BRANSJENE:
-        valgt_bransje = ""
+    # Tillegg 3: flere bransjer samtidig, i samme rekkefølge som brikkene.
+    # Ukjente valg i adressen hoppes over. «Alle» er en lenke uten bransjene,
+    # med søket, omsetningen, sorteringen og byttet.
+    i_adressen = set(request.args.getlist("bransje"))
+    valgte_bransjer = [b for b in valg.BRANSJENE if b in i_adressen]
+    uten_bransjer = urlencode([(k, v) for k, v in request.args.items(multi=True) if k != "bransje"])
     valgt_omsetning = request.args.get("omsetning") or ""
     if valgt_omsetning not in {v for v, _ in ferdige_lister.OMSETNINGSFILTER}:
         valgt_omsetning = ""
@@ -2359,8 +2362,10 @@ def folg_side():
     if valgt is None:
         opptatt = set(i_lista) | {o.symbol for o in lager.ventende() if o.handling == valg.FOLG}
         alle = ferdige_lister.foelgbare(g.tilkobling, opptatt, medianene)
-        rader = ferdige_lister.sorter(ferdige_lister.filtrer(alle, "", valgt_bransje, valgt_omsetning), valgt_sortering)
-        treff = {a.kode for a in ferdige_lister.filtrer(rader, sok, "", "")}
+        rader = ferdige_lister.sorter(
+            ferdige_lister.filtrer(alle, "", valgte_bransjer, valgt_omsetning), valgt_sortering
+        )
+        treff = {a.kode for a in ferdige_lister.filtrer(rader, sok, (), "")}
     # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
     # ikke følges, og siden sier det før skjemaet sendes.
     alt_fulgt = valgt is not None and (
@@ -2377,7 +2382,8 @@ def folg_side():
         alle=alle,
         rader=rader,
         treff=treff,
-        valgt_bransje=valgt_bransje,
+        valgte_bransjer=valgte_bransjer,
+        alle_bransjer="/folg" + (f"?{uten_bransjer}" if uten_bransjer else ""),
         valgt_sortering=valgt_sortering,
         sorteringer=ferdige_lister.SORTERINGER,
         omsatt=ferdige_lister.OMSATT,

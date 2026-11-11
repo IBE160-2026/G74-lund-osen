@@ -87,10 +87,14 @@
         <input id="q" name="q" type="search" value="{{ sok }}" maxlength="40" autocomplete="off" data-folgsok>
         <button type="submit" class="knapp">Vis</button>
       </div>
+      {#- Tillegg 3 (svarene 10.11 kl. 22:44): flere bransjer kan velges
+          samtidig, og kombineres med omsetningen. Det valgte er oransje med
+          et hakemerke, så fargen ikke står alene (stil.css). «Alle» er en
+          lenke som tar bort bransjene. #}
       <fieldset class="bransjefilter">
         <legend>Bransje</legend>
-        <label class="valgbrikke"><input type="radio" name="bransje" value=""{% if not valgt_bransje %} checked{% endif %}> Alle</label>
-        {% for b in bransjene %}<label class="valgbrikke"><input type="radio" name="bransje" value="{{ b }}"{% if b == valgt_bransje %} checked{% endif %}> {{ bransjesymbol(b) }}{{ b }}</label>{% endfor %}
+        <a class="valgbrikke{% if not valgte_bransjer %} valgt{% endif %}" href="{{ alle_bransjer }}"{% if not valgte_bransjer %} aria-current="true"{% endif %}>Alle</a>
+        {% for b in bransjene %}<label class="valgbrikke"><input type="checkbox" name="bransje" value="{{ b }}"{% if b in valgte_bransjer %} checked{% endif %}> {{ bransjesymbol(b) }}{{ b }}</label>{% endfor %}
       </fieldset>
       <fieldset class="omsetningsfilter">
         <legend>Målt omsetning</legend>
@@ -101,7 +105,7 @@
         {% for verdi, tekst in sorteringer %}<label class="valgbrikke"><input type="radio" name="sorter" value="{{ verdi }}"{% if verdi == valgt_sortering %} checked{% endif %}> {{ tekst }}</label>{% endfor %}
       </fieldset>
     </form>
-    <h2 class="alle-tittel">Alle som kan følges{% if valgt_bransje %} i {{ valgt_bransje }}{% endif %}</h2>
+    <h2 class="alle-tittel">Alle som kan følges{% if valgte_bransjer %} i {{ (valgte_bransjer[:-1]|join(", ") ~ " og " ~ valgte_bransjer[-1]) if valgte_bransjer|length > 1 else valgte_bransjer[0] }}{% endif %}</h2>
     <p class="antall-vist"><span id="antall-vist">{{ treff|length }}</span> av {{ rader|length }} vises.{% if valgt_sortering == omsatt %} Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet.{% endif %}</p>
     <ul class="foelgbare" id="foelgbare">
       {% for a in rader %}{{ rad(a) }}{% endfor %}

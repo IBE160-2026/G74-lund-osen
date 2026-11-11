@@ -102,8 +102,46 @@ class TestFilteret:
         eller et ukjent valg i adressen ga en tom liste."""
         html = _side(klient, "/folg?bransje=Helse")
         assert _rader(html) == ["NYB"]
-        assert re.search(r'<input type="radio" name="bransje" value="Helse" checked> <svg class="bransjesymbol"', html)
+        assert re.search(
+            r'<input type="checkbox" name="bransje" value="Helse" checked> <svg class="bransjesymbol"', html
+        )
         assert _rader(_side(klient, "/folg?bransje=Tull")) == ["NYA", "NYB", "NYC", "NYD"]
+
+    def test_flere_bransjer_samtidig_og_med_omsetningen(self, klient, stier):  # noqa: F811
+        """Tillegg 3: ville feilet hvis bare den siste bransjen i adressen
+        gjaldt, hvis omsetningen ikke gjaldt i tillegg, eller hvis begge
+        bransjene ikke var krysset av og sto i overskriften."""
+        maal(stier[1], [("NYA", 50e6), ("NYB", 10e6), ("NYC", 40e6)])
+        html = _side(klient, "/folg?bransje=Kraft&bransje=Helse&sorter=navn")
+        assert _rader(html) == ["NYA", "NYB", "NYC", "NYD"]
+        for b in ("Helse", "Kraft"):
+            assert f'<input type="checkbox" name="bransje" value="{b}" checked>' in html
+        assert '<h2 class="alle-tittel">Alle som kan følges i Helse og Kraft</h2>' in html
+        assert _rader(_side(klient, "/folg?bransje=Kraft&bransje=Helse&omsetning=under")) == ["NYB"]
+        assert _rader(_side(klient, "/folg?bransje=Helse&bransje=Tull")) == ["NYB"]
+
+    def test_alle_tar_bort_bransjene_og_beholder_resten(self, klient):  # noqa: F811
+        """Tillegg 3: ville feilet hvis «Alle» ikke var merket uten valgt
+        bransje, var merket med en bransje valgt, eller mistet søket,
+        omsetningen, sorteringen eller byttet."""
+        html = _side(klient)
+        assert '<a class="valgbrikke valgt" href="/folg" aria-current="true">Alle</a>' in html
+        html = _side(klient, "/folg?q=ny&bransje=Kraft&omsetning=over&sorter=navn&bytt=DNB&bransje=Helse")
+        assert (
+            '<a class="valgbrikke" href="/folg?q=ny&amp;omsetning=over&amp;sorter=navn&amp;bytt=DNB">Alle</a>' in html
+        )
+
+    def test_det_valgte_er_oransje_med_et_merke(self):
+        """Tillegg 3: ville feilet hvis det valgte ikke var oransje som
+        bryterne i Innstillinger, var gult («skilte seg ut»), eller bare
+        hadde fargen, uten hakemerket."""
+        css = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        valgt = ":where(.side-oversikt) .valgbrikke:has(input:checked), :where(.side-oversikt) .valgbrikke.valgt {"
+        regel = css.split(valgt, 1)[1].split("}", 1)[0]
+        assert "background: var(--oransje)" in regel and "gul" not in regel
+        assert '.innstillingsbryter[aria-checked="true"] .spor { background: var(--oransje); }' in css
+        merke = css.split(".valgbrikke.valgt::before {", 1)[1].split("}", 1)[0]
+        assert 'content: "✓"' in merke
 
     def test_maalt_omsetning(self, klient, stier):  # noqa: F811
         """Spørsmål 6: ville feilet hvis «Over 32 MNOK», «Under 32 MNOK» eller
@@ -167,12 +205,15 @@ class TestFunksjonene:
         """Ville feilet hvis søket skilte på store og små bokstaver, eller
         filtrene ga noe annet enn de fire valgene sier."""
         rader = [self.A, self.B, self.C]
-        assert filtrer(rader, "CÆS", "", "") == [self.C]
-        assert filtrer(rader, "", "Kraft", "under") == [self.B]
-        assert filtrer(rader, "", "", "ikke") == [self.C]
-        assert filtrer(rader, " ", "", "") == rader
+        assert filtrer(rader, "CÆS", (), "") == [self.C]
+        assert filtrer(rader, "", ("Kraft",), "under") == [self.B]
+        assert filtrer(rader, "", (), "ikke") == [self.C]
+        assert filtrer(rader, " ", (), "") == rader
         # Gjennomgangen (BH5, ECH7): ticker og navn hver for seg, som skriptet.
-        assert filtrer(rader, "a al", "", "") == []
+        assert filtrer(rader, "a al", (), "") == []
+        # Tillegg 3: flere bransjer samtidig, og omsetningen i tillegg.
+        assert filtrer(rader, "", ("Kraft", "Helse"), "") == rader
+        assert filtrer(rader, "", ("Helse", "Kraft"), "over") == [self.A]
 
     def test_grensen_er_32_mnok_som_merket(self):
         """Gjennomgangen (BH6, VG7): ville feilet hvis en aksje på nøyaktig 32
@@ -180,8 +221,8 @@ class TestFunksjonene:
         grensen ulikt."""
         paa = Foelgbar("PP", "På grensen", "Kraft", 32e6, date(2026, 10, 22), False)
         under = Foelgbar("UU", "Under", "Kraft", 32e6 - 1, date(2026, 10, 22), False)
-        assert filtrer([paa, under], "", "", "over") == [paa] and not paa.utenfor
-        assert filtrer([paa, under], "", "", "under") == [under] and under.utenfor
+        assert filtrer([paa, under], "", (), "over") == [paa] and not paa.utenfor
+        assert filtrer([paa, under], "", (), "under") == [under] and under.utenfor
 
     def test_norsk_alfabet(self):
         """Gjennomgangen (ECH8): ville feilet hvis Å sto foran Æ og Ø, eller

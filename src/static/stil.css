@@ -1241,9 +1241,22 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .folgfilter fieldset { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; }
 :where(.side-oversikt) .folgfilter legend { font-weight: 600; margin-bottom: 6px; padding: 0; }
 :where(.side-oversikt) .valgbrikke { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px;
-                                     border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort); cursor: pointer; }
-:where(.side-oversikt) .valgbrikke:has(input:checked) { background: var(--blekk); color: var(--hvit); border-color: var(--blekk); }
-:where(.side-oversikt) .valgbrikke input { margin: 0; }
+                                     border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort); cursor: pointer;
+                                     position: relative; color: var(--blekk); text-decoration: none; }
+/* Tillegg 3 (svarene 10.11 kl. 22:44): det valgte er oransje, som bryterne i Innstillinger og
+   fanen i toppen (8.23, A6), med tekst i blekk og et hakemerke foran, så fargen ikke står alene.
+   Gult brukes ikke, fordi det betyr «skilte seg ut». Boksen er skjult, men kan fortsatt
+   velges med tastaturet, og fokus står rundt brikken. */
+:where(.side-oversikt) .valgbrikke:has(input:checked), :where(.side-oversikt) .valgbrikke.valgt {
+  background: var(--oransje); color: var(--blekk); border-color: var(--oransje); font-weight: 600; }
+:where(.side-oversikt) .valgbrikke:has(input:checked)::before, :where(.side-oversikt) .valgbrikke.valgt::before {
+  content: "✓"; font-weight: 700; }
+:where(.side-oversikt) .valgbrikke input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
+:where(.side-oversikt) .valgbrikke:has(input:focus-visible), :where(.side-oversikt) a.valgbrikke:focus-visible {
+  outline: 3px solid var(--blekk); outline-offset: 2px; }
+@media (forced-colors: active) {
+  :where(.side-oversikt) .valgbrikke:has(input:checked), :where(.side-oversikt) .valgbrikke.valgt { border: 2px solid Highlight; }
+}
 :where(.side-oversikt) .antall-folg, :where(.side-oversikt) .antall-vist { color: var(--dempet); }
 :where(.side-oversikt) .alle-tittel { margin: 20px 0 6px; font-size: 18px; }
 :where(.side-oversikt) .foelgbare { list-style: none; padding: 0; margin: 8px 0; }

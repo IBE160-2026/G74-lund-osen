@@ -481,17 +481,20 @@ def _norsk(navn: str) -> str:
     return navn.casefold().translate(_ALFABETET)
 
 
-def filtrer(rader: list[Foelgbar], tekst: str, bransje: str, omsetning: str) -> list[Foelgbar]:
+def filtrer(rader: list[Foelgbar], tekst: str, bransjer: Collection[str], omsetning: str) -> list[Foelgbar]:
     """Story 8.22: søket (ticker eller navn, hver for seg og uten forskjell
-    på store og små bokstaver), bransjen og omsetningen (spørsmål 6). Det
+    på store og små bokstaver), bransjene og omsetningen (spørsmål 6). Det
     samme gjør hjelp.js i nettleseren mens man skriver, med data-kode og
-    data-navn (gjennomgangen, BH5, ECH7); dette er veien uten skript."""
+    data-navn (gjennomgangen, BH5, ECH7); dette er veien uten skript.
+    Tillegg 3 (svarene 10.11 kl. 22:44): flere bransjer kan velges samtidig,
+    og ingen valgt er alle. Omsetningen gjelder i tillegg til bransjene."""
+    assert not isinstance(bransjer, str), "bransjene er en samling, ikke én tekst"
     tekst = tekst.strip().lower()
     ut = []
     for a in rader:
         if tekst and tekst not in a.kode.lower() and tekst not in a.navn.lower():
             continue
-        if bransje and a.bransje != bransje:
+        if bransjer and a.bransje not in bransjer:
             continue
         if omsetning == IKKE_MAALT and a.median is not None:
             continue
