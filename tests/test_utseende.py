@@ -856,8 +856,10 @@ class TestBrikkene:
     def test_to_av_tre_er_en_hvit_pille_og_en_av_tre_er_tekst(self, sidene):
         """Gruppen 14.10 kl. 19:59: hvit pille med kant i blekk ved 2 av 3,
         uten ring. 1 og 0 av 3 står uten pille. Ville feilet hvis «2 av 3»
-        mistet pillen."""
-        html = sidene["oversikten i demoen"]
+        mistet pillen. Gjelder tabellen, så innholdet i notatpanelet fra 8.27
+        (<template>), der notatene viser styrken som i Min liste (8.21), tas
+        ut først."""
+        html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", sidene["oversikten i demoen"], flags=re.S)
         assert '<span class="pille to-av-tre">2 av 3</span>' in html
         assert not re.search(r'<span class="pille[^"]*">[01] av 3</span>', html)
         assert re.search(r'<span class="styrketall">[01] av 3</span>', html)

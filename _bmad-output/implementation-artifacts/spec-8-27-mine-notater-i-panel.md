@@ -124,6 +124,7 @@ Blind Hunter fikk bare diffen for `src/` og `tests/` (`db89c5ba..ad144136`, med 
 - VG1 (høy): fire eldre tester leste hele siden, der panelets `<template>` har de samme notatene. De leser nå siden uten panelet (`_uten_panelet` i `tests/test_notater.py`).
 - VG2, VG3: avgjørelsene i panelet står i `NOTATPANEL` i `hjelp.js` og testes med Node, som omvisningen i 8.25, og reglene for hjelpen over panelet har en test.
 - VG4, VG6, VG7, VG9: nye tester for en tidligere dag, en aksje som er tatt ut eller uten kurser, og `tilbake` ved «Slett».
+- Etter pausen kl. 23:50 (ikke fra gjennomgangen): `test_to_av_tre_er_en_hvit_pille_og_en_av_tre_er_tekst` i `tests/test_utseende.py` leste hele oversikten og fant «1 av 3» som pille i panelets `<template>`. Testen gjelder tabellen og leser nå siden uten panelet, som VG1. *Åpent punkt (lav):* notatene viser styrken som pille også ved 1 og 0 av 3, som i Min liste siden 8.21, mens tabellen har dem uten pille (gruppen 14.10 kl. 19:59). Panelet viser det nå på alle sidene. Det er ikke endret her.
 
 **Står åpent** til gruppen svarer (regel 25):
 - BH15 og ECH2 (middels): hver side leser alle notatene til panelet, også når det aldri åpnes. Det følger av forslaget i spørsmål 11. Graden er ikke satt ned.
