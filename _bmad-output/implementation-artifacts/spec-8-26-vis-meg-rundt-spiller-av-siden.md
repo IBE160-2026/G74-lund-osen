@@ -37,6 +37,14 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» vise
 
 *Ønskene 2026-11-11 kl. 17:48 og 17:53 (tillegg 4, rådet var enig):* filteret «Alle», «3 av 3 positiv» og «3 av 3 negativ» tas bort, og lenken «Den ekte versjonen» åpnes i en ny fane.
 
+*Ønsket 2026-11-11 kl. 19:36 (tillegg 6, rådet var enig):* siden står i ro når man trykker på en periode.
+
+*Ønsket 2026-11-11 kl. 19:51 (tillegg 8, rådet var enig):* den samme forklaringen på hvorfor overalt der «uten data» sto. Det skjerper tillegg 2.
+
+*Ønsket 2026-11-11 kl. 20:06 (tillegg 10, rådet var enig):* en lenke har samme farge før og etter at man har klikket på den.
+
+Tilleggene 5, 7 og 9 er ikke limt inn i vinduet.
+
 Rådet anbefalte alle unntatt det med to knapper.
 
 ## Spørsmål til gruppen før flettingen
@@ -56,6 +64,7 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
    - **Børsometeret** viser ikke en aksje som venter, fordi den ikke har kurs eller rute ennå. **Siden Min liste** viser den nederst med «venter på henting», som oversikten. Raden har stjernen, «Egen» og navnet uten lenke, fordi aksjen ikke har en aksjeside før hentingen.
 8. **Ordene om «lista» (tillegg 3, del 2).** *Forslag:* der «lista» betyr alle aksjene appen følger, sier sidene det: «appen følger 16 av 18» (to steder), «Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen.» (tre steder og i `valg.py`, også «… for å angre dette.»), «Appen følger alt …, eller den venter på hentingen.» og «Appen kan følge opptil 18 aksjer …». Ikke endret: «lista di» (stegene i «Din egen liste», som er brukerens egen liste), meldingen «N endringer i lista tas i bruk ved hentingen» og «13 av de 15 aksjene i lista» i «Signalet forklart» og KI-teksten, fordi tillegget sier at bare de setningene endres, og KI-teksten kontrolleres mot ordene.
 9. **Testene av boksen i nettleseren (gjennomgangen, VG1, middels).** *Forslag:* skriptet testes som før: de rene funksjonene i `OMVISNING` kjøres med Node, og resten (`start`, `visSiden`, `avslutt`, lenken og `pageshow`) sjekkes i kildeteksten og er prøvd i Edge mot demoen for hver del og etter gjennomgangen. En test som kjører siden i en nettleser eller med jsdom, krever pakker fra npm i CI, som repoet ikke har. Alternativet er å legge til jsdom i CI før flettingen.
+10. **Hvorfor en aksje er uten kurser (tillegg 8, gjennomgangen ECH2, BH3 og VG2, middels).** *Forslag:* ordlyden fra tillegg 8, som bygget: «appen har ingen kurser for aksjen ennå, fordi den nettopp er lagt til og venter på hentingen om kvelden, eller fordi kilden ikke har kurser for den.» Gjennomgangen påpekte at en aksje som venter på hentingen, står med «venter på henting», og at en aksje som står i lista uten kurser, alt er forsøkt hentet og tas ut kvelden etter hvis kilden fortsatt ikke gir kurser (`valg.uten_rader`). Alternativet er å legge til: «Gir kilden ingen kurser ved neste henting, tas den ut av lista.» Funnet står åpent til gruppen har svart (regel 25).
 
 ## Delene
 
@@ -160,3 +169,48 @@ Blind Hunter med bare diffen fra `7fd5320c`, uten bildene; Edge Case Hunter og V
 - *Rettet:* ECH7 (en aksje som venter, står ikke med «Velg dag»), BH15 (kommentarene om høydene i `test_docker.py`), BH16 («Ukjent» og hjelpen om raden sier «venter på hentingen» og at raden ikke har lenke), BH17 (docstringen sier 13), VG7 (kommentarene ved `SqliteMinlistelager` og `_SKRIVERE`).
 - *Ført:* BH3 og ECH6 («Angre» tar også en stjerne som fantes før, for en aksje som var tatt ut og følges igjen; den står da også uten lenke mens den venter), BH5 (knappen «Vis meg rundt» står bare når dataene for omvisningen kan leses, som på alle sidene med knappen), BH6 (lenken «Spill av hele omvisningen» er en lenke med `href="#"`), BH7 (ingen egen fokusring for sideknappene, verken lenkene eller knappene), BH9 (som VG1), BH12 (`FULL` sier 18 også når testene endrer `TAK`), ECH8 (en base på versjon 12 gir feil ved «Følg»; webserveren migrerer når den starter), ECH9 (telleren og tre steg med samme anker, som BH11 i 8.25), VG6 (testen for lenker ut av appen søker etter `http` og to variabler), VG8 (stegene på knappen er bare sammenlignet på børsometeret og i 8.9-testene), VG9 (testene for brikkene og fargen søker i stilen).
 - *Ikke en feil:* BH13 (oversikten sier «ikke hva», Min liste «ikke om»; begge er NFR-06), BH14 (sitatet «Sluttkursen vises som `close`» står i PRD-en, og kildetesten slår det opp).
+
+### 7) Siden står i ro (tillegg 6, ønsket kl. 19:36)
+
+- Periodevalget på oversikten, i Min liste og på børsometeret har ankeret `#perioden` på raden over (`PERIODEANKER`), som aksjesiden har `#kursgrafen` (8.2a, U36): knappene, pilene og skjemaet for «Vis dagen» går dit. Filteret i «Følg en aksje» har `#filteret`, «Alle» og «Min liste» i Min liste `#visvalget`, og bryterne i Innstillinger sender tilbake til bryteren (`INNSTILLINGSANKER`). `scroll-margin-top: 16px` gir luft over. Omvisningen sammenligner adressen uten ankeret (`her()`), og steget `velg-dag` finnes som før.
+- Prøvd i Edge mot demoen, ved 1280 og 390 px: etter et trykk på «1 uke» står periodevalget 16 px fra toppen på oversikten, i Min liste og på børsometeret, og filteret i «Følg en aksje» etter et klikk på en bransje (58 px ved 1280 px, der siden ikke kan rulles lenger). Før sto alle sidene på toppen. Bildene før og etter står på bildegrenen.
+
+**Ville feilet hvis:** en lenke eller skjemaet i periodevalget manglet ankeret, ankeret ikke fantes eller sto to ganger, aksjesiden mistet ankeret, filteret i «Følg en aksje» eller bryterne i Innstillinger sendte til toppen, eller omvisningen så på ankeret.
+
+### 8) De samme ordene overalt (tillegg 8, ønsket kl. 19:51)
+
+- «ingen kurser ennå» kommer fra én konstant (`UTEN_DATA_TEKST`) i raden på oversikten og i Min liste, ruta, `title` og begge kolonnene i tabellen på børsometeret, aksjesiden og hjelpen bak «?» ved «Oppdatert». Forklaringen (`UTEN_KURSER_HVORFOR`) står bak «?» og på aksjesiden, og i demoen setningen om Matfjord Merkevarer (`DEMO_UTEN_KURSER`, navnet fra `UTEN_KURSER` i `demo.py`), på aksjesiden bare for den aksjen. En test finner alle stedene for MTFJ og feiler hvis ett sier noe annet.
+- Ruta har ikke plass til teksten i den store utformingen (`STOR`), så den får den vanlige; den er prøvd i Edge ved 1280 og 390 px uten at teksten kuttes. En aksje med eldre kurser, men uten kurs på dagen, står med «Ingen kurs» i ruta og «Ingen kurs den dagen» i `title` og tabellen.
+
+**Ville feilet hvis:** ett av stedene sa noe annet enn «ingen kurser ennå», forklaringen manglet bak «?» eller på aksjesiden, demoen ikke sa hvilken aksje som med vilje er uten kurser, eller den ekte versjonen sa det.
+
+### 9) Lenkene (tillegg 10, ønsket kl. 20:06)
+
+- En felles regel `a { color: inherit; … }` i `stil.css`, med understreken fra navnene i tabellene. Stilarket går foran nettleserens, også for en besøkt lenke, og `a` er svakest, så lenker med egen farge, som i demolinja og `.knapp`, står som før. `:where(a)` ble prøvd først, men testen for stilarket krever at `:where` bare avgrenser til en side.
+- Prøvd i Edge etter et besøk på aksjesiden for NLYS: navnet i notatet i Min liste er `rgb(22, 24, 29)`, som navnene i tabellen; før var det nettleserens blå (`rgb(0, 0, 238)`). Bildene før og etter står på bildegrenen.
+
+**Ville feilet hvis:** lenkene ikke hadde en felles regel med `color: inherit`, eller en regel ga en lenke nettleserens blå eller lilla.
+
+### Mutantene for tilleggene
+
+- Tillegg 6 (`2f71e9d1`): periodevalget på børsometeret uten ankeret.
+- Tillegg 8 (`2f71e9d1`): «Uten data» i kolonnen for styrken på børsometeret.
+- Tillegg 10 (`c6083134`): regelen for `a` uten `color: inherit`.
+
+Alle ble fanget av `tests/test_vis_meg_rundt_8_26.py`, og hver fil var lik HEAD etterpå.
+
+### Gjennomgangen av tilleggene 6 og 8
+
+Blind Hunter med bare diffen fra `059a4228`, og Edge Case Hunter og Verification Gap med repoet. Blind Hunter hadde 16 funn, Edge Case Hunter 7 og Verification Gap 7.
+
+*Høy*
+- *VG1, rettet.* Testen for «Ingen kurs den dagen» så bare i malteksten, og ruta sa «Ingen kurser ennå» også for en aksje med eldre kurser (ECH1, BH1, BH2, VG3). Nå skiller ruta på `aldri_kurs`, og en test tegner ruta med en aksje som har eldre kurser.
+
+*Middels*
+- *ECH1, BH1, BH2 og VG3, rettet* med VG1.
+- *ECH2, BH3 og VG2, åpent, spørsmål 10.* Forklaringen fra tillegg 8 sier «venter på hentingen» om en aksje som står i lista uten kurser.
+
+*Lav*
+- *Rettet:* BH4 (setningen om demoen bare på siden for MTFJ), BH6, ECH3 og VG4 (ankeret i Innstillinger slås opp før noe skrives, og en test knytter ankrene til valgene), BH12 (kommentaren i stilen), BH16 (hjelpen), ECH6 (kommentarene i `boersometer.py`), ECH7 («Alle» og «Min liste» i Min liste holder plassen).
+- *Ført:* BH5, ECH4 og VG5 (teksten i ruta er ikke regnet for nivå 2 og 3; prøvd i Edge, der MTFJ står på nivå 1), ECH5 (en dag før første kurs sier «Ingen kurser ennå»), BH8 og VG6 (regexen for lenkene og testen av ankeret i omvisningen), BH9 (samletesten sammenligner uten stor forbokstav), BH10 (hjelpetekstene importerer demodataene), BH13 (stor forbokstav regnes to steder; samletesten sammenligner dem), BH14 (`test_notater` sletter også versjon 13), BH15 (testen for pila i demolinja), VG7 (`scroll-margin-top` er ikke testet).
+- *Ikke en feil:* BH7 (de to radene med periodevalget utelukker hverandre, som ECH fant), BH11 (en tom tittel står ikke).
