@@ -1332,7 +1332,8 @@ HOEYDE_PAA_BILDET = 1864
 # er tatt paa nytt.
 # Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
-AVTRYKK_BAK_BILDET = "4c4c9f81aa1ec39ce0742efbb98c581730721502cecb03b062d8782439f116e7"
+# Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_BILDET = "c308dd9420efc88d8dfd668378cd06ccb9be53fbfc049054561d2e40fe8563c0"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1782,7 +1783,8 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # er tatt paa nytt.
 # Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "c7ca614d67e81065fac141987cfc9ffd3f5198b1f99f8e12855f0271f4720955"
+# Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "ff3635e81478a0cedb5aac263efa2f3aaf6e7639cb6cbcbe0f9daccea4599d1f"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1994,20 +1996,20 @@ DE_NYE_BILDENE = {
 # Flettingen av main (8.24) inn i 8.22: alle bildene ble tatt paa nytt. Notatene i Min liste er nytt med
 # samme hoeyde (1346); de andre er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "50dfd11c934425a91b88d1a49bf981e610471c36ad18a531cffd144b0c58902f",
-    TOPPEN_AV_OVERSIKTEN: "4c4c9f81aa1ec39ce0742efbb98c581730721502cecb03b062d8782439f116e7",
-    "docs/appen/boersometeret-demo.png": "ec18c1d485c0032e8562f351f0840e1c88790490ea9619b7044fcdbcbf3a825c",
-    "docs/appen/min-liste-demo.png": "f763354ac8b3814baf91087369f9ad95ed3e58b209fc59c803eb1dedaf1736a5",
-    "docs/appen/oversikten-390-demo.png": "4c4c9f81aa1ec39ce0742efbb98c581730721502cecb03b062d8782439f116e7",
-    "docs/appen/boersometeret-390-demo.png": "ec18c1d485c0032e8562f351f0840e1c88790490ea9619b7044fcdbcbf3a825c",
-    "docs/appen/din-egen-liste-demo.png": "f763354ac8b3814baf91087369f9ad95ed3e58b209fc59c803eb1dedaf1736a5",
-    "docs/appen/investorsiden-brfe-demo.png": "d366941ccc793862d00a0adf9540937187520fe44453c2a1da517501963bc0d3",
-    "docs/appen/investorsiden-brfe-390-demo.png": "d366941ccc793862d00a0adf9540937187520fe44453c2a1da517501963bc0d3",
-    "docs/appen/folg-en-aksje-390-demo.png": "50dfd11c934425a91b88d1a49bf981e610471c36ad18a531cffd144b0c58902f",
-    "docs/appen/notatene-brfe-390-demo.png": "c7ca614d67e81065fac141987cfc9ffd3f5198b1f99f8e12855f0271f4720955",
-    "docs/appen/notatene-brfe-demo.png": "c7ca614d67e81065fac141987cfc9ffd3f5198b1f99f8e12855f0271f4720955",
-    "docs/appen/notatene-min-liste-demo.png": "f763354ac8b3814baf91087369f9ad95ed3e58b209fc59c803eb1dedaf1736a5",
-    "docs/appen/innstillinger-demo.png": "65e1560cb8db7d3ca4951f02dcdc7486de4e410cf81c2f69e50eb4d02825054c",
+    "docs/appen/folg-en-aksje-demo.png": "154de66a19ebd7370e2171408f81cddce2d5689ce3cb784a746a6047d22bca28",
+    TOPPEN_AV_OVERSIKTEN: "c308dd9420efc88d8dfd668378cd06ccb9be53fbfc049054561d2e40fe8563c0",
+    "docs/appen/boersometeret-demo.png": "06a04ab299a6a8f8185c461a134497d74f752ed46b4166a3e150b0561535f5c8",
+    "docs/appen/min-liste-demo.png": "ff4aa46654ef5b6122900ff1bdb65a83a8585a8ecca0bfb7540d99bbf7632508",
+    "docs/appen/oversikten-390-demo.png": "c308dd9420efc88d8dfd668378cd06ccb9be53fbfc049054561d2e40fe8563c0",
+    "docs/appen/boersometeret-390-demo.png": "06a04ab299a6a8f8185c461a134497d74f752ed46b4166a3e150b0561535f5c8",
+    "docs/appen/din-egen-liste-demo.png": "ff4aa46654ef5b6122900ff1bdb65a83a8585a8ecca0bfb7540d99bbf7632508",
+    "docs/appen/investorsiden-brfe-demo.png": "8fcb4700590dd422b119233452075794f8decf3c4c94faa1c7e440c57160e692",
+    "docs/appen/investorsiden-brfe-390-demo.png": "8fcb4700590dd422b119233452075794f8decf3c4c94faa1c7e440c57160e692",
+    "docs/appen/folg-en-aksje-390-demo.png": "154de66a19ebd7370e2171408f81cddce2d5689ce3cb784a746a6047d22bca28",
+    "docs/appen/notatene-brfe-390-demo.png": "ff3635e81478a0cedb5aac263efa2f3aaf6e7639cb6cbcbe0f9daccea4599d1f",
+    "docs/appen/notatene-brfe-demo.png": "ff3635e81478a0cedb5aac263efa2f3aaf6e7639cb6cbcbe0f9daccea4599d1f",
+    "docs/appen/notatene-min-liste-demo.png": "ff4aa46654ef5b6122900ff1bdb65a83a8585a8ecca0bfb7540d99bbf7632508",
+    "docs/appen/innstillinger-demo.png": "77a8734b92761ee7c9368088e99aa549ca6240b795fd9e247dc9c395e4912782",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2482,8 +2484,10 @@ def _detaljer(tekst: str) -> dict[str, str]:
 
 # Story 3.3g: setningen om regelen kl. 14:48 (svaret 19.10 under
 # «Prioritering» i epics.md), rett under listene i «Status».
+# Story 3.6 (gjennomgangen, ECH5 og BH7): med lista «Ekstra, ferdig» sier
+# setningen hvilken «Ekstra» den gjelder. Var «under «Ekstra»,».
 REGELEN_FOR_EKSTRA = (
-    "Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
+    "Det som står under «Ekstra, hvis tiden rekker», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
     "før README-prøven, senest én uke før innleveringen."
 )
 
@@ -3380,7 +3384,15 @@ class TestReadmeForNybegynnere:
         lister = _statuslister(status)
         # Story 3.3g (svaret 19.10 kl. 14:48): «Neste» er delt i det briefen
         # lover og det ekstra.
-        assert list(lister) == ["Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
+        # Story 3.6 (gruppens svar 11.11 kl. 13:49): den fjerde lista, «Ekstra,
+        # ferdig», står rett etter «Ferdig». Ville feilet hvis den manglet,
+        # sto et annet sted eller het noe annet.
+        # Story 8.22: «Ekstra, hvis tiden rekker» står bare når den har noe.
+        assert list(lister) in (
+            ["Ferdig", "Ekstra, ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"],
+            ["Ferdig", "Ekstra, ferdig", "Neste i v1"],
+        ), list(lister)
+        assert bool(EKSTRA) == ("Ekstra, hvis tiden rekker" in lister), list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
         # Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): «Ferdig» er en
@@ -3397,7 +3409,7 @@ class TestReadmeForNybegynnere:
         )
         assert samlet + "\n\n" + REGELEN_FOR_EKSTRA + "\n\n«Ferdig» betyr flettet til main." in status
         ferdig = "\n".join(lister["Ferdig"]).lower()
-        neste_punkter = lister["Neste i v1"] + lister["Ekstra, hvis tiden rekker"]
+        neste_punkter = lister["Neste i v1"] + lister.get("Ekstra, hvis tiden rekker", [])
         neste = "\n".join(neste_punkter).lower()
         # Story 3.3h: det appen kan, med det samme som er flettet som før,
         # kortere sagt.
@@ -3472,7 +3484,8 @@ class TestReadmeForNybegynnere:
         # i «Ferdig».
         rundt = (
             # Story 3.5i: installasjonen med bildene staar i en egen fil.
-            "Rundt appen er dette også ferdig: README-en med demoen først og installasjonen med bilder i en egen "
+            # Story 3.6 (svaret 11.11 kl. 13:49): og brukertesten, først.
+            "Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen "
             "fil, ruff i CI og "
             "i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene."
         )
@@ -3497,7 +3510,8 @@ class TestReadmeForNybegynnere:
         # prøven på en ren maskin er neste (avgjørelsen 21.10 kl. 18:33).
         saker = (
             # Gruppens svar 05.11 kl. 12:20: brukertesten står under «Neste i v1».
-            "brukertesten med én person",
+            # Story 3.6 (svaret 11.11 kl. 13:49): brukertesten er flyttet til
+            # setningen om det som er ferdig rundt appen.
             "prøven av readme-en på en ren maskin",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
             # Story 8.17a: periodevalget i oversikten er flyttet til «Ferdig»,
@@ -3509,9 +3523,9 @@ class TestReadmeForNybegynnere:
             # «Ekstra» har storyene i de åpne PR-ene fra ekstravinduet.
             # Flettingen av de fem storyene 10.11: de sju fra ekstravinduet er
             # flettet, og «Ekstra» har storyene i de åpne PR-ene, som 09.11.
-            "målingen av omsetning for aksjene som ikke er målt",
-            "faste bransjer, «følg en aksje» med hele lista",
-            "egne notater på aksjesiden",
+            # Story 3.6 (svaret 11.11 kl. 13:49): målingen av omsetningen og
+            # notatene er flyttet til «Ekstra, ferdig».
+            # Story 8.22: del B er flyttet til «Ekstra, ferdig».
         )
         assert len(neste_punkter) == len(saker), neste_punkter
         for punkt, sak in zip(neste_punkter, saker):
@@ -3521,7 +3535,9 @@ class TestReadmeForNybegynnere:
             assert sak not in neste, sak
         # Setningene om begge versjonene, boersmeldingene og detaljene staar
         # under listene.
-        etter = status.split("**Ekstra, hvis tiden rekker**", 1)[1].split("\n\n", 2)[2]
+        # Story 8.22: setningene står etter regelen for det ekstra, som står
+        # også når lista «Ekstra, hvis tiden rekker» er tom.
+        etter = status.split(REGELEN_FOR_EKSTRA, 1)[1]
         for setning in (
             # Gjennomgangen, ECH1: hva «Ferdig» betyr, fordi sprintstatusen kan
             # si review for noe som er flettet.
@@ -3806,9 +3822,22 @@ EKSTRA = (
     # KI-teksten om dagen og å velge og bytte aksjer.
     # Flettingen av de fem storyene 10.11: de sju er flettet, og «Ekstra» har
     # storyene i de åpne PR-ene #137–#139.
+    # Story 3.6 (gruppens svar 11.11 kl. 13:49): målingen av omsetningen og
+    # notatene er flyttet til «Ekstra, ferdig».
+    # Story 8.22 (svarene 11.11 kl. 13:49 og 14:29): «Følg en aksje» er flyttet
+    # til «Ekstra, ferdig», og lista «Ekstra, hvis tiden rekker» er tom og står
+    # ikke. Setningen om regelen for det ekstra (14:48) står.
+)
+
+# Story 3.6 (gruppens svar 11.11 kl. 13:49): den fjerde lista, «Ekstra,
+# ferdig», rett etter «Ferdig», med det ekstra som er flettet. «Ferdig»
+# lister det appen kan, og det briefen lover.
+EKSTRA_FERDIG = (
     ("målingen av omsetning",),
-    ("«følg en aksje»",),
-    ("egne notater",),
+    ("egne notater", "tenkte kjøp og salg"),
+    ("ikonet", "snarveien"),
+    # Story 8.22 (svaret 11.11 kl. 13:49): del B er flettet.
+    ("faste bransjer", "«følg en aksje»"),
 )
 
 
@@ -3929,7 +3958,7 @@ class TestReadmeDemoenAnbefales:
         status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
         lister = _statuslister(status)
         v1 = [p.lower() for p in lister["Neste i v1"]]
-        ekstra = [p.lower() for p in lister["Ekstra, hvis tiden rekker"]]
+        ekstra = [p.lower() for p in lister.get("Ekstra, hvis tiden rekker", [])]
         assert sum("min liste" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
         for saker in EKSTRA:
             for sak in saker:
@@ -3942,12 +3971,32 @@ class TestReadmeDemoenAnbefales:
         # som i briefen v8 og story 10.5 etter 06.10.
         # Gruppens svar 05.11 kl. 12:20: brukertesten (8.1) står under «Neste i
         # v1», uten storynummeret, som resten av «Status».
-        for sak in ("brukertesten med én person", "prøven av readme-en på en ren maskin"):
-            assert sum(sak in p for p in v1) == 1, (sak, v1)
+        # Story 3.6 (gruppens svar 11.11 kl. 13:49): brukertesten er gjort og
+        # står i setningen om det som er ferdig rundt appen, fordi «Ferdig»
+        # lister det appen kan. Ville feilet hvis den sto igjen i «Neste i v1»
+        # eller i en av listene, eller manglet i setningen.
+        assert sum("prøven av readme-en på en ren maskin" in p for p in v1) == 1, v1
+        assert not any("brukertest" in p.lower() for punkter in lister.values() for p in punkter), lister
+        assert "Rundt appen er dette også ferdig: brukertesten med én person, " in status
         assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
         assert sum("lenken til investorsiden" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
-        assert len(v1) == 2, v1
+        assert len(v1) == 1, v1
+        # Story 3.6 (svaret kl. 13:49): «Ekstra, ferdig» har det ekstra som er
+        # flettet, i den rekkefølgen, og ingen av dem står i en annen liste.
+        # Ville feilet hvis lista manglet, hadde et punkt for mye eller for
+        # lite, eller et av dem sto igjen under «Ekstra, hvis tiden rekker»,
+        # «Neste i v1» eller «Ferdig».
+        ekstra_ferdig = [p.lower() for p in lister["Ekstra, ferdig"]]
+        assert len(ekstra_ferdig) == len(EKSTRA_FERDIG), ekstra_ferdig
+        andre = [
+            p.lower() for navn in ("Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker") for p in lister.get(navn, [])
+        ]
+        for punkt, saker in zip(ekstra_ferdig, EKSTRA_FERDIG, strict=True):
+            for sak in saker:
+                assert sak in punkt, (sak, punkt)
+                assert not any(sak in p for p in andre), (sak, andre)
+            assert len(re.findall(r"\w+", punkt)) <= 20, punkt
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status
 
@@ -4127,8 +4176,10 @@ AVTRYKK_I_PILENE = {
     # Flettingen av de fem storyene 10.11 (regel 19): «Din egen liste» og
     # investorsiden ved 1280 px i punktet for docs/appen/. Var bea5b6e1....
     # Story 8.21 (tillegg 2): og de tre nye bildene. Var cd526f3e....
+    # Story 3.6 (gjennomgangen, ECH12): snarveien under start/. Var e4171fa9....
     # Tillegg 5 til 8.22 (regel 19): «Følg en aksje» og notatene for BRFE ved 390 px. Var e4171fa9....
-    "Mappestruktur": "55c0a57b602500b6a3f1a40b46eb840c5fdcb922a939b85560ab8eec23e2074d",
+    # Flettingen av main (3.6) inn i 8.22: begge endringene. Var 55c0a57b... og 3ea3433e....
+    "Mappestruktur": "66d9867584978b5ded9cd972fd40cb7e2941599a2756fd7fe722bc22b54f613e",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
@@ -4160,7 +4211,12 @@ AVTRYKK_I_KOM_I_GANG = {
     "Du trenger": "edb9feeacf0f246bf416ab859f08e196d6ec92a0a44e8da9e371325c9680917b",
     "Med Docker Desktop": "440935debadb3cea3dc714c75663de5b576648547ec3295953836948b83d1cbd",
     "Uten Docker, med uv": "a1d3d1cf96d7b4b5a0e9f1428ed3876b508939fe326ab67bfeabaa9b63dbc3f0",
-    "Slik virker dobbeltklikket": "6cd3d9de32ad3dbb44532b20185e4746d72d288dbdb1b756a32efb674da59358",
+    # Story 3.6 (del C): snarveien og at mobil kommer senere. Var 6cd3d9de....
+    # Story 3.6 (svaret 11.11 kl. 13:47, spørsmål 8): setningen om en snarvei
+    # til en annen kopi. Var d8dccde4....
+    # Gjennomgangen av spørsmål 8 (ECH1): fila for neiet heter «snarvei-nei…».
+    # Var 3a938e6a....
+    "Slik virker dobbeltklikket": "1f7571e7722d7518d56a3c977562e85bbead28d8385327f10656ac5ced0de3f6",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 

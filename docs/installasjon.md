@@ -189,6 +189,8 @@ Når vinduet er åpent:
 - Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
 - Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
 - Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
+- På Windows spør vinduet første gang om det skal lage snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen, med ikonet under. Skriv `j` og trykk Enter for ja, eller bare Enter for nei. Ikonet er de tre søylene fra logoen, med den høyeste i oransje. Et nei huskes, og finnes snarveien, spørres det ikke igjen. Starter snarveien en annen kopi av appen, sier vinduet hvilken mappe den peker på, og spør én gang om den skal starte denne kopien i stedet. Snarveien starter appen som dobbeltklikket. Vil du bli spurt på nytt, sletter du fila i `data` som begynner med `snarvei-nei`.
+- Appen svarer bare på denne maskinen (127.0.0.1), så den kan ikke åpnes fra en mobil. Mobil kommer i en senere versjon.
 - Stopp appen ved å lukke vinduet, eller med Ctrl+C.
 
 **Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.

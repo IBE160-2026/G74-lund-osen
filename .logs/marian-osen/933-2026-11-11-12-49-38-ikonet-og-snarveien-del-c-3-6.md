@@ -39,3 +39,42 @@ Del C (limt inn 10.11 kl. 17:23): ikonet til appen laget av logoen i toppen, og 
   7. Ikonet beskrives med ord i installasjonen.
 - Spørsmål 8 (BH2 og ECH4, middels) står åpent til gruppen har svart. En snarvei til en annen kopi som finnes, blir stående. Forslaget er at snarveien bare rettes når mappa den peker på, er slettet.
 - Del C, steg 2 og 3 gjenstår etter ja: flettingen, done-commiten (epics.md, sprint-status, kvalitetssikringen og mobil som plan for en senere versjon) og føringen av del C med Utført-linje i dagsfila 10.11.
+
+## 2026-11-11 kl. 15:36 — Marian Osen
+
+### Oppgave
+Del C gjøres ferdig og flettes, etter gruppens svar kl. 13:47 og 13:49 (instruksjonen kl. 14:26). Spørsmål 8: startskriptet spør om snarveien skal starte denne kopien når den starter en annen. README-en får lista «Ekstra, ferdig», og brukertesten flyttes til setningen om det som er ferdig rundt appen. Så flettingen, done og føringen av del C i dagsfila 10.11.
+
+### Plan
+- Steg 0 og kvotesjekken, dagsfila 11.11 og svarene i spesifikasjonen.
+- Spørsmål 8 og README-en på grenen i worktreen `G74-lund-osen-3-6`, med tester, mutant, gjennomgang og triage.
+- Main inn, hele settet i deler, push og CI. Så squash-flett låst til head-en, og føringen på main.
+
+### Resultat
+- **Fortsettelsen av 10.10 kl. 14:18** ble limt inn i dette vinduet ved en feil. Den stoppet ved steg 0, og ingenting ble gjort. Etterpå ble slutten av svaret limt inn igjen uten instruksjon. Begge er ført i dagsfila 11.11 (`c6ec09ea`), sammen med instruksjonen kl. 14:26.
+- **Kvotesjekken:** 0 kall brukt i dag (GMT), 20 igjen, `extraLimit` 296.
+- **Svarene i spesifikasjonen:** `2a28a86f`.
+- **Spørsmål 8 (`d4dd5382`):**
+  - Starter snarveien samme startfil i en annen kopi som finnes, sier vinduet mappa og spør én gang. Det gjelder begge snarveiene.
+  - Ja retter snarveien hit, og nei huskes.
+  - Installasjonen har én setning om det.
+  - Mutanten ble fanget av fire tester.
+- **README-en (`7153b37a`):** «Ekstra, ferdig» har målingen av omsetningen, notatene og ikonet med snarveien. Brukertesten står i setningen rundt appen.
+- **Gjennomgangen kl. 14:36–14:55:** Blind Hunter hadde 7 funn, Edge Case Hunter 5 og Verification Gap 4. Ingen var høye.
+  - Rettet i `f8eaec8f`:
+    - ECH1/BH1 (middels): neiet til å flytte har sin egen fil, `snarvei-nei-flytt-<versjon>`.
+    - VG1 (middels): spørsmålet prøves.
+    - ECH3/BH2: bare samme startfil er en annen kopi, og argumentene nullstilles.
+    - VG2 og BH5.
+    - ECH5/BH7: regelsetningen gjelder «Ekstra, hvis tiden rekker».
+  - Mutantene for ECH1 og VG1 ble fanget.
+  - Triagen står i spesifikasjonen (`b489c4d5`).
+- **Main inn og testene:** main ble flettet inn (`11998215`). Hele settet i åtte deler, én om gangen bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen 5191, likt `--collect-only`.
+- **CI:** grønn på head-en (run 43036831538). Jobben `pytest` hadde 5143 bestått og 48 hoppet over, og «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over.
+- **Flettingen:** flettet med PR #144 som `078c7c28` kl. 15:21, låst til head-en. Grenen er slettet, worktreen fjernet, og treet på main er likt head-en. CI er grønn på flettecommiten (run 43037656742).
+- **Done (`be287801`):** spesifikasjonen, storyen med svarene og mobil som plan i epics.md, sprint-status og radene i kvalitetssikringen. Dokumenttestene ga 2400 bestått og 7 hoppet over.
+- **Dagsfila 10.11:** del C er ført med Utført-linja (`c3e34f1d`).
+- **Grenser:** ingen API-kall utover kvotesjekken. `data/db/ose.db` er ikke rørt, ingen snarvei er laget på det ekte skrivebordet, og andre grener er ikke rørt.
+
+### Åpne punkter
+Ingen. De tre punktene for 3.6 i `issues.md` er lukket.

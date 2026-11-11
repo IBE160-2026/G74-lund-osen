@@ -96,7 +96,7 @@ Til faglærer:
 4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
 5. **Lukk vinduet** for å stoppe appen.
 
-**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes).
+**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
 
 <a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
 
@@ -115,20 +115,20 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
 - Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 
+**Ekstra, ferdig**
+
+- Målingen av omsetning for aksjene som ikke var målt
+- Egne notater på aksjesiden, med tenkte kjøp og salg
+- Ikonet i fanen og snarveien på skrivebordet i Windows, også for demoen
+- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+
 **Neste i v1**
 
-- Brukertesten med én person, først med KI av
 - Prøven av README-en på en ren maskin, når alt i v1 er bygget
 
-**Ekstra, hvis tiden rekker**
+Det som står under «Ekstra, hvis tiden rekker», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
-- Målingen av omsetning for aksjene som ikke er målt ennå
-- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
-- Egne notater på aksjesiden, med tenkte kjøp og salg
-
-Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
-
-«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter ikke, og viser et eksempel på meldingen om dem, merket «Eksempeltall». Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter ikke, og viser et eksempel på meldingen om dem, merket «Eksempeltall». Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
@@ -259,7 +259,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
-- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
+- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også snarveien på skrivebordet i Windows, jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss, og skillen sesjonslogg, som kommer fra faglærer
 - [`README.md`](README.md) — denne fila: hva appen er, hvordan den startes, status og testene
 - [`CLAUDE.md`](CLAUDE.md) — reglene for KI-øktene i repoet, som Claude Code leser når en økt starter
