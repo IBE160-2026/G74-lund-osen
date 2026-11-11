@@ -308,9 +308,10 @@ def base(basemal):
 
 # Story 8.6: børsometeret har sin egen tekst.
 # Story 8.17b: Min liste med en periode, for «Sammenlign med».
+# Story 8.22: «Følg en aksje» har sin egen hjelp ved «?».
 # Story 8.21 la til «Innstillinger» for «?» ved bryteren «Notater»; story 8.24 (gruppens
 # svar 10.11 kl. 22:59) tok «?» bort, så siden er ute igjen.
-SIDENE = ("/", "/boersometer", "/aksje/BRFE", "/aksje/VRDS", "/min-liste?vis=alle&periode=1-uke")
+SIDENE = ("/", "/boersometer", "/aksje/BRFE", "/aksje/VRDS", "/min-liste?vis=alle&periode=1-uke", "/folg")
 
 
 def _side(klient, adresse: str) -> str:

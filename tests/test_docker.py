@@ -1318,7 +1318,22 @@ HOEYDE_PAA_BILDET = 1864
 # bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene, og var byte for byte de samme.
 # Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_BILDET = "69c148e5540ef2542569b17f14b3c3038eeb48baf78ff27610745deaed9277a5"
+# Story 8.22: _egne.html, app.py, valg.py, ferdige_lister.py, demo.py, hjelpetekster.py og stil.css.
+# Bildet ble tatt paa nytt med DevTools-protokollen og er byte for byte det samme.
+# Gjennomgangen av 8.22: ferdige_lister.py, valg.py, stil.css og hjelp.js. Bildet er byte for byte det samme.
+# Flettingen av main (med 2.4, 2.6, 8.14, 8.7, 8.9 og 2.13b) inn i 8.22: avtrykkene er regnet ut paa nytt,
+# og bildene er tatt paa nytt.
+# Tillegg 4 til 8.22 (svaret 10.11 kl. 22:50): stil.css og _egne.html. Bildet er byte for byte det samme.
+# Flettingen av main (8.21 og brukertesten 10.11) inn i 8.22: avtrykkene er regnet ut paa nytt, og bildene
+# er tatt paa nytt.
+# Flettingen av main (8.24) inn i 8.22: avtrykkene er regnet ut paa nytt, og bildene
+# er tatt paa nytt.
+# Flettingen av main (8.23, del A) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt, og bildene
+# er tatt paa nytt.
+# Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
+# bildene er tatt paa nytt.
+# Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_BILDET = "4dd9c5298ddeb536a2be29802d7a04b77f9ddbfd4bd6607259d98adc91992f66"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1755,7 +1770,21 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # «Mine notater», og var byte for byte det samme (gjennomgangen, VG6).
 # Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "4255d10eabca1c38d2d51a7680c05e3b1f15e57cd39cd8a7d66227160e5ebb07"
+# Story 8.22: de samme filene. Bildet ble tatt paa nytt og er byte for byte det samme.
+# Gjennomgangen av 8.22: de samme filene. Bildet er byte for byte det samme.
+# Flettingen av main (med 2.4, 2.6, 8.14, 8.7, 8.9 og 2.13b) inn i 8.22: avtrykkene er regnet ut paa nytt,
+# og bildene er tatt paa nytt.
+# Tillegg 4 til 8.22: stil.css. Bildet er byte for byte det samme.
+# Flettingen av main (8.21 og brukertesten 10.11) inn i 8.22: avtrykkene er regnet ut paa nytt, og bildene
+# er tatt paa nytt.
+# Flettingen av main (8.24) inn i 8.22: avtrykkene er regnet ut paa nytt, og bildene
+# er tatt paa nytt.
+# Flettingen av main (8.23, del A) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt, og bildene
+# er tatt paa nytt.
+# Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
+# bildene er tatt paa nytt.
+# Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "a6223ef0dadecb9a7edf158dc58f57fbf59783dd193172b94cd4513d89f985ae"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1791,6 +1820,10 @@ FILENE_BAK_INVESTORSIDEN = (
     "src/static/investorsider/brfe.svg",
     "src/static/investorsider/bobler.json",
 )
+# Story 8.22 (gjennomgangen, VG2, og tillegget 10.11 kl. 17:16): «Følg en aksje»
+# med Kraft valgt i demoen, med filteret og lista. Tillegg 3: sorteringen og
+# tabellen i stedet for forslagene.
+FILENE_BAK_FOLG = (*FILENE_BAK_AKSJESIDEN, "src/templates/folg.html", "src/static/hjelp.js")
 TOPPEN_AV_OVERSIKTEN = "docs/appen/oversikten-topp-demo.png"
 DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
@@ -1821,13 +1854,27 @@ DE_NYE_BILDENE = {
     # Gruppens ønske 09.11 kl. 22:01: investorsiden for BRFE ved 390 px, sist
     # blant bildene ved 390 px, hele siden (1117 px).
     "docs/appen/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1117, FILENE_BAK_INVESTORSIDEN),
+    # Tillegg 5 til 8.22 (svaret 10.11 kl. 22:55): «Følg en aksje» med Kraft valgt ved 390 px, hele
+    # siden, og «Mine notater» på aksjesiden for BRFE ved 390 px, bare delen (id-en mine-notater),
+    # klippet ut med 16 px over og under, fordi hele aksjesiden er for høy. Etter de andre ved 390 px.
+    "docs/appen/folg-en-aksje-390-demo.png": ("/folg?bransje=Kraft", 390, 1573, FILENE_BAK_FOLG),
+    "docs/appen/notatene-brfe-390-demo.png": ("/aksje/BRFE", 390, 1354, FILENE_BAK_AKSJESIDEN),
     # Story 2.12: «Din egen liste» i Min liste, bare delen (id-en
     # din-egen-liste), klippet ut med 16 px over og under.
     # Story 8.11: 1216, med «Start fra en ferdig liste» nederst.
     # Gruppens ønske 08.11 kl. 23:59: investorsiden for BRFE, 948 px, hele siden.
     # Flettingen av 2.12 inn i 8.11: 1216 som i 8.11, med «Start fra en ferdig liste».
     # Story 8.11b: 1432, med de ni ferdige listene i demoen.
-    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1432, FILENE_BAK_MIN_LISTE),
+    # Story 8.22: 1628, med de tre stegkortene og 11 ferdige lister i demoen.
+    # Tillegg 4 (svaret 10.11 kl. 22:50): 1634, med statusen og «Slik bytter du nøkkel» i steg 2.
+    # Gjennomgangen av tillegg 4: 1714, med teksten for Docker i «Slik bytter du nøkkel».
+    # Tillegg 3 (svarene 10.11 kl. 22:44): 1454, med én knapp per bransje i stedet for lister. Var 1714.
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1454, FILENE_BAK_MIN_LISTE),
+    # Story 8.22: «Følg en aksje» i demoen med Kraft valgt, hele siden (1326 px), sist i knappen.
+    # Flettingen av main (8.9, «Vis meg rundt») inn i 8.22: 1368. Bekreftelsen sier «Demo Børs» i
+    # demoen (folg.html); bildet er byte for byte det samme.
+    # Tillegg 3: 1252, med sorteringen og tabellen i stedet for forslagskortet. Var 1368.
+    "docs/appen/folg-en-aksje-demo.png": ("/folg?bransje=Kraft", 1280, 1252, FILENE_BAK_FOLG),
     # Story 8.21 (tillegg 2, gruppens svar 10.11 kl. 15:57): «Mine notater» på
     # aksjesiden for BRFE og samlet i Min liste, bare delen (id-en
     # mine-notater), klippet ut med 16 px over og under, og Innstillinger med
@@ -1935,23 +1982,41 @@ DE_NYE_BILDENE = {
 # Flettingen av 8.11 (med 8.10b, svaret kl. 10:23 og main) inn i 8.11b: avtrykkene er regnet ut paa nytt,
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
+# Story 8.22: faste bransjer, «Følg en aksje» med hele lista, «Din egen liste» som tre stegkort og
+# sju oppdiktede selskaper til i demoen (_egne.html, folg.html, app.py, valg.py, ferdige_lister.py,
+# demo.py, hjelpetekster.py og stil.css). Alle bildene ble tatt paa nytt med DevTools-protokollen.
+# «Din egen liste» er ny (1628 px, med stegkortene og 11 ferdige lister); de andre er byte for byte de samme.
+# Gjennomgangen av 8.22: ferdige_lister.py, valg.py, folg.html, hjelp.js og stil.css, og det nye
+# bildet av «Følg en aksje» (VG2). Alle bildene ble tatt paa nytt; de andre er byte for byte de samme.
+# Tillegg 4 til 8.22 (svaret 10.11 kl. 22:50): steg 2 i «Din egen liste» (_egne.html, app.py, valg.py og
+# stil.css). Alle bildene ble tatt paa nytt; «Din egen liste» er ny (1634 px), de andre er byte for byte de samme.
+# Gjennomgangen av tillegg 4: _egne.html, app.py og valg.py. «Din egen liste» er ny (1714 px); de andre er
+# byte for byte de samme.
+# Flettingen av main (8.21 og brukertesten 10.11) inn i 8.22: alle bildene ble tatt paa nytt. Notatene i
+# Min liste er nytt med samme hoeyde; de andre er byte for byte de samme.
+# Flettingen av main (8.24) inn i 8.22: alle bildene ble tatt paa nytt. Notatene i Min liste er nytt med
+# samme hoeyde (1346); de andre er byte for byte de samme.
 # Story 10.10: demotekstene i de nye formene, ki_dagen.py, dagsgrunnlag.py, ki_visning.py og
 # hjelpetekster.py. Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden og oversikten
-# ved 390 px (4602 px) er nye; de andre er byte for byte de samme.
-# Flettingen av main (3.6) inn i 10.10: avtrykkene er regnet ut paa nytt. Alle bildene ble tatt paa
-# nytt med DevTools-protokollen og er byte for byte de samme som etter flettingen.
+# ved 390 px er nye; de andre er byte for byte de samme.
+# Flettingen av main (3.6 og 8.22) inn i 10.10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa
+# nytt og er byte for byte de samme. notatene-brfe-390-demo.png er som paa main (8.22), fordi den klippes
+# ut med en fremgangsmaate dette vinduet ikke har.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "69c148e5540ef2542569b17f14b3c3038eeb48baf78ff27610745deaed9277a5",
-    "docs/appen/boersometeret-demo.png": "832a702a2a014d94b126b571b0e02946b60f81bd7df6097a8719b007d3138f3d",
-    "docs/appen/min-liste-demo.png": "4ff9b1a89a9f638f0c81f934684f9c869f478f20f19ee8b2fcf8cc5efa7b842f",
-    "docs/appen/oversikten-390-demo.png": "69c148e5540ef2542569b17f14b3c3038eeb48baf78ff27610745deaed9277a5",
-    "docs/appen/boersometeret-390-demo.png": "832a702a2a014d94b126b571b0e02946b60f81bd7df6097a8719b007d3138f3d",
-    "docs/appen/din-egen-liste-demo.png": "4ff9b1a89a9f638f0c81f934684f9c869f478f20f19ee8b2fcf8cc5efa7b842f",
-    "docs/appen/investorsiden-brfe-demo.png": "4a368c172a6d77e268586ca9802f90c46677de932b8e7aa6d83a6486853072c1",
-    "docs/appen/investorsiden-brfe-390-demo.png": "4a368c172a6d77e268586ca9802f90c46677de932b8e7aa6d83a6486853072c1",
-    "docs/appen/notatene-brfe-demo.png": "4255d10eabca1c38d2d51a7680c05e3b1f15e57cd39cd8a7d66227160e5ebb07",
-    "docs/appen/notatene-min-liste-demo.png": "4ff9b1a89a9f638f0c81f934684f9c869f478f20f19ee8b2fcf8cc5efa7b842f",
-    "docs/appen/innstillinger-demo.png": "361175f75f1772c15d632a652180c6ca1e4a1102122cfc0accca86128ccd76e4",
+    "docs/appen/folg-en-aksje-demo.png": "3b08f7d125b6ed9405d6874eb4f25ff441532cb6fdfd98e521df3d5db2769acd",
+    TOPPEN_AV_OVERSIKTEN: "4dd9c5298ddeb536a2be29802d7a04b77f9ddbfd4bd6607259d98adc91992f66",
+    "docs/appen/boersometeret-demo.png": "44cd02e6c15a215372ad36b3fc2de368750d52222bbf4a814941a3eb04d3e7e2",
+    "docs/appen/min-liste-demo.png": "8c4f02bbf7061a29509728f076275984132c5c048722a4e1ae3f1b192ca40ad8",
+    "docs/appen/oversikten-390-demo.png": "4dd9c5298ddeb536a2be29802d7a04b77f9ddbfd4bd6607259d98adc91992f66",
+    "docs/appen/boersometeret-390-demo.png": "44cd02e6c15a215372ad36b3fc2de368750d52222bbf4a814941a3eb04d3e7e2",
+    "docs/appen/din-egen-liste-demo.png": "8c4f02bbf7061a29509728f076275984132c5c048722a4e1ae3f1b192ca40ad8",
+    "docs/appen/investorsiden-brfe-demo.png": "8fcb4700590dd422b119233452075794f8decf3c4c94faa1c7e440c57160e692",
+    "docs/appen/investorsiden-brfe-390-demo.png": "8fcb4700590dd422b119233452075794f8decf3c4c94faa1c7e440c57160e692",
+    "docs/appen/folg-en-aksje-390-demo.png": "3b08f7d125b6ed9405d6874eb4f25ff441532cb6fdfd98e521df3d5db2769acd",
+    "docs/appen/notatene-brfe-390-demo.png": "a6223ef0dadecb9a7edf158dc58f57fbf59783dd193172b94cd4513d89f985ae",
+    "docs/appen/notatene-brfe-demo.png": "a6223ef0dadecb9a7edf158dc58f57fbf59783dd193172b94cd4513d89f985ae",
+    "docs/appen/notatene-min-liste-demo.png": "8c4f02bbf7061a29509728f076275984132c5c048722a4e1ae3f1b192ca40ad8",
+    "docs/appen/innstillinger-demo.png": "0d883f6dad47683a81924a0d7d783bb45a64125d8a1526faf5e08e8e343d9669",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3329,7 +3394,12 @@ class TestReadmeForNybegynnere:
         # Story 3.6 (gruppens svar 11.11 kl. 13:49): den fjerde lista, «Ekstra,
         # ferdig», står rett etter «Ferdig». Ville feilet hvis den manglet,
         # sto et annet sted eller het noe annet.
-        assert list(lister) == ["Ferdig", "Ekstra, ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
+        # Story 8.22: «Ekstra, hvis tiden rekker» står bare når den har noe.
+        assert list(lister) in (
+            ["Ferdig", "Ekstra, ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"],
+            ["Ferdig", "Ekstra, ferdig", "Neste i v1"],
+        ), list(lister)
+        assert bool(EKSTRA) == ("Ekstra, hvis tiden rekker" in lister), list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
         # Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): «Ferdig» er en
@@ -3346,7 +3416,7 @@ class TestReadmeForNybegynnere:
         )
         assert samlet + "\n\n" + REGELEN_FOR_EKSTRA + "\n\n«Ferdig» betyr flettet til main." in status
         ferdig = "\n".join(lister["Ferdig"]).lower()
-        neste_punkter = lister["Neste i v1"] + lister["Ekstra, hvis tiden rekker"]
+        neste_punkter = lister["Neste i v1"] + lister.get("Ekstra, hvis tiden rekker", [])
         neste = "\n".join(neste_punkter).lower()
         # Story 3.3h: det appen kan, med det samme som er flettet som før,
         # kortere sagt.
@@ -3463,7 +3533,7 @@ class TestReadmeForNybegynnere:
             # flettet, og «Ekstra» har storyene i de åpne PR-ene, som 09.11.
             # Story 3.6 (svaret 11.11 kl. 13:49): målingen av omsetningen og
             # notatene er flyttet til «Ekstra, ferdig».
-            "faste bransjer, «følg en aksje» med hele lista",
+            # Story 8.22: del B er flyttet til «Ekstra, ferdig».
         )
         assert len(neste_punkter) == len(saker), neste_punkter
         for punkt, sak in zip(neste_punkter, saker):
@@ -3473,7 +3543,9 @@ class TestReadmeForNybegynnere:
             assert sak not in neste, sak
         # Setningene om begge versjonene, boersmeldingene og detaljene staar
         # under listene.
-        etter = status.split("**Ekstra, hvis tiden rekker**", 1)[1].split("\n\n", 2)[2]
+        # Story 8.22: setningene står etter regelen for det ekstra, som står
+        # også når lista «Ekstra, hvis tiden rekker» er tom.
+        etter = status.split(REGELEN_FOR_EKSTRA, 1)[1]
         for setning in (
             # Gjennomgangen, ECH1: hva «Ferdig» betyr, fordi sprintstatusen kan
             # si review for noe som er flettet.
@@ -3619,7 +3691,8 @@ class TestReadmeForNybegynnere:
         # med investorsiden ved 390 px i punktet for docs/appen/.
         # Flettingen av de fem storyene 10.11: «Din egen liste» og investorsiden ved 1280 px (regel 19).
         # Story 8.21 (tillegg 2): 46, med de tre nye bildene i docs/appen/.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 46, lenker
+        # Tillegg 5 til 8.22: 48, med de to nye bildene ved 390 px.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 48, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -3759,7 +3832,9 @@ EKSTRA = (
     # storyene i de åpne PR-ene #137–#139.
     # Story 3.6 (gruppens svar 11.11 kl. 13:49): målingen av omsetningen og
     # notatene er flyttet til «Ekstra, ferdig».
-    ("«følg en aksje»",),
+    # Story 8.22 (svarene 11.11 kl. 13:49 og 14:29): «Følg en aksje» er flyttet
+    # til «Ekstra, ferdig», og lista «Ekstra, hvis tiden rekker» er tom og står
+    # ikke. Setningen om regelen for det ekstra (14:48) står.
 )
 
 # Story 3.6 (gruppens svar 11.11 kl. 13:49): den fjerde lista, «Ekstra,
@@ -3769,6 +3844,8 @@ EKSTRA_FERDIG = (
     ("målingen av omsetning",),
     ("egne notater", "tenkte kjøp og salg"),
     ("ikonet", "snarveien"),
+    # Story 8.22 (svaret 11.11 kl. 13:49): del B er flettet.
+    ("faste bransjer", "«følg en aksje»"),
 )
 
 
@@ -3889,7 +3966,7 @@ class TestReadmeDemoenAnbefales:
         status = tekst.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
         lister = _statuslister(status)
         v1 = [p.lower() for p in lister["Neste i v1"]]
-        ekstra = [p.lower() for p in lister["Ekstra, hvis tiden rekker"]]
+        ekstra = [p.lower() for p in lister.get("Ekstra, hvis tiden rekker", [])]
         assert sum("min liste" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
         for saker in EKSTRA:
             for sak in saker:
@@ -3920,7 +3997,9 @@ class TestReadmeDemoenAnbefales:
         # «Neste i v1» eller «Ferdig».
         ekstra_ferdig = [p.lower() for p in lister["Ekstra, ferdig"]]
         assert len(ekstra_ferdig) == len(EKSTRA_FERDIG), ekstra_ferdig
-        andre = [p.lower() for navn in ("Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker") for p in lister[navn]]
+        andre = [
+            p.lower() for navn in ("Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker") for p in lister.get(navn, [])
+        ]
         for punkt, saker in zip(ekstra_ferdig, EKSTRA_FERDIG, strict=True):
             for sak in saker:
                 assert sak in punkt, (sak, punkt)
@@ -4096,7 +4175,8 @@ AVTRYKK_I_PILENE = {
     # Instruksjonen 08.11 kl. 13:00 (regel 19): utdraget fra designtavla 08.11
     # i «Dokumentene». Var d80b9ef9..., og cda0d0fd... med «kort fortalt»,
     # som test_de_gamle_ordene_staar_ikke_igjen ikke tillater.
-    "Dokumentene": "cd15079ad259593d86543f04e0c4e020f642f76dae09ec611547acad5e6e774b",
+    # Story 8.22 (regel 19): kontrollsjekken av bransjene 10.11. Var cd15079a....
+    "Dokumentene": "79d0a921c1d032371e8edbd66e512e9c1b4428161007557b7acef7ce68f814cd",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i
@@ -4105,7 +4185,9 @@ AVTRYKK_I_PILENE = {
     # investorsiden ved 1280 px i punktet for docs/appen/. Var bea5b6e1....
     # Story 8.21 (tillegg 2): og de tre nye bildene. Var cd526f3e....
     # Story 3.6 (gjennomgangen, ECH12): snarveien under start/. Var e4171fa9....
-    "Mappestruktur": "3ea3433e7c85673b00e4b2d364c2e640e2b7ce3771c3163fd042369e28bcf5d1",
+    # Tillegg 5 til 8.22 (regel 19): «Følg en aksje» og notatene for BRFE ved 390 px. Var e4171fa9....
+    # Flettingen av main (3.6) inn i 8.22: begge endringene. Var 55c0a57b... og 3ea3433e....
+    "Mappestruktur": "66d9867584978b5ded9cd972fd40cb7e2941599a2756fd7fe722bc22b54f613e",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
