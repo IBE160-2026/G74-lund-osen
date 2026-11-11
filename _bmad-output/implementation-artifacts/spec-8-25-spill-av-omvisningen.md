@@ -42,6 +42,7 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 6. **Et steg uten delen.** *Forslag:* hoppes over i samme retning, som når en side ikke viser sjekkene.
 7. **Stegene.** *Forslag:* de samme som «Vis meg rundt» på sidene (`rundturer()`), i rekkefølgen sidene står, 21 steg i demoen. «Følg en aksje» er ikke med, fordi den ikke er i rekkefølgen i svaret.
 8. **Bildene.** *Forslag:* bildene av stegene fra demoen står i PR-en, fra en egen gren med bare bildene (som for 8.17b). Bildene i `docs/appen/` tas på nytt, med tilbudet besvart, fordi knappen står øverst på sidene.
+9. **Startet fra oversikten med valg.** *Forslag:* lagt til ved flettingen av 8.23 11.11. Startes omvisningen på oversikten med «Min liste» (`?vis=min`), et filter eller en sortering, går den først til oversikten med alle aksjene (`/`), så stegene merker tabellen og aksjesiden er den første aksjen i den. Alternativet er å starte der brukeren er, men med tom Min liste står det ingen tabell der, og aksjesiden hoppes over.
 
 ## Delene
 
