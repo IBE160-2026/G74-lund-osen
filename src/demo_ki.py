@@ -328,7 +328,7 @@ def lag_dagsteksten(modell, fil: Path = DAGFIL, skriv: Callable[[str], None] = p
     aa faa en bedre tekst (FR-604): bestaar teksten ikke kontrollen, staar
     raden som den ble."""
     import demo
-    from dagsgrunnlag import dagsgrunnlag
+    from dagsgrunnlag import dagsgrunnlag, vanlig_fra
     from ki_dagen import lag_dagsrad
     from ki_tekst import _kursene
     from lagring_sqlite import SqliteVurderingslager
@@ -344,9 +344,10 @@ def lag_dagsteksten(modell, fil: Path = DAGFIL, skriv: Callable[[str], None] = p
             lager = SqliteVurderingslager(tilkobling, klokke, demo.DEMOUNIVERS)
             serier, indeksserie = _kursene(tilkobling, demo.DEMOUNIVERS)
             vurderinger = {a.symbol: lager.les(a.symbol, dag) for a in demo.DEMOUNIVERS}
+            tidligere = {a.symbol: lager.les_periode(a.symbol, vanlig_fra(dag), dag) for a in demo.DEMOUNIVERS}
         finally:
             tilkobling.close()
-    grunnlag = dagsgrunnlag(dag, demo.DEMOUNIVERS, vurderinger, serier, indeksserie)
+    grunnlag = dagsgrunnlag(dag, demo.DEMOUNIVERS, vurderinger, serier, indeksserie, tidligere=tidligere)
     if grunnlag is None:
         raise UgyldigDemoKI("ingen aksje er vurdert paa siste demodag")
     start = time.perf_counter()

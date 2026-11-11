@@ -129,6 +129,17 @@ def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
         setninger.append(f"I snitt steg {str(grunnlag['bransje_mest_opp']).lower()} mest.")
     if "bransje_mest_ned" in grunnlag:
         setninger.append(f"I snitt falt {str(grunnlag['bransje_mest_ned']).lower()} mest.")
+    # Tillegget kl. 17:21 (spoersmaal 11 og 12).
+    if "skilte_seg_ut_vanlig" in grunnlag:
+        mot = {"flere": "flere enn", "færre": "færre enn", "like mange": "like mange som"}[
+            grunnlag["skilte_seg_ut_mot_vanlig"]
+        ]
+        setninger.append(f"Det var {mot} vanlig: snittet de siste 20 børsdagene er {grunnlag['skilte_seg_ut_vanlig']}.")
+    uka = grunnlag.get("hovedindeksen_uka")
+    if uka == "uendret":
+        setninger.append("De siste fem børsdagene var hovedindeksen uendret.")
+    elif uka in ("steg", "falt"):
+        setninger.append(f"De siste fem børsdagene {uka} hovedindeksen.")
     return " ".join(setninger)
 
 

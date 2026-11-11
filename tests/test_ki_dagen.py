@@ -311,7 +311,9 @@ class TestKontrollen:
 AVTRYKK = {
     "dag-1": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7",
     # Story 10.10. Teksten til dag-1 staar i src/ki_dagen.py paa 059dc10c.
-    "dag-2": "f0377e8ff13697db3d9d1baa00dcc0c15f7b6f48ca6ce9461b1cf4cd0e3246d0",
+    # Tillegget kl. 17:21: tre nye former, og versjonen staar som dag-2, fordi den ikke er
+    # flettet. Var f0377e8f....
+    "dag-2": "e3d36a47454c681c7477bd18863edc3324d0d642573025bcc69cc4c41f8217b9",
 }
 
 
@@ -565,6 +567,74 @@ class TestForsiden:
         """Spørsmål 9: FR-607 gjelder markedsoversikten."""
         forsiden_med(TEKSTEN)
         assert "Børsdagen kort fortalt" not in html(klient, "/min-liste?vis=alle")
+
+    def test_linja_om_min_liste_under_teksten(self, klient):
+        """Story 10.10, spørsmål 10 (gjennomgangen, VG1): ville feilet hvis
+        forsiden ikke viste linja appen skriver om Min liste under teksten,
+        viste den uten merkede aksjer, eller viste den med KI av."""
+        import re
+
+        forsiden_med(TEKSTEN)
+        assert "min-liste-linje" not in html(klient)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            lagring_sqlite.SqliteMinlistelager(tilkobling).merk("EQNR")
+        finally:
+            tilkobling.close()
+        side = html(klient)
+        linja = re.search(
+            r'<p class="min-liste-linje">I Min liste skilte [^<]+ \(3 av 3, positiv\) seg ut\. '
+            r'<span class="merke-app">Skrevet av appen\.</span></p>',
+            side,
+        )
+        assert linja and side.index('class="ki-tekst"') < linja.start(), side[side.index("boersdagen-kort-fortalt") :][
+            :1500
+        ]
+        assert "min-liste-linje" not in html(klient, kapsel="av")
+
+    def test_hentingen_og_forsiden_regner_det_samme_grunnlaget(self, klient):
+        """Story 10.10, tillegget (gjennomgangen, VG2, FR-607): med 12 vurderte
+        dager før har grunnlaget fra hentingen antallet mot vanlig, og
+        forsiden viser teksten. Ville feilet hvis hentingen eller forsiden
+        leste de tidligere vurderingene ulikt, så teksten forsvant."""
+        from dagsgrunnlag import VANLIG, dagene_foer
+        from ki_tekst import _grunnlaget_for_dagen
+        from lagring_sqlite import SqliteVurderingslager
+
+        forsiden_med(None)
+        for d in dagene_foer(FREDAG, 12):
+            skriv_vurdering("EQNR", d, vurdering(2, "Positiv"))
+            skriv_vurdering("DNB", d, vurdering(1, "Positiv"))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            from app import SqliteOversiktsleser
+
+            lista = tuple(p.aksje for p in SqliteOversiktsleser(tilkobling).oversikt())
+        finally:
+            tilkobling.close()
+        # Hentingen venter til hver aksje i lista har en rad for dagen.
+        for a in lista:
+            if a.symbol not in ("EQNR", "DNB"):
+                skriv_vurdering(a.symbol, FREDAG, Grunn.SYMBOL_FEILET)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            klokke = app_modul.naa
+            grunnlag, grunn = _grunnlaget_for_dagen(
+                tilkobling,
+                SqliteKILogg(tilkobling, klokke),
+                SqliteVurderingslager(tilkobling, klokke, lista),
+                FREDAG,
+                lista,
+                lambda: FREDAG,
+                lambda _: None,
+            )
+        finally:
+            tilkobling.close()
+        assert grunnlag is not None, grunn
+        assert grunnlag[VANLIG] == 1
+        forsiden_med(TEKSTEN, grunnlag=dict(grunnlag))
+        side = html(klient)
+        assert '<p class="ki-tekst">' in side and DAGEN_UTEN not in side
 
     def test_vakta_stopper_et_raad(self):
         """NFR-06: ville feilet hvis en tekst som besto kontrollen, men sier

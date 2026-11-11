@@ -44,7 +44,7 @@ import json
 import re
 from collections.abc import Mapping
 
-from dagsgrunnlag import ANDRE, MEST_NED, MEST_OPP, NAVNENE
+from dagsgrunnlag import ANDRE, MEST_NED, MEST_OPP, MOT_VANLIG, NAVNENE, UKA, VANLIG
 from ki_kontroll import (
     _EGET_MOENSTER,
     _ENHETER,
@@ -74,15 +74,19 @@ Opplysningene under er regnet ut av appen for én børsdag og for aksjene i list
 - skilte_seg_ut_andre: hvor mange flere som skilte seg ut, utenom navnene. Feltet kan mangle.
 - bransjer: for hver bransje, steg er hvor mange aksjer som steg, og med_endring hvor mange som hadde en endring den dagen. Feltet kan mangle.
 - bransje_mest_opp og bransje_mest_ned: bransjen der aksjene i snitt steg mest, og bransjen der de i snitt falt mest, regnet ut av appen. Feltene kan mangle.
+- skilte_seg_ut_vanlig og skilte_seg_ut_mot_vanlig: snittet av hvor mange som skilte seg ut de siste 20 børsdagene, som et helt tall, og om det var flere, færre eller like mange denne dagen. Feltene kan mangle.
+- hovedindeksen_uka: om hovedindeksen steg, falt eller var uendret de siste fem børsdagene. Feltet kan mangle.
 
 Regler for teksten:
-- Skriv tre til sju korte setninger, med disse formene. Sett inn tallene og ordene for feltene i ‹ ›:
+- Skriv tre til ni korte setninger, med disse formene. Sett inn tallene og ordene for feltene i ‹ ›:
   - «Hovedindeksen steg ‹ukedag›.», «Hovedindeksen falt ‹ukedag›.» eller «Hovedindeksen var uendret ‹ukedag›.», etter feltet hovedindeksen.
   - «‹bedre_enn_indeksen› av ‹med_kurs› aksjer gjorde det bedre enn indeksen.»
   - «‹skilte_seg_ut› skilte seg ut: ‹skilte_seg_ut_positiv› med positiv retning, ‹skilte_seg_ut_negativ› negativ og ‹skilte_seg_ut_blandet› blandet.» Ta bare med retningene som har minst én aksje. Er skilte_seg_ut 0, skriver du «Ingen aksjer skilte seg ut.»
   - «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹navn› (‹styrke› av 3, ‹retning›).», med alle navnene i skilte_seg_ut_navn, i den rekkefølgen de står, og skrevet som der. Med skilte_seg_ut_andre slutter setningen med «og ‹skilte_seg_ut_andre› andre.»
   - «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.», med navnet på bransjen med små bokstaver. Nevn høyst to bransjer.
   - «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.», med navnet på bransjen med små bokstaver.
+  - «Det var flere enn vanlig: snittet de siste 20 børsdagene er ‹skilte_seg_ut_vanlig›.», med «flere enn», «færre enn» eller «like mange som» etter feltet skilte_seg_ut_mot_vanlig.
+  - «De siste fem børsdagene steg hovedindeksen.», «De siste fem børsdagene falt hovedindeksen.» eller «De siste fem børsdagene var hovedindeksen uendret.», etter feltet hovedindeksen_uka.
 - Mangler et felt, skriver du ikke setningen for det.
 - Skriv tallene som i opplysningene. Ikke nevn andre tall, prosenter, kurser eller beløp.
 - Ikke si noe om hovedindeksen, bransjene, retningene eller hvor mange som steg eller falt utenom formene.
@@ -129,6 +133,10 @@ def dagsregel(grunnlag: Mapping[str, object]) -> str:
         deler.append(f"Høyest snitt: {grunnlag[MEST_OPP]}.")
     if MEST_NED in grunnlag:
         deler.append(f"Lavest snitt: {grunnlag[MEST_NED]}.")
+    if VANLIG in grunnlag:
+        deler.append(f"Mot vanlig: {grunnlag[MOT_VANLIG]}, snittet {grunnlag[VANLIG]}.")
+    if UKA in grunnlag:
+        deler.append(f"Hovedindeksen siste fem børsdager: {grunnlag[UKA]}.")
     return " ".join(deler)
 
 
@@ -182,6 +190,17 @@ _F_MEST = re.compile(
     re.IGNORECASE,
 )
 _MEST_FELT = {"steg": MEST_OPP, "falt": MEST_NED}
+# Tillegget kl. 17:21 (spoersmaal 11 og 12).
+_F_VANLIG = re.compile(
+    r"(?<![\w-])det\s+var\s+(flere\s+enn|færre\s+enn|like\s+mange\s+som)\s+vanlig\s*:\s*snittet\s+de\s+siste\s+20\s+"
+    r"børsdagene\s+er\s+" + _N,
+    re.IGNORECASE,
+)
+_MOT = {"flere enn": "flere", "færre enn": "færre", "like mange som": "like mange"}
+_F_UKA = re.compile(
+    r"(?<![\w-])de\s+siste\s+fem\s+børsdagene\s+(?:(steg|falt)\s+hovedindeksen|var\s+hovedindeksen\s+(uendret))(?![\w-])",
+    re.IGNORECASE,
+)
 _ORD = re.compile(r"[\w-]+")
 # Tegnsettingen som kan staa mellom formene.
 _TEGN = frozenset(" \t\n.,:;")
@@ -288,6 +307,29 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
     # andre formene ellers ville lest.
     tekst, navnegrunner = _navnene(tekst, grunnlag)
     grunner += navnegrunner
+    # Tillegget kl. 17:21: antallet mot vanlig og hovedindeksen siste uke,
+    # foer formene for hovedindeksen, saa ordene der ikke leses to ganger.
+    # Gjennomgangen av tillegget (ECH1): hver form én gang.
+    for form, navn in ((_F_VANLIG, "antallet mot vanlig"), (_F_UKA, "hovedindeksen siste fem børsdager")):
+        if len(form.findall(tekst)) > 1:
+            grunner.append(f"1: setningen om {navn} står mer enn én gang")
+    for treff in list(_F_VANLIG.finditer(tekst)):
+        mot = _MOT[" ".join(treff.group(1).lower().split())]
+        if VANLIG not in grunnlag:
+            grunner.append(f"1: «{treff.group(0)}», men {VANLIG} mangler i grunnlaget")
+        else:
+            if mot != grunnlag[MOT_VANLIG]:
+                grunner.append(f"1: «{treff.group(0)}», grunnlaget sier {grunnlag[MOT_VANLIG]}")
+            if _antall(treff.group(2)) != grunnlag[VANLIG]:
+                grunner.append(f"2: tallet «{treff.group(2)}» ved {VANLIG}")
+        tekst = _ta_ut(tekst, treff)
+    for treff in list(_F_UKA.finditer(tekst)):
+        verb = (treff.group(1) or treff.group(2)).lower()
+        if UKA not in grunnlag:
+            grunner.append(f"1: «{treff.group(0)}», men {UKA} mangler i grunnlaget")
+        elif verb != grunnlag[UKA]:
+            grunner.append(f"1: «{treff.group(0)}», grunnlaget sier {grunnlag[UKA]}")
+        tekst = _ta_ut(tekst, treff)
     mest = list(_F_MEST.finditer(tekst))
     # Gjennomgangen (ECH4): hver bransje én gang.
     for verb in ("steg", "falt"):
