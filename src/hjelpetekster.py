@@ -279,7 +279,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "sluttkurs": Hjelpetekst(
             "Sluttkurs:",
             "kursen ved børsens stengning siste børsdag i dataene, uten utbyttejustering.",
-            ((PRD, "| Sluttkurs | `close` for siste børsdag |"), (INDEX_MAL, "Sluttkursen er den ujusterte kursen")),
+            # Story 8.26 (tillegg 1): fotnoten i index.html er borte, så kilden
+            # er PRD-en alene.
+            ((PRD, "| Sluttkurs | `close` for siste børsdag |"), (PRD, "Sluttkursen vises som `close`")),
         ),
         # U5 i docs/ux-logg.md (story 2.7b): paa aksjesiden er sluttkursen for
         # dagen siden viser, ogsaa en dag valgt med «Velg dag» (8.16b).

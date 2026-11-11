@@ -43,9 +43,9 @@
   {% endif %}
   {#- Svar 18: børsen og datoen, «Demo Børs» i demoen. #}
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
-  {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sier hva
-      siden viser. #}
-  <p class="innledning">{% if detalj.sjekker %}Siden viser sjekkene for {{ detalj.aksje.navn }} med tallene bak, kursgrafen og det appen skrev om aksjen hver børsdag.{% else %}Siden viser kursgrafen for {{ detalj.aksje.navn }} og det appen skrev om aksjen hver børsdag.{% endif %}</p>
+  {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sa hva
+      siden viser. Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 1): den
+      er tatt bort, fordi overskriftene og «Vis meg rundt» sier det. #}
 
   {#- Gjennomgangen av 8.20a (BH11, ECH1): 2 av 3 merkes bare for siste
       børsdag (designregler §3), som overskriften over. #}

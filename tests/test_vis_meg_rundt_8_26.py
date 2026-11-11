@@ -332,3 +332,39 @@ class TestIngenKurserEnnaa:
         tekst = ht.hjelpetekster()["ukjent"].tekst
         assert "eller aksjen har ingen kurser ennå" in tekst
         assert ht.hjelpetekster()["uten_data"].tittel == "Ingen kurser ennå:"
+
+
+# --- 3) Tillegg 1: fotnoten og de løse tekstene -----------------------------
+
+
+class TestFotnotenOgDeLoeseTekstene:
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    @pytest.mark.parametrize("sti", ["/", "/min-liste?vis=alle"])
+    def test_fotnoten_er_borte_og_forbeholdet_staar(self, versjon, sti, request):
+        """Ønsket kl. 17:44: ville feilet hvis fotnoten «Sluttkursen er den
+        ujusterte kursen …» sto igjen under tabellen, eller at signalstyrken
+        ikke er et råd om å kjøpe eller selge, ikke sto synlig i innledningen
+        (NFR-06)."""
+        side = _side(request.getfixturevalue(versjon), sti)
+        assert "Sluttkursen er den ujusterte kursen" not in side
+        innledning = side.split('<p class="innledning">', 1)[1].split("</p>", 1)[0]
+        assert re.search(r"(ikke hva du bør kjøpe eller selge|ikke om du bør kjøpe eller selge)\.", innledning)
+
+    def test_det_fotnoten_sa_staar_bak_spoersmaalstegnene(self):
+        """Ville feilet hvis «?» ved Sluttkurs, Endring eller Signalstyrke ikke
+        sa det fotnoten sa: ujustert sluttkurs, endringen på utbyttejustert
+        kurs, og hvor mange sjekker som slo ut, ikke et råd."""
+        tekster = ht.hjelpetekster()
+        assert "uten utbyttejustering" in tekster["sluttkurs"].tekst
+        endring = " ".join(t.tekst for n, t in tekster.items() if n in ("endring", "utbyttejustert"))
+        assert "justert for utbytte" in endring and "kursfall" in endring
+        styrke = " ".join(t.tekst for t in tekster.values() if "sjekkene som slo ut" in t.tekst or "råd" in t.tekst)
+        assert "hvor mange av de 3 sjekkene som slo ut" in styrke and "ikke et råd om å kjøpe eller selge" in styrke
+
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_innledningen_paa_aksjesiden_er_borte(self, versjon, request):
+        """Forslaget i spesifikasjonen: ville feilet hvis innledningen «Siden
+        viser sjekkene for …» sto igjen på aksjesiden."""
+        k = request.getfixturevalue(versjon)
+        side = _side(k, "/aksje/BRFE" if versjon == "klient" else "/aksje/EQNR")
+        assert "Siden viser sjekkene for" not in side and "Siden viser kursgrafen for" not in side

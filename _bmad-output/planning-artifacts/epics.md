@@ -372,6 +372,8 @@ tverrgående (NFR-03, 05, 06 og 08).
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* fotnoten som raden for NFR-06 siterer, står nå i `src/templates/index.html:137`, ikke på linje 108. Den endres i 8.0c til «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.» Forbeholdet om kjøp og salg står fortsatt synlig.
 
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:44, story 8.26):* fotnoten under tabellen på oversikten og i Min liste er tatt bort. Det den sa om sluttkursen, endringen og signalstyrken, står bak «?» ved kolonnene, og at signalstyrken ikke sier om du bør kjøpe eller selge, står synlig i innledningen på oversikten og i Min liste (NFR-06). Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 1, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 ## Epic List
 
 **Rekkefølge.** Pilene er harde avhengigheter, ikke anbefalinger.

@@ -170,7 +170,9 @@
     {% endif %}
     </div>
     {% if rader %}
-    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall.</p>
+    {#- Story 8.26 (tillegg 1): setningen om signalstyrken fra fotnoten,
+        synlig på siden (NFR-06). #}
+    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall. Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.</p>
     {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
         (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
         åpnes (designregler §2). Radene er siste børsdag, og linja under
@@ -355,14 +357,11 @@
     {% endif %}
 
     {#- Story 8.2a, b (U23): fotnoten «Uten data i denne kilden» er borte,
-        fordi aksjene uten kurser har en rad i tabellen. #}
-
-    <p class="fotnote">
-      Sluttkursen er den ujusterte kursen aksjen omsettes til. Endringen er
-      regnet på utbyttejustert kurs, slik at et ordinært utbytte ikke ser ut
-      som et kursfall.
-      Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.
-    </p>
+        fordi aksjene uten kurser har en rad i tabellen.
+        Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 1): fotnoten om
+        sluttkursen, endringen og signalstyrken er også borte. Det den sa,
+        står bak «?» ved kolonnene, og at signalstyrken ikke er et råd, står
+        i innledningen på oversikten og i Min liste (NFR-06). #}
     {% endif %}
 
     {#- Story 2.12: «Dine egne aksjer» under tabellen, og «Din egen liste» i

@@ -382,13 +382,13 @@ def test_tallene_i_ki_teksten_har_prikket_strek():
     assert "underline dotted currentColor" in _regel(".ki .tall")
 
 
-def test_innledningen_under_tittelen(klient):
-    """U62. Ville feilet uten innledning, med den et annet sted, eller med
-    en som sa sjekkene på en side uten sjekker."""
-    html = _html(klient, "/aksje/BRFE")
-    assert '<p class="innledning">Siden viser sjekkene for Brattfjell Energi med tallene bak' in html
-    assert html.index('<p class="meta">') < html.index('<p class="innledning">') < html.index('class="sammendrag"')
-    assert '<p class="innledning">Siden viser kursgrafen for Varde Systemer' in _html(klient, "/aksje/VRDS")
+def test_innledningen_under_tittelen_er_borte(klient):
+    """U62 ga en innledning under tittelen. Story 8.26 (gruppens ønske 11.11
+    kl. 17:44, tillegg 1): den er tatt bort, fordi overskriftene og «Vis meg
+    rundt» sier hva siden viser. Ville feilet hvis den sto igjen."""
+    for adresse in ("/aksje/BRFE", "/aksje/VRDS"):
+        html = _html(klient, adresse)
+        assert '<p class="innledning">' not in html and "Siden viser sjekkene for" not in html, adresse
 
 
 def test_kortet_retning_sier_hva_sjekkene_ga(klient):

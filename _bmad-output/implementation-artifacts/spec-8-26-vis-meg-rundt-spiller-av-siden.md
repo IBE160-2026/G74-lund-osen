@@ -83,3 +83,30 @@ Hver del har tester med «Ville feilet hvis» i `tests/test_vis_meg_rundt_8_26.p
 - Testene som så etter «uten data» som tekst på sidene, er rettet til de nye ordene; kommentarene og docstringene står.
 
 **Ville feilet hvis:** en side fortsatt sa «uten data», raden for MTFJ i demoen ikke sa «ingen kurser ennå», ruta ikke sa «Ingen kurs», teksten ikke fikk plass i en stor rute, eller «Ukjent» ikke forklarte en aksje uten kurser.
+
+### 3) Fotnoten og de løse tekstene (tillegg 1, ønsket kl. 17:44)
+
+**Fotnoten** under tabellen på oversikten og i Min liste («Sluttkursen er den ujusterte kursen …») er tatt bort. Det den sa, står bak «?»: Sluttkurs sier «uten utbyttejustering», Endring sier «justert for utbytte» og at et ordinært utbytte ikke ser ut som et kursfall, og Signalstyrke sier hvor mange av de 3 sjekkene som slo ut, og at det ikke er et råd. Ingen tekst bak «?» måtte endres. At signalstyrken ikke er et råd, står synlig i innledningen på oversikten (som før) og i Min liste (setningen fra fotnoten er lagt til innledningen der), så NFR-06 står på begge (Rettet-linje i raden for NFR-06 i `epics.md`). Kilden for «sluttkurs» i `hjelpetekster.py` var fotnoten; nå er den PRD-en alene. Vurderingsmatrisen og kvalitetssikringen viser ikke til denne fotnoten, så de er ikke endret.
+
+**De andre løse tekstene.** Forslaget for hver; beskjeder som bare står i demoen eller bare når noe gjelder, står til gruppen har svart (tillegg 1, steg 2).
+
+| Side | Teksten | Forslag | Grunnen |
+|---|---|---|---|
+| Aksjesiden | Innledningen «Siden viser sjekkene for … med tallene bak, kursgrafen og det appen skrev om aksjen hver børsdag.» (U62) | Ta bort (bygget) | Overskriftene og «Vis meg rundt» sier det samme. |
+| Aksjesiden | «Linjene er kursen og 50-dagers snittet …» under grafen | Behold | Tegnforklaringen for grafen, som ikke står andre steder. |
+| Aksjesiden | «Signalet bygger bare på kurs og volum …» i «Signalet forklart», og «Signalstyrken sier ikke om du bør kjøpe eller selge.» uten sjekker | Behold | NFR-06. |
+| Aksjesiden | «Laget av KI. Regelforklaringen over …» | Behold | Merket for KI-teksten. |
+| Aksjesiden | Ingressen under «Mine notater» og «Signalet dag for dag» | Behold | Sier hvor notatene lagres og hvordan man velger en dag. |
+| Børsometeret | Innledningen «Hver rute er en aksje …, ikke hva du bør kjøpe eller selge.» | Behold | Sier hvordan kartet leses, og NFR-06. |
+| Børsometeret | «Datoen kunne ikke leses …», «… er før første kurs …», «Gul ramme betyr 3 av 3 …», «Ikke vurdert» kan også ha en annen grunn …» | Står til gruppen har svart | Bare når noe gjelder. |
+| Min liste | «Stjernen foran et selskap legger aksjen i lista …» | Behold, med setningen om signalstyrken | NFR-06 etter fotnoten. |
+| Min liste | «Øverst i hver rad står siste børsdag …» med «Velg dag» eller en periode | Står til gruppen har svart | Bare når en dag eller periode er valgt. |
+| Min liste | «Ingen aksjer i Min liste ennå …», «Ingen notater ennå …» | Står til gruppen har svart | Bare når lista er tom. |
+| Min liste | Ingressen under «Mine notater» | Behold | Sier hva man kan gjøre der. |
+| Oversikten | Meldingen om endringer som venter, og eksempelet i demoen | Står til gruppen har svart | Bare når noe venter, eller bare i demoen. |
+| Oversikten | «Tabellen viser …» og «Endringen gjelder …» med «Velg dag» eller en periode | Står til gruppen har svart | Bare når en dag eller periode er valgt. |
+| Oversikten | Fotnoten om «ikke vurdert» | Står til gruppen har svart | Bare når en dag ikke er vurdert. |
+| Innstillinger | «Valgene gjelder alle sidene og lagres på denne maskinen.» | Behold | Ordrett fra utdraget §4, og testet. |
+| Innstillinger | Forklaringene under bryterne | Behold | De forklarer bryteren rett over. |
+
+**Ville feilet hvis:** fotnoten sto igjen, forbeholdet ikke sto synlig på oversikten og i Min liste, «?» ved kolonnene ikke sa det fotnoten sa, eller innledningen på aksjesiden sto igjen.

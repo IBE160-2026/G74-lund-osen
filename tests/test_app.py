@@ -1647,12 +1647,15 @@ class TestStory80c:
         assert "background: var(--opp-bakgrunn)" in _regel(stil, ".sjekkort .resultat.opp")
         assert "#fafafa" not in stil
 
-    def test_fotnoten_i_oversikten_sier_hvor_mange_som_slo_ut(self, klient, monkeypatch):
-        """Punkt 4.4 i endringsforslaget 13.10. Ville feilet med «hvor kraftig»."""
+    def test_fotnoten_i_oversikten_er_borte_og_forbeholdet_staar(self, klient, monkeypatch):
+        """Punkt 4.4 i endringsforslaget 13.10. Ville feilet med «hvor kraftig».
+        Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 1): fotnoten under
+        tabellen er borte, og at signalet ikke er et råd, står i innledningen.
+        Ville feilet hvis fotnoten sto igjen, eller forbeholdet ble borte."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         html = klient.get("/").data.decode("utf-8")
-        assert "Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge." in html
-        assert "Sluttkursen er den ujusterte kursen" in html
+        assert "Sluttkursen er den ujusterte kursen" not in html
+        assert "ikke hva du bør kjøpe eller selge." in html.split('<p class="innledning">', 1)[1].split("</p>", 1)[0]
         assert "hvor kraftig" not in html
 
     def test_fotnoten_paa_aksjesiden_har_forbeholdet(self, klient, monkeypatch):
@@ -3813,9 +3816,10 @@ class TestStory816bDagenPaaHeleSiden:
         siste børsdag."""
         self._aksjen()
         toppen = _toppen(klient.get("/aksje/EQNR?dag=2026-10-03").data.decode("utf-8"))
-        # Story 8.2b, c (U62): innledningen står mellom datoen og kortene.
-        assert "Oslo Børs · 03.10 Siden viser " in toppen
-        assert "aksjen hver børsdag. Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
+        # Story 8.2b, c (U62): innledningen sto mellom datoen og kortene.
+        # Story 8.26 (tillegg 1): den er borte, så kortene kommer rett etter.
+        assert "Oslo Børs · 03.10 Siden viser " not in toppen and "Oslo Børs · 03.10" in toppen
+        assert "Oslo Børs · 03.10 Sluttkurs ? – Endring ? – Signalstyrke ? –" in toppen
         assert "NOK" not in toppen
 
     def test_merket_og_lenken_tilbake(self, klient):
