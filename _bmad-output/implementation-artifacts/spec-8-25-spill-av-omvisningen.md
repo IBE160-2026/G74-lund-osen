@@ -125,3 +125,14 @@ Instruksjonen kl. 16:07 11.11. Del B (8.22) ble flettet med PR #138, og Utført-
 - **Prøvd i Edge** mot demoen, side for side: alle 23 stegene på de seks sidene er merket, med fokus på boksen; «Tilbake» over en side, Esc og en lenke midt i omvisningen virker, og tilbudet står ikke på `/folg`.
 - **Bildene** i `docs/appen/` er tatt på nytt (`97f3dbe5`): bare de to av «Følg en aksje» ble ulike, med knappen, og med de samme høydene. Bildene av stegene på `pr-8-25-bilder` er tatt på nytt, med et nytt av «Følg en aksje» (`d35e705f`).
 - **Mutanten:** `omvisning_side=None` i `folg_side` ble fanget av to tester i `tests/test_omvisningen_8_25.py`, og `src/app.py` var lik HEAD etterpå (kopi før, sha256 mot HEAD etter).
+
+**Gjennomgangen av «Følg en aksje»** (Blind Hunter med bare diffen fra `c6c01170`, Edge Case Hunter og Verification Gap i samme agent, med repoet). Blind Hunter hadde 10 funn, Edge Case Hunter 5 og Verification Gap 6. Ingen høye. Rettet i `29601f75`.
+
+*Middels*
+- *ECH1 og VG1, rettet.* Når basen ikke kan åpnes, svarer `/folg` med feilsiden på samme adresse, uten navnet `folg`. Omvisningen fortsatte der fordi adressen stemte, og lastet `/folg` igjen og igjen. Nå fortsetter den bare når steget hører til siden (`OMVISNING.paaSiden`); ellers lukkes den. Tester med Node og for feilsiden på `/folg`. Prøvd i Edge igjen: alle 23 stegene.
+- *VG2, BH3 og ECH4 (delvis), rettet.* At «Følg en aksje» med full liste viser tittelen og ikke søket, hadde ingen test. Nå følger testen aksjer i demoen til lista er full.
+
+*Lav*
+- *Rettet:* ECH5 og BH5 (`default(..., true)` i rammen, så `None` gir navnet fra stripa), BH4 (en test for at `/folg?kode=` lukker omvisningen), BH7 (testen sammenligner også tekstene) og VG5 (antallet sider i README-en følger `OMVISNINGEN_SIDER`).
+- *Ført:* ECH2 (en base uten tabellene fra 0010 gir en 404 uten rammen på `/folg`, så omvisningen stopper der), ECH3 (`/ferdig-liste` og investorsiden har navnet fra stripa; `fortsett` og `paaSiden` holder dem utenfor), ECH4 (telleren hopper over steget om søket med full liste, som BH11), VG3 (`OMVISNING.SIDENE` brukes ikke av skriptet; rekkefølgen kommer fra dataene, som testene sjekker), VG4 (stripa ved `?bytt=` er ikke testet her, men i testene for 8.22), VG6 (testene med Node hoppes over uten Node; CI har Node) og BH10 (vakten i søket fra 8.22 dekkes av testene med Node, som laster hele skriptet).
+- *Ikke en feil:* BH1 («fem av sidene» står ikke lenger i README-en), BH2 (setningen er gruppens svar kl. 16:26), BH6 (`folg_side` rendrer `folg.html` ett sted), BH8 (bildene er i `97f3dbe5`, utenfor diffen gjennomgangen fikk) og BH9 (instruksjonen kl. 16:07 sier «Ekstra, ferdig» etter svaret kl. 13:49, og README-en flettes med omvisningen).
