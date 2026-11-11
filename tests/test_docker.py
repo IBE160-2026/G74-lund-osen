@@ -1881,7 +1881,8 @@ DE_NYE_BILDENE = {
     # Gjennomgangen av tillegg 4: 1714, med teksten for Docker i «Slik bytter du nøkkel».
     # Tillegg 3 (svarene 10.11 kl. 22:44): 1454, med én knapp per bransje i stedet for lister. Var 1714.
     # Story 8.26: 1454 -> 1474 (tabellen «Dine egne aksjer» med navnet og bransjen på to linjer).
-    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1474, FILENE_BAK_MIN_LISTE),
+    # Story 8.26 (tillegg 12): 1474 -> 1389, stegkortene som på tavla, med kallene bak «?».
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1389, FILENE_BAK_MIN_LISTE),
     # Story 8.22: «Følg en aksje» i demoen med Kraft valgt, hele siden (1326 px), sist i knappen.
     # Flettingen av main (8.9, «Vis meg rundt») inn i 8.22: 1368. Bekreftelsen sier «Demo Børs» i
     # demoen (folg.html); bildet er byte for byte det samme.
