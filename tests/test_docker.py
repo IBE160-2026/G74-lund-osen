@@ -3318,7 +3318,10 @@ class TestReadmeForNybegynnere:
         lister = _statuslister(status)
         # Story 3.3g (svaret 19.10 kl. 14:48): «Neste» er delt i det briefen
         # lover og det ekstra.
-        assert list(lister) == ["Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
+        # Story 3.6 (gruppens svar 11.11 kl. 13:49): den fjerde lista, «Ekstra,
+        # ferdig», står rett etter «Ferdig». Ville feilet hvis den manglet,
+        # sto et annet sted eller het noe annet.
+        assert list(lister) == ["Ferdig", "Ekstra, ferdig", "Neste i v1", "Ekstra, hvis tiden rekker"], list(lister)
         for navn, punkter in lister.items():
             assert 1 <= len(punkter) <= 8, (navn, len(punkter))
         # Story 3.3h (gruppens svar 20.10 kl. 10:14-10:19): «Ferdig» er en
@@ -3410,7 +3413,8 @@ class TestReadmeForNybegynnere:
         # i «Ferdig».
         rundt = (
             # Story 3.5i: installasjonen med bildene staar i en egen fil.
-            "Rundt appen er dette også ferdig: README-en med demoen først og installasjonen med bilder i en egen "
+            # Story 3.6 (svaret 11.11 kl. 13:49): og brukertesten, først.
+            "Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen "
             "fil, ruff i CI og "
             "i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene."
         )
@@ -3435,7 +3439,8 @@ class TestReadmeForNybegynnere:
         # prøven på en ren maskin er neste (avgjørelsen 21.10 kl. 18:33).
         saker = (
             # Gruppens svar 05.11 kl. 12:20: brukertesten står under «Neste i v1».
-            "brukertesten med én person",
+            # Story 3.6 (svaret 11.11 kl. 13:49): brukertesten er flyttet til
+            # setningen om det som er ferdig rundt appen.
             "prøven av readme-en på en ren maskin",
             # Story 8.16: periodene i kursgrafen er flyttet til «Ferdig».
             # Story 8.17a: periodevalget i oversikten er flyttet til «Ferdig»,
@@ -3447,9 +3452,9 @@ class TestReadmeForNybegynnere:
             # «Ekstra» har storyene i de åpne PR-ene fra ekstravinduet.
             # Flettingen av de fem storyene 10.11: de sju fra ekstravinduet er
             # flettet, og «Ekstra» har storyene i de åpne PR-ene, som 09.11.
-            "målingen av omsetning for aksjene som ikke er målt",
+            # Story 3.6 (svaret 11.11 kl. 13:49): målingen av omsetningen og
+            # notatene er flyttet til «Ekstra, ferdig».
             "faste bransjer, «følg en aksje» med hele lista",
-            "egne notater på aksjesiden",
         )
         assert len(neste_punkter) == len(saker), neste_punkter
         for punkt, sak in zip(neste_punkter, saker):
@@ -3743,9 +3748,18 @@ EKSTRA = (
     # KI-teksten om dagen og å velge og bytte aksjer.
     # Flettingen av de fem storyene 10.11: de sju er flettet, og «Ekstra» har
     # storyene i de åpne PR-ene #137–#139.
-    ("målingen av omsetning",),
+    # Story 3.6 (gruppens svar 11.11 kl. 13:49): målingen av omsetningen og
+    # notatene er flyttet til «Ekstra, ferdig».
     ("«følg en aksje»",),
-    ("egne notater",),
+)
+
+# Story 3.6 (gruppens svar 11.11 kl. 13:49): den fjerde lista, «Ekstra,
+# ferdig», rett etter «Ferdig», med det ekstra som er flettet. «Ferdig»
+# lister det appen kan, og det briefen lover.
+EKSTRA_FERDIG = (
+    ("målingen av omsetning",),
+    ("egne notater", "tenkte kjøp og salg"),
+    ("ikonet", "snarveien"),
 )
 
 
@@ -3879,12 +3893,30 @@ class TestReadmeDemoenAnbefales:
         # som i briefen v8 og story 10.5 etter 06.10.
         # Gruppens svar 05.11 kl. 12:20: brukertesten (8.1) står under «Neste i
         # v1», uten storynummeret, som resten av «Status».
-        for sak in ("brukertesten med én person", "prøven av readme-en på en ren maskin"):
-            assert sum(sak in p for p in v1) == 1, (sak, v1)
+        # Story 3.6 (gruppens svar 11.11 kl. 13:49): brukertesten er gjort og
+        # står i setningen om det som er ferdig rundt appen, fordi «Ferdig»
+        # lister det appen kan. Ville feilet hvis den sto igjen i «Neste i v1»
+        # eller i en av listene, eller manglet i setningen.
+        assert sum("prøven av readme-en på en ren maskin" in p for p in v1) == 1, v1
+        assert not any("brukertest" in p.lower() for punkter in lister.values() for p in punkter), lister
+        assert "Rundt appen er dette også ferdig: brukertesten med én person, " in status
         assert not any("egen nøkkel" in p for p in v1), v1
         assert not any("min liste" in p or "investorside" in p or "historikk" in p for p in v1), v1
         assert sum("lenken til investorsiden" in p.lower() for p in lister["Ferdig"]) == 1, lister["Ferdig"]
-        assert len(v1) == 2, v1
+        assert len(v1) == 1, v1
+        # Story 3.6 (svaret kl. 13:49): «Ekstra, ferdig» har det ekstra som er
+        # flettet, i den rekkefølgen, og ingen av dem står i en annen liste.
+        # Ville feilet hvis lista manglet, hadde et punkt for mye eller for
+        # lite, eller et av dem sto igjen under «Ekstra, hvis tiden rekker»,
+        # «Neste i v1» eller «Ferdig».
+        ekstra_ferdig = [p.lower() for p in lister["Ekstra, ferdig"]]
+        assert len(ekstra_ferdig) == len(EKSTRA_FERDIG), ekstra_ferdig
+        andre = [p.lower() for navn in ("Ferdig", "Neste i v1", "Ekstra, hvis tiden rekker") for p in lister[navn]]
+        for punkt, saker in zip(ekstra_ferdig, EKSTRA_FERDIG, strict=True):
+            for sak in saker:
+                assert sak in punkt, (sak, punkt)
+                assert not any(sak in p for p in andre), (sak, andre)
+            assert len(re.findall(r"\w+", punkt)) <= 20, punkt
         assert "newsweb" not in "\n".join(v1 + ekstra)
         assert REGELEN_FOR_EKSTRA in status
 
