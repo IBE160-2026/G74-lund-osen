@@ -855,3 +855,23 @@ class TestDinEgenListeSomTavla:
         assert not re.search(r"kurs|kjøp|selg|salg", EODHD_BOBLE, re.IGNORECASE)
         tegningen = (ROT / "src" / "static" / "demo" / "eodhd.svg").read_text(encoding="utf-8")
         assert "<title" in tegningen and "<desc" in tegningen and "http" not in tegningen.split("xmlns=", 1)[1][60:]
+
+
+class TestEtterGjennomgangenAvTillegg12:
+    def test_med_hjelpen_av_staar_det_i_kortene(self, klient):
+        """ECH1, BH2, VG1: ville feilet hvis byttet av nøkkel og kallene
+        forsvant fra siden med «Vis hjelp» av, eller statusen viste til en
+        «?» som ikke finnes."""
+        klient.post("/innstillinger", data={"navn": "vis_hjelp", "til": "av"})
+        side = _side(klient, "/min-liste")
+        kortene = _stegene(side)
+        assert "popovertarget" not in "".join(kortene)
+        assert "Slik bytter du nøkkel:</strong> Slett det som står etter EODHD_API_KEY=" in kortene[1]
+        assert re.search(r"<li>\d+ kall: margin</li>", kortene[2])
+        assert "bak «?»" not in side.split('id="din-egen-liste"', 1)[1]
+
+    def test_dagens_tall_er_lista(self, klient):
+        """BH3, ECH2: ville feilet hvis steg 3 sa «dagens 15» fast, i stedet
+        for antallet appen følger."""
+        mal = (ROT / "src" / "templates" / "_egne.html").read_text(encoding="utf-8")
+        assert "Start med dagens {{ egne.antall }}{% if egne.ferdige %}" in mal

@@ -756,6 +756,8 @@ class TestHjelpefeltet:
             ".hjelpevindu button.flytt",
             # Story 8.26: linja om hvordan vinduet lukkes, i dempet tekst.
             ".hjelpevindu .lukkes",
+            # Story 8.26 (tillegg 12): kallene, regnet av lista, i vinduet.
+            ".hjelpevindu .kallene",
         }, uten_klassen
         assert all("display" not in k for v, k in reglene if v == ".hjelpevindu button.flytt")
         assert re.search(r"\.hjelpefelt body:has\(\.hjelpevindu:popover-open\)", stil)

@@ -81,12 +81,17 @@
       <p class="handling">
       {%- if eksempeltall %}<span class="noekkelstatus virker"><span class="hake" aria-hidden="true">✓</span> Demoen trenger ingen nøkkel.</span>
       {%- elif egne.henting %}<span class="noekkelstatus virker"><span class="hake" aria-hidden="true">✓</span> Nøkkelen virket ved siste henting {{ egne.henting.dag|dato }}, som brukte minst {{ egne.henting.serier }} av {{ egne.kall.kvote }} kall.</span>
-      {%- else %}<span class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel» bak «?».</span>{% endif -%}
+      {%- else %}<span class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel»{% if vis_hjelp is not defined or vis_hjelp %} bak «?»{% endif %}.</span>{% endif -%}
       </p>
+      {#- Gjennomgangen av tillegg 12 (ECH1, BH2): med «Vis hjelp» av står det
+          som ellers står bak «?», i kortet. #}
+      {% if vis_hjelp is defined and not vis_hjelp %}<p class="uten-hjelp"><strong>Slik bytter du nøkkel:</strong> {{ hjelp.tekst("bytt_noekkel").tekst }} {{ hjelp.tekst("bytt_noekkel_docker").tekst }}</p>{% endif %}
     </li>
     <li class="kort-steg">
       <div class="steg-topp"><span class="stegnummer" aria-hidden="true">3</span><h4>Velg aksjene dine</h4> {{ hjelpeknapp("hjelp-kallene", "Hjelp: kallene og de ferdige listene") }}</div>
-      <p>Start med dagens 15 eller en ferdig liste for 1 bransje, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}.</p>
+      {#- Gjennomgangen (BH3, ECH2): tallet regnes av lista, og den ferdige
+          lista nevnes bare når det finnes en. #}
+      <p>Start med dagens {{ egne.antall }}{% if egne.ferdige %} eller en ferdig liste for én bransje{% endif %}, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}.</p>
       {#- Story 8.11 og tillegg 3 til 8.22: de ferdige listene som brikker med
           ikonet og antallet, til siden «Er du sikker?» (/ferdig-liste). #}
       {% if egne.ferdige %}
@@ -96,6 +101,13 @@
       {% endfor %}
       </ul>
       {% endif %}
+      {% if vis_hjelp is defined and not vis_hjelp %}<p class="uten-hjelp">{{ hjelp.tekst("kallene_lista").tittel }} {{ hjelp.tekst("kallene_lista").tekst }}</p>
+      <ul class="kallene">
+        <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
+        <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>
+        {% if egne.kall.egne %}<li>{{ egne.kall.egne }} kall: {{ "din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer" }}</li>{% endif %}
+        <li>{{ egne.kall.margin }} kall: margin</li>
+      </ul>{% endif %}
       <p class="handling">
         {% if egne.full %}<span class="full">{{ full_tekst }}</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
       </p>

@@ -678,8 +678,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): steg 2 og 3 i
         # «Din egen liste» som på tavla, med det som sto i kortene, bak «?».
         "bytt_noekkel": Hjelpetekst(
-            "Slik bytter du nøkkel:",
-            "slett det som står etter EODHD_API_KEY= i fila .env i mappa til appen. Neste gang den ekte "
+            # Gjennomgangen (BH6, ECH5): uten tittel, fordi vinduet heter det.
+            "",
+            "Slett det som står etter EODHD_API_KEY= i fila .env i mappa til appen. Neste gang den ekte "
             "versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye.",
             (("start/start.ps1", "EODHD_API_KEY"), ("start/start.sh", "EODHD_API_KEY")),
         ),
