@@ -25,6 +25,7 @@ Skrevet 10.11 kl. 16:32 i instruksjonen kl. 16:26 («Del B 10.11», vindu 4). In
 - **Kl. 14:53:** gruppen valgte å starte del B i et nytt vindu med en gang. Rådet anbefalte vindu 1 etter del C. Kilden er den samme.
 - **Kl. 22:44 (tillegg 3, rådet anbefalte alle fire):** kortet «Mest omsatt» tas bort, og lista får sorteringen «Mest omsatt først», «A–Å» og «Bransje», uten «høyst tre». Flere bransjer kan velges samtidig og kombineres med omsetningen, og det valgte er oransje med et merke i tillegg. Radene får stilen fra tabellen på oversikten. «Start fra en ferdig liste» får én knapp per bransje, én kort setning og en side «Er du sikker?», og knappen i steg 3 heter som delen. Se «Tillegg 3 og 5» nedenfor.
 - **Kl. 22:55 (tillegg 5):** to nye bilder fra demoen ved 390 px, «Følg en aksje» og notatene på aksjesiden for BRFE, i README-en etter de andre bildene ved 390 px.
+- **11.11 kl. 14:29 (rådet anbefalte alt):** gruppen sa ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. For spørsmål 12 måles tiden for medianene, og for spørsmål 14 legges testen for et kall som feiler til. Det valgte står i oransje med hakemerket som bygget (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet, uten at gruppen ser på den igjen. Kilden er instruksjonen 11.11 kl. 14:31, som står ordrett i scratchpad-mappa til økta. Se «Svaret kl. 14:29» nedenfor.
 - Tillegg 3 og 5 ble gitt 10.11 kl. 22:44 og 22:55, men kom aldri fram til vindu 4. De ble gitt på nytt i instruksjonen 11.11 kl. 11:56, etter at Windows Update startet maskinen på nytt kl. 04:29. Svarene kl. 22:44 og 22:55 føres i `epics.md` med de andre svarene når del B flettes.
 
 ## Slått opp 10.11 på `53ff012c` (regel 3)
@@ -219,3 +220,25 @@ Funnet på middels som står åpent, er ECH2 (spørsmål 15, regel 25).
 16. **Sorteringen fra start (tillegg 3).** *Forslag:* «Mest omsatt først», fordi den står først i svaret, med linja om at den ikke er en rangering etter kursen. Alternativet er «A–Å», som før tillegg 3.
 17. **Rekkefølgen i «Bransje» (tillegg 3).** *Forslag:* bransjene i samme rekkefølge som brikkene i filteret (`valg.BRANSJENE`), og navnet innen hver bransje.
 18. **Lista mellom «Er du sikker?» og «Bruk denne lista» (BH6).** *Forslag:* som bygget: POST regner lista på nytt, som før. Står siden åpen over kveldshentingen, kan lista bli en annen enn den som ble vist.
+
+## Svaret kl. 14:29
+
+| Spørsmål | Svar |
+|---|---|
+| 1–4, 6, 8–11, 13, 16–18 | Ja, som bygget. |
+| 5, 7 | Bortfalt med tillegg 3. |
+| 12 (ECH5, middels) | Tiden måles. Tar én visning over ett sekund, regnes medianene én gang per henting og huskes i minnet, uten migrasjon. Se «Spørsmål 12: tiden» nedenfor. |
+| 14 (VG2, middels) | Testen for et kall som feiler og prøves igjen, legges til. Se «Spørsmål 14: et kall som feiler» nedenfor. |
+| 15 (ECH2, middels) | Ja: det valgte står i oransje med hakemerket, som bygget. |
+
+### Spørsmål 12: tiden
+
+Målt 11.11 kl. 14:40 med koden på grenen (`8b90fb0f`), uten server (Flasks test-klient), mot en kopi av `data/db/ose.db` i en midlertidig mappe som ble slettet etterpå. sha256 for basen var lik før og etter (regel 22). Skriptet skrev bare ut tidene og antallet rader.
+
+- Den ekte lista er full (15 aksjer og 3 ønsker som venter), så `/folg` viser bare «Lista er full» og regner ingen rader. Målingen er derfor «Bytt ut» (`/folg?bytt=…`), som viser hele lista med omsetningen for alle: 277 rader, alle med omsetning.
+- Tre visninger: 0,051 s, 0,016 s og 0,017 s. Den første er lengst fordi malen lastes. `ferdige_lister.medianene` alene tok 0,003 s.
+- Én visning tar langt under ett sekund, så medianene regnes fortsatt én gang per forespørsel, og ingenting huskes i minnet (svaret kl. 14:29).
+
+### Spørsmål 14: et kall som feiler
+
+`test_et_kall_som_feiler_og_proeves_igjen_gir_minst` i `test_din_egen_liste_8_22.py`: DNB feiler i kveldens henting og hentes i et nytt forsøk 30 minutter senere (2.3b). Hentingen brukte da ett kall mer enn seriene den lagret, og steg 2 sier «minst» med seriene, ikke kallene. Mutanten der `valg.siste_henting` teller én for mye, ble fanget av testen og tre til, og `src/valg.py` hadde samme sha256 som HEAD etterpå.
