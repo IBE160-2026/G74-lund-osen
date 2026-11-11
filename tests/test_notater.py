@@ -718,11 +718,12 @@ def _vurdering_i_basen(sti: Path, symbol: str, dag: str):
 class TestBryteren:
     def test_bryteren_staar_i_innstillinger_med_hjelpen(self, klient, demobase):
         """Del E: ville feilet hvis «Notater» manglet i Innstillinger, ikke var
-        på fra start, eller sto uten «?» og teksten under."""
+        på fra start, eller sto uten teksten under. Story 8.24 (gruppens svar
+        10.11 kl. 22:59): uten «?», som Hjelp og KI-tekst."""
         side = klient.get("/innstillinger").data.decode("utf-8")
         assert 'value="vis_notater"' in side and "Vis notater" in side
         assert re.search(r'name="navn" value="vis_notater">\s*<input type="hidden" name="til" value="av">', side)
-        assert 'popovertarget="hjelp-notatene"' in side and 'id="hjelp-notatene"' in side
+        assert "hjelp-notatene" not in side and 'class="hjelpeknapp"' not in side
         assert "Appen sier aldri om noe var riktig." in _tekst(side)
 
     def test_av_skjuler_notatene_og_sletter_ingenting(self, klient, demobase):
@@ -745,7 +746,8 @@ class TestBryteren:
 class TestMinListe:
     def test_alle_notatene_samlet_nyeste_foerst_med_lenke(self, klient, demobase):
         """Del F: ville feilet hvis Min liste ikke viste notatene for alle
-        aksjene, nyeste først, med lenke til aksjen, eller hadde skjemaene."""
+        aksjene, nyeste først, med lenke til aksjen. Story 8.24: med de samme
+        knappene som aksjesiden, men uten skjemaet for et nytt notat."""
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "ELDST"})
         klient.post(f"/aksje/{ANNEN}/notat", data={"dag": "2026-10-09", "tekst": "NYEST"})
         side = klient.get("/min-liste").data.decode("utf-8")
@@ -753,7 +755,7 @@ class TestMinListe:
         delen = side[start : side.index("</section>", start)]
         assert delen.index("NYEST") < delen.index("ELDST")
         assert f'href="/aksje/{ANNEN}"' in delen and f'href="/aksje/{AKSJE}"' in delen
-        assert "<form" not in delen
+        assert 'class="nytt-notat"' not in delen and "/notat/slett" in delen
         assert "Etterpå" in _tekst(delen)
 
     def test_menyen_faar_ingen_ny_knapp(self, klient, demobase):
@@ -1141,3 +1143,91 @@ class TestEtterGjennomgangenAvTilleggene:
             if rad[8]:
                 solgt = datetime.fromisoformat(rad[8])
                 assert (solgt.hour, solgt.minute) >= (22, 30) and rad[9] == solgt.date().isoformat()
+
+
+# --- Story 8.24: to ting etter flettingen (gruppens svar 10.11 kl. 22:59) ------
+
+
+def _min_liste_delen(klient, adresse="/min-liste") -> str:
+    side = klient.get(adresse).data.decode("utf-8")
+    start = side.index('<section class="notater" id="mine-notater"')
+    return side[start : side.index("</section>", start)]
+
+
+class TestKnappeneIMinListe:
+    def test_samme_knapper_som_paa_aksjesiden(self, klient, demobase):
+        """Del B: ville feilet hvis Min liste manglet «Noter et tenkt kjøp» og
+        «Slett», eller knappen sendte en annen dag enn siste dag med kurser."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        delen = _min_liste_delen(klient)
+        felt = _kjoepsknapp(delen)
+        assert felt["dag"] == "2026-10-09" and felt["vis"] == "min-liste"
+        assert "Slett" in _tekst(delen) and "Noter et tenkt kjøp" in _tekst(delen)
+
+    def test_kjoepet_fra_min_liste_lagres_og_sender_tilbake(self, klient, demobase):
+        """Del B: ville feilet hvis et kjøp fra Min liste ikke ble lagret med
+        sjekkene for siste dag, eller svaret gikk til aksjesiden."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        svar = klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=_kjoepsknapp(_min_liste_delen(klient)))
+        assert svar.status_code == 303 and svar.headers["Location"] == "/min-liste#mine-notater"
+        (rad,) = _rader(demobase, "tenkt_kjoep")
+        assert rad[5:8] == _vurdering_i_basen(demobase, AKSJE, "2026-10-09")
+
+    def test_alle_sender_tilbake_til_alle(self, klient, demobase):
+        """Del B: ville feilet hvis svaret fra «Alle» i Min liste mistet valget."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        felt = _kjoepsknapp(_min_liste_delen(klient, "/min-liste?vis=alle"))
+        assert felt["vis"] == "min-liste-alle"
+        svar = klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        assert svar.headers["Location"] == "/min-liste?vis=alle#mine-notater"
+
+    def test_salget_og_slettingen_fra_min_liste(self, klient, demobase):
+        """Del B: ville feilet hvis salget eller slettingen ikke virket fra Min
+        liste, med de samme reglene."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        _kjoep_i_basen(demobase, rad[0], "2026-10-07")
+        delen = _min_liste_delen(klient)
+        assert not _kjoepsknapp(delen)
+        salget = _salgsknapp(delen)
+        assert klient.post(f"/aksje/{AKSJE}/notat/salg", data=salget).status_code == 303
+        assert _rader(demobase, "tenkt_kjoep")[0][9] == "2026-10-12"
+        slett = re.search(
+            r'action="/aksje/[A-Z]+/notat/slett"><input type="hidden" name="id" value="(\d+)"><input type="hidden" name="vis" value="([^"]*)"',
+            _min_liste_delen(klient),
+        )
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": slett.group(1), "vis": slett.group(2)})
+        assert svar.headers["Location"] == "/min-liste#mine-notater"
+        assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
+
+    def test_hoeyst_ett_aapent_kjoep_ogsaa_i_min_liste(self, klient, demobase):
+        """Del B: ville feilet hvis Min liste tilbød et nytt kjøp for en aksje
+        med et åpent kjøp."""
+        felt = TestTenkteKjoep()._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "y"})
+        assert not _kjoepsknapp(_min_liste_delen(klient))
+
+    def test_aksjen_som_fjernes_i_kveld(self, klient, demobase):
+        """Del B: ville feilet hvis Min liste tilbød et kjøp for en aksje som
+        fjernes i kveld, eller ikke sa hvorfor."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        klient.post("/fjern", data={"symbol": AKSJE, "tilbake": "oversikten"})
+        delen = _min_liste_delen(klient)
+        assert not _kjoepsknapp(delen) and "fjernes fra lista ved hentingen i kveld" in _tekst(delen)
+
+    def test_innledningen_sier_det(self, klient, demobase):
+        """Del B: ville feilet hvis innledningen i Min liste sa at notatene bare
+        endres på aksjesiden."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        tekst = _tekst(_min_liste_delen(klient))
+        assert "her kan du notere et tenkt kjøp eller salg og slette" in tekst
+
+
+class TestUtenSpoersmaalstegn:
+    def test_hjelpeteksten_for_notatene_er_borte(self):
+        """Del A: ville feilet hvis hjelpeteksten bak «?» ved Notater sto igjen
+        uten en side som viste den."""
+        from hjelpetekster import hjelpetekster
+
+        assert "notatene" not in hjelpetekster()

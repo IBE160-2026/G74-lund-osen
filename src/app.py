@@ -1075,6 +1075,8 @@ def _tabellsiden(aktiv: str):
         # liste, nyeste først, med lenke til aksjen. Bare med bryteren på.
         alle_notater=_alle_notatene() if i_lista else None,
         alle_notater_indeks=_indeksen_for_grafen()[0] if i_lista else None,
+        # Story 8.24: skjemaene ved notatene sender tilbake til samme liste.
+        alle_notater_vis="min-liste-alle" if alle else "min-liste",
         rader=rader,
         hovedindeks=hovedindeks,
         indeks_feilet=indeks_feilet,
@@ -1428,6 +1430,9 @@ _NOTAT_ID = re.compile(r"[0-9]{1,18}")
 # Gjennomgangen (ECH2, BH7): visningen skjemaet kom fra, så svaret går tilbake
 # til samme periode eller dag. Bare en dag eller en periode siden kjenner.
 _VISNINGEN = re.compile(r"dag=([0-9]{4}-[0-9]{2}-[0-9]{2})|periode=([a-z0-9-]+)")
+# Story 8.24 (gruppens svar 10.11 kl. 22:59): fra «Mine notater» i Min liste,
+# med eller uten «Alle». Bare disse to, så adressen aldri kommer fra skjemaet.
+MIN_LISTE_TILBAKE = {"min-liste": "/min-liste", "min-liste-alle": "/min-liste?vis=alle"}
 
 
 def _notatene(
@@ -1473,6 +1478,12 @@ class _Notatet:
     handelen: object
     kan_kjoepe: bool
     aksje: object
+    # Story 8.24 (gruppens svar 10.11 kl. 22:59): Min liste har de samme
+    # knappene som aksjesiden, så hvert notat bærer siste dag med kurser for
+    # aksjen, om et kjøp eller salg kan noteres, og om aksjen fjernes i kveld.
+    siste_dag: date | None = None
+    kan_handle: bool = False
+    fjernes: bool = False
 
 
 def _alle_notatene() -> list | None:
@@ -1493,6 +1504,7 @@ def _alle_notatene() -> list | None:
         oversiktsleser = SqliteOversiktsleser(tilkobling)
         kursleser = SqliteKurslager(tilkobling)
         i_dag = idag()
+        fjernes = _fjernes_i_kveld()
         per_aksje = {}
         for symbol in {n.symbol for n in notatene}:
             post = oversiktsleser.post(symbol)
@@ -1504,11 +1516,16 @@ def _alle_notatene() -> list | None:
     except (*BASEFEIL, ValueError) as feil:
         app.logger.warning("Notatene kunne ikke leses: %s", type(feil).__name__)
         return None
+    # Story 8.24: de samme reglene som på aksjesiden. Høyst ett åpent kjøp per
+    # aksje, bare for en aksje i lista som ikke fjernes i kveld, og bare med
+    # sjekkene for siste dag med kurser.
+    aapne = {k.symbol for k in kjoepene.values() if k.aapent}
     ut = []
     for notat in notatene:
         if notat.symbol not in per_aksje:
             continue
         post, rader, vurderingene = per_aksje[notat.symbol]
+        kan_handle = post.ut is None and bool(rader) and notat.symbol not in fjernes
         ut.append(
             _Notatet(
                 notat,
@@ -1518,8 +1535,11 @@ def _alle_notatene() -> list | None:
                 bygg_handelen(kjoepene[notat.id], rader, indeks, indeks_feilet=indeks_feilet)
                 if notat.id in kjoepene
                 else None,
-                kan_kjoepe=False,
+                kan_kjoepe=notat.id not in kjoepene and notat.symbol not in aapne and post.ut is None,
                 aksje=post.aksje,
+                siste_dag=rader[-1].dato if rader else None,
+                kan_handle=kan_handle,
+                fjernes=notat.symbol in fjernes,
             )
         )
     return ut
@@ -1536,6 +1556,9 @@ def _visningen(valg: Valg, slutt: date, periode: str | None) -> str:
 def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
     """Samme side, med samme periode eller dag, ved «Mine notater» (del B).
     En visning siden ikke kjenner, gir standardvisningen."""
+    # Story 8.24: skjemaene i Min liste sender tilbake dit, til «Mine notater».
+    if visningen in MIN_LISTE_TILBAKE:
+        return MIN_LISTE_TILBAKE[visningen] + f"#{NOTATANKER}"
     adresse_ = f"/aksje/{symbol}"
     treff = _VISNINGEN.fullmatch(visningen or "")
     if treff and treff.group(1) and _gyldig_dato(treff.group(1)):
