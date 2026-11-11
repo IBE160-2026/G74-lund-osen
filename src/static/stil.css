@@ -1308,3 +1308,23 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 .rundtur-steg li { margin-bottom: 0.3rem; }
 /* Lukket: lista har ingen boks, så ingenting regnes som synlig tekst (test_hjelpefeltet). */
 .rundtur:not([open]) .rundtur-steg { display: none; }
+/* Story 8.25: «Spill av omvisningen». Boksen står fast nederst til høyre og
+   dekker ikke delen den peker på, som er merket med en kraftig ramme. */
+.spill-av { font: inherit; font-size: 14px; font-weight: 600; padding: 0.3rem 0.8rem; margin: 0.5rem 0 0.25rem 0.5rem;
+            border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; cursor: pointer; }
+.rundtur-rad { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.omvisning-merket { outline: 3px solid var(--oransje); outline-offset: 4px; border-radius: 6px; }
+.omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
+             padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
+             border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
+.omvisning:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.omvisning h2 { margin: 0 0 6px; font-size: 20px; color: var(--blekk); }
+.omvisning p { margin: 0 0 10px; }
+.omvisning .omvisning-teller { color: var(--dempet); font-size: 13.5px; margin: 0 0 4px; }
+.omvisning-knapper { display: flex; flex-wrap: wrap; gap: 8px; }
+.omvisning-knapper button, .omvisning-tilbud button { font: inherit; padding: 6px 14px; border: 1px solid var(--strek-2);
+                                                       border-radius: 999px; background: var(--hvit); color: var(--blekk); cursor: pointer; }
+.omvisning-knapper button:disabled { opacity: 0.5; cursor: default; }
+.omvisning-tilbud { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0; padding: 12px 16px;
+                    background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; }
+.omvisning-tilbud p { margin: 0; }

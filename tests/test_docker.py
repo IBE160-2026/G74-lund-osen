@@ -1318,7 +1318,9 @@ HOEYDE_PAA_BILDET = 1864
 # bildene ble tatt paa nytt med DevTools-protokollen, med de samme hoeydene, og var byte for byte de samme.
 # Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_BILDET = "0168adc0f1c3f6b28319f56ed49d92d2aec78ae8be19601ae5b563c0ce520933"
+# Story 8.25: «Spill av omvisningen» ved «Vis meg rundt» (hjelp.js, _rundtur.html, _ramme.html og
+# stil.css). Avtrykkene er regnet ut paa nytt, og bildene med knappen er tatt paa nytt, med samme hoeyder.
+AVTRYKK_BAK_BILDET = "b057b05f933f447edb3de91bbc30d6ce61c2c2548d2dc3a89c2238cba7009c40"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1755,7 +1757,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # «Mine notater», og var byte for byte det samme (gjennomgangen, VG6).
 # Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "6dfb932aebc4b12683cd99bdc8d47f5fe0ee3ab0875573a88bd6c23a88b0e090"
+AVTRYKK_BAK_AKSJESIDEN = "5c64c2266ed52e611bce17657951c3ab6c2a225dd1f9ce6abeecf7fd72710514"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1931,17 +1933,17 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "0168adc0f1c3f6b28319f56ed49d92d2aec78ae8be19601ae5b563c0ce520933",
-    "docs/appen/boersometeret-demo.png": "61ab81f87302bfc537eb495f129dac6f568a7f8eaa478f9cb1039694524ef369",
-    "docs/appen/min-liste-demo.png": "a1448ef5acb537134dec2ef0fddf563b8c15da57c7f26258d412c97a846bb468",
-    "docs/appen/oversikten-390-demo.png": "0168adc0f1c3f6b28319f56ed49d92d2aec78ae8be19601ae5b563c0ce520933",
-    "docs/appen/boersometeret-390-demo.png": "61ab81f87302bfc537eb495f129dac6f568a7f8eaa478f9cb1039694524ef369",
-    "docs/appen/din-egen-liste-demo.png": "a1448ef5acb537134dec2ef0fddf563b8c15da57c7f26258d412c97a846bb468",
-    "docs/appen/investorsiden-brfe-demo.png": "29d934062d6352d5a57fe280b2f2da815a86175450d6acd594c83fecf260a3a4",
-    "docs/appen/investorsiden-brfe-390-demo.png": "29d934062d6352d5a57fe280b2f2da815a86175450d6acd594c83fecf260a3a4",
-    "docs/appen/notatene-brfe-demo.png": "6dfb932aebc4b12683cd99bdc8d47f5fe0ee3ab0875573a88bd6c23a88b0e090",
-    "docs/appen/notatene-min-liste-demo.png": "a1448ef5acb537134dec2ef0fddf563b8c15da57c7f26258d412c97a846bb468",
-    "docs/appen/innstillinger-demo.png": "54a2ff3d42a9d9ca4425ab51c47061588850c93bd552f4f4ba0bc828100022f1",
+    TOPPEN_AV_OVERSIKTEN: "b057b05f933f447edb3de91bbc30d6ce61c2c2548d2dc3a89c2238cba7009c40",
+    "docs/appen/boersometeret-demo.png": "36f076a7b63b4fcb027786d0c57a91ec9f387f678679a34b774d759221c9ca71",
+    "docs/appen/min-liste-demo.png": "e8ac6181965df62342b2ae1d15c7dc2378cfe21f1f8cd57333ea62e6bce29d2e",
+    "docs/appen/oversikten-390-demo.png": "b057b05f933f447edb3de91bbc30d6ce61c2c2548d2dc3a89c2238cba7009c40",
+    "docs/appen/boersometeret-390-demo.png": "36f076a7b63b4fcb027786d0c57a91ec9f387f678679a34b774d759221c9ca71",
+    "docs/appen/din-egen-liste-demo.png": "e8ac6181965df62342b2ae1d15c7dc2378cfe21f1f8cd57333ea62e6bce29d2e",
+    "docs/appen/investorsiden-brfe-demo.png": "e210618091474545a37cd00a417e73062cf5975d571b55fd0ffb24d8f307a893",
+    "docs/appen/investorsiden-brfe-390-demo.png": "e210618091474545a37cd00a417e73062cf5975d571b55fd0ffb24d8f307a893",
+    "docs/appen/notatene-brfe-demo.png": "5c64c2266ed52e611bce17657951c3ab6c2a225dd1f9ce6abeecf7fd72710514",
+    "docs/appen/notatene-min-liste-demo.png": "e8ac6181965df62342b2ae1d15c7dc2378cfe21f1f8cd57333ea62e6bce29d2e",
+    "docs/appen/innstillinger-demo.png": "b3af36feac2c11c1e70f41dc2c91e715ac436d65ac1ca56250d2c7cc78e786f2",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

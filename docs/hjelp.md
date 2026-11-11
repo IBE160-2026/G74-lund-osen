@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-11T01:25
+updated: 2026-11-11T02:32
 ---
 
 # Hjelp til «Kom i gang»
@@ -213,7 +213,7 @@ Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en f
 
 ### Hva er «Vis meg rundt»?
 
-Øverst på oversikten, Min liste, børsometeret, aksjesiden, Innstillinger og «Følg en aksje» står knappen «Vis meg rundt». Den åpner en kort liste, høyst sju steg, over delene av siden, og hvert steg er en lenke som går til delen det forklarer. Stegene om signalstyrken, retningen og sjekkene er tekstene fra tavla 12.10, uten setningene som er tatt bort fra sidene siden, og tallene i stegene er de som gjelder i appen. På aksjesiden for en dag uten vurdering står ikke stegene om sjekkene, fordi siden ikke viser dem. Oversikten og børsometeret har knappen når de har aksjer å vise, og Min liste når du har merket en aksje. «Følg en aksje» har den på søket, ikke når lista er full eller en aksje er valgt. Knappen følger «Vis hjelp» i Innstillinger: med hjelpen av står den ikke. Det gjelder både demoen og den ekte versjonen.
+Øverst på oversikten, Min liste, børsometeret, aksjesiden, Innstillinger og «Følg en aksje» står knappen «Vis meg rundt». Den åpner en kort liste, høyst sju steg, over delene av siden, og hvert steg er en lenke som går til delen det forklarer. Stegene om signalstyrken, retningen og sjekkene er tekstene fra tavla 12.10, uten setningene som er tatt bort fra sidene siden, og tallene i stegene er de som gjelder i appen. På aksjesiden for en dag uten vurdering står ikke stegene om sjekkene, fordi siden ikke viser dem. Oversikten og børsometeret har knappen når de har aksjer å vise, og Min liste når du har merket en aksje. «Følg en aksje» har den på søket, ikke når lista er full eller en aksje er valgt. Ved siden av står «Spill av omvisningen», som går gjennom sidene i fast rekkefølge, oversikten, en aksjeside, børsometeret, Min liste og Innstillinger, ett steg om gangen med de samme tekstene. Hvert steg merker delen det forklarer, og har «Tilbake», «Neste» og «Lukk»; Esc lukker også. Aksjesiden er den første aksjen i tabellen på oversikten. Første gang appen åpnes i nettleseren, tilbys omvisningen øverst på oversikten, og svaret, også «Nei takk», huskes i nettleseren, ikke i basen. Omvisningen trenger skriptet; uten det står bare lista. Knappene følger «Vis hjelp» i Innstillinger: med hjelpen av står de ikke. Det gjelder både demoen og den ekte versjonen.
 
 ### Hva er «Innstillinger»?
 

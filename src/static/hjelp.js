@@ -7,6 +7,8 @@
 "use strict";
 
 (function () {
+  // Story 8.25: testene kjører omvisningen under med Node, uten en side.
+  if (typeof HTMLElement === "undefined") return;
   // Gjennomgangen (ECH3): uten popover i nettleseren står hjelpen som før.
   if (!("popover" in HTMLElement.prototype)) return;
   const BRED = window.matchMedia("(min-width: 1056px)");
@@ -180,4 +182,230 @@
     if (e.persisted) side(lagret() === "venstre");
   });
   rot.classList.add("hjelpefelt");
+})();
+
+
+// Story 8.25 (gruppens svar 10.11 kl. 22:59): «Spill av omvisningen» ved «Vis
+// meg rundt». Omvisningen går gjennom sidene i fast rekkefølge, ett steg om
+// gangen, med de samme tekstene som «Vis meg rundt» (hjelpetekster.py).
+// Stegene står som data i rammen (id-en omvisning), så siden har ett skript.
+// Hvor omvisningen er, står i sessionStorage, så den følger med fra side til
+// side. At tilbudet første gang er besvart, står i localStorage i nettleseren
+// (spørsmål 3 i spec-8-25-spill-av-omvisningen.md), så det trengs ingen
+// migrasjon. Uten skriptet står lista fra 8.9 som før.
+const OMVISNING = {
+  // Sidene i fast rekkefølge, og adressen til hver. Aksjesiden er den første
+  // aksjen i tabellen på oversikten, som omvisningen leser der.
+  SIDENE: ["oversikt", "aksje", "boersometer", "min_liste", "innstillinger"],
+  ADRESSE: {
+    oversikt: "/",
+    boersometer: "/boersometer",
+    min_liste: "/min-liste?vis=alle",
+    innstillinger: "/innstillinger",
+  },
+  STEGET: "ose-omvisning", // sessionStorage: indeksen til steget
+  AKSJEN: "ose-omvisning-aksje", // sessionStorage: adressen til aksjesiden
+  SVARET: "ose-omvisning-svar", // localStorage: tilbudet første gang er besvart
+
+  // Indeksen til steget man kommer til fra i i retningen (1 eller -1). Et
+  // steg på denne siden uten delen det peker på, hoppes over; et steg på en
+  // annen side kan ikke sjekkes her, så det gis tilbake. -1 når det ikke er
+  // flere steg.
+  nesteSteg(steg, i, retning, side, finnes) {
+    for (let j = i; j >= 0 && j < steg.length; j += retning) {
+      if (steg[j].side !== side || finnes(steg[j].anker)) return j;
+    }
+    return -1;
+  },
+
+  // Adressen til en side, eller null når aksjesiden ikke er kjent.
+  adresse(side, aksjen) {
+    if (side === "aksje") return aksjen || null;
+    return OMVISNING.ADRESSE[side] || null;
+  },
+
+  // «Steg 3 av 18»: nummeret i hele omvisningen.
+  teller(i, antall) {
+    return `Steg ${i + 1} av ${antall}`;
+  },
+};
+
+if (typeof module === "object" && module.exports) {
+  module.exports = OMVISNING;
+}
+
+(function () {
+  if (typeof document === "undefined") return;
+  const data = document.getElementById("omvisning");
+  if (!data) return;
+  let steg;
+  try {
+    steg = JSON.parse(data.dataset.steg);
+  } catch {
+    return;
+  }
+  if (!Array.isArray(steg) || steg.length === 0) return;
+  const SIDE = data.dataset.side;
+  let boksen = null;
+  let merket = null;
+  let fokusFoer = null;
+
+  function les(lager, noekkel) {
+    try {
+      return lager.getItem(noekkel);
+    } catch {
+      return null;
+    }
+  }
+  function skriv(lager, noekkel, verdi) {
+    try {
+      if (verdi === null) lager.removeItem(noekkel);
+      else lager.setItem(noekkel, verdi);
+    } catch {
+      // Lagringen er slått av: omvisningen virker på denne siden.
+    }
+  }
+
+  function aksjen() {
+    if (SIDE === "oversikt") {
+      const lenke = document.querySelector('#aksjene a[href^="/aksje/"]');
+      if (lenke) skriv(sessionStorage, OMVISNING.AKSJEN, lenke.getAttribute("href"));
+    }
+    return les(sessionStorage, OMVISNING.AKSJEN);
+  }
+
+  function fjernMerket() {
+    if (merket) merket.classList.remove("omvisning-merket");
+    merket = null;
+  }
+
+  function avslutt() {
+    skriv(sessionStorage, OMVISNING.STEGET, null);
+    fjernMerket();
+    if (boksen) boksen.remove();
+    boksen = null;
+    document.removeEventListener("keydown", tast);
+    if (fokusFoer && document.contains(fokusFoer)) fokusFoer.focus();
+  }
+
+  function tast(e) {
+    if (e.key === "Escape" && boksen) {
+      e.preventDefault();
+      avslutt();
+    }
+  }
+
+  function knapp(tekst, klasse, handling) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = klasse;
+    b.textContent = tekst;
+    b.addEventListener("click", handling);
+    return b;
+  }
+
+  function gaaTil(i, retning) {
+    const j = OMVISNING.nesteSteg(steg, i, retning, SIDE, (anker) => document.getElementById(anker) !== null);
+    if (j < 0) return avslutt();
+    const s = steg[j];
+    if (s.side !== SIDE) {
+      const adresse = OMVISNING.adresse(s.side, aksjen());
+      if (!adresse) return gaaTil(j + retning, retning);
+      skriv(sessionStorage, OMVISNING.STEGET, String(j));
+      window.location.href = adresse;
+      return;
+    }
+    vis(j);
+  }
+
+  // Noen anker fra 8.9 er et tomt merke rett foran delen, som
+  // <span id="noekkeltallene">. Da merkes delen etter merket.
+  function delen(anker) {
+    if (anker.childElementCount === 0 && anker.textContent.trim() === "" && anker.nextElementSibling) {
+      return anker.nextElementSibling;
+    }
+    return anker;
+  }
+
+  function vis(j) {
+    const s = steg[j];
+    const del = delen(document.getElementById(s.anker));
+    skriv(sessionStorage, OMVISNING.STEGET, String(j));
+    fjernMerket();
+    merket = del;
+    del.classList.add("omvisning-merket");
+    del.scrollIntoView({ block: "center" });
+    if (!boksen) {
+      fokusFoer = document.activeElement;
+      boksen = document.createElement("div");
+      boksen.className = "omvisning";
+      boksen.setAttribute("role", "dialog");
+      boksen.setAttribute("aria-modal", "false");
+      boksen.setAttribute("aria-labelledby", "omvisning-tittel");
+      boksen.setAttribute("aria-describedby", "omvisning-tekst");
+      boksen.tabIndex = -1;
+      document.body.appendChild(boksen);
+      document.addEventListener("keydown", tast);
+    }
+    boksen.replaceChildren();
+    const teller = document.createElement("p");
+    teller.className = "omvisning-teller";
+    teller.textContent = OMVISNING.teller(j, steg.length);
+    const tittel = document.createElement("h2");
+    tittel.id = "omvisning-tittel";
+    tittel.textContent = s.tittel;
+    const tekst = document.createElement("p");
+    tekst.id = "omvisning-tekst";
+    tekst.textContent = s.tekst;
+    const knappene = document.createElement("div");
+    knappene.className = "omvisning-knapper";
+    const tilbake = knapp("Tilbake", "omvisning-tilbake", () => gaaTil(j - 1, -1));
+    tilbake.disabled = j === 0;
+    const siste = j === steg.length - 1;
+    knappene.append(
+      tilbake,
+      knapp(siste ? "Ferdig" : "Neste", "omvisning-neste", () => (siste ? avslutt() : gaaTil(j + 1, 1))),
+      knapp("Lukk", "omvisning-lukk", avslutt),
+    );
+    boksen.append(teller, tittel, tekst, knappene);
+    boksen.focus();
+  }
+
+  function start() {
+    skriv(localStorage, OMVISNING.SVARET, "ja");
+    gaaTil(0, 1);
+  }
+
+  // Første gang appen åpnes: tilbudet øverst på oversikten, én gang. Et
+  // svar, ja eller nei, huskes i nettleseren.
+  function tilby() {
+    const rad = document.createElement("div");
+    rad.className = "omvisning-tilbud";
+    rad.setAttribute("role", "region");
+    rad.setAttribute("aria-label", "Omvisning");
+    const tekst = document.createElement("p");
+    tekst.textContent = "Første gang her? Omvisningen viser sidene i appen, ett steg om gangen.";
+    const ja = knapp("Spill av omvisningen", "spill-av", () => {
+      rad.remove();
+      start();
+    });
+    const nei = knapp("Nei takk", "omvisning-nei", () => {
+      skriv(localStorage, OMVISNING.SVARET, "nei");
+      rad.remove();
+    });
+    rad.append(tekst, ja, nei);
+    const main = document.querySelector("main");
+    if (main) main.prepend(rad);
+  }
+
+  for (const b of document.querySelectorAll("button.spill-av[hidden]")) {
+    b.hidden = false;
+    b.addEventListener("click", start);
+  }
+  const lagret = les(sessionStorage, OMVISNING.STEGET);
+  if (lagret !== null && /^[0-9]+$/.test(lagret) && Number(lagret) < steg.length) {
+    gaaTil(Number(lagret), 1);
+  } else if (SIDE === "oversikt" && les(localStorage, OMVISNING.SVARET) === null) {
+    tilby();
+  }
 })();
