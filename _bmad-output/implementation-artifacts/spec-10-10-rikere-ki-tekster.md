@@ -227,3 +227,10 @@ Bygget: `reglene()` og `BRANSJEFORMEN` i `src/ki_dagen.py` (formen for én brans
 Den nye teksten om dagen fra Gemma besto på første forsøk. Ollama ble stoppet kl. 19:36, fordi dette vinduet startet den.
 
 > Hovedindeksen falt fredag. De siste fem børsdagene falt hovedindeksen. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. Det var flere enn vanlig: snittet de siste 20 børsdagene er 3. Blant dem var Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv), Laksevik Sjømat (3 av 3, blandet), Trygghavn Forsikring (3 av 3, blandet), Havdyp Olje (2 av 3, blandet) og 2 andre. I snitt steg sjømat mest. I snitt falt finans mest.
+
+Mutant I (`reglene` tar alltid med formen for én bransje) ble fanget av `TestSvaret1930`, og sha256 mot HEAD var lik. Edge Case Hunter fant ingen funn på middels eller over:
+
+| Funn | Grad | Hva | Triage |
+|---|---|---|---|
+| ECH1 | lav | Med setningen om vanlig mellom «skilte seg ut» og «Blant dem var» kan «dem» leses som børsdagene | Står: rekkefølgen er gruppens svar kl. 19:30 |
+| ECH2 | lav | Versjonen står som dag-2 selv om reglene er endret | Står: dag-2 er ikke flettet, og ingen tekst i basen har den. Avtrykket er satt på nytt |
