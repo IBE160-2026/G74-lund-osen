@@ -197,12 +197,13 @@
 // serveren. Et klikk på en bransje eller en omsetning sender skjemaet; med
 // tastaturet flytter piltastene valget uten å laste siden, og «Vis» sender
 // det (gjennomgangen, BH4, ECH2, WCAG 3.2.2). Står her fordi sidene bare har
-// ett skript (8.0f), og gjelder bare siden med lista.
+// ett skript (8.0f), og gjelder bare siden med lista. Tillegg 3: radene er
+// rader i en tabell, som på oversikten.
 (function () {
   const felt = document.querySelector("input[data-folgsok]");
   const lista = document.getElementById("foelgbare");
   if (!felt || !lista) return;
-  const rader = Array.from(lista.querySelectorAll("li[data-kode]"));
+  const rader = Array.from(lista.querySelectorAll("tr[data-kode]"));
   const antall = document.getElementById("antall-vist");
   const ingen = document.getElementById("ingen-treff");
   function filtrer() {

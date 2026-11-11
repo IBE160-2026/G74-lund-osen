@@ -1259,12 +1259,16 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 }
 :where(.side-oversikt) .antall-folg, :where(.side-oversikt) .antall-vist { color: var(--dempet); }
 :where(.side-oversikt) .alle-tittel { margin: 20px 0 6px; font-size: 18px; }
-:where(.side-oversikt) .foelgbare { list-style: none; padding: 0; margin: 8px 0; }
-:where(.side-oversikt) .foelgbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 0;
-                                   border-top: 1px solid var(--strek); }
+/* Tillegg 3 (svarene 10.11 kl. 22:44): radene i samme kort og med samme svarte kolonnerad som
+   tabellen på oversikten. Tabellen er smalere enn den, så den får plass ved 390 px. */
+:where(.side-oversikt) .folgtabell { margin: 8px 0; }
+:where(.side-oversikt) .folgtabell table { min-width: 0; }
 :where(.side-oversikt) .foelgbar[hidden] { display: none; }
-:where(.side-oversikt) .foelgbar .knapp { margin-left: auto; min-height: 36px; }
-:where(.side-oversikt) .foelgbar .ikke-maalt { color: var(--dempet); font-style: italic; }
+:where(.side-oversikt) .folgtabell td.omsetning { font-weight: 600; }
+:where(.side-oversikt) .folgtabell td.omsetning .utenformerke { margin-top: 4px; }
+:where(.side-oversikt) .folgtabell td.valg { width: 1%; text-align: right; white-space: nowrap; }
+:where(.side-oversikt) .folgtabell .knapp { min-height: 36px; }
+:where(.side-oversikt) .folgtabell .ikke-maalt { color: var(--dempet); font-style: italic; font-weight: 400; }
 /* Story 8.22 (utdraget §2): «Din egen liste» som tre stegkort, med kant og
    hjørner som de andre kortene, og nummeret i en sirkel. */
 :where(.side-oversikt) .stegkort { list-style: none; padding: 0; margin: 12px 0 16px; display: grid; gap: 12px;

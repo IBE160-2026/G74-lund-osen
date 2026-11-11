@@ -23,13 +23,14 @@ def _side(klient, adresse="/folg"):  # noqa: F811
 
 
 def _rader(html: str, synlige: bool = True) -> list[str]:
-    """Tickerne i hele lista (id foelgbare), i rekkefølgen de står."""
-    lista = html.split('<ul class="foelgbare" id="foelgbare">', 1)[1].split("</ul>", 1)[0]
+    """Tickerne i hele lista (id foelgbare), i rekkefølgen de står. Tillegg 3:
+    radene er rader i en tabell."""
+    lista = html.split('<tbody id="foelgbare">', 1)[1].split("</tbody>", 1)[0]
     ut = []
-    for li in re.findall(r"<li class=\"foelgbar\"[^>]*>.*?</li>", lista, re.S):
-        if synlige and " hidden>" in li.split("\n", 1)[0]:
+    for tr in re.findall(r"<tr class=\"foelgbar\"[^>]*>.*?</tr>", lista, re.S):
+        if synlige and " hidden>" in tr.split("\n", 1)[0]:
             continue
-        ut.append(re.search(r'href="/folg\?kode=([A-Z0-9]+)', li).group(1))
+        ut.append(re.search(r'href="/folg\?kode=([A-Z0-9]+)', tr).group(1))
     return ut
 
 
@@ -61,13 +62,37 @@ class TestLista:
         «ikke målt ennå»."""
         maal(stier[1], [("NYA", 50e6), ("NYB", 10e6)])
         html = _side(klient)
-        rad_c = html.split('data-kode="nyc" data-navn="ny c asa"', 1)[1].split("</li>", 1)[0]
+        rad_c = html.split('data-kode="nyc" data-navn="ny c asa"', 1)[1].split("</tr>", 1)[0]
         assert "ikke målt ennå" in rad_c and '<a class="knapp" href="/folg?kode=NYC"' in rad_c
         assert ">Følg</a>" in rad_c
-        rad_a = html.split('data-kode="nya" data-navn="ny aksje asa"', 1)[1].split("</li>", 1)[0]
-        assert "ca. 50,0 MNOK om dagen, målt 22.10</span>" in rad_a and "Utenfor målingen" not in rad_a
-        rad_b = html.split('data-kode="nyb" data-navn="ny b asa"', 1)[1].split("</li>", 1)[0]
+        rad_a = html.split('data-kode="nya" data-navn="ny aksje asa"', 1)[1].split("</tr>", 1)[0]
+        assert 'ca. 50,0 MNOK<span class="fra">målt 22.10</span>' in rad_a and "Utenfor målingen" not in rad_a
+        rad_b = html.split('data-kode="nyb" data-navn="ny b asa"', 1)[1].split("</tr>", 1)[0]
         assert "Utenfor målingen" in rad_b and "</svg>Helse</span>" in rad_b
+
+    def test_radene_som_tabellen_paa_oversikten(self, klient, stier):  # noqa: F811
+        """Tillegg 3: ville feilet hvis radene ikke sto i samme kort med
+        svart kolonnerad som tabellen på oversikten, med navnet og så
+        tickeren og bransjeikonet under i første celle, omsetningen i en egen
+        kolonne og «Følg» i den siste, til høyre."""
+        maal(stier[1], [("NYA", 50e6)])
+        html = _side(klient)
+        boksen = html.split('<div class="tabellboks folgtabell" role="region" aria-label="Aksjene som kan følges"', 1)[
+            1
+        ]
+        hode = boksen.split("<thead>", 1)[1].split("</thead>", 1)[0]
+        assert re.findall(r"<th[^>]*>", hode) == ["<th>", '<th class="tall">', "<th>"]
+        assert ">Selskap</th>" in hode and ">Omsetning<span" in hode
+        rad = boksen.split('data-kode="nya" data-navn="ny aksje asa">', 1)[1].split("</tr>", 1)[0]
+        celler = re.findall(r'<td class="([^"]+)">', rad)
+        assert celler == ["selskap", "tall omsetning", "valg"]
+        selskap = rad.split('<td class="selskap">', 1)[1].split("</td>", 1)[0]
+        assert re.fullmatch(
+            r'Ny Aksje ASA<span class="linje">NYA · <svg class="bransjesymbol".*</svg>Kraft</span>', selskap, re.S
+        )
+        assert ">Følg</a></td>" in rad.split('<td class="valg">', 1)[1]
+        css = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        assert ":where(.side-oversikt) .folgtabell td.valg { width: 1%; text-align: right;" in css
 
     def test_bytt_ut_bruker_den_samme_lista(self, klient, stier):  # noqa: F811
         """Ville feilet hvis «Bytt ut» mistet byttet i en rad eller i
@@ -251,6 +276,7 @@ def test_skriptet_filtrerer_paa_det_samme_som_serveren():
     del_ = js.split("Story 8.22", 1)[1]
     assert 'querySelector("input[data-folgsok]")' in del_
     assert "rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst)" in del_
+    assert 'lista.querySelectorAll("tr[data-kode]")' in del_
     assert 'felt.addEventListener("input", filtrer)' in del_ and "rad.hidden = !med" in del_
     assert "toLowerCase()" in del_ and 'getElementById("antall-vist")' in del_
     assert 'addEventListener("pointerdown"' in del_ and "if (klikk) felt.form.submit()" in del_
