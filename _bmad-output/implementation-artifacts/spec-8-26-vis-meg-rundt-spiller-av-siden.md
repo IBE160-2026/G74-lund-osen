@@ -51,10 +51,11 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 6. **Ordene for en aksje uten kurser (tillegg 2).** *Forslag:* rådets ord, «ingen kurser ennå», under «–» i raden på oversikten og i Min liste, og «uten kurser» i båndet over radene. På børsometeret står «Ingen kurs» i ruta, fordi den må få plass i en stor rute (`STOR`, 207 px, som «Uten data»), og «Ingen kurser ennå» i tabellen under kartet og når man peker på ruta. «Ukjent» bak «?» ved Retning sier at det også gjelder en aksje uten kurser. Aksjesiden for en aksje uten kurser sier alt «Det finnes ingen kurser for … ennå», og står som før. «venter på henting» står for aksjene som venter, i del 5.
 7. **Stjernen og aksjene som venter (tillegg 3).** *Forslag:*
    - **Stjernen** skrives av nettsiden i `min_liste` i samme transaksjon som ønsket i `oenske`, og ingenting annet skrives (regel 22). En aksje som venter, står ikke i `aksje` ennå, og triggerne fra 0007 avviste den, så **migrasjon 0013** lar dem godta et symbol med et ønske om å følge som verken er tatt i bruk eller avvist. Med en migrasjon kan storyen bare flettes kl. 23:50–23:58. Alternativet uten migrasjon er at hentingen setter stjernen når den tar aksjen inn, men da skriver hentingen `min_liste`, mot AD-3 og føringen 30.09, eller at stjernen bare vises og ikke kan tas bort før hentingen.
-   - **Tallet i overskriften** («N av M aksjer») teller ikke en aksje som venter, fordi appen ikke følger den før hentingen. Båndet over radene sier «og N venter på henting», og «Min liste» med antallet teller den, fordi den har stjerne og en rad.
-   - **«Angre»** tar også bort stjernen som «Følg» satte, også i et bytte, så Min liste ikke har en aksje appen ikke følger.
+   - **Tallene** («N av M aksjer», «Alle», «Min liste», «Øvrige aksjer» og «appen følger 16 av 18») teller en aksje som venter, som radene i tabellen, og båndet over radene sier «og N venter på henting». Først var forslaget at overskriften ikke talte den, men da sprikte tallene på samme side (gjennomgangen, ECH3). Med «Velg dag» står den ikke, fordi appen ikke fulgte den den dagen.
+   - **«Angre»** tar også bort stjernen som «Følg» satte, også i et bytte, så Min liste ikke har en aksje appen ikke følger. En stjerne på en aksje som verken står i lista eller venter (ønsket ble avvist eller slettet), ryddes bort ved neste «Følg», «Angre» eller «Bruk denne lista». En aksje fra en ferdig liste får ikke stjerne, fordi svaret gjelder «Følg».
    - **Børsometeret** viser ikke en aksje som venter, fordi den ikke har kurs eller rute ennå. **Siden Min liste** viser den nederst med «venter på henting», som oversikten. Raden har stjernen, «Egen» og navnet uten lenke, fordi aksjen ikke har en aksjeside før hentingen.
 8. **Ordene om «lista» (tillegg 3, del 2).** *Forslag:* der «lista» betyr alle aksjene appen følger, sier sidene det: «appen følger 16 av 18» (to steder), «Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen.» (tre steder og i `valg.py`, også «… for å angre dette.»), «Appen følger alt …, eller den venter på hentingen.» og «Appen kan følge opptil 18 aksjer …». Ikke endret: «lista di» (stegene i «Din egen liste», som er brukerens egen liste), meldingen «N endringer i lista tas i bruk ved hentingen» og «13 av de 15 aksjene i lista» i «Signalet forklart» og KI-teksten, fordi tillegget sier at bare de setningene endres, og KI-teksten kontrolleres mot ordene.
+9. **Testene av boksen i nettleseren (gjennomgangen, VG1, middels).** *Forslag:* skriptet testes som før: de rene funksjonene i `OMVISNING` kjøres med Node, og resten (`start`, `visSiden`, `avslutt`, lenken og `pageshow`) sjekkes i kildeteksten og er prøvd i Edge mot demoen for hver del og etter gjennomgangen. En test som kjører siden i en nettleser eller med jsdom, krever pakker fra npm i CI, som repoet ikke har. Alternativet er å legge til jsdom i CI før flettingen.
 
 ## Delene
 
@@ -124,3 +125,38 @@ Hver del har tester med «Ville feilet hvis» i `tests/test_vis_meg_rundt_8_26.p
 - **Likt i begge versjonene:** demoen henter aldri, så en aksje man følger der, står alltid nederst med «venter på henting». En test viser det samme i den ekte versjonen med en testbase.
 
 **Ville feilet hvis:** «Følg» ikke ga stjerne og rad med en gang, skrev noe annet enn ønsket og stjernen, stjernen ikke kunne tas bort og settes igjen, «Angre» lot stjernen stå, tallet i overskriften talte en aksje som venter, triggeren godtok et ukjent symbol, eller sidene sa «aksjer i lista» og «Lista er full».
+
+## Bildene
+
+Bildene i `docs/appen/` er tatt på nytt fra demoen etter delene (`947b1d79`), med de nye høydene for bildene av hele siden, og avtrykkene er regnet ut på nytt. Bildene før og etter, også ved 390 px, og bilder av «Vis meg rundt» og en aksje som venter, står i PR-en fra bildegrenen `pr-8-26-bilder`. I bildet av investorsiden sto «(åpnes i en ny fane)» synlig i demolinja; det er rettet i `16aded4d`, med en test.
+
+## Mutantene
+
+Én per del, med kopi før og sha256 mot HEAD etter; alle ble fanget av `tests/test_vis_meg_rundt_8_26.py`, og hver fil var lik HEAD etterpå:
+
+- Del 1 (`e06fa3e6`): uten lenken «Spill av hele omvisningen» i `hjelp.js`.
+- Del 2 (`d24de09a`): bryteren ved «Børsdagen kort fortalt» i blekk igjen.
+- Del 3 (`1b180fcf`): fotnoten satt inn igjen i `index.html`.
+- Del 4 (`4d2ee9ec`): `UTEN_DATA_TEKST` «uten data» igjen. Fanget i demoen; testbasen for den ekte versjonen har ingen aksje uten kurser, så den varianten besto.
+- Del 5 (`c922edcc`): uten stjernen i `valg.folg()`.
+- Del 6 (`8846fbc1`): lenken «Den ekte versjonen» uten `target="_blank"`.
+
+## Gjennomgangen 11.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen fra `7fd5320c`, uten bildene; Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 17 funn, Edge Case Hunter 9 og Verification Gap 9. Ingen høye.
+
+*Middels*
+- *ECH1 og BH4, rettet.* «Spill av omvisningen» mens boksen fra «Vis meg rundt» var åpen, spilte bare siden. Nå lukker `start()` boksen først. Prøvd i Edge: fra steg 2 av 4 på børsometeret til steg 1 av 23 på `/`.
+- *ECH2, rettet.* En side fra hurtigbufferen beholdt stegene for siden; `oppstart()` setter hele omvisningen tilbake.
+- *ECH3, BH10, BH11 og VG4, rettet.* Tallene sprikte når en aksje venter: overskriften talte den ikke, men radene, «Min liste» og «appen følger» gjorde. Nå teller alle den (spørsmål 7).
+- *ECH4 og VG5, rettet.* «Ingen kurser ennå» sto også for en aksje med kurser, men uten kurs på dagen. Nå sier tabellen og `title` «Ingen kurs den dagen» da (`aldri_kurs`).
+- *BH1, rettet.* En påstand i `test_tallene_foelger_konstantene` hadde havnet i en kommentar.
+- *BH2 og ECH5, rettet.* En stjerne fra «Følg» ble liggende når ønsket ble avvist eller slettet, og kunne følge med aksjen fra en ferdig liste. Nå ryddes den (`_rydd_stjernene`). At en aksje fra en ferdig liste ikke får stjerne, følger av svaret, som gjelder «Følg», og hjelpen sier «med «Følg»».
+- *BH8 og VG2, rettet.* Testen av triggeren prøvde ikke et ønske som er avvist eller tatt i bruk, et ønske om å fjerne eller UPDATE.
+- *VG3, rettet.* «Angre» i et bytte har en test.
+- *VG1, åpent, spørsmål 9.* Testene av boksen søker i kildeteksten; ingen test kjører siden i en nettleser. Forslaget er å la det stå, med prøvingen i Edge.
+
+*Lav*
+- *Rettet:* ECH7 (en aksje som venter, står ikke med «Velg dag»), BH15 (kommentarene om høydene i `test_docker.py`), BH16 («Ukjent» og hjelpen om raden sier «venter på hentingen» og at raden ikke har lenke), BH17 (docstringen sier 13), VG7 (kommentarene ved `SqliteMinlistelager` og `_SKRIVERE`).
+- *Ført:* BH3 og ECH6 («Angre» tar også en stjerne som fantes før, for en aksje som var tatt ut og følges igjen; den står da også uten lenke mens den venter), BH5 (knappen «Vis meg rundt» står bare når dataene for omvisningen kan leses, som på alle sidene med knappen), BH6 (lenken «Spill av hele omvisningen» er en lenke med `href="#"`), BH7 (ingen egen fokusring for sideknappene, verken lenkene eller knappene), BH9 (som VG1), BH12 (`FULL` sier 18 også når testene endrer `TAK`), ECH8 (en base på versjon 12 gir feil ved «Følg»; webserveren migrerer når den starter), ECH9 (telleren og tre steg med samme anker, som BH11 i 8.25), VG6 (testen for lenker ut av appen søker etter `http` og to variabler), VG8 (stegene på knappen er bare sammenlignet på børsometeret og i 8.9-testene), VG9 (testene for brikkene og fargen søker i stilen).
+- *Ikke en feil:* BH13 (oversikten sier «ikke hva», Min liste «ikke om»; begge er NFR-06), BH14 (sitatet «Sluttkursen vises som `close`» står i PRD-en, og kildetesten slår det opp).
