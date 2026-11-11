@@ -2,7 +2,7 @@
 title: "Installasjonen"
 status: aktiv
 created: 2026-11-08
-updated: 2026-11-11T18:24
+updated: 2026-11-10T16:39
 ---
 
 # Installasjonen
@@ -68,7 +68,7 @@ Den ekte versjonen er for å prøve løsningen med kurser fra EODHD. Begge versj
 docker compose up --build demo
 ```
 
-6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.», med en lenke til den ekte versjonen, som åpnes i en ny fane. Klikk på et selskapsnavn for å se en aksje. Nederst på aksjesiden går boblen «Investorsiden til ‹navn›» til en side i appen med en tegning laget av KI, fordi selskapene er oppdiktet.
+6. **Åpne http://127.0.0.1:8000** i en ny fane. Øverst står «Eksempeltall: oppdiktede selskaper og kurser, ikke data fra Oslo Børs.», med en lenke til den ekte versjonen. Klikk på et selskapsnavn for å se en aksje. Nederst på aksjesiden går boblen «Investorsiden til ‹navn›» til en side i appen med en tegning laget av KI, fordi selskapene er oppdiktet.
 7. **Stopp** med Ctrl+C i terminalvinduet, også på Mac, og lim så inn denne i PowerShell-vinduet fra steg 4. Det er klart når det står at containerne er fjernet (Removed).
 
 ```
