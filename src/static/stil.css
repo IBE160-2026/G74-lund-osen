@@ -135,11 +135,11 @@ header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
 /* Story 3.3i (U51): lenken til den ekte versjonen i demolinja, i fargen til
    stripa og understreket, saa den synes paa den moerke stripa. */
 header.stripe .eksempeltall a { color: var(--hvit); text-decoration: underline; }
-/* Story 8.26 (ønsket kl. 17:53): «(åpnes i en ny fane)» ved «Den ekte
-   versjonen» er bare for skjermlesere, som ved investorsiden. */
 /* Story 8.26 (tillegg 6): luft over periodevalget og filteret når siden
    holder plassen med ankeret. */
-#perioden, #filteret, .valg[id$="-valget"] { scroll-margin-top: 16px; }
+#perioden, #filteret, #visvalget, .valg[id$="-valget"] { scroll-margin-top: 16px; }
+/* Story 8.26 (ønsket kl. 17:53): «(åpnes i en ny fane)» ved «Den ekte
+   versjonen» er bare for skjermlesere, som ved investorsiden. */
 header.stripe .eksempeltall .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* Story 8.3: knapperaden med Markedsoversikt og Min liste. Knappen for
    siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.

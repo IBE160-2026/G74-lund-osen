@@ -162,10 +162,11 @@
       <h1 class="overskrift">Min liste</h1>
     {% endif %}
     {% if rader %}
-    <nav class="visvalg" aria-label="Vis">
+    {#- Story 8.26 (tillegg 6, gjennomgangen ECH7): valget holder plassen. #}
+    <nav class="visvalg" id="visvalget" aria-label="Vis">
       {#- Story 8.17b: valget beholder perioden og dagen. #}
-      <a class="visknapp" href="{{ sidesti }}?vis=alle{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
-      <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
+      <a class="visknapp" href="{{ sidesti }}?vis=alle{% for ledd in periodeledd %}&amp;{{ ledd }}{% endfor %}{% if sortering %}&amp;sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}#visvalget"{% if alle %} aria-current="true"{% endif %}>Alle <span class="antall">{{ antall_aksjer }}</span></a>
+      <a class="visknapp" href="{{ sidesti }}{% for ledd in periodeledd %}{% if loop.first %}?{% else %}&amp;{% endif %}{{ ledd }}{% endfor %}{% if sortering %}{% if periodeledd %}&amp;{% else %}?{% endif %}sorter={{ sortering.kolonne }}&amp;orden={{ sortering.orden }}{% endif %}#visvalget"{% if not alle %} aria-current="true"{% endif %}>Min liste <span class="antall">{{ antall_merket }}</span></a>
     </nav>
     {% endif %}
     </div>

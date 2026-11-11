@@ -62,6 +62,7 @@ from boersometer import (
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from dagsgrunnlag import dagsgrunnlag
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
+from demo import UTEN_KURSER as DEMO_UTEN_KURSER_SYMBOL
 from etterpaa import brikkene, bygg_etterpaa, bygg_handelen
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import (
@@ -269,6 +270,8 @@ app.jinja_env.globals["uten_data_tekst"] = UTEN_DATA_TEKST
 app.jinja_env.globals["uten_data_kort"] = UTEN_DATA
 app.jinja_env.globals["uten_kurser_hvorfor"] = UTEN_KURSER_HVORFOR
 app.jinja_env.globals["demo_uten_kurser"] = DEMO_UTEN_KURSER
+# Gjennomgangen (BH4): setningen bare på siden for den aksjen.
+app.jinja_env.globals["demo_uten_kurser_symbol"] = DEMO_UTEN_KURSER_SYMBOL
 # Story 8.26 (tillegg 3): beskjeden når appen følger så mange aksjer den kan.
 app.jinja_env.globals["full_tekst"] = valg.FULL
 # Story 8.26 (tillegg 3): ønsket om å følge. Eget navn, fordi oversikten har
@@ -2612,9 +2615,12 @@ def lagre_innstilling():
     # Story 8.21: «Notater» står i notatvalg, som en base fra før 0012 mangler.
     if not innstillinger.har_tabellen(tilkobling, innstillinger.TABELL[navn]):
         abort(404)
-    innstillinger.sett(tilkobling, navn, til == PAA)
     # Story 8.26 (tillegg 6): tilbake til bryteren, så siden står i ro.
-    svar = redirect("/innstillinger#" + INNSTILLINGSANKER[navn], code=303)
+    # Gjennomgangen (ECH3): ankeret slås opp før noe skrives, med tittelen
+    # for et valg uten anker.
+    anker = INNSTILLINGSANKER.get(navn, "innstillinger-tittel")
+    innstillinger.sett(tilkobling, navn, til == PAA)
+    svar = redirect("/innstillinger#" + anker, code=303)
     if navn == innstillinger.VIS_KI_TEKST:
         # Story 8.10b: kapselen også, som bryteren ved teksten.
         svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)

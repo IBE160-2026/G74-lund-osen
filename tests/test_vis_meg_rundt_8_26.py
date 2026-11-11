@@ -707,3 +707,46 @@ class TestSidenStaarIRo:
         den lukket seg etter et trykk på en periode."""
         skriptet = SKRIPTET.read_text(encoding="utf-8")
         assert "return window.location.pathname + window.location.search;" in skriptet
+
+
+class TestEtterGjennomgangenAvTillegg6Og8:
+    def test_ruta_for_en_aksje_med_eldre_kurser_sier_ingen_kurs(self, klient, monkeypatch):
+        """ECH1, BH1, VG1, VG3: ville feilet hvis ruta, title eller tabellen på
+        børsometeret sa «Ingen kurser ennå» om en aksje som har kurser, men
+        ikke den dagen."""
+        import dataclasses
+
+        ekte_bygg = app_modul.bygg_rute
+
+        def bygg(aksje, *a, **k):
+            rute = ekte_bygg(aksje, *a, **k)
+            return dataclasses.replace(rute, aldri_kurs=False) if aksje.symbol == "MTFJ" else rute
+
+        monkeypatch.setattr(app_modul, "bygg_rute", bygg)
+        side = _side(klient, "/boersometer")
+        rute = side.split('href="/aksje/MTFJ"', 1)[1].split("</a>", 1)[0]
+        assert '<span class="endring">Ingen kurs</span>' in rute
+        assert 'title="MTFJ: ingen kurs den dagen"' in side
+        rad = side.split("<table", 1)[1].split("MTFJ", 1)[1].split("</tr>", 1)[0]
+        assert "Ingen kurs den dagen" in rad and "Ingen kurser ennå" not in rad
+
+    def test_ankrene_i_innstillinger_folger_valgene(self):
+        """ECH3, VG4: ville feilet hvis et valg på siden manglet et anker."""
+        import innstillinger
+
+        assert set(app_modul.INNSTILLINGSANKER) == set(innstillinger.PAA_SIDEN)
+
+    def test_demosetningen_bare_paa_siden_for_aksjen(self):
+        """BH4: ville feilet hvis setningen om Matfjord Merkevarer sto på siden
+        for en annen aksje uten kurser i demoen."""
+        mal = (ROT / "src" / "templates" / "aksje_uten_kurser.html").read_text(encoding="utf-8")
+        assert "{% if eksempeltall and aksje.symbol == demo_uten_kurser_symbol %}{{ demo_uten_kurser }}" in mal
+        assert app_modul.app.jinja_env.globals["demo_uten_kurser_symbol"] == demo.UTEN_KURSER
+
+    def test_alle_og_min_liste_i_min_liste_holder_plassen(self, klient):
+        """ECH7: ville feilet hvis «Alle» og «Min liste» i Min liste sendte
+        til toppen av siden."""
+        side = _side(klient, "/min-liste")
+        nav = side.split('<nav class="visvalg" id="visvalget"', 1)[1].split("</nav>", 1)[0]
+        lenkene = re.findall(r'<a class="visknapp" href="([^"]+)"', nav)
+        assert len(lenkene) == 2 and all(lenke.endswith("#visvalget") for lenke in lenkene)

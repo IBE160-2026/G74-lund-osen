@@ -592,9 +592,12 @@ class TestGjennomgangen:
         assert tilbake == {"/min-liste?vis=alle&amp;sorter=kurs&amp;orden=synkende"}
         # Story 8.23 (A2): lenken går til tabellen.
         assert '<a href="/min-liste?vis=alle#aksjene">Standard rekkefølge</a>' in html
-        assert re.search(r'class="visknapp" href="/min-liste\?sorter=kurs&amp;orden=synkende">Min liste', html)
         assert re.search(
-            r'class="visknapp" href="/min-liste\?vis=alle&amp;sorter=kurs&amp;orden=synkende" aria-current', html
+            r'class="visknapp" href="/min-liste\?sorter=kurs&amp;orden=synkende#visvalget">Min liste', html
+        )
+        assert re.search(
+            r'class="visknapp" href="/min-liste\?vis=alle&amp;sorter=kurs&amp;orden=synkende#visvalget" aria-current',
+            html,
         )
         sorterlenker = re.findall(r'<a class="sorter[^"]*" href="([^"]*)"', html)
         assert len(sorterlenker) == 5

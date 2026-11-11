@@ -26,7 +26,7 @@
       «Oppdatert». #}
   <p class="ingen-kurser">
     <strong>{{ uten_data_kort }}</strong>: {{ uten_kurser_hvorfor }} Siden har derfor ingen kursgraf og ingen sjekker for {{ aksje.navn }}.
-    {% if eksempeltall %}{{ demo_uten_kurser }}{% endif %}
+    {% if eksempeltall and aksje.symbol == demo_uten_kurser_symbol %}{{ demo_uten_kurser }}{% endif %}
   </p>
 
   {#- Story 3.4h (spørsmål 5): boblen nederst, også uten kurser. #}

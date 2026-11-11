@@ -330,7 +330,7 @@ class TestRammen:
                     href = href.removesuffix("#aksjene")
                 # Story 8.26 (tillegg 6): periodevalget og filteret holder plassen
                 # med et anker, som må finnes på siden.
-                for anker in ("perioden", "filteret"):
+                for anker in ("perioden", "filteret", "visvalget"):
                     if href.endswith("#" + anker) and href != "#" + anker:
                         assert re.search(rf'(?<![\w-])id="{anker}"', html), (navn, href)
                         href = href.removesuffix("#" + anker)

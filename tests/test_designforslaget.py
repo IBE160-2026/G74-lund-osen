@@ -432,7 +432,7 @@ def test_lenken_til_boersometeret_har_samme_periode(klient, oversikt, boersomete
 @pytest.mark.parametrize(
     ("oversikt", "ventet"),
     [
-        ("/?periode=1-mnd", 'href="/boersometer?periode=1-mnd" aria-current="true"'),
+        ("/?periode=1-mnd", 'href="/boersometer?periode=1-mnd#perioden" aria-current="true"'),
         ("/?periode=velg&dag=2026-10-05", "mandag 05.10"),
     ],
 )

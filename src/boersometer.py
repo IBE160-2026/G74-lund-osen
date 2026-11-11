@@ -293,7 +293,7 @@ def bygg_rute(
     p: Parametre = STANDARD,
 ) -> Rute:
     """Ruta for én aksje på dato. kurser er kursradene til og med dato. En
-    aksje uten kurs på dato står med «Ingen kurs» (var «Uten data»), og med gult bare ved 3 av 3
+    aksje uten kurs på dato står med «Ingen kurser ennå», eller «Ingen kurs» når den har eldre kurser (var «Uten data»), og med gult bare ved 3 av 3
     på siste børsdag."""
     if not kurser or kurser[-1].dato != dato:
         return Rute(
@@ -328,7 +328,7 @@ def med_perioden(rute: Rute, serie: list[Kursrad], start: date, siste: date) -> 
     Endringen er fra start, dagen den første kursen i perioden er fra, til
     siste børsdag, regnet som i oversikten (periodeendring), og ruta er like
     stor som de andre. Signalet og rammen er siste børsdag, som før. En rute
-    uten kurs siste børsdag står med «Ingen kurs» (var «Uten data»)."""
+    uten kurs siste børsdag står med «Ingen kurser ennå» eller «Ingen kurs» (var «Uten data»)."""
     if rute.uten_data:
         return replace(rute, lik_stoerrelse=True)
     utfall = periodeendring(serie, start, siste)

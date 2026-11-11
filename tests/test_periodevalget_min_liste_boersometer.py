@@ -186,8 +186,8 @@ class TestAdressen:
         assert '<a href="/min-liste?vis=alle&amp;periode=1-mnd#perioden">1 mnd</a>' in html
         assert '<a href="/min-liste?vis=alle&amp;periode=1-uke#perioden" aria-current="true">1 uke</a>' in html
         assert '<input type="hidden" name="vis" value="alle">' in html
-        assert 'href="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
-        assert 'href="/min-liste?periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
+        assert 'href="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende#visvalget"' in html
+        assert 'href="/min-liste?periode=1-uke&amp;sorter=kurs&amp;orden=synkende#visvalget"' in html
         assert 'name="tilbake" value="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
         assert "periode=1-uke&amp;sorter=endring" in html
         dag = _side(klient, "/min-liste?vis=alle&periode=velg&dag=2026-10-07")
