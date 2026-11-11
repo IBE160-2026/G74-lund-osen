@@ -4128,6 +4128,8 @@ del er før jeg leser tallene.
 
 *Rettet 2026-11-11 (gruppens svar 10.11 kl. 22:59):* svaret kl. 11:52 godtok spørsmål 1, at det ikke er noen omvisning som flytter seg fra del til del. Det gjelder ikke lenger: «Vis meg rundt» får også knappen «Spill av omvisningen», som går side for side gjennom appen, i story 8.25 (`spec-8-25-spill-av-omvisningen.md`). Den nummererte lista fra 8.9 står. Rådet anbefalte onsdag, men gruppen valgte i natt. Svaret er ført etter instruksjonen kl. 23:02 10.11, som lagres i `docs/ai-prompts/2026-11-10.md` etter gruppens ja.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 16:58, story 8.26):* svaret 10.11 kl. 11:52 og føringen etter svaret kl. 22:59 over sier at den nummererte lista fra 8.9 står. Det gjelder ikke lenger: «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og lista er tatt bort, fordi testpersonen 10.11 gikk seg vill når siden hoppet. Etter svaret kl. 17:06 står «Vis meg rundt» og «Spill av omvisningen» i raden øverst etter «Innstillinger» (`spec-8-26-vis-meg-rundt-spiller-av-siden.md`). Svaret føres etter instruksjonen kl. 18:01 11.11, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Ferdig 2026-11-10:* flettet i `eb3ba928`, PR #136.
 
 ### Story 8.10: Innstillinger øverst

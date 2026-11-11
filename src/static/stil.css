@@ -139,13 +139,13 @@ header.stripe .eksempeltall a { color: var(--hvit); text-decoration: underline; 
    siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.
    To knapper får plass på 390 px, og raden brytes heller enn å rulle. */
 header.stripe .sider { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
-header.stripe a.sideknapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
+header.stripe .sideknapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
                             border: 1px solid var(--stripe-kant); border-radius: 999px; color: var(--stripe-tekst);
                             font-size: 15px; font-weight: 600; text-decoration: none; }
 /* Gruppens svar 04.11 kl. 22:23, 4: ikonene foran navnet, 16 px med strek 2
    i tekstfargen (currentColor), så de følger knappen som er valgt, og 8 px
    fra navnet (gap i regelen for a.sideknapp over). */
-header.stripe a.sideknapp .ikon { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
+header.stripe .sideknapp .ikon { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
                                   stroke-linecap: round; stroke-linejoin: round; }
 /* Story 8.23 (A6): siden man er på, er oransje i toppen, som står på blekk. */
 header.stripe a.sideknapp[aria-current="page"] { background: var(--oransje); border-color: var(--oransje); color: var(--blekk); }
@@ -1413,22 +1413,14 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Brikkene og «N av 3» på linje med teksten i «Etterpå» og ved kjøpet. */
 .etterpaa .sjekker, .tenkt .sjekker { display: inline-flex; vertical-align: middle; margin: 0 4px; }
 .etterpaa .pille, .tenkt .pille { display: inline-block; }
-/* Story 8.9 (FR-109): «Vis meg rundt», en knapp som åpner stegene. */
-.rundtur { margin: 0.5rem 0 0.25rem; max-width: 46rem; }
-.rundtur summary { display: inline-block; cursor: pointer; padding: 0.3rem 0.8rem; border: 1px solid currentColor; border-radius: 999px; font-size: 14px; font-weight: 600; }
-.rundtur-steg a { color: inherit; }
-.rundtur-steg { margin: 0.6rem 0 0; padding-left: 1.4rem; font-size: 14px; line-height: 1.5; }
-.rundtur-steg li { margin-bottom: 0.3rem; }
-/* Lukket: lista har ingen boks, så ingenting regnes som synlig tekst (test_hjelpefeltet). */
-.rundtur:not([open]) .rundtur-steg { display: none; }
-/* Story 8.25: «Spill av omvisningen». Boksen står fast nederst til høyre, og
-   delen den peker på, rulles øverst og merkes med en kraftig ramme. */
-.spill-av { font: inherit; font-size: 14px; font-weight: 600; padding: 0.3rem 0.8rem; margin: 0.5rem 0 0.25rem 0.5rem;
-            border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; cursor: pointer; }
-.rundtur-rad { display: flex; flex-wrap: wrap; align-items: flex-start; }
+/* Story 8.26 (svaret 11.11 kl. 17:06): «Vis meg rundt» og «Spill av
+   omvisningen» er knapper i raden øverst, i samme stil som sideknappene
+   (regelen for .sideknapp over), uten fyll. */
+header.stripe button.sideknapp { font-family: inherit; background: transparent; cursor: pointer; }
+header.stripe button.sideknapp[hidden] { display: none; }
+/* Story 8.25: boksen står fast nederst til høyre, og delen den peker på,
+   rulles øverst og merkes med en kraftig ramme. */
 .omvisning-merket { outline: 3px solid var(--oransje); outline-offset: 4px; border-radius: 6px; scroll-margin-top: 24px; }
-/* Gjennomgangen av 8.25 (BH15): en åpen liste står på egen linje, så den er like bred som før. */
-.rundtur-rad .rundtur[open] { flex-basis: 100%; }
 .omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
              border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }

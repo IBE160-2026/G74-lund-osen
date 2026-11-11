@@ -67,14 +67,18 @@ def _dataene(side: str) -> tuple[str, list]:
 
 class TestKnappenOgRekkefoelgen:
     def test_knappen_staar_ved_vis_meg_rundt(self, klient):
-        """Del A: ville feilet hvis knappen manglet ved «Vis meg rundt», eller
-        lista fra 8.9 ble borte."""
+        """Del A: ville feilet hvis knappen manglet ved «Vis meg rundt».
+        Story 8.26 (svaret 11.11 kl. 16:58 og 17:06): begge står i raden
+        øverst, rett etter «Innstillinger», og lista fra 8.9 er borte."""
         for adresse in SIDENE.values():
             side = klient.get(adresse).data.decode("utf-8")
-            rundtur = side[side.index('<div class="rad rundtur-rad">') :]
-            rundtur = rundtur[: rundtur.index("</div>")]
-            assert '<button type="button" class="spill-av" hidden>Spill av omvisningen</button>' in rundtur, adresse
-            assert '<ol class="rundtur-steg">' in rundtur, adresse
+            raden = side[side.index('<nav class="rad sider"') : side.index("</nav>")]
+            etter = raden[raden.index("Innstillinger</a>") :]
+            assert re.search(r'<button type="button" class="sideknapp vis-meg-rundt" data-steg="[^"]*" hidden>', etter)
+            assert '<button type="button" class="sideknapp spill-av" hidden>' in etter, adresse
+            assert etter.index("vis-meg-rundt") < etter.index("spill-av"), adresse
+            assert "Spill av omvisningen</button>" in etter, adresse
+            assert '<ol class="rundtur-steg">' not in side and "rundtur-rad" not in side, adresse
 
     def test_sidene_i_fast_rekkefoelge(self, klient):
         """Del A: ville feilet hvis omvisningen gikk gjennom sidene i en annen
@@ -136,7 +140,9 @@ class TestStegene:
         """Del B: ville feilet hvis knappen sto synlig uten skriptet, der den
         ikke gjør noe."""
         side = klient.get("/").data.decode("utf-8")
-        assert re.search(r'<button type="button" class="spill-av" hidden>', side)
+        assert re.search(r'<button type="button" class="sideknapp spill-av" hidden>', side)
+        # Story 8.26: «Vis meg rundt» er også skjult uten skriptet.
+        assert re.search(r'<button type="button" class="sideknapp vis-meg-rundt" data-steg="[^"]*" hidden>', side)
         assert '<div id="omvisning" hidden' in side
 
     def test_vis_hjelp_av_tar_bort_omvisningen(self, klient):
@@ -318,7 +324,9 @@ class TestOppfoerselenMedNode(TestLogikkenMedNode):
         skriptet = SKRIPTET.read_text(encoding="utf-8")
         for bit in (
             "OMVISNING.fortsett(lagret, her(), steg.length)",
-            "OMVISNING.knappene(steg, j, SIDE, finnes)",
+            # Story 8.26: boksen går gjennom de aktive stegene, hele
+            # omvisningen eller siden med «Vis meg rundt».
+            "OMVISNING.knappene(aktive, j, stedet, finnes)",
             "OMVISNING.skalLukke(e.key,",
             "OMVISNING.skalTilby(SIDE,",
             'document.addEventListener("keydown", tast)',

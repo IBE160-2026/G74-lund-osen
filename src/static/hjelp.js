@@ -293,6 +293,16 @@ const OMVISNING = {
     return Boolean(steg[i]) && steg[i].side === side;
   },
 
+  // Story 8.26 (svaret 11.11 kl. 16:58): «Vis meg rundt» bruker den samme
+  // boksen, bare med stegene for siden man står på. De får sidenavnet SIDEN,
+  // så et steg uten delen hoppes over som i omvisningen, og ingen går til en
+  // annen side.
+  SIDEN: "siden",
+  sidensSteg(liste) {
+    if (!Array.isArray(liste)) return [];
+    return liste.map((s) => ({ side: OMVISNING.SIDEN, anker: s.anker, tittel: s.tittel, tekst: s.tekst }));
+  },
+
   // Tilbudet første gang: bare på oversikten, og bare før det er besvart.
   skalTilby(side, svar) {
     return side === "oversikt" && svar === null;
@@ -315,6 +325,10 @@ if (typeof module === "object" && module.exports) {
   }
   if (!Array.isArray(steg) || steg.length === 0) return;
   const SIDE = data.dataset.side;
+  // Story 8.26: stegene boksen går gjennom, og siden de hører til. Hele
+  // omvisningen, eller bare siden med «Vis meg rundt».
+  let aktive = steg;
+  let stedet = SIDE;
   let boksen = null;
   let merket = null;
   let fokusFoer = null;
@@ -349,7 +363,11 @@ if (typeof module === "object" && module.exports) {
   }
 
   function avslutt() {
-    skriv(sessionStorage, OMVISNING.STEGET, null);
+    // «Vis meg rundt» lagrer ingen tilstand, så en omvisning som er i gang
+    // på en annen fane eller side, røres ikke.
+    if (aktive === steg) skriv(sessionStorage, OMVISNING.STEGET, null);
+    aktive = steg;
+    stedet = SIDE;
     fjernMerket();
     if (boksen) boksen.remove();
     boksen = null;
@@ -383,10 +401,10 @@ if (typeof module === "object" && module.exports) {
   }
 
   function gaaTil(i, retning) {
-    const j = OMVISNING.nesteSteg(steg, i, retning, SIDE, finnes);
+    const j = OMVISNING.nesteSteg(aktive, i, retning, stedet, finnes);
     if (j < 0) return avslutt();
-    const s = steg[j];
-    if (s.side !== SIDE) {
+    const s = aktive[j];
+    if (s.side !== stedet) {
       const adresse = OMVISNING.adresse(s.side, aksjen());
       if (!adresse) return gaaTil(j + retning, retning);
       skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, retning, adresse));
@@ -411,9 +429,9 @@ if (typeof module === "object" && module.exports) {
   }
 
   function vis(j) {
-    const s = steg[j];
+    const s = aktive[j];
     const del = delen(document.getElementById(s.anker));
-    skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));
+    if (aktive === steg) skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));
     fjernMerket();
     merket = del;
     del.classList.add("omvisning-merket");
@@ -435,7 +453,7 @@ if (typeof module === "object" && module.exports) {
     boksen.replaceChildren();
     const teller = document.createElement("p");
     teller.className = "omvisning-teller";
-    teller.textContent = OMVISNING.teller(j, steg.length);
+    teller.textContent = OMVISNING.teller(j, aktive.length);
     const tittel = document.createElement("h2");
     tittel.id = "omvisning-tittel";
     tittel.textContent = s.tittel;
@@ -444,7 +462,7 @@ if (typeof module === "object" && module.exports) {
     tekst.textContent = s.tekst;
     const knappene = document.createElement("div");
     knappene.className = "omvisning-knapper";
-    const lov = OMVISNING.knappene(steg, j, SIDE, finnes);
+    const lov = OMVISNING.knappene(aktive, j, stedet, finnes);
     const tilbake = knapp("Tilbake", "omvisning-tilbake", () => gaaTil(j - 1, -1));
     tilbake.disabled = !lov.tilbake;
     const siste = lov.ferdig;
@@ -454,6 +472,22 @@ if (typeof module === "object" && module.exports) {
       knapp("Lukk", "omvisning-lukk", avslutt),
     );
     boksen.append(teller, tittel, tekst, knappene);
+    // Story 8.26 (svaret kl. 16:58): siste steg med «Vis meg rundt» har
+    // «Ferdig» og lenken til hele omvisningen.
+    if (siste && aktive !== steg) {
+      const hele = document.createElement("p");
+      hele.className = "omvisning-hele";
+      const lenke = document.createElement("a");
+      lenke.href = "#";
+      lenke.textContent = "Spill av hele omvisningen";
+      lenke.addEventListener("click", (e) => {
+        e.preventDefault();
+        avslutt();
+        start();
+      });
+      hele.append(lenke);
+      boksen.append(hele);
+    }
     boksen.focus();
   }
 
@@ -495,6 +529,28 @@ if (typeof module === "object" && module.exports) {
   for (const b of document.querySelectorAll("button.spill-av[hidden]")) {
     b.hidden = false;
     b.addEventListener("click", start);
+  }
+  // Story 8.26: «Vis meg rundt» med stegene for siden, fra knappen.
+  function visSiden(liste) {
+    if (boksen) avslutt();
+    aktive = OMVISNING.sidensSteg(liste);
+    stedet = OMVISNING.SIDEN;
+    if (aktive.length === 0) {
+      aktive = steg;
+      stedet = SIDE;
+      return;
+    }
+    gaaTil(0, 1);
+  }
+  for (const b of document.querySelectorAll("button.vis-meg-rundt[hidden]")) {
+    let liste;
+    try {
+      liste = JSON.parse(b.dataset.steg);
+    } catch {
+      continue;
+    }
+    b.hidden = false;
+    b.addEventListener("click", () => visSiden(liste));
   }
   function oppstart() {
     const lagret = les(sessionStorage, OMVISNING.STEGET);
