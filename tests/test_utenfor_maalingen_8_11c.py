@@ -20,7 +20,7 @@ from lagring_sqlite import aapne_base
 from test_ferdige_lister import maal
 from test_ferdige_lister_8_11b import base  # noqa: F401 (fixturen)
 from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
-from test_valg import BOERSEN, lager, med_boersen
+from test_valg import BOERSEN, faste_bransjer, lager, med_boersen  # noqa: F401 (story 8.22: de faste bransjene)
 
 MERKET = re.compile(
     r'<a href="/aksje/NYA">Ny Aksje ASA</a> <span class="egenmerke">Egen</span>( <span class="utenformerke")?'
@@ -54,6 +54,14 @@ def egen(tmp_path, monkeypatch):
 
 def _side(sti="/"):
     return app_modul.app.test_client().get(sti).data.decode("utf-8")
+
+
+def _de_ferdige_listene() -> str:
+    """Tillegg 3 til 8.22: aksjene i de ferdige listene står på siden «Er du
+    sikker?» for hver bransje, ikke i Min liste."""
+    lenker = re.findall(r'href="(/ferdig-liste\?bransje=[^"]+)"', _side("/min-liste"))
+    assert lenker
+    return "".join(_side(lenke) for lenke in lenker)
 
 
 class TestMedianene:
@@ -128,10 +136,7 @@ class TestMerket:
         """Del B: ville feilet hvis en aksje sto med merket i tabellen og uten
         det i den ferdige lista, eller omvendt (ECH2 i 8.11b)."""
         maal(egen, [("NYA", 500e6)])
-        side = _side("/min-liste")
-        ferdig = re.search(
-            r"NYA</span>( <span class=\"utenformerke\">Utenfor målingen)?", side.split("Start fra en ferdig liste")[1]
-        )
+        ferdig = re.search(r"NYA</span>( <span class=\"utenformerke\">Utenfor målingen)?", _de_ferdige_listene())
         assert ferdig and ferdig.group(1), "NYA skulle hatt merket i den ferdige lista"
         treff = MERKET.search(_side())
         assert treff and treff.group(1), "NYA skulle hatt merket i tabellen"
@@ -153,10 +158,7 @@ class TestMerketEtterGjennomgangen:
         _sql(egen, "UPDATE kurs SET volum = 1000000000 WHERE symbol = 'NYA'")
         treff = MERKET.search(_side())
         assert treff and not treff.group(1), "NYA skulle vært uten merket i tabellen"
-        ferdig = re.search(
-            r"NYA</span>( <span class=\"utenformerke\">Utenfor målingen)?",
-            _side("/min-liste").split("Start fra en ferdig liste")[1],
-        )
+        ferdig = re.search(r"NYA</span>( <span class=\"utenformerke\">Utenfor målingen)?", _de_ferdige_listene())
         assert ferdig and not ferdig.group(1), "NYA skulle vært uten merket i den ferdige lista"
 
 
@@ -171,7 +173,10 @@ class TestFoelgSiden:
         assert "ca. 0,1 MNOK om dagen, regnet av kursene til 22.09." in side
         assert "omsetning de 3 siste månedene er 0,1 MNOK, regnet av kursene til 22.09." in side
         assert "så den merkes «Utenfor målingen»" in side
-        assert "MNOK om dagen, regnet av kursene til 22.09</span>" in _side("/folg?q=DnB")
+        # Tillegg 3 til 8.22: omsetningen står i en egen kolonne, med dagen under.
+        assert 'MNOK<span class="skjult">, </span><span class="fra">regnet av kursene til 22.09</span>' in _side(
+            "/folg?q=DnB"
+        )
 
     def test_dagen_er_aksjens_siste_dag_med_kurser(self, egen):
         """Gjennomgangen (BH1, ECH1, BH10): ville feilet hvis teksten sa den
@@ -186,7 +191,7 @@ class TestFoelgSiden:
         """Del C: ville feilet hvis en aksje appen aldri har hentet, mistet
         målingen fra 2.13 i søket."""
         maal(egen, [("NYB", 40e6)])
-        assert "ca. 40,0 MNOK om dagen, målt 22.10</span>" in _side("/folg?q=NYB")
+        assert 'ca. 40,0 MNOK<span class="skjult">, </span><span class="fra">målt 22.10</span>' in _side("/folg?q=NYB")
 
 
 class TestTeksten:

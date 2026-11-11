@@ -1069,9 +1069,10 @@ class TestFjernesIKveld:
         et åpent kjøp, ikke sa fra før knappen."""
         felt = TestTenkteKjoep()._notat(klient)
         klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
-        assert f"{AKSJE} har et åpent tenkt kjøp. Når den fjernes" in _tekst(
-            klient.get("/min-liste").data.decode("utf-8")
-        )
+        # Tillegg 3 til 8.22: på siden «Er du sikker?» for hver bransje.
+        lenker = re.findall(r'href="(/ferdig-liste\?bransje=[^"]+)"', klient.get("/min-liste").data.decode("utf-8"))
+        sidene = [_tekst(klient.get(lenke).data.decode("utf-8")) for lenke in lenker]
+        assert any(f"{AKSJE} har et åpent tenkt kjøp. Når den fjernes" in side for side in sidene)
 
 
 class TestEtterGjennomgangenAvTilleggene:

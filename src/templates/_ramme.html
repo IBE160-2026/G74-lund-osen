@@ -27,6 +27,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block tittel %}OSE Signal{% endblock %}</title>
   <link rel="stylesheet" href="{{ stilark }}">
+  {#- Story 3.6 (del C, gruppens svar 10.11 kl. 14:07): ikonet i fanen, laget
+      av logoen i src/ikon.py, i demoen og i den ekte versjonen. #}
+  <link rel="icon" href="/static/ikon.svg" type="image/svg+xml">
+  <link rel="icon" href="/static/ikon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/static/ikon-180.png">
   {#- Story 8.0f: hjelpen ved «?» som ett fast felt. Uten skriptet virker
       hjelpen som i 8.0b. #}
   <script src="{{ hjelpeskript }}" defer></script>

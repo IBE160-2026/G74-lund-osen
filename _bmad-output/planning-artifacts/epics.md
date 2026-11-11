@@ -2713,6 +2713,28 @@ Resten ryddes etter alle testene.
 
 ---
 
+### Story 3.6: Ikonet og snarveien
+
+*Lagt til 2026-11-11, etter instruksjonen for del C (limt inn 10.11 kl. 17:23) i `docs/ai-prompts/2026-11-10.md`.* 3.6 var neste ledige nummer i Epic 3.
+
+Som **bruker i Windows**, vil jeg starte appen fra en snarvei med appens ikon på skrivebordet og kjenne den igjen i fanen, så jeg slipper å lete fram mappa og dobbeltklikke startfila.
+
+Spesifikasjonen er `spec-3-6-ikonet-og-snarveien.md`.
+
+*Avgjort 2026-11-10 kl. 14:07 (gruppens svar):* appen får et ikon laget av logoen i toppen, og en snarvei «OSE Signal» på skrivebordet i Windows. Rådet anbefalte det.
+
+*Plan for en senere versjon (svaret kl. 14:07):* mobil kommer i en senere versjon, fordi appen bare svarer på 127.0.0.1. README-en og `docs/installasjon.md` sier det.
+
+*Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel. Startskriptet for demoen tilbyr også snarveien, med et eget navn, «OSE Signal (demo)». Rådet anbefalte det.
+
+*Avgjort 2026-11-11 kl. 13:47 (gruppens svar):* ja til ikonet som bygget (spørsmål 1) og til forslagene i spørsmål 2–7 i spesifikasjonen. Når snarveien starter en annen kopi som finnes, skal startskriptet si hvilken mappe den peker på og spørre én gang om den skal starte denne kopien i stedet (spørsmål 8). Del C flettes når svarene er bygget, gjennomgått og CI er grønn, uten at gruppen ser på den igjen. Rådet anbefalte det.
+
+*Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* README-en får en fjerde liste under «Status», «Ekstra, ferdig», og brukertesten flyttes fra «Neste i v1» til setningen om det som er ferdig rundt appen, fordi «Ferdig» lister det appen kan. Rådet anbefalte det.
+
+*Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
+
+---
+
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger. De som gjelder Epic 4:
@@ -4527,6 +4549,38 @@ Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan
 *Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel, med oppdiktede eksempler merket «Eksempeltall». Rådet anbefalte det. Svaret er ført etter tillegg 2 kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
+
+### Story 8.22: Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 16:26 («Del B 10.11», vindu 4) i `docs/ai-prompts/2026-11-10.md`.* 8.22 var neste ledige nummer i Epic 8.
+
+Som **bruker**, vil jeg følge hvilken som helst aksje på Oslo Børs med en fast bransje, finne den i en liste jeg kan sortere og filtrere, og se i tre steg hva den egne lista krever, så jeg kan lage min egen liste uten å gjette.
+
+Spesifikasjonen er `spec-8-22-foelg-en-aksje-og-min-liste.md`, med spørsmålene, triagen av gjennomgangene og målingen av tiden.
+
+*Avgjort 2026-11-10 kl. 13:38 (gruppens svar):* alle aksjene i børslista kobles til en bransje gruppen har sjekket, så den som følger en aksje, ikke velger bransjen selv. Det erstatter svaret 08.11 kl. 11:57.
+
+*Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* ja til del A og B. Bare feltet i steg 2 bygges ikke, fordi nettsiden aldri skal røre nøkkelen (AD-10, svaret 08.11 kl. 12:39), og resten følger designforslaget.
+
+*Avgjort 2026-11-10 kl. 14:43 (gruppens svar):* alle 195 forslag og usikre i kontrollsjekken er avgjort: 194 som foreslått, og MULTI er tatt ut.
+
+*Avgjort 2026-11-10 kl. 14:53 (gruppens svar):* del B startes i et nytt vindu med en gang. Rådet anbefalte vindu 1 etter del C.
+
+*Avgjort 2026-11-10 kl. 14:59 (gruppens svar):* ingen fletting før gruppen har svart.
+
+*Avgjort 2026-11-10 kl. 15:22 (gruppens svar):* SCOIN er ute, som 08.11 kl. 22:03, fordi selskapet er under avvikling.
+
+*Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel, med oppdiktede selskaper merket «Eksempeltall».
+
+*Avgjort 2026-11-10 kl. 22:44 (gruppens svar, tillegg 3):* kortet «Mest omsatt» tas bort, og lista sorteres «Mest omsatt først», «A–Å» eller «Bransje». Flere bransjer kan velges samtidig, og det valgte er oransje med et merke. Radene får stilen fra tabellen på oversikten. «Start fra en ferdig liste» får én knapp per bransje og siden «Er du sikker?». Rådet anbefalte alle fire.
+
+*Avgjort 2026-11-10 kl. 22:50 (gruppens svar, tillegg 4):* steg 2 i «Din egen liste» blir som på designtavla, men uten felt. AD-10 og svaret 08.11 kl. 12:39 står. Der tavla har feltet, står en status regnet av siste henting. Rådet anbefalte det.
+
+*Avgjort 2026-11-10 kl. 22:55 (gruppens svar, tillegg 5):* to nye bilder fra demoen ved 390 px, «Følg en aksje» og notatene for BRFE, i README-en.
+
+*Avgjort 2026-11-11 kl. 14:29 (gruppens svar):* ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. Tiden for medianene måles, og testen for et kall som feiler legges til (spørsmål 12 og 14). Det valgte står i oransje med hakemerket (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet. Rådet anbefalte alt.
+
+*Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43043943092). Tiden for én visning av hele lista var 0,046, 0,014 og 0,014 s, så medianene huskes ikke i minnet.
 
 ### Story 8.23: Funnene fra brukertesten 10.11 (del A)
 

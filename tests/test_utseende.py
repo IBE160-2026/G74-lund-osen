@@ -249,6 +249,11 @@ def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     # sortert, så rammetestene og lenkene prøves på den nye siden.
     sider["min liste i demoen"] = klient.get("/min-liste").data.decode("utf-8")
     sider["alle i min liste"] = klient.get("/min-liste?vis=alle&sorter=kurs&orden=synkende").data.decode("utf-8")
+    # Tillegg 3 til 8.22 (gjennomgangen, VG9, ECH7): «Følg en aksje» og «Er du sikker?».
+    sider["følg i demoen"] = klient.get("/folg?bransje=Kraft&bransje=Helse&sorter=navn").data.decode("utf-8")
+    svar = klient.get("/ferdig-liste?bransje=Energi")
+    assert svar.status_code == 200
+    sider["er du sikker i demoen"] = svar.data.decode("utf-8")
     demo_sti().write_bytes(b"ikke en sqlite-base" * 10)
     svar = klient.get("/")
     assert svar.status_code == 503
@@ -334,6 +339,16 @@ class TestRammen:
                     or re.fullmatch(r"/(min-liste)?\?([a-z]+=[A-Za-z0-9-]+&amp;)*signal=(positiv|negativ)", href)
                     # Story 2.12: «Følg en aksje» og «Bytt ut».
                     or re.fullmatch(r"/folg(\?bytt=[A-Z0-9-]+)?", href)
+                    # Story 8.22: steg 3 i «Din egen liste» går til bransjelistene
+                    # på samme side, bare når de står der.
+                    or (href == "#ferdige-lister" and 'id="ferdige-lister"' in html)
+                    # Tillegg 3 til 8.22: knappen for hver ferdige liste går til
+                    # siden «Er du sikker?» for bransjen.
+                    or re.fullmatch(r"/ferdig-liste\?bransje=[A-Za-z%0-9]+", href)
+                    # Tillegg 3: «Følg» på radene, «Alle» med resten av filteret, og
+                    # «Avbryt» tilbake til de ferdige listene.
+                    or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
+                    or href in ("/min-liste#ferdige-lister", "/#dine-egne-aksjer")
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
@@ -342,6 +357,11 @@ class TestRammen:
                     or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
                     # Story 8.9: stegene i «Vis meg rundt» peker på en id på samme side.
                     or (href.startswith("#") and re.search(rf'(?<![\w-])id="{re.escape(href[1:])}"', html))
+                    # Story 3.6: ikonet i fanen, som finnes i src/static.
+                    or (
+                        href in ("/static/ikon.svg", "/static/ikon-32.png", "/static/ikon-180.png")
+                        and (FONTS.parent / href.removeprefix("/static/")).is_file()
+                    )
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
                     or re.fullmatch(
                         r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",
@@ -973,7 +993,9 @@ class TestStilarket:
         # Story 2.12: «Følg en aksje» (folg.html) er den sjuende, og story
         # 8.10: «Innstillinger» (innstillinger.html) den åttende. Story 8.21:
         # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
-        assert sider == 9
+        # Tillegg 3 til 8.22: «Er du sikker?» før en ferdig liste
+        # (ferdig_liste.html) er den tiende.
+        assert sider == 10
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,

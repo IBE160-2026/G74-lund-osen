@@ -1230,7 +1230,72 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .knapp.hoved { background: var(--blekk); color: var(--hvit); border-color: var(--blekk); }
 :where(.side-oversikt) .demoboks { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--strek-2); border-radius: 10px;
                                    color: var(--dempet); font-size: 14px; }
-:where(.side-oversikt) .folg { max-width: 720px; }
+/* Story 8.22 (gjennomgangen av bildet): 860 px, så tabellen og brikkene får plass. Var 720 px. */
+:where(.side-oversikt) .folg { max-width: 860px; }
+/* Story 8.22: bransjen med symbolet ved aksjen, i tekstfargen og 15 px, som i tabellen. */
+:where(.side-oversikt) .folg .bransjesymbol { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
+/* Story 8.22: «Følg en aksje» med hele lista og filteret som brikker. Tillegg 3
+   (svarene 10.11 kl. 22:44): sorteringen som brikker, og kortet med forslagene er borte. */
+:where(.side-oversikt) .folgfilter { display: grid; gap: 12px; margin: 12px 0 16px; }
+:where(.side-oversikt) .folgfilter fieldset { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; }
+:where(.side-oversikt) .folgfilter legend { font-weight: 600; margin-bottom: 6px; padding: 0; }
+:where(.side-oversikt) .valgbrikke { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px;
+                                     border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort); cursor: pointer;
+                                     position: relative; color: var(--blekk); text-decoration: none; }
+/* Tillegg 3 (svarene 10.11 kl. 22:44): det valgte er oransje, som bryterne i Innstillinger og
+   fanen i toppen (8.23, A6), med tekst i blekk og et hakemerke foran, så fargen ikke står alene.
+   Gult brukes ikke, fordi det betyr «skilte seg ut». Boksen er skjult, men kan fortsatt
+   velges med tastaturet, og fokus står rundt brikken. */
+:where(.side-oversikt) .valgbrikke:has(input:checked), :where(.side-oversikt) .valgbrikke.valgt {
+  background: var(--oransje); color: var(--blekk); border-color: var(--oransje); font-weight: 600; }
+:where(.side-oversikt) .valgbrikke:has(input:checked)::before, :where(.side-oversikt) .valgbrikke.valgt::before {
+  content: "✓" / ""; font-weight: 700; }
+:where(.side-oversikt) .valgbrikke input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
+:where(.side-oversikt) .valgbrikke:has(input:focus-visible), :where(.side-oversikt) a.valgbrikke:focus-visible {
+  outline: 3px solid var(--blekk); outline-offset: 2px; }
+@media (forced-colors: active) {
+  :where(.side-oversikt) .valgbrikke:has(input:checked), :where(.side-oversikt) .valgbrikke.valgt { border: 2px solid Highlight; }
+}
+:where(.side-oversikt) .antall-folg, :where(.side-oversikt) .antall-vist { color: var(--dempet); }
+:where(.side-oversikt) .alle-tittel { margin: 20px 0 6px; font-size: 18px; }
+/* Tillegg 3 (svarene 10.11 kl. 22:44): radene i samme kort og med samme svarte kolonnerad som
+   tabellen på oversikten. Tabellen er smalere enn den, så den får plass ved 390 px. */
+:where(.side-oversikt) .folgtabell { margin: 8px 0; }
+:where(.side-oversikt) .folgfilter .vis-nederst { margin: 0; }
+:where(.side-oversikt) .folgtabell table { min-width: 0; }
+:where(.side-oversikt) .foelgbar[hidden] { display: none; }
+:where(.side-oversikt) .folgtabell td.omsetning { font-weight: 600; }
+:where(.side-oversikt) .folgtabell td.omsetning .utenformerke { margin-top: 4px; }
+:where(.side-oversikt) .folgtabell td.valg { width: 1%; text-align: right; white-space: nowrap; }
+:where(.side-oversikt) .folgtabell .knapp { min-height: 36px; }
+:where(.side-oversikt) .folgtabell .ikke-maalt { color: var(--dempet); font-style: italic; font-weight: 400; }
+/* Tillegg 3 til 8.22 (svarene 10.11 kl. 22:44): de ferdige listene som én knapp per bransje,
+   med ikonet og antallet, og siden «Er du sikker?» før lista byttes. */
+:where(.side-oversikt) .ferdige-knapper { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; padding: 0; list-style: none; }
+:where(.side-oversikt) .ferdigknapp { gap: 6px; }
+:where(.side-oversikt) .ferdigknapp .bransjesymbol { width: 15px; height: 15px; }
+:where(.side-oversikt) .ferdigknapp .antall { font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) .ferdig-bekreft { max-width: 720px; }
+:where(.side-oversikt) .ferdig-bekreft .bransjesymbol { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
+:where(.side-oversikt) .ferdig-bekreft .under { color: var(--dempet); font-size: 14px; }
+:where(.side-oversikt) .ferdig-bekreft .knapper { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Story 8.22 (utdraget §2): «Din egen liste» som tre stegkort, med kant og
+   hjørner som de andre kortene, og nummeret i en sirkel. */
+:where(.side-oversikt) .stegkort { list-style: none; padding: 0; margin: 12px 0 16px; display: grid; gap: 12px;
+                                   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+:where(.side-oversikt) .kort-steg { padding: 16px 18px; border: 1px solid var(--strek); border-radius: 12px; background: var(--kort); }
+:where(.side-oversikt) .kort-steg h4 { margin: 8px 0 6px; font-size: 16px; }
+:where(.side-oversikt) .kort-steg p { margin: 6px 0; }
+:where(.side-oversikt) .stegnummer { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+                                     border-radius: 50%; background: var(--blekk); color: var(--hvit); font-weight: 600; }
+:where(.side-oversikt) .kort-steg .adresse { color: var(--dempet); }
+:where(.side-oversikt) .kort-steg .kallene { margin: 8px 0; padding-left: 20px; }
+/* Tillegg 4 (svaret 10.11 kl. 22:50): statusen der tavla har feltet, som en boks i samme stil
+   som demoboksen, men uten fargen til signalet. */
+:where(.side-oversikt) .kort-steg .noekkelstatus { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--strek-2);
+                                                   border-radius: 10px; font-size: 14px; }
+:where(.side-oversikt) .kort-steg h5 { margin: 12px 0 4px; font-size: 14px; }
+:where(.side-oversikt) .stegknapper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 :where(.side-oversikt) .folgskjema { display: grid; gap: 10px; margin: 16px 0; }
 :where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }
 :where(.side-oversikt) .folgskjema select, :where(.side-oversikt) .sok input { min-height: 44px; font: inherit; padding: 0 10px; }
@@ -1246,11 +1311,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.11: filteret på signalet og de ferdige listene. */
 :where(.side-oversikt) .signalfilter { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
 :where(.side-oversikt) .filtertekst { margin: 4px 0 12px; }
-:where(.side-oversikt) .ferdig-liste { margin: 8px 0; }
-:where(.side-oversikt) .ferdig-liste summary { cursor: pointer; display: flex; align-items: center; gap: 6px; }
-:where(.side-oversikt) .ferdig-liste summary .bransjesymbol { width: 16px; height: 16px; flex: none; }
-:where(.side-oversikt) .ferdig-liste ol { margin: 8px 0; padding-left: 24px; }
-:where(.side-oversikt) .ferdig-liste .foer-knappen { margin: 4px 0 8px; color: var(--dempet); }
+/* Tillegg 3 til 8.22: aksjene i en ferdig liste står på siden «Er du sikker?», ikke under en
+   <details> i Min liste. */
+:where(.side-oversikt) ol.ferdig-liste { margin: 8px 0; padding-left: 24px; }
 /* Story 8.10 (utdraget 08.11 §4): «Innstillinger», med en bryter per valg. */
 :where(.side-oversikt) .innstillinger { max-width: 720px; }
 :where(.side-oversikt) .innstillinger .valg { margin: 16px 0; padding: 18px 20px; background: var(--kort); border: 1px solid var(--strek);

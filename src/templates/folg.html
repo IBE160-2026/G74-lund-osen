@@ -4,6 +4,8 @@
     en side med skjema i stedet for en dialog, så den virker med tastatur og
     uten skript (spørsmål 8). Tekstene står ordrett fra utdraget. Siden leser
     bare, og skjemaet skriver bare ønsket (AD-3, AD-10). #}
+{% from "_bransjer.html" import bransjesymbol -%}
+{% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% block tittel %}{% if gammel %}Bytt ut {{ gammel.navn }}{% else %}Følg en aksje{% endif %} — OSE Signal{% endblock %}
 {% block side %}side-oversikt{% endblock %}
 {#- Story 8.9: «Vis meg rundt», på søket. #}
@@ -31,8 +33,13 @@
   {% elif valgt and alt_fulgt %}
     <p class="feil">{{ valgt.navn }} er alt i lista, eller venter på hentingen.</p>
     <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
+  {% elif valgt and not bransje %}
+    {#- Story 8.22 (spørsmål 1): uten bransje i lista kan aksjen ikke følges. #}
+    <p class="feil">{{ valgt.navn }} har ingen bransje i lista over Oslo Børs, så den kan ikke følges.</p>
+    <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
   {% elif valgt %}
-    <p class="aksjetype">Aksje på Oslo Børs · {{ valgt.kode }}</p>
+    {#- Story 8.22 (svaret 10.11 kl. 13:38): bransjen er fast, med symbolet. #}
+    <p class="aksjetype">Aksje på {{ 'Demo Børs' if eksempeltall else 'Oslo Børs' }} · {{ valgt.kode }} · {{ bransjesymbol(bransje) }}{{ bransje }}</p>
     {% if omsetning and omsetning.median is not none %}
       <p class="omsetning">Median omsetning de 3 siste månedene: ca. {{ omsetning.median|tall('mnok') }} MNOK om dagen, {{ 'regnet av kursene til' if omsetning.kursene else 'målt' }} {{ omsetning.maalt|dato }}.
       {% if omsetning.utenfor %}Det er under de {{ grense|tall('heltall') }} MNOK signalet er målt på, så den merkes «Utenfor målingen».{% else %}Det er over de {{ grense|tall('heltall') }} MNOK signalet er målt på.{% endif %}</p>
@@ -51,13 +58,6 @@
     <form class="folgskjema" method="post" action="/folg">
       <input type="hidden" name="kode" value="{{ valgt.kode }}">
       {% if gammel %}<input type="hidden" name="bytt" value="{{ gammel.symbol }}">{% endif %}
-      {#- Spørsmål 4 (svaret 08.11 kl. 11:57): brukeren velger bransjen, og
-          appen foreslår ingen (NFR-06). #}
-      <label for="sektor">Bransje</label>
-      <select id="sektor" name="sektor" required>
-        <option value="">Velg bransje</option>
-        {% for bransje in bransjene %}<option value="{{ bransje }}">{{ bransje }}</option>{% endfor %}
-      </select>
       <div class="knapper">
         <a class="knapp" href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Avbryt</a>
         {% if omsetning and omsetning.utenfor and omsetning.median is not none and not gammel %}<a class="knapp" href="/folg">Velg en annen</a>{% endif %}
@@ -66,27 +66,67 @@
       <p class="under">Hver aksje bruker {{ egne.kall.per_aksje }} kall om dagen.</p>
     </form>
   {% else %}
-    <form class="sok" method="get" action="/folg">
+    {#- Story 8.22: alle aksjene som kan følges, med filteret. Radene står i
+        siden; hjelp.js skjuler dem som ikke passer med søket mens man
+        skriver (spørsmål 8), og uten skript gjør knappen «Vis» det samme.
+        Ticker og navn står hver for seg, som i filtrer() (BH5, ECH7).
+        Tillegg 3 (svarene 10.11 kl. 22:44): sorteringen i stedet for kortet
+        «Mest omsatt», og aldri etter kursen eller signalet (NFR-06). #}
+    {#- Tillegg 3 (svarene 10.11 kl. 22:44): radene har samme stil som
+        radene i tabellen på oversikten, med navnet og tickeren og
+        bransjeikonet under, omsetningen i en egen kolonne og «Følg» til
+        høyre. #}
+    {% macro rad(a) -%}
+      <tr class="foelgbar" data-kode="{{ a.kode|lower }}" data-navn="{{ a.navn|lower }}"{% if a.kode not in treff %} hidden{% endif %}>
+        <td class="selskap">{{ a.navn }}<span class="skjult">, </span><span class="linje">{{ a.kode }} · {{ bransjesymbol(a.bransje) }}{{ a.bransje }}</span></td>
+        <td class="tall omsetning">{% if a.median is not none %}ca. {{ (a.median / mill)|tall('mnok') }} MNOK<span class="skjult">, </span><span class="fra">{{ 'regnet av kursene til' if a.kursene else 'målt' }} {{ a.dag|dato }}</span>{% if a.utenfor %}<span class="utenformerke">Utenfor målingen</span>{% endif %}{% else %}<span class="ikke-maalt">ikke målt ennå</span>{% endif %}</td>
+        <td class="valg"><a class="knapp" href="/folg?kode={{ a.kode }}{% if gammel %}&amp;bytt={{ gammel.symbol }}{% endif %}" aria-label="{{ 'Bytt inn' if gammel else 'Følg' }} {{ a.navn }}">{{ 'Bytt inn' if gammel else 'Følg' }}</a></td>
+      </tr>
+    {%- endmacro %}
+    <p class="antall-folg"><span id="antall-alle">{{ alle|length }}</span> aksjer på {{ 'Demo Børs' if eksempeltall else 'Oslo Børs' }} kan følges. {{ hjelpeknapp("hjelp-folg", "Hjelp: følg en aksje") }}</p>
+    <form class="folgfilter" method="get" action="/folg">
       {% if gammel %}<input type="hidden" name="bytt" value="{{ gammel.symbol }}">{% endif %}
-      <label for="q">Søk blant aksjene på Oslo Børs</label>
-      <input id="q" name="q" type="search" value="{{ sok }}" maxlength="40" autocomplete="off">
-      <button type="submit" class="knapp">Søk</button>
+      <div class="sok">
+        <label for="q">Søk på ticker eller navn</label>
+        <input id="q" name="q" type="search" value="{{ sok }}" maxlength="40" autocomplete="off" data-folgsok>
+        <button type="submit" class="knapp">Vis</button>
+      </div>
+      {#- Tillegg 3 (svarene 10.11 kl. 22:44): flere bransjer kan velges
+          samtidig, og kombineres med omsetningen. Det valgte er oransje med
+          et hakemerke, så fargen ikke står alene (stil.css). «Alle» er en
+          lenke som tar bort bransjene. #}
+      <fieldset class="bransjefilter">
+        <legend>Bransje</legend>
+        <a class="valgbrikke{% if not valgte_bransjer %} valgt{% endif %}" href="{{ alle_bransjer }}"{% if not valgte_bransjer %} aria-current="true"{% endif %}>Alle</a>
+        {% for b in bransjene %}<label class="valgbrikke"><input type="checkbox" name="bransje" value="{{ b }}"{% if b in valgte_bransjer %} checked{% endif %}> {{ bransjesymbol(b) }}{{ b }}</label>{% endfor %}
+      </fieldset>
+      <fieldset class="omsetningsfilter">
+        <legend>Målt omsetning</legend>
+        {% for verdi, tekst in omsetningsfilter %}<label class="valgbrikke"><input type="radio" name="omsetning" value="{{ verdi }}"{% if verdi == valgt_omsetning %} checked{% endif %}> {{ tekst }}</label>{% endfor %}
+      </fieldset>
+      <fieldset class="sorteringen">
+        <legend>Sorter</legend>
+        {% for verdi, tekst in sorteringer %}<label class="valgbrikke"><input type="radio" name="sorter" value="{{ verdi }}"{% if verdi == valgt_sortering %} checked{% endif %}> {{ tekst }}</label>{% endfor %}
+      </fieldset>
+      {#- Gjennomgangen av tillegg 3 (BH11, ECH1): «Vis» også etter brikkene, så
+          tastaturet ikke må gå tilbake forbi alle bransjene. #}
+      <p class="vis-nederst"><button type="submit" class="knapp">Vis</button></p>
     </form>
-    <p>Du kan søke blant alle aksjene på Oslo Børs. Er omsetningen målt, står den i søket. Omsettes en aksje for mindre enn {{ grense|tall('heltall') }} MNOK om dagen i median de 3 siste månedene, merkes den «Utenfor målingen».</p>
-    {% if sok %}
-      {% if treff %}
-        <ul class="treff">
-          {% for aksje in treff %}
-            <li><a href="/folg?kode={{ aksje.kode }}{% if gammel %}&amp;bytt={{ gammel.symbol }}{% endif %}">{{ aksje.navn }}</a> <span class="linje">{{ aksje.kode }}</span>
-              {#- Gjennomgangen (VG3): er omsetningen målt, står den i søket. #}
-              {% if aksje.median is not none %}<span class="linje">ca. {{ (aksje.median / mill)|tall('mnok') }} MNOK om dagen, {{ 'regnet av kursene til' if aksje.kursene else 'målt' }} {{ aksje.maalt|dato }}</span>{% if aksje.median < grense * mill %} <span class="utenformerke">Utenfor målingen</span>{% endif %}{% endif %}</li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="ingen">Ingen aksjer på Oslo Børs passer med søket, eller de er alt i lista.</p>
-      {% endif %}
-    {% endif %}
+    <h2 class="alle-tittel">Alle som kan følges{% if valgte_bransjer %} i {{ (valgte_bransjer[:-1]|join(", ") ~ " og " ~ valgte_bransjer[-1]) if valgte_bransjer|length > 1 else valgte_bransjer[0] }}{% endif %}</h2>
+    <p class="antall-vist"><span id="antall-vist">{{ treff|length }}</span> av {{ rader|length }} vises.{% if valgt_sortering == omsatt and rader|selectattr("median")|list %} Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet.{% endif %}</p>
+    <div class="tabellboks folgtabell" role="region" aria-label="Aksjene som kan følges" tabindex="0">
+    <table>
+      <thead>
+        <tr><th>Selskap</th><th class="tall">Omsetning<span class="under">median per dag, 3 mnd.</span></th><th><span class="skjult">{{ 'Bytt inn' if gammel else 'Følg' }}</span></th></tr>
+      </thead>
+      <tbody id="foelgbare">
+      {% for a in rader %}{{ rad(a) }}{% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p class="ingen" id="ingen-treff"{% if treff %} hidden{% endif %}>Ingen aksjer passer med søket og filteret.</p>
     <p><a href="{{ '/min-liste#din-egen-liste' if gammel else '/#dine-egne-aksjer' }}">Tilbake</a></p>
+    {{ hjelpevindu("hjelp-folg", "Følg en aksje", [("", ["foelg_en_aksje"])]) }}
   {% endif %}
 </section>
 {% endblock %}

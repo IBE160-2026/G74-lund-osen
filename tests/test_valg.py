@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 import app as app_modul
+import ferdige_lister
 import lagring_sqlite
 import valg
 from lagring_sqlite import aapne_base, les_lista
@@ -18,6 +19,17 @@ from valg import ListaErFull, UgyldigValg, Valglager
 
 KLOKKE = datetime(2026, 9, 22, 12, 0, tzinfo=timezone.utc)
 BOERSEN = [("NYA", "Ny Aksje ASA"), ("NYB", "Ny B ASA"), ("NYC", "Ny C ASA"), ("NYD", "Ny D ASA")]
+
+
+# Story 8.22: de oppdiktede tickerne har en fast bransje, som de 295 i
+# ferdige_lister.BRANSJE, fordi brukeren ikke lenger velger den.
+FASTE = {"NYA": "Kraft", "NYB": "Helse", "NYC": "Kraft", "NYD": "Kraft"}
+
+
+@pytest.fixture(autouse=True)
+def faste_bransjer(monkeypatch):
+    for kode, bransje in FASTE.items():
+        monkeypatch.setitem(ferdige_lister.BRANSJE, kode, bransje)
 
 
 @pytest.fixture
@@ -229,12 +241,20 @@ class TestSidene:
         side = klient.get("/").data.decode("utf-8")
         assert "Venter på henting i kveld etter kl. 22." in side and "16 av 18 aksjer i lista" in side
 
-    def test_en_bransje_maa_velges(self, klient):
-        """Spørsmål 4 og NFR-06: ingen bransje foreslås, og uten bransje avvises valget."""
+    def test_bransjen_er_fast(self, klient, stier):
+        """Story 8.22 (svaret 10.11 kl. 13:38, som erstatter spørsmål 4): ville
+        feilet hvis siden lot brukeren velge bransjen, eller et felt i
+        skjemaet bestemte den."""
         bekreft = klient.get("/folg?kode=NYA").data.decode("utf-8")
-        assert '<option value="">Velg bransje</option>' in bekreft and "selected" not in bekreft
-        svar = klient.post("/folg", data={"kode": "NYA", "sektor": ""})
-        assert svar.status_code == 303 and "feil=" in svar.headers["Location"]
+        assert "<select" not in bekreft and "Velg bransje" not in bekreft
+        assert "Aksje på Oslo Børs · NYA · " in bekreft and "</svg>Kraft</p>" in bekreft
+        svar = klient.post("/folg", data={"kode": "NYA", "sektor": "Helse"})
+        assert svar.status_code == 303 and "feil=" not in svar.headers["Location"]
+        t = aapne_base(stier[1])
+        try:
+            assert t.execute("SELECT sektor FROM oenske WHERE symbol = 'NYA'").fetchone() == ("Kraft",)
+        finally:
+            t.close()
 
     def test_full_liste_sier_det(self, klient):
         for kode, _ in BOERSEN[:3]:

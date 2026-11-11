@@ -300,6 +300,8 @@ _RUTER_MED_BASE = {
     "demoselskap",
     # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
     "folg_side",
+    # Tillegg 3 til 8.22: siden «Er du sikker?» før en ferdig liste.
+    "ferdig_liste_side",
     # Story 8.10: «Innstillinger».
     "innstillinger_side",
     "lagre_innstilling",
@@ -2226,7 +2228,8 @@ def _egne_regnet() -> dict | None:
                     {
                         "symbol": aksje.symbol,
                         "navn": aksje.navn,
-                        "sektor": aksje.sektor,
+                        # Story 8.22 (spørsmål 3): den faste bransjen med en gang.
+                        "sektor": ferdige_lister.fast_bransje(aksje.symbol) or aksje.sektor,
                         "status": "fjernes" if aksje.symbol in fjernes else "hentet",
                         "oenske": fjernes.get(aksje.symbol),
                         "utenfor": valg.utenfor_maalingen(omsetningen[0]),
@@ -2240,7 +2243,7 @@ def _egne_regnet() -> dict | None:
                     {
                         "symbol": o.symbol,
                         "navn": o.navn,
-                        "sektor": o.sektor,
+                        "sektor": ferdige_lister.fast_bransje(o.symbol) or o.sektor,
                         "status": "venter",
                         "oenske": o.id,
                         "utenfor": valg.utenfor_maalingen(omsetningen[0]),
@@ -2290,12 +2293,15 @@ def _egne_regnet() -> dict | None:
                 "igjen": igjen,
                 "med_en": med_en,
                 "igjen_med_en": igjen_med_en,
-                # Story 8.23 (A7): tallene i «Følg flere aksjer» regnes av
-                # kvoten, taket og lista, ikke skrevet for hånd.
+                # Tillegg 4 (gjennomgangen, BH3): kvoten i steg 2. Story 8.23 (A7): tallene i
+                # «Følg flere aksjer» regnes av kvoten, taket og lista, ikke skrevet for hånd.
                 "kvote": valg.KVOTE,
                 "per_aksje": valg.KALL_PER_AKSJE,
                 "igjen_med_taket": valg.KVOTE - valg.TAK * valg.KALL_PER_AKSJE - valg.INDEKSKALL,
             },
+            # Story 8.22, tillegg 4 (svaret kl. 22:50): status for nøkkelen i
+            # steg 2, regnet av siste henting, uten kall og uten .env (AD-10).
+            "henting": valg.siste_henting(g.tilkobling),
         }
     except (*BASEFEIL, ValueError) as feil:
         app.logger.warning("Valget kunne ikke leses: %s: %s", type(feil).__name__, feil)
@@ -2314,10 +2320,16 @@ def _samme_side() -> None:
         abort(403)
 
 
+# Story 8.22 (spørsmål 1): grunnen når en aksje ikke har en bransje i lista.
+INGEN_BRANSJE = "Aksjen har ingen bransje i lista over Oslo Børs, så den kan ikke følges."
+
+
 @app.route("/folg")
 def folg_side():
     """«Følg en aksje» og «Bytt ut» - story 2.12, utdraget §1 og §2. En side
-    med skjema, ikke en dialog med skript (spørsmål 8). Bare lesing."""
+    med skjema, ikke en dialog med skript (spørsmål 8). Bare lesing.
+    Story 8.22: alle aksjene som kan følges, med filter på bransje og
+    omsetning. Tillegg 3: sorteringen i stedet for de tre forslagene."""
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     lager = _valglager()
@@ -2331,9 +2343,9 @@ def folg_side():
     gammel = i_lista.get(bytt) if bytt else None
     valgt = lager.boersaksje(kode) if kode else None
     omsetning = None
-    # Story 8.11c: samme median som i de ferdige listene og merket. Bare når
-    # siden viser en omsetning (gjennomgangen, BH4).
-    medianene = _medianene() if valgt is not None or sok else {}
+    # Story 8.11c: samme median som i de ferdige listene og merket. Story
+    # 8.22: lista viser omsetningen for alle, så den regnes alltid.
+    medianene = _medianene()
     if valgt is not None:
         median, maalt, kursene = _omsetningen(lager, medianene, valgt.kode)
         omsetning = {
@@ -2342,29 +2354,64 @@ def folg_side():
             "kursene": kursene,
             "utenfor": valg.utenfor_maalingen(median),
         }
-    treff = []
-    if sok and valgt is None:
-        for aksje in lager.sok(sok):
-            median, maalt, kursene = _omsetningen(lager, medianene, aksje.kode)
-            treff.append({"kode": aksje.kode, "navn": aksje.navn, "median": median, "maalt": maalt, "kursene": kursene})
+    # Story 8.22: hele lista og filteret på bransje og omsetning (spørsmål 6).
+    # Tillegg 3 (svarene 10.11 kl. 22:44): sorteringen i stedet for de tre
+    # forslagene. Et ukjent valg i adressen er «Alle», og en ukjent sortering
+    # er «Mest omsatt først».
+    # Tillegg 3: flere bransjer samtidig, i samme rekkefølge som brikkene.
+    # Ukjente valg i adressen hoppes over. «Alle» er en lenke uten bransjene,
+    # med søket, omsetningen, sorteringen og byttet.
+    i_adressen = set(request.args.getlist("bransje"))
+    valgte_bransjer = [b for b in valg.BRANSJENE if b in i_adressen]
+    # Gjennomgangen (ECH4): ikke feil= eller ukjente parametre.
+    uten_bransjer = urlencode(
+        [(k, v) for k, v in request.args.items(multi=True) if k in ("q", "omsetning", "sorter", "bytt")]
+    )
+    valgt_omsetning = request.args.get("omsetning") or ""
+    if valgt_omsetning not in {v for v, _ in ferdige_lister.OMSETNINGSFILTER}:
+        valgt_omsetning = ""
+    valgt_sortering = request.args.get("sorter") or ""
+    if valgt_sortering not in {v for v, _ in ferdige_lister.SORTERINGER}:
+        valgt_sortering = ferdige_lister.OMSATT
+    alle, rader, treff = [], [], set()
+    if valgt is None:
+        opptatt = set(i_lista) | {o.symbol for o in lager.ventende() if o.handling == valg.FOLG}
+        alle = ferdige_lister.foelgbare(g.tilkobling, opptatt, medianene)
+        rader = ferdige_lister.sorter(
+            ferdige_lister.filtrer(alle, "", valgte_bransjer, valgt_omsetning), valgt_sortering
+        )
+        treff = {a.kode for a in ferdige_lister.filtrer(rader, sok, (), "")}
     # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
     # ikke følges, og siden sier det før skjemaet sendes.
     alt_fulgt = valgt is not None and (
         valgt.kode in i_lista or any(o.symbol == valgt.kode and o.handling == valg.FOLG for o in lager.ventende())
     )
+    # Story 8.22 (svaret 10.11 kl. 13:38): bransjen er fast, og en aksje uten
+    # bransje kan ikke følges (spørsmål 1).
+    bransje = ferdige_lister.bransjen(g.tilkobling, valgt.kode) if valgt is not None else None
     return render_template(
         "folg.html",
         aktiv="min_liste" if gammel else "oversikt",
         sidesti="/folg",
         sok=sok,
+        alle=alle,
+        rader=rader,
         treff=treff,
+        valgte_bransjer=valgte_bransjer,
+        alle_bransjer="/folg" + (f"?{uten_bransjer}" if uten_bransjer else ""),
+        valgt_sortering=valgt_sortering,
+        sorteringer=ferdige_lister.SORTERINGER,
+        omsatt=ferdige_lister.OMSATT,
+        valgt_omsetning=valgt_omsetning,
+        bransjene=valg.BRANSJENE,
+        omsetningsfilter=ferdige_lister.OMSETNINGSFILTER,
         alt_fulgt=alt_fulgt,
+        bransje=bransje,
         mill=1_000_000,
         valgt=valgt,
         omsetning=omsetning,
         gammel=gammel,
         egne=egne,
-        bransjene=valg.BRANSJENE,
         grense=valg.GRENSE_MNOK,
         tilbake="min_liste" if gammel else "oversikten",
         feil=request.args.get("feil"),
@@ -2382,7 +2429,12 @@ def folg():
     kode = (request.form.get("kode") or "").strip().upper()
     bytt = (request.form.get("bytt") or "").strip().upper() or None
     try:
-        lager.folg(kode, request.form.get("sektor", ""), bytt)
+        # Story 8.22 (svaret 10.11 kl. 13:38): bransjen er den faste, ikke et
+        # felt i skjemaet. En aksje uten bransje avvises med grunnen.
+        sektor = ferdige_lister.bransjen(g.tilkobling, kode)
+        if sektor is None and lager.boersaksje(kode) is not None:
+            raise valg.UgyldigValg(INGEN_BRANSJE)
+        lager.folg(kode, sektor or "", bytt)
     except (valg.UgyldigValg, valg.ListaErFull) as feil:
         # Gjennomgangen (BH9, ECH9): samme side, med aksjen og byttet, og
         # grunnen. Kode og bytt er sjekket mot lista og tegnene foer de
@@ -2394,6 +2446,28 @@ def folg():
             deler["bytt"] = bytt
         return redirect("/folg?" + urlencode(deler), code=303)
     return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
+
+
+@app.get("/ferdig-liste")
+def ferdig_liste_side():
+    """Tillegg 3 til 8.22 (svarene 10.11 kl. 22:44): «Er du sikker?» før en
+    ferdig liste blir lista. Bare lesing; ingenting byttes før skjemaet
+    sendes til POST /ferdig-liste. En bransje uten liste gir 404."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    egne = _egne()
+    bransje = request.args.get("bransje", "")
+    aksjene = egne["ferdige"].get(bransje) if egne else None
+    if not aksjene:
+        abort(404)
+    return render_template(
+        "ferdig_liste.html",
+        aktiv="min_liste",
+        sidesti="/ferdig-liste",
+        egne=egne,
+        bransje=bransje,
+        aksjene=aksjene,
+    )
 
 
 @app.post("/ferdig-liste")
