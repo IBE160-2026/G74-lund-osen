@@ -1,0 +1,236 @@
+---
+title: 'Story 10.10: Rikere KI-tekster, med navnene og bransjene i teksten om børsdagen og kortere setninger om én aksje'
+type: 'feature'
+created: '2026-11-11'
+status: 'in-review'
+route: 'dispatch'
+baseline_commit: '059dc10c'
+context:
+  - '{project-root}/CLAUDE.md'
+  - '{project-root}/_bmad-output/planning-artifacts/epics.md'
+  - '{project-root}/_bmad-output/implementation-artifacts/spec-10-6-ki-teksten-om-dagen-paa-forsiden.md'
+  - '{project-root}/_bmad-output/implementation-artifacts/spec-10-9-ki-teksten-forklarer-det-siden-viser.md'
+  - '{project-root}/docs/brukertest.md'
+---
+
+*Svar 2026-11-11 kl. 16:05 (gruppens svar):* forslagene i spørsmål 1–5 og 7–9 er godtatt som bygget. Demoen skal vise tekster fra Gemma i de nye formene (spørsmål 6), og gruppen ser demotekstene før flettingen. Rådet anbefalte alt.
+
+*Svar 2026-11-11 kl. 17:21 (gruppens svar):* teksten om børsdagen skal si mer, med tre nye deler: hvilke av aksjene i Min liste som skilte seg ut, om flere eller færre enn vanlig skilte seg ut, og hovedindeksen siste uke. Rådet anbefalte de to første, og gruppen valgte også den tredje. Delene står under «Tillegget kl. 17:21», med spørsmål 10–12.
+
+Begge svarene er gjengitt fra instruksjonen kl. 17:41, fordi instruksjonen kl. 16:05 aldri kom til dette vinduet.
+
+Skrevet 11.11 i instruksjonen kl. 11:00, «Rikere KI-tekster». Den ble først gitt 10.11 kl. 16:28 og ble aldri startet. Instruksjonen er kopiert til scratchpad og føres i dagsfila sammen med flettingen, etter gruppens ja. Storyen bygges nå, og spørsmålene under har hvert et forslag som koden bygger på. Gruppen svarer før PR-en flettes (svaret kl. 16:18: ingen fletting før det).
+
+**Svaret 10.11 kl. 16:18** (gruppens svar, gjengitt fra instruksjonen, fordi svaret ikke står andre steder i repoet; slått opp med `git grep` 11.11): teksten om børsdagen får navnene på aksjene som skilte seg ut og retningen deres, og bransjene som steg og falt mest i snitt. Teksten om én aksje får kortere setninger uten tall som er 0. Rådet anbefalte det. Flettingen og føringen i dagsfila og `epics.md` kommer i en egen instruksjon etter gruppens ja.
+
+## Spørsmål til gruppen før flettingen
+
+Hvert spørsmål har et forslag, og koden bygger på forslaget.
+
+1. **Hvilke bransjer er med når appen finner bransjen som steg og falt mest i snitt?** *Forslag:* de samme som i feltet `bransjer`, altså bransjer der minst to aksjer i lista har en endring den dagen (`MINST_I_BRANSJEN`). Snittet regnes som på Børsometeret, av endringen for aksjene som har en endring (`snitt` i `src/boersometer.py`), og sammenlignes slik det vises, med to desimaler. Bransjen som steg mest må ha et snitt over 0,00 og bransjen som falt mest et snitt under 0,00. Med én aksje ville snittet bare si hva den aksjen gjorde (svaret 6.11 kl. 11:15, 1).
+2. **Hva skjer når to bransjer har samme snitt?** *Forslag:* da nevnes ingen bransje for den siden, og feltet mangler i grunnlaget. Ellers måtte appen eller modellen velge en av dem, og modellen skal ikke velge noe selv.
+3. **I hvilken rekkefølge står navnene?** *Forslag:* 3 av 3 først og så 2 av 3, og alfabetisk etter navnet innenfor samme styrke, i norsk rekkefølge med Æ, Ø og Å sist og uten hensyn til store og små bokstaver (gjennomgangen, BH5). Rekkefølgen følger ikke tabellen, fordi forsiden regner grunnlaget på nytt med den sorteringen siden har (FR-607). Med tabellens rekkefølge ville teksten forsvinne når noen sorterer.
+4. **Hvordan skrives navnene?** *Forslag:* én setning etter tallet på dem som skilte seg ut: «Blant dem var Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv) og 2 andre.» Navnet står som i lista, og retningen med liten bokstav. Høyst fem navn står i teksten, og resten som antall. Den eldre setningen med antallet i hver retning står fortsatt.
+5. **Hva skjer med tekstene om dagen fra før flettingen?** Grunnlaget har fire nye felt, så en rad med promptversjon dag-1 ville ikke lenger vært lik grunnlaget forsiden regner ut. Da ville teksten forsvunnet fra de dagene. *Forslag:* forsiden sammenligner en rad med dag-1 med grunnlaget uten de nye feltene (`for_promptversjon` i `src/dagsgrunnlag.py`), så tekstene fra 09.11 og 10.11 fortsatt vises.
+6. **Hvem skriver eksempeltekstene i demoen, og hva står i merket?** Ollama skulle ikke startes, så Gemma kan ikke lage tekstene i de nye formene nå. *Forslag:* en fast skriver i appen (`src/ki_eksempel.py`) skriver formene fra reglene med tallene og navnene fra grunnlaget. Den er også den falske modellen i testene, og den finner ingenting selv. Merket står som før, «Laget av KI», men modellen heter «eksempeltekst (lokal)», ikke gemma4:e4b, så ingen tekst ser ut som den er laget av Gemma. «Laget av KI» stemmer da ikke helt for demoen, og gruppen avgjør om merket skal si noe annet der. Etter gruppens ja kan Gemma-tekster lages med `uv run python src/demo_ki.py` og `--dagen`, i en egen instruksjon med Ollama.
+7. **Hvilke nye ord stopper kontrollen (NFR-06)?** «bør» sto allerede i lista. *Forslag:* «verdt» («verdt å følge»), «følg med» med bøyningene og «vil» stoppes i begge kontrollene. «vil» står ikke i noen av formene. Vakta på siden (`_VAKT` i `src/ki_visning.py`) er urørt, fordi den stopper ordstammer, og et nytt ord der ville stoppet tekster som besto kontrollen.
+8. **Hva er «kortere setninger» i teksten om én aksje?** *Forslag:* formen for bevegelsen er kortere: «fordi kursen steg mer enn den vanligvis svinger» og «fordi dagens endring ikke var stor». Hvert mønster får sin egen korte setning, ikke én lang. En form med tallet 0 skrives ikke: «negativt 0» står ikke, og er antallet dager aksjen gikk samme vei som hovedindeksen eller antallet skift 0, står ikke den setningen. Kontrollen stopper en form med 0. Formene for trenden og interessen står, fordi kontrollen leser dem.
+9. **Står setningen «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer» fortsatt i teksten om dagen?** *Forslag:* ja, for nå. Den sier noe annet enn snittet. Teksten har nå opptil sju korte setninger, og gruppen kan be om at den tas ut når de har sett tekstene.
+
+## Intent
+
+**Problem:** testpersonen forsto ikke alt og ville ha mer KI-hjelp (brukertesten 10.11, `docs/brukertest.md`, «Funnene», og U103 i `docs/ux-logg.md`). Teksten om børsdagen hadde bare antall, og teksten om én aksje hadde lange setninger med tall som var 0.
+
+**Brukertesten 10.4 ble tatt 10.11 med promptversjon 5 for teksten om én aksje og dag-1 for teksten om dagen.** Testen brukte dataene fra 09.11 (`docs/brukertest.md`, Rettet-linja 11.11). KI-loggen i `data/db/ose.db` har for 09.11 bare rader med versjon 5 og dag-1 (lest 11.11 med `mode=ro`, sha256 for basen den samme før og etter). Versjon 6 og dag-2 er altså ikke testet med en person.
+
+**Målet:** teksten om dagen sier hvilke aksjer og bransjer som skilte seg ut, og teksten om én aksje er lettere å lese. Appen regner ut alt, og modellen skriver det i faste former.
+
+## Slått opp 11.11 på `059dc10c` (regel 3)
+
+- **Grunnlaget for dagen** (`dagsgrunnlag` i `src/dagsgrunnlag.py`) hadde antallet aksjer, ukedagen, retningen på hovedindeksen, «bedre enn indeksen», antallet som skilte seg ut og retningene blant dem, og for hver bransje med minst to aksjer med en endring hvor mange som steg. Ingen navn.
+- **Forsiden** (`_boersdagen` i `src/app.py`) regner grunnlaget på nytt av aksjene på siden, i den rekkefølgen siden har, og `bygg_dagsvisning` i `src/ki_visning.py` viser teksten bare når grunnlaget er likt.
+- **Snittet på Børsometeret** er gjennomsnittet av endringen for aksjene i bransjen som har en endring (`snitt` i `src/boersometer.py`), uten vekt.
+- **KI-loggen** godtar lister i grunnlaget og lagrer dem som tuple (`_frys` i `src/kilogg.py`). Grunnlaget regnet på nytt har en liste, så sammenligningen måtte gjøre begge til lister.
+- **Prompten for én aksje** var versjon 5 (`src/ki_prompt.py`), med én lang setning om mønstrene. **Prompten for dagen** var dag-1 (`src/ki_dagen.py`).
+- **Kontrollen for dagen** tar ut formene og stopper alt som er igjen utenom «og», «men» og tegnsetting. **Kontrollen for én aksje** stoppet «bør», men ikke «verdt», «følg med» eller «vil» alene.
+- **Navnene i lista:** ingen av de 312 navnene i `aksje` og `boersliste` i `data/db/ose.db` har ord vakta på siden eller de nye ordene stopper (lest 11.11 med `mode=ro`). Navnene har tegnene `&`, `(`, `)`, `-`, `.`, `/` og hardt mellomrom, så kontrollen leser navnet ordrett, med hvilket som helst mellomrom.
+- **Demotekstene** lages med Gemma (`src/demo_ki.py`), og testene avviser en tekst laget med en annen prompt.
+
+## Delene
+
+### A) Teksten om børsdagen, promptversjon dag-2
+
+- Grunnlaget får `skilte_seg_ut_navn` (høyst fem, med `navn`, `styrke` og `retning`), `skilte_seg_ut_andre` (bare når det er flere), `bransje_mest_opp` og `bransje_mest_ned` (spørsmål 1–4).
+- Prompten forklarer feltene og gir formene «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›) … og ‹skilte_seg_ut_andre› andre.», «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.». Modellen finner ingenting selv og sammenligner ikke.
+- `dagsregel` skriver navnene og bransjene i regelen (FR-604).
+- En rad med dag-1 vises fortsatt (spørsmål 5).
+
+### B) Teksten om én aksje, promptversjon 6
+
+- Kortere form for bevegelsen, én setning per mønster og ingen tall som er 0 (spørsmål 8).
+- Linja om råd sier «bør», «verdt å følge» og «følg med».
+
+### C) Kontrollen (FR-603)
+
+- Teksten om dagen: hvert navn leses ordrett fra grunnlaget med styrken og retningen i parentesen. Feil styrke eller retning stoppes, og det samme gjør et navn som står to ganger eller ikke står i grunnlaget, fordi det blir stående igjen når formene er tatt ut. «og ‹N› andre» må stemme med feltet, og bransjene må være de appen regnet ut. Mangler feltet, stoppes formen.
+- Teksten om én aksje: en form for mønstrene med 0 stoppes.
+- Begge: «verdt», «følg med» og «vil» stoppes (spørsmål 7).
+
+### D) Demoen
+
+- `src/demo_ki_tekster.json` og `src/demo_ki_dagen.json` er laget på nytt med `uv run python src/demo_ki.py --eksempel` og `--eksempel --dagen`, i de nye formene, med modellen «eksempeltekst» (spørsmål 6). Alle 13 tekstene og teksten om dagen besto kontrollen.
+
+### E) Testene
+
+`tests/test_rikere_ki_tekster.py`, med «Ville feilet hvis» i hver test og eksempelskriveren som falsk modell. Testene for 10.6, 10.9 og demoen er rettet til de nye versjonene.
+
+## Grenser
+
+- Ingen API-kall utover kvotesjekken, `src/fetch_prices.py` er ikke kjørt, og `data/db/ose.db` er bare lest med `mode=ro`.
+- Ollama og den ekte versjonen er ikke startet. Ingen KI-tekst fra den ekte versjonen står i repoet.
+- Vakta på siden (NFR-06) er urørt (spørsmål 7).
+
+## Bygget 11.11 (instruksjonen kl. 11:00)
+
+- Grenen `10-10-rikere-ki-tekster` fra `origin/main` (`059dc10c`), i worktreen `G74-lund-osen-10-10`.
+- `e754a91e` spesifikasjonen, `aa740217` del A og C (dag-2), `c9df6cae` del B og C (versjon 6), `c090db5d` del D og E (eksempeltekstene og testene), `2c2d5b11` README-en og hjelpen. Rettingene etter gjennomgangen står i en egen commit etter disse.
+- Demotekstene er laget med `uv run python src/demo_ki.py --eksempel` og `--eksempel --dagen`. Alle 13 tekstene og teksten om dagen besto kontrollen. Etter rettingene ble de laget på nytt og var byte for byte de samme.
+
+## Demotekstene før og etter
+
+Teksten om dagen i demoen (fredag 9. oktober 2026, oppdiktede selskaper), før med Gemma og dag-1:
+
+> Hovedindeksen falt fredag. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. I energi steg 1 av 4 aksjer. I materialer steg 2 av 2 aksjer.
+
+Etter, som eksempeltekst med dag-2:
+
+> Hovedindeksen falt fredag. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. Blant dem var Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv), Laksevik Sjømat (3 av 3, blandet), Trygghavn Forsikring (3 av 3, blandet), Havdyp Olje (2 av 3, blandet) og 2 andre. I snitt steg sjømat mest. I snitt falt finans mest.
+
+Teksten om én aksje i demoen (Havdyp Olje), etter, med versjon 6:
+
+> Trenden ga et positivt utslag fordi kursen ligger over snittet for de siste 50 børsdagene. Bevegelsen ga ikke utslag fordi dagens endring ikke var stor. Interessen ga et negativt utslag fordi det ble handlet mer enn vanlig på en dag kursen falt. Aksjen gikk samme vei som hovedindeksen. Av de 15 vurderte børsdagene av de siste 20 var signalet positivt 12 og blandet 3. Aksjen gikk samme vei som hovedindeksen 1 av de 5 dagene som kunne telles av de siste 5 børsdagene. Den siste måneden skiftet retningen minst 5 ganger.
+
+«negativt 0» og «uten retning 0» står ikke. Tekstene er i de faste formene fra eksempelskriveren, ikke fra en modell (spørsmål 6).
+
+## Mutantene
+
+Én per del, med kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad og er ikke i repoet). Alle ble fanget, og alle filene var like HEAD etterpå.
+
+| Del | Fil | Mutanten | Fanget av |
+|---|---|---|---|
+| A | `src/dagsgrunnlag.py` | navnene etter navnet, ikke styrken først | `TestGrunnlagetForDagen` |
+| B | `src/ki_prompt.py` | «Tall som er 0, kan du ta med» | `TestVersjon6` |
+| C | `src/ki_dagen.py` | retningen ved et navn sjekkes ikke | `TestKontrollenForDagen` |
+| D | `src/ki_eksempel.py` | modellnavnet «gemma4:e4b» | `TestDemoen` |
+| E | denne spesifikasjonen | setningen om promptversjonene i brukertesten | `test_spesifikasjonen_sier_hvilke_versjoner_brukertesten_brukte` |
+
+Del C ble prøvd på nytt etter rettingene, se under.
+
+## Gjennomgangen 11.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Tre lesere i parallell, uten å kjøre tester eller endre noe. Blind Hunter leste bare diffen.
+
+| Funn | Grad | Hva | Triage |
+|---|---|---|---|
+| BH1, ECH1 | middels | Kontrollen krevde ikke alle navnene, så «og 2 andre» kunne bli feil | Rettet: bruker teksten navnene, må alle stå der, i rekkefølgen i grunnlaget (`_navnene` i `src/ki_dagen.py`) |
+| BH3, VG1 | middels | Testen av avrundingen av snittet ville bestått uten avrunding | Rettet: testen går gjennom `dagsgrunnlag` med 1,001 mot 1,004 og 0,004 mot 0,003 |
+| VG2 | middels | `dagsregel` hadde ingen test | Rettet: `test_regelen_har_navnene_og_bransjene`, og regelen i demoen sammenlignes |
+| VG3 | middels | «vil» ble stoppet av den gamle lista også uten det nye ordet | Rettet: testen bruker «Det vil vise seg.» og krever punkt 4 |
+| BH2, ECH2 | lav | Et navn som er slutten av et annet («BP» i «Aker BP») | Rettet: det lengste navnet leses først |
+| ECH3 | lav | To aksjer med samme navn | Rettet: leses som to oppføringer |
+| ECH4 | lav | «Blant dem var» og «I snitt … mest» kunne stå to ganger | Rettet |
+| ECH5 | lav | Navnet i grunnlaget ble ikke normalisert som teksten | Rettet |
+| BH4 | lav | Testen med hardt mellomrom | Avvist: grunnlaget hadde hardt mellomrom, også bekreftet av VG. Gjort tydelig med `HARDT` i testen |
+| BH5 | lav | Alfabetisk etter kodepunkt, ikke norsk | Rettet (spørsmål 3) |
+| BH6 | lav | «følges med» og «fulgte med» slapp gjennom | Rettet. «følg nøye med» slipper fortsatt gjennom teksten om én aksje, men stoppes i teksten om dagen som rest |
+| BH7 | lav | Et navn kunne stå utenfor setningen etter «Blant dem var» | Rettet |
+| BH8 | lav | Testen av eksempelradene tok ikke med temperaturen | Rettet |
+| BH9 | lav | Den negative korte formen for bevegelsen ble ikke prøvd som riktig | Rettet: `test_eksempelskriverens_form_bestaar_for_hvert_fortegn` |
+| VG4 | lav | Grunnen (punkt 3 og 4) ble ikke sjekket i teksten om dagen | Rettet |
+| VG5 | lav | «Blant dem var» uten navnene i grunnlaget ble ikke prøvd alene | Rettet |
+| VG6 | lav | «ordrett» stemte ikke, fordi navnet ble lest uten hensyn til store og små bokstaver | Rettet: navnet leses med bokstavene i grunnlaget |
+| VG7 | lav | Hjelpen ved «Børsdagen kort fortalt» hadde tatt ut antallet i hver bransje | Rettet, og setningen står ordrett i `docs/hjelp.md` |
+| VG8 | lav | At tekstene for aksjene og `--eksempel` er det skriveren gir, ble ikke testet | Rettet |
+| VG9 | lav | Docstrings og navn på tester sa versjon 5 | Rettet. Navnet `test_demotekstene_har_versjon_5_og_moenstrene` står, fordi `docs/` viser til det (`tests/test_kvalitetssikring.py`), og docstringen sier at versjonen er 6 |
+| VG10 | lav | Endringen i `som_vanlig`, som ingen kaller | Tatt ut igjen, `som_vanlig` er som på `059dc10c` |
+
+Ingen funn står åpent på middels eller over.
+
+## Etter gjennomgangen
+
+- **Mutantene på nytt:** alle fem kjørt mot koden etter rettingene, med mutant C nå i `_navnene` (setningen med færre navn enn grunnlaget). Alle ble fanget, og sha256 mot HEAD var lik.
+- **Bildene:** alle bildene i `docs/appen/` er tatt på nytt med DevTools-protokollen, fra en demobase i en midlertidig mappe og waitress på en ledig port. Bildet av aksjesiden og oversikten ved 390 px er nye, og oversikten ved 390 px er 4602 px høy (var 4444). De andre er byte for byte de samme.
+- **README-en:** punktene under «Status» har høyst 20 ord (testen i `tests/test_docker.py`), så punktet om KI-teksten om dagen står som før. Punktet om demoen sier «eksempeltekster i KI-formene», ikke «KI-tekst fra Gemma».
+- **Hele settet** i fire deler: 1622 + 1489 + 1304 + 818 = 5233, likt `--collect-only`. Del 1 og 3 ble kjørt på nytt etter rettingene og besto (1599 bestått og 23 hoppet over, og 1304 bestått). Del 1 gikk kl. 11:55–12:02, mens to andre vinduer kjørte pytest. Det skulle ikke skjedd.
+
+## Tillegget kl. 17:21 (instruksjonen kl. 17:41)
+
+Tre nye deler i teksten om børsdagen, etter gruppens svar kl. 17:21. Appen regner ut, modellen skriver i faste former, og kontrollen (FR-603) sjekker hvert tall. Spørsmålene under har hvert et forslag, og koden bygger på forslaget.
+
+10. **Står Min liste i KI-teksten eller som en linje appen skriver?** Min liste kan endres etter at teksten er skrevet, og forsiden viser teksten bare når grunnlaget er det samme som det siden regner ut (FR-607). Med Min liste i grunnlaget ville teksten forsvinne hver gang lista endres. *Forslag:* en linje appen skriver under teksten, av lista slik den er nå, merket «Skrevet av appen.»: «I Min liste skilte Bravo (3 av 3, negativ) og Alfa (2 av 3, positiv) seg ut.» eller «Ingen av aksjene i Min liste skilte seg ut.» Navnene følger de samme reglene som i teksten. Linja står bare når teksten vises og minst én aksje i Min liste er vurdert den dagen (`min_liste_linje` i `src/dagsgrunnlag.py`).
+11. **Hva er «vanlig»?** *Forslag:* snittet av hvor mange som skilte seg ut de 20 børsdagene før dagen, regnet av de lagrede vurderingene. En dag telles bare når minst én aksje i lista er vurdert, og med færre enn 10 slike dager står ikke delen, som for mønster 1. Snittet rundes til et heltall med halve opp, fordi grunnlaget bare har antall (beslutningen 04.10) og kontrollen stopper desimaltall. Sammenligningen bruker det rundede tallet, så teksten aldri sier «flere enn snittet på 3» om 3. Formen: «Det var flere enn vanlig: snittet de siste 20 børsdagene er 3.», med «færre enn» eller «like mange som».
+12. **Hva er «endringen» i hovedindeksen siste uke?** Grunnlaget har ingen prosenter (beslutningen 04.10). *Forslag:* bare retningen, fra sluttkursen fem børsdager før til dagen, slik endringen vises med to desimaler: «De siste fem børsdagene falt hovedindeksen.» Mangler indeksen en av de to dagene, står ikke delen.
+
+Rader med dag-1 sammenlignes fortsatt uten de nye feltene (spørsmål 5). Versjonen står som dag-2, fordi dag-2 ikke er flettet og ingen tekst i `data/db/ose.db` har den. Avtrykket for dag-2 er satt på nytt.
+
+### Mutantene for tillegget
+
+| Del | Fil | Mutanten | Fanget av |
+|---|---|---|---|
+| F (Min liste) | `src/dagsgrunnlag.py` | linja tar med alle aksjene, ikke bare de i Min liste | `TestMinListe` |
+| G (vanlig) | `src/dagsgrunnlag.py` | snittet rundes alltid opp | `TestVanlig` |
+| H (uka) | `src/dagsgrunnlag.py` | fire børsdager i stedet for fem | `TestUka` |
+
+Alle ble fanget, og sha256 mot HEAD var lik.
+
+### Gjennomgangen av tillegget (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+| Funn | Grad | Hva | Triage |
+|---|---|---|---|
+| VG1 | høy | Linja om Min liste på forsiden var ikke testet | Rettet: `test_linja_om_min_liste_under_teksten` |
+| VG2 | høy | Ingen test av at hentingen og forsiden regner det samme grunnlaget med de nye feltene | Rettet: `test_hentingen_og_forsiden_regner_det_samme_grunnlaget` |
+| BH1 | middels | Ingen ny promptversjon for de nye formene | Avvist: dag-2 er ikke flettet, og ingen tekst i `data/db/ose.db` har den, som unntaket i 10.2f–10.2h. Avtrykket er satt på nytt |
+| BH2 | middels | Grunnlaget kan endre seg når data kommer inn senere, for eksempel en indeksrad fem børsdager før, og da forsvinner teksten (FR-607) | **Åpent, spørsmål 13** |
+| VG3, VG4 | middels | Avrundingen og en dag uten vurdering var ikke testet så feil ville vist | Rettet |
+| BH3, BH4, VG5 | lav | Lengden på vinduet og grensen på 10 dager var ikke festet | Rettet |
+| BH5 | lav | «20 børsdager» fulgte kursdatoene, «fem børsdager» kalenderen | Rettet: begge følger børskalenderen (`dagene_foer`) |
+| BH6 | lav | Forsiden leste hele historikken | Rettet: `vanlig_fra` |
+| VG6 | lav | Uten rad på dagen og over en helligdag var ikke testet | Rettet |
+| VG7, VG8 | lav | «like mange», «uendret» og mer enn fem navn i Min liste var ikke prøvd | Rettet |
+| ECH1 | lav | De nye formene kunne stå to ganger | Rettet |
+| ECH2 | lav | Formen sier «de siste 20 børsdagene» også når snittet er regnet av 10–19 dager | Står, og er en del av spørsmål 11 |
+| ECH3 | lav | Klassene for linja om Min liste hadde ingen stil | Rettet i `stil.css` |
+
+### Gemma-tekstene (svaret kl. 16:05)
+
+Ollama ble startet fra dette vinduet kl. 17:46, med `gemma4:e4b`. Første kjøring ga 6 av 13 tekster om aksjene som besto. Gemma skrev «negativt 0» og andre tall som er 0, og fylte ut alle fire retningene, også med tall som ikke sto i opplysningene. Appen sender derfor ikke tall som er 0 (`ki_grunnlag.py`), og gir setningen om de siste 20 børsdagene ferdig (`setning_om_retningene` i `ki_prompt.py`), som ordlyden om hovedindeksen. Da besto alle 13.
+
+Teksten om dagen trengte tre forsøk:
+1. Gemma satte punktum før «og 2 andre».
+2. Etter at appen ga setningen med navnene ferdig, skrev Gemma etiketten «Setningen om navnene:» foran.
+3. Med setningen i anførselstegn besto teksten.
+
+Tekstene står ordrett i PR #145 og i scratchpad.
+
+Gjennomgangen av denne rettingen (Edge Case Hunter) fant fire lave funn. ECH1: setningen står i anførselstegn, og en modell som kopierer dem, stoppes. ECH2: formen i regelen viser «og ‹N› andre» uten forbehold. Begge står, fordi teksten om dagen alt hadde brukt de tre forsøkene. ECH3: én commit var rød uten den neste, og PR-en flettes med squash. ECH4: død kode i `ki_eksempel.py`, rettet.
+
+13. **Hva skjer når data kommer inn etter teksten (BH2)?** Forsiden viser teksten bare når grunnlaget er det samme som det siden regner ut (FR-607). Kommer en kurs eller en indeksrad inn senere for en dag i vinduene, blir grunnlaget annerledes, og teksten for den dagen forsvinner. Det gjaldt også før for bransjene og «bedre enn indeksen». De nye delene har lengre vinduer: 20 og 5 børsdager. *Forslag:* godta det, som før. Hentingen fyller ikke inn eldre dager, og en dag uten tekst sier «Dagen er uten KI-tekst.».
+
+## Svaret kl. 19:30 (tillegget kl. 19:33)
+
+*Svar 2026-11-11 kl. 19:30 (gruppens svar):* dagsteksten rettes, og PR-en flettes i kveld når alt er grønt. Modellen valgte to av bransjene selv, og formene med «mest» sier det bedre. Når «I snitt steg ‹bransje› mest» eller «I snitt falt ‹bransje› mest» kan stå, er formen «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.» ikke med i reglene, og kontrollen stopper den. Kan ingen av dem stå, gjelder formen som før. Rekkefølgen i reglene er hovedindeksen den dagen, de siste fem børsdagene, «bedre enn indeksen», «skilte seg ut» med «flere/færre enn vanlig» rett etter, navnene, og til slutt bransjene. Rådet anbefalte det.
+
+14. **Skal kontrollen også stoppe en annen rekkefølge?** *Forslag:* nei. Kontrollen sjekker hvert navn og hvert tall uansett hvor de står, så en tekst i en annen rekkefølge sier ikke noe galt. Gemma har byttet om på formene før. Stoppet kontrollen rekkefølgen, ville en riktig tekst forsvunnet fra forsiden for hele dagen. Reglene og eksempelskriveren har rekkefølgen, og testene sjekker det. Bygget etter forslaget.
+
+Bygget: `reglene()` og `BRANSJEFORMEN` i `src/ki_dagen.py` (formen for én bransje settes inn bare uten «mest»), kontrollen i `kontroller_dagen`, rekkefølgen i reglene og i `ki_eksempel.py`, og testene i `TestSvaret1930`. Versjonen står som dag-2, fordi den ikke er flettet, og avtrykket er satt på nytt.
+
+Den nye teksten om dagen fra Gemma besto på første forsøk. Ollama ble stoppet kl. 19:36, fordi dette vinduet startet den.
+
+> Hovedindeksen falt fredag. De siste fem børsdagene falt hovedindeksen. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. Det var flere enn vanlig: snittet de siste 20 børsdagene er 3. Blant dem var Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv), Laksevik Sjømat (3 av 3, blandet), Trygghavn Forsikring (3 av 3, blandet), Havdyp Olje (2 av 3, blandet) og 2 andre. I snitt steg sjømat mest. I snitt falt finans mest.
+
+Mutant I (`reglene` tar alltid med formen for én bransje) ble fanget av `TestSvaret1930`, og sha256 mot HEAD var lik. Edge Case Hunter fant ingen funn på middels eller over:
+
+| Funn | Grad | Hva | Triage |
+|---|---|---|---|
+| ECH1 | lav | Med setningen om vanlig mellom «skilte seg ut» og «Blant dem var» kan «dem» leses som børsdagene | Står: rekkefølgen er gruppens svar kl. 19:30 |
+| ECH2 | lav | Versjonen står som dag-2 selv om reglene er endret | Står: dag-2 er ikke flettet, og ingen tekst i basen har den. Avtrykket er satt på nytt |

@@ -143,15 +143,27 @@ rammen «Signalet forklart», saa to linjer i reglene sier «over teksten», ikk
 «under». Versjonen staar som 5, fordi versjon 5 ikke er flettet og ingen tekst
 i ose.db har versjon 5, som i 10.2i. Avtrykket, demotekstene og
 proevekjoeringen (malinger.md §56) er laget paa nytt.
+
+Versjon 6 (story 10.10, gruppens svar 10.11 kl. 16:18): kortere setninger,
+og tall som er 0 tas ikke med. Brukertesten 10.11 fant at testpersonen ikke
+forsto alt (docs/brukertest.md, «Funnene»). Formen for bevegelsen er kortere,
+hvert moenster faar sin egen korte setning, og en form med tallet 0 skrives
+ikke: «positivt 0» staar ikke, og er siste_5_samme_vei eller
+siste_måned_skift 0, skrives ikke den setningen. Kontrollen stopper en form
+for moenstrene med 0 (ki_kontroll.py). Linja om raad sier ogsaa «bør»,
+«verdt å følge» og «følg med» (NFR-06). Versjonen er 6, fordi ose.db har
+tekster med versjon 5 (lest 11.11 med mode=ro). Demotekstene er laget paa
+nytt som eksempeltekster uten modell (ki_eksempel.py, spoersmaal 6 i
+spec-10-10-rikere-ki-tekster.md), fordi Ollama ikke skulle startes.
 """
 
 import json
 from collections.abc import Mapping
 
-PROMPTVERSJON = "5"
+PROMPTVERSJON = "6"
 
 REGLER = """Du skriver en kort forklaring på norsk av et regelbasert signal for én aksje på Oslo Børs.
-Forklaringen skal være lett å forstå for en som ikke kjenner reglene. Skriv én hel setning for hver sjekk, og så én setning om mønstrene når de står i opplysningene.
+Forklaringen skal være lett å forstå for en som ikke kjenner reglene. Skriv korte setninger: én for hver sjekk, og så én for hvert mønster som står i opplysningene.
 
 Signalet bygger på tre sjekker. Hver gir et positivt utslag, et negativt utslag eller ikke noe utslag:
 - trend: om kursen ligger over eller under snittet for de siste 50 børsdagene.
@@ -172,7 +184,7 @@ Opplysningene kan også ha tre mønstre appen har regnet ut av signalene som er 
 Regler for teksten:
 - Skriv én setning for hver sjekk, i rekkefølgen trend, bevegelse og interesse. Si med vanlige ord hva sjekken måler og hva den ga, med formen for fortegnet i opplysningene:
   - trend 1: «Trenden ga et positivt utslag fordi kursen ligger over snittet for de siste 50 børsdagene.» -1: «Trenden ga et negativt utslag fordi kursen ligger under snittet for de siste 50 børsdagene.» 0: «Trenden ga ikke utslag fordi kursen ligger nær snittet for de siste 50 børsdagene.»
-  - bevegelse 1: «Bevegelsen ga et positivt utslag fordi kursen steg mer i dag enn den vanligvis svinger de siste 20 dagene.» -1: «Bevegelsen ga et negativt utslag fordi kursen falt mer i dag enn den vanligvis svinger de siste 20 dagene.» 0: «Bevegelsen ga ikke utslag fordi dagens endring ikke var stor sammenlignet med de siste 20 dagene.»
+  - bevegelse 1: «Bevegelsen ga et positivt utslag fordi kursen steg mer enn den vanligvis svinger.» -1: «Bevegelsen ga et negativt utslag fordi kursen falt mer enn den vanligvis svinger.» 0: «Bevegelsen ga ikke utslag fordi dagens endring ikke var stor.»
   - interesse 1: «Interessen ga et positivt utslag fordi det ble handlet mer enn vanlig på en dag kursen steg.» -1: «Interessen ga et negativt utslag fordi det ble handlet mer enn vanlig på en dag kursen falt.» 0: «Interessen ga ikke utslag fordi det ikke ble handlet mye mer enn vanlig.»
 - Beskriv hver sjekk slik fortegnet står i opplysningene: et positivt utslag, et negativt utslag eller ikke noe utslag. Ikke si at en sjekk ga utslag når den ikke ga det, eller at den ga et annet utslag enn det som står.
 - Når du sier noe om én sjekk, bruk navnet på sjekken, for eksempel «interessen ga ikke utslag». Skriv «ingen sjekk» bare når styrken er 0.
@@ -181,13 +193,14 @@ Regler for teksten:
 - Bruk bare opplysningene under. Skriv utslagene med ord, ikke som tall. Ikke nevn kurser, prosenter eller andre tall enn antallene i opplysningene og regelens faste tall.
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
 - Om hovedindeksen kan teksten bare bruke setningen etter «Ordlyden om hovedindeksen:» under opplysningene, ordrett og som en egen setning, eller ikke si noe om hovedindeksen. Står det ingen ordlyd, skal teksten ikke si noe om hovedindeksen.
-- Setningen om mønstrene kan likevel si hvor mange dager aksjen gikk samme vei som hovedindeksen, med formen under.
-- Etter sjekkene kommer én setning om mønstrene, med bare de mønstrene som står i opplysningene, og med tallene derfra. Bruk disse formene, sett inn tallene for feltene i ‹ ›, og sett formene sammen med komma og «og»: «av de ‹siste_20_vurdert› vurderte børsdagene av de siste 20 var signalet positivt ‹siste_20_positiv›, negativt ‹siste_20_negativ›, blandet ‹siste_20_blandet› og uten retning ‹siste_20_ingen›», «aksjen gikk samme vei som hovedindeksen ‹siste_5_samme_vei› av de ‹siste_5_kunne_telles› dagene som kunne telles av de siste 5 børsdagene» og «den siste måneden skiftet retningen ‹siste_måned_skift› ganger». Med siste_måned_merke skriver du «minst» foran tallet. Er alle 20 vurdert, skriver du «av de siste 20 børsdagene var signalet …». Skriv aldri navnet på et felt eller tegnene ‹ › i teksten. Står ingen mønstre i opplysningene, skriver du ingen setning om dem.
+- Setningene om mønstrene kan likevel si hvor mange dager aksjen gikk samme vei som hovedindeksen, med formen under.
+- Etter sjekkene kommer én kort setning for hvert mønster som står i opplysningene, med tallene derfra. For de siste 20 børsdagene bruker du setningen etter «Setningen om de siste 20 børsdagene:» under opplysningene, ordrett, når den står der. For de to andre bruker du disse formene og setter inn tallene for feltene i ‹ ›: «Aksjen gikk samme vei som hovedindeksen ‹siste_5_samme_vei› av de ‹siste_5_kunne_telles› dagene som kunne telles av de siste 5 børsdagene.» og «Den siste måneden skiftet retningen ‹siste_måned_skift› ganger.» Med siste_måned_merke skriver du «minst» foran tallet. Skriv aldri navnet på et felt eller tegnene ‹ › i teksten. Står ingen mønstre i opplysningene, skriver du ingen setning om dem.
+- Tall som er 0, tar du ikke med: skriv ikke «positivt 0» eller de andre retningene med 0, og er siste_5_samme_vei eller siste_måned_skift 0, skriver du ikke den setningen. Et felt som er 0, står ikke i opplysningene, og da tar du ikke med den delen av formen.
 - Mønstrene sier bare hva som har skjedd. Ikke si hva de betyr for kursen videre, ikke sammenlign tallene med hverandre, og ikke finn mønstre selv. Ikke bruk ordene «mønster», «tendens», «pleier», «gjentar seg» eller «oftere».
 - Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. Appen skriver det selv over teksten.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
 - Ikke si hvor lenge signalet har vart, om det er nytt, eller om det er første gang. Siden sier over teksten hvor lenge signalet har vart.
-- Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
+- Ikke gi råd om å kjøpe, selge eller holde, ikke skriv «bør», «verdt å følge» eller «følg med», og ikke si noe om hva som vil skje.
 - Ikke gjett på årsaker, som nyheter, resultater eller kontrakter. Du kan forklare regelen, for eksempel at en sjekk ikke ga utslag.
 - Når du forklarer regelen, bruk «fordi». Ikke bruk «skyldes» eller «indikerer».
 - Etter «fordi» står «ikke» foran verbet, for eksempel «fordi trenden ikke ga utslag».
@@ -212,13 +225,41 @@ def ordlyd_om_hovedindeksen(grunnlag: Mapping[str, object]) -> str | None:
     return SAMME_VEI if aksjen == indeksen else MOTSATT_VEI
 
 
+# Story 10.10: Gemma skrev alle fire retningene i formen for moenster 1, ogsaa
+# med 0 og med tall som ikke sto i opplysningene (11.11). Appen gir derfor
+# setningen ferdig, som ordlyden om hovedindeksen, og kontrollen leser den
+# som foer, tall for tall.
+SETNINGEN_20 = "\nSetningen om de siste 20 børsdagene: {setning}\n"
+_RETNINGSORDENE = (
+    ("siste_20_positiv", "positivt"),
+    ("siste_20_negativ", "negativt"),
+    ("siste_20_blandet", "blandet"),
+    ("siste_20_ingen", "uten retning"),
+)
+
+
+def setning_om_retningene(grunnlag: Mapping[str, object]) -> str | None:
+    """Setningen om retningene de siste 20 boersdagene, med bare retningene
+    som ikke er 0, eller None uten moenster 1."""
+    vurdert = grunnlag.get("siste_20_vurdert")
+    deler = [f"{ord_} {grunnlag[felt]}" for felt, ord_ in _RETNINGSORDENE if grunnlag.get(felt)]
+    if not vurdert or not deler:
+        return None
+    start = "Av de siste 20 børsdagene" if vurdert == 20 else f"Av de {vurdert} vurderte børsdagene av de siste 20"
+    oppramsing = deler[0] if len(deler) == 1 else ", ".join(deler[:-1]) + " og " + deler[-1]
+    return f"{start} var signalet {oppramsing}."
+
+
 def lag_prompt(grunnlag: Mapping[str, object]) -> str:
-    """Reglene, grunnlaget som JSON og ordlyden om hovedindeksen naar den
-    finnes. Ingenting annet kommer med."""
+    """Reglene, grunnlaget som JSON, setningen om de siste 20 boersdagene og
+    ordlyden om hovedindeksen naar de finnes. Ingenting annet kommer med."""
     prompt = REGLER
     if grunnlag.get("merke"):
         prompt += UTENFOR
     prompt += "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+    setning = setning_om_retningene(grunnlag)
+    if setning:
+        prompt += SETNINGEN_20.format(setning=setning)
     ordlyd = ordlyd_om_hovedindeksen(grunnlag)
     if ordlyd:
         prompt += ORDLYDEN.format(ordlyd=ordlyd)

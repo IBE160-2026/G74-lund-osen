@@ -155,11 +155,16 @@ def ki_grunnlag(
                 grunnlag[felt] = getattr(dagen, felt)
     if moenstrene is not None:
         # Story 10.9: bare moenstrene som gis (moenstrene.py).
+        # Story 10.10 (versjon 6): tall som er 0, sendes ikke, saa modellen
+        # ikke kan skrive dem. Gemma skrev «negativt 0» i 7 av 13 demotekster
+        # selv om prompten ba om det motsatte (11.11).
         if moenstrene.retningene is not None:
-            grunnlag.update(zip(MOENSTER_1, moenstrene.retningene))
-        if moenstrene.samme_vei is not None:
+            grunnlag.update(
+                (navn, n) for navn, n in zip(MOENSTER_1, moenstrene.retningene) if n or navn == MOENSTER_1[0]
+            )
+        if moenstrene.samme_vei is not None and moenstrene.samme_vei[1]:
             grunnlag.update(zip(MOENSTER_2, moenstrene.samme_vei))
-        if moenstrene.skiftene is not None:
+        if moenstrene.skiftene is not None and moenstrene.skiftene[0]:
             skift, minst = moenstrene.skiftene
             grunnlag[MOENSTER_3[0]] = skift
             if minst:
@@ -191,16 +196,19 @@ def _kontroller(grunnlag: dict[str, object]) -> None:
 
 def _kontroller_moenstrene(grunnlag: dict[str, object]) -> None:
     """Story 10.9: hvert moenster helt eller ikke, bare heltall fra 0, og
-    antallene innenfor vinduet og grensene i spoersmaal 3 og 4."""
-    for felter in (MOENSTER_1, MOENSTER_2, MOENSTER_3):
+    antallene innenfor vinduet og grensene i spoersmaal 3 og 4. Story 10.10:
+    retningene i moenster 1 som er 0, er ikke med, men vurdert er alltid med."""
+    for felter in (MOENSTER_2, MOENSTER_3):
         med = [navn in grunnlag for navn in felter]
         if any(med) and not all(med):
             raise ValueError(f"moensteret med {felter[0]} maa ha alle feltene sine")
+    if any(navn in grunnlag for navn in MOENSTER_1[1:]) and MOENSTER_1[0] not in grunnlag:
+        raise ValueError(f"moensteret med {MOENSTER_1[0]} maa ha antallet vurderte dager")
     for navn in MOENSTERANTALLENE:
         if navn in grunnlag and (not _heltall(grunnlag[navn]) or grunnlag[navn] < 0):
             raise ValueError(f"{navn} maa vaere et heltall fra 0")
     if MOENSTER_1[0] in grunnlag:
-        vurdert, *antall = (grunnlag[navn] for navn in MOENSTER_1)
+        vurdert, *antall = (grunnlag.get(navn, 0) for navn in MOENSTER_1)
         if not MINST_VURDERTE <= vurdert <= VINDU_RETNINGEN or sum(antall) != vurdert:
             raise ValueError("moenster 1 maa ha 10 til 20 vurderte dager, fordelt paa de fire retningene")
     if MOENSTER_2[0] in grunnlag:

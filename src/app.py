@@ -59,7 +59,7 @@ from boersometer import (
     med_perioden as rute_med_perioden,
 )
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
-from dagsgrunnlag import dagsgrunnlag
+from dagsgrunnlag import dagsgrunnlag, min_liste_linje, vanlig_fra
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
 from etterpaa import brikkene, bygg_etterpaa, bygg_handelen
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
@@ -1988,14 +1988,25 @@ def _boersdagen(
         indeksserie = lager.serie(valgt_indeks(symboler)) if symboler else None
         lista = tuple(post.aksje for post in poster)
         vurderinger = {a.symbol: oversiktsleser.vurdering(a.symbol, dag) for a in lista}
-        grunnlag = dagsgrunnlag(dag, lista, vurderinger, serier, indeksserie)
+        # Story 10.10 (tillegget kl. 17:21): vurderingene foer dagen, lest som i hentingen.
+        lageret = SqliteVurderingslager(g.tilkobling, naa, lista)
+        tidligere = {a.symbol: lageret.les_periode(a.symbol, vanlig_fra(dag), dag) for a in lista}
+        grunnlag = dagsgrunnlag(dag, lista, vurderinger, serier, indeksserie, tidligere=tidligere)
     except (RuntimeError, sqlite3.Error, UgyldigKIRad, ValueError) as feil:
         app.logger.warning("Teksten om dagen kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return {**bryter, "uten": DAGEN_UTEN}
     visning = bygg_dagsvisning(rad, grunnlag)
     if not visning.vist:
         return {**bryter, "uten": DAGEN_UTEN}
-    return {**bryter, "tekst": visning.tekst, "modell": visning.modell}
+    # Story 10.10, spoersmaal 10: Min liste er en linje appen skriver under
+    # teksten, av lista slik den er naa, saa den aldri blir feil og teksten
+    # ikke forsvinner naar lista endres (FR-607).
+    try:
+        merkede = SqliteMinlistelager(g.tilkobling).merkede()
+    except (RuntimeError, sqlite3.Error, ValueError):
+        merkede = set()
+    min_liste = min_liste_linje(lista, vurderinger, merkede)
+    return {**bryter, "tekst": visning.tekst, "modell": visning.modell, "min_liste": min_liste}
 
 
 # Bare aksjesiden kan vaere maalet for bryteren. Alt annet gaar til /, ogsaa

@@ -97,7 +97,9 @@ class TestGrunnlaget:
     def test_feltene(self):
         """Ville feilet hvis grunnlaget talte feil: hovedindeksen steg 0,5,
         AAA og CCC gjorde det bedre, AAA og BBB skilte seg ut (styrke 2 og 3),
-        og bare Energi har to aksjer med endring."""
+        og bare Energi har to aksjer med endring. Story 10.10: navnene, A
+        med 3 av 3 foerst, og Energi med snittet 0,5 som bransjen som steg
+        mest; ingen bransje falt."""
         assert dict(grunnlaget()) == {
             "aksjer": 4,
             "ukedag": "fredag",
@@ -108,7 +110,12 @@ class TestGrunnlaget:
             "skilte_seg_ut_positiv": 1,
             "skilte_seg_ut_negativ": 1,
             "skilte_seg_ut_blandet": 0,
+            "skilte_seg_ut_navn": [
+                {"navn": "A", "styrke": 3, "retning": "positiv"},
+                {"navn": "B", "styrke": 2, "retning": "negativ"},
+            ],
             "bransjer": {"Energi": {"steg": 1, "med_endring": 2}},
+            "bransje_mest_opp": "Energi",
         }
 
     def test_bare_heltall_og_tekst(self):
@@ -118,6 +125,10 @@ class TestGrunnlaget:
         def verdier(verdi):
             if isinstance(verdi, dict) or hasattr(verdi, "items"):
                 for v in verdi.values():
+                    yield from verdier(v)
+            elif isinstance(verdi, (list, tuple)):
+                # Story 10.10: navnene er en liste.
+                for v in verdi:
                     yield from verdier(v)
             else:
                 yield verdi
@@ -297,11 +308,21 @@ class TestKontrollen:
 
 # Avtrykket av prompten for dagen (FR-605). Endres prompten, faar den ny
 # versjon, og avtrykket settes paa nytt.
-AVTRYKK = {"dag-1": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7"}
+AVTRYKK = {
+    "dag-1": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7",
+    # Story 10.10. Teksten til dag-1 staar i src/ki_dagen.py paa 059dc10c.
+    # Tillegget kl. 17:21: tre nye former, og versjonen staar som dag-2, fordi den ikke er
+    # flettet. Var f0377e8f....
+    "dag-2": "cf1e7f7577f9f3afa07d1b7ca0db65845d9daecf9ef6cbf4ab472a6a33340c7a",
+}
 
 
 def promptens_avtrykk() -> str:
     tekst = REGLER_DAGEN + inspect.getsource(lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
+    # Story 10.10: setningen om navnene.
+    tekst += ki_dagen.SETNINGEN_NAVN + inspect.getsource(ki_dagen.setning_om_navnene)
+    # Svaret 11.11 kl. 19:30: formen for én bransje og reglene() som velger den.
+    tekst += ki_dagen.BRANSJEFORMEN + inspect.getsource(ki_dagen.reglene)
     return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 
@@ -375,7 +396,8 @@ class _Teller(FalskModell):
         self.feil_for_aksjene = feil_for_aksjene
 
     def lag_tekst(self, prompt):
-        if prompt.startswith(REGLER_DAGEN):
+        # Svaret 11.11 kl. 19:30: reglene har formen for én bransje bare uten «mest».
+        if prompt.startswith(REGLER_DAGEN.split("{bransjeformen}")[0]):
             self.dagkall += 1
             self.kall += 1
             return Modellsvar(tekst="Hovedindeksen steg tirsdag.", modell="gemma4:e4b")
@@ -551,6 +573,74 @@ class TestForsiden:
         forsiden_med(TEKSTEN)
         assert "Børsdagen kort fortalt" not in html(klient, "/min-liste?vis=alle")
 
+    def test_linja_om_min_liste_under_teksten(self, klient):
+        """Story 10.10, spørsmål 10 (gjennomgangen, VG1): ville feilet hvis
+        forsiden ikke viste linja appen skriver om Min liste under teksten,
+        viste den uten merkede aksjer, eller viste den med KI av."""
+        import re
+
+        forsiden_med(TEKSTEN)
+        assert "min-liste-linje" not in html(klient)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            lagring_sqlite.SqliteMinlistelager(tilkobling).merk("EQNR")
+        finally:
+            tilkobling.close()
+        side = html(klient)
+        linja = re.search(
+            r'<p class="min-liste-linje">I Min liste skilte [^<]+ \(3 av 3, positiv\) seg ut\. '
+            r'<span class="merke-app">Skrevet av appen\.</span></p>',
+            side,
+        )
+        assert linja and side.index('class="ki-tekst"') < linja.start(), side[side.index("boersdagen-kort-fortalt") :][
+            :1500
+        ]
+        assert "min-liste-linje" not in html(klient, kapsel="av")
+
+    def test_hentingen_og_forsiden_regner_det_samme_grunnlaget(self, klient):
+        """Story 10.10, tillegget (gjennomgangen, VG2, FR-607): med 12 vurderte
+        dager før har grunnlaget fra hentingen antallet mot vanlig, og
+        forsiden viser teksten. Ville feilet hvis hentingen eller forsiden
+        leste de tidligere vurderingene ulikt, så teksten forsvant."""
+        from dagsgrunnlag import VANLIG, dagene_foer
+        from ki_tekst import _grunnlaget_for_dagen
+        from lagring_sqlite import SqliteVurderingslager
+
+        forsiden_med(None)
+        for d in dagene_foer(FREDAG, 12):
+            skriv_vurdering("EQNR", d, vurdering(2, "Positiv"))
+            skriv_vurdering("DNB", d, vurdering(1, "Positiv"))
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            from app import SqliteOversiktsleser
+
+            lista = tuple(p.aksje for p in SqliteOversiktsleser(tilkobling).oversikt())
+        finally:
+            tilkobling.close()
+        # Hentingen venter til hver aksje i lista har en rad for dagen.
+        for a in lista:
+            if a.symbol not in ("EQNR", "DNB"):
+                skriv_vurdering(a.symbol, FREDAG, Grunn.SYMBOL_FEILET)
+        tilkobling = aapne_base(lagring_sqlite.BASE_STI)
+        try:
+            klokke = app_modul.naa
+            grunnlag, grunn = _grunnlaget_for_dagen(
+                tilkobling,
+                SqliteKILogg(tilkobling, klokke),
+                SqliteVurderingslager(tilkobling, klokke, lista),
+                FREDAG,
+                lista,
+                lambda: FREDAG,
+                lambda _: None,
+            )
+        finally:
+            tilkobling.close()
+        assert grunnlag is not None, grunn
+        assert grunnlag[VANLIG] == 1
+        forsiden_med(TEKSTEN, grunnlag=dict(grunnlag))
+        side = html(klient)
+        assert '<p class="ki-tekst">' in side and DAGEN_UTEN not in side
+
     def test_vakta_stopper_et_raad(self):
         """NFR-06: ville feilet hvis en tekst som besto kontrollen, men sier
         «kjøp», ble vist."""
@@ -587,7 +677,10 @@ class TestHjelpen:
         assert "Dagen er uten KI-tekst." in hjelp
         # Gjennomgangen (BH6, VG6): setningen om hva modellen fikk, ordrett i begge.
         tekst = hjelpetekster()["boersdagen_kort_fortalt"].tekst
-        setningen = tekst[tekst.index("Modellen fikk bare antall:") : tekst.index("nyheter.") + len("nyheter.")]
+        # Story 10.10: «bare det appen regnet ut», fordi modellen ogsaa faar navnene.
+        setningen = tekst[
+            tekst.index("Modellen fikk bare det appen regnet ut:") : tekst.index("nyheter.") + len("nyheter.")
+        ]
         assert setningen in hjelp
         assert "Børsdagen kort fortalt" in (rot / "README.md").read_text(encoding="utf-8")
 
@@ -627,6 +720,7 @@ class TestDemoen:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
         side = app_modul.app.test_client().get("/").data.decode("utf-8")
         tekst = les_dagsraden().tekst
+        # Story 10.10 (svaret 11.11 kl. 16:05): Gemma i demoen.
         assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
         from ki_visning import prikkede_tall
 

@@ -103,6 +103,12 @@ bare med interesse 0, og «på en dag kursen steg» bare med interesse 1
 (_maalingene). Proeven av demotekstene 07.11 fant «Det ble ikke handlet mer
 enn vanlig, fordi interessen ga et negativt utslag», som besto foer dette.
 
+Story 10.10 (gruppens svar 10.11 kl. 16:18), promptversjon 6: tall som er
+0 tas ikke med, saa en form for moenstrene med 0 stoppes («negativt 0»,
+«skiftet retningen 0 ganger»). Under punkt 3 og 4 stoppes ogsaa «verdt»
+(«verdt å følge»), «følg med» og «vil» (alt om hva som vil skje, NFR-06),
+for begge tekstene (ki_dagen.py bruker de samme listene).
+
 Kontrollen er grov: den fanger ord, ikke mening (FR-603). Teksten
 normaliseres (NFC, uten myk bindestrek og usynlige tegn) foer den leses, saa
 et ord ikke slipper gjennom fordi det er skrevet med andre tegn.
@@ -627,6 +633,11 @@ def _moenstrene(tekst: str, grunnlag: Mapping[str, object]) -> tuple[str, list[s
         return tekst, grunner
 
     def lik(felt: str, ord_: str) -> str | None:
+        # Story 10.10: tall som er 0, tas ikke med (versjon 6).
+        if _antall(ord_) == 0:
+            return "tall som er 0, tas ikke med"
+        if felt not in grunnlag:
+            return f"grunnlaget har ikke {felt}"
         return None if _antall(ord_) == grunnlag[felt] else f"grunnlaget sier {felt} {grunnlag[felt]}"
 
     def skift(m: re.Match[str]) -> str | None:
@@ -880,6 +891,11 @@ RAAD = (
     r"buy\b",
     r"sell\b",
     r"should\b",
+    # Story 10.10 (NFR-06): «verdt å følge» og «følg med».
+    r"verdt",
+    # Gjennomgangen (BH6): ogsaa «følges med», «følger med» og «fulgte med».
+    r"følg\w*\s+med",
+    r"fulgt\w*\s+med",
 )
 GJETNING = (
     r"trolig",
@@ -911,6 +927,8 @@ GJETNING = (
     r"likely\b",
     r"due to\b",
     r"expected\b",
+    # Story 10.10 (NFR-06): alt om hva som vil skje.
+    r"vil\b",
 )
 AARSAKER = (
     r"nyhet",

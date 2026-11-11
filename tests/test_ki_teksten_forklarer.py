@@ -229,14 +229,15 @@ class TestPrompten:
     def test_en_setning_per_sjekk_og_en_om_moenstrene(self):
         """Del E: ville feilet hvis prompten manglet linja om én setning per
         sjekk i fast rekkefølge, eller linja om mønstrene, eller versjonen
-        ikke var 5. Da kan to prompter se ut som én i loggen (FR-605)."""
-        assert PROMPTVERSJON == "5"
+        ikke var 6 (var 5 i 10.9). Da kan to prompter se ut som én i loggen (FR-605).
+        Story 10.10: versjon 6 har én kort setning for hvert mønster."""
+        assert PROMPTVERSJON == "6"
         reglene = REGLER.split("Regler for teksten:\n", 1)[1].splitlines()
         assert reglene[0].startswith(
             "- Skriv én setning for hver sjekk, i rekkefølgen trend, bevegelse og interesse. "
             "Si med vanlige ord hva sjekken måler og hva den ga"
         )
-        assert any(linje.startswith("- Etter sjekkene kommer én setning om mønstrene") for linje in reglene)
+        assert any(linje.startswith("- Etter sjekkene kommer én kort setning for hvert mønster") for linje in reglene)
         assert any("ikke finn mønstre selv" in linje for linje in reglene)
 
     def test_moenstrene_kommer_med_i_prompten(self):
@@ -478,7 +479,9 @@ def test_hjelpen_ved_rammen_har_hoeyst_60_ord(klient):
 def test_demotekstene_har_versjon_5_og_moenstrene():
     """Del G: demotekstene er laget på nytt med versjon 5, og grunnlaget har
     mønster 1 med færre enn 20 vurderte dager, fordi vurderingene i demoen
-    starter 21.09. Ville feilet hvis en demotekst med versjon 4 sto igjen."""
+    starter 21.09. Ville feilet hvis en demotekst med versjon 4 sto igjen.
+    Story 10.10: demotekstene har versjon 6, som eksempeltekster. Navnet
+    staar, fordi dokumentene viser til testen (test_kvalitetssikring.py)."""
     radene = demo_ki.les_radene(prompt=demo_ki.promptavtrykk())
-    assert radene and all(rad.promptversjon == "5" for rad in radene)
+    assert radene and all(rad.promptversjon == "6" for rad in radene)
     assert all(10 <= rad.grunnlag["siste_20_vurdert"] < 20 for rad in radene)

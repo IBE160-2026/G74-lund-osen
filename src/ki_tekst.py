@@ -72,7 +72,7 @@ import ki_anthropic
 import ki_gemini
 import ki_openai
 from boersdag import forrige_boersdag, innevaerende_boersdag, norsk_dato
-from dagsgrunnlag import dagsgrunnlag
+from dagsgrunnlag import dagsgrunnlag, vanlig_fra
 from hovedindeks import valgt_indeks
 from ki_anthropic import AnthropicModell
 from ki_dagen import dagsrad_uten_kall, lag_dagsrad
@@ -241,7 +241,9 @@ def _grunnlaget_for_dagen(tilkobling, logg, vurderinger, dato, lista, skrivbar, 
         if any(rad is None for rad in radene.values()):
             return None, "venter til alle aksjene har en rad for dagen"
         serier, indeksserie = _kursene(tilkobling, lista)
-        return dagsgrunnlag(dato, lista, radene, serier, indeksserie), None
+        # Story 10.10 (tillegget kl. 17:21): vurderingene foer dagen, til antallet mot vanlig.
+        tidligere = {a.symbol: vurderinger.les_periode(a.symbol, vanlig_fra(dato), dato) for a in lista}
+        return dagsgrunnlag(dato, lista, radene, serier, indeksserie, tidligere=tidligere), None
     except Exception as feil:  # NFR-04: teksten om dagen stopper ikke resten.
         skriv(f"Teksten om dagen: grunnlaget kunne ikke regnes ({type(feil).__name__}).")
         return None, "ble ikke laget"

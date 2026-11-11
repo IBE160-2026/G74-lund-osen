@@ -157,12 +157,21 @@ class TestFila:
 
     def test_hver_rad_har_tjenesten_modellen_og_hvordan_den_kjoerte(self, radene):
         """FR-604 og FR-605. Ville feilet med en rad uten tjenesten, modellen,
-        modell-ID-en, seed, temperaturen, maskinvaren eller Ollama-versjonen."""
+        modell-ID-en, seed, temperaturen, maskinvaren eller Ollama-versjonen.
+        Story 10.10 (spoersmaal 6): en eksempeltekst uten modell har
+        modellnavnet «eksempeltekst» og ingen av feltene om kjoeringen, saa
+        den aldri ser ut som Gemma."""
+        from ki_eksempel import MODELLNAVN
         from ki_lokal import MODELL, SEED, TEMPERATUR
 
         for rad in radene:
-            assert rad.tjeneste == LOKAL and rad.modell == MODELL, rad.emne.symbol
+            assert rad.tjeneste == LOKAL and rad.modell in (MODELL, MODELLNAVN), rad.emne.symbol
             assert rad.promptversjon == PROMPTVERSJON, rad.emne.symbol
+            if rad.modell == MODELLNAVN:
+                assert rad.modell_id is rad.seed is rad.temperatur is rad.maskinvare is rad.ollama_versjon is None, (
+                    rad.emne.symbol
+                )
+                continue
             assert rad.modell_id and rad.ollama_versjon, rad.emne.symbol
             assert rad.seed == SEED and rad.temperatur == TEMPERATUR, rad.emne.symbol
             assert rad.maskinvare in MASKINVARE, rad.emne.symbol

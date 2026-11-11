@@ -1363,6 +1363,10 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                            text-underline-offset: 3px; }
 :where(.side-oversikt) .boersdagen p.modell { color: var(--dempet); font-size: 12.5px; margin: 8px 0 0; }
 :where(.side-oversikt) .boersdagen .uten { color: var(--dempet); margin: 0; }
+/* Story 10.10, spørsmål 10 (gjennomgangen, ECH3): linja om Min liste skrives av appen, med en strek over
+   og merket «Skrevet av appen.» dempet, så den skiller seg fra KI-teksten. */
+:where(.side-oversikt) .boersdagen p.min-liste-linje { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--strek); }
+:where(.side-oversikt) .boersdagen .merke-app { color: var(--dempet); font-size: 12.5px; }
 
 /* Story 8.21 (gruppens svar 10.11 kl. 14:32): «Mine notater» under «Signalet
    dag for dag», et kort som «Signalet forklart». «Etterpå» står dempet under
