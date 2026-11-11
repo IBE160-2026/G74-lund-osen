@@ -55,3 +55,53 @@ Fortsettelsen kl. 20:43 sa at PR-en skulle gjøres ferdig så tidlig som tillegg
 - 8.22 venter på gruppens svar på spørsmål 1–14 i spesifikasjonen. Det gjelder også ECH5 (12) og VG2 (14) på middels. Ingen fletting før svaret (kl. 14:59).
 - Instruksjonen kl. 16:26, tilleggene og fortsettelsen kl. 20:43 skal føres i dagsfila 10.11, og svaret kl. 22:50 i `epics.md`, når del B flettes.
 - Svarene kl. 13:54 og 14:53, som instruksjonen viser til, er ikke funnet i repoet eller i scratchpad-mappene.
+
+## 2026-11-11 kl. 14:07 — Marian Osen
+
+### Oppgave
+Instruksjonen 11.11 kl. 11:56 ba om tre ting:
+- main inn i grenen for del B (8.22, PR #138);
+- tillegg 3 og 5 til del B, gitt 10.11 kl. 22:44 og 22:55, som aldri kom fram til vindu 4;
+- spesifikasjonen med svarene kl. 13:54, 14:53, 22:44 og 22:55.
+
+Windows Update startet maskinen på nytt kl. 04:29, og vinduet ble tatt opp igjen med /resume. Instruksjonen står ordrett i scratchpad-mappa. Ingenting flettes til main før gruppens ja (svaret kl. 14:59).
+
+### Plan
+- Steg 0: statusen ble sjekket. Fem commits fra main manglet før kl. 10:29, og den sjette (`ce33771c`) kom kl. 11:55.
+- Kvotesjekken (regel 15): `apiRequestsDate` sto på 10.11, så 0 kall var brukt 11.11, 20 var igjen og 296 sto i `extraLimit`. Ingen andre kall ble gjort.
+- Arbeidsgangen var main inn, så tillegg 3 i fire deler med tester og mutanter, så én gjennomgang med tre gjennomgåere, så tillegg 5 og bildene, og til slutt spesifikasjonen, hele settet, push og CI.
+
+### Resultat
+- **Main inn:** `45111d53` (8.23, del A) og `8aec5c4b` (loggen og Utført-linja for del C).
+  - Konfliktene i `45111d53` var de ventede, og begge sider er beholdt.
+  - Én test for den faste bransjen leste radene som `<li>` og leser nå tabellraden fra 8.23.
+  - Hele settet ga 5206, lik `--collect-only`, med den ene feilen rettet og fila kjørt på nytt.
+  - CI var grønn på `45111d53`.
+- **Tillegg 3:**
+  - Sorteringen i stedet for «Mest omsatt»: `013d1974`.
+  - Flere bransjer, og det valgte i oransje med hakemerke: `2dbe3a4d`.
+  - Radene som tabellen på oversikten: `42ebdc5a`.
+  - De ferdige listene som knapper, og siden «Er du sikker?»: `05b527da`.
+  - Rettingene etter gjennomgangen: `05cd01e4`.
+- **Gjennomgangen:** 14 funn fra Blind Hunter, 12 fra Edge Case Hunter og 12 fra Verification Gap. Triagen står i spesifikasjonen. ECH2 står åpent som spørsmål 15 (regel 25): den oransje fargen er også fargen for 3 av 3.
+- **Mutantene:** ni ble fanget, og filene var like HEAD etterpå.
+- **Tillegg 5 og bildene (`66fff077`):**
+  - `folg-en-aksje-390-demo.png` (1573 px) og `notatene-brfe-390-demo.png` (utsnitt, 1354 px), i README-en og i «Mappestruktur».
+  - Alle bildene er tatt på nytt med DevTools-protokollen. «Din egen liste» er 1454 px og «Følg en aksje» 1252 px.
+- **Spesifikasjonen (`b4f0b773`):**
+  - Svarene kl. 13:54 og 14:53 står nå med kilden.
+  - Spørsmål 5 og 7 er bortfalt med grunnen.
+  - Spørsmål 15–18 er nye.
+- **Testene og CI:** hele settet i fem deler på `b4f0b773`, med 5217 tester, lik `--collect-only`, og 0 feilet. Pushet `8aec5c4b` kl. 14:02, og CI var grønn kl. 14:07.
+- **PR-en:** bildene ble tatt på nytt fra demoen på `pr-8-22-bilder` (`566e46c6`, spolt fram uten force). Kommentaren med bildene og spørsmålene står i PR #138.
+- **Feil underveis:**
+  - Del 2 av hele settet ble stoppet av tidsgrensen etter sju minutters venting på en annen pytest, og ble kjørt i to halvdeler.
+  - To tester fra 8.11c leste den gamle radteksten etter del 3. Det ble funnet og rettet i del 4.
+  - Loggfila til 8.25 på main har også nummeret 935.
+
+### Åpne punkter
+- 8.22 venter på gruppens svar på spørsmål 1–18 i spesifikasjonen. 5 og 7 er bortfalt. ECH5 (12), VG2 (14) og ECH2 (15) er på middels. Ingen fletting før svaret.
+- Disse føres i dagsfila når del B flettes:
+  - instruksjonen kl. 16:26, tilleggene og fortsettelsen kl. 20:43 i dagsfila 10.11;
+  - instruksjonen 11.11 kl. 11:56 i dagsfila 11.11.
+- Svarene kl. 22:44, 22:50 og 22:55 føres i `epics.md` når del B flettes.
