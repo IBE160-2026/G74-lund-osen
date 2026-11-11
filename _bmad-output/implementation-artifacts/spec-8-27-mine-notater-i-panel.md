@@ -139,6 +139,22 @@ Blind Hunter fikk bare diffen for `src/` og `tests/` (`db89c5ba..ad144136`, med 
 - ECH11: to like knapper når panelet er åpent ved delen nederst; panelet har eget navn (BH10).
 - VG5, VG8, VG10 (lav): rekkefølgen kommer fra samme funksjon som i Min liste, og sidene i testen er de seks med stripa.
 
+## Mutantene 11.11
+
+Kjørt kl. 23:52 på `39548c04`, én om gangen: kopi av fila før, én endring, testklassen for delen, kopien tilbake, og sha256 mot HEAD etterpå. Alle sju ble fanget, og alle filene var like HEAD etterpå.
+
+| Del | Endringen | Testene | Utfallet |
+|---|---|---|---|
+| A | knappen står også med bryteren av (`_ramme.html`) | `TestKnappen` | fanget, 1 feilet |
+| B | notatene i panelet i motsatt rekkefølge (`_notatpanel.html`) | `TestPanelet` | fanget, 1 feilet |
+| C | notatet fra `/notat` får første dag med kurs, ikke siste (`app.py`) | `TestSkjemaet` | fanget, 1 feilet |
+| D | linja om demoen står også i den ekte versjonen (`_notatpanel.html`) | `TestDemoen` | fanget, 1 feilet |
+| E | tre notater på aksjesiden, ikke to (`aksje.html`) | `TestPlassenPaaAksjesiden` | fanget, 1 feilet |
+| ECH1 | panelet regner aldri siden som en tidligere dag (`app.py`) | `TestReglerIPanelet` | fanget, 1 feilet |
+| ECH4 | Esc lukker panelet også når hjelpen er åpen (`hjelp.js`) | `TestPanelskriptetMedNode` | fanget, 1 feilet |
+
+Del F er ikke bygget (venter på 8.26), og har ingen mutant.
+
 ## Bildene i `docs/appen/`
 
 Knappen øverst endrer toppen av hver side, så alle 16 bildene er tatt på nytt fra demoen med DevTools-protokollen i Edge uten vindu, med tilbudet om omvisningen besvart. Metoden ble først prøvd mot `min-liste-demo.png` og `oversikten-topp-demo.png`, som ble byte for byte de samme på main. Ved 1280 px er høydene de samme. Ved 390 px blir tre bilder 52 px høyere (børsometeret, investorsiden og «Følg en aksje»), fordi knappene går over tre rader. *Åpent punkt:* `oversikten-390-demo.png` er 4810 px i repoet, men main målte 4758 px mellom kl. 22:22 og 22:26 (klokka lest før og etter) med samme metode. Med knappen blir oversikten 4810 px.
