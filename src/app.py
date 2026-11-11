@@ -331,6 +331,8 @@ _RUTER_MED_BASE = {
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
+# Story 8.26 (tillegg 3, gjennomgangen VG7): «Følg» og «Angre» skriver også
+# stjernen i min_liste, i samme transaksjon som ønsket (valg.py, 0013).
 _SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
 # Story 8.21 (gruppens svar 10.11 kl. 14:32): rutene som skriver notatene, og
 # bare tabellen notat (AD-3).
@@ -1061,7 +1063,10 @@ def _tabellsiden(aktiv: str):
         [(o.symbol, o.navn, o.sektor) for o in valglager.ventende() if o.handling == ONSKE_FOLG] if valglager else [],
         {post.aksje.symbol for post in poster},
     )
-    alle_uten_data = [*rader_uten_data(poster), *venter]
+    # Gjennomgangen (ECH7): ikke med «Velg dag», som er en dag appen ikke
+    # fulgte dem.
+    annen_dag_valgt = not i_lista and valg is not None and valg.periode == VELG
+    alle_uten_data = [*rader_uten_data(poster), *([] if annen_dag_valgt else venter)]
     mangler = alle_uten_data
     # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
@@ -1128,9 +1133,9 @@ def _tabellsiden(aktiv: str):
         # er også antallet rader i tabellen, fordi hver aksje uten kurser nå
         # har en rad, så «7 av 15» stemmer med tabellen. Summen er lik
         # len(poster), og definisjonen fra 14.10 står (gjennomgangen, BH5).
-        # Story 8.26 (tillegg 3, forslaget i spørsmål 7): aksjene som venter,
-        # er ikke med i tallet, fordi appen ikke følger dem før hentingen.
-        antall_aksjer=len(rader) + len(alle_uten_data) - len(venter),
+        # Story 8.26 (tillegg 3, gjennomgangen ECH3): aksjene som venter, er
+        # med, som radene, «Min liste N» og «appen følger 16 av 18».
+        antall_aksjer=len(rader) + len(alle_uten_data),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som

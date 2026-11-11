@@ -285,9 +285,9 @@ class TestKalleneRegnesAvLista:
         monkeypatch.setattr(valg, "TAK", 20)
         html = _html(klient, "/min-liste")
         avsnitt = html.split("<h3>Følg flere aksjer</h3>", 1)[1].split("</p>", 1)[0]
-        assert (
-            "Appen kan følge opptil 20 aksjer" in avsnitt
-        )  # Story 8.26: «appen følger» and "av de 25 kallene" in avsnitt
+        # Story 8.26: «Appen kan følge», ikke «Lista kan ha». Gjennomgangen
+        # (BH1): påstanden om kallene sto i en kommentar.
+        assert "Appen kan følge opptil 20 aksjer" in avsnitt and "av de 25 kallene" in avsnitt
         assert "med 20 aksjer er 4 igjen" in avsnitt
         treff = re.search(r"Med (\d+) aksjer etter neste henting er (\d+) kall igjen", avsnitt)
         antall, igjen = int(treff.group(1)), int(treff.group(2))

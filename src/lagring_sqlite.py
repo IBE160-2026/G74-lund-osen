@@ -694,6 +694,10 @@ class SqliteMinlistelager:
     Webserveren er eneste skriver, og den skriver bare denne tabellen. Et
     symbol som ikke staar i aksje, avvises her foer noe skrives, og av
     triggeren i 0007 hvis noe annet proever.
+
+    Story 8.26 (tillegg 3, gjennomgangen VG7): «Følg» og «Angre» i valg.py
+    skriver ogsaa stjernen direkte, fra webserveren, og triggeren fra 0013
+    godtar en aksje som venter paa hentingen etter «Følg».
     """
 
     def __init__(self, tilkobling: sqlite3.Connection):

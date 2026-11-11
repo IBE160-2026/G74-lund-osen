@@ -90,6 +90,9 @@ class Rute:
     styrke: int | None
     tekst: str | None
     uten_data: bool = False
+    # Gjennomgangen av 8.26 (ECH4): uten en eneste kurs til og med dagen, ikke
+    # bare uten kurs på dagen. Bare da sier tabellen «Ingen kurser ennå».
+    aldri_kurs: bool = False
     siste_styrke: int | None = None
     er_siste: bool = True
     # Story 8.17b (gruppens svar 23.10 kl. 12:35, b): ved en periode er
@@ -293,6 +296,7 @@ def bygg_rute(
             styrke=None,
             tekst=UTEN_DATA,
             uten_data=True,
+            aldri_kurs=not kurser,
             siste_styrke=siste_styrke,
             er_siste=er_siste,
         )

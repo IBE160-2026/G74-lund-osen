@@ -135,6 +135,19 @@ class TestBoksenForSiden(_Node):
         assert "if (siste && aktive !== steg) {" in vis
         assert '"Spill av hele omvisningen"' in vis
 
+    def test_hele_omvisningen_lukker_boksen_for_siden_foerst(self):
+        """Gjennomgangen (ECH1, BH4): ville feilet hvis «Spill av omvisningen»
+        mens boksen fra «Vis meg rundt» er åpen, spilte bare siden. ECH2: og
+        hvis en side fra hurtigbufferen beholdt stegene for siden."""
+        skriptet = SKRIPTET.read_text(encoding="utf-8")
+        start = skriptet[skriptet.index("  function start() {") :]
+        start = start[: start.index("\n  }\n")]
+        assert "if (aktive !== steg) avslutt();" in start
+        assert start.index("avslutt();") < start.index("gaaTil(0, 1);")
+        oppstart = skriptet[skriptet.index("  function oppstart() {") :]
+        oppstart = oppstart[: oppstart.index("\n  }\n")]
+        assert "aktive = steg;" in oppstart and "stedet = SIDE;" in oppstart
+
     def test_vis_meg_rundt_lagrer_ingen_omvisning(self):
         """Ville feilet hvis «Vis meg rundt» lagret steget som omvisningen
         fortsetter fra på neste side, så en annen side åpnet boksen."""
@@ -324,6 +337,24 @@ class TestIngenKurserEnnaa:
         tabell = side.split("<table", 1)[1].split("</table>", 1)[0]
         assert "Ingen kurser ennå" in tabell
 
+    def test_bare_en_aksje_uten_kurser_sier_ennaa(self):
+        """Gjennomgangen (ECH4, VG5): ville feilet hvis en aksje med kurser,
+        men uten kurs på dagen, sto med «Ingen kurser ennå»."""
+        from datetime import date
+
+        import boersometer
+        from kursdata import Aksje
+        from test_boersometer import KURSER
+
+        aksje = Aksje("A", "A.OL", "A ASA", "Energi")
+        senere = date(2030, 1, 2)
+        med = boersometer.bygg_rute(aksje, KURSER, None, senere, senere)
+        uten = boersometer.bygg_rute(aksje, [], None, senere, senere)
+        assert med.uten_data and not med.aldri_kurs
+        assert uten.uten_data and uten.aldri_kurs
+        mal = (ROT / "src" / "templates" / "boersometer.html").read_text(encoding="utf-8")
+        assert "'Ingen kurser ennå' if rute.aldri_kurs else 'Ingen kurs den dagen'" in mal
+
     def test_ingen_kurs_faar_plass_i_en_stor_rute(self):
         """Ville feilet hvis den nye teksten gjorde en stor rute for smal, så
         grensen for store ruter (STOR) ikke lenger gjaldt."""
@@ -443,12 +474,48 @@ class TestStjernenOgDeSomVenter:
         assert f'id="rad-{kode}"' not in _side(klient, "/") and f'id="rad-{kode}"' not in _side(klient, "/min-liste")
         assert _tabellene(demo_sti())["min_liste"] == len(demo.MERKET_I_DEMOEN)
 
-    def test_tallet_i_overskriften_teller_ikke_dem_som_venter(self, klient):
-        """Forslaget i spørsmål 7: ville feilet hvis «N av M aksjer» talte en
-        aksje appen ikke følger ennå."""
-        foer = re.search(r"av (\d+) aksjer</mark>", _side(klient, "/")).group(1)
+    def test_tallene_teller_dem_som_venter_som_radene(self, klient):
+        """Forslaget i spørsmål 7, etter gjennomgangen (ECH3, VG4): ville
+        feilet hvis «N av M aksjer», «Alle» eller «Øvrige aksjer» sa noe annet
+        enn radene i tabellen og «appen følger», så tallene sprikte."""
+
+        def tallene(side):
+            return (
+                int(re.search(r"av (\d+) aksjer</mark>", side).group(1)),
+                int(re.search(r'>Alle <span class="antall">(\d+)</span>', side).group(1)),
+                int(re.search(r'Øvrige aksjer <span class="antall">(\d+)</span>', side).group(1)),
+            )
+
+        foer = tallene(_side(klient, "/"))
         _foelg_i_demoen(klient)
-        assert re.search(r"av (\d+) aksjer</mark>", _side(klient, "/")).group(1) == foer
+        side = _side(klient, "/")
+        assert tallene(side) == tuple(n + 1 for n in foer)
+        assert len(re.findall(r'<form id="rad-', side)) == foer[1] + 1
+
+    def test_velg_dag_viser_ikke_dem_som_venter(self, klient):
+        """Gjennomgangen (ECH7): ville feilet hvis en dag valgt med «Velg dag»
+        viste en aksje appen ikke fulgte den dagen."""
+        kode = _foelg_i_demoen(klient)
+        assert f'id="rad-{kode}"' not in _side(klient, "/?periode=velg&dag=2026-10-01")
+
+    def test_angre_i_et_bytte_tar_bort_stjernen(self, klient):
+        """Gjennomgangen (VG3): ville feilet hvis «Angre» på halvdelen av et
+        bytte som fjerner, lot stjernen på aksjen som skulle følges, stå."""
+        import lagring_sqlite
+        import valg
+
+        kode = re.search(r'href="/folg\?kode=([A-Z0-9-]+)"', _side(klient, "/folg")).group(1)
+        t = lagring_sqlite.aapne_base(demo_sti(), kjoer_migrasjoner=False)
+        try:
+            lager = valg.Valglager(t, lambda: datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc))
+            lager.folg(kode, "Energi", bytt_ut="BRFE")
+            fjern_id = t.execute("SELECT id FROM oenske WHERE handling = 'fjern' AND symbol = 'BRFE'").fetchone()[0]
+            assert t.execute("SELECT 1 FROM min_liste WHERE symbol = ?", (kode,)).fetchone()
+            lager.angre(fjern_id)
+            assert not t.execute("SELECT 1 FROM min_liste WHERE symbol = ?", (kode,)).fetchone()
+            assert not t.execute("SELECT 1 FROM oenske WHERE symbol IN (?, 'BRFE')", (kode,)).fetchone()
+        finally:
+            t.close()
 
     def test_den_ekte_versjonen_viser_dem_som_venter(self, ekte, tmp_path):
         """Likt i den ekte versjonen: ville feilet hvis en aksje som venter,
@@ -471,6 +538,30 @@ class TestStjernenOgDeSomVenter:
         assert "merket" in rad and "venter på henting" in rad
 
 
+class TestRyddingen:
+    def test_en_stjerne_uten_aksje_og_oenske_tas_bort(self, klient):
+        """Gjennomgangen (BH2, ECH5): ville feilet hvis stjernen fra «Følg»
+        ble liggende etter at ønsket ble avvist, og dukket opp igjen når
+        aksjen kom inn via en ferdig liste."""
+
+        import lagring_sqlite
+        import valg
+
+        kode = _foelg_i_demoen(klient)
+        t = lagring_sqlite.aapne_base(demo_sti(), kjoer_migrasjoner=False)
+        try:
+            with t:
+                t.execute("UPDATE oenske SET avvist = 'x' WHERE symbol = ?", (kode,))
+            assert t.execute("SELECT 1 FROM min_liste WHERE symbol = ?", (kode,)).fetchone()
+            lager = valg.Valglager(t, lambda: datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc))
+            lager.bruk_liste([(kode, "Energi")])
+            assert not t.execute("SELECT 1 FROM min_liste WHERE symbol = ?", (kode,)).fetchone()
+            # De merkede aksjene i lista står.
+            assert t.execute("SELECT COUNT(*) FROM min_liste").fetchone()[0] > 0
+        finally:
+            t.close()
+
+
 class TestTriggerenFra0013:
     def test_et_ukjent_symbol_avvises_fortsatt(self, tmp_path):
         """0013: ville feilet hvis triggeren godtok et symbol som verken står
@@ -489,9 +580,24 @@ class TestTriggerenFra0013:
                 "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', 'NYA', 'Ny A', 'Energi', 'x')"
             )
             t.execute("INSERT INTO min_liste (symbol) VALUES ('NYA')")
+            # Gjennomgangen (VG2, BH8): et ønske som er avvist eller tatt i
+            # bruk, og et ønske om å fjerne, gir ikke stjerne uten aksjen.
+            t.execute("DELETE FROM min_liste WHERE symbol = 'NYA'")
             t.execute("UPDATE oenske SET avvist = 'x' WHERE symbol = 'NYA'")
-            with pytest.raises(sqlite3.IntegrityError):
-                t.execute("INSERT INTO min_liste (symbol) VALUES ('NYB')")
+            t.execute(
+                "INSERT INTO oenske (handling, symbol, navn, sektor, laget, tatt_i_bruk) "
+                "VALUES ('folg', 'NYC', 'Ny C', 'Energi', 'x', 'y')"
+            )
+            t.execute("INSERT INTO oenske (handling, symbol, laget) VALUES ('fjern', 'NYD', 'x')")
+            for symbol in ("NYA", "NYC", "NYD"):
+                with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i min_liste"):
+                    t.execute("INSERT INTO min_liste (symbol) VALUES (?)", (symbol,))
+            t.execute(
+                "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', 'NYE', 'Ny E', 'Energi', 'x')"
+            )
+            t.execute("INSERT INTO min_liste (symbol) VALUES ('NYE')")
+            with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i min_liste"):
+                t.execute("UPDATE min_liste SET symbol = 'NYA' WHERE symbol = 'NYE'")
         finally:
             t.close()
 

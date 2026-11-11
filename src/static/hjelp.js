@@ -492,6 +492,9 @@ if (typeof module === "object" && module.exports) {
   }
 
   function start() {
+    // Gjennomgangen av 8.26 (ECH1, BH4): er boksen fra «Vis meg rundt» åpen,
+    // lukkes den først, så hele omvisningen spilles og ikke bare siden.
+    if (aktive !== steg) avslutt();
     skriv(localStorage, OMVISNING.SVARET, "ja");
     // En aksje fra en tidligere omvisning gjelder ikke; den leses på nytt.
     skriv(sessionStorage, OMVISNING.AKSJEN, null);
@@ -567,6 +570,10 @@ if (typeof module === "object" && module.exports) {
       boksen = null;
       document.removeEventListener("keydown", tast);
     }
+    // Gjennomgangen av 8.26 (ECH2): en side fra hurtigbufferen har ikke
+    // lenger boksen fra «Vis meg rundt», så hele omvisningen gjelder igjen.
+    aktive = steg;
+    stedet = SIDE;
     if (OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET)) && !document.querySelector(".omvisning-tilbud")) {
       tilby();
     }
