@@ -1337,6 +1337,9 @@ def aksjedetalj(symbol: str):
         # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
         # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
         # henting.
+        # Story 8.27, gjennomgangen (ECH3): panelet sier at aksjen ikke har
+        # kurser, i stedet for å by fram valget.
+        g.notatpanel_aksje = {"symbol": post.aksje.symbol, "navn": post.aksje.navn, "uten_kurser": True}
         # Story 3.4h (spørsmål 5): boblen nederst også her.
         return render_template(
             "aksje_uten_kurser.html",
@@ -1416,6 +1419,7 @@ def aksjedetalj(symbol: str):
     )
     # Story 8.27 (del C): skjemaet i panelet skriver for aksjen og dagen
     # siden viser, med samme visning som skjemaet nederst.
+    g.notatpanel_tidligere = slutt != rader[-1].dato
     g.notatpanel_aksje = {
         "symbol": post.aksje.symbol,
         "navn": post.aksje.navn,
@@ -1520,8 +1524,9 @@ MIN_LISTE_TILBAKE = {"min-liste": "/min-liste", "min-liste-alle": "/min-liste?vi
 # skjema i panelet sender tilbake hit på siden man sto på.
 NOTATPANEL = "notatpanel"
 # Siden man sto på: en sti i appen med eller uten spørsmål, aldri en annen
-# vert («//», «/\»), mellomrom, linjeskift eller «#». Høyst 512 tegn.
-_PANELSIDEN = re.compile(r"/(?![/\\])[^\s#\\]{0,511}")
+# vert («//», «/\»), mellomrom, linjeskift eller «#». Høyst 2048 tegn
+# (gjennomgangen, ECH6: en lang adresse med filter og sortering).
+_PANELSIDEN = re.compile(r"/(?![/\\])[^\s#\\]{0,2047}")
 
 
 def _panelsiden(verdi: str | None) -> str | None:
@@ -1580,8 +1585,12 @@ def _notatpanelet():
         aksjen = g.get("notatpanel_aksje")
         # Gjennomgangen (BH2): en basefeil her gir panelet uten notater, ikke
         # 500, så siden og feilsiden vises som før.
+        # Gjennomgangen (ECH1): viser siden en tidligere dag, står ingen
+        # knapper for kjøp og salg i panelet, som på aksjesiden og i Min liste.
+        # Aksjesiden sier selv om den viser siste dag med kurser.
+        tidligere = g.get("notatpanel_tidligere", request.args.get("dag") is not None)
         try:
-            notatene, indeks = _alle_notatene(), _indeksen_for_grafen()[0]
+            notatene, indeks = _alle_notatene(tidligere), _indeksen_for_grafen()[0]
         except BASEFEIL as feil:
             app.logger.warning("Panelet kunne ikke leses: %s", type(feil).__name__)
             notatene, indeks = None, None
@@ -1592,6 +1601,7 @@ def _notatpanelet():
             "valget": None if aksjen or notatene is None else _aksjevalget(),
             "tilbake": _her(),
             "maks": MAKS_TEGN,
+            "tidligere": tidligere,
         }
     return {"notatpanel": g.notatpanel}
 

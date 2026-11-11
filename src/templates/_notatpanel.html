@@ -20,7 +20,9 @@
 {% else %}
 {% if panel_aksjen %}
 {%- set a = panel_aksjen %}
-{% if a.tatt_ut %}
+{% if a.uten_kurser %}
+<p class="uten">{{ a.navn }} har ingen kurser ennå, så et notat kan ikke skrives for den før kursene er hentet.</p>
+{% elif a.tatt_ut %}
 <p class="uten">{{ a.navn }} er tatt ut av lista, så et nytt notat kan ikke skrives for den.</p>
 {% elif not a.har_kurs %}
 <p class="uten">Et notat får dagen siden viser, og {{ a.dag|ukedag }} {{ a.dag|dato }} har ingen kurs for {{ a.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
@@ -53,6 +55,8 @@
 <p class="uten">Ingen aksje i lista har kurser ennå, så et notat kan ikke skrives.</p>
 {% endif %}
 {% if panelnotater %}
+{#- Gjennomgangen (ECH1): som i Min liste, når siden viser en tidligere dag. #}
+{% if notatpanel.tidligere %}<p class="notatgrense">Et tenkt kjøp eller salg noteres med sjekkene for siste dag med kurser, så knappene står når siden viser siste børsdag.</p>{% endif %}
 <ol class="notatliste">
   {% for n in panelnotater %}{{ notatet(n, panel_indeks, med_skjema=true, siste_dag=n.siste_dag, kan_handle=n.kan_handle, med_navn=true, tilbake=panel_tilbake) }}{% endfor %}
 </ol>

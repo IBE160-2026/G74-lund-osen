@@ -235,7 +235,7 @@ class TestPanelet:
         """Ville feilet hvis panelet hentet innholdet med fetch eller satte
         det inn som tekst, i stedet for å klone malen fra siden."""
         skriptet = (ROT / "src" / "static" / "hjelp.js").read_text(encoding="utf-8")
-        delen = skriptet[skriptet.index("// Story 8.27") :]
+        delen = skriptet[skriptet.index("// Story 8.27 (gruppens svar") :]
         assert "mal.content.cloneNode(true)" in delen
         assert "fetch(" not in delen and "innerHTML" not in delen
 
@@ -244,11 +244,11 @@ class TestPanelet:
         husket valgene i localStorage, eller siden ikke ga plass. Selve
         oppførselen er prøvd i Edge (bildene i PR-en)."""
         skriptet = (ROT / "src" / "static" / "hjelp.js").read_text(encoding="utf-8")
-        delen = skriptet[skriptet.index("// Story 8.27") :]
+        delen = skriptet[skriptet.index("// Story 8.27 (gruppens svar") :]
         assert 'matchMedia("(min-width: 1056px)")' in delen
-        assert '"ose-notatpanel"' in delen and '"ose-notatpanel-side"' in delen
+        assert '"ose-notatpanel"' in skriptet and '"ose-notatpanel-side"' in skriptet
         assert "localStorage" in delen and "sessionStorage" not in delen
-        assert 'location.hash === "#notatpanel"' in delen
+        assert "const fraSkjema = location.hash === P.ANKER;" in delen
         stilen = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
         blokk = stilen[stilen.index("/* Story 8.27") :]
         blokk = blokk[blokk.index("@media (min-width: 1056px)") :]
@@ -462,3 +462,156 @@ class TestGjennomgangen:
         bokstav med aksent kom etter å."""
         navn = ["Åker", "Ørje", "Élkem", "Zeta", "Ærfugl", "alfa", "Ünder"]
         assert sorted(navn, key=app_modul._navnenoekkel) == ["alfa", "Élkem", "Ünder", "Zeta", "Ærfugl", "Ørje", "Åker"]
+
+
+# --- Gjennomgangen: Edge Case Hunter og Verification Gap -----------------------
+
+NODE = shutil.which("node")
+SKRIPTET = ROT / "src" / "static" / "hjelp.js"
+
+
+@pytest.mark.skipif(NODE is None, reason="Node finnes ikke på maskinen")
+class TestPanelskriptetMedNode:
+    """VG2 og VG3: avgjørelsene i panelet (NOTATPANEL i hjelp.js), kjørt med
+    Node uten en side, som omvisningen i 8.25."""
+
+    def _kjoer(self, uttrykk: str):
+        import json
+        import subprocess
+
+        kode = f"const P = require({json.dumps(str(SKRIPTET))}).NOTATPANEL; console.log(JSON.stringify({uttrykk}));"
+        svar = subprocess.run([NODE, "-e", kode], capture_output=True, text=True, timeout=60)
+        assert svar.returncode == 0, svar.stderr
+        return json.loads(svar.stdout)
+
+    def test_bare_fra_1056_px_og_bare_aapent(self):
+        """Ville feilet hvis panelet sto smalere enn 1056 px, eller uten å
+        være åpent."""
+        uttrykk = "[P.synlig(true, true), P.synlig(true, false), P.synlig(false, true)]"
+        assert self._kjoer(uttrykk) == [True, False, False]
+
+    def test_husket_som_aapent_eller_fra_et_skjema(self):
+        """Ville feilet hvis valget ikke ble lest ved start, eller panelet
+        ikke sto åpent etter lagring (#notatpanel)."""
+        uttrykk = (
+            '[P.aapentVedStart("ja", ""), P.aapentVedStart(null, "#notatpanel"), P.aapentVedStart(null, ""), '
+            'P.aapentVedStart("nei", "#annet")]'
+        )
+        assert self._kjoer(uttrykk) == [True, True, False, False]
+
+    def test_knappen_og_flytt_lagrer_valgene(self):
+        """Ville feilet hvis knappen ikke lagret at panelet er åpent, eller
+        «Flytt» ikke byttet side og tekst."""
+        assert self._kjoer("[P.etterKnappen(true), P.etterKnappen(false)]") == ["ja", None]
+        uttrykk = '[P.flytt(false), P.flytt(true), P.venstre("venstre"), P.venstre("hoeyre"), P.venstre(null)]'
+        assert self._kjoer(uttrykk) == ["venstre", "hoeyre", True, False, False]
+        assert self._kjoer("[P.flyttTekst(true), P.flyttTekst(false)]") == ["Flytt til høyre", "Flytt til venstre"]
+        assert self._kjoer("[P.AAPENT, P.SIDEN, P.ANKER]") == ["ose-notatpanel", "ose-notatpanel-side", "#notatpanel"]
+
+    def test_esc_lukker_bare_den_oeverste(self):
+        """ECH4: ville feilet hvis Esc lukket panelet mens hjelpen eller
+        omvisningen var åpen, når fokus ikke var i panelet, eller når en
+        annen kontroll hadde brukt tasten."""
+        uttrykk = (
+            '[P.escLukker("Escape", false, false, true, false), P.escLukker("Escape", false, false, true, true), '
+            'P.escLukker("Escape", false, false, false, false), P.escLukker("Escape", true, false, true, false), '
+            'P.escLukker("Escape", false, true, true, false), P.escLukker("Enter", false, false, true, false)]'
+        )
+        assert self._kjoer(uttrykk) == [True, False, False, False, False, False]
+
+    def test_skriptet_bruker_avgjoerelsene(self):
+        """Ville feilet hvis skriptet for siden gikk forbi avgjørelsene over,
+        eller lyttet etter Esc etter hjelpen (ECH4)."""
+        skriptet = SKRIPTET.read_text(encoding="utf-8")
+        delen = skriptet[skriptet.index("// Story 8.27 (gruppens svar") :]
+        for bruk in (
+            "P.synlig(aapen, BRED.matches)",
+            "P.aapentVedStart(les(P.AAPENT)",
+            "P.etterKnappen(panel.hidden)",
+            "P.flytt(rot.classList.contains",
+            "P.escLukker(e.key",
+        ):
+            assert bruk in delen, bruk
+        assert re.search(r"P\.escLukker\(.*?\)\) \{\s*lukk\(\);\s*\}\s*\},\s*true,", delen, re.S)
+
+
+class TestStilen:
+    def test_hjelpen_staar_over_panelet(self):
+        """Spørsmål 1, VG3: ville feilet hvis hjelpen åpnet seg på den andre
+        siden mens panelet er åpent, siden ga plass til to felt, eller «Flytt»
+        i hjelpen sto."""
+        stilen = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        blokk = stilen[stilen.index("/* Story 8.27") :]
+        for regel in (
+            ".hjelpefelt.notatpanel-aapent .hjelpevindu { inset: 16px 16px 16px auto; }",
+            ".hjelpefelt.notatpanel-aapent.panel-venstre .hjelpevindu { inset: 16px auto 16px 16px; }",
+            ".hjelpefelt.notatpanel-aapent body:has(.hjelpevindu:popover-open) "
+            "{ padding-right: var(--notatpanel); padding-left: 0; }",
+            ".hjelpefelt.notatpanel-aapent .hjelpevindu button.flytt { display: none; }",
+        ):
+            assert regel in blokk, regel
+        # Reglene står etter reglene for hjelpefeltet, så de vinner.
+        foerst = stilen.index(".hjelpefelt.felt-venstre .hjelpevindu")
+        assert foerst < stilen.index(".hjelpefelt.notatpanel-aapent .hjelpevindu")
+
+
+class TestReglerIPanelet:
+    def test_ingen_kjoep_naar_siden_viser_en_tidligere_dag(self, klient, base):
+        """ECH1, VG4: ville feilet hvis panelet hadde «Noter et tenkt kjøp» på
+        en side for en tidligere dag, som aksjesiden og Min liste ikke har."""
+        _notat(base, AKSJE, SISTE, "k")
+        assert "/notat/kjoep" in _panelet(klient, f"/aksje/{AKSJE}")
+        for adresse in (f"/aksje/{AKSJE}?dag=2026-10-01", "/min-liste?dag=2026-10-01"):
+            panelet = _panelet(klient, adresse)
+            assert "/notat/kjoep" not in panelet, adresse
+            assert "knappene står når siden viser siste børsdag" in _tekst(panelet)
+
+    def test_ingen_kjoep_for_en_aksje_som_er_tatt_ut(self, klient, base):
+        """VG4, VG9: ville feilet hvis panelet tillot et kjøp eller et nytt
+        notat for en aksje som er tatt ut."""
+        _notat(base, ANNEN, SISTE, "ut")
+        c = sqlite3.connect(base)
+        c.execute("UPDATE aksje SET ut = '2026-10-01' WHERE symbol = ?", (ANNEN,))
+        c.commit()
+        c.close()
+        assert f"/aksje/{ANNEN}/notat/kjoep" not in _panelet(klient, "/")
+        panelet = _panelet(klient, f"/aksje/{ANNEN}")
+        assert '<form class="nytt-notat"' not in panelet
+        assert "er tatt ut av lista" in _tekst(panelet)
+
+    def test_en_aksje_uten_kurser(self, klient, base):
+        """ECH3, VG6: ville feilet hvis panelet på siden for en aksje uten
+        kurser bød fram valget, eller /notat skrev et notat for den."""
+        c = sqlite3.connect(base)
+        c.execute("DELETE FROM kurs WHERE symbol = ?", (ANNEN,))
+        c.commit()
+        c.close()
+        panelet = _panelet(klient, f"/aksje/{ANNEN}")
+        assert "<select" not in panelet and '<form class="nytt-notat"' not in panelet
+        assert "har ingen kurser ennå" in _tekst(panelet)
+        assert f'<option value="{ANNEN}">' not in _panelet(klient, "/")
+        assert klient.post("/notat", data={"symbol": ANNEN, "tekst": "x"}).status_code == 400
+        assert _notatene(base) == []
+
+    @pytest.mark.parametrize("tilbake", ["//ondt.example", "http://ondt.example", "/a\tb", "/" + "a" * 2048])
+    def test_ugyldig_tilbake_ved_slett_gir_den_gamle_veien(self, klient, base, tilbake):
+        """VG7: ville feilet hvis «Slett» godtok en adresse utenfor appen."""
+        _notat(base, AKSJE, SISTE, "s")
+        notat_id = str(_id(base))
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": notat_id, "vis": "min-liste", "tilbake": tilbake})
+        assert svar.headers["Location"] == "/min-liste#mine-notater"
+
+    def test_en_gyldig_tilbake_gaar_foran_min_liste(self, klient, base):
+        """VG7: ville feilet hvis vis=min-liste gikk foran siden man sto på."""
+        _notat(base, AKSJE, SISTE, "s")
+        data = {"id": str(_id(base)), "vis": "min-liste", "tilbake": "/boersometer"}
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data=data)
+        assert svar.headers["Location"] == "/boersometer#notatpanel"
+
+
+def _id(base: Path) -> int:
+    c = sqlite3.connect(base)
+    try:
+        return c.execute("SELECT id FROM notat").fetchone()[0]
+    finally:
+        c.close()
