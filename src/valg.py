@@ -33,6 +33,8 @@ TAK = 18
 # Dagskvoten hos EODHD (gratisnivået) og kallet til hovedindeksen.
 KVOTE = 20
 INDEKSKALL = 1
+# Story 8.23 (gjennomgangen, BH15): hver aksje bruker ett kall om dagen.
+KALL_PER_AKSJE = 1
 # Signalet er målt på aksjer som omsettes for over 32 MNOK om dagen (utdraget
 # 08.11 §1, malinger.md §36).
 GRENSE_MNOK = 32.0
@@ -105,8 +107,8 @@ def utenfor_tekst(median_nok: float | None, maalt: date | None, *, kursene: bool
 def kallene(i_lista: int, folg: int, fjern: int) -> tuple[int, int, int]:
     """(siste henting, neste henting, igjen til nye forsøk) i kall, med
     hovedindeksen, som teksten i dialogen (utdraget §1)."""
-    sist = i_lista + INDEKSKALL
-    neste = i_lista + folg - fjern + INDEKSKALL
+    sist = i_lista * KALL_PER_AKSJE + INDEKSKALL
+    neste = (i_lista + folg - fjern) * KALL_PER_AKSJE + INDEKSKALL
     return sist, neste, KVOTE - neste
 
 

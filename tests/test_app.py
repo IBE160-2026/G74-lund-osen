@@ -1638,7 +1638,8 @@ class TestStory80c:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         stil = _stil(html)
-        assert '<section class="sjekkort bidro"' in html
+        # Story 8.23 (tillegg 2): kortet har også klassen for resultatet.
+        assert re.search(r'<section class="sjekkort (?:opp|ned) bidro"', html)
         assert "background: var(--opp-bakgrunn)" in _regel(stil, ".sjekkort .resultat.opp")
         assert "#fafafa" not in stil
 
@@ -1737,12 +1738,13 @@ class TestStory80c:
         """VG2: like mange rader med class="bidro" som sjekker som slo ut."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert html.count('<section class="sjekkort bidro"') == 2
-        assert html.count('<section class="sjekkort"') == 1
+        # Story 8.23 (tillegg 2): kortet har også klassen for resultatet.
+        assert len(re.findall(r'<section class="sjekkort (?:opp|ned) bidro"', html)) == 2
+        assert html.count('<section class="sjekkort ingen"') == 1
         # Gjennomgangen 15.10 (BH12, ECH7): det som skiller kortene for synet,
         # er pillen med farge etter fortegnet (utdraget §8). Kortet uten
         # utslag har den grå pillen.
-        kortene = re.findall(r'<section class="sjekkort( bidro)?"(.*?)</section>', html, re.DOTALL)
+        kortene = re.findall(r'<section class="sjekkort (?:opp|ned|ingen)( bidro)?"(.*?)</section>', html, re.DOTALL)
         assert len(kortene) == 3
         for bidro, innhold in kortene:
             klasse = re.search(r'class="resultat fortegn ([a-z]+)"', innhold).group(1)
@@ -2434,7 +2436,8 @@ class TestStory815Sortering:
         html = self._side(tabell, "/")
         thead = html.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert "aria-sort" not in thead
-        lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead))
+        # Story 8.23 (A2): lenkene går til tabellen (#aksjene).
+        lenker = dict(re.findall(r'href="/\?sorter=(\w+)&amp;orden=(\w+)#aksjene"', thead))
         # Story 8.15b: Selskap A til Å foerst.
         assert lenker == {
             "selskap": "stigende",
@@ -2446,11 +2449,13 @@ class TestStory815Sortering:
         valgt = self._side(tabell, "/?sorter=endring&orden=synkende")
         thead = valgt.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert re.findall(
-            r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)"', thead
+            r'<th[^>]*aria-sort="(\w+)"[^>]*><a class="sorter valgt" href="/\?sorter=(\w+)&amp;orden=(\w+)#aksjene"',
+            thead,
         ) == [("descending", "endring", "stigende")]
         stigende = self._side(tabell, "/?sorter=retning&orden=stigende")
         assert re.search(
-            r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende">', stigende
+            r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende#aksjene">',
+            stigende,
         )
 
     def test_skjermleseren_hoerer_kolonnen_og_retningen(self, tabell):
@@ -2469,7 +2474,7 @@ class TestStory815Sortering:
         assert 'class="sortert"' not in self._side(tabell, "/")
         html = self._side(tabell, "/?sorter=signal&orden=stigende")
         assert (
-            '<p class="sortert">Sortert på signalstyrke, stigende, i én liste. <a href="/">Standard rekkefølge</a></p>'
+            '<p class="sortert">Sortert på signalstyrke, stigende, i én liste. <a href="/#aksjene">Standard rekkefølge</a></p>'
         ) in html
         assert html.index('<p class="sortert">') < html.index('<div class="tabellboks"')
         # Gjennomgangen (VG2): navnet for hver kolonne. Svar 9 sa «innenfor
@@ -3462,7 +3467,8 @@ def _valgt(html: str) -> list[str]:
 
 
 def _foerste_og_siste_dag(html: str) -> str:
-    return re.search(r"<figcaption>\s*(\S+ til \S+)\.", html).group(1)
+    # Story 8.23 (tillegg 2): datoene står først bak «Mer om grafen».
+    return re.search(r"<summary>Mer om grafen</summary><p>\s*(\S+ til \S+)\.", html).group(1)
 
 
 def _dagen(html: str) -> str:
@@ -3966,7 +3972,7 @@ class TestStory815bSelskapOgMarkeringen:
         """Ville feilet hvis lenken på Selskap ikke snudde, eller linja og
         teksten for skjermleseren ikke sa «(A til Å)» som for Retning."""
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=stigende")
-        assert 'href="/?sorter=selskap&amp;orden=synkende"' in thead
+        assert 'href="/?sorter=selskap&amp;orden=synkende#aksjene"' in thead
         assert ", sortert stigende (A til Å). Velg for synkende (Å til A)." in thead
         # Story 8.2a, e: «i én liste».
         assert "Sortert på selskap, stigende (A til Å), i én liste." in html
@@ -3975,7 +3981,7 @@ class TestStory815bSelskapOgMarkeringen:
         # Gjennomgangen (VG7): og synkende.
         html, thead = self._thead(tabell, "/?sorter=selskap&orden=synkende")
         assert "Sortert på selskap, synkende (Å til A), i én liste." in html
-        assert 'href="/?sorter=selskap&amp;orden=stigende"' in thead
+        assert 'href="/?sorter=selskap&amp;orden=stigende#aksjene"' in thead
 
     @pytest.mark.parametrize("orden, aria", [("stigende", "ascending"), ("synkende", "descending")])
     @pytest.mark.parametrize("kolonne", ["selskap", "kurs", "endring", "signal", "retning"])

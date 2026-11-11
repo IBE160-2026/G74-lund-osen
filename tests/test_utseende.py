@@ -318,6 +318,12 @@ class TestRammen:
         liste finnes, med «Alle» og sorteringen som parametre."""
         for navn, html in sidene.items():
             for href in re.findall(r'href="([^"]*)"', html):
+                # Story 8.23 (A2 og B7): lenkene til tabellen har ankeret #aksjene,
+                # som må finnes på siden, og «Min liste» på oversikten er ?vis=min.
+                if href.endswith("#aksjene") and href != "#aksjene":
+                    assert re.search(r'(?<![\w-])id="aksjene"', html), (navn, href)
+                    href = href.removesuffix("#aksjene")
+                href = href.replace("?vis=min&amp;", "?").replace("?vis=min", "") or "/"
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
                     href in ("/", "/min-liste", "/min-liste?vis=alle")
@@ -511,7 +517,11 @@ class TestOversikten:
         brikke, retning, peker = (innhold for _, innhold in felt)
         # Svaret kl. 12:15 (15.10, BH20): en grønn +1 over en rød -1, med en
         # egen klasse, så regelen for brikkene i rammen ikke virker inn.
-        assert '<span class="utslagsfelt"><span class="pluss">+1</span><span class="minus">-1</span></span>' in brikke
+        # Story 8.23 (tillegg 2): med den blanke 0-brikken mellom +1 og -1.
+        assert (
+            '<span class="utslagsfelt"><span class="pluss">+1</span><span class="null">0</span><span class="minus">-1</span></span>'
+            in brikke
+        )
         assert "brikke" not in kortet
         stil = _stil(html)
         assert "flex-direction: column" in _regel(stil, ".utslagsfelt")

@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 from graf import MAANEDER
+from justeringsdager import aaret_foer
 from markedsoversikt import RETNINGSVISNING, SJEKKBOKSTAVER, Retningsvisning, les_tilstand
 from perioder import _gjentatt
 from tallformat import fortegn
@@ -247,3 +248,32 @@ def bygg_maaned(
         kurs_til=siste,
         beskjed=beskjed,
     )
+
+
+@dataclass(frozen=True)
+class AlleSjekkene:
+    """Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): hvor ofte
+    aksjen fikk utslag på alle sjekkene det siste året, og sist. fra er den
+    første dagen med en rad når serien er kortere enn et år, ellers None.
+    Bare antall og datoer, ingen avkastning (NFR-06)."""
+
+    antall: int
+    sist: date | None
+    fra: date | None
+
+
+def alle_sjekkene_det_siste_aaret(
+    vurderingene: dict[date, Vurdering | Grunn] | None, til: date, antall_sjekker: int
+) -> AlleSjekkene | None:
+    """Radene i vurdering fra samme dato året før (justeringsdager.aaret_foer,
+    som «1 år» i grafen) til og med til, lest og aldri regnet (AD-7). None
+    når vurderingene ikke kan leses eller ingen rad finnes."""
+    if not vurderingene:
+        return None
+    start = aaret_foer(til)
+    dagene = sorted(d for d in vurderingene if start <= d <= til)
+    if not dagene:
+        return None
+    alle = [d for d in dagene if isinstance(vurderingene[d], Vurdering) and vurderingene[d].styrke == antall_sjekker]
+    foerste = min(vurderingene)
+    return AlleSjekkene(antall=len(alle), sist=alle[-1] if alle else None, fra=foerste if foerste > start else None)

@@ -1320,7 +1320,7 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Story 8.25: «Spill av omvisningen» ved «Vis meg rundt» (hjelp.js, _rundtur.html, _ramme.html og
 # stil.css). Avtrykkene er regnet ut paa nytt, og bildene med knappen er tatt paa nytt, med samme hoeyder.
-AVTRYKK_BAK_BILDET = "968c2ec30d874405991fae8dcc34db78c1089a6c1587ade2cb739929b1dc0799"
+AVTRYKK_BAK_BILDET = "a147cd852e0148ccbd84b842979b37a15164c1b4c7ea771c8776429797c6c7e7"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1757,7 +1757,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # «Mine notater», og var byte for byte det samme (gjennomgangen, VG6).
 # Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "5d2688ef98530ad15f8ffcdc8cd014ff4baab60459709420cf2fbaf8e49c91f4"
+AVTRYKK_BAK_AKSJESIDEN = "749e73aa146cb814f750c97039c01312da5a09f4a03524499c9c7397eaf4e650"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1802,7 +1802,8 @@ DE_NYE_BILDENE = {
     "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 948, FILENE_BAK_INVESTORSIDEN),
     # Story 8.20b: 1682, med kortene «Mål mot børsen» og «Slik leser du
     # børsometeret» øverst og to linjer i bransjeoverskriftene. Var 1329.
-    "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 1682, FILENE_BAK_BOERSOMETERET),
+    # Story 8.23 (tillegg 3): 3136, med tabellen åpen fra start. Var 1682.
+    "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 3136, FILENE_BAK_BOERSOMETERET),
     "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
     # Story 8.20a: 3509, med datoen og pilene på egen linje ved 390 px. Var 3524.
     # Story 2.12: 3797, med «Dine egne aksjer» under tabellen.
@@ -1811,10 +1812,13 @@ DE_NYE_BILDENE = {
     # Flettingen av 2.11 (med 10.6) inn i 2.12: 4120, med «Dine egne aksjer» og så
     # «Børsdagen kort fortalt» under tabellen (utdraget 08.11 §1).
     # Flettingen av 2.12 inn i 8.11: 4240, med filteret, «Dine egne aksjer» og «Børsdagen kort fortalt».
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 4240, MALENE_BAK_BILDET),
+    # Story 8.23: 4444, med meldingen øverst, antallet i filteret, «Dine egne aksjer» som tabell
+    # og «Vis meg rundt» fra 8.9. Var 4240.
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 4444, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
-    "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 3327, FILENE_BAK_BOERSOMETERET),
+    # Story 8.23 (tillegg 3): 5021, med tabellen åpen fra start. Var 3327.
+    "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 5021, FILENE_BAK_BOERSOMETERET),
     # Gruppens ønske 09.11 kl. 22:01: investorsiden for BRFE ved 390 px, sist
     # blant bildene ved 390 px, hele siden (1117 px).
     "docs/appen/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1117, FILENE_BAK_INVESTORSIDEN),
@@ -1933,17 +1937,17 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "968c2ec30d874405991fae8dcc34db78c1089a6c1587ade2cb739929b1dc0799",
-    "docs/appen/boersometeret-demo.png": "19976ec73f2b36ff4986ef87714ef07534f738638fdb5cfa5a611431b17f7ace",
-    "docs/appen/min-liste-demo.png": "cfafdadbd15629fe4a99bd9418b3507418631c9fdb152ffb00c7d7e25532462c",
-    "docs/appen/oversikten-390-demo.png": "968c2ec30d874405991fae8dcc34db78c1089a6c1587ade2cb739929b1dc0799",
-    "docs/appen/boersometeret-390-demo.png": "19976ec73f2b36ff4986ef87714ef07534f738638fdb5cfa5a611431b17f7ace",
-    "docs/appen/din-egen-liste-demo.png": "cfafdadbd15629fe4a99bd9418b3507418631c9fdb152ffb00c7d7e25532462c",
-    "docs/appen/investorsiden-brfe-demo.png": "9a69dc457511b411401f80cd6e14275d955b7fdfcfe0020d760de62b4c39af59",
-    "docs/appen/investorsiden-brfe-390-demo.png": "9a69dc457511b411401f80cd6e14275d955b7fdfcfe0020d760de62b4c39af59",
-    "docs/appen/notatene-brfe-demo.png": "5d2688ef98530ad15f8ffcdc8cd014ff4baab60459709420cf2fbaf8e49c91f4",
-    "docs/appen/notatene-min-liste-demo.png": "cfafdadbd15629fe4a99bd9418b3507418631c9fdb152ffb00c7d7e25532462c",
-    "docs/appen/innstillinger-demo.png": "286e2a3ba24b294f00f28ac51116e33de74c9a12b528e2215c024e0654ad6fdf",
+    TOPPEN_AV_OVERSIKTEN: "a147cd852e0148ccbd84b842979b37a15164c1b4c7ea771c8776429797c6c7e7",
+    "docs/appen/boersometeret-demo.png": "eaaea586f1fe0e1408b0bfa98ca538c631a59fc6f998c4c12de71838a3283356",
+    "docs/appen/min-liste-demo.png": "1ad8a4f91c9974fae89086c0945be7ced1dd0c97d4cad3f2a9e7abdfe94f196b",
+    "docs/appen/oversikten-390-demo.png": "a147cd852e0148ccbd84b842979b37a15164c1b4c7ea771c8776429797c6c7e7",
+    "docs/appen/boersometeret-390-demo.png": "eaaea586f1fe0e1408b0bfa98ca538c631a59fc6f998c4c12de71838a3283356",
+    "docs/appen/din-egen-liste-demo.png": "1ad8a4f91c9974fae89086c0945be7ced1dd0c97d4cad3f2a9e7abdfe94f196b",
+    "docs/appen/investorsiden-brfe-demo.png": "eee417c19967b654d88a849c061eb3143ec801eb6d3f39209a03203e82f2abc2",
+    "docs/appen/investorsiden-brfe-390-demo.png": "eee417c19967b654d88a849c061eb3143ec801eb6d3f39209a03203e82f2abc2",
+    "docs/appen/notatene-brfe-demo.png": "749e73aa146cb814f750c97039c01312da5a09f4a03524499c9c7397eaf4e650",
+    "docs/appen/notatene-min-liste-demo.png": "1ad8a4f91c9974fae89086c0945be7ced1dd0c97d4cad3f2a9e7abdfe94f196b",
+    "docs/appen/innstillinger-demo.png": "ed3808b32059368c59d964d0d86088ea190b6b292220c3a1889745e2d95bf059",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "

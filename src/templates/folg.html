@@ -45,7 +45,7 @@
     {% if gammel %}
       <p class="bytte">Etter byttet er {{ valgt.navn }} en av de {{ egne.lista|length }}, og {{ gammel.navn }} hentes ikke lenger om kvelden. Det som alt er lagret for {{ gammel.navn }}, kursene og signalet dag for dag, blir liggende. Bytter du {{ gammel.navn }} inn igjen senere, mangler signalet for dagene den var ute.</p>
     {% else %}
-      <p class="kall">Aksjen hentes ved neste henting, tidligst i kveld etter kl. 22. Siste henting brukte {{ egne.kall.sist }} av 20 kall. Med denne bruker neste henting {{ egne.kall.med_en }}, og {{ egne.kall.igjen_med_en }} er igjen til nye forsøk.</p>
+      <p class="kall">Aksjen hentes ved neste henting, tidligst i kveld etter kl. 22. Siste henting brukte {{ egne.kall.sist }} av {{ egne.kall.kvote }} kall. Med denne bruker neste henting {{ egne.kall.med_en }}, og {{ egne.kall.igjen_med_en }} er igjen til nye forsøk.</p>
     {% endif %}
     <p>Valget lagres på denne maskinen og huskes neste gang. Fjerner du aksjen før kvelden, brukes ingen kall.</p>
     <form class="folgskjema" method="post" action="/folg">
@@ -63,7 +63,7 @@
         {% if omsetning and omsetning.utenfor and omsetning.median is not none and not gammel %}<a class="knapp" href="/folg">Velg en annen</a>{% endif %}
         <button type="submit" class="knapp hoved">{% if gammel %}Bytt inn {{ valgt.navn }}{% else %}Følg aksjen{% endif %}</button>
       </div>
-      <p class="under">Hver aksje bruker 1 kall om dagen.</p>
+      <p class="under">Hver aksje bruker {{ egne.kall.per_aksje }} kall om dagen.</p>
     </form>
   {% else %}
     <form class="sok" method="get" action="/folg">
