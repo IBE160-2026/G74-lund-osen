@@ -5,6 +5,7 @@ egen base under tmp_path (regel 22), og ingen test gjør nettkall (AD-8).
 """
 
 import json
+import re
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -246,6 +247,9 @@ class TestSidene:
         feilet hvis siden lot brukeren velge bransjen, eller et felt i
         skjemaet bestemte den."""
         bekreft = klient.get("/folg?kode=NYA").data.decode("utf-8")
+        # Story 8.27: valget av aksje i notatpanelet (<template>) er ikke
+        # skjemaet for å følge en aksje.
+        bekreft = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", bekreft, flags=re.S)
         assert "<select" not in bekreft and "Velg bransje" not in bekreft
         assert "Aksje på Oslo Børs · NYA · " in bekreft and "</svg>Kraft</p>" in bekreft
         svar = klient.post("/folg", data={"kode": "NYA", "sektor": "Helse"})

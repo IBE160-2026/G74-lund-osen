@@ -459,6 +459,9 @@ class TestSiden:
         styrke for dagen (gruppens svar 23.10 kl. 09:24, a). Ville feilet uten
         gult den dagen, eller med styrke eller mørk ramme."""
         html = _side(klient, "/boersometer?dag=2026-09-18")
+        # Story 8.27: notatene i panelet (<template>) viser styrken som i Min
+        # liste. Testen gjelder rutene og tabellen, så panelet tas ut.
+        html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
         assert "fredag 18.09" in html
         ruter = _ruter(html)
         rammer = {symbol: re.search(r"ramme-(\w+)", klasser) for klasser, symbol in ruter}
@@ -551,6 +554,11 @@ class TestSiden:
         # Story 8.25: stegene i omvisningen står som data i rammen, og steget
         # for Innstillinger heter «KI-tekst». De er ikke tekst på siden.
         html = re.sub(r'<div id="omvisning" hidden[^>]*></div>', "", html)
+        # Story 8.27 (gruppens svar 11.11 kl. 21:09-21:20): panelet har alle
+        # notatene med knappene for et tenkt kjøp og salg, som Min liste
+        # (8.21). Det står i en <template> og er ikke tekst på siden før
+        # panelet åpnes. Spørsmål 14 i spesifikasjonen.
+        html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
         tekst = re.sub(r"<[^>]+>", " ", html.split("<main", 1)[1]).lower()
         assert not re.search(r"\b(kjøp|selg|anbefal)", tekst)
         assert 'class="ki' not in html and "KI-tekst" not in html
