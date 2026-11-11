@@ -849,8 +849,10 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
 
 
 # Story 8.25 (gruppens svar 10.11 kl. 22:59): «Spill av omvisningen» går
-# gjennom sidene i denne rekkefølgen, med stegene fra rundturer().
-OMVISNINGEN_SIDER = ("oversikt", "aksje", "boersometer", "min_liste", "innstillinger")
+# gjennom sidene i denne rekkefølgen, med stegene fra rundturer(). Svaret
+# 11.11 kl. 14:33 (spørsmål 7): «Følg en aksje» etter Min liste, når del B
+# (8.22) er flettet.
+OMVISNINGEN_SIDER = ("oversikt", "aksje", "boersometer", "min_liste", "folg", "innstillinger")
 
 
 def omvisningen(p: Parametre = STANDARD) -> list[dict[str, str]]:

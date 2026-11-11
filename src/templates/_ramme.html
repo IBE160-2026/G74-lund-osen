@@ -76,8 +76,10 @@
         steg, øverst, så den ikke står inne i innholdet. #}
     {% block rundtur %}{% endblock %}
     {#- Story 8.25: stegene i «Spill av omvisningen», som skriptet leser. Ikke
-        synlig; uten skriptet skjer ingenting. #}
-    {% if omvisning %}<div id="omvisning" hidden data-side="{{ aktiv|default('') }}" data-steg="{{ omvisning|tojson|forceescape }}"></div>{% endif %}
+        synlig; uten skriptet skjer ingenting. Siden er aktiv, eller
+        omvisning_side der siden har et annet merke i stripa enn sitt eget,
+        som «Følg en aksje», som merker oversikten eller Min liste. #}
+    {% if omvisning %}<div id="omvisning" hidden data-side="{{ omvisning_side|default(aktiv|default('')) }}" data-steg="{{ omvisning|tojson|forceescape }}"></div>{% endif %}
   </header>
 
   <main>

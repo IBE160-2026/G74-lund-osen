@@ -2392,6 +2392,9 @@ def folg_side():
     return render_template(
         "folg.html",
         aktiv="min_liste" if gammel else "oversikt",
+        # Story 8.25 (spørsmål 7): siden i omvisningen er «Følg en aksje», ikke
+        # oversikten, så omvisningen ikke tilbys her og stegene finner siden.
+        omvisning_side="folg",
         sidesti="/folg",
         sok=sok,
         alle=alle,

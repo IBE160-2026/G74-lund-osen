@@ -121,6 +121,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Egne notater på aksjesiden, med tenkte kjøp og salg
 - Ikonet i fanen og snarveien på skrivebordet i Windows, også for demoen
 - Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+- «Spill av omvisningen» ved «Vis meg rundt»: seks av sidene, ett steg om gangen, og tilbudet første gang
 
 **Neste i v1**
 

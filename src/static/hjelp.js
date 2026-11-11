@@ -203,12 +203,14 @@
 // migrasjon. Uten skriptet står lista fra 8.9 som før.
 const OMVISNING = {
   // Sidene i fast rekkefølge, og adressen til hver. Aksjesiden er den første
-  // aksjen i tabellen på oversikten, som omvisningen leser der.
-  SIDENE: ["oversikt", "aksje", "boersometer", "min_liste", "innstillinger"],
+  // aksjen i tabellen på oversikten, som omvisningen leser der. «Følg en
+  // aksje» etter Min liste (svaret 11.11 kl. 14:33, spørsmål 7).
+  SIDENE: ["oversikt", "aksje", "boersometer", "min_liste", "folg", "innstillinger"],
   ADRESSE: {
     oversikt: "/",
     boersometer: "/boersometer",
     min_liste: "/min-liste?vis=alle",
+    folg: "/folg",
     innstillinger: "/innstillinger",
   },
   STEGET: "ose-omvisning", // sessionStorage: indeksen til steget
@@ -526,6 +528,8 @@ if (typeof module === "object" && module.exports) {
 // ett skript (8.0f), og gjelder bare siden med lista. Tillegg 3: radene er
 // rader i en tabell, som på oversikten.
 (function () {
+  // Flettingen av 8.22 inn i 8.25: testene laster skriptet i Node, uten side.
+  if (typeof document === "undefined") return;
   const felt = document.querySelector("input[data-folgsok]");
   const lista = document.getElementById("foelgbare");
   if (!felt || !lista) return;

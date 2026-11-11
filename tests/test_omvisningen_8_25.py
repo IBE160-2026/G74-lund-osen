@@ -31,6 +31,7 @@ SIDENE = {
     "aksje": "/aksje/BRFE",
     "boersometer": "/boersometer",
     "min_liste": "/min-liste?vis=alle",
+    "folg": "/folg",
     "innstillinger": "/innstillinger",
 }
 
@@ -76,14 +77,14 @@ class TestKnappenOgRekkefoelgen:
 
     def test_sidene_i_fast_rekkefoelge(self, klient):
         """Del A: ville feilet hvis omvisningen gikk gjennom sidene i en annen
-        rekkefølge enn oversikten, en aksjeside, børsometeret, Min liste og
-        Innstillinger."""
-        assert OMVISNINGEN_SIDER == ("oversikt", "aksje", "boersometer", "min_liste", "innstillinger")
+        rekkefølge enn oversikten, en aksjeside, børsometeret, Min liste, «Følg
+        en aksje» og Innstillinger (svaret 11.11 kl. 14:33, spørsmål 7)."""
+        assert OMVISNINGEN_SIDER == ("oversikt", "aksje", "boersometer", "min_liste", "folg", "innstillinger")
         _, steg = _dataene(klient.get("/").data.decode("utf-8"))
         rekkefoelgen = list(dict.fromkeys(s["side"] for s in steg))
         assert rekkefoelgen == list(OMVISNINGEN_SIDER)
         skriptet = SKRIPTET.read_text(encoding="utf-8")
-        assert 'SIDENE: ["oversikt", "aksje", "boersometer", "min_liste", "innstillinger"]' in skriptet
+        assert 'SIDENE: ["oversikt", "aksje", "boersometer", "min_liste", "folg", "innstillinger"]' in skriptet
 
     def test_hver_side_vet_hvilken_side_den_er(self, klient):
         """Del A: ville feilet hvis en side ga skriptet feil navn, så steget
@@ -178,6 +179,7 @@ class TestLogikkenMedNode:
         ble gjettet når den ikke er kjent."""
         assert self._kjoer("o.adresse('oversikt', null)") == "/"
         assert self._kjoer("o.adresse('min_liste', null)") == "/min-liste?vis=alle"
+        assert self._kjoer("o.adresse('folg', null)") == "/folg"
         assert self._kjoer("o.adresse('aksje', null)") is None
         assert self._kjoer("o.adresse('aksje', '/aksje/BRFE')") == "/aksje/BRFE"
         assert self._kjoer("o.teller(2, 21)") == "Steg 3 av 21"
@@ -242,8 +244,10 @@ class TestEtterBygget:
 
     def test_readme_og_hjelpen_nevner_omvisningen(self):
         """Regel 19: ville feilet hvis README-en eller hjelpen ikke nevnte
-        omvisningen."""
-        assert "en omvisning gjennom fem av sidene" in (ROT / "README.md").read_text(encoding="utf-8")
+        omvisningen. Svaret 11.11 kl. 13:49: under «Ekstra, ferdig»."""
+        readme = (ROT / "README.md").read_text(encoding="utf-8")
+        ekstra = readme[readme.index("**Ekstra, ferdig**") : readme.index("**Neste i v1**")]
+        assert "«Spill av omvisningen»" in ekstra
         hjelpen = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "«Spill av omvisningen»" in hjelpen and "«Nei takk»" in hjelpen
 
@@ -299,6 +303,7 @@ class TestOppfoerselenMedNode(TestLogikkenMedNode):
         assert self._kjoer("o.skalTilby('oversikt', 'nei')") is False
         assert self._kjoer("o.skalTilby('oversikt', 'ja')") is False
         assert self._kjoer("o.skalTilby('min_liste', null)") is False
+        assert self._kjoer("o.skalTilby('folg', null)") is False
 
     def test_skriptet_bruker_funksjonene(self):
         """Ville feilet hvis siden ikke brukte funksjonene testene kjører."""
@@ -341,6 +346,35 @@ class TestEtterFlettingenAv823:
         side = klient.get("/?vis=min").data.decode("utf-8")
         assert '<p class="tom-min-liste" id="aksjene">' in side
         assert _dataene(side)[0] == "oversikt"
+
+
+class TestFoelgEnAksje:
+    """Svaret 11.11 kl. 14:33 (spørsmål 7): stegene fra «Vis meg rundt» på
+    «Følg en aksje» etter Min liste, når del B (8.22) er flettet."""
+
+    def test_stegene_fra_foelg_en_aksje_etter_min_liste(self, klient):
+        """Ville feilet hvis stegene fra «Følg en aksje» manglet, sto et annet
+        sted enn rett etter Min liste, eller hadde andre tekster enn «Vis meg
+        rundt» på siden."""
+        _, steg = _dataene(klient.get("/").data.decode("utf-8"))
+        sidene = [s["side"] for s in steg]
+        foerste = sidene.index("folg")
+        assert sidene[foerste - 1] == "min_liste"
+        assert sidene[foerste + len(rundturer()["folg"])] == "innstillinger"
+        assert [(s["anker"], s["tittel"]) for s in steg if s["side"] == "folg"] == [
+            (s.anker, s.tittel) for s in rundturer()["folg"]
+        ]
+
+    def test_foelg_en_aksje_er_folg_i_omvisningen(self, klient):
+        """Ville feilet hvis «Følg en aksje» ga skriptet navnet fra stripa
+        («oversikt» eller «min_liste»): da tilbys omvisningen der, og et steg
+        på siden sender brukeren til den samme siden igjen og igjen."""
+        assert _dataene(klient.get("/folg").data.decode("utf-8"))[0] == "folg"
+        assert _dataene(klient.get("/folg?bytt=BRFE").data.decode("utf-8"))[0] == "folg"
+        assert _dataene(klient.get("/folg?kode=BRFE").data.decode("utf-8"))[0] == "folg"
+        # Stripa merker fortsatt oversikten, som før.
+        side = klient.get("/folg").data.decode("utf-8")
+        assert re.search(r'<a class="sideknapp" href="/" aria-current="page">', side)
 
 
 @pytest.mark.skipif(NODE is None, reason="Node finnes ikke på maskinen")
