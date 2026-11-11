@@ -290,7 +290,7 @@ class TestBoersometeret:
 
     def test_knappen_ser_ut_som_en_knapp(self):
         """Ville feilet hvis «Se tallene som tabell» sto som vanlig tekst."""
-        regler = STIL.split("details.tallene > summary {")[2].split("}", 1)[0]
+        regler = STIL.split("details.tallene > summary {")[1].split("}", 1)[0]
         assert "border-radius: 999px" in regler and "min-height: 44px" in regler
 
 

@@ -645,7 +645,8 @@ class TestGjennomgangen:
         smal skjerm (390 px, målt i spesifikasjonen)."""
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
         fylt = re.search(r'header\.stripe a\.sideknapp\[aria-current="page"\] \{([^}]*)\}', stil).group(1)
-        assert "background: var(--hvit)" in fylt and "color: var(--blekk)" in fylt
+        # Story 8.23 (A6, brukertesten 10.11): fylt med oransje, ikke hvitt.
+        assert "background: var(--oransje)" in fylt and "color: var(--blekk)" in fylt
         assert "flex-wrap: wrap" in re.search(r"header\.stripe \.sider \{([^}]*)\}", stil).group(1)
         valgt = re.search(r'a\.visknapp\[aria-current="true"\] \{([^}]*)\}', stil).group(1)
         assert "background: var(--fyll)" in valgt

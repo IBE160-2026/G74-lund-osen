@@ -1098,15 +1098,17 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
 /* Gruppens svar 26.10 kl. 15:21 (f): tabellen bak «Se tallene som tabell»,
    lukket som standard. summary er en knapp skjermleseren og Tab finner. */
 :where(.side-oversikt) details.tallene { margin-top: 28px; }
-:where(.side-oversikt) details.tallene > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--blekk); }
 /* Story 8.23 (tillegg 3): tabellen står åpen fra start, og knappen ser ut som
    de andre knappene, med kant, og lukker den. */
-:where(.side-oversikt) details.tallene > summary { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
+:where(.side-oversikt) details.tallene > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--blekk);
+                                                  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
                                                   box-sizing: border-box; border: 1px solid var(--strek-2); border-radius: 999px;
                                                   background: var(--kort); margin-bottom: 12px; }
 /* Gjennomgangen av 8.23 (BH8): pila viser om tabellen og «Mer om grafen» er åpne. */
-:where(.side-oversikt) details.tallene > summary::after, :where(.side-aksje) figcaption .mer-om-grafen > summary::after { content: "▾"; margin-left: 8px; }
-:where(.side-oversikt) details.tallene[open] > summary::after, :where(.side-aksje) figcaption .mer-om-grafen[open] > summary::after { content: "▴"; }
+:where(.side-oversikt) details.tallene > summary::after { content: "▾"; margin-left: 8px; }
+:where(.side-oversikt) details.tallene[open] > summary::after { content: "▴"; }
+:where(.side-aksje) figcaption .mer-om-grafen > summary::after { content: "▾"; margin-left: 8px; }
+:where(.side-aksje) figcaption .mer-om-grafen[open] > summary::after { content: "▴"; }
 :where(.side-oversikt) details.tallene > summary:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-oversikt) table.boersometertabell { font-variant-numeric: tabular-nums; }
 :where(.side-oversikt) table.boersometertabell caption { text-align: left; font-weight: 600; padding: 12px 8px 8px; }
