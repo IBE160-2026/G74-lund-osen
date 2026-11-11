@@ -51,6 +51,14 @@ siste demodag:
 
 Da lages bare teksten om dagen, og tekstene for aksjene staar. ki_dagen
 importeres bare inne i lag_dagsteksten og dagens_promptavtrykk.
+
+Story 10.10 (spoersmaal 6 i spec-10-10-rikere-ki-tekster.md): med
+--eksempel lages tekstene av eksempelskriveren i ki_eksempel.py, i formene
+fra reglene, uten modell og uten Ollama. Radene har modellnavnet
+«eksempeltekst», saa merket paa siden ikke sier Gemma:
+
+    uv run python src/demo_ki.py --eksempel
+    uv run python src/demo_ki.py --eksempel --dagen
 """
 
 import hashlib
@@ -376,11 +384,22 @@ def main(argv: list[str] | None = None) -> None:
         description="Lager KI-tekstene i demoen med Gemma i Ollama, én gang, i src/demo_ki_tekster.json."
     )
     tolker.add_argument("--dagen", action="store_true", help="bare teksten om dagen, i src/demo_ki_dagen.json")
+    tolker.add_argument(
+        "--eksempel",
+        action="store_true",
+        help="eksempeltekster i formene fra reglene, uten modell og uten Ollama (ki_eksempel.py)",
+    )
     valg = tolker.parse_args(argv)
-    modell = OllamaModell()
-    if grunn := modell.sjekk():
-        print(f"Ingen KI-tekster: {grunn}. Fila er ikke endret.")
-        sys.exit(1)
+    if valg.eksempel:
+        # Story 10.10, spoersmaal 6: uten Ollama, merket «eksempeltekst».
+        from ki_eksempel import EksempelModell
+
+        modell = EksempelModell()
+    else:
+        modell = OllamaModell()
+        if grunn := modell.sjekk():
+            print(f"Ingen KI-tekster: {grunn}. Fila er ikke endret.")
+            sys.exit(1)
     try:
         if valg.dagen:
             lag_dagsteksten(modell)
