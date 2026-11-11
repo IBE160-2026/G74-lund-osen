@@ -105,3 +105,22 @@ Windows Update startet maskinen på nytt kl. 04:29, og vinduet ble tatt opp igje
   - instruksjonen kl. 16:26, tilleggene og fortsettelsen kl. 20:43 i dagsfila 10.11;
   - instruksjonen 11.11 kl. 11:56 i dagsfila 11.11.
 - Svarene kl. 22:44, 22:50 og 22:55 føres i `epics.md` når del B flettes.
+
+## 2026-11-11 kl. 14:18 — Marian Osen
+
+### Oppgave
+Tillegget om ventingen i dag kl. 14:18, likt for vindu 1, 3 og 4. Tillegget har tre regler, og det står ordrett i scratchpad-mappa til økta:
+- En ventekommando i bakgrunnen som stoppes fordi maskinen har lite minne, startes igjen uten å spørre.
+- En pytest som stoppes av samme grunn, kjøres på nytt når ingen annen pytest kjører.
+- Main som endrer seg etter at PR-en er pushet, flettes inn ved flettingen, ikke før.
+
+### Plan
+- Lagre tillegget og føre det her.
+- Ikke flette inn main nå, fordi PR #138 alt er pushet.
+
+### Resultat
+- Tillegget gjelder fra nå for ventingen i dette vinduet.
+- PR #138 står som før på `2c1d3139`, med grønn CI. Main er ikke flettet inn etter pushen.
+
+### Åpne punkter
+- Tillegget føres i dagsfila 11.11 med neste fletting fra vinduet. Det står i punktet om dagsfila i `issues.md`.
