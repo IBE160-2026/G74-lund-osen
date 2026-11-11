@@ -4680,6 +4680,30 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 *Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43054754599), og hele settet lokalt før flettingen: 5252 bestått og 37 hoppet over.
 
+### Story 8.27: «Mine notater» i et panel fra en knapp øverst
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 21:25 og tillegg 1 kl. 21:40, som lagres i `docs/ai-prompts/2026-11-11.md` med flettingen.* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt. 8.26 er tatt av et annet vindu, så dette er 8.27. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-27-mine-notater-i-panel.md`.
+
+Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel ved siden av det jeg ser på, så jeg kan skrive og lese notater uten å gå fra siden.
+
+**Oppfyller:** svarene 11.11 kl. 21:09–21:20 og 21:36 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`
+
+**Kontroll — hva testen ser etter:**
+- Knappen «Mine notater» står øverst etter «Min liste», med eget ikon, og er borte når bryteren «Notater» er av
+- Fra 1056 px åpner knappen et panel fast i kanten, som siden gir plass til, og som kan flyttes til venstre eller høyre; om det er åpent, og hvilken side det står på, huskes i nettleseren
+- Panelet har alle notatene, de nyeste først, som i Min liste, og et skjema for et nytt notat: på aksjesiden for aksjen og dagen siden viser, ellers med et valg blant aksjene i lista; etter lagring kommer siden tilbake med panelet åpent
+- Smalere enn 1056 px går knappen til notatene i Min liste, og i demoen sier panelet at notatene står til demoen startes på nytt
+- På aksjesiden står «Mine notater» nederst, med skjemaet, de to nyeste notatene og «Vis alle (N)»
+- **Ville feilet hvis:** knappen sto med bryteren av, panelet manglet et notat, et notat fra panelet fikk en annen aksje eller dag, svaret gikk til en annen side, eller nettsiden skrev noe annet enn notatene
+
+**Avhenger av:** 8.0f, 8.21, 8.24. **Én økt:** ja.
+
+*Avgjort 2026-11-11 kl. 21:09–21:20 (gruppens svar):* «Mine notater» får en knapp øverst etter «Min liste», som fra 1056 px åpner et panel fast i kanten som hjelpen, og som kan flyttes til venstre eller høyre. Panelet har alle notatene og et skjema for et nytt notat. Smalere går knappen til notatene i Min liste. Rådet foreslo to snarveier først, og gruppen valgte panelet nå, uten mobil. Rådet anbefalte å starte i kveld.
+
+*Avgjort 2026-11-11 kl. 21:36 (gruppens svar):* på aksjesiden flyttes «Mine notater» nederst, etter «Signalet dag for dag» og knappen til investorsiden, med skjemaet, de to nyeste notatene og «Vis alle (N)». Rådet anbefalte det (Rettet-linje under 8.21).
+
+*Avgjort 2026-11-11 mellom kl. 21:41 og 21:43 (gruppens svar i økta):* storyen står under «Ekstra, hvis tiden rekker» bare her, ikke i README-en, etter svaret kl. 16:26, og føres under «Ekstra, ferdig» der når den er flettet. Rådet anbefalte det.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
