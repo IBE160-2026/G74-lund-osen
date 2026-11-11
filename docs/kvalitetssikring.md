@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-11T16:10
+updated: 2026-11-11T17:25
 ---
 
 # Kvalitetssikring
@@ -422,6 +422,7 @@ sist i dokumentet.
 | 8.24 Notatene, to ting etter flettingen: svaret 10.11 kl. 22:59 | `38a0a0e` (#141) | 1 (2: A og B på `efb3f25`, og på nytt på `ae9e395`) | ingen overlevde | `S/spec-8-24-notatene-to-ting.md` |
 | 8.23 Funnene fra brukertesten 10.11 (del A): svarene 10.11 kl. 13:54, 14:15, 14:53, 14:59, 15:54 og 15:57 | `7fb9b1f` (#142) | 1 (17: én per del, på arbeidskopien 10.11 kl. 23:51–23:52) | – | `S/spec-8-23-funnene-fra-brukertesten.md` |
 | 8.22 Faste bransjer, «Følg en aksje» og «Din egen liste» (del B): svarene 10.11 kl. 13:38, 13:54, 14:43, 14:53, 14:59, 15:22, 15:57, 22:44, 22:50 og 22:55 og 11.11 kl. 14:29 | `dcb0bc6` (#138) | 1 (A–D og demoen før gjennomgangen, og 18 etter: 4 for rettingene, 2 for tillegg 4, 9 for tillegg 3 og 3 for svarene kl. 14:29) | ingen overlevde | `S/spec-8-22-foelg-en-aksje-og-min-liste.md` |
+| 8.25 «Spill av omvisningen» ved «Vis meg rundt»: svarene 10.11 kl. 22:59 og 11.11 kl. 13:49, 14:33 og 16:26 | `c53df5b` (#143) | 1 (5: A–D på `de66640` og på nytt på `d25271a`, og én for «Følg en aksje» på `5862d1f`) | ingen overlevde | `S/spec-8-25-spill-av-omvisningen.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -704,6 +705,7 @@ funn. Antall rader i loggen:
 | 8.24, gjennomgangen 11.11 (22 funn, telt per funn; BH1, BH3 og BH9 ikke reelle, talt som avvist; ECH2, BH6, ECH6, VG4, VG6, BH8 og BH10 ført, talt som utsatt) | 22 | 12 | 3 | 7 |
 | 8.23, gjennomgangen 10.11 (40 funn, telt per funn; VG1 høy og rettet; BH4 og BH5 ikke reelle, talt som avvist; BH6 og ECH10 talt som rettet) | 40 | 26 | 2 | 12 |
 | 8.22, gjennomgangene 10.11 og 11.11 (36, 11, 38 og 25 funn, slått sammen til 69 rader i triagen; ECH5 lukket med gruppens svar 11.11 kl. 14:29 etter målingen, talt som utsatt; VG2 i tillegg 4 rettet etter svaret) | 69 | 49 | 6 | 14 |
+| 8.25, gjennomgangene 11.11 (31, 8 og 21 funn, telt per funn; VG6, BH13 og BH1, BH2, BH6, BH8 og BH9 i tredje runde ikke reelle, talt som avvist; de førte talt som utsatt, ECH4 i tredje runde også) | 60 | 37 | 7 | 16 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1556,6 +1558,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 8.24, svaret 10.11 kl. 22:59 | 2 på `efb3f25` (A og B) og på nytt på `ae9e395` | A («?» satt tilbake ved Notater) `test_bryteren_staar_i_innstillinger_med_hjelpen`, B (Min liste uten knappene) `TestKnappeneIMinListe` og `TestMinListeEtterGjennomgangen`. Hver fil var lik HEAD etterpå | `S/spec-8-24-notatene-to-ting.md` |
 | 8.23, svarene 10.11 kl. 13:54, 14:15, 14:53, 14:59, 15:54 og 15:57 | 17, én per del | alle fanget: A1 `test_radene_er_en_tabell_som_tabellen_over`, A2 `test_lenkene_i_kolonneraden_gaar_til_tabellen`, A3 `test_et_nytt_trykk_paa_samme_knapp_lukker`, A4 `test_alle_rutene_har_symbolet_endringen_og_styrken_i_lappen` og `test_volum_mot_vanlig_med_to_desimaler`, A5 `test_tabellen_er_aapen_og_har_hjelp_ved_kolonnene`, A6 `test_bryterne`, A7 `test_tallene_foelger_konstantene`, A8 `test_ved_0_staar_2_av_3_med_lenke`, tillegg 1 `test_med_alle_staar_begge_tallene`, B1 `test_tre_brikker`, B2 `test_kort_og_resten_bak_mer_om_grafen`, B3 `test_paa_aksjesiden`, B4 `test_med_en_endring_som_venter`, B5 `test_regnet_av_radene_som_er_lagret`, B6 `test_kortene_har_klassen_og_kanten`, B7 `test_bare_de_merkede_paa_oversikten`. Hver fil var lik før og etter | `S/spec-8-23-funnene-fra-brukertesten.md` |
 | 8.22, svarene 10.11 kl. 13:38–22:55 og 11.11 kl. 14:29 | A–D og demoen før gjennomgangen; 4 for rettingene, 2 for tillegg 4, 9 for tillegg 3 og 3 for svarene kl. 14:29 | alle fanget. Etter gjennomgangen: forslagene skjules av søket, ønsker for MULTI og SCOIN tas i bruk, `bransjen` slipper dem gjennom, bekreftelsen sier «Oslo Børs» i demoen; steg 2 teller alle dagene og leser nøkkelen; tillegg 3 og svarene kl. 14:29 med testene navngitt i spesifikasjonen | `S/spec-8-22-foelg-en-aksje-og-min-liste.md` |
+| 8.25, svarene 10.11 kl. 22:59 og 11.11 kl. 14:33 | 4 på `de66640` (A–D) og på nytt på `d25271a`; 1 på `5862d1f` (`omvisning_side=None` i `folg_side`) | alle fanget av `tests/test_omvisningen_8_25.py`: A (børsometeret før aksjesiden), B (et steg uten delen hoppes ikke over), C (et nei huskes ikke), D (omvisningen bare i demoen), og «Følg en aksje» `test_hver_side_vet_hvilken_side_den_er` og `test_foelg_en_aksje_er_folg_i_omvisningen`. Hver fil var lik HEAD etterpå | `S/spec-8-25-spill-av-omvisningen.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |

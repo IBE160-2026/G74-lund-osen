@@ -548,6 +548,9 @@ class TestSiden:
         # Story 8.6b, a: forklaringen sier at bildet ikke er et råd, med
         # «kjøpe eller selge». Den setningen tas ut, og resten prøves.
         html = html.replace(FORKLARINGEN, "")
+        # Story 8.25: stegene i omvisningen står som data i rammen, og steget
+        # for Innstillinger heter «KI-tekst». De er ikke tekst på siden.
+        html = re.sub(r'<div id="omvisning" hidden[^>]*></div>', "", html)
         tekst = re.sub(r"<[^>]+>", " ", html.split("<main", 1)[1]).lower()
         assert not re.search(r"\b(kjøp|selg|anbefal)", tekst)
         assert 'class="ki' not in html and "KI-tekst" not in html

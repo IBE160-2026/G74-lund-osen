@@ -1333,7 +1333,14 @@ HOEYDE_PAA_BILDET = 1864
 # Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_BILDET = "3d47a15f932f5795ac153a995d407141c89f9e5dc3babe178624b9f8edee5f95"
+# Story 8.25: «Spill av omvisningen» ved «Vis meg rundt» (hjelp.js, _rundtur.html, _ramme.html og
+# stil.css). Avtrykkene er regnet ut paa nytt, og bildene med knappen er tatt paa nytt, med samme hoeyder.
+# Flettingen av main (8.23) inn i 8.25: avtrykkene er regnet ut paa nytt, og bildene med knappen er tatt paa nytt
+# med hoeydene fra 8.23. Etter startAdresse i hjelp.js (gjennomgangen) ble bildene like byte for byte.
+# Flettingen av main (8.22, del B, og 3.6, del C) inn i 8.25 11.11: avtrykkene er regnet ut paa nytt,
+# og bildene med knappen er tatt paa nytt.
+# Gjennomgangen av «Følg en aksje» i 8.25: _ramme.html. Bildene er byte for byte de samme.
+AVTRYKK_BAK_BILDET = "ef2a1fb8702f3e956f956c1479484d770d2f9b5cfd458ca0389feb6528539e90"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1784,7 +1791,8 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "f7c310da8fdad69034903b188553090c90e744179887645931475eb45e0a8671"
+# Story 8.25 og flettingen av main (8.22 og 3.6) inn i 8.25: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "24b44d33bad5c9e43f1abf04dc21d10a4e83a4f46fb69f3fc0b601d7a3e75f47"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2005,21 +2013,23 @@ DE_NYE_BILDENE = {
 # Flettingen av main (3.6 og 8.22) inn i 10.10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa
 # nytt og er byte for byte de samme. notatene-brfe-390-demo.png er som paa main (8.22), fordi den klippes
 # ut med en fremgangsmaate dette vinduet ikke har.
+# Flettingen av main (8.25) inn i 10.10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt med
+# tilbudet om omvisningen besvart, som i 8.25. Aksjesiden og oversikten ved 390 px (4810 px) har Gemma-teksten.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "bb21e988d7396dbbc25aa7d2ad2b579b53552584fcb3993771233c1f4b9bff60",
-    TOPPEN_AV_OVERSIKTEN: "3d47a15f932f5795ac153a995d407141c89f9e5dc3babe178624b9f8edee5f95",
-    "docs/appen/boersometeret-demo.png": "b8a1ffdf95f10d06810e933da5816594ee9d321ecec53d3f34d29cbc56a858d3",
-    "docs/appen/min-liste-demo.png": "05b461ec6e115fcc9a3c236e98a58e6633133831f09756b57eb77b2e0f3ba0a7",
-    "docs/appen/oversikten-390-demo.png": "3d47a15f932f5795ac153a995d407141c89f9e5dc3babe178624b9f8edee5f95",
-    "docs/appen/boersometeret-390-demo.png": "b8a1ffdf95f10d06810e933da5816594ee9d321ecec53d3f34d29cbc56a858d3",
-    "docs/appen/din-egen-liste-demo.png": "05b461ec6e115fcc9a3c236e98a58e6633133831f09756b57eb77b2e0f3ba0a7",
-    "docs/appen/investorsiden-brfe-demo.png": "1db2067643edee425ad52121086fb92525232a6c4d5f3cb0fe742f4c9d061a56",
-    "docs/appen/investorsiden-brfe-390-demo.png": "1db2067643edee425ad52121086fb92525232a6c4d5f3cb0fe742f4c9d061a56",
-    "docs/appen/folg-en-aksje-390-demo.png": "bb21e988d7396dbbc25aa7d2ad2b579b53552584fcb3993771233c1f4b9bff60",
-    "docs/appen/notatene-brfe-390-demo.png": "f7c310da8fdad69034903b188553090c90e744179887645931475eb45e0a8671",
-    "docs/appen/notatene-brfe-demo.png": "f7c310da8fdad69034903b188553090c90e744179887645931475eb45e0a8671",
-    "docs/appen/notatene-min-liste-demo.png": "05b461ec6e115fcc9a3c236e98a58e6633133831f09756b57eb77b2e0f3ba0a7",
-    "docs/appen/innstillinger-demo.png": "e32648da58f7f328cef417cc738d0dafb79d40bc9c65e1864038d4920317a519",
+    "docs/appen/folg-en-aksje-demo.png": "312a9ced6b1f48b5f722a2c55afb4aad0aacd451d275aef94de3ec14b924b563",
+    TOPPEN_AV_OVERSIKTEN: "ef2a1fb8702f3e956f956c1479484d770d2f9b5cfd458ca0389feb6528539e90",
+    "docs/appen/boersometeret-demo.png": "926c29a336fc6518baeffb53d787857135fbacada56890baae5c57a4ed04b20e",
+    "docs/appen/min-liste-demo.png": "b9ed99e6ffe2f7884463171a8e24a9ab11853b668f9d6f15cceb7f2b228c5e22",
+    "docs/appen/oversikten-390-demo.png": "ef2a1fb8702f3e956f956c1479484d770d2f9b5cfd458ca0389feb6528539e90",
+    "docs/appen/boersometeret-390-demo.png": "926c29a336fc6518baeffb53d787857135fbacada56890baae5c57a4ed04b20e",
+    "docs/appen/din-egen-liste-demo.png": "b9ed99e6ffe2f7884463171a8e24a9ab11853b668f9d6f15cceb7f2b228c5e22",
+    "docs/appen/investorsiden-brfe-demo.png": "0c4a3f573717363a36f289bb8d6939bd688c1b86a143cc4f898e146fe056bec8",
+    "docs/appen/investorsiden-brfe-390-demo.png": "0c4a3f573717363a36f289bb8d6939bd688c1b86a143cc4f898e146fe056bec8",
+    "docs/appen/folg-en-aksje-390-demo.png": "312a9ced6b1f48b5f722a2c55afb4aad0aacd451d275aef94de3ec14b924b563",
+    "docs/appen/notatene-brfe-390-demo.png": "24b44d33bad5c9e43f1abf04dc21d10a4e83a4f46fb69f3fc0b601d7a3e75f47",
+    "docs/appen/notatene-brfe-demo.png": "24b44d33bad5c9e43f1abf04dc21d10a4e83a4f46fb69f3fc0b601d7a3e75f47",
+    "docs/appen/notatene-min-liste-demo.png": "b9ed99e6ffe2f7884463171a8e24a9ab11853b668f9d6f15cceb7f2b228c5e22",
+    "docs/appen/innstillinger-demo.png": "c423cd43645d7c9e84d97aa3043b73d9c6aa0428e57a93fe723394acfb346031",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2496,8 +2506,11 @@ def _detaljer(tekst: str) -> dict[str, str]:
 # «Prioritering» i epics.md), rett under listene i «Status».
 # Story 3.6 (gjennomgangen, ECH5 og BH7): med lista «Ekstra, ferdig» sier
 # setningen hvilken «Ekstra» den gjelder. Var «under «Ekstra»,».
+# Story 8.25 (gruppens svar 11.11 kl. 16:26): lista «Ekstra, hvis tiden
+# rekker» står borte, så setningen sier «Ekstra» igjen, som før 3.6. Ville
+# feilet hvis setningen fortsatt viste til en liste som ikke står.
 REGELEN_FOR_EKSTRA = (
-    "Det som står under «Ekstra, hvis tiden rekker», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
+    "Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
     "før README-prøven, senest én uke før innleveringen."
 )
 
@@ -3849,6 +3862,8 @@ EKSTRA_FERDIG = (
     ("ikonet", "snarveien"),
     # Story 8.22 (svaret 11.11 kl. 13:49): del B er flettet.
     ("faste bransjer", "«følg en aksje»"),
+    # Story 8.25 (svaret 11.11 kl. 13:49): omvisningen er flettet.
+    ("«spill av omvisningen»", "«vis meg rundt»"),
 )
 
 
