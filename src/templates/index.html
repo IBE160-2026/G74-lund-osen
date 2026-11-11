@@ -140,7 +140,7 @@
       alt er siden (BH10). #}
   {#- Story 8.2a, b (U23): en aksje uten kurser har en rad i tabellen. #}
   {#- Story 8.11 (gjennomgangen, ECH2, ECH3): lista før filteret. #}
-  {% set vist_tabell = rader and (foer_filter or ingen_skilte_seg_ut) %}
+  {% set vist_tabell = rader and (har_rader or ingen_skilte_seg_ut) %}
   {% if aktiv == "min_liste" %}
     {#- Story 8.2b, d (U69): tittelen sier hvor mange i lista som skilte seg ut
         siste børsdag, med markeringen fra oversikten (designregler §4), når
@@ -271,18 +271,8 @@
     </div>
 
   {% endif %}
-  {#- Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
-      lista som vises. #}
-  {% if rader %}
-    <nav class="signalfilter" aria-label="Filter på signalet">
-      {% for tekst, adresse, er_aktiv in filterlenker %}<a class="visknapp" href="{{ adresse }}"{% if er_aktiv %} aria-current="true"{% endif %}>{{ tekst }}</a>{% endfor %}
-    </nav>
-    {#- Gjennomgangen (BH4, BH11): forbeholdet står også før et klikk. #}
-    {#- Story 8.23 (A8): ved 0 står hvor mange som fikk 2 av 3 i samme
-        retning, med en lenke som viser dem. #}
-    {% if signalfilter %}{% set retning, styrke = filter_retning_og_styrke %}{% endif %}
-    <p class="filtertekst">{% if signalfilter %}Bare aksjene som fikk {{ styrke }} av {{ antall_sjekker }} med retning {{ retning }}.{% if filter_tomt %} Ingen av aksjene her fikk det.{% endif %}{% if nest_beste %} {% if nest_beste[0] %}{{ nest_beste[0] }} fikk {{ antall_sjekker - 1 }} av {{ antall_sjekker }} {{ retning }}: <a href="{{ nest_beste[1] }}">se {{ "den" if nest_beste[0] == 1 else "dem" }}</a>.{% else %}Ingen fikk {{ antall_sjekker - 1 }} av {{ antall_sjekker }} {{ retning }} heller.{% endif %}{% endif %} {% endif %}Filteret viser hva sjekkene ga, og er ikke et råd om å kjøpe eller selge.</p>
-  {% endif %}
+  {#- Story 8.26 (ønsket 11.11 kl. 17:48): filteret på signalet fra 8.11 og
+      8.23 er tatt bort. At signalstyrken ikke er et råd, står i innledningen. #}
   {#- Gjennomgangen av 8.23 (ECH2, VG4): «Min liste» på oversikten uten merkede
       aksjer sier det, med ankeret stjernen og lenkene sender til. #}
   {% if bare_min and not vist_tabell %}

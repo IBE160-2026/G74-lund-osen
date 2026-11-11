@@ -2996,7 +2996,9 @@ class TestReadmeForNybegynnere:
         # etter merket, i samme avsnitt.
         assert re.findall(r'<p class="eksempeltall">(.+?)</p>', ramme) == [
             "Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se "
-            '<a href="{{ ekte_versjonen_url }}">Den ekte versjonen</a>.'
+            # Story 8.26: i en ny fane.
+            '<a href="{{ ekte_versjonen_url }}" target="_blank" rel="noreferrer">Den ekte versjonen'
+            '<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>.'
         ]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")

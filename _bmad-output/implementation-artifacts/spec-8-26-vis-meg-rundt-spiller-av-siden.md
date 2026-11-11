@@ -67,3 +67,10 @@ Hver del har tester med «Ville feilet hvis» i `tests/test_vis_meg_rundt_8_26.p
 - **Bryterne ved KI-teksten** er oransje med blekk-knott, som i Innstillinger, og «Laget av KI» står grått som før. Det endrer spørsmål 5 i 8.2b og testen fra 8.23 (`test_bryteren_ved_ki_teksten_er_oransje`).
 
 **Ville feilet hvis:** et hjelpevindu manglet linja om lukkingen, brikkene sto utenfor ruta, «?» ved Hovedindeksen ikke sa hvilken indeks det er, «Dine egne aksjer» hadde bransjekolonnen eller en stor knapp, beskjeden om full liste var rød, eller en KI-bryter ikke var oransje.
+
+### 6) Filteret og lenken «Den ekte versjonen» (tillegg 4, ønskene kl. 17:48 og 17:53)
+
+- **Filteret** er tatt bort: raden «Alle», «3 av 3 positiv» og «3 av 3 negativ», linja «Filteret viser hva sjekkene ga …», lenken til dem som fikk 2 av 3, adressene `?signal=` (en gammel adresse med `?signal=` viser alle radene) og det som bare fantes for filteret i `app.py` og stilen. «Alle | Min liste» står, og at signalstyrken ikke er et råd, står i innledningen på oversikten (NFR-06). Filteret står i PRD-en som FR-108, med FR-412 i lista over det ekstra; Rettet-linja står under FR-108, og under 8.11 og 8.23 i `epics.md`. Testene for filteret i `test_ferdige_lister.py` og `test_funnene_8_23.py` er tatt bort, og hjelpen og installasjonen er rettet.
+- **«Den ekte versjonen»** i demolinja åpnes i en ny fane, med `target="_blank"`, `rel="noreferrer"`, pila ↗ og «(åpnes i en ny fane)» for skjermlesere, som lenken til investorsiden. Adressen er den samme (`EKTE_VERSJONEN_URL`). Det er den eneste lenken ut av appen som åpnet i samme fane; en test sjekker alle malene.
+
+**Ville feilet hvis:** filteret, linja om det eller adressene sto igjen, `?signal=` skjulte rader, setningen om råd ble borte fra oversikten, eller en lenke ut av appen åpnet i samme fane.

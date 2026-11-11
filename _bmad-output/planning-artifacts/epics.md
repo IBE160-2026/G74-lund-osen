@@ -4224,6 +4224,8 @@ NFR-01, NFR-06
 
 *Avgjort 2026-11-09 kl. 10:55 (gruppens svar):* 8.11 (PR #128) og 8.11b (PR #129) flettes «alt så tidlig som mulig», etter flettingen av #126 kl. 23:50, og 8.11 før 8.11b. Svaret er ført etter nattflettingen (kl. 12:00) i `docs/ai-prompts/2026-11-09.md`.
 
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret på signalet fra denne storyen er tatt bort, fordi det ikke viste noe tabellen ikke alt viser under «Skilte seg ut». De ferdige listene står. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 ### Story 8.11c: «Utenfor målingen» med medianen av kursene
 
 *Lagt til 2026-11-10 (gruppens svar 09.11 kl. 17:37):* spørsmål 9 i 8.11b, bygget i ekstravinduet 09.11 (PR #131, `spec-8-11c-utenfor-maalingen.md`). «Ekstra, hvis tiden rekker», som 8.11.
@@ -4607,6 +4609,8 @@ Som **bruker fra brukertesten**, vil jeg at det som var uklart eller tungvint 10
 *Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* «ja» til del A og B. Rådet anbefalte det. Kl. 14:15 la gruppen til overskriften i Min liste, kl. 14:53 og 14:59 sju småfunn fra gjennomgangen, kl. 15:54 tabellen på Børsometeret åpen fra start, og kl. 15:57 at alt skal kunne ses i demoen. Rådet anbefalte alle. Svarene er ført etter instruksjonen om del A og tilleggene i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-11:* 8.23 er flettet med PR #142 i `7fb9b1fd` kl. 03:41, låst til head-en `3e9c84ae`. CI var grønn på head-en (run 42945863521), og hele settet lokalt før flettingen: 5137 bestått og 25 hoppet over.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* antallet på knappene i filteret og lenken til dem som fikk 2 av 3 (A8) er tatt bort med filteret. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.24: Notatene, to ting etter flettingen
 

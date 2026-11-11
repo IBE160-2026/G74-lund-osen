@@ -1322,9 +1322,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
 :where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
                                     color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
-/* Story 8.11: filteret på signalet og de ferdige listene. */
-:where(.side-oversikt) .signalfilter { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
-:where(.side-oversikt) .filtertekst { margin: 4px 0 12px; }
+/* Story 8.11: de ferdige listene. Filteret på signalet er tatt bort i 8.26. */
 /* Tillegg 3 til 8.22: aksjene i en ferdig liste står på siden «Er du sikker?», ikke under en
    <details> i Min liste. */
 :where(.side-oversikt) ol.ferdig-liste { margin: 8px 0; padding-left: 24px; }

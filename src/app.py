@@ -1069,24 +1069,11 @@ def _tabellsiden(aktiv: str):
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
         if sortert is not None:
             sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
-    # Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
-    # lista som vises, og etter at radene er delt eller sortert, så
-    # rekkefølgen fortsatt er FR-102. Bare 3 av 3 i retningen som er valgt.
-    signalfilter = _signalfilteret()
-    # Gjennomgangen (ECH1, ECH2, ECH3): overskriften, innledningen og om
-    # tabellen vises, regnes av lista før filteret, så filteret bare skjuler
-    # rader og aldri endrer det siden sier.
+    # Story 8.26 (gruppens ønske 11.11 kl. 17:48, tillegg 4): filteret på
+    # signalet fra 8.11 og 8.23 er tatt bort, fordi det ikke viste noe
+    # tabellen ikke alt viser under «Skilte seg ut».
     overskrift_ut = alle_som_skilte_seg_ut if bare_min else skilte_seg_ut
-    foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
-    # Story 8.23 (A8): radene i lista som vises, før filteret, til antallet
-    # på knappene og 2 av 3 ved et tomt filter.
-    rader_foer = sortert if sortert is not None else [*skilte_seg_ut, *oevrige]
-    if signalfilter is not None:
-        skilte_seg_ut = [rad for rad in skilte_seg_ut if _passer(rad, signalfilter)]
-        oevrige = [rad for rad in oevrige if _passer(rad, signalfilter)]
-        mangler = []
-        if sortert is not None:
-            sortert = [rad for rad in sortert if _passer(rad, signalfilter)]
+    har_rader = bool(skilte_seg_ut or oevrige or mangler or sortert)
     hovedindeks, indeks_feilet = (
         (None, False)
         if i_lista
@@ -1153,78 +1140,16 @@ def _tabellsiden(aktiv: str):
         # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
         # Min liste, og merket «Egen» i tabellen.
         egne=_egne(),
-        # Story 8.11: filteret på signalet, og lenkene til det.
-        signalfilter=signalfilter,
-        filterlenker=_filterlenkene(signalfilter, rader_foer),
-        nest_beste=_nest_beste(signalfilter, rader_foer),
-        filter_retning_og_styrke=_filterets_retning_og_styrke(signalfilter) if signalfilter else None,
         # Story 8.23 (tillegg 1): overskriften i Min liste med «Alle».
         antall_ut=len(overskrift_ut),
         overskrift_ut=overskrift_ut,
-        foer_filter=foer_filter,
-        filter_tomt=signalfilter is not None and not (skilte_seg_ut or oevrige or sortert),
+        har_rader=har_rader,
         # Story 10.6: «Børsdagen kort fortalt», bare paa oversikten.
         boersdagen=None
         if i_lista
         else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd, sortering),
         **felles,
     )
-
-
-# Story 8.11: filteret på signalet (FR-412, tillegget).
-SIGNALFILTER = {"positiv": "Positiv", "negativ": "Negativ"}
-# Story 8.23 (A8): dem som fikk én sjekk mindre i samme retning, som lenken
-# ved et tomt filter viser. Ingen knapp har dem.
-NEST_BESTE = {"positiv-2": "positiv", "negativ-2": "negativ"}
-
-
-def _signalfilteret() -> str | None:
-    """Verdien i ?signal=, eller None. En verdi som ikke er kjent, gir ingen
-    filtrering."""
-    verdi = request.args.get("signal")
-    return verdi if verdi in SIGNALFILTER or verdi in NEST_BESTE else None
-
-
-def _filterets_retning_og_styrke(signalfilter: str) -> tuple[str, int]:
-    """(retningen som ord, styrken) for en verdi i ?signal= - story 8.23."""
-    if signalfilter in NEST_BESTE:
-        return NEST_BESTE[signalfilter], ANTALL_SJEKKER - 1
-    return signalfilter, ANTALL_SJEKKER
-
-
-def _passer(rad, signalfilter: str) -> bool:
-    vurdering = rad.vurdering
-    retning, styrke = _filterets_retning_og_styrke(signalfilter)
-    return vurdering is not None and vurdering.styrke == styrke and vurdering.retning == SIGNALFILTER[retning]
-
-
-def _filteradresse(verdi: str | None) -> str:
-    """Adressen med ?signal=verdi og resten av adressen som den er, til
-    tabellen (story 8.23, A2)."""
-    ledd = [(k, v) for k, v in request.args.items(multi=True) if k != "signal"]
-    deler = ledd + ([("signal", verdi)] if verdi else [])
-    return request.path + ("?" + urlencode(deler) if deler else "") + "#aksjene"
-
-
-def _filterlenkene(signalfilter: str | None, rader_foer: list) -> list[tuple[str, str, bool]]:
-    """(teksten, adressen, aktiv) for «Alle», «3 av 3 positiv» og «3 av 3
-    negativ», med resten av adressen som den er. Story 8.23 (A8): med
-    antallet i lista som vises, før filteret, i parentes."""
-    lenker = [("Alle", _filteradresse(None), signalfilter is None)]
-    for verdi in ("positiv", "negativ"):
-        antall = sum(1 for rad in rader_foer if _passer(rad, verdi))
-        tekst = f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} {verdi} ({antall})"
-        lenker.append((tekst, _filteradresse(verdi), verdi == signalfilter))
-    return lenker
-
-
-def _nest_beste(signalfilter: str | None, rader_foer: list) -> tuple[int, str] | None:
-    """Story 8.23 (A8): når «3 av 3» i en retning gir 0, (hvor mange som fikk
-    2 av 3 i samme retning, adressen som viser dem). None ellers."""
-    if signalfilter not in SIGNALFILTER or any(_passer(rad, signalfilter) for rad in rader_foer):
-        return None
-    verdi = f"{signalfilter}-2"
-    return sum(1 for rad in rader_foer if _passer(rad, verdi)), _filteradresse(verdi)
 
 
 def sidens_siste(rader: list) -> date | None:

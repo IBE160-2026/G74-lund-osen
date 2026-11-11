@@ -306,7 +306,8 @@ def test_hjelpen_sier_sorteringen_og_er_du_sikker():
     ):
         assert ord_ in foelg, ord_
     assert "høyst tre" not in foelg and "ordnet etter navnet" not in foelg
-    ferdige = hjelp.split("### Hva er de ferdige listene og filteret?", 1)[1].split("\n### ", 1)[0]
+    # Story 8.26: filteret er tatt bort, så overskriften er bare de ferdige listene.
+    ferdige = hjelp.split("### Hva er de ferdige listene?", 1)[1].split("\n### ", 1)[0]
     assert "«Er du sikker?»" in ferdige and "én knapp per bransje" in ferdige
 
 

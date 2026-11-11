@@ -219,3 +219,65 @@ class TestFunnene:
             assert "background: var(--blekk)" in _regel(paa + "::after")
         assert "color: var(--dempet)" in _regel(":where(.side-oversikt) .boersdagen .merke-ki")
         assert "color: var(--dempet)" in _regel(":where(.side-aksje) .ki .merke-ki")
+
+
+# --- 6) Tillegg 4: filteret og lenken «Den ekte versjonen» --------------------
+
+
+def _radene(side: str) -> list[str]:
+    tabell = side.split('id="aksjene"', 1)[1].split("</table>", 1)[0]
+    return re.findall(r'<a href="/aksje/([A-Z0-9-]+)"', tabell)
+
+
+class TestFilteretOgLenken:
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    @pytest.mark.parametrize("sti", ["/", "/min-liste", "/?vis=min"])
+    def test_filteret_er_borte(self, versjon, sti, request):
+        """Ønsket kl. 17:48: ville feilet hvis raden «Alle», «3 av 3 positiv»
+        og «3 av 3 negativ», linja om filteret eller lenken til 2 av 3 sto
+        igjen, eller «Alle | Min liste» forsvant med den."""
+        k = request.getfixturevalue(versjon)
+        side = _side(k, sti)
+        assert 'class="signalfilter"' not in side and 'class="filtertekst"' not in side
+        assert "3 av 3 positiv" not in side and "Filteret viser" not in side and "signal=" not in side
+
+    def test_alle_og_min_liste_staar(self, klient):
+        side = _side(klient, "/")
+        knappene = re.findall(r'<a class="visknapp" href="[^"]*"[^>]*>(Alle|Min liste) <span class="antall">', side)
+        assert knappene == ["Alle", "Min liste"]
+
+    @pytest.mark.parametrize("verdi", ["positiv", "negativ", "positiv-2"])
+    def test_signal_i_adressen_filtrerer_ikke(self, klient, verdi):
+        """Ville feilet hvis en gammel adresse med ?signal= fortsatt skjulte
+        rader."""
+        assert _radene(_side(klient, f"/?signal={verdi}")) == _radene(_side(klient, "/"))
+
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_nfr_06_staar_synlig_paa_oversikten(self, versjon, request):
+        """NFR-06: ville feilet hvis at signalet ikke er et råd om å kjøpe
+        eller selge, ble borte fra oversikten med filteret."""
+        side = _side(request.getfixturevalue(versjon), "/")
+        innledning = side.split('<p class="innledning">', 1)[1].split("</p>", 1)[0]
+        assert "ikke hva du bør kjøpe eller selge" in innledning
+
+    def test_den_ekte_versjonen_i_en_ny_fane(self, klient):
+        """Ønsket kl. 17:53: ville feilet hvis lenken i demolinja åpnet GitHub
+        i samme fane, så demoen forsvant, eller manglet pila og teksten for
+        skjermlesere som lenken til investorsiden har."""
+        demo_linja = _side(klient, "/").split('<p class="eksempeltall">', 1)[1].split("</p>", 1)[0]
+        lenke = re.search(r'<a href="([^"]+)"([^>]*)>(.*?)</a>', demo_linja)
+        assert lenke.group(1) == app_modul.EKTE_VERSJONEN_URL
+        assert lenke.group(2) == ' target="_blank" rel="noreferrer"'
+        assert lenke.group(3) == (
+            'Den ekte versjonen<span class="pil" aria-hidden="true"> ↗</span>'
+            '<span class="skjult"> (åpnes i en ny fane)</span>'
+        )
+
+    def test_alle_lenker_ut_av_appen_i_ny_fane(self):
+        """Ville feilet hvis en annen lenke ut av appen i malene åpnet i samme
+        fane."""
+        for mal in (ROT / "src" / "templates").glob("*.html"):
+            tekst = mal.read_text(encoding="utf-8")
+            for lenke in re.findall(r"<a [^>]*>", tekst):
+                if "http" in lenke or "ekte_versjonen_url" in lenke or "{{ adresse }}" in lenke:
+                    assert 'target="_blank"' in lenke and 'rel="noreferrer"' in lenke, (mal.name, lenke)

@@ -73,7 +73,9 @@
     {% endif %}
     {% if eksempeltall %}
     <div class="rad demo">
-      <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se <a href="{{ ekte_versjonen_url }}">Den ekte versjonen</a>.</p>
+      {#- Story 8.26 (ønsket 11.11 kl. 17:53): lenken ut av appen åpnes i en
+          ny fane, som lenken til investorsiden, så demoen står åpen. #}
+      <p class="eksempeltall">Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se <a href="{{ ekte_versjonen_url }}" target="_blank" rel="noreferrer">Den ekte versjonen<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>.</p>
     </div>
     {% endif %}
     {#- Story 8.25: stegene i «Spill av omvisningen», som skriptet leser. Ikke
