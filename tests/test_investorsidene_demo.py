@@ -298,7 +298,8 @@ def test_boblen_ved_1280_px(demoklient, tmp_path, aksje):  # noqa: F811
 # Tegningen står på samme sted på alle sidene (gruppens svar 24.10 kl. 13:02):
 # venstre kant og toppen ved 1280 px, målt på BRFE. Måles den på nytt, skal
 # alle 15 ha samme tall.
-_PLASSEN = [136, 371]
+# Story 8.26 (tillegg 17): 371 -> 409, med linja «Oppdatert …» i stripa på alle sidene.
+_PLASSEN = [136, 409]
 
 
 @I_NETTLESER

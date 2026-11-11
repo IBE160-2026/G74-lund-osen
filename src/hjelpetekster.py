@@ -389,7 +389,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Selskap står den etter navnet.
             # Story 8.26 (tillegg 8): først hvorfor, så hvor raden står.
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen, med «–». "
+            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen, med «–» og lenke til aksjesiden. "
             "En aksje som venter, står under med «venter på henting».",
             (
                 # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
@@ -953,7 +953,8 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
     }
     # Aksjesiden uten sjekker (signalet kunne ikke regnes, eller dagen er
     # ikke vurdert): stegene om sjekkene forklarer noe siden ikke viser.
-    sider["aksje_uten_sjekker"] = tuple(s for s in sider["aksje"] if s.anker != "sjekkene")
+    # Story 8.26 (tillegg 20): uten sjekker er det heller ingen «Signalet forklart».
+    sider["aksje_uten_sjekker"] = tuple(s for s in sider["aksje"] if s.anker not in ("sjekkene", KI_ANKER))
     for side, steg in sider.items():
         assert len(steg) <= MAKS_STEG, side
     return sider

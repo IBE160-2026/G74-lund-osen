@@ -286,7 +286,8 @@ class TestEtterGjennomgangen:
         demoen har også listene for bransjene til de 15 oppdiktede
         selskapene, i rekkefølgen fra designregler.md §4."""
         side, _ = demoklient
-        html = side.get("/min-liste").data.decode("utf-8").split('id="ferdige-lister"', 1)[1]
+        # Story 8.26 (tillegg 14): bare brikkene i steg 3, ikke kortene under «Følg flere aksjer».
+        html = side.get("/min-liste").data.decode("utf-8").split('id="ferdige-lister"', 1)[1].split("</ul>", 1)[0]
         navn = re.findall(r"</svg>(\w+) <span class=\"antall\">", html)
         # Story 8.22 (tillegget 10.11 kl. 17:16): 11, med Helse og Teknologi
         # fra de nye målte i demoen. Var 9.
