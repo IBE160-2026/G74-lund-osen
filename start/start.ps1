@@ -322,6 +322,9 @@ Write-Host ''
 Write-Host "Appen kjører på $Adresse."
 Write-Host 'Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den.'
 if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process $Adresse }
+# Story 3.6 (del C): snarveien på skrivebordet i Windows, første gang.
+. (Join-Path $PSScriptRoot 'snarvei.ps1')
+Tilby-Snarvei $Versjon (Get-Location).Path
 $server.WaitForExit()
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
 if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Startet du demoen eller den ekte versjonen i et annet vindu, er det den som kjører nå, og dette vinduet kan lukkes. Ellers står grunnen i linjene over: lukk vinduet og dobbeltklikk på nytt." }
