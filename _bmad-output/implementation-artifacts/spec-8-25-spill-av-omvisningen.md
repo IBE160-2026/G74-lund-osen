@@ -93,3 +93,16 @@ Blind Hunter med bare diffen, uten bildene og `tests/test_docker.py`, og Edge Ca
 - *Rettet:* BH6 og ECH5 (en gammel tilstand starter ikke omvisningen), BH7 og ECH7 (delen rulles øverst, så boksen dekker mindre), BH8 (fokus går tilbake til knappen når det var på siden), BH9 (Esc lukker ikke omvisningen når et hjelpevindu er åpent), BH10 (bare et tomt `<span>` er et merke), BH15 (en åpen liste står på egen linje), VG4 (testen for migrasjonen ser ikke på nummeret), VG5 og VG7 (hjelpen og README-en).
 - *Ført:* BH11 («Steg N av M» teller med steg som hoppes over), BH12 og ECH6 (uten lagring i nettleseren kommer tilbudet igjen, og omvisningen stopper ved første sidebytte; hjelpen sier det), ECH8 (fokus går til boksen ved hvert steg), ECH9 (tilbudet står også på en tom oversikt), VG2 (aksjesiden uten sjekker og uten kurser er ikke testet for seg) og VG3 (testen for demoen og den ekte versjonen sammenligner bare dataene).
 - *Ikke en feil:* BH13 (både «Vis meg rundt» og omvisningen bruker `STANDARD`).
+
+## Flettingen av main 11.11 (8.23, del A av funnene fra brukertesten)
+
+Instruksjonen kl. 11:59 11.11. Main ble flettet inn i grenen i `07033d0c`. Konfliktene var i README-en, `src/app.py`, `tests/test_docker.py` og åtte bilder i `docs/appen/`, ikke ni. Begge sidene er beholdt. I `583f291c` er de åtte bildene med knappen tatt på nytt fra demoen, med høydene fra 8.23 og tilbudet besvart. De fem andre bildene i `docs/appen/` ble like byte for byte, og avtrykkene er regnet ut på nytt. Omvisningen ble prøvd side for side i Edge etterpå: alle 21 stegene var merket, og «Tilbake» over en side, Esc og en lenke midt i omvisningen virket som før. Bildene av stegene i PR-en er tatt på nytt.
+
+**Gjennomgangen av det som ble endret ved konfliktene** (Edge Case Hunter og Verification Gap i samme agent, med repoet). 8.23 fikk «Min liste» på oversikten til å filtrere tabellen (`?vis=min`), med en tekst i stedet for tabellen når lista er tom.
+
+*Middels*
+- *ECH1, ECH2, VG1 og VG2, rettet.* Startet omvisningen på `/?vis=min` med tom Min liste, merket stegene om tabellen teksten «Ingen aksjer i Min liste ennå». Aksjesiden ble i tillegg hoppet over stille, fordi ingen aksjelenke fantes. Nå går omvisningen først til `/` når den startes på oversikten med en annen adresse (`OMVISNING.startAdresse`), og en aksje fra en tidligere omvisning glemmes. Tester: ankeret `aksjene` på `/` er tabellen med BRFE først, tilfellet med tom Min liste, og `startAdresse` kjørt med Node. Prøvd i Edge med tom Min liste i demoen: omvisningen gikk fra `/?vis=min` til `/`, merket tabellen og gikk videre til BRFE. Fra `/?signal=positiv` gikk den også til `/`.
+
+*Lav*
+- *Rettet med ECH1:* ECH3 (fra `/?vis=min` ble aksjesiden den første merkede aksjen) og ECH4 (adressen med valg på oversikten gikk tapt ved «Tilbake»; nå starter omvisningen alltid på `/`).
+- *Ført:* VG3 (ingen test kjører hele løpet når en side uten adresse hoppes over) og VG4 (omvisningen med tom Min liste er bare prøvd i demoen, ikke i den ekte versjonen, som ikke ble startet).

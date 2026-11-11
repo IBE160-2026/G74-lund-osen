@@ -232,6 +232,16 @@ const OMVISNING = {
     return OMVISNING.ADRESSE[side] || null;
   },
 
+  // Adressen omvisningen må starte på, eller null når den kan starte her.
+  // Flettingen av 8.23 (gjennomgangen 11.11, ECH1-ECH3): oversikten med
+  // ?vis=min eller et filter viser ikke hele tabellen, og med en tom Min liste
+  // står ingen aksjer der. Da går omvisningen først til oversikten uten valg,
+  // så stegene merker tabellen og aksjesiden er den første aksjen i den.
+  startAdresse(side, her) {
+    const oversikten = OMVISNING.ADRESSE.oversikt;
+    return side === "oversikt" && her !== oversikten ? oversikten : null;
+  },
+
   // «Steg 3 av 18»: nummeret i hele omvisningen.
   teller(i, antall) {
     return `Steg ${i + 1} av ${antall}`;
@@ -440,6 +450,14 @@ if (typeof module === "object" && module.exports) {
 
   function start() {
     skriv(localStorage, OMVISNING.SVARET, "ja");
+    // En aksje fra en tidligere omvisning gjelder ikke; den leses på nytt.
+    skriv(sessionStorage, OMVISNING.AKSJEN, null);
+    const adresse = OMVISNING.startAdresse(SIDE, her());
+    if (adresse) {
+      skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(0, 1, adresse));
+      window.location.href = adresse;
+      return;
+    }
     gaaTil(0, 1);
   }
 

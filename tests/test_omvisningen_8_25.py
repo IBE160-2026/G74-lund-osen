@@ -312,3 +312,63 @@ class TestOppfoerselenMedNode(TestLogikkenMedNode):
             'window.addEventListener("pageshow"',
         ):
             assert bit in skriptet, bit
+
+
+class TestEtterFlettingenAv823:
+    """Flettingen av main (8.23) inn i 8.25, gjennomgangen 11.11 (Edge Case
+    Hunter og Verification Gap)."""
+
+    def test_aksjene_paa_oversikten_er_tabellen_med_den_foerste_aksjen(self, klient):
+        """VG2: ville feilet hvis ankeret skriptet leser aksjesiden fra, ikke
+        var tabellen på oversikten, eller ikke hadde en lenke til en aksje, så
+        omvisningen stille hoppet over aksjesiden."""
+        side = klient.get("/").data.decode("utf-8")
+        assert side.count('id="aksjene"') == 1
+        m = re.search(r'<(\w+) class="([^"]*)" id="aksjene"', side) or re.search(
+            r'<(\w+) id="aksjene" class="([^"]*)"', side
+        )
+        assert m and m.group(1) == "div" and "tabellboks" in m.group(2), m and m.group(0)
+        etter = side[side.index('id="aksjene"') :]
+        assert re.search(r'href="(/aksje/[A-Z]+)"', etter).group(1) == SIDENE["aksje"]
+
+    def test_min_liste_paa_oversikten_tom_har_ingen_aksjer(self, klient):
+        """ECH1, VG1: tilfellet startAdresse er laget for. Med en tom Min liste
+        på oversikten står ankeret på en tekst uten aksjer, og skriptet ser
+        fortsatt siden som oversikten. Ville feilet hvis det endret seg uten at
+        startAdresse ble sett på igjen."""
+        for symbol in demo.MERKET_I_DEMOEN:
+            klient.post("/min-liste/merk", data={"symbol": symbol, "til": "fjern", "tilbake": "/?vis=min"})
+        side = klient.get("/?vis=min").data.decode("utf-8")
+        assert '<p class="tom-min-liste" id="aksjene">' in side
+        assert _dataene(side)[0] == "oversikt"
+
+
+@pytest.mark.skipif(NODE is None, reason="Node finnes ikke på maskinen")
+class TestStartenMedNode(TestLogikkenMedNode):
+    def test_starter_paa_oversikten_uten_valg(self):
+        """ECH1-ECH3: ville feilet hvis omvisningen startet på oversikten med
+        ?vis=min, et filter eller en sortering, der tabellen ikke viser alle
+        aksjene, eller gikk til oversikten når den alt er der."""
+        for her in ("/?vis=min", "/?signal=positiv", "/?sorter=navn&orden=ned", "/?vis=alle"):
+            assert self._kjoer(f"o.startAdresse('oversikt', {json.dumps(her)})") == "/", her
+        assert self._kjoer("o.startAdresse('oversikt', '/')") is None
+        for side, her in (
+            ("boersometer", "/boersometer"),
+            ("min_liste", "/min-liste?vis=min"),
+            ("aksje", "/aksje/BRFE"),
+        ):
+            assert self._kjoer(f"o.startAdresse({json.dumps(side)}, {json.dumps(her)})") is None, side
+        assert self._kjoer("o.fortsett(o.tilstand(0, 1, '/'), '/', 21)") == {"i": 0, "retning": 1}
+
+    def test_skriptet_bruker_startadressen(self):
+        """Ville feilet hvis knappen og tilbudet ikke brukte startAdresse, eller
+        en aksje fra en tidligere omvisning ble brukt på nytt."""
+        skriptet = SKRIPTET.read_text(encoding="utf-8")
+        start = skriptet[skriptet.index("function start()") :]
+        start = start[: start.index("\n  }\n")]
+        for bit in (
+            "OMVISNING.startAdresse(SIDE, her())",
+            "skriv(sessionStorage, OMVISNING.AKSJEN, null)",
+            "OMVISNING.tilstand(0, 1, adresse)",
+        ):
+            assert bit in start, bit
