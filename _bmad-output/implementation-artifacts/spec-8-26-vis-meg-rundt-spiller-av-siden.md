@@ -43,7 +43,9 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» vise
 
 *Ønsket 2026-11-11 kl. 20:06 (tillegg 10, rådet var enig):* en lenke har samme farge før og etter at man har klikket på den.
 
-Tilleggene 5, 7 og 9 er ikke limt inn i vinduet.
+*Svar 2026-11-11 kl. 20:28 (tillegg 12, rådet anbefalte begge, og siden i demoen var gruppens ønske):* «Din egen liste: kom i gang» i Min liste bygges som på designtavla, og knappen i steg 1 får en egen side i demoen.
+
+Tilleggene 5, 7, 9, 11, 13 og 14 er ikke limt inn i vinduet. Tillegg 15 (kl. 20:46) stoppet i steg 0, fordi det bygger på forslaget fra tillegg 14.
 
 Rådet anbefalte alle unntatt det med to knapper.
 
@@ -65,6 +67,7 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 8. **Ordene om «lista» (tillegg 3, del 2).** *Forslag:* der «lista» betyr alle aksjene appen følger, sier sidene det: «appen følger 16 av 18» (to steder), «Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen.» (tre steder og i `valg.py`, også «… for å angre dette.»), «Appen følger alt …, eller den venter på hentingen.» og «Appen kan følge opptil 18 aksjer …». Ikke endret: «lista di» (stegene i «Din egen liste», som er brukerens egen liste), meldingen «N endringer i lista tas i bruk ved hentingen» og «13 av de 15 aksjene i lista» i «Signalet forklart» og KI-teksten, fordi tillegget sier at bare de setningene endres, og KI-teksten kontrolleres mot ordene.
 9. **Testene av boksen i nettleseren (gjennomgangen, VG1, middels).** *Forslag:* skriptet testes som før: de rene funksjonene i `OMVISNING` kjøres med Node, og resten (`start`, `visSiden`, `avslutt`, lenken og `pageshow`) sjekkes i kildeteksten og er prøvd i Edge mot demoen for hver del og etter gjennomgangen. En test som kjører siden i en nettleser eller med jsdom, krever pakker fra npm i CI, som repoet ikke har. Alternativet er å legge til jsdom i CI før flettingen.
 10. **Hvorfor en aksje er uten kurser (tillegg 8, gjennomgangen ECH2, BH3 og VG2, middels).** *Forslag:* ordlyden fra tillegg 8, som bygget: «appen har ingen kurser for aksjen ennå, fordi den nettopp er lagt til og venter på hentingen om kvelden, eller fordi kilden ikke har kurser for den.» Gjennomgangen påpekte at en aksje som venter på hentingen, står med «venter på henting», og at en aksje som står i lista uten kurser, alt er forsøkt hentet og tas ut kvelden etter hvis kilden fortsatt ikke gir kurser (`valg.uten_rader`). Alternativet er å legge til: «Gir kilden ingen kurser ved neste henting, tas den ut av lista.» Funnet står åpent til gruppen har svart (regel 25).
+11. **Boblen på siden i demoen (tillegg 12).** *Forslag 1, som bygget:* «Nøkkelen? Den ligger under matta, sammen med de 20 kallene.» *Forslag 2:* «20 kall i døgnet: jeg bruker 18 og sparer 2 til en regnværsdag.» Begge handler om nøkler og kall, ikke om kurser eller kjøp og salg (NFR-06).
 
 ## Delene
 
@@ -214,3 +217,11 @@ Blind Hunter med bare diffen fra `059a4228`, og Edge Case Hunter og Verification
 - *Rettet:* BH4 (setningen om demoen bare på siden for MTFJ), BH6, ECH3 og VG4 (ankeret i Innstillinger slås opp før noe skrives, og en test knytter ankrene til valgene), BH12 (kommentaren i stilen), BH16 (hjelpen), ECH6 (kommentarene i `boersometer.py`), ECH7 («Alle» og «Min liste» i Min liste holder plassen).
 - *Ført:* BH5, ECH4 og VG5 (teksten i ruta er ikke regnet for nivå 2 og 3; prøvd i Edge, der MTFJ står på nivå 1), ECH5 (en dag før første kurs sier «Ingen kurser ennå»), BH8 og VG6 (regexen for lenkene og testen av ankeret i omvisningen), BH9 (samletesten sammenligner uten stor forbokstav), BH10 (hjelpetekstene importerer demodataene), BH13 (stor forbokstav regnes to steder; samletesten sammenligner dem), BH14 (`test_notater` sletter også versjon 13), BH15 (testen for pila i demolinja), VG7 (`scroll-margin-top` er ikke testet).
 - *Ikke en feil:* BH7 (de to radene med periodevalget utelukker hverandre, som ECH fant), BH11 (en tom tittel står ikke).
+
+### 10) «Din egen liste» som på tavla, og siden i demoen (tillegg 12, svaret kl. 20:28)
+
+- **Kortene:** tittelen i Newsreader ved tallet i den svarte boblen, kort tekst og én handling nederst, og like høye kort (`display: flex` og `margin-top: auto`). Steg 1 har knappen «Åpne eodhd.com ↗»: i den ekte versjonen `https://eodhd.com/register` (`EODHD_REGISTRERING`, samme adresse som startskriptet) i en ny fane, og i demoen `/eodhd-demo`. Svaret kl. 14:29 på spørsmål 9 i 8.22 har Rettet-linje i spesifikasjonen for 8.22 og i `epics.md`, og kontrollpunktet i `test_hjelpetekster.py` godtar akkurat den lenken. Steg 2 har statusen som én linje med ✓, og «Slik bytter du nøkkel» bak «?». Steg 3 har teksten fra tavla, de ferdige listene som brikker med ikonet og antallet, og «+ Følg en aksje»; kallene, regnet av lista som spørsmål 10 i 8.22 sa, og bransjelistene står bak «?» (hjelpevinduet har fått `linjer` for tall siden har regnet ut).
+- **Siden i demoen:** `/eodhd-demo` (`eodhd_demo.html`), bare i demoen, i oppsettet fra investorsidene: «Tilbake til Min liste», tegningen `src/static/demo/eodhd.svg` laget av KI i samme stil som de 15, boblen etter forslag 1 i spørsmål 11, «Illustrasjon laget av KI» og teksten nederst. I den ekte versjonen svarer ruta 404. Prøvd i Edge ved 1280 og 390 px; der står boblen under tegningen, som på investorsidene.
+- **Testene fra 8.22** som så etter adressen som tekst, kallene i steg 3, `<h5>Slik bytter du nøkkel</h5>` og avsnittet «Start fra en ferdig liste», er rettet til det nye oppsettet.
+
+**Ville feilet hvis:** et kort manglet tallet ved tittelen eller handlingen nederst, demoen lenket til eodhd.com, den ekte versjonen ikke åpnet registreringen i en ny fane med adressen fra startskriptet, kallene eller byttet av nøkkel sto i kortene, eller siden i demoen manglet en av delene eller sa noe om kurser.

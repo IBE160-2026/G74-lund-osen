@@ -4586,6 +4586,8 @@ Spesifikasjonen er `spec-8-22-foelg-en-aksje-og-min-liste.md`, med spørsmålene
 
 *Avgjort 2026-11-11 kl. 14:29 (gruppens svar):* ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. Tiden for medianene måles, og testen for et kall som feiler legges til (spørsmål 12 og 14). Det valgte står i oransje med hakemerket (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet. Rådet anbefalte alt.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 20:28, story 8.26, tillegg 12):* svaret kl. 14:29 godtok forslaget i spørsmål 9, at adressen i steg 1 står som tekst fordi sidene ikke har adresser til nettet. Det gjelder ikke lenger: steg 1 har knappen «Åpne eodhd.com ↗», som i den ekte versjonen åpner registreringen hos EODHD i en ny fane, med samme adresse som startskriptet, og i demoen en egen side. Kontrollpunktet i `test_hjelpetekster.py` godtar akkurat den lenken. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 12, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43043943092). Tiden for én visning av hele lista var 0,046, 0,014 og 0,014 s, så medianene huskes ikke i minnet.
 
 ### Story 8.23: Funnene fra brukertesten 10.11 (del A)
