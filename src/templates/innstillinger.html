@@ -1,4 +1,5 @@
 {% extends "_ramme.html" %}
+{% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_rundtur.html" import rundtur with context -%}
 {#- Story 8.10 (FR-110, utdraget 08.11 §4): «Innstillinger» med «Vis hjelp».
     Et skjema per valg, som virker uten skript. Skjemaet skriver bare
@@ -33,6 +34,19 @@
     </form>
     <p>Noen setninger om dagen og om hver aksje, skrevet av en språkmodell når kursene hentes. Merket «Laget av KI». Hver KI-tekst har også sin egen bryter.</p>
   </div>
+  {#- Story 8.21 (tillegget 10.11 kl. 14:44, punkt 1): «Notater», på fra
+      start. Av skjuler notatene på aksjesidene og i Min liste, og sletter
+      ingenting. Valget står i tabellen notatvalg fra 0012. #}
+  <div class="valg">
+    <h2>Notater {{ hjelpeknapp("hjelp-notatene", "Hjelp: notatene") }}</h2>
+    <form method="post" action="/innstillinger">
+      <input type="hidden" name="navn" value="vis_notater">
+      <input type="hidden" name="til" value="{{ 'av' if valgene.vis_notater else 'paa' }}">
+      <button type="submit" class="innstillingsbryter" role="switch" aria-checked="{{ 'true' if valgene.vis_notater else 'false' }}"{% if not notater_kan_lagres %} disabled{% endif %}><span class="spor" aria-hidden="true"></span><span class="navn">Vis notater</span> <span class="verdi" aria-hidden="true">{{ 'På' if valgene.vis_notater else 'Av' }}</span></button>
+    </form>
+    <p>Dine egne notater på aksjesiden, samlet nederst i Min liste. Under hvert notat står hva aksjen og hovedindeksen gjorde etterpå, på kurs justert for utbytte, og et tenkt kjøp eller salg får den neste sluttkursen appen henter. Appen sier aldri om noe var riktig. Av skjuler notatene, men sletter ingenting.</p>
+  </div>
   <p class="nederst">Valgene gjelder alle sidene og lagres på denne maskinen.</p>
 </section>
+{{ hjelpevindu("hjelp-notatene", "Notater", [("", ["notatene"])]) }}
 {% endblock %}

@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-08T12:31
+updated: 2026-11-10T17:22
 ---
 
 # Hjelp til «Kom i gang»
@@ -218,6 +218,14 @@ Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en f
 ### Hva er «Innstillinger»?
 
 Knappen «Innstillinger» står øverst på alle sidene, etter «Min liste». Der slår du «Vis hjelp» av og på: hjelpen er de faste forklaringene bak «?», som vi har skrevet og sjekket, om hva tallene, bokstavene og fargene betyr. Med hjelpen av står ingen «?» på noen side. Et nytt trykk på samme «?» lukker hjelpen. Bryterne i Innstillinger er oransje når de er på. Der slår du også «Vis KI-tekst» av og på. Det er det samme valget som bryteren ved hver KI-tekst, så de viser alltid det samme, og et trykk på det ene stedet endrer det andre. Valgene gjelder alle sidene og lagres på denne maskinen, i basen, så de huskes neste gang. Det er ingen innlogging. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter.
+
+### Hva er «Mine notater»?
+
+På aksjesiden, under kursgrafen og «Signalet forklart», står «Mine notater». Der skriver du et kort notat, høyst 280 tegn, om aksjen. Notatet får dagen siden viser: siste børsdag, eller dagen du har valgt med «Vis dagen». Under hvert notat står «Etterpå»: hvor mye aksjen og hovedindeksen endret seg fra notatdagen til siste dag med kurser for aksjen, på kurs justert for utbytte som endringen ellers, og signalet som er lagret for de to dagene, som i «Signalet dag for dag». Mangler en kurs, står «–» med grunnen, og er notatdagen den siste dagen, står det at det ikke er børsdager med kurs etter den ennå. Appen sier aldri om et notat var riktig eller galt, og gir ingen råd; det er bare tallene. «Slett» ved et notat sletter det med en gang, og et notat kan ikke endres. Alle notatene står også samlet nederst i Min liste, det nyeste først, med lenke til aksjen.
+
+Ved et notat kan du trykke «Noter et tenkt kjøp», og senere «Noter et tenkt salg», fra siden for siste dag med kurser. Det er bare for å se etterpå hva som skjedde; ingen penger og ingen ordre er med. Hver aksje har høyst ett åpent tenkt kjøp om gangen, og bare aksjene i lista appen følger, kan få det, fordi bare de får nye kurser hver kveld. Kjøpet og salget får den neste sluttkursen appen henter etter trykket: sluttkursen for den første børsdagen etter både den siste dagen appen hadde kurs for da du trykket, og børsdagen før trykket. Trykker du på en børsdag før kveldens henting, er det altså sluttkursen samme dag, selv om børsen alt har stengt. Til den er hentet, står «venter på sluttkursen». Ved trykket lagres de tre sjekkene slik de sto på siden. Mens kjøpet er åpent, står endringen i prosent siden kjøpsdagen, og etter salget står kjøpsdagen, salgsdagen, hvor mange børsdager det gikk, sjekkene begge gangene og endringen fra kjøpet til salget, alltid med hovedindeksens endring de samme dagene ved siden av. Det er bare prosent, ingen kronebeløp, ingen samlet statistikk og ingen varsler. Kursen lagres ikke; den leses fra kursserien hver gang siden vises, så prosenten følger serien når den hentes på nytt eller justeres. Sletter du notatet, slettes det tenkte kjøpet med det. Fjerner du en aksje med et åpent tenkt kjøp, eller et salg som venter, fra lista, sier appen først at kursene for den stopper fra og med hentingen i kveld, og når en aksje skal fjernes i kveld, kan det ikke noteres et nytt kjøp eller salg for den.
+
+Bryteren «Notater» i «Innstillinger» er på fra start. Står den av, skjules notatene på aksjesidene og i Min liste, men ingenting slettes. Notatene lagres på denne maskinen, i basen, og ingen kall brukes. For en aksje som er tatt ut av lista, står notatene, men du kan ikke skrive nye. I demoen står noen oppdiktede notater fra tidligere dager, merket «Eksempeltall», med ett avsluttet og ett åpent tenkt kjøp. Nye notater og tenkte kjøp virker også der, men demoen henter aldri kurser, så et nytt kjøp venter på sluttkursen, og siden sier det. Demobasen lages på nytt hver gang demoen starter, så det du skriver der, er borte neste gang.
 
 ### Hvordan følger jeg andre aksjer?
 

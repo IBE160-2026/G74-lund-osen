@@ -90,6 +90,9 @@
       {%- set ut = egne.lista|rejectattr("symbol", "in", aksjene|map(attribute="symbol")|list)|list|length %}
       {#- Gjennomgangen (BH3): hva knappen gjør, før den trykkes. #}
       <p class="foer-knappen">Lista di blir disse {{ aksjene|length }} aksjene ved neste henting{% if ut %}, og {{ ut }} {{ "aksje" if ut == 1 else "aksjer" }} som er i lista nå, fjernes{% endif %}.</p>
+      {#- Story 8.21 (tillegget kl. 14:44): kursene stopper for et åpent tenkt kjøp. #}
+      {%- set med_kjoep = egne.lista|rejectattr("symbol", "in", aksjene|map(attribute="symbol")|list)|selectattr("symbol", "in", aapne_kjoep|list)|map(attribute="symbol")|list %}
+      {% if med_kjoep %}<p class="foer-knappen">{{ med_kjoep|join(", ") }} har et åpent tenkt kjøp. Når {{ "den" if med_kjoep|length == 1 else "de" }} fjernes, hentes ingen nye kurser, så endringen siden kjøpet stopper på den siste dagen med kurser.</p>{% endif %}
       <form method="post" action="/ferdig-liste"><input type="hidden" name="bransje" value="{{ bransje }}"><button type="submit" class="knapp">Bruk denne lista</button></form>
     </details>
   {% endfor %}

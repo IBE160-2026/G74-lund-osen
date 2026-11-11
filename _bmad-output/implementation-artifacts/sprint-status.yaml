@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 11-10-2026 21:12
+last_updated: 11-11-2026 00:32
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -160,7 +160,7 @@ development_status:
   8-0e-oversikten-fra-designforslaget: done
   # 8.0f står under story 8.0b i epics.md, flettet i 238ef18 (PR #102) 26.10.
   8-0f-hjelpefeltet: done
-  8-1-brukertest-rett-etter-epic-2: ready-for-dev
+  8-1-brukertest-rett-etter-epic-2: done
   # 8.2a (#93) og 8.2b (#109) er flettet. Funnene fra 8.1 er ikke brukt, fordi
   # brukertesten ikke er gjort (linja 04.11 under story 8.2 i epics.md).
   8-2-ux-gjennomgang-av-de-to-skjermbildene-med-cu-bmad-ux: in-progress
@@ -191,6 +191,7 @@ development_status:
   8-18-kommende-eksdato-i-kursgrafen: backlog
   8-19-neste-henting-i-stripa-øverst: backlog
   8-20-ux-rettingene-etter-gjennomgangen-06-11: done
+  8-21-egne-notater-paa-aksjesiden: done
   epic-8-retrospective: optional
 
   epic-9: in-progress
@@ -220,7 +221,7 @@ development_status:
   # Ekstra, hvis tiden rekker: 10-6 og 10-8. Briefen v8 lover dem ikke.
   # 2026-11-05 (svarene kl. 12:23 og 12:24): loggdelen er talt for uka 29.10-04.11 (spec-10-4-loggdelen.md),
   # og delen med en person venter paa brukertesten. Derfor in-progress.
-  10-4-måle-bidraget-egen-brukertest-etter-8-1: in-progress
+  10-4-måle-bidraget-egen-brukertest-etter-8-1: done
   # 10-5 er lenken til selskapets investorside, ikke NewsWeb (2026-10-06). Navnet staar.
   10-5-lenke-til-selskapets-side-på-newsweb: done
   10-6-ki-teksten-om-dagen-på-forsiden: done
