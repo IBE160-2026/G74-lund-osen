@@ -73,7 +73,7 @@ from historikk import (
     maanedsnavn,
     perioden,
 )
-from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, rundturer
+from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, omvisningen, rundturer
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
 from justeringsdager import justeringsdager
@@ -508,6 +508,16 @@ def _utenfor_maalingen():
         return {"utenfor": {}}
     egne = _egne()
     return {"utenfor": egne["utenfor_tekst"] if egne else {}}
+
+
+@app.context_processor
+def _omvisningen():
+    """Story 8.25: stegene i «Spill av omvisningen», på hver side, som
+    «Vis meg rundt»: borte når «Vis hjelp» er av i Innstillinger. Bare
+    lesing, og lik i demoen og i den ekte versjonen."""
+    if not innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_HJELP]:
+        return {"omvisning": None}
+    return {"omvisning": omvisningen(STANDARD)}
 
 
 @app.context_processor
@@ -2382,6 +2392,9 @@ def folg_side():
     return render_template(
         "folg.html",
         aktiv="min_liste" if gammel else "oversikt",
+        # Story 8.25 (spørsmål 7): siden i omvisningen er «Følg en aksje», ikke
+        # oversikten, så omvisningen ikke tilbys her og stegene finner siden.
+        omvisning_side="folg",
         sidesti="/folg",
         sok=sok,
         alle=alle,

@@ -24,6 +24,8 @@ Skrevet 09.11 i ekstravinduet (instruksjonen limt inn kl. 11:00, med tilleggene 
 
 *Svar 2026-11-10 kl. 11:52 (gruppens svar):* alle åtte forslagene er godtatt, også spørsmål 8, som står nederst. BH1 og BH4 lukkes som avgjort av gruppen, med graden urørt (regel 25). Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 15:24 i `docs/ai-prompts/2026-11-10.md`.
 
+*Rettet 2026-11-11 (gruppens svar 10.11 kl. 22:59):* svaret kl. 11:52 godtok spørsmål 1, at det ikke er noen omvisning som flytter seg fra del til del. Det gjelder ikke lenger: «Vis meg rundt» får også knappen «Spill av omvisningen», som går side for side gjennom appen, i story 8.25 (`spec-8-25-spill-av-omvisningen.md`). Den nummererte lista fra 8.9 står. Rådet anbefalte onsdag, men gruppen valgte i natt. Svaret er ført etter instruksjonen kl. 23:02 10.11, som lagres i `docs/ai-prompts/2026-11-10.md` etter gruppens ja.
+
 ## Intent
 
 **Problem:** En ny bruker ser alle delene av siden på en gang og vet ikke hva de er før tallene leses (FR-109).
