@@ -2,7 +2,7 @@
 title: 'Story 10.10: Rikere KI-tekster, med navnene og bransjene i teksten om børsdagen og kortere setninger om én aksje'
 type: 'feature'
 created: '2026-11-11'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '059dc10c'
 context:
@@ -234,3 +234,5 @@ Mutant I (`reglene` tar alltid med formen for én bransje) ble fanget av `TestSv
 |---|---|---|---|
 | ECH1 | lav | Med setningen om vanlig mellom «skilte seg ut» og «Blant dem var» kan «dem» leses som børsdagene | Står: rekkefølgen er gruppens svar kl. 19:30 |
 | ECH2 | lav | Versjonen står som dag-2 selv om reglene er endret | Står: dag-2 er ikke flettet, og ingen tekst i basen har den. Avtrykket er satt på nytt |
+
+*Ferdig 2026-11-11:* PR #145 er squash-flettet i `e5268b30`, låst til head-en `497548e0`, etter gruppens ja kl. 19:30. Spørsmål 13 (BH2) står åpent til gruppen har svart.

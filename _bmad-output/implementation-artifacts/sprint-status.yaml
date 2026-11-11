@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 11-11-2026 17:10
+last_updated: 11-11-2026 20:29
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -233,4 +233,5 @@ development_status:
   10-7-egen-nøkkel-til-gemini-anthropic-og-openai: done
   10-8-chatgpt-med-sign-in-with-chatgpt: backlog
   10-9-ki-teksten-forklarer-det-siden-viser: done
+  10-10-rikere-ki-tekster: done
   epic-10-retrospective: optional

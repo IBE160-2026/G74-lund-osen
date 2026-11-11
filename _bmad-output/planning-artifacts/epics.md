@@ -3313,6 +3313,8 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 
 *Avgjort 2026-11-08 kl. 21:35 (gruppens svar):* forslagene i spørsmål 1–12 i spesifikasjonen 10.6 (`spec-10-6-ki-teksten-om-dagen-paa-forsiden.md`) er godtatt, også navnet «Børsdagen kort fortalt» (spørsmål 11), og storyen flettes i kveld. Rådet anbefalte alt. Svaret er ført etter instruksjonen kl. 21:47 i `docs/ai-prompts/2026-11-08.md`.
 
+*Rettet 2026-11-11 (story 10.10, gruppens svar 10.11 kl. 16:18 og 11.11 kl. 17:21 og 19:30):* grunnlaget for teksten om dagen har nå også navnene på dem som skilte seg ut (høyst fem, med styrke og retning), bransjen som steg og falt mest i snitt (bare navnet, ingen prosent), antallet mot snittet for de siste 20 børsdagene og retningen på hovedindeksen de siste fem børsdagene. Når bransjen som steg eller falt mest kan stå, står ikke formen med antallet som steg i én bransje. Rekkefølgen i teksten er fast. Uka er med som retning, ikke som antall. Se story 10.10.
+
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 
 *Lagt til 2026-10-05, gruppens beslutning 04.10.*
@@ -3395,6 +3397,31 @@ så KI-teksten bruker abonnementet jeg har.
 *Svar 2026-11-07 kl. 12:32 (gruppens svar):* forslagene i spørsmål 1–4 under «Spørsmål til gruppen før flettingen» i [`spec-10-9-ki-teksten-forklarer-det-siden-viser.md`](../implementation-artifacts/spec-10-9-ki-teksten-forklarer-det-siden-viser.md) er godtatt: 1) kontrollen stopper ikke en tekst som deler mønstrene i to setninger; prompten ber fortsatt om én, og hjelpen sier «en setning eller to» (VG4); 2) tellingene godtas bare i formene, ved feltet sitt, ikke i `ANTALLENE` (BH2, ECH5); 3) de faste formene for sjekkene står til tellingen for 10.4 etter fem kvelder med versjon 5, og tas opp igjen da; 4) de fete navnene på sjekkene bygges i 8.20a. Rådet anbefalte alle fire. Svaret er ført etter instruksjonen kl. 12:47 i `docs/ai-prompts/2026-11-07.md`.
 
 *Ferdig 2026-11-07 kl. 12:55:* PR #116 er squash-flettet i `03bd75c7`, låst til head-en `9557777e` (spesifikasjonen [`spec-10-9-ki-teksten-forklarer-det-siden-viser.md`](../implementation-artifacts/spec-10-9-ki-teksten-forklarer-det-siden-viser.md)). Promptversjon 5: KI-teksten forklarer hver sjekk med vanlige ord og de tre mønstrene appen regner ut, i rammen «Signalet forklart». CI var grønn på head-en (run 42370033815) og på flettecommiten (run 42370225294). Hele settet før den siste commiten med kode og tester (`c7159bb9`, Utført-linja kl. 12:14): 4330 bestått, 24 hoppet over, og bare 6 porttester for `start.ps1` som feilet. Etter svaret kl. 12:32 ble bare dokumenter endret (`9557777e`), og dokumenttestene og testene som leser `docs/hjelp.md` ga 993 bestått, 7 hoppet over og bare de 7 porttestene for `start.ps1` som feilet. Jobben tar main fra midnatt, så den bruker versjon 5 fra kjøringen søndag 08.11.
+
+
+### Story 10.10: Rikere KI-tekster
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 11:00 i `docs/ai-prompts/2026-11-11.md` (gitt første gang 10.11 kl. 16:28) og gruppens svar 10.11 kl. 16:18.* Spesifikasjonen står i [`spec-10-10-rikere-ki-tekster.md`](../implementation-artifacts/spec-10-10-rikere-ki-tekster.md), med spørsmålene, svarene, triagen av gjennomgangene og mutantene.
+
+Som **bruker**, vil jeg at KI-tekstene sier hvilke aksjer og bransjer som skilte seg ut, og at de har korte setninger, så jeg forstår dagen og aksjen på første lesning.
+
+**Oppfyller:** FR-607, FR-603, svaret 10.11 kl. 16:18 · **Begrenses av:** FR-601, FR-602, FR-605, NFR-06, `AD-10`
+
+**Kontroll — hva testen ser etter:**
+- Teksten om dagen (dag-2) har navnene på høyst fem som skilte seg ut, 3 av 3 først og resten som antall, bransjene som steg og falt mest i snitt, antallet mot vanlig og hovedindeksen siste fem børsdager, i fast rekkefølge
+- Teksten om én aksje (versjon 6) har korte setninger og ingen tall som er 0
+- Kontrollen sjekker hvert navn og hvert tall, og stopper «bør», «verdt å følge», «følg med» og «vil»
+- Min liste står som en linje appen skriver under teksten, ikke i KI-teksten
+- Tekster med dag-1 vises fortsatt
+- **Ville feilet hvis:** et navn sto med feil styrke eller retning, et navn manglet, et tall var 0 eller feil, eller forsiden regnet et annet grunnlag enn hentingen
+
+*Avgjort 2026-11-11 kl. 16:05 (gruppens svar):* forslagene i spørsmål 1–5 og 7–9 er godtatt, og demoen viser tekster fra Gemma (spørsmål 6).
+
+*Avgjort 2026-11-11 kl. 17:21 (gruppens svar):* teksten om dagen får Min liste, antallet mot vanlig og hovedindeksen siste uke. Rådet anbefalte de to første, og gruppen valgte også den tredje.
+
+*Avgjort 2026-11-11 kl. 19:30 (gruppens svar):* formen med antallet i én bransje står bare uten «mest», rekkefølgen er fast, og storyen flettes i kveld. Rådet anbefalte det. Spørsmål 13 (BH2) står åpent til gruppen har svart.
+
+*Ferdig 2026-11-11:* PR #145 er squash-flettet i `e5268b30`, låst til head-en `497548e0`.
 
 ---
 
