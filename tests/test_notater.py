@@ -758,11 +758,14 @@ class TestMinListe:
         assert 'class="nytt-notat"' not in delen and "/notat/slett" in delen
         assert "Etterpå" in _tekst(delen)
 
-    def test_menyen_faar_ingen_ny_knapp(self, klient, demobase):
-        """Del F: ville feilet hvis stripa øverst fikk en knapp for notatene."""
+    def test_menyen_faar_bare_knappen_fra_8_27(self, klient, demobase):
+        """Del F: ville feilet hvis stripa øverst fikk en knapp for notatene.
+        Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): stripa får én,
+        «Mine notater», og ingen annen (tests/test_notatpanel_8_27.py)."""
         side = klient.get("/min-liste").data.decode("utf-8")
         stripa = side[: side.index("</nav>")]
-        assert "otater" not in stripa
+        assert stripa.count("otater") == 2  # adressen og navnet på knappen
+        assert stripa.count('class="sideknapp notatknapp"') == 1
 
 
 class TestTenkteKjoep:
@@ -1083,10 +1086,12 @@ class TestEtterGjennomgangenAvTilleggene:
         klient.post("/innstillinger", data={"navn": "vis_notater", "til": "av"})
         assert len(_rader(demobase, "tenkt_kjoep")) == 1
 
-    def test_delen_staar_under_grafen_og_over_historikken(self, klient, demobase):
-        """VG7, spørsmål 13: ville feilet hvis «Mine notater» sto et annet sted."""
+    def test_delen_staar_nederst_etter_historikken(self, klient, demobase):
+        """VG7, spørsmål 13: ville feilet hvis «Mine notater» sto et annet sted.
+        Story 8.27 (tillegg 1, gruppens svar 11.11 kl. 21:36): nederst, etter
+        «Signalet dag for dag» og boblen til investorsiden. Var under grafen."""
         side = klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
-        assert side.index('id="ki-tittel"') < side.index('id="mine-notater"') < side.index('id="signalet-dag-for-dag"')
+        assert side.index('id="signalet-dag-for-dag"') < side.index('id="mine-notater"')
 
     def test_base_uten_notatvalg(self, klient, demobase):
         """VG7: ville feilet hvis bryteren kunne trykkes, eller lagringen ga

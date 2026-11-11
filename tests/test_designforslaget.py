@@ -519,7 +519,9 @@ def test_hver_menyknapp_har_sitt_ikon(klient, sti, navn, del_):
     assert knapp, navn
     assert 'aria-hidden="true" focusable="false"' in knapp.group(1) and del_ in knapp.group(1)
     # Story 8.10: og tannhjulet for «Innstillinger», den fjerde knappen.
-    assert len(re.findall(r'<svg class="ikon"', meny)) == 4
+    # Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): og notatarket for
+    # «Mine notater», den femte, når bryteren «Notater» er på.
+    assert len(re.findall(r'<svg class="ikon"', meny)) == 5
 
 
 def test_ikonene_er_16_px_med_strek_2_i_tekstfargen():

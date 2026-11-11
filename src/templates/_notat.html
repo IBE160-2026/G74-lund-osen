@@ -24,7 +24,8 @@ venter på sluttkursen{% if eksempeltall %}. Demoen henter ikke kurser, så den 
 {#- Story 8.24 (gruppens svar 10.11 kl. 22:59): i Min liste står navnet med
     lenke og de samme knappene (med_navn og med_skjema), og siste dag og om det
     kan noteres, står i notatet. -#}
-{% macro notatet(n, indeks_symbol, med_skjema=false, vis="", siste_dag=none, kan_handle=false, med_navn=false) -%}
+{#- Story 8.27: i panelet sender skjemaene med siden man står på (tilbake). -#}
+{% macro notatet(n, indeks_symbol, med_skjema=false, vis="", siste_dag=none, kan_handle=false, med_navn=false, tilbake=none) -%}
 {%- set notat, etter, h = n.notat, n.etter, n.handelen -%}
 <li class="notat">
   <p class="notatdag">{% if med_navn or not med_skjema %}<a href="/aksje/{{ notat.symbol }}">{{ n.aksje.navn }}</a> · {% endif %}{{ notat.dato|ukedag }} {{ notat.dato|dato }}{% if eksempeltall %} <span class="eksempelmerke">Eksempeltall</span>{% endif %}</p>
@@ -68,11 +69,11 @@ venter på sluttkursen{% if eksempeltall %}. Demoen henter ikke kurser, så den 
   {% if med_navn and n.merknad %}<p class="notatgrense">{{ n.merknad }}</p>{% endif %}
   <div class="notatknapper">
     {% if kan_handle and n.kan_kjoepe %}
-      <form method="post" action="/aksje/{{ notat.symbol }}/notat/kjoep"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="dag" value="{{ siste_dag.isoformat() }}"><input type="hidden" name="vis" value="{{ vis }}"><button type="submit">Noter et tenkt kjøp</button></form>
+      <form method="post" action="/aksje/{{ notat.symbol }}/notat/kjoep"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="dag" value="{{ siste_dag.isoformat() }}"><input type="hidden" name="vis" value="{{ vis }}">{% if tilbake %}<input type="hidden" name="tilbake" value="{{ tilbake }}">{% endif %}<button type="submit">Noter et tenkt kjøp</button></form>
     {% elif kan_handle and h and h.kan_selges %}
-      <form method="post" action="/aksje/{{ notat.symbol }}/notat/salg"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="dag" value="{{ siste_dag.isoformat() }}"><input type="hidden" name="vis" value="{{ vis }}"><button type="submit">Noter et tenkt salg</button></form>
+      <form method="post" action="/aksje/{{ notat.symbol }}/notat/salg"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="dag" value="{{ siste_dag.isoformat() }}"><input type="hidden" name="vis" value="{{ vis }}">{% if tilbake %}<input type="hidden" name="tilbake" value="{{ tilbake }}">{% endif %}<button type="submit">Noter et tenkt salg</button></form>
     {% endif %}
-    <form class="slett-notat" method="post" action="/aksje/{{ notat.symbol }}/notat/slett"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="vis" value="{{ vis }}"><button type="submit" aria-label="Slett notatet{% if med_navn %} om {{ n.aksje.navn }}{% endif %} fra {{ notat.dato|dato }}{% if h %} og det tenkte kjøpet{% endif %}">{{ "Slett notatet og det tenkte kjøpet" if h else "Slett" }}</button></form>
+    <form class="slett-notat" method="post" action="/aksje/{{ notat.symbol }}/notat/slett"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="vis" value="{{ vis }}">{% if tilbake %}<input type="hidden" name="tilbake" value="{{ tilbake }}">{% endif %}<button type="submit" aria-label="Slett notatet{% if med_navn %} om {{ n.aksje.navn }}{% endif %} fra {{ notat.dato|dato }}{% if h %} og det tenkte kjøpet{% endif %}">{{ "Slett notatet og det tenkte kjøpet" if h else "Slett" }}</button></form>
   </div>
   {%- endif %}
 </li>

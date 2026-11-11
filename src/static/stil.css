@@ -1447,3 +1447,54 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 .omvisning-tilbud { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0; padding: 12px 16px;
                     background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; }
 .omvisning-tilbud p { margin: 0; }
+/* Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): «Mine notater» i et
+   panel fra knappen øverst. Med skriptet (hjelp.js, klassen
+   notatpanel-aapent på <html>) står panelet fra 1056 px fast i høyre kant,
+   400 px bredt som hjelpefeltet, og <body> gir like mye plass. panel-venstre
+   flytter det til venstre. Smalere, og uten skriptet, står det aldri. */
+.notatpanel { display: none; }
+@media (min-width: 1056px) {
+  .notatpanel-aapent { --notatpanel: 432px; }
+  .notatpanel-aapent .notatpanel:not([hidden]) {
+    display: flex; flex-direction: column; position: fixed; inset: 16px 16px 16px auto; z-index: 40;
+    width: 400px; box-sizing: border-box; padding: 16px 20px 18px 22px; overflow: auto;
+    background: var(--kort); color: var(--tekst); border: 1px solid var(--strek); border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+  .notatpanel-aapent body { padding-right: var(--notatpanel); }
+  .notatpanel-aapent.panel-venstre .notatpanel:not([hidden]) { inset: 16px auto 16px 16px; }
+  .notatpanel-aapent.panel-venstre body { padding-right: 0; padding-left: var(--notatpanel); }
+  /* Spørsmål 1: mens panelet er åpent, åpnes hjelpen over panelet, på samme
+     side, så siden gir plass til ett felt, ikke to. «Flytt» i hjelpen er
+     borte da; panelet har sin egen. */
+  .hjelpefelt.notatpanel-aapent .hjelpevindu { inset: 16px 16px 16px auto; }
+  .hjelpefelt.notatpanel-aapent.panel-venstre .hjelpevindu { inset: 16px auto 16px 16px; }
+  .hjelpefelt.notatpanel-aapent body:has(.hjelpevindu:popover-open) { padding-right: var(--notatpanel); padding-left: 0; }
+  .hjelpefelt.notatpanel-aapent.panel-venstre body:has(.hjelpevindu:popover-open) { padding-right: 0; padding-left: var(--notatpanel); }
+  .hjelpefelt.notatpanel-aapent .hjelpevindu button.flytt { display: none; }
+}
+.notatpanel:focus { outline: none; }
+.notatpanel:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.notatpanel-topp { display: flex; align-items: center; gap: 8px; }
+.notatpanel-topp h2 { font-family: "Newsreader", Georgia, serif; font-size: 23px; font-weight: 600; line-height: 1.2;
+                      color: var(--blekk); margin: 0 auto 0 0; }
+.notatpanel button, .notatpanel select {
+  font: inherit; font-size: 0.85rem; min-height: 36px; padding: 0 0.9rem; cursor: pointer;
+  border: 1px solid var(--strek-2); border-radius: 8px; background: var(--hvit); color: var(--blekk);
+}
+.notatpanel-topp button { min-height: 44px; }
+.notatpanel select { display: block; width: 100%; min-height: 44px; margin: 0 0 12px; }
+.notatpanel button:focus-visible, .notatpanel select:focus-visible,
+.notatpanel textarea:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.notatpanel .notatpanel-innhold { margin: 12px 0 0; }
+.notatpanel .uten, .notatpanel .notatgrense { color: var(--dempet); margin: 0 0 12px; }
+.notatpanel .notatgrense { font-size: 13.5px; margin: 4px 0 8px; }
+.notatpanel .notatpanel-demo { margin: 0 0 12px; }
+.notatpanel .notatliste { margin-top: 12px; }
+.notatpanel .etterpaa, .notatpanel .tenkt { font-size: 14px; }
+/* Tillegg 1 til 8.27 (svaret 11.11 kl. 21:36): «Vis alle (N)» under de to
+   nyeste notatene på aksjesiden, som en knapp. */
+.alle-notater summary { display: inline-block; cursor: pointer; margin: 8px 0 0; padding: 6px 14px; font-weight: 600;
+                        border: 1px solid var(--strek-2); border-radius: 999px; background: var(--hvit); color: var(--blekk); }
+.alle-notater summary:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.alle-notater[open] summary { margin-bottom: 4px; }

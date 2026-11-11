@@ -349,6 +349,8 @@ class TestRammen:
                     # «Avbryt» tilbake til de ferdige listene.
                     or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
                     or href in ("/min-liste#ferdige-lister", "/#dine-egne-aksjer")
+                    # Story 8.27: «Mine notater» i stripa går til notatene i Min liste.
+                    or href == "/min-liste#mine-notater"
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
