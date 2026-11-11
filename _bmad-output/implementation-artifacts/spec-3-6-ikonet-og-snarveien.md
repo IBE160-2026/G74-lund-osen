@@ -27,6 +27,7 @@ Forslaget er det som bygges. Spørsmålene står åpne til gruppen har svart.
 5. **Demoen.** *Forslag:* «OSE Signal (demo)», som starter «Start demoen.cmd», og «OSE Signal» for den ekte versjonen, som starter «Start den ekte versjonen.cmd», begge med ikonet.
 6. **Mac.** *Forslag:* ingen snarvei i denne storyen; instruksjonen gjelder Windows.
 7. **Bildet.** *Forslag:* ikonet i 48 px i installasjonen, ved punktet om snarveien. Et skjermbilde av skrivebordet viser andres filer og gir ikke mer.
+   *Rettet 2026-11-11 (testene):* installasjonen har bare de tre skjermbildene fra gjennomgangen (`test_bildene_er_de_tre_fra_gjennomgangen_og_ci_merket`), så ikonet beskrives med ord der, og «Kom i gang» har fem avsnitt (`test_dobbeltklikket_staar_foerst_og_ikke_bak_en_pil`), så snarveien står i avsnittet «Første gang».
 
 ## Delene og «Ville feilet hvis»
 

@@ -131,7 +131,8 @@ def svg() -> str:
             f'height="{tall(h * skala)}" rx="{tall(r * skala)}" fill="{hex_(*(ORANSJE if hoey else HVIT))}"/>'
         )
     deler.append("</svg>")
-    return "\n".join(deler) + "\n"
+    # Én linje uten linjeskift, så fila er lik byte for byte også med autocrlf i Windows.
+    return "".join(deler)
 
 
 def filene() -> dict[str, bytes]:

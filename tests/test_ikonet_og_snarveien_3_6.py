@@ -202,4 +202,4 @@ class TestDokumentene:
         assert "Mobil kommer i en senere versjon" in readme
         inst = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
         assert "snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen" in inst
-        assert "](../src/static/ikon-48.png)" in inst and "Mobil kommer i en senere versjon." in inst
+        assert "Ikonet er de tre søylene fra logoen" in inst and "Mobil kommer i en senere versjon." in inst
