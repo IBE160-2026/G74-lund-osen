@@ -2,7 +2,7 @@
 title: 'Story 3.6: ikonet og snarveien (del C)'
 type: 'feature'
 created: '2026-11-11'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '059dc10c'
 context:
@@ -137,3 +137,7 @@ Pytest i CI feilet på `ec558aec` kl. 04:23 i `TestRammen::test_hver_lenke_gaar_
 - **Årsaken:** testen går gjennom hver `href` på sidene, også i `<head>`, mot en liste over lovlige adresser. Stilarket står på lista med sitt eget mønster (2.7a). Ikonlenkene fra 3.6 er `<link rel="icon">` og `<link rel="apple-touch-icon">` i `_ramme.html`, og de manglet der. Lenkene i appen er riktige, så rettingen er i testen.
 - **Rettingen:** lista har nå nøyaktig de tre adressene `/static/ikon.svg`, `/static/ikon-32.png` og `/static/ikon-180.png`, og bare når fila finnes i `src/static`. Ingen andre adresser slippes gjennom, og ingen sjekk er tatt bort.
 - **Ville feilet hvis** en side lenket til en annen ikonfil enn de tre, for eksempel `/static/ikon-64.png`, eller hvis en av de tre filene manglet i `src/static`.
+
+## Flettingen
+
+*Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
