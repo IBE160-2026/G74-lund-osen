@@ -2,7 +2,7 @@
 title: 'Story 8.25: «Spill av omvisningen» ved «Vis meg rundt»'
 type: 'feature'
 created: '2026-11-11'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'd6e3b4a3'
 context:
@@ -136,3 +136,7 @@ Instruksjonen kl. 16:07 11.11. Del B (8.22) ble flettet med PR #138, og Utført-
 - *Rettet:* ECH5 og BH5 (`default(..., true)` i rammen, så `None` gir navnet fra stripa), BH4 (en test for at `/folg?kode=` lukker omvisningen), BH7 (testen sammenligner også tekstene) og VG5 (antallet sider i README-en følger `OMVISNINGEN_SIDER`).
 - *Ført:* ECH2 (en base uten tabellene fra 0010 gir en 404 uten rammen på `/folg`, så omvisningen stopper der), ECH3 (`/ferdig-liste` og investorsiden har navnet fra stripa; `fortsett` og `paaSiden` holder dem utenfor), ECH4 (telleren hopper over steget om søket med full liste, som BH11), VG3 (`OMVISNING.SIDENE` brukes ikke av skriptet; rekkefølgen kommer fra dataene, som testene sjekker), VG4 (stripa ved `?bytt=` er ikke testet her, men i testene for 8.22), VG6 (testene med Node hoppes over uten Node; CI har Node) og BH10 (vakten i søket fra 8.22 dekkes av testene med Node, som laster hele skriptet).
 - *Ikke en feil:* BH1 («fem av sidene» står ikke lenger i README-en), BH2 (setningen er gruppens svar kl. 16:26), BH6 (`folg_side` rendrer `folg.html` ett sted), BH8 (bildene er i `97f3dbe5`, utenfor diffen gjennomgangen fikk) og BH9 (instruksjonen kl. 16:07 sier «Ekstra, ferdig» etter svaret kl. 13:49, og README-en flettes med omvisningen).
+
+## Flettingen
+
+*Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:49, 14:33 og 16:26. Main hadde ikke endret seg siden main ble flettet inn i grenen (`c6c01170`). Hele settet lokalt i seks deler før pushen: 5252 bestått og 37 hoppet over (5289, likt `--collect-only`). CI var grønn på head-en (run 43054754599). Grenen er slettet og worktreen fjernet; bildegrenen `pr-8-25-bilder` står, etter svaret kl. 16:26.

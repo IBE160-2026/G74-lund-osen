@@ -4625,6 +4625,34 @@ Som **bruker**, vil jeg ha forklaringen av notatene der de andre valgene har sin
 
 *Lagt til 2026-11-11:* 8.24 er flettet med PR #141 i `38a0a0e9` kl. 02:03, låst til head-en `ae9e395e`. CI var grønn på head-en (run 42935503846), og hele settet lokalt før flettingen: 5083 bestått og 24 hoppet over.
 
+### Story 8.25: «Spill av omvisningen» ved «Vis meg rundt»
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 23:02 i `docs/ai-prompts/2026-11-10.md`.* 8.22, 8.23 og 8.24 var brukt, så dette er 8.25. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-25-spill-av-omvisningen.md`, med spørsmålene, triagen av gjennomgangene og mutantene.
+
+Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side gjennom appen og viser hva hver del er, så jeg finner fram uten å lese alt først.
+
+**Oppfyller:** FR-109, svaret 10.11 kl. 22:59 · **Begrenses av:** NFR-06, `AD-10`
+
+**Kontroll — hva testen ser etter:**
+- Knappen «Spill av omvisningen» ved «Vis meg rundt» starter en omvisning gjennom oversikten, en aksjeside, børsometeret, Min liste, «Følg en aksje» og Innstillinger, i den rekkefølgen
+- Hvert steg merker én del av siden og viser en kort tekst fra de samme tekstene som «Vis meg rundt», med «Tilbake», «Neste» og «Lukk»; Esc lukker, fokus flyttes til steget, og skjermleseren får rollen dialog
+- Den nummererte lista fra 8.9 står
+- Første gang appen åpnes, tilbys omvisningen én gang, og et nei huskes
+- Ingen tekst gir råd, og omvisningen er lik i demoen og i den ekte versjonen
+- **Ville feilet hvis:** omvisningen gikk i en annen rekkefølge, et steg pekte på en del som ikke finnes, Esc ikke lukket, eller et nei ikke ble husket
+
+**Avhenger av:** 8.9. **Én økt:** ja.
+
+*Avgjort 2026-11-10 kl. 22:59 (gruppens svar):* «Vis meg rundt» får også en omvisning som går side for side gjennom appen, slik prototypen kunne spilles av. Rådet anbefalte onsdag, men gruppen valgte i natt. Svaret endrer svaret 10.11 kl. 11:52 om 8.9 (Rettet-linje under 8.9).
+
+*Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* tilbudet første gang og et nei huskes i nettleseren, som bygget (spørsmål 3). Rådet anbefalte det.
+
+*Avgjort 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B er flettet (spørsmål 7), og flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
+
+*Avgjort 2026-11-11 kl. 16:26 (gruppens svar):* lista «Ekstra, hvis tiden rekker» står borte fra README-en, og setningen under listene sier «Ekstra» igjen. Bildegrenene beholdes, så bildene i PR-ene står, og så gruppen kan vise endringene i refleksjonsloggen og rapporten. Rådet anbefalte det.
+
+*Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43054754599), og hele settet lokalt før flettingen: 5252 bestått og 37 hoppet over.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
