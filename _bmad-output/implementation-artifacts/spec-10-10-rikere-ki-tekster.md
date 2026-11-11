@@ -145,7 +145,14 @@ Tre lesere i parallell, uten å kjøre tester eller endre noe. Blind Hunter lest
 | VG6 | lav | «ordrett» stemte ikke, fordi navnet ble lest uten hensyn til store og små bokstaver | Rettet: navnet leses med bokstavene i grunnlaget |
 | VG7 | lav | Hjelpen ved «Børsdagen kort fortalt» hadde tatt ut antallet i hver bransje | Rettet, og setningen står ordrett i `docs/hjelp.md` |
 | VG8 | lav | At tekstene for aksjene og `--eksempel` er det skriveren gir, ble ikke testet | Rettet |
-| VG9 | lav | Docstrings og navn på tester sa versjon 5 | Rettet |
+| VG9 | lav | Docstrings og navn på tester sa versjon 5 | Rettet. Navnet `test_demotekstene_har_versjon_5_og_moenstrene` står, fordi `docs/` viser til det (`tests/test_kvalitetssikring.py`), og docstringen sier at versjonen er 6 |
 | VG10 | lav | Endringen i `som_vanlig`, som ingen kaller | Tatt ut igjen, `som_vanlig` er som på `059dc10c` |
 
 Ingen funn står åpent på middels eller over.
+
+## Etter gjennomgangen
+
+- **Mutantene på nytt:** alle fem kjørt mot koden etter rettingene, med mutant C nå i `_navnene` (setningen med færre navn enn grunnlaget). Alle ble fanget, og sha256 mot HEAD var lik.
+- **Bildene:** alle bildene i `docs/appen/` er tatt på nytt med DevTools-protokollen, fra en demobase i en midlertidig mappe og waitress på en ledig port. Bildet av aksjesiden og oversikten ved 390 px er nye, og oversikten ved 390 px er 4602 px høy (var 4444). De andre er byte for byte de samme.
+- **README-en:** punktene under «Status» har høyst 20 ord (testen i `tests/test_docker.py`), så punktet om KI-teksten om dagen står som før. Punktet om demoen sier «eksempeltekster i KI-formene», ikke «KI-tekst fra Gemma».
+- **Hele settet** i fire deler: 1622 + 1489 + 1304 + 818 = 5233, likt `--collect-only`. Del 1 og 3 ble kjørt på nytt etter rettingene og besto (1599 bestått og 23 hoppet over, og 1304 bestått). Del 1 gikk kl. 11:55–12:02, mens to andre vinduer kjørte pytest. Det skulle ikke skjedd.
