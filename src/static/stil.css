@@ -1269,6 +1269,16 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .folgtabell td.valg { width: 1%; text-align: right; white-space: nowrap; }
 :where(.side-oversikt) .folgtabell .knapp { min-height: 36px; }
 :where(.side-oversikt) .folgtabell .ikke-maalt { color: var(--dempet); font-style: italic; font-weight: 400; }
+/* Tillegg 3 til 8.22 (svarene 10.11 kl. 22:44): de ferdige listene som én knapp per bransje,
+   med ikonet og antallet, og siden «Er du sikker?» før lista byttes. */
+:where(.side-oversikt) .ferdige-knapper { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; padding: 0; list-style: none; }
+:where(.side-oversikt) .ferdigknapp { gap: 6px; }
+:where(.side-oversikt) .ferdigknapp .bransjesymbol { width: 15px; height: 15px; }
+:where(.side-oversikt) .ferdigknapp .antall { font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) .ferdig-bekreft { max-width: 720px; }
+:where(.side-oversikt) .ferdig-bekreft .bransjesymbol { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
+:where(.side-oversikt) .ferdig-bekreft .under { color: var(--dempet); font-size: 14px; }
+:where(.side-oversikt) .ferdig-bekreft .knapper { display: flex; flex-wrap: wrap; gap: 8px; }
 /* Story 8.22 (utdraget §2): «Din egen liste» som tre stegkort, med kant og
    hjørner som de andre kortene, og nummeret i en sirkel. */
 :where(.side-oversikt) .stegkort { list-style: none; padding: 0; margin: 12px 0 16px; display: grid; gap: 12px;
@@ -1301,11 +1311,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.11: filteret på signalet og de ferdige listene. */
 :where(.side-oversikt) .signalfilter { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
 :where(.side-oversikt) .filtertekst { margin: 4px 0 12px; }
-:where(.side-oversikt) .ferdig-liste { margin: 8px 0; }
-:where(.side-oversikt) .ferdig-liste summary { cursor: pointer; display: flex; align-items: center; gap: 6px; }
-:where(.side-oversikt) .ferdig-liste summary .bransjesymbol { width: 16px; height: 16px; flex: none; }
-:where(.side-oversikt) .ferdig-liste ol { margin: 8px 0; padding-left: 24px; }
-:where(.side-oversikt) .ferdig-liste .foer-knappen { margin: 4px 0 8px; color: var(--dempet); }
+/* Tillegg 3 til 8.22: aksjene i en ferdig liste står på siden «Er du sikker?», ikke under en
+   <details> i Min liste. */
+:where(.side-oversikt) ol.ferdig-liste { margin: 8px 0; padding-left: 24px; }
 /* Story 8.10 (utdraget 08.11 §4): «Innstillinger», med en bryter per valg. */
 :where(.side-oversikt) .innstillinger { max-width: 720px; }
 :where(.side-oversikt) .innstillinger .valg { margin: 16px 0; padding: 18px 20px; background: var(--kort); border: 1px solid var(--strek);

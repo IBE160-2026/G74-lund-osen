@@ -300,6 +300,8 @@ _RUTER_MED_BASE = {
     "demoselskap",
     # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
     "folg_side",
+    # Tillegg 3 til 8.22: siden «Er du sikker?» før en ferdig liste.
+    "ferdig_liste_side",
     # Story 8.10: «Innstillinger».
     "innstillinger_side",
     "lagre_innstilling",
@@ -2431,6 +2433,28 @@ def folg():
             deler["bytt"] = bytt
         return redirect("/folg?" + urlencode(deler), code=303)
     return redirect(VALG_TILBAKE["min_liste" if bytt else "oversikten"], code=303)
+
+
+@app.get("/ferdig-liste")
+def ferdig_liste_side():
+    """Tillegg 3 til 8.22 (svarene 10.11 kl. 22:44): «Er du sikker?» før en
+    ferdig liste blir lista. Bare lesing; ingenting byttes før skjemaet
+    sendes til POST /ferdig-liste. En bransje uten liste gir 404."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    egne = _egne()
+    bransje = request.args.get("bransje", "")
+    aksjene = egne["ferdige"].get(bransje) if egne else None
+    if not aksjene:
+        abort(404)
+    return render_template(
+        "ferdig_liste.html",
+        aktiv="min_liste",
+        sidesti="/ferdig-liste",
+        egne=egne,
+        bransje=bransje,
+        aksjene=aksjene,
+    )
 
 
 @app.post("/ferdig-liste")

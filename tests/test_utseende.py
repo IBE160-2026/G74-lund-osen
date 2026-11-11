@@ -337,6 +337,9 @@ class TestRammen:
                     # Story 8.22: steg 3 i «Din egen liste» går til bransjelistene
                     # på samme side, bare når de står der.
                     or (href == "#ferdige-lister" and 'id="ferdige-lister"' in html)
+                    # Tillegg 3 til 8.22: knappen for hver ferdige liste går til
+                    # siden «Er du sikker?» for bransjen.
+                    or re.fullmatch(r"/ferdig-liste\?bransje=[A-Za-z%0-9]+", href)
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
@@ -976,7 +979,9 @@ class TestStilarket:
         # Story 2.12: «Følg en aksje» (folg.html) er den sjuende, og story
         # 8.10: «Innstillinger» (innstillinger.html) den åttende. Story 8.21:
         # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
-        assert sider == 9
+        # Tillegg 3 til 8.22: «Er du sikker?» før en ferdig liste
+        # (ferdig_liste.html) er den tiende.
+        assert sider == 10
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,

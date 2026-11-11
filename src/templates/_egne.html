@@ -98,7 +98,8 @@
         <li>{{ egne.kall.margin }} kall: margin</li>
       </ul>
       <p class="stegknapper">
-        {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Velg en bransjeliste</a>{% endif %}
+        {#- Tillegg 3: knappen har samme navn som delen den går til. #}
+        {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>{% endif %}
         {% if egne.full %}<span class="full">Lista er full. Fjern en aksje for å følge en annen.</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
       </p>
     </li>
@@ -115,25 +116,19 @@
         {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp" href="/folg?bytt={{ aksje.symbol }}">Bytt ut</a>{% endif %}</li>
     {% endfor %}
   </ul>
-  {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. #}
+  {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. Tillegg 3
+      (svarene 10.11 kl. 22:44): én knapp per bransje med ikonet og antallet,
+      og én kort setning. Aksjene, det som fjernes, og knappen som bytter,
+      står på siden «Er du sikker?» (/ferdig-liste), og ingenting byttes før
+      den. #}
   {% if egne.ferdige %}
   <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Hver ferdige liste er de opptil {{ egne.tak }} aksjene i en bransje med høyest omsetning: for aksjene appen følger eller har fulgt, regnet av kursene for tre måneder bakover fra siste dag med kurser, og for de andre den siste målingen. Listene er ordnet etter omsetning, ikke etter signalet, og er ikke et råd om hva du bør følge. Velger du en, blir den hele lista di ved neste henting: alle de andre aksjene i lista fjernes, og ønskene som venter, forsvinner.</p>
+  <p>Velger du en bransje, byttes lista di ut med de mest omsatte aksjene i bransjen ved neste henting.</p>
+  <ul class="ferdige-knapper">
   {% for bransje, aksjene in egne.ferdige.items() %}
-    <details class="ferdig-liste">
-      <summary>{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></summary>
-      <ol>
-        {% for a in aksjene %}<li><span class="navn">{{ a.navn }}</span> <span class="linje">{{ a.symbol }}</span>{% if a.symbol in egne.ferdige_utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}</li>{% endfor %}
-      </ol>
-      {%- set ut = egne.lista|rejectattr("symbol", "in", aksjene|map(attribute="symbol")|list)|list|length %}
-      {#- Gjennomgangen (BH3): hva knappen gjør, før den trykkes. #}
-      <p class="foer-knappen">Lista di blir disse {{ aksjene|length }} aksjene ved neste henting{% if ut %}, og {{ ut }} {{ "aksje" if ut == 1 else "aksjer" }} som er i lista nå, fjernes{% endif %}.</p>
-      {#- Story 8.21 (tillegget kl. 14:44): kursene stopper for et åpent tenkt kjøp. #}
-      {%- set med_kjoep = egne.lista|rejectattr("symbol", "in", aksjene|map(attribute="symbol")|list)|selectattr("symbol", "in", aapne_kjoep|list)|map(attribute="symbol")|list %}
-      {% if med_kjoep %}<p class="foer-knappen">{{ med_kjoep|join(", ") }} har et åpent tenkt kjøp. Når {{ "den" if med_kjoep|length == 1 else "de" }} fjernes, hentes ingen nye kurser, så endringen siden kjøpet stopper på den siste dagen med kurser.</p>{% endif %}
-      <form method="post" action="/ferdig-liste"><input type="hidden" name="bransje" value="{{ bransje }}"><button type="submit" class="knapp">Bruk denne lista</button></form>
-    </details>
+    <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></a></li>
   {% endfor %}
+  </ul>
   {% endif %}
   {% if eksempeltall %}<p class="demoboks">Demoen henter ingenting, så et valg står som «Venter på henting». I den ekte versjonen hentes aksjen ved neste henting etter kl. 22.</p>{% endif %}
 </section>

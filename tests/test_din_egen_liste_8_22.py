@@ -92,7 +92,8 @@ def test_demoen_viser_kortene_og_trenger_ingen_noekkel(tmp_path, monkeypatch):
     kortene = _kortene(html)
     assert len(kortene) == 3
     assert "Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri." in kortene[1]
-    assert '<a class="knapp" href="#ferdige-lister">Velg en bransjeliste</a>' in kortene[2]
+    # Tillegg 3 (svarene 10.11 kl. 22:44): knappen har samme navn som delen.
+    assert '<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>' in kortene[2]
     assert 'id="ferdige-lister"' in html
 
 

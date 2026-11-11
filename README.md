@@ -36,11 +36,11 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Investorsiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-390-demo.png)
 *Investorsiden for BRFE i demoen ved 390 px, som på en mobil, med oppdiktede selskaper («Eksempeltall»).*
 
-![«Din egen liste» i Min liste i demoen: de tre stegene som kort, med kallene lista bruker, «Bytt ut» ved hver aksje og de ferdige listene per bransje, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
-*«Din egen liste» i Min liste i demoen, med de tre stegene som kort, kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én liste per bransje. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
+![«Din egen liste» i Min liste i demoen: de tre stegene som kort, med kallene lista bruker, «Bytt ut» ved hver aksje og én knapp per bransje for de ferdige listene, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
+*«Din egen liste» i Min liste i demoen, med de tre stegene som kort, kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én knapp per bransje og siden «Er du sikker?» før lista byttes. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
-![«Følg en aksje» i demoen med bransjen Kraft valgt: antallet, søket, filteret på bransje og målt omsetning, de mest omsatte i bransjen og alle som kan følges, med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/folg-en-aksje-demo.png)
-*«Følg en aksje» i demoen med Kraft valgt, med de mest omsatte i bransjen øverst, ordnet etter omsetningen og ikke etter kursen eller signalet, og «ikke målt ennå» der omsetningen ikke er målt, med oppdiktede selskaper («Eksempeltall»).*
+![«Følg en aksje» i demoen med bransjen Kraft valgt: antallet, søket, filteret på bransje og målt omsetning, sorteringen og alle som kan følges i en tabell, med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/folg-en-aksje-demo.png)
+*«Følg en aksje» i demoen med Kraft valgt og «Mest omsatt først», ordnet etter omsetningen og ikke etter kursen eller signalet, med det valgte i oransje og «ikke målt ennå» der omsetningen ikke er målt, med oppdiktede selskaper («Eksempeltall»).*
 
 ![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-demo.png)
 *«Mine notater» på aksjesiden for BRFE i demoen, med «Etterpå» under hvert notat og et tenkt kjøp og salg, bare i prosent, med oppdiktede selskaper («Eksempeltall»).*
