@@ -43,12 +43,6 @@ SJEKKENE = {
         0: "Interessen ga ikke utslag fordi det ikke ble handlet mye mer enn vanlig.",
     },
 }
-_RETNINGENE = (
-    ("siste_20_positiv", "positivt"),
-    ("siste_20_negativ", "negativt"),
-    ("siste_20_blandet", "blandet"),
-    ("siste_20_ingen", "uten retning"),
-)
 
 
 def opplysningene(prompt: str) -> tuple[dict, str | None]:
