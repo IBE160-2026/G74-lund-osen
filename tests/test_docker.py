@@ -1333,7 +1333,7 @@ HOEYDE_PAA_BILDET = 1864
 # Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_BILDET = "4dd9c5298ddeb536a2be29802d7a04b77f9ddbfd4bd6607259d98adc91992f66"
+AVTRYKK_BAK_BILDET = "3d47a15f932f5795ac153a995d407141c89f9e5dc3babe178624b9f8edee5f95"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1784,7 +1784,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Tillegg 3 og 5 til 8.22 (svarene 10.11 kl. 22:44 og 22:55): avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "a6223ef0dadecb9a7edf158dc58f57fbf59783dd193172b94cd4513d89f985ae"
+AVTRYKK_BAK_AKSJESIDEN = "f7c310da8fdad69034903b188553090c90e744179887645931475eb45e0a8671"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1846,7 +1846,8 @@ DE_NYE_BILDENE = {
     # Story 8.23: 4444, med meldingen øverst, antallet i filteret, «Dine egne aksjer» som tabell
     # og «Vis meg rundt» fra 8.9. Var 4240.
     # Story 10.10: 4602, med navnene og bransjene i «Børsdagen kort fortalt». Var 4444.
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 4602, MALENE_BAK_BILDET),
+    # Story 10.10, tillegget kl. 17:21: 4810, med Gemma-teksten og de tre nye delene.
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 4810, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     # Story 8.23 (tillegg 3): 5021, med tabellen åpen fra start. Var 3327.
@@ -1999,24 +2000,26 @@ DE_NYE_BILDENE = {
 # Story 10.10: demotekstene i de nye formene, ki_dagen.py, dagsgrunnlag.py, ki_visning.py og
 # hjelpetekster.py. Alle bildene ble tatt paa nytt med DevTools-protokollen. Aksjesiden og oversikten
 # ved 390 px er nye; de andre er byte for byte de samme.
+# Story 10.10, tillegget kl. 17:21 og Gemma-tekstene: app.py, dagsgrunnlag.py, index.html, stil.css og
+# demotekstene. Bildene er tatt paa nytt; bare oversikten ved 390 px er ny (4810 px).
 # Flettingen av main (3.6 og 8.22) inn i 10.10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa
 # nytt og er byte for byte de samme. notatene-brfe-390-demo.png er som paa main (8.22), fordi den klippes
 # ut med en fremgangsmaate dette vinduet ikke har.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "3b08f7d125b6ed9405d6874eb4f25ff441532cb6fdfd98e521df3d5db2769acd",
-    TOPPEN_AV_OVERSIKTEN: "4dd9c5298ddeb536a2be29802d7a04b77f9ddbfd4bd6607259d98adc91992f66",
-    "docs/appen/boersometeret-demo.png": "44cd02e6c15a215372ad36b3fc2de368750d52222bbf4a814941a3eb04d3e7e2",
-    "docs/appen/min-liste-demo.png": "8c4f02bbf7061a29509728f076275984132c5c048722a4e1ae3f1b192ca40ad8",
-    "docs/appen/oversikten-390-demo.png": "4dd9c5298ddeb536a2be29802d7a04b77f9ddbfd4bd6607259d98adc91992f66",
-    "docs/appen/boersometeret-390-demo.png": "44cd02e6c15a215372ad36b3fc2de368750d52222bbf4a814941a3eb04d3e7e2",
-    "docs/appen/din-egen-liste-demo.png": "8c4f02bbf7061a29509728f076275984132c5c048722a4e1ae3f1b192ca40ad8",
-    "docs/appen/investorsiden-brfe-demo.png": "8fcb4700590dd422b119233452075794f8decf3c4c94faa1c7e440c57160e692",
-    "docs/appen/investorsiden-brfe-390-demo.png": "8fcb4700590dd422b119233452075794f8decf3c4c94faa1c7e440c57160e692",
-    "docs/appen/folg-en-aksje-390-demo.png": "3b08f7d125b6ed9405d6874eb4f25ff441532cb6fdfd98e521df3d5db2769acd",
-    "docs/appen/notatene-brfe-390-demo.png": "a6223ef0dadecb9a7edf158dc58f57fbf59783dd193172b94cd4513d89f985ae",
-    "docs/appen/notatene-brfe-demo.png": "a6223ef0dadecb9a7edf158dc58f57fbf59783dd193172b94cd4513d89f985ae",
-    "docs/appen/notatene-min-liste-demo.png": "8c4f02bbf7061a29509728f076275984132c5c048722a4e1ae3f1b192ca40ad8",
-    "docs/appen/innstillinger-demo.png": "0d883f6dad47683a81924a0d7d783bb45a64125d8a1526faf5e08e8e343d9669",
+    "docs/appen/folg-en-aksje-demo.png": "bb21e988d7396dbbc25aa7d2ad2b579b53552584fcb3993771233c1f4b9bff60",
+    TOPPEN_AV_OVERSIKTEN: "3d47a15f932f5795ac153a995d407141c89f9e5dc3babe178624b9f8edee5f95",
+    "docs/appen/boersometeret-demo.png": "b8a1ffdf95f10d06810e933da5816594ee9d321ecec53d3f34d29cbc56a858d3",
+    "docs/appen/min-liste-demo.png": "05b461ec6e115fcc9a3c236e98a58e6633133831f09756b57eb77b2e0f3ba0a7",
+    "docs/appen/oversikten-390-demo.png": "3d47a15f932f5795ac153a995d407141c89f9e5dc3babe178624b9f8edee5f95",
+    "docs/appen/boersometeret-390-demo.png": "b8a1ffdf95f10d06810e933da5816594ee9d321ecec53d3f34d29cbc56a858d3",
+    "docs/appen/din-egen-liste-demo.png": "05b461ec6e115fcc9a3c236e98a58e6633133831f09756b57eb77b2e0f3ba0a7",
+    "docs/appen/investorsiden-brfe-demo.png": "1db2067643edee425ad52121086fb92525232a6c4d5f3cb0fe742f4c9d061a56",
+    "docs/appen/investorsiden-brfe-390-demo.png": "1db2067643edee425ad52121086fb92525232a6c4d5f3cb0fe742f4c9d061a56",
+    "docs/appen/folg-en-aksje-390-demo.png": "bb21e988d7396dbbc25aa7d2ad2b579b53552584fcb3993771233c1f4b9bff60",
+    "docs/appen/notatene-brfe-390-demo.png": "f7c310da8fdad69034903b188553090c90e744179887645931475eb45e0a8671",
+    "docs/appen/notatene-brfe-demo.png": "f7c310da8fdad69034903b188553090c90e744179887645931475eb45e0a8671",
+    "docs/appen/notatene-min-liste-demo.png": "05b461ec6e115fcc9a3c236e98a58e6633133831f09756b57eb77b2e0f3ba0a7",
+    "docs/appen/innstillinger-demo.png": "e32648da58f7f328cef417cc738d0dafb79d40bc9c65e1864038d4920317a519",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
