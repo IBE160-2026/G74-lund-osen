@@ -38,6 +38,8 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 
 *Svar 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B (8.22) er flettet (spørsmål 7). Omvisningen flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
 
+*Svar 2026-11-11 kl. 16:26 (gruppens svar):* lista «Ekstra, hvis tiden rekker» står borte fra README-en, og setningen under listene sier «Ekstra» igjen, som før 3.6. Bildegrenene beholdes, så bildene i PR-ene står, og så gruppen kan vise endringene i refleksjonsloggen og rapporten; ingen bildegren slettes. Rådet anbefalte det.
+
 1. **Hvor står knappen?** *Forslag:* ved siden av «Vis meg rundt» øverst, på de samme sidene, og skjult til skriptet er lastet, så den aldri står uten å virke. Med «Vis hjelp» av står den ikke, som «Vis meg rundt».
 2. **Hvilken aksjeside?** *Forslag:* den første aksjen i tabellen på oversikten, som omvisningen leser når den går fra oversikten. I demoen er det BRFE. Min liste vises med «Alle», så tabellen har aksjer også uten stjerner.
 3. **Hvordan huskes tilbudet første gang og et nei?** *Forslag:* i nettleseren (`localStorage`), ikke i basen, så det trengs ingen migrasjon, og storyen kan flettes når som helst. Tilbudet står øverst på oversikten til det er besvart, med «Spill av omvisningen» og «Nei takk», og begge svarene huskes. Hvor omvisningen er mellom sidene, står i `sessionStorage`. Alternativet er en rad i `innstilling`, som krever en ny migrasjon og fletting kl. 23:50–23:58; da gjelder svaret maskinen, ikke nettleseren.
@@ -111,3 +113,15 @@ Instruksjonen kl. 11:59 11.11. Main ble flettet inn i grenen i `07033d0c`. Konfl
 *Lav*
 - *Rettet med ECH1:* ECH3 (fra `/?vis=min` ble aksjesiden den første merkede aksjen) og ECH4 (adressen med valg på oversikten gikk tapt ved «Tilbake»; nå starter omvisningen alltid på `/`).
 - *Ført:* VG3 (ingen test kjører hele løpet når en side uten adresse hoppes over) og VG4 (omvisningen med tom Min liste er bare prøvd i demoen, ikke i den ekte versjonen, som ikke ble startet).
+
+## Stegene fra «Følg en aksje» 11.11 (spørsmål 7)
+
+Instruksjonen kl. 16:07 11.11. Del B (8.22) ble flettet med PR #138, og Utført-linja kom i dagsfila 11.11 kl. 16:19. Main ble flettet inn i grenen i `c6c01170`, med konflikter i README-en, `docs/hjelp.md`, `src/static/hjelp.js`, `tests/test_docker.py` og `issues.md`; begge sidene er beholdt.
+
+- **Stegene** (`5862d1f2`): `OMVISNINGEN_SIDER` og `OMVISNING.SIDENE` har `folg` etter `min_liste`, med adressen `/folg`, og stegene er de to fra «Vis meg rundt» på siden (`folg-tittel` og `q`), 23 steg i demoen. Er lista full, står bare tittelen, og søket hoppes over.
+- **Navnet på siden.** «Følg en aksje» merker oversikten (eller Min liste ved et bytte) i stripa, og rammen ga skriptet det navnet. Da ville omvisningen blitt tilbudt der, og et steg på siden sendt brukeren til samme side igjen. Nå gir siden `omvisning_side="folg"`, og rammen bruker det før `aktiv`.
+- **Feil fra flettingen:** søket fra 8.22 i `hjelp.js` kjørte når testene laster skriptet i Node, uten `document`. Det hopper nå over da, som omvisningen.
+- **README-en** har omvisningen under «Ekstra, ferdig» (svaret kl. 13:49), og setningen under listene sier «Ekstra» igjen (svaret kl. 16:26, `a96e5f12`).
+- **Prøvd i Edge** mot demoen, side for side: alle 23 stegene på de seks sidene er merket, med fokus på boksen; «Tilbake» over en side, Esc og en lenke midt i omvisningen virker, og tilbudet står ikke på `/folg`.
+- **Bildene** i `docs/appen/` er tatt på nytt (`97f3dbe5`): bare de to av «Følg en aksje» ble ulike, med knappen, og med de samme høydene. Bildene av stegene på `pr-8-25-bilder` er tatt på nytt, med et nytt av «Følg en aksje» (`d35e705f`).
+- **Mutanten:** `omvisning_side=None` i `folg_side` ble fanget av to tester i `tests/test_omvisningen_8_25.py`, og `src/app.py` var lik HEAD etterpå (kopi før, sha256 mot HEAD etter).
