@@ -215,3 +215,15 @@ Tekstene står ordrett i PR #145 og i scratchpad.
 Gjennomgangen av denne rettingen (Edge Case Hunter) fant fire lave funn. ECH1: setningen står i anførselstegn, og en modell som kopierer dem, stoppes. ECH2: formen i regelen viser «og ‹N› andre» uten forbehold. Begge står, fordi teksten om dagen alt hadde brukt de tre forsøkene. ECH3: én commit var rød uten den neste, og PR-en flettes med squash. ECH4: død kode i `ki_eksempel.py`, rettet.
 
 13. **Hva skjer når data kommer inn etter teksten (BH2)?** Forsiden viser teksten bare når grunnlaget er det samme som det siden regner ut (FR-607). Kommer en kurs eller en indeksrad inn senere for en dag i vinduene, blir grunnlaget annerledes, og teksten for den dagen forsvinner. Det gjaldt også før for bransjene og «bedre enn indeksen». De nye delene har lengre vinduer: 20 og 5 børsdager. *Forslag:* godta det, som før. Hentingen fyller ikke inn eldre dager, og en dag uten tekst sier «Dagen er uten KI-tekst.».
+
+## Svaret kl. 19:30 (tillegget kl. 19:33)
+
+*Svar 2026-11-11 kl. 19:30 (gruppens svar):* dagsteksten rettes, og PR-en flettes i kveld når alt er grønt. Modellen valgte to av bransjene selv, og formene med «mest» sier det bedre. Når «I snitt steg ‹bransje› mest» eller «I snitt falt ‹bransje› mest» kan stå, er formen «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.» ikke med i reglene, og kontrollen stopper den. Kan ingen av dem stå, gjelder formen som før. Rekkefølgen i reglene er hovedindeksen den dagen, de siste fem børsdagene, «bedre enn indeksen», «skilte seg ut» med «flere/færre enn vanlig» rett etter, navnene, og til slutt bransjene. Rådet anbefalte det.
+
+14. **Skal kontrollen også stoppe en annen rekkefølge?** *Forslag:* nei. Kontrollen sjekker hvert navn og hvert tall uansett hvor de står, så en tekst i en annen rekkefølge sier ikke noe galt. Gemma har byttet om på formene før. Stoppet kontrollen rekkefølgen, ville en riktig tekst forsvunnet fra forsiden for hele dagen. Reglene og eksempelskriveren har rekkefølgen, og testene sjekker det. Bygget etter forslaget.
+
+Bygget: `reglene()` og `BRANSJEFORMEN` i `src/ki_dagen.py` (formen for én bransje settes inn bare uten «mest»), kontrollen i `kontroller_dagen`, rekkefølgen i reglene og i `ki_eksempel.py`, og testene i `TestSvaret1930`. Versjonen står som dag-2, fordi den ikke er flettet, og avtrykket er satt på nytt.
+
+Den nye teksten om dagen fra Gemma besto på første forsøk. Ollama ble stoppet kl. 19:36, fordi dette vinduet startet den.
+
+> Hovedindeksen falt fredag. De siste fem børsdagene falt hovedindeksen. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. Det var flere enn vanlig: snittet de siste 20 børsdagene er 3. Blant dem var Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv), Laksevik Sjømat (3 av 3, blandet), Trygghavn Forsikring (3 av 3, blandet), Havdyp Olje (2 av 3, blandet) og 2 andre. I snitt steg sjømat mest. I snitt falt finans mest.
