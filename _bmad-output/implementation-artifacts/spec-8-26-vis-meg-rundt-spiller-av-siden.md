@@ -225,3 +225,17 @@ Blind Hunter med bare diffen fra `059a4228`, og Edge Case Hunter og Verification
 - **Testene fra 8.22** som så etter adressen som tekst, kallene i steg 3, `<h5>Slik bytter du nøkkel</h5>` og avsnittet «Start fra en ferdig liste», er rettet til det nye oppsettet.
 
 **Ville feilet hvis:** et kort manglet tallet ved tittelen eller handlingen nederst, demoen lenket til eodhd.com, den ekte versjonen ikke åpnet registreringen i en ny fane med adressen fra startskriptet, kallene eller byttet av nøkkel sto i kortene, eller siden i demoen manglet en av delene eller sa noe om kurser.
+
+### Gjennomgangen av tilleggene 10 og 12
+
+Blind Hunter med bare diffen fra `99d0d24a`, og Edge Case Hunter og Verification Gap med repoet. Blind Hunter hadde 14 funn, Edge Case Hunter 9 og Verification Gap 7. Ingen høye. Mutanten for tillegg 12 (demoen lenket til eodhd.com) ble fanget av `test_demoen_lenker_aldri_til_eodhd`, og fila var lik HEAD etterpå.
+
+*Middels*
+- *ECH1, BH2 og VG1, rettet.* Med «Vis hjelp» av forsvant byttet av nøkkel og kallene fra siden, og statusen viste til en «?» som ikke fantes. Nå står de i kortene da, med en test.
+- *BH3, rettet.* Steg 3 sa «dagens 15» fast; nå antallet appen følger, og den ferdige lista nevnes bare når det finnes en (ECH2).
+- *BH1, ikke en feil.* Diffen Blind Hunter fikk, begynte etter tillegg 10. Edge Case Hunter gikk gjennom regelen for `a` i repoet og fant ingen lenke med egen farge som ble overstyrt.
+
+*Lav*
+- *Rettet:* BH6 og ECH5 (tittelen sto to ganger), ECH4 (stilen på kallene i vinduet), ECH8 (hjelpen sa «under»).
+- *Ført:* BH4 og ECH3 (teksten om kallene bruker konstantene fra `valg.py`, linjene regnes av lista), BH5 (linjene står etter tekstene i vinduet), BH7 (setningen om «Følg en aksje» og overskriften «Start fra en ferdig liste» er tatt bort med tavla), BH8 («Åpne eodhd.com» går i demoen til siden som sier at det er demoen), BH10 og ECH9 (plassen til boblen er i rammen på 560 × 400, som på investorsidene), BH11, BH12, BH13, VG2–VG7 (svakere testvakter), BH14 (tonen i boblen; spørsmål 11 har et annet forslag), ECH6 (siden i demoen har data-side for Min liste og leser lista), ECH7 (✓ i grønt).
+- *Ikke en feil:* BH9 (`.skjult` i kortene er avgrenset til oversikten, som Min liste er).
