@@ -982,6 +982,8 @@ def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
     assert len(ruter) == 15
     uten_styrke = 0
     for symbol, rute in ruter.items():
+        # Story 8.23 (A4): lappen (title) gjentar styrken; testen teller teksten i ruta.
+        rute = re.sub(r' title="[^"]*"', "", rute)
         if "uten-data" in re.search(r'<a class="rute ([^"]*)"', rute).group(1).split():
             assert "ikke vurdert" not in rute and "styrke" not in rute, (adresse, symbol)
             assert '<span class="endring">Uten data</span>' in rute

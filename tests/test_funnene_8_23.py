@@ -301,13 +301,17 @@ class TestOransje:
         "velger",
         [
             '.innstillingsbryter[aria-checked="true"] .spor',
-            '.dagsbryter [aria-checked="true"] .spor',
-            '.ki-bryter [aria-checked="true"] .spor',
         ],
     )
     def test_bryterne(self, velger):
-        """Ville feilet hvis en bryter som er på, var svart som før."""
+        """Ville feilet hvis en bryter i Innstillinger som er på, var svart som før."""
         assert "background: var(--oransje)" in _regel(velger)
+
+    def test_bryteren_ved_ki_teksten_er_i_blekk(self):
+        """Hele settet, del 3: ville feilet hvis bryterne ved KI-teksten og ved
+        «Børsdagen kort fortalt» ble oransje, mot spørsmål 5 i 8.2b (blekk)."""
+        for velger in ('.dagsbryter [aria-checked="true"] .spor', '.ki-bryter [aria-checked="true"] .spor'):
+            assert "background: var(--blekk)" in _regel(velger), velger
 
     def test_siden_man_er_paa(self):
         """Ville feilet hvis knappen for siden man er på, var hvit som før."""
@@ -352,7 +356,7 @@ class TestTekstenUnderGrafen:
         html = _html(klient, "/aksje/BRFE")
         fig = html.split("<figcaption>", 1)[1].split("</figcaption>", 1)[0]
         kort = fig.split('<p class="graf-kort">', 1)[1].split("</p>", 1)[0]
-        assert kort.startswith("Linjene er kursen og snittet for de siste 50 børsdagene")
+        assert kort.startswith("Linjene er kursen og 50-dagers snittet")
         detaljer = fig.split('<details class="mer-om-grafen"><summary>Mer om grafen</summary>', 1)[1]
         assert "Det lyse båndet er sjekk 2" in detaljer and "Den stiplede linja er hovedindeksen" in detaljer
         assert "font-size: 1rem" in _regel("figcaption .graf-kort")

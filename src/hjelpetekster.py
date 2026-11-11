@@ -366,18 +366,6 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (INDEX_MAL, "Skilte seg ut <span"),
             ),
         ),
-        # Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): hva 3 av 3
-        # betyr, og linja under «Signalet dag for dag».
-        "tre_av_tre": Hjelpetekst(
-            f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER}:",
-            f"alle de {ANTALL_SJEKKER} sjekkene, trend, bevegelse og interesse, slo ut den dagen, med +1 eller -1. "
-            "Under «Signalet dag for dag» står hvor mange ganger det skjedde det siste året, og den siste dagen, "
-            "av det appen lagret. Det sier ikke hva aksjen gjorde etterpå.",
-            (
-                (SIGNALBEREGNING, "def finn_styrke("),
-                (HISTORIKK, "def alle_sjekkene_det_siste_aaret("),
-            ),
-        ),
         # Story 8.20a (del E): det siste i vinduet for signalstyrken paa
         # aksjesiden, som ikke_raad i én setning.
         "ikke_raad_kort": Hjelpetekst(

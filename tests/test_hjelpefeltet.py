@@ -212,10 +212,11 @@ class TestEttFelt:
     @pytest.mark.parametrize("bredde", [1280, 390])
     def test_et_nytt_spoersmaalstegn_bytter_innholdet(self, sidene, tmp_path, bredde):
         """Kontrollpunktet: et nytt «?» bytter innholdet. Ville feilet hvis
-        to vinduer sto åpne samtidig, «?» for det åpne feltet lukket det, et
-        klikk utenfor lukket det (vinduene er manual med skriptet,
-        gjennomgangen BH5), eller den tomme plassen ble stående etter byttet
-        på smal skjerm (VG4)."""
+        to vinduer sto åpne samtidig, et klikk utenfor lukket det (vinduene
+        er manual med skriptet, gjennomgangen BH5), eller den tomme plassen
+        ble stående etter byttet på smal skjerm (VG4). Story 8.23 (A3,
+        brukertesten 10.11): «?» for det åpne feltet lukker det nå, og et
+        trykk til åpner det igjen."""
         r = _kjoer(
             sidene["/aksje/BRFE"],
             tmp_path,
@@ -228,6 +229,7 @@ class TestEttFelt:
           const saa = aapne().map((f) => f.id);
           b.click(); await vent();
           const igjen = aapne().map((f) => f.id);
+          b.click(); await vent();
           const plasser = document.querySelectorAll(".hjelpeplass").length;
           const d = dekket(document.getElementById(b.getAttribute("popovertarget")));
           const manual = Array.from(document.querySelectorAll(".hjelpevindu")).every((f) => f.popover === "manual");
@@ -242,7 +244,7 @@ class TestEttFelt:
         assert r["a"] != r["b"]
         assert r["foerst"] == [r["a"]]
         assert r["saa"] == [r["b"]]
-        assert r["igjen"] == [r["b"]]
+        assert r["igjen"] == []
         assert r["etter_klikk_utenfor"] == [r["b"]] and r["manual"] is True
         assert r["plasser"] == (0 if bredde == 1280 else 1) and r["dekket"] == [], r
 

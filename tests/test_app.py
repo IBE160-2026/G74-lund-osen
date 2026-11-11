@@ -1638,7 +1638,8 @@ class TestStory80c:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
         stil = _stil(html)
-        assert '<section class="sjekkort bidro"' in html
+        # Story 8.23 (tillegg 2): kortet har også klassen for resultatet.
+        assert re.search(r'<section class="sjekkort (?:opp|ned) bidro"', html)
         assert "background: var(--opp-bakgrunn)" in _regel(stil, ".sjekkort .resultat.opp")
         assert "#fafafa" not in stil
 
@@ -1737,12 +1738,13 @@ class TestStory80c:
         """VG2: like mange rader med class="bidro" som sjekker som slo ut."""
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 60 + [104.0])}))  # 2 av 3
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
-        assert html.count('<section class="sjekkort bidro"') == 2
-        assert html.count('<section class="sjekkort"') == 1
+        # Story 8.23 (tillegg 2): kortet har også klassen for resultatet.
+        assert len(re.findall(r'<section class="sjekkort (?:opp|ned) bidro"', html)) == 2
+        assert html.count('<section class="sjekkort ingen"') == 1
         # Gjennomgangen 15.10 (BH12, ECH7): det som skiller kortene for synet,
         # er pillen med farge etter fortegnet (utdraget §8). Kortet uten
         # utslag har den grå pillen.
-        kortene = re.findall(r'<section class="sjekkort( bidro)?"(.*?)</section>', html, re.DOTALL)
+        kortene = re.findall(r'<section class="sjekkort (?:opp|ned|ingen)( bidro)?"(.*?)</section>', html, re.DOTALL)
         assert len(kortene) == 3
         for bidro, innhold in kortene:
             klasse = re.search(r'class="resultat fortegn ([a-z]+)"', innhold).group(1)
@@ -3465,7 +3467,8 @@ def _valgt(html: str) -> list[str]:
 
 
 def _foerste_og_siste_dag(html: str) -> str:
-    return re.search(r"<figcaption>\s*(\S+ til \S+)\.", html).group(1)
+    # Story 8.23 (tillegg 2): datoene står først bak «Mer om grafen».
+    return re.search(r"<summary>Mer om grafen</summary><p>\s*(\S+ til \S+)\.", html).group(1)
 
 
 def _dagen(html: str) -> str:

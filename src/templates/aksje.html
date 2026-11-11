@@ -304,7 +304,7 @@
         {#- Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): først en kort
             forklaring i vanlig størrelse av linjene og tegnene, og detaljene bak
             «Mer om grafen», med de samme setningene som før. #}
-        <p class="graf-kort">{% if graf.har_ma50 %}Linjene er kursen og snittet for de siste {{ parametre.ma_vindu }} børsdagene{% else %}Linja er kursen{% endif %}{% if graf.har_indeks %}, og den stiplede er hovedindeksen{% endif %}.{% if signal_fra and graf.signaldager %} Prikkene er dager med signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% if graf.baand and graf.volumfelt %} Båndet og søylene viser sjekk 2 og 3.{% elif graf.baand %} Båndet viser sjekk 2.{% elif graf.volumfelt %} Søylene viser sjekk 3.{% endif %}{% if graf.justeringsdager %} De korte strekene nederst er justeringsdager.{% endif %}</p>
+        <p class="graf-kort">{% if graf.har_ma50 %}Linjene er kursen og {{ parametre.ma_vindu }}-dagers snittet{% else %}Linja er kursen{% endif %}{% if graf.har_indeks %}, og den stiplede er hovedindeksen{% endif %}.{% if signal_fra and graf.signaldager %} Prikkene er dager med signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% if graf.baand and graf.volumfelt %} Båndet og søylene viser sjekk 2 og 3.{% elif graf.baand %} Båndet viser sjekk 2.{% elif graf.volumfelt %} Søylene viser sjekk 3.{% endif %}{% if graf.justeringsdager %} De korte strekene nederst er justeringsdager.{% endif %}</p>
         <details class="mer-om-grafen"><summary>Mer om grafen</summary><p>
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
         {#- FR-201: 1 år, og de andre periodene, viser bare det serien har. #}
@@ -491,12 +491,12 @@
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
   {% endif %}
-  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "tre_av_tre", "ikke_raad_kort"])]) }}
+  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad_kort"])]) }}
   {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
     ("", ["retning_aksje", "positiv_aksje", "negativ_aksje", "blandet_aksje", "ingen_aksje", "ukjent_aksje", "oftere_positiv"]),
   ]) }}
   {{ hjelpevindu("hjelp-sjekkene", "Sjekkene", [("", ["sjekkene" if detalj.sjekker else "sjekkene_uten"])]) }}
-  {{ hjelpevindu("hjelp-historikk", "Signalet dag for dag", [("", ["historikken", "tre_av_tre"])]) }}
+  {{ hjelpevindu("hjelp-historikk", "Signalet dag for dag", [("", ["historikken"])]) }}
   {#- Story 10.9, del D: «?» ved rammen «Signalet forklart», som vises med
       sjekkene, også med KI av. #}
   {% if detalj.sjekker %}{{ hjelpevindu("hjelp-ki", "Signalet forklart", [("", ["signalet_forklart"])]) }}{% endif %}

@@ -1314,7 +1314,7 @@ HOEYDE_PAA_BILDET = 1864
 # Story 8.9: «Vis meg rundt» på hver side (hjelpetekster.py, _ramme.html, _rundtur.html, malene og
 # stil.css). Flettingen av main (med 2.4, 2.6, 8.14 og 8.7) inn i 8.9: avtrykkene er regnet ut paa nytt,
 # og bildene er tatt paa nytt.
-AVTRYKK_BAK_BILDET = "2db9c99abfc3b1ff453f868198adbc24d2b3a287cb4cedbca7f71b03295d15a7"
+AVTRYKK_BAK_BILDET = "6195a5ea4143d17ce1be38715bde0c958aab9ea116199f300bf193e11f6e89f6"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1744,7 +1744,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 8.7: båndet og volumet i kursgrafen (graf.py, aksjedetalj.py, signalberegning.py, aksje.html og
 # stil.css). Flettingen av main (med 2.4, 2.6 og 8.14) inn i 8.7: avtrykkene er regnet ut paa nytt, og
 # bildene er tatt paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "6a0ffa33a3ca59bff410ec132032be00c15398a2d566b9868084f712b1c93272"
+AVTRYKK_BAK_AKSJESIDEN = "6ec96c4775c4507f1669d6614c8982f29f6cc6999162e842f424fc3918f23208"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1912,12 +1912,12 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "2db9c99abfc3b1ff453f868198adbc24d2b3a287cb4cedbca7f71b03295d15a7",
-    "docs/appen/boersometeret-demo.png": "30ec9d480a00494993d0a67157aab24bf92b8a430b38006f9f1003790a6ee8ea",
-    "docs/appen/min-liste-demo.png": "864b68b67e70614e4d94575e846b78b31fc67eba807247923a265699005d3e79",
-    "docs/appen/oversikten-390-demo.png": "2db9c99abfc3b1ff453f868198adbc24d2b3a287cb4cedbca7f71b03295d15a7",
-    "docs/appen/boersometeret-390-demo.png": "30ec9d480a00494993d0a67157aab24bf92b8a430b38006f9f1003790a6ee8ea",
-    "docs/appen/din-egen-liste-demo.png": "864b68b67e70614e4d94575e846b78b31fc67eba807247923a265699005d3e79",
+    TOPPEN_AV_OVERSIKTEN: "6195a5ea4143d17ce1be38715bde0c958aab9ea116199f300bf193e11f6e89f6",
+    "docs/appen/boersometeret-demo.png": "4c83c1be0a171d0f062f3a021315945067da9c8af782a9f7d7c3d864eac84147",
+    "docs/appen/min-liste-demo.png": "0407c37dc9eb01282201c2ee12f8c053be313bb6c9c714beed4f31353f447b48",
+    "docs/appen/oversikten-390-demo.png": "6195a5ea4143d17ce1be38715bde0c958aab9ea116199f300bf193e11f6e89f6",
+    "docs/appen/boersometeret-390-demo.png": "4c83c1be0a171d0f062f3a021315945067da9c8af782a9f7d7c3d864eac84147",
+    "docs/appen/din-egen-liste-demo.png": "0407c37dc9eb01282201c2ee12f8c053be313bb6c9c714beed4f31353f447b48",
     "docs/appen/investorsiden-brfe-demo.png": "03b05f1662a080d91e12e5a670046bac0eaa2dcf6c50b0478ccb6e88d0bf5ca7",
     "docs/appen/investorsiden-brfe-390-demo.png": "03b05f1662a080d91e12e5a670046bac0eaa2dcf6c50b0478ccb6e88d0bf5ca7",
 }

@@ -392,7 +392,9 @@ class TestAksjesiden:
         for rad in radene:
             bildet, _ = dagene[rad.emne.symbol]
             side = klient.get(f"/aksje/{rad.emne.symbol}").data.decode("utf-8")
-            assert f'<p class="samme-dag">{escape(setning_om_samme_dag(bildet))}</p>' in side, rad.emne.symbol
+            # Story 8.23 (tillegg 2): med antallet aksjer i lista den dagen, de 15 i demoen.
+            forventet = setning_om_samme_dag(bildet, len(demo.DEMOUNIVERS))
+            assert f'<p class="samme-dag">{escape(forventet)}</p>' in side, rad.emne.symbol
             assert rad.grunnlag.get("hovedindeksen") == bildet.hovedindeksen, rad.emne.symbol
             # Gjennomgangen (BH12, VG2): ogsaa aksjen.
             assert rad.grunnlag.get("aksjen") == bildet.aksjen, rad.emne.symbol
