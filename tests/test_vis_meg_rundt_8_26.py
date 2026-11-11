@@ -756,7 +756,7 @@ class TestEtterGjennomgangenAvTillegg6Og8:
 
 
 class TestLenkene:
-    def test_en_felles_regel_uten_spesifisitet(self):
+    def test_en_felles_regel_for_lenkene(self):
         """Ønsket kl. 20:06: ville feilet hvis lenkene ikke hadde en felles
         regel som gir samme farge før og etter besøk, så navnet i et notat
         sto blått og så lilla, eller regelen overstyrte lenker med egen farge."""
