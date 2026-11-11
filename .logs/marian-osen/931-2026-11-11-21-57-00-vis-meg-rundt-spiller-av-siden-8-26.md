@@ -31,3 +31,29 @@ Instruksjonen kl. 18:01, etter gruppens svar 11.11 kl. 16:58, 17:06, 17:12 og 17
 - Spørsmål 9 (VG1, middels): testene av boksen i nettleseren søker i kildeteksten.
 - Spørsmål 10 (ECH2, middels): forklaringen på hvorfor en aksje er uten kurser, som tillegg 8 har den.
 - Tilleggene 5, 7, 9, 11, 13 og 14 er ikke limt inn i vinduet, og tillegg 15 venter på tillegg 14.
+
+## 2026-11-12 kl. 00:59 — Marian Osen
+
+### Oppgave
+Tilleggene 5, 7, 9, 13, 14, 16, 17, 18, 19 og 20 til 8.26, og tillegg 15 som stoppet kl. 20:46, etter gruppens svar og ønsker 11.11 kl. 18:09–22:20. Tilleggene kom til vinduet 11.11 kl. 22:05–22:25 og ble lagret ordrett i scratchpad med klokkeslett fra `date`. Tillegg 11 kom aldri.
+
+### Plan
+- Tilleggene i den rekkefølgen de kom, med 17 først. Steg 1 i tillegg 18 (hjelpetekstene) kom etter de andre, og bilderunden i tillegg 16 til slutt, etter grønn CI.
+- Pytest var stengt kl. 22:15–23:50, så testene ble skrevet før og kjørt etter kl. 23:50. Gjennomgangen med de tre agentene ble gjort uten pytest.
+
+### Resultat
+- Tillegg 17 (`301d92ca`): brikkene i «Følg en aksje» med antallet, grå ved 0 og filtrering med en gang (`FOLGLISTA` i `hjelp.js`). Overskriften og linja om 3 av 3 følger dagen med «Vis dagen». «Signalet er ikke regnet ennå» for Varde Systemer. «Oppdatert …» på alle sidene med basen.
+- Tillegg 18: hjelpetekstene på høyst 50 ord og tre setninger, uten «basen», «kilden» og «kontrollsjekken», med en tabell før og etter i spesifikasjonen. Bryteren «Vis KI-tekst» er lik på alle tre stedene, og stegene om signalstyrken og retningen merker bare kolonnen.
+- Tillegg 19: eksempelboksen i demoen er borte (Rettet-linje i spesifikasjonen for 8.23). Tillegg 20: KI-stegene, hele omvisningen uten stegene som gjentas, og README-en.
+- Tillegg 5 og 7: setningen om den første knappen og «Uten ramme/ring: 0 eller 1 av 3.». Tillegg 9 og 13 var alt gjort; testene dekker dem nå. Tillegg 14 og 15: «Følg flere aksjer» som tegnet.
+- Gjennomgangen (Blind Hunter 15 funn, Edge Case Hunter 9, Verification Gap 12). To høye (VG1/VG2, eldre tester) og VG3 (vinduene over 60 ord) er rettet. VG3 er også spørsmål 22. Rettingene står i `fb43d76a`, og triagen i spesifikasjonen.
+- Testene etter kl. 23:50 viste regler fra før som tekstene og README-en brøt: tre setninger (8.0c), fem avsnitt i «Kom i gang» (3.5i), 20 ord under «Ekstra», ordene fra utdraget 08.11 og designforslaget, og «uten ramme» i hjelpen. Alt er rettet i `7582131f` og commiten etter.
+- Mutantene M13–M26, én per tillegg: alle fanget, og hver fil var lik HEAD etterpå.
+- Hele settet i seks deler: 5524 bestått og 24 hoppet over (5548, likt `--collect-only`). Bildene i `docs/appen/` er tatt på nytt med høydene og avtrykkene.
+- CI er grønn på `6b2b5067`. Bilderunden i tillegg 16 ligger på bildegrenen med kontaktark, og PR #146 har lista. Ikke flettet.
+- Brudd på rammene i instruksjonen: `git status` kl. 22:11 og `git archive` kl. 22:16 i stilletiden for git, begge bare lesing. Mutantene kl. 00:06, `--collect-only` kl. 00:13 og testene kl. 00:28–00:30 startet mens et annet vindu kjørte pytest; etter det har hver kjøring en betingelse foran.
+
+### Åpne punkter
+- Spørsmål 12–22 i spesifikasjonen venter på gruppen. Spørsmål 22 (VG3, middels) står åpent til gruppen har svart (regel 25).
+- Tillegg 11 er ikke limt inn i vinduet.
+- Ved 390 px er tabellen i «Følg en aksje» kuttet til høyre («Føl…»), også før 8.26 (kontaktarket på bildegrenen).
