@@ -462,3 +462,15 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           uv run pytest -q -p no:cacheprovider -rs tests/test_kveldshenting.py | tee "$RUNNER_TEMP/kveld.log"
           if grep -q "skipped" "$RUNNER_TEMP/kveld.log"; then echo "En test for kveldshentingen ble hoppet over"; exit 1; fi
+
+      # Story 3.6 (gjennomgangen, VG1): snarveien på skrivebordet lages i
+      # en midlertidig mappe. Testene hoppes over på Linux, så her feiler
+      # steget hvis noen hoppes over.
+      - name: Snarveien på Windows
+        if: runner.os == 'Windows'
+        shell: bash
+        timeout-minutes: 10
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv run pytest -q -p no:cacheprovider -rs tests/test_ikonet_og_snarveien_3_6.py -k "Snarveien" | tee "$RUNNER_TEMP/snarvei.log"
+          if grep -q "skipped" "$RUNNER_TEMP/snarvei.log"; then echo "En test for snarveien ble hoppet over"; exit 1; fi
