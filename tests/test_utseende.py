@@ -353,6 +353,9 @@ class TestRammen:
                     # «Avbryt» tilbake til de ferdige listene.
                     or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
                     or href in ("/min-liste#ferdige-lister", "/#dine-egne-aksjer")
+                    # Story 8.26 (tillegg 12): «Åpne eodhd.com» i demoen, og
+                    # tilbake til Min liste fra den siden.
+                    or href in ("/eodhd-demo", "/min-liste#din-egen-liste")
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
@@ -998,8 +1001,9 @@ class TestStilarket:
         # 8.10: «Innstillinger» (innstillinger.html) den åttende. Story 8.21:
         # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
         # Tillegg 3 til 8.22: «Er du sikker?» før en ferdig liste
-        # (ferdig_liste.html) er den tiende.
-        assert sider == 10
+        # (ferdig_liste.html) er den tiende. Story 8.26 (tillegg 12): siden for
+        # «Åpne eodhd.com» i demoen (eodhd_demo.html) er den ellevte.
+        assert sider == 11
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,

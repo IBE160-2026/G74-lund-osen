@@ -776,3 +776,82 @@ class TestLenkene:
         den felles regelen."""
         notatene = _side(klient, "/min-liste").split('id="mine-notater"', 1)[1]
         assert re.search(r'<a href="/aksje/[A-Z]+">', notatene)
+
+
+# --- 9) Tillegg 12: «Din egen liste» som på tavla, og siden i demoen --------
+
+
+def _stegene(side: str) -> list[str]:
+    delen = side.split('id="din-egen-liste"', 1)[1].split("</ol>", 1)[0]
+    return re.findall(r'<li class="kort-steg">(.*?)</li>\s*(?=<li class="kort-steg">|$)', delen, re.S)
+
+
+class TestDinEgenListeSomTavla:
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_tre_kort_med_tittelen_ved_tallet_og_en_handling(self, versjon, request):
+        """Svaret kl. 20:28: ville feilet hvis et kort ikke hadde tallet og
+        tittelen i samme topp, eller ikke hadde handlingen nederst."""
+        k = request.getfixturevalue(versjon)
+        if versjon == "ekte":
+            k.post("/min-liste/merk", data={"symbol": "EQNR", "til": "merk", "tilbake": "/"})
+        kortene = _stegene(_side(k, "/min-liste"))
+        assert len(kortene) == 3
+        for nummer, kort in enumerate(kortene, 1):
+            assert re.search(
+                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h4>', kort
+            ), nummer
+            assert kort.rstrip().endswith("</p>") and '<p class="handling">' in kort, nummer
+        assert "kort-steg .handling { margin-top: auto;" in STIL
+
+    def test_demoen_lenker_aldri_til_eodhd(self, klient):
+        """Ville feilet hvis demoen lenket til eodhd.com, i stedet for siden
+        i demoen, eller sa at nøkkelen virket."""
+        for sti in ("/", "/min-liste", "/min-liste?vis=alle", "/eodhd-demo", "/folg"):
+            assert "eodhd.com/register" not in _side(klient, sti), sti
+        kortene = _stegene(_side(klient, "/min-liste"))
+        assert '<a class="knapp" href="/eodhd-demo">Åpne eodhd.com</a>' in kortene[0]
+        assert '<span class="hake" aria-hidden="true">✓</span> Demoen trenger ingen nøkkel.</span>' in kortene[1]
+
+    def test_den_ekte_versjonen_lenker_til_registreringen(self, ekte):
+        """Ville feilet hvis den ekte versjonen ikke åpnet registreringen hos
+        EODHD i en ny fane, med samme adresse som startskriptet, eller hadde
+        siden fra demoen."""
+        ekte.post("/min-liste/merk", data={"symbol": "EQNR", "til": "merk", "tilbake": "/"})
+        kortene = _stegene(_side(ekte, "/min-liste"))
+        assert (
+            f'<a class="knapp" href="{app_modul.EODHD_REGISTRERING}" target="_blank" rel="noreferrer">Åpne eodhd.com'
+            '<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>'
+        ) in kortene[0]
+        for skript in ("start/start.ps1", "start/start.sh"):
+            assert app_modul.EODHD_REGISTRERING in (ROT / skript).read_text(encoding="utf-8"), skript
+        assert ekte.get("/eodhd-demo").status_code == 404
+
+    def test_kallene_og_noekkelen_bak_spoersmaalstegnet(self, klient):
+        """Ville feilet hvis kallene, regnet av lista, bransjelistene eller
+        «Slik bytter du nøkkel» sto i kortene i stedet for bak «?»."""
+        side = _side(klient, "/min-liste")
+        kortene = _stegene(side)
+        assert 'popovertarget="hjelp-noekkel"' in kortene[1] and "Slik bytter du nøkkel" not in kortene[1]
+        assert 'popovertarget="hjelp-kallene"' in kortene[2] and "kall: margin" not in kortene[2]
+        vindu = side.split('id="hjelp-kallene"', 1)[1].split('<p class="lukkes">', 1)[0]
+        assert re.search(r"<li>\d+ kall: margin</li>", vindu) and "mest omsatte aksjene i bransjen" in vindu
+        assert 'id="ferdige-lister"' in kortene[2] and 'class="knapp ferdigknapp"' in kortene[2]
+
+    def test_siden_i_demoen(self, klient):
+        """Ville feilet hvis siden i demoen manglet lenken tilbake, tegningen,
+        boblen, KI-merket eller teksten nederst, eller boblen sa noe om kurser
+        eller kjøp og salg (NFR-06)."""
+        from investorsider import EODHD_BOBLE
+        from test_hjelpetekster import RAADSORD
+
+        side = _side(klient, "/eodhd-demo")
+        assert '<a class="tilbake" href="/min-liste#din-egen-liste">Tilbake til Min liste</a>' in side
+        assert '<img src="/static/demo/eodhd.svg" width="560" height="400"' in side
+        assert '<p class="boble"' in side and EODHD_BOBLE in html.unescape(side)
+        assert '<figcaption class="ki-merke">Illustrasjon laget av KI</figcaption>' in side
+        assert "så ingen konto trengs" in side and "registreringen hos EODHD i en ny fane" in side
+        for ord_ in RAADSORD:
+            assert not re.search(ord_, EODHD_BOBLE, re.IGNORECASE), ord_
+        assert not re.search(r"kurs|kjøp|selg|salg", EODHD_BOBLE, re.IGNORECASE)
+        tegningen = (ROT / "src" / "static" / "demo" / "eodhd.svg").read_text(encoding="utf-8")
+        assert "<title" in tegningen and "<desc" in tegningen and "http" not in tegningen.split("xmlns=", 1)[1][60:]

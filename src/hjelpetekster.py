@@ -33,6 +33,7 @@ from signalberegning import (
     nodvendige_dager,
 )
 from tallformat import HARDT_MELLOMROM, tall
+from valg import INDEKSKALL, KALL_PER_AKSJE, KVOTE
 
 # Kildene, som stier fra roten av repoet.
 PRD = "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md"
@@ -674,6 +675,32 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         # Story 2.12 (utdraget 08.11 §1): hjelpen ved «Dine egne aksjer», med
         # ordene fra utdraget i tre setninger (story 8.0c).
+        # Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): steg 2 og 3 i
+        # «Din egen liste» som på tavla, med det som sto i kortene, bak «?».
+        "bytt_noekkel": Hjelpetekst(
+            "Slik bytter du nøkkel:",
+            "slett det som står etter EODHD_API_KEY= i fila .env i mappa til appen. Neste gang den ekte "
+            "versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye.",
+            (("start/start.ps1", "EODHD_API_KEY"), ("start/start.sh", "EODHD_API_KEY")),
+        ),
+        "bytt_noekkel_docker": Hjelpetekst(
+            "",
+            "Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter EODHD_API_KEY= selv og "
+            "starter appen på nytt. Siden har ikke noe felt for nøkkelen, fordi den aldri rører den.",
+            ((APP, "AD-10"),),
+        ),
+        "kallene_lista": Hjelpetekst(
+            "Kallene:",
+            f"hver aksje bruker {KALL_PER_AKSJE} av de {KVOTE} kallene i døgnet hos EODHD, og hovedindeksen "
+            f"{INDEKSKALL}. Det som er igjen, er margin til et nytt forsøk hvis noe feiler.",
+            ((VALG, "KVOTE = 20"), (VALG, "INDEKSKALL = 1"), (VALG, "KALL_PER_AKSJE = 1")),
+        ),
+        "ferdige_lister_kort": Hjelpetekst(
+            "De ferdige listene:",
+            "velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de "
+            "mest omsatte aksjene i bransjen.",
+            ((FERDIGE_LISTER, "def lister("),),
+        ),
         "dine_egne_aksjer": Hjelpetekst(
             "",
             "Lista kan ha opptil 18 aksjer, og aksjer du følger selv, står i tabellen sammen med de andre, merket "

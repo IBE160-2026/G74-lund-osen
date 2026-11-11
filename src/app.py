@@ -85,7 +85,7 @@ from hjelpetekster import (
     rundturer,
 )
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
-from investorsider import demoside
+from investorsider import demoside, eodhd_demoside
 from justeringsdager import justeringsdager
 from ki_visning import (
     AV,
@@ -323,6 +323,8 @@ _RUTER_MED_BASE = {
     "merk",
     "boersometer",
     "demoselskap",
+    # Story 8.26 (tillegg 12): siden for «Åpne eodhd.com» i demoen.
+    "eodhd_demo",
     # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
     "folg_side",
     # Tillegg 3 til 8.22: siden «Er du sikker?» før en ferdig liste.
@@ -1778,6 +1780,24 @@ def _gyldig_dato(verdi: str) -> bool:
     except ValueError:
         return False
     return True
+
+
+# Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): registreringen hos
+# EODHD, samme adresse som startskriptet åpner (start.ps1 og start.sh).
+EODHD_REGISTRERING = "https://eodhd.com/register"
+app.jinja_env.globals["eodhd_registrering"] = EODHD_REGISTRERING
+
+
+@app.route("/eodhd-demo")
+def eodhd_demo():
+    """Story 8.26 (tillegg 12): siden «Åpne eodhd.com» i steg 1 går til i
+    demoen, i samme oppsett som investorsidene. Bare i demoen: den ekte
+    versjonen lenker til registreringen hos EODHD, og ruta svarer 404."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler") or not g.get("eksempeltall"):
+        abort(404)
+    return render_template("eodhd_demo.html", side=eodhd_demoside(), aktiv="min_liste")
 
 
 @app.route("/investorside/<symbol>")

@@ -1303,7 +1303,8 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
    hjørner som de andre kortene, og nummeret i en sirkel. */
 :where(.side-oversikt) .stegkort { list-style: none; padding: 0; margin: 12px 0 16px; display: grid; gap: 12px;
                                    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-:where(.side-oversikt) .kort-steg { padding: 16px 18px; border: 1px solid var(--strek); border-radius: 12px; background: var(--kort); }
+:where(.side-oversikt) .kort-steg { padding: 16px 18px; border: 1px solid var(--strek); border-radius: 12px; background: var(--kort);
+                                    display: flex; flex-direction: column; }
 :where(.side-oversikt) .kort-steg h4 { margin: 8px 0 6px; font-size: 16px; }
 :where(.side-oversikt) .kort-steg p { margin: 6px 0; }
 :where(.side-oversikt) .stegnummer { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px;
@@ -1315,6 +1316,16 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .kort-steg .noekkelstatus { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--strek-2);
                                                    border-radius: 10px; font-size: 14px; }
 :where(.side-oversikt) .kort-steg h5 { margin: 12px 0 4px; font-size: 14px; }
+/* Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): som tavla «Min
+   liste» 13.10: tittelen i Newsreader ved siden av tallet, like høye kort og
+   handlingen nederst, og statusen i steg 2 som én linje med ✓. */
+:where(.side-oversikt) .kort-steg .steg-topp { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+:where(.side-oversikt) .kort-steg .steg-topp h4 { margin: 0; font-family: "Newsreader", Georgia, serif; font-size: 20px; font-weight: 600; }
+:where(.side-oversikt) .kort-steg .stegnummer { flex: none; }
+:where(.side-oversikt) .kort-steg .handling { margin-top: auto; padding-top: 10px; }
+:where(.side-oversikt) .kort-steg .handling .noekkelstatus { display: block; margin: 0; }
+:where(.side-oversikt) .kort-steg .noekkelstatus.virker { border: none; padding: 0; }
+:where(.side-oversikt) .kort-steg .hake { color: var(--opp); font-weight: 700; }
 :where(.side-oversikt) .stegknapper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 :where(.side-oversikt) .folgskjema { display: grid; gap: 10px; margin: 16px 0; }
 :where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }

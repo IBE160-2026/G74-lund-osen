@@ -35,7 +35,12 @@ def test_tre_stegkort_i_rekkefoelgen_fra_utdraget(klient):  # noqa: F811
         "2",
         "3",
     ]
-    assert "Adressen er eodhd.com." in kortene[0]
+    # Story 8.26 (tillegg 12): knappen til registreringen hos EODHD i en ny
+    # fane, i stedet for adressen som tekst (spørsmål 9 er rettet).
+    assert (
+        '<a class="knapp" href="https://eodhd.com/register" target="_blank" rel="noreferrer">Åpne eodhd.com'
+        in kortene[0]
+    )
 
 
 def test_noekkelen_har_ikke_noe_felt(klient):  # noqa: F811
@@ -44,12 +49,16 @@ def test_noekkelen_har_ikke_noe_felt(klient):  # noqa: F811
     sa hvordan nøkkelen byttes med startskriptet."""
     html = klient.get("/min-liste").data.decode("utf-8")
     andre = _kortene(html)[1]
-    assert "<input" not in andre and "<button" not in andre and "Sjekk nøkkelen" not in andre
+    # Story 8.26 (tillegg 12): bare «?» er en knapp i steg 2.
+    uten_hjelp = re.sub(r'<button type="button" class="hjelpeknapp"[^>]*>\?</button>', "", andre)
+    assert "<input" not in andre and "<button" not in uten_hjelp and "Sjekk nøkkelen" not in andre
     assert not re.search(r'<input[^>]*type="(text|password)"', _delen(html))
     assert "Demoen trenger ingen nøkkel" not in andre
-    assert "<h5>Slik bytter du nøkkel</h5>" in andre
+    # Story 8.26 (tillegg 12): «Slik bytter du nøkkel» står bak «?».
+    assert 'popovertarget="hjelp-noekkel"' in andre
     assert (
-        "Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye." in andre
+        "Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye."
+        in html.split('id="hjelp-noekkel"', 1)[1]
     )
     assert "Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen." in andre
 
@@ -59,10 +68,13 @@ def test_kallene_og_knappene_i_steg_3(klient):  # noqa: F811
     lista, eller knappen til «Følg en aksje» manglet."""
     html = klient.get("/min-liste").data.decode("utf-8")
     tredje = _kortene(html)[2]
-    assert "<li>15 kall: de 15 aksjene</li>" in tredje and "<li>4 kall: margin</li>" in tredje
+    # Story 8.26 (tillegg 12): kallene, regnet av lista, står bak «?».
+    vindu = html.split('id="hjelp-kallene"', 1)[1].split('<p class="lukkes">', 1)[0]
+    assert "<li>15 kall: de 15 aksjene</li>" in vindu and "<li>4 kall: margin</li>" in vindu
+    assert 'popovertarget="hjelp-kallene"' in tredje
     assert '<a class="knapp hoved" href="/folg">+ Følg en aksje</a>' in tredje
     # Kallene står bare ett sted.
-    assert _delen(html).count("kall: hovedindeksen") == 1
+    assert html.count("kall: hovedindeksen") == 1
 
 
 def test_full_liste_i_steg_3(klient):  # noqa: F811
@@ -94,10 +106,11 @@ def test_demoen_viser_kortene_og_trenger_ingen_noekkel(tmp_path, monkeypatch):
     html = app_modul.app.test_client().get("/min-liste").data.decode("utf-8")
     kortene = _kortene(html)
     assert len(kortene) == 3
-    assert "Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri." in kortene[1]
-    # Tillegg 3 (svarene 10.11 kl. 22:44): knappen har samme navn som delen.
-    assert '<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>' in kortene[2]
-    assert 'id="ferdige-lister"' in html
+    # Story 8.26 (tillegg 12): én linje med ✓, de ferdige listene som brikker
+    # i steg 3, og «Åpne eodhd.com» til siden i demoen.
+    assert '<span class="hake" aria-hidden="true">✓</span> Demoen trenger ingen nøkkel.</span>' in kortene[1]
+    assert 'id="ferdige-lister"' in kortene[2] and 'class="knapp ferdigknapp"' in kortene[2]
+    assert '<a class="knapp" href="/eodhd-demo">Åpne eodhd.com</a>' in kortene[0] and "eodhd.com/register" not in html
 
 
 def test_kallene_i_steg_3_er_regnet_av_lista(klient, stier):  # noqa: F811
@@ -117,9 +130,11 @@ def test_kallene_i_steg_3_er_regnet_av_lista(klient, stier):  # noqa: F811
         valg.ta_i_bruk(t, date(2026, 9, 23))
     finally:
         t.close()
-    tredje = _kortene(klient.get("/min-liste").data.decode("utf-8"))[2]
-    assert "<li>15 kall: de 15 aksjene</li>" in tredje and "<li>1 kall: din egen aksje</li>" in tredje
-    assert "<li>3 kall: margin</li>" in tredje
+    # Story 8.26 (tillegg 12): bak «?» i steg 3.
+    side = klient.get("/min-liste").data.decode("utf-8")
+    vindu = side.split('id="hjelp-kallene"', 1)[1].split('<p class="lukkes">', 1)[0]
+    assert "<li>15 kall: de 15 aksjene</li>" in vindu and "<li>1 kall: din egen aksje</li>" in vindu
+    assert "<li>3 kall: margin</li>" in vindu
 
 
 # Tillegg 4 (svaret 10.11 kl. 22:50): steg 2 som på designtavla, uten felt.
@@ -152,8 +167,8 @@ def test_statusen_er_kallene_hentingen_brukte(stier, monkeypatch):  # noqa: F811
     andre = _kortene(k.get("/min-liste").data.decode("utf-8"))[1]
     assert kall
     assert (
-        f'<p class="noekkelstatus virker">Nøkkelen virket ved siste henting 22.09, som brukte minst {len(kall)} '
-        f"av {valg.KVOTE} kall.</p>"
+        f'<span class="hake" aria-hidden="true">✓</span> Nøkkelen virket ved siste henting 22.09, som brukte minst '
+        f"{len(kall)} av {valg.KVOTE} kall.</span>"
     ) in andre
     assert "Ingen henting har lagret kurser ennå" not in andre
     monkeypatch.setattr(valg, "KVOTE", 25)
@@ -209,7 +224,7 @@ def test_et_kall_som_feiler_og_proeves_igjen_gir_minst(stier, monkeypatch):  # n
 
     def status() -> str:
         andre = _kortene(app_modul.app.test_client().get("/min-liste").data.decode("utf-8"))[1]
-        return re.search(r'<p class="noekkelstatus virker">(.*?)</p>', andre).group(1)
+        return re.search(r'<span class="hake" aria-hidden="true">✓</span> (.*?)</span>', andre).group(1)
 
     # Etter feilen: 15 serier er lagret, men hentingen brukte 16 kall.
     assert status() == f"Nøkkelen virket ved siste henting 22.09, som brukte minst {KALL - 1} av {valg.KVOTE} kall."
@@ -234,7 +249,7 @@ def test_uten_henting_staar_hva_man_gjoer(klient, monkeypatch):  # noqa: F811
     assert (
         "Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter "
         "nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se "
-        "«Slik bytter du nøkkel».</p>"
+        "«Slik bytter du nøkkel» bak «?».</span>"
     ) in andre
 
 
@@ -242,11 +257,12 @@ def test_byttet_staar_ogsaa_for_docker(klient, monkeypatch):  # noqa: F811
     """Gjennomgangen (ECH1, VG3): ville feilet hvis «Slik bytter du nøkkel»
     bare gjaldt startskriptet, også når appen kjører i Docker."""
     monkeypatch.setenv(app_modul.I_DOCKER, "1")
-    andre = _kortene(klient.get("/min-liste").data.decode("utf-8"))[1]
+    side = klient.get("/min-liste").data.decode("utf-8")
+    # Story 8.26 (tillegg 12): bak «?» i steg 2.
     assert (
-        "Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter <code>EODHD_API_KEY=</code> "
+        "Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter EODHD_API_KEY= "
         "selv og starter appen på nytt."
-    ) in andre
+    ) in side.split('id="hjelp-noekkel"', 1)[1]
 
 
 def test_statusen_leser_aldri_noekkelen(klient, monkeypatch, tmp_path):  # noqa: F811
@@ -331,9 +347,6 @@ def test_demoen_har_det_samme_kortet(tmp_path, monkeypatch):
     monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
     monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
     andre = _kortene(app_modul.app.test_client().get("/min-liste").data.decode("utf-8"))[1]
-    assert (
-        '<p class="noekkelstatus">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>'
-        in andre
-    )
+    assert '<span class="hake" aria-hidden="true">✓</span> Demoen trenger ingen nøkkel.</span>' in andre
     assert "Nøkkelen virket" not in andre and "Ingen henting har lagret kurser ennå" not in andre
-    assert "<h5>Slik bytter du nøkkel</h5>" in andre and "<input" not in andre
+    assert 'popovertarget="hjelp-noekkel"' in andre and "<input" not in andre

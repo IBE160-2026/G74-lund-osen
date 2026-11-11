@@ -155,11 +155,12 @@ class TestErDuSikker:
         mer enn én setning under overskriften."""
         self._med_kraft(monkeypatch)
         side = klient.get("/min-liste").data.decode("utf-8")
-        delen = side.split('<h3 id="ferdige-lister">Start fra en ferdig liste</h3>', 1)[1].split("</ul>", 1)[0]
-        setning = re.search(r"<p>(.*?)</p>", delen, re.S).group(1)
+        # Story 8.26 (tillegg 12): brikkene står i steg 3, og setningen bak «?».
+        delen = side.split('id="ferdige-lister"', 1)[1].split("</ul>", 1)[0]
+        vindu = side.split('id="hjelp-kallene"', 1)[1].split('<p class="lukkes">', 1)[0]
         assert (
-            setning
-            == "Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen."
+            "velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest "
+            "omsatte aksjene i bransjen." in vindu
         )
         assert re.search(
             r'<a class="knapp ferdigknapp" href="/ferdig-liste\?bransje=Kraft"><svg class="bransjesymbol".*?</svg>'

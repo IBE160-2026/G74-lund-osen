@@ -440,6 +440,8 @@
     {#- Story 8.17b: «Sammenlign med» i Min liste. #}
     {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign siste børsdag med", [("", ["sammenlign_med"])]) }}{% endif %}
     {% if egne and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-egne", "Dine egne aksjer", [("", ["dine_egne_aksjer"])]) }}{% endif %}
+    {#- Story 8.26 (tillegg 12): steg 2 og 3 i «Din egen liste». #}
+    {% if egne and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-noekkel", "Slik bytter du nøkkel", [("", ["bytt_noekkel", "bytt_noekkel_docker"])]) }}{%- set kallene = [egne.kall.faste ~ " kall: de " ~ egne.kall.faste ~ " aksjene", egne.kall.indeks ~ " kall: hovedindeksen"] + ([egne.kall.egne ~ " kall: " ~ ("din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer")] if egne.kall.egne else []) + [egne.kall.margin ~ " kall: margin"] %}{{ hjelpevindu("hjelp-kallene", "Kallene og de ferdige listene", [("", ["kallene_lista", "ferdige_lister_kort"])], linjer=kallene) }}{% endif %}
     {% if boersdagen %}{{ hjelpevindu("hjelp-boersdagen", "Børsdagen kort fortalt", [("", ["boersdagen_kort_fortalt"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}

@@ -512,7 +512,10 @@ class TestSidene:
         for adresse in SIDENE:
             html = _side(klient, adresse)
             assert "<script" not in _uten_hjelpeskriptet(html).lower(), adresse
-            assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', html), adresse
+            # Story 8.26 (tillegg 12): bare registreringen hos EODHD, i en ny
+            # fane, i den ekte versjonen.
+            uten = html.replace(f'href="{app_modul.EODHD_REGISTRERING}" target="_blank"', "")
+            assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', uten), adresse
             # Story 8.0d: skriften ligger i appen, saa url( er lov bare til
             # /static/ (designregler §1).
             adresser = re.findall(r"""url\(\s*["']?([^"')]+)""", html)

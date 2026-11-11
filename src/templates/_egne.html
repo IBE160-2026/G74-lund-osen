@@ -54,54 +54,49 @@
   <p>Vil du følge helt andre aksjer, lager du din egen liste. Hver bruker har sin egen gratis nøkkel fra EODHD, som legges inn én gang.</p>
   <h3>Din egen liste: kom i gang</h3>
   <p>Appen kjører på din egen maskin, så det finnes ingen innlogging hos oss. Du trenger bare din egen gratiskonto hos EODHD. Da velger du selv hvilke aksjer du følger.</p>
-  {#- Story 8.22 (utdraget §2): de tre stegene som kort, i samme stil som
-      resten av siden. Steg 1 har adressen som tekst, fordi sidene ikke har
-      adresser til nettet (spørsmål 9). Steg 2 er en forklaring, ikke et
-      felt: webserveren rører aldri nøkkelen (AD-10, svaret 08.11 kl.
-      12:39). Steg 3 har kallene regnet av lista (spørsmål 10). #}
+  {#- Story 8.22 (utdraget §2): de tre stegene som kort. Steg 2 er en
+      forklaring, ikke et felt: webserveren rører aldri nøkkelen (AD-10, svaret
+      08.11 kl. 12:39).
+      Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): som tavla «Min
+      liste» 13.10 (utdraget §2): tittelen ved siden av tallet i den svarte
+      boblen, kort tekst og én handling nederst i like høye kort. Steg 1 lenker
+      til registreringen hos EODHD i en ny fane, og i demoen til en egen side.
+      Svaret 11.11 kl. 14:29 (spørsmål 9 i 8.22) om adressen som tekst er
+      rettet. Kallene, bransjelistene og byttet av nøkkel står bak «?». #}
   <ol class="stegkort">
     <li class="kort-steg">
-      <span class="stegnummer" aria-hidden="true">1</span>
-      <h4>Lag en gratis konto hos EODHD</h4>
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">1</span><h4>Lag en gratis konto hos EODHD</h4></div>
       <p>Registreringen skjer hos EODHD, ikke hos oss. Gratiskontoen gir {{ egne.kall.kvote }} kall i døgnet og sluttkurser 1 år tilbake.</p>
       <p>Kontoen er din egen. Den kan ikke deles med andre, heller ikke i en gruppe.</p>
-      <p class="adresse">Adressen er eodhd.com.</p>
+      <p class="handling">
+      {%- if eksempeltall %}<a class="knapp" href="/eodhd-demo">Åpne eodhd.com</a>
+      {%- else %}<a class="knapp" href="{{ eodhd_registrering }}" target="_blank" rel="noreferrer">Åpne eodhd.com<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>{% endif -%}
+      </p>
     </li>
     <li class="kort-steg">
-      <span class="stegnummer" aria-hidden="true">2</span>
-      <h4>Lim inn nøkkelen din</h4>
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">2</span><h4>Lim inn nøkkelen din</h4> {{ hjelpeknapp("hjelp-noekkel", "Hjelp: slik bytter du nøkkel") }}</div>
       <p>Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen.</p>
-      {#- Tillegg 4 (svaret 10.11 kl. 22:50): kortet er det samme i demoen og
-          i den ekte versjonen. Der tavla har feltet og «Sjekk nøkkelen», står
-          statusen regnet av siste henting (valg.siste_henting), uten kall og
-          uten å lese .env (AD-10, svaret 08.11 kl. 12:39). Demoen viser at den
-          ikke trenger nøkkel på samme plass (tillegget kl. 17:16).
-          Gjennomgangen: «virket» og «minst», fordi siden bare vet hva siste
-          henting lagret (BH1, BH2, ECH3). Byttet står også for Docker og uten
-          startskriptet (ECH1), og teksten uten henting peker på byttet (ECH2). #}
-      {% if eksempeltall %}
-        <p class="noekkelstatus">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>
-      {% elif egne.henting %}
-        <p class="noekkelstatus virker">Nøkkelen virket ved siste henting {{ egne.henting.dag|dato }}, som brukte minst {{ egne.henting.serier }} av {{ egne.kall.kvote }} kall.</p>
-      {% else %}
-        <p class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel».</p>
-      {% endif %}
-      <h5>Slik bytter du nøkkel</h5>
-      <p>Slett det som står etter <code>EODHD_API_KEY=</code> i fila <code>.env</code> i mappa til appen. Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye. Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter <code>EODHD_API_KEY=</code> selv og starter appen på nytt. Siden her har ikke noe felt for nøkkelen.</p>
+      {#- Tillegg 4 til 8.22: statusen regnet av siste henting, uten kall og
+          uten å lese .env. Story 8.26: én linje med ✓, i samme stil i demoen. #}
+      <p class="handling">
+      {%- if eksempeltall %}<span class="noekkelstatus virker"><span class="hake" aria-hidden="true">✓</span> Demoen trenger ingen nøkkel.</span>
+      {%- elif egne.henting %}<span class="noekkelstatus virker"><span class="hake" aria-hidden="true">✓</span> Nøkkelen virket ved siste henting {{ egne.henting.dag|dato }}, som brukte minst {{ egne.henting.serier }} av {{ egne.kall.kvote }} kall.</span>
+      {%- else %}<span class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel» bak «?».</span>{% endif -%}
+      </p>
     </li>
     <li class="kort-steg">
-      <span class="stegnummer" aria-hidden="true">3</span>
-      <h4>Velg aksjene dine</h4>
-      <p>Start fra en ferdig liste, eller følg aksjene én og én, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}. I «Følg en aksje» står alle aksjene på Oslo Børs som kan følges, med bransjen og den målte omsetningen.</p>
-      <ul class="kallene">
-        <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
-        <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>
-        {% if egne.kall.egne %}<li>{{ egne.kall.egne }} kall: {{ "din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer" }}</li>{% endif %}
-        <li>{{ egne.kall.margin }} kall: margin</li>
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">3</span><h4>Velg aksjene dine</h4> {{ hjelpeknapp("hjelp-kallene", "Hjelp: kallene og de ferdige listene") }}</div>
+      <p>Start med dagens 15 eller en ferdig liste for 1 bransje, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}.</p>
+      {#- Story 8.11 og tillegg 3 til 8.22: de ferdige listene som brikker med
+          ikonet og antallet, til siden «Er du sikker?» (/ferdig-liste). #}
+      {% if egne.ferdige %}
+      <ul class="ferdige-knapper" id="ferdige-lister" aria-label="Start fra en ferdig liste">
+      {% for bransje, aksjene in egne.ferdige.items() %}
+        <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
+      {% endfor %}
       </ul>
-      <p class="stegknapper">
-        {#- Tillegg 3: knappen har samme navn som delen den går til. #}
-        {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>{% endif %}
+      {% endif %}
+      <p class="handling">
         {% if egne.full %}<span class="full">{{ full_tekst }}</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
       </p>
     </li>
@@ -119,20 +114,6 @@
         {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp" href="/folg?bytt={{ aksje.symbol }}">Bytt ut</a>{% endif %}</li>
     {% endfor %}
   </ul>
-  {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. Tillegg 3
-      (svarene 10.11 kl. 22:44): én knapp per bransje med ikonet og antallet,
-      og én kort setning. Aksjene, det som fjernes, og knappen som bytter,
-      står på siden «Er du sikker?» (/ferdig-liste), og ingenting byttes før
-      den. #}
-  {% if egne.ferdige %}
-  <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen.</p>
-  <ul class="ferdige-knapper">
-  {% for bransje, aksjene in egne.ferdige.items() %}
-    <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
-  {% endfor %}
-  </ul>
-  {% endif %}
   {% if eksempeltall %}<p class="demoboks">Demoen henter ingenting, så et valg står som «Venter på henting». I den ekte versjonen hentes aksjen ved neste henting etter kl. 22.</p>{% endif %}
 </section>
 {% endif %}
