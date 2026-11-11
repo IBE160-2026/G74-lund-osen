@@ -173,30 +173,48 @@ def test_to_hentinger_samme_dag_gir_minst(stier, monkeypatch):  # noqa: F811
 def test_et_kall_som_feiler_og_proeves_igjen_gir_minst(stier, monkeypatch):  # noqa: F811
     """Spørsmål 14 (VG2 i gjennomgangen av tillegg 4, svaret 11.11 kl. 14:29):
     ett kall feiler i kveldens henting og prøves igjen i et nytt forsøk (2.3b)
-    samme kveld. Hentingen brukte da ett kall mer enn seriene den lagret.
-    Ville feilet hvis statusen talte kallene i stedet for seriene og sa mer
-    enn det den vet, hvis den mistet «minst», eller hvis det nye forsøket
-    ikke ble talt med samme dag."""
+    samme kveld. Kallene telles i begge kjøringene, og seriene i basen.
+    Ville feilet hvis statusen talte kallene eller størrelsen på lista i
+    stedet for seriene (etter feilen er det 15 serier, men 16 kall og 16 i
+    lista), hvis den mistet «minst», eller hvis det nye forsøket ikke ble
+    talt med samme dag (gjennomgangen av svarene, BH1, BH2, VG1, VG6)."""
     import lagring_sqlite
     import valg
-    from test_fetch_prices import ETTER_30_MIN, KALL, hovedhenting, kjoer_23
+    from test_fetch_prices import (
+        ETTER_30_MIN,
+        KALL,
+        OEYEBLIKK_22_09,
+        TIRSDAG_22_09,
+        kjoer_23,
+        kjoer_23_kode,
+        serie_til,
+    )
     from test_valg import med_boersen
 
+    def hent(ticker, *_):
+        if ticker == "DNB.OL":
+            raise RuntimeError("nei")
+        return serie_til(TIRSDAG_22_09)
+
     raa, base = stier
-    hovedhenting(stier, feiler=("DNB",))
-    fil, kall2, _ = kjoer_23(raa, base, ETTER_30_MIN)
-    assert fil is not None and kall2 == ["DNB.OL"]
-    brukt = KALL + len(kall2)
+    kode, kall1, _ = kjoer_23_kode(raa, base, OEYEBLIKK_22_09, hent)
+    assert kode == 1 and len(kall1) == KALL and "DNB.OL" in kall1
     med_boersen(base)
     monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
     monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 9, 23, 12, 0).astimezone())
-    app_modul.app.config["TESTING"] = True
-    andre = _kortene(app_modul.app.test_client().get("/min-liste").data.decode("utf-8"))[1]
-    assert (
-        f'<p class="noekkelstatus virker">Nøkkelen virket ved siste henting 22.09, som brukte minst {KALL} '
-        f"av {valg.KVOTE} kall.</p>"
-    ) in andre
-    assert KALL < brukt
+    monkeypatch.setitem(app_modul.app.config, "TESTING", True)
+
+    def status() -> str:
+        andre = _kortene(app_modul.app.test_client().get("/min-liste").data.decode("utf-8"))[1]
+        return re.search(r'<p class="noekkelstatus virker">(.*?)</p>', andre).group(1)
+
+    # Etter feilen: 15 serier er lagret, men hentingen brukte 16 kall.
+    assert status() == f"Nøkkelen virket ved siste henting 22.09, som brukte minst {KALL - 1} av {valg.KVOTE} kall."
+    fil, kall2, _ = kjoer_23(raa, base, ETTER_30_MIN)
+    assert fil is not None and kall2 == ["DNB.OL"]
+    # Etter det nye forsøket: 16 serier, og 17 kall til sammen.
+    assert status() == f"Nøkkelen virket ved siste henting 22.09, som brukte minst {KALL} av {valg.KVOTE} kall."
+    assert KALL < len(kall1) + len(kall2)
 
 
 def test_uten_henting_staar_hva_man_gjoer(klient, monkeypatch):  # noqa: F811
