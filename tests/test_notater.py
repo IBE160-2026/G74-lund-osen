@@ -759,12 +759,16 @@ class TestMinListe:
         assert "Etterpå" in _tekst(delen)
 
     def test_menyen_faar_bare_knappen_fra_8_27(self, klient, demobase):
-        """Del F: ville feilet hvis stripa øverst fikk en knapp for notatene.
-        Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): stripa får én,
-        «Mine notater», og ingen annen (tests/test_notatpanel_8_27.py)."""
+        """Del F sa at stripa øverst ikke fikk en knapp for notatene. Story
+        8.27 (gruppens svar 11.11 kl. 21:09–21:20): stripa får én, «Mine
+        notater». Ville feilet hvis stripa fikk en knapp til for notatene
+        (tests/test_notatpanel_8_27.py tester knappen)."""
         side = klient.get("/min-liste").data.decode("utf-8")
         stripa = side[: side.index("</nav>")]
-        assert stripa.count("otater") == 2  # adressen og navnet på knappen
+        lenkene = re.findall(r"<a [^>]*>.*?</a>", stripa, re.S)
+        assert [lenke for lenke in lenkene if "otater" in lenke] == re.findall(
+            r'<a class="sideknapp notatknapp".*?</a>', stripa, re.S
+        )
         assert stripa.count('class="sideknapp notatknapp"') == 1
 
 

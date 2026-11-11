@@ -310,7 +310,8 @@ class TestSkjemaet:
     def test_skriver_bare_notatet(self, klient, base):
         """AD-3: ville feilet hvis ruta skrev i en annen tabell."""
         foer = _andre_tabeller(base)
-        klient.post("/notat", data={"symbol": AKSJE, "tekst": "bare notat", "tilbake": "/"})
+        svar = klient.post("/notat", data={"symbol": AKSJE, "tekst": "bare notat", "tilbake": "/"})
+        assert svar.status_code == 303 and svar.headers["Location"] == "/#notatpanel"
         assert _andre_tabeller(base) == foer
         assert len(_notatene(base)) == 1
 
@@ -412,3 +413,52 @@ class TestPlassenPaaAksjesiden:
         delen = _delen(_side(klient, f"/aksje/{AKSJE}"))
         assert "alle-notater" not in delen
         assert delen.count('<p class="notattekst">') == 2
+
+
+# --- Gjennomgangen ------------------------------------------------------------
+
+
+class TestGjennomgangen:
+    def test_en_basefeil_i_panelet_gir_siden_uten_notater(self, klient, monkeypatch):
+        """BH2: ville feilet hvis en basefeil mens panelet ble laget, ga 500."""
+
+        def feil(*_a, **_k):
+            raise sqlite3.OperationalError("database is locked")
+
+        monkeypatch.setattr(app_modul, "_alle_notatene", feil)
+        side = _side(klient, "/boersometer")
+        assert "Notatene kan ikke leses fra basen nå." in _tekst(_malen(side))
+        assert '<form class="nytt-notat"' not in _malen(side)
+
+    def test_stien_kommer_tilbake_som_den_var(self):
+        """BH4: ville feilet hvis en sti med mellomrom eller æøå ga en
+        tilbake-adresse appen avviser, så svaret gikk til aksjesiden."""
+        for sti, sporsmaal in (("/folg", "q=a%20b"), ("/a b", ""), ("/børs", "x=1")):
+            with app_modul.app.test_request_context(sti, query_string=sporsmaal):
+                her = app_modul._her()
+                assert app_modul._panelsiden(her) == her, her
+                assert " " not in her
+
+    def test_vis_alle_er_aapen_etter_et_trykk_paa_et_notat_der(self, klient, base):
+        """BH5: ville feilet hvis «Vis alle» var lukket etter et trykk på et
+        notat under den, eller åpen etter et trykk på et av de to nyeste."""
+        for i, dag in enumerate((date(2026, 10, 1), date(2026, 10, 2), date(2026, 10, 5))):
+            _notat(base, AKSJE, dag, f"n{i}")
+        delen = _delen(_side(klient, f"/aksje/{AKSJE}"))
+        nede = delen[delen.index('<details class="alle-notater"') :]
+        slett = re.search(r'<form class="slett-notat".*?</form>', nede, re.S).group(0)
+        felt = dict(re.findall(r'name="(id|vis|alle)" value="([^"]*)"', slett))
+        assert felt["alle"] == "1"
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data=felt)
+        assert svar.headers["Location"] == f"/aksje/{AKSJE}?alle=1#mine-notater"
+        assert '<details class="alle-notater" open>' not in _side(klient, f"/aksje/{AKSJE}")
+        _notat(base, AKSJE, date(2026, 10, 6), "n3")
+        assert '<details class="alle-notater" open>' in _side(klient, f"/aksje/{AKSJE}?alle=1")
+        oppe = _delen(_side(klient, f"/aksje/{AKSJE}")).split('<details class="alle-notater"')[0]
+        assert 'name="alle"' not in oppe
+
+    def test_navnene_sorteres_som_i_norsk(self):
+        """BH12: ville feilet hvis æ, ø og å ikke kom etter z, eller en
+        bokstav med aksent kom etter å."""
+        navn = ["Åker", "Ørje", "Élkem", "Zeta", "Ærfugl", "alfa", "Ünder"]
+        assert sorted(navn, key=app_modul._navnenoekkel) == ["alfa", "Élkem", "Ünder", "Zeta", "Ærfugl", "Ørje", "Åker"]

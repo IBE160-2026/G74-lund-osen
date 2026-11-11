@@ -515,10 +515,10 @@
           {% for n in notatene[:2] %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle) }}{% endfor %}
         </ol>
         {% if notatene|length > 2 %}
-        <details class="alle-notater">
+        <details class="alle-notater"{% if request.args.get("alle") == "1" %} open{% endif %}>
           <summary>Vis alle ({{ notatene|length }})</summary>
           <ol class="notatliste" start="3">
-            {% for n in notatene[2:] %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle) }}{% endfor %}
+            {% for n in notatene[2:] %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle, alle=true) }}{% endfor %}
           </ol>
         </details>
         {% endif %}

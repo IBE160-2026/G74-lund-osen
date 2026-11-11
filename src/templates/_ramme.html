@@ -96,7 +96,8 @@
       leses opp, og som skriptet setter inn når panelet åpnes, så skriptet
       henter ingenting (_notatpanel.html). #}
   {% if vis_notater and notatpanel %}
-  <aside class="notatpanel" id="notatpanel" aria-labelledby="notatpanel-tittel" tabindex="-1" hidden>
+  {#- Gjennomgangen (BH10): navnet skiller panelet fra delen nederst på siden. #}
+  <aside class="notatpanel" id="notatpanel" aria-label="Mine notater, panelet" tabindex="-1" hidden>
     <div class="notatpanel-topp">
       <h2 id="notatpanel-tittel">Mine notater</h2>
       <button type="button" class="panelflytt">Flytt til venstre</button>

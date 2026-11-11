@@ -28,12 +28,13 @@ import re
 import sqlite3
 import sys
 import threading
+import unicodedata
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from pathlib import Path
-from urllib.parse import parse_qs, urlencode, urlsplit
+from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
@@ -1533,14 +1534,18 @@ def _panelsiden(verdi: str | None) -> str | None:
 
 def _her() -> str:
     """Siden som vises nå, med spørsmålet, som skjemaene i panelet sender
-    tilbake til."""
+    tilbake til. Gjennomgangen (BH4): stien kodes igjen, som spørsmålet er,
+    så en sti med mellomrom eller andre tegn kommer tilbake som den var."""
     sporring = request.query_string.decode("utf-8", "replace")
-    return request.path + (f"?{sporring}" if sporring else "")
+    return quote(request.path, safe="/-._~!$&'()*+,;=:@") + (f"?{sporring}" if sporring else "")
 
 
 def _navnenoekkel(navn: str) -> str:
-    """Navnet sortert som i norsk: æ, ø og å etter z, i den rekkefølgen."""
-    return navn.casefold().translate(str.maketrans({"æ": "{", "ø": "|", "å": "}"}))
+    """Navnet sortert som i norsk: æ, ø og å etter z, i den rekkefølgen, og
+    andre bokstaver med aksent som bokstaven uten (gjennomgangen, BH12), så
+    «Élkem» står ved E."""
+    navn = navn.casefold().translate(str.maketrans({"æ": "{", "ø": "|", "å": "}"}))
+    return "".join(t for t in unicodedata.normalize("NFD", navn) if not unicodedata.combining(t))
 
 
 def _aksjevalget() -> list[tuple[str, str]] | None:
@@ -1566,15 +1571,25 @@ def _notatpanelet():
     leser basen. Bare lesing (AD-3, AD-10)."""
     if request.endpoint not in _RUTER_MED_BASE or request.method != "GET" or g.get("tilkobling") is None:
         return {"notatpanel": None}
-    if not innstillinger.les(g.tilkobling)[innstillinger.VIS_NOTATER]:
+    try:
+        if not innstillinger.les(g.tilkobling)[innstillinger.VIS_NOTATER]:
+            return {"notatpanel": None}
+    except BASEFEIL:
         return {"notatpanel": None}
     if "notatpanel" not in g:
         aksjen = g.get("notatpanel_aksje")
+        # Gjennomgangen (BH2): en basefeil her gir panelet uten notater, ikke
+        # 500, så siden og feilsiden vises som før.
+        try:
+            notatene, indeks = _alle_notatene(), _indeksen_for_grafen()[0]
+        except BASEFEIL as feil:
+            app.logger.warning("Panelet kunne ikke leses: %s", type(feil).__name__)
+            notatene, indeks = None, None
         g.notatpanel = {
-            "notatene": _alle_notatene(),
-            "indeks": _indeksen_for_grafen()[0],
+            "notatene": notatene,
+            "indeks": indeks,
             "aksjen": aksjen,
-            "valget": None if aksjen else _aksjevalget(),
+            "valget": None if aksjen or notatene is None else _aksjevalget(),
             "tilbake": _her(),
             "maks": MAKS_TEGN,
         }
@@ -1757,11 +1772,16 @@ def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
         return MIN_LISTE_TILBAKE[visningen] + f"#{NOTATANKER}"
     adresse_ = f"/aksje/{symbol}"
     treff = _VISNINGEN.fullmatch(visningen or "")
+    sporsmaal = []
     if treff and treff.group(1) and _gyldig_dato(treff.group(1)):
-        adresse_ += f"?dag={treff.group(1)}"
+        sporsmaal.append(f"dag={treff.group(1)}")
     elif treff and treff.group(2) in PERIODENE and treff.group(2) != VELG:
-        adresse_ += f"?periode={treff.group(2)}"
-    return adresse_ + f"#{NOTATANKER}"
+        sporsmaal.append(f"periode={treff.group(2)}")
+    # Story 8.27, gjennomgangen (BH5): fra et notat under «Vis alle» kommer
+    # siden tilbake med lista åpen.
+    if request.form.get("alle") == "1":
+        sporsmaal.append("alle=1")
+    return adresse_ + ("?" + "&".join(sporsmaal) if sporsmaal else "") + f"#{NOTATANKER}"
 
 
 def _notatsiden(symbol: str):

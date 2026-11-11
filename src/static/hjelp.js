@@ -593,14 +593,18 @@ if (typeof module === "object" && module.exports) {
 
   // Er lagringen slått av, kaster localStorage, og panelet virker likevel,
   // men bare på denne siden.
+  // Gjennomgangen (BH11): valgene står også her, så panelet holder seg
+  // når lagringen er slått av og bredden endres.
+  const minne = {};
   function les(noekkel) {
     try {
       return localStorage.getItem(noekkel);
     } catch {
-      return null;
+      return noekkel in minne ? minne[noekkel] : null;
     }
   }
   function skriv(noekkel, verdi) {
+    minne[noekkel] = verdi;
     try {
       if (verdi === null) localStorage.removeItem(noekkel);
       else localStorage.setItem(noekkel, verdi);
@@ -650,8 +654,9 @@ if (typeof module === "object" && module.exports) {
     vis(aapen, aapen);
   });
   // Mellomrom åpner også, som en knapp, når lenken er en knapp.
+  // Gjennomgangen (BH9): ikke på nytt mens tasten holdes inne.
   knapp.addEventListener("keydown", (e) => {
-    if (e.key === " " && BRED.matches) {
+    if (e.key === " " && BRED.matches && !e.repeat) {
       e.preventDefault();
       knapp.click();
     }
@@ -674,7 +679,7 @@ if (typeof module === "object" && module.exports) {
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape" || e.defaultPrevented || panel.hidden) return;
     if (!panel.contains(document.activeElement)) return;
-    if (document.querySelector(".hjelpevindu:popover-open")) return;
+    if (hjelpenErAapen()) return;
     skriv(AAPENT, null);
     vis(false);
     knapp.focus();
@@ -682,13 +687,27 @@ if (typeof module === "object" && module.exports) {
 
   BRED.addEventListener("change", () => vis(les(AAPENT) === "ja", false));
 
+  // Gjennomgangen (BH8): uten popover i nettleseren kaster velgeren.
+  function hjelpenErAapen() {
+    try {
+      return Boolean(document.querySelector(".hjelpevindu:popover-open"));
+    } catch {
+      return false;
+    }
+  }
+
   function start() {
     side(les(SIDEN) === "venstre");
     // Etter lagring sender appen tilbake med #notatpanel, så panelet står
     // åpent også når lagringen er slått av.
     const fraSkjema = location.hash === "#notatpanel";
-    if (fraSkjema && BRED.matches) skriv(AAPENT, "ja");
-    vis(les(AAPENT) === "ja" || fraSkjema, fraSkjema);
+    if (fraSkjema) {
+      skriv(AAPENT, "ja");
+      // Gjennomgangen (BH1): ankeret tas bort, så «Lukk» varer også når
+      // siden lastes på nytt.
+      history.replaceState(history.state, "", location.pathname + location.search);
+    }
+    vis(les(AAPENT) === "ja", fraSkjema);
   }
   start();
   // En side fra hurtigbufferen ved «Tilbake» leser valgene på nytt.
