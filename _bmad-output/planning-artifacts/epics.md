@@ -2713,6 +2713,28 @@ Resten ryddes etter alle testene.
 
 ---
 
+### Story 3.6: Ikonet og snarveien
+
+*Lagt til 2026-11-11, etter instruksjonen for del C (limt inn 10.11 kl. 17:23) i `docs/ai-prompts/2026-11-10.md`.* 3.6 var neste ledige nummer i Epic 3.
+
+Som **bruker i Windows**, vil jeg starte appen fra en snarvei med appens ikon på skrivebordet og kjenne den igjen i fanen, så jeg slipper å lete fram mappa og dobbeltklikke startfila.
+
+Spesifikasjonen er `spec-3-6-ikonet-og-snarveien.md`.
+
+*Avgjort 2026-11-10 kl. 14:07 (gruppens svar):* appen får et ikon laget av logoen i toppen, og en snarvei «OSE Signal» på skrivebordet i Windows. Rådet anbefalte det.
+
+*Plan for en senere versjon (svaret kl. 14:07):* mobil kommer i en senere versjon, fordi appen bare svarer på 127.0.0.1. README-en og `docs/installasjon.md` sier det.
+
+*Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel. Startskriptet for demoen tilbyr også snarveien, med et eget navn, «OSE Signal (demo)». Rådet anbefalte det.
+
+*Avgjort 2026-11-11 kl. 13:47 (gruppens svar):* ja til ikonet som bygget (spørsmål 1) og til forslagene i spørsmål 2–7 i spesifikasjonen. Når snarveien starter en annen kopi som finnes, skal startskriptet si hvilken mappe den peker på og spørre én gang om den skal starte denne kopien i stedet (spørsmål 8). Del C flettes når svarene er bygget, gjennomgått og CI er grønn, uten at gruppen ser på den igjen. Rådet anbefalte det.
+
+*Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* README-en får en fjerde liste under «Status», «Ekstra, ferdig», og brukertesten flyttes fra «Neste i v1» til setningen om det som er ferdig rundt appen, fordi «Ferdig» lister det appen kan. Rådet anbefalte det.
+
+*Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
+
+---
+
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger. De som gjelder Epic 4:
