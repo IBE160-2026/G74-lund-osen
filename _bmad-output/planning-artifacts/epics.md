@@ -4526,6 +4526,30 @@ Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan
 
 *Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
 
+### Story 8.23: Funnene fra brukertesten 10.11 (del A)
+
+*Lagt til 2026-11-11, etter instruksjonen om del A (lest 10.11 kl. 21:31) i `docs/ai-prompts/2026-11-10.md`.* 8.21 og 8.22 var tatt av de åpne PR-ene #139 og #138. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-23-funnene-fra-brukertesten.md`, med de 18 spørsmålene og forslagene.
+
+Som **bruker fra brukertesten**, vil jeg at det som var uklart eller tungvint 10.11 blir rettet, så sidene sier det de viser og blir stående der jeg arbeider.
+
+**Oppfyller:** funnene fra brukertesten 10.11 · **Begrenses av:** NFR-06, `AD-7`, `AD-10`, regel 21, designregler §3
+
+**Kontroll — hva testen ser etter:**
+- «Dine egne aksjer» som tabellen, med bransjeikonet, og sorteringen, «Standard rekkefølge» og filteret blir stående ved tabellen (`#aksjene`)
+- Et nytt trykk på samme «?» lukker hjelpen
+- Børsometeret: små ruter viser endringen og har lappen med styrken, forklaringen sier hva ringen og den tykke rammen er, «Volum mot vanlig» har to desimaler, og tabellen står åpen med «?» ved «Endring» og «Volum mot vanlig»
+- Bryterne i Innstillinger og siden man er på i toppen er oransje, og kallene i «Følg flere aksjer» regnes av lista
+- Filteret har antallet, og ved 0 lenken til dem som fikk 2 av 3 i samme retning; overskriften i Min liste stemmer med tabellen
+- 0-brikken, «Mer om grafen», «13 av de 15 aksjene i lista», meldingen om endringer som venter, 3 av 3 det siste året, kanten på sjekkortene og «Min liste» som filter på oversikten
+- Alt kan ses i demoen, med «Eksempeltall» der demoen trenger eksempler
+- **Ville feilet hvis:** en av de 17 delene manglet; hver del har en mutant som ble fanget
+
+**Én økt:** ja.
+
+*Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* «ja» til del A og B. Rådet anbefalte det. Kl. 14:15 la gruppen til overskriften i Min liste, kl. 14:53 og 14:59 sju småfunn fra gjennomgangen, kl. 15:54 tabellen på Børsometeret åpen fra start, og kl. 15:57 at alt skal kunne ses i demoen. Rådet anbefalte alle. Svarene er ført etter instruksjonen om del A og tilleggene i `docs/ai-prompts/2026-11-10.md`.
+
+*Lagt til 2026-11-11:* 8.23 er flettet med PR #142 i `7fb9b1fd` kl. 03:41, låst til head-en `3e9c84ae`. CI var grønn på head-en (run 42945863521), og hele settet lokalt før flettingen: 5137 bestått og 25 hoppet over.
+
 ### Story 8.24: Notatene, to ting etter flettingen
 
 *Lagt til 2026-11-11, etter instruksjonen kl. 23:01 i `docs/ai-prompts/2026-11-10.md`.* 8.22 og 8.23 er tatt av andre vinduer. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-24-notatene-to-ting.md`.

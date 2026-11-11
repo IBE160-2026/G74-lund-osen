@@ -2,7 +2,7 @@
 title: 'Story 8.23: funnene fra brukertesten 10.11 (del A)'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '86d1fe4f'
 context:
@@ -78,3 +78,9 @@ Diffen `86d1fe4f` mot arbeidskopien kl. 22:20: Blind Hunter med bare diffen (18 
 *Lagt til 2026-11-11 (hele settet, del 1):* heller ikke vinduet ved «Signalet dag for dag» har plass til teksten om 3 av 3 innenfor 60 ord, og et eget «?» ved linja om året bryter regelen om ett «?» per kort og del (8.20a, del E, `test_ett_spoersmaalstegn_per_kort_og_del`). Hva 3 av 3 betyr, står derfor i `docs/hjelp.md` under «Hva sa appen om en aksje tidligere?», med linja om året, og ikke i et vindu i appen. Linja over gjelder også ECH10.
 
 *Lagt til 2026-11-11 (hele settet, del 3):* forslaget i spørsmål 7 tok med KI-bryteren og bryteren ved «Børsdagen kort fortalt». `test_bryteren_staar_i_rammen_som_en_bryter` håndhever at KI-bryteren er i blekk, etter spørsmål 5 i 8.2b, så bare bryterne i Innstillinger er oransje, som instruksjonen sa. Designregelen og hjelpen sier det samme. `test_et_nytt_spoersmaalstegn_bytter_innholdet` krevde at «?» for det åpne feltet ikke lukket det; den følger nå A3, og `test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer` teller teksten i ruta uten lappen (A4).
+
+## Mutantene
+
+Én per del, på arbeidskopien 10.11 kl. 23:51–23:52, med kopi før og fila lik før og etter (sha256), alle fanget: A1 (uten bransjeikon) `test_radene_er_en_tabell_som_tabellen_over`, A2 (sortering uten anker) `test_lenkene_i_kolonneraden_gaar_til_tabellen`, A3 (nytt trykk lukker ikke) `test_et_nytt_trykk_paa_samme_knapp_lukker`, A4 (uten lappen) `test_alle_rutene_har_symbolet_endringen_og_styrken_i_lappen`, A4 (volumet rundes over grensen) `test_volum_mot_vanlig_med_to_desimaler`, A5 (tabellen lukket) `test_tabellen_er_aapen_og_har_hjelp_ved_kolonnene`, A6 (bryteren svart) `test_bryterne`, A7 (kvoten skrevet for hånd) `test_tallene_foelger_konstantene`, A8 (ingen lenke til 2 av 3) `test_ved_0_staar_2_av_3_med_lenke`, tillegg 1 (overskriften som før) `test_med_alle_staar_begge_tallene`, B1 (uten 0-brikken) `test_tre_brikker`, B2 (uten den korte forklaringen) `test_kort_og_resten_bak_mer_om_grafen`, B3 (uten antallet i lista) `test_paa_aksjesiden`, B4 (meldingen teller ikke) `test_med_en_endring_som_venter`, B5 (alltid det siste året) `test_regnet_av_radene_som_er_lagret`, B6 (kortet uten farge) `test_kortene_har_klassen_og_kanten` og B7 (valget går til siden) `test_bare_de_merkede_paa_oversikten`.
+
+*Lagt til 2026-11-11:* 8.23 er flettet med PR #142 i `7fb9b1fd` kl. 03:41, låst til head-en `3e9c84ae`, etter instruksjonen om del A (lest 10.11 kl. 21:31) i `docs/ai-prompts/2026-11-10.md` og gruppens svar 10.11 kl. 13:54, 14:15, 14:53, 14:59, 15:54 og 15:57. Main ble flettet inn to ganger, i `5d7cae7d` (8.21, #140 og 2.13b) og `3e9c84ae` (8.24), med avtrykkene regnet ut på nytt og alle de 13 bildene tatt på nytt fra demoen. Hele settet alene i ni deler 11.11 kl. 03:25–03:40, hver del bare når ingen annen pytest kjørte: 5137 bestått, 25 hoppet over og 0 feilet, til sammen de 5162 som `pytest --collect-only` finner. CI var grønn på head-en (run 42945863521). Treet på main etter `git pull --ff-only` er likt treet på `3e9c84ae`. Ingen funn på middels eller over sto åpne. Spørsmålene 1–18 er bygget etter forslaget og står i `issues.md` til gruppen har sett på dem.
