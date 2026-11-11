@@ -1,0 +1,75 @@
+{#- Story 8.21 (gruppens svar 10.11 kl. 14:32 og 14:44): ett notat, med
+    «Etterpå» og det tenkte kjøpet, likt på aksjesiden og samlet i Min liste.
+    Bare fakta: ingen ord om at noe var riktig eller galt, ingen kronebeløp og
+    ingen råd (NFR-06). med_skjema er aksjesiden, med knappene; i Min liste
+    står navnet på aksjen med lenke i stedet. -#}
+{% from "_brikker.html" import brikker, retningspille -%}
+
+{% macro signalet(dag) -%}
+{% if dag is none %}<span class="tilstand">– signalet kunne ikke leses</span>{% elif dag.vurdering %}{{ retningspille(dag.retning) }} {{ brikker(dag.brikker) }} <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>{% else %}<span class="tilstand">–{% if dag.tekst %} {{ dag.tekst }}{% endif %}</span>{% endif %}
+{%- endmacro %}
+
+{% macro sjekkene(sjekker) -%}
+{% if sjekker %}{{ brikker(sjekker) }}{% else %}<span class="tilstand">– ikke vurdert</span>{% endif %}
+{%- endmacro %}
+
+{% macro prosent(verdi, grunn) -%}
+{% if verdi is not none %}<span class="{{ 'opp' if verdi|avrundet('endring') > 0 else 'ned' if verdi|avrundet('endring') < 0 else '' }}">{{ verdi|tall('endring') }}</span>{% else %}– {{ grunn }}{% endif %}
+{%- endmacro %}
+
+{% macro venter() -%}
+venter på sluttkursen{% if eksempeltall %}. Demoen henter ikke kurser, så den kommer ikke her{% endif %}
+{%- endmacro %}
+
+{% macro notatet(n, indeks_symbol, med_skjema=false, vis="", siste_dag=none, kan_handle=false) -%}
+{%- set notat, etter, h = n.notat, n.etter, n.handelen -%}
+<li class="notat">
+  <p class="notatdag">{% if not med_skjema %}<a href="/aksje/{{ notat.symbol }}">{{ n.aksje.navn }}</a> · {% endif %}{{ notat.dato|ukedag }} {{ notat.dato|dato }}{% if eksempeltall %} <span class="eksempelmerke">Eksempeltall</span>{% endif %}</p>
+  <p class="notattekst">{{ notat.tekst }}</p>
+  <div class="etterpaa">
+    <p class="etterpaa-tittel">Etterpå</p>
+    {% if etter.siste is none %}
+      <p>Ingen børsdager med kurs etter notatdagen ennå.</p>
+    {% else %}
+      <p>Aksjen fra {{ etter.notatdag|ukedag }} {{ etter.notatdag|dato }} til {{ etter.siste|ukedag }} {{ etter.siste|dato }}: {{ prosent(etter.aksjen, etter.aksjen_grunn) }}</p>
+      <p>Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(etter.indeksen, etter.indeksen_grunn) }}</p>
+    {% endif %}
+    <p>Signalet {{ etter.notatdag|ukedag }} {{ etter.notatdag|dato }}: {{ signalet(etter.paa_dagen) }}</p>
+    {% if etter.siste is not none %}<p>Signalet {{ etter.siste|ukedag }} {{ etter.siste|dato }}: {{ signalet(etter.paa_siste) }}</p>{% endif %}
+  </div>
+  {%- if h %}
+  {#- Tillegget kl. 14:44: det tenkte kjøpet, bare med prosent. #}
+  <div class="tenkt">
+    <p class="etterpaa-tittel">{{ "Tenkt kjøp og salg" if h.kjoep.solgt else "Tenkt kjøp" }}</p>
+    {% if h.venter_paa_kjoepet %}
+      <p>Notert {{ h.kjoep.kjoept|norsk_tid }}, {{ venter() }}.</p>
+    {% else %}
+      <p>Kjøpsdag {{ h.kjoepsdag|ukedag }} {{ h.kjoepsdag|dato }}. Sjekkene på siden da kjøpet ble notert: {{ sjekkene(h.kjoep.kjoep_sjekker|brikkene) }}</p>
+      {% if h.kjoep.solgt %}
+        {% if h.venter_paa_salget %}
+          <p>Tenkt salg notert {{ h.kjoep.solgt|norsk_tid }}, {{ venter() }}.</p>
+          <p>Sjekkene på siden da salget ble notert: {{ sjekkene(h.kjoep.salg_sjekker|brikkene) }}</p>
+        {% else %}
+          <p>Salgsdag {{ h.salgsdag|ukedag }} {{ h.salgsdag|dato }}, {{ h.dager }} {{ "børsdag" if h.dager == 1 else "børsdager" }} etter. Sjekkene på siden da salget ble notert: {{ sjekkene(h.kjoep.salg_sjekker|brikkene) }}</p>
+          <p>Aksjen fra kjøpet til salget: {{ prosent(h.aksjen, "aksjen har ingen kurs fra en av dagene") }} · Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(h.indeksen, h.indeksen_grunn) }}</p>
+        {% endif %}
+      {% elif h.til %}
+        <p>Aksjen siden kjøpet, til {{ h.til|ukedag }} {{ h.til|dato }}: {{ prosent(h.aksjen, "aksjen har ingen kurs fra en av dagene") }} · Hovedindeksen{% if indeks_symbol %} ({{ indeks_symbol }}){% endif %} samme dager: {{ prosent(h.indeksen, h.indeksen_grunn) }}</p>
+      {% else %}
+        <p>Ingen børsdager med kurs etter kjøpsdagen ennå.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+  {%- endif %}
+  {%- if med_skjema %}
+  <div class="notatknapper">
+    {% if kan_handle and n.kan_kjoepe %}
+      <form method="post" action="/aksje/{{ notat.symbol }}/notat/kjoep"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="dag" value="{{ siste_dag.isoformat() }}"><input type="hidden" name="vis" value="{{ vis }}"><button type="submit">Noter et tenkt kjøp</button></form>
+    {% elif kan_handle and h and h.kan_selges %}
+      <form method="post" action="/aksje/{{ notat.symbol }}/notat/salg"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="dag" value="{{ siste_dag.isoformat() }}"><input type="hidden" name="vis" value="{{ vis }}"><button type="submit">Noter et tenkt salg</button></form>
+    {% endif %}
+    <form class="slett-notat" method="post" action="/aksje/{{ notat.symbol }}/notat/slett"><input type="hidden" name="id" value="{{ notat.id }}"><input type="hidden" name="vis" value="{{ vis }}"><button type="submit" aria-label="Slett notatet fra {{ notat.dato|dato }}{% if h %} og det tenkte kjøpet{% endif %}">{{ "Slett notatet og det tenkte kjøpet" if h else "Slett" }}</button></form>
+  </div>
+  {%- endif %}
+</li>
+{%- endmacro %}

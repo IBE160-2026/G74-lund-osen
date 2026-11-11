@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-09T00:04
+updated: 2026-11-11T00:32
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -225,6 +225,8 @@ Brukerkontoer, innlogging og personlig portefølje; varsler, betaling,
 mobiltilpasning og meglerintegrasjon; flere børser og flere språk;
 fundamental- og verdimodell; intradag- og sanntidsdata; statistisk studie av om
 signalene slår markedet.
+
+*Lagt til 2026-11-10 (gruppens svar kl. 14:44):* tenkte kjøp og salg ved et notat på aksjesiden (story 8.21) er flyttet inn i v1. Ekte portefølje, kontoer, varsler og statistikk over om signalene slår markedet står utenfor som før.
 
 ### Utsatte vurderinger
 
@@ -2021,6 +2023,8 @@ på vilkår, og andre norske finansmedier publiserer ikke lenger åpen RSS. Se
 *Rettet 2026-11-03 (gjennomgangen 02.11, R26, gruppens svar 02.11 kl. 22:15, B):* «est. uke 45» i raden «KI-bidrag i drift» gjelder ikke lenger. Uke 45 er 2.–8.11, og datoen for demonstrasjonen er fortsatt ukjent (punkt 13 i §8, som står åpent).
 
 *Rettet 2026-11-03 (gjennomgangen 02.11, R27, gruppens svar 02.11 kl. 22:15, C):* «Brukerutfall» står som mål for v1. Brukertesten (story 8.1 og 10.4) er ikke tatt, og den tas senere, uten dato ennå (`docs/brukertest.md`). «Neste uke» i svaret 23.10 kl. 12:29 gjelder ikke lenger.
+
+*Lagt til 2026-11-11 (gruppens svar 10.11 kl. 22:26 og 22:30):* brukertesten er tatt 10.11 med én person, med den ekte versjonen. Personen forklarte uoppfordret hvorfor en aksje skilte seg ut, men brukte over 5 minutter, så «Brukerutfall» er ikke nådd. Målet står som før. Notatene står i `docs/brukertest.md`.
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R28, gruppens svar 02.11 kl. 22:15, D):* «Adopsjon» og «Fortsatt bruk» krever bruk som er loggført. Bruken ble ikke logget før 4.11. Fra 4.11 føres én linje for hver dag gruppen bruker appen, i [brukslogga](../../../../docs/brukslogg.md), med dato, hvem, hva vi gjorde i appen og feil vi så. Jobbens logger regnes ikke som bruk.
 
