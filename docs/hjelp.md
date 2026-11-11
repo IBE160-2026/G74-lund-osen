@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-11T20:51
+updated: 2026-11-11T21:05
 ---
 
 # Hjelp til «Kom i gang»
