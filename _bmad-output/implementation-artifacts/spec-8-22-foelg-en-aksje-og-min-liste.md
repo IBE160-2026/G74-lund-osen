@@ -107,7 +107,7 @@ Gjennomgangen av `53ff012c..59a84ee4` ga 12 funn fra Blind Hunter, 14 fra Edge C
 | VG6 (GET `/folg` skriver ikke) | lav | Rettet: `/folg` med filter, søk og bytte i `test_sidene_skriver_aldri`. |
 | VG8, VG9 (ordlyden i spørsmål 7, Kilde-kolonnen, 157 og 53) | lav | Rettet: ordlyden står over, Kilde-kolonnen har bare seks kjente verdier, og docstringen forklarer 141 + 15 + MULTI = 157 og 52 + SCOIN = 53. |
 | VG10 («Ville feilet hvis» mangler i to tester) | lav | Rettet. Byttet er også sjekket i forslagene og filterskjemaet. |
-| ECH5, BH11 (medianene regnes ved hver GET `/folg`) | middels/lav | Står: lista viser omsetningen for alle, så den trengs. Klikkene laster ikke lenger siden ved hvert piltrykk (BH4). Ikke målt; spørsmål til gruppen. |
+| ECH5, BH11 (medianene regnes ved hver GET `/folg`) | middels/lav | Står: lista viser omsetningen for alle, så den trengs. Klikkene laster ikke lenger siden ved hvert piltrykk (BH4). Ikke målt; spørsmål til gruppen. | *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
 | ECH14 (full liste viser «Følg» for alle) | lav | Avvist: med full liste og uten bytte viser `/folg` bare «Lista er full …» (den første grenen i `folg.html`). |
 | BH8 (`fetchone()[0]` uten rad) | lav | Avvist: `egne_i_lista` velger fra `aksje` med `ut IS NULL`, så raden finnes, og en aksje som er tatt ut, er ikke med. |
 | BH9, ECH6, ECH9 (avvisning og tom lista ved feil) | lav | Står: `Valglager.folg` avviser en ukjent kode først, og en base uten `boersliste` viser 0, som før 8.22. |
@@ -156,10 +156,10 @@ Gjennomgangen av `a251c087..508a3a16` ga 3 funn fra Blind Hunter, 4 fra Edge Cas
 | ECH2 (teksten uten henting peker feil vei når hentingen ved oppstart har feilet) | middels | Rettet: hentingen går med en gang ved oppstart (`docs/installasjon.md`), og teksten peker på byttet. |
 | ECH4 (én verdi som ikke kan leses, gir «ingen henting») | lav | Rettet: verdien hoppes over. En feil i basen går til `_egne_regnet`, som skjuler delen som før. |
 | VG1 (testen for AD-10 fanget bare `os.getenv`) | middels | Rettet: `os.environ` byttes med en spion, og testen fanger hver fil som heter `.env` og åpnes med `open` eller `Path.open`. |
-| VG2 (`kjoer_23` lar alle kall lykkes) | middels | Delvis rettet: teksten sier «minst», så den stemmer også når et kall feiler, og testen med to hentinger viser at tallet ikke blir for høyt. Ingen test har et kall som feiler. |
+| VG2 (`kjoer_23` lar alle kall lykkes) | middels | Delvis rettet: teksten sier «minst», så den stemmer også når et kall feiler, og testen med to hentinger viser at tallet ikke blir for høyt. Ingen test har et kall som feiler. | *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
 | VG4 (avtrykkene viser ikke at bildet viser statusen) | lav | Står: bildene ble tatt på nytt og sett på, som for de andre bildene, og bildet av «Din egen liste» viser demoboksen og byttet. |
 
-VG2 er middels og bare delvis rettet, så den står som spørsmål 14 (regel 25).
+VG2 er middels og bare delvis rettet, så den står som spørsmål 14 (regel 25). *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
 
 ## Flettingen av main 11.11
 
@@ -209,14 +209,14 @@ Gjennomgangen av `45111d53..05b527da` ga 14 funn fra Blind Hunter, 12 fra Edge C
 | ECH10 (tom børsliste), ECH12 (alle 13 valgt) | lav | Står. |
 | VG11 (byttet med flere bransjer og sorteringen) | lav | Rettet: test. |
 
-Funnet på middels som står åpent, er ECH2 (spørsmål 15, regel 25).
+Funnet på middels som står åpent, er ECH2 (spørsmål 15, regel 25). *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
 
 ## Spørsmål etter gjennomgangen
 
-12. **Medianene ved hver visning av «Følg en aksje» (ECH5).** *Forslag:* som bygget. Lista trenger omsetningen for alle, og medianene regnes én gang per forespørsel, som på Min liste. Det er ikke målt hvor lang tid det tar med den ekte basen.
+12. **Medianene ved hver visning av «Følg en aksje» (ECH5).** *Forslag:* som bygget. Lista trenger omsetningen for alle, og medianene regnes én gang per forespørsel, som på Min liste. Det er ikke målt hvor lang tid det tar med den ekte basen. *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
 13. **Demotickerne i den ekte versjonen (ECH12).** *Forslag:* som bygget, fordi ingen av dem er på Oslo Børs 10.11. Kommer en av dem på børsen, sjekkes bransjen på nytt.
-14. **Et kall som feiler, i testen for statusen i steg 2 (VG2, tillegg 4).** *Forslag:* som bygget. Teksten sier «minst», så den stemmer også når kall feiler. En test med et kall som feiler og et nytt forsøk i `kjoer_23` kan legges til, men tester da hentingen mer enn siden.
-15. **Den oransje fargen på det valgte (ECH2, tillegg 3).** `--oransje` er også fargen for 3 av 3 på oversikten. *Forslag:* som bygget, fordi svaret kl. 22:44 sa fargen fra bryterne og fanen, og hakemerket skiller det valgte fra 3 av 3. Alternativet er en egen farge for «valgt».
+14. **Et kall som feiler, i testen for statusen i steg 2 (VG2, tillegg 4).** *Forslag:* som bygget. Teksten sier «minst», så den stemmer også når kall feiler. En test med et kall som feiler og et nytt forsøk i `kjoer_23` kan legges til, men tester da hentingen mer enn siden. *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
+15. **Den oransje fargen på det valgte (ECH2, tillegg 3).** `--oransje` er også fargen for 3 av 3 på oversikten. *Forslag:* som bygget, fordi svaret kl. 22:44 sa fargen fra bryterne og fanen, og hakemerket skiller det valgte fra 3 av 3. Alternativet er en egen farge for «valgt». *Besvart 11.11 kl. 14:29, se «Svaret kl. 14:29».*
 16. **Sorteringen fra start (tillegg 3).** *Forslag:* «Mest omsatt først», fordi den står først i svaret, med linja om at den ikke er en rangering etter kursen. Alternativet er «A–Å», som før tillegg 3.
 17. **Rekkefølgen i «Bransje» (tillegg 3).** *Forslag:* bransjene i samme rekkefølge som brikkene i filteret (`valg.BRANSJENE`), og navnet innen hver bransje.
 18. **Lista mellom «Er du sikker?» og «Bruk denne lista» (BH6).** *Forslag:* som bygget: POST regner lista på nytt, som før. Står siden åpen over kveldshentingen, kan lista bli en annen enn den som ble vist.
@@ -233,12 +233,51 @@ Funnet på middels som står åpent, er ECH2 (spørsmål 15, regel 25).
 
 ### Spørsmål 12: tiden
 
-Målt 11.11 kl. 14:40 med koden på grenen (`8b90fb0f`), uten server (Flasks test-klient), mot en kopi av `data/db/ose.db` i en midlertidig mappe som ble slettet etterpå. sha256 for basen var lik før og etter (regel 22). Skriptet skrev bare ut tidene og antallet rader.
+Målt 11.11 kl. 14:41 med koden i worktreen på `c294a1bc`, uten server (Flasks test-klient), mot en kopi av `data/db/ose.db` i en midlertidig mappe som ble slettet etterpå (regel 22). Skriptet ligger i scratchpad-mappa til økta (`maal_folg2.py`, sha256 `ade6a115d3c9d0b4…`):
 
-- Den ekte lista er full (15 aksjer og 3 ønsker som venter), så `/folg` viser bare «Lista er full» og regner ingen rader. Målingen er derfor «Bytt ut» (`/folg?bytt=…`), som viser hele lista med omsetningen for alle: 277 rader, alle med omsetning.
-- Tre visninger: 0,051 s, 0,016 s og 0,017 s. Den første er lengst fordi malen lastes. `ferdige_lister.medianene` alene tok 0,003 s.
-- Én visning tar langt under ett sekund, så medianene regnes fortsatt én gang per forespørsel, og ingenting huskes i minnet (svaret kl. 14:29).
+- Kopien ble laget med SQLite-backup fra en skrivebeskyttet tilkobling, og bare når det ikke fantes noen `-journal`- eller `-wal`-fil.
+- Skriptet sjekket med `assert` at appen ble lest fra worktreen og brukte kopien, og at hver visning hadde over 200 rader, like mange som antallet på siden.
+- Det skrev bare ut tidene og linja for regel 22, også om noe feilet. Utskriften, ordrett:
+
+```
+visningene: 0.046 s, 0.014 s, 0.014 s
+sha256 lik før og etter: True | den midlertidige mappa er slettet: True
+```
+
+- Den ekte lista er full (15 aksjer og 3 ønsker som venter), så `/folg` viser ingen rader, men regner dem likevel (ECH1). «Bytt ut» (`/folg?bytt=…`) gjør det samme arbeidet og viser hele lista, så det er den som er målt.
+- Den første visningen tar lengst. Den sjekker også migreringen av kopien, og diskbufferen var varm etter kopieringen (ECH3, VG4). En kald disk etter en omstart er ikke målt.
+- Tiden gjelder hele visningen, også at `_aksjene_i_lista` regnes to ganger per forespørsel, i medianene og i de ferdige listene (ECH4).
+- Én visning tar langt under ett sekund, så medianene regnes fortsatt én gang per forespørsel, og ingenting huskes i minnet (svaret kl. 14:29). Tiden måles på nytt hvis `ferdige_lister.medianene`, `foelgbare` eller `_egne_regnet` endres (VG5).
+- Den første målingen kl. 14:40 (på `8b90fb0f`, med `shutil.copy2`) ga 0,051, 0,016 og 0,017 s.
 
 ### Spørsmål 14: et kall som feiler
 
-`test_et_kall_som_feiler_og_proeves_igjen_gir_minst` i `test_din_egen_liste_8_22.py`: DNB feiler i kveldens henting og hentes i et nytt forsøk 30 minutter senere (2.3b). Hentingen brukte da ett kall mer enn seriene den lagret, og steg 2 sier «minst» med seriene, ikke kallene. Mutanten der `valg.siste_henting` teller én for mye, ble fanget av testen og tre til, og `src/valg.py` hadde samme sha256 som HEAD etterpå.
+`test_et_kall_som_feiler_og_proeves_igjen_gir_minst` i `test_din_egen_liste_8_22.py`: DNB feiler i kveldens henting kl. 22:00 og hentes i et nytt forsøk kl. 22:30 samme dag (2.3b). Kallene telles i begge kjøringene: 16 og 1. Etter feilen sier steg 2 «minst 15» (15 serier, mens hentingen brukte 16 kall og lista har 16), og etter forsøket «minst 16» (16 serier, 17 kall).
+
+Mutantene, alle fanget, med filene like HEAD (sha256) etterpå:
+- `siste_henting` teller én for mye: fanget av den nye testen, `test_statusen_er_kallene_hentingen_brukte`, `test_to_hentinger_samme_dag_gir_minst` og `test_siste_henting_er_dagen_i_oslo`.
+- Malen viser kallene regnet av lista (`egne.kall.sist`) i stedet for seriene (VG1): fanget av den nye testen.
+- `siste_henting` mister seriene fra det nye forsøket: fanget av den nye testen og `test_siste_henting_er_dagen_i_oslo`.
+
+### Gjennomgangen av svarene kl. 14:29
+
+Gjennomgangen av `8b90fb0f..c294a1bc` og det første måleskriptet ga 10 funn fra Blind Hunter, 7 fra Edge Case Hunter og 8 fra Verification Gap.
+
+| Funn | Grad | Utfall |
+|---|---|---|
+| BH1, VG1 (testen skilte ikke seriene fra kallene eller lista: alt var 16) | høy/middels | Rettet: testen sjekker statusen etter feilen (15) og etter forsøket (16), og mutanten der malen viser lista, ble fanget. |
+| BH2, VG6, ECH2 (`assert KALL < brukt` var alltid sann, og kallene i første henting ble ikke talt) | middels/lav | Rettet: første henting kjøres i testen, og kallene telles (16 og 1). |
+| BH3, ECH7 (kopien bare av hovedfila, og WAL) | middels/lav | Rettet: backup fra en skrivebeskyttet tilkobling, og ingen `-journal` eller `-wal`. Basen bruker vanlig journal (ECH). |
+| BH4, ECH6, BH6 (ingen sjekk av at kopien og koden i worktreen ble brukt) | middels/lav | Rettet: `assert` på stien til appen og på `BASE_STI`, og commiten står over. |
+| VG2 (skriptet skrev ut mer enn tidene) | middels | Rettet: målt på nytt, med bare tidene og linja for regel 22. Radene sjekkes med `assert`. |
+| VG3 (målingen kan ikke etterprøves) | middels | Delvis rettet: utskriften står ordrett over, med navnet og sha256 for skriptet. Skriptet ligger i scratchpad-mappa, ikke i `malinger.md`. |
+| BH5 (kilden er i scratchpad, og 14:29 mot 14:31) | middels | Står: 14:29 er svaret, og 14:31 er instruksjonen som ga det videre. Instruksjonen føres i dagsfila 11.11 med flettingen, som de andre. |
+| VG8 (gamle tekster sa at ECH5, VG2 og ECH2 sto åpne) | lav | Rettet: «Besvart 11.11 kl. 14:29» ved hver av dem. |
+| ECH1, ECH3, ECH4, BH7, VG4 (begrunnelsene for tidene) | lav | Rettet i teksten over. |
+| BH8 (sha-sjekken ved feil) | lav | Rettet: i `finally`. |
+| BH9 (`TESTING` uten `monkeypatch`) | lav | Rettet i den nye testen. |
+| VG7 (mutanten bare som prosa) | lav | Rettet: testene er navngitt over. |
+| VG5 (ingen test for grensen på ett sekund) | lav | Står: tiden måles på nytt ved endringer i medianene, som over. |
+| BH10, ECH5 (samme kveld; et nytt forsøk etter midnatt fordeler seriene på to dager) | lav | Står: ECH fant at forsøket i testen er samme dag i Oslo og UTC. Etter midnatt sier steg 2 den nye dagen og bare seriene den dagen, og det er sant, men lite. |
+
+Ingen funn på middels eller over står åpne.
