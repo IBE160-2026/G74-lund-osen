@@ -4524,6 +4524,25 @@ Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan
 
 *Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
 
+### Story 8.24: Notatene, to ting etter flettingen
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 23:01 i `docs/ai-prompts/2026-11-10.md`.* 8.22 og 8.23 er tatt av andre vinduer. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-24-notatene-to-ting.md`.
+
+Som **bruker**, vil jeg ha forklaringen av notatene der de andre valgene har sin, og kunne notere et tenkt kjøp eller salg og slette fra notatene i Min liste.
+
+**Oppfyller:** svaret 10.11 kl. 22:59 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`
+
+**Kontroll — hva testen ser etter:**
+- Bryteren «Notater» i Innstillinger står uten «?», og forklaringen står under den, som ved Hjelp og KI-tekst
+- Notatene i Min liste har «Noter et tenkt kjøp», «Noter et tenkt salg» og «Slett», med de samme reglene og varslene som på aksjesiden, og innledningen sier det
+- **Ville feilet hvis:** «?» sto igjen ved Notater, eller Min liste manglet en knapp, tillot et kjøp aksjesiden ikke tillater, eller sendte svaret til en annen side
+
+**Avhenger av:** 8.21. **Én økt:** ja.
+
+*Avgjort 2026-11-10 kl. 22:59 (gruppens svar):* etter gruppens gjennomgang av bildene tas «?» ved Notater bort, fordi forklaringen står under bryteren, og notatene i Min liste får de samme knappene som på aksjesiden, med de samme reglene, varslene og «Er du sikker?» der aksjesiden har det. Rådet anbefalte det. Svaret er ført etter instruksjonen kl. 23:01 i `docs/ai-prompts/2026-11-10.md`.
+
+*Lagt til 2026-11-11:* 8.24 er flettet med PR #141 i `38a0a0e9` kl. 02:03, låst til head-en `ae9e395e`. CI var grønn på head-en (run 42935503846), og hele settet lokalt før flettingen: 5083 bestått og 24 hoppet over.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
