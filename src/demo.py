@@ -148,8 +148,8 @@ DEMOBOERSEN: tuple[tuple[str, str], ...] = (
     ("TNDT", "Tindtopp Teknologi"),
     ("VKVF", "Vikvåg Forbruk"),
     # Story 8.22 (tillegget 10.11 kl. 17:16, svaret kl. 15:57): sju til, så
-    # søket, filtrene, antallet, forslagene og «ikke målt ennå» kan ses i
-    # demoen. Kraft har tre målte (forslagene) og én som ikke er målt.
+    # søket, filtrene, antallet, sorteringen og «ikke målt ennå» kan ses i
+    # demoen. Kraft har tre målte og én som ikke er målt.
     ("BRKR", "Breivik Kraft"),
     ("STRM", "Strømsvik Kraft"),
     ("LYSV", "Lysvann Kraft"),

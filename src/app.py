@@ -2317,7 +2317,7 @@ def folg_side():
     """«Følg en aksje» og «Bytt ut» - story 2.12, utdraget §1 og §2. En side
     med skjema, ikke en dialog med skript (spørsmål 8). Bare lesing.
     Story 8.22: alle aksjene som kan følges, med filter på bransje og
-    omsetning, og tre forslag i valgt bransje."""
+    omsetning. Tillegg 3: sorteringen i stedet for de tre forslagene."""
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     lager = _valglager()
@@ -2342,21 +2342,25 @@ def folg_side():
             "kursene": kursene,
             "utenfor": valg.utenfor_maalingen(median),
         }
-    # Story 8.22: hele lista, filteret på bransje og omsetning (spørsmål 6)
-    # og de tre forslagene (spørsmål 7). Et ukjent valg i adressen er «Alle».
+    # Story 8.22: hele lista og filteret på bransje og omsetning (spørsmål 6).
+    # Tillegg 3 (svarene 10.11 kl. 22:44): sorteringen i stedet for de tre
+    # forslagene. Et ukjent valg i adressen er «Alle», og en ukjent sortering
+    # er «Mest omsatt først».
     valgt_bransje = request.args.get("bransje") or ""
     if valgt_bransje not in valg.BRANSJENE:
         valgt_bransje = ""
     valgt_omsetning = request.args.get("omsetning") or ""
     if valgt_omsetning not in {v for v, _ in ferdige_lister.OMSETNINGSFILTER}:
         valgt_omsetning = ""
-    alle, rader, treff, forslag = [], [], set(), []
+    valgt_sortering = request.args.get("sorter") or ""
+    if valgt_sortering not in {v for v, _ in ferdige_lister.SORTERINGER}:
+        valgt_sortering = ferdige_lister.OMSATT
+    alle, rader, treff = [], [], set()
     if valgt is None:
         opptatt = set(i_lista) | {o.symbol for o in lager.ventende() if o.handling == valg.FOLG}
         alle = ferdige_lister.foelgbare(g.tilkobling, opptatt, medianene)
-        rader = ferdige_lister.filtrer(alle, "", valgt_bransje, valgt_omsetning)
+        rader = ferdige_lister.sorter(ferdige_lister.filtrer(alle, "", valgt_bransje, valgt_omsetning), valgt_sortering)
         treff = {a.kode for a in ferdige_lister.filtrer(rader, sok, "", "")}
-        forslag = ferdige_lister.forslagene(alle, valgt_bransje)
     # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
     # ikke følges, og siden sier det før skjemaet sendes.
     alt_fulgt = valgt is not None and (
@@ -2373,8 +2377,10 @@ def folg_side():
         alle=alle,
         rader=rader,
         treff=treff,
-        forslag=forslag,
         valgt_bransje=valgt_bransje,
+        valgt_sortering=valgt_sortering,
+        sorteringer=ferdige_lister.SORTERINGER,
+        omsatt=ferdige_lister.OMSATT,
         valgt_omsetning=valgt_omsetning,
         bransjene=valg.BRANSJENE,
         omsetningsfilter=ferdige_lister.OMSETNINGSFILTER,

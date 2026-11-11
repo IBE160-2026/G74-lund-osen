@@ -365,7 +365,17 @@ OMSETNINGSFILTER = (
     (UNDER, f"Under {GRENSE_MNOK:.0f} MNOK"),
     (IKKE_MAALT, "Ikke målt ennå"),
 )
-FORSLAG = 3
+# Tillegg 3 til 8.22 (svarene 10.11 kl. 22:44): sorteringen erstatter kortet
+# «Mest omsatt» med de tre forslagene, som testpersonen ønsket. Omsetningen
+# er median omsetning, aldri kursen eller signalet (NFR-06).
+OMSATT = "omsatt"
+NAVN = "navn"
+BRANSJEN = "bransje"
+SORTERINGER = (
+    (OMSATT, "Mest omsatt først"),
+    (NAVN, "A–Å"),
+    (BRANSJEN, "Bransje"),
+)
 
 
 def fast_bransje(kode: str) -> str | None:
@@ -491,14 +501,18 @@ def filtrer(rader: list[Foelgbar], tekst: str, bransje: str, omsetning: str) -> 
     return ut
 
 
-def forslagene(rader: list[Foelgbar], bransje: str) -> list[Foelgbar]:
-    """Story 8.22 (spørsmål 7): de tre med høyest median omsetning blant de
-    målte i bransjen, av radene som kan følges. Ordnet etter omsetningen,
-    aldri etter kursen eller signalet (NFR-06). Uten bransje: ingen."""
-    if not bransje:
-        return []
-    maalte = [a for a in rader if a.bransje == bransje and a.median is not None]
-    return sorted(maalte, key=lambda a: (-a.median, a.kode))[:FORSLAG]
+def sorter(rader: list[Foelgbar], sortering: str) -> list[Foelgbar]:
+    """Tillegg 3 til 8.22: «Mest omsatt først» (OMSATT) ordner etter median
+    omsetning de 3 siste månedene, høyest først, og de som ikke er målt, sist.
+    Det er ingen rangering etter kursen eller signalet (NFR-06). «A–Å» (NAVN)
+    ordner etter navnet, med Æ, Ø og Å sist, og «Bransje» (BRANSJEN) etter
+    bransjen i samme rekkefølge som filteret, så navnet. Likt ordnes etter
+    navnet og så tickeren. En ukjent sortering gir OMSATT."""
+    if sortering == NAVN:
+        return sorted(rader, key=lambda a: (_norsk(a.navn), a.kode))
+    if sortering == BRANSJEN:
+        return sorted(rader, key=lambda a: (BRANSJENE.index(a.bransje), _norsk(a.navn), a.kode))
+    return sorted(rader, key=lambda a: (a.median is None, -(a.median or 0.0), _norsk(a.navn), a.kode))
 
 
 @dataclass(frozen=True)
