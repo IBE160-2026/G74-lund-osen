@@ -638,7 +638,7 @@ def test_styrken_staar_i_rutene_som_i_tabellen(klient):
         elif styrke:
             assert styrke.group(1) == "styrke" and styrke.group(2) in "01", symbol
         else:
-            assert 'class="tekst"' in rute or "Uten data" in rute, symbol
+            assert 'class="tekst"' in rute or "Ingen kurs" in rute, symbol
         sett.add(styrke.group(2) if styrke else None)
     assert {"3", "2"} <= sett and sett & {"1", "0"}, sett
     assert 'class="merke"' not in "".join(ruter.values())
@@ -991,7 +991,7 @@ def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
         rute = re.sub(r' title="[^"]*"', "", rute)
         if "uten-data" in re.search(r'<a class="rute ([^"]*)"', rute).group(1).split():
             assert "ikke vurdert" not in rute and "styrke" not in rute, (adresse, symbol)
-            assert '<span class="endring">Uten data</span>' in rute
+            assert '<span class="endring">Ingen kurs</span>' in rute
             continue
         if re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
             assert "ikke vurdert" not in rute, (adresse, symbol)

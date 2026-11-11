@@ -65,7 +65,10 @@ LAV, VANLIG, HOEY = "lav", "vanlig", "hoey"
 VOLUMORD = {LAV: "lavt", VANLIG: "vanlig", HOEY: "høyt"}
 # Rammen, etter styrken (designregler.md §3).
 GUL, MOERK = "gul", "moerk"
-UTEN_DATA = "Uten data"
+# Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 2): «Uten data» sa ikke
+# hvorfor. Ruta sier «Ingen kurs», kort nok til grensen for store ruter
+# (STOR), og tabellen og title sier «Ingen kurser ennå», som oversikten.
+UTEN_DATA = "Ingen kurs"
 
 # Story 8.6b, c: fem fargetrinn etter endringen slik den vises, med grensene i
 # prosent. Navnene er klassene i malen og fargene i :root i stil.css.
@@ -280,7 +283,7 @@ def bygg_rute(
     p: Parametre = STANDARD,
 ) -> Rute:
     """Ruta for én aksje på dato. kurser er kursradene til og med dato. En
-    aksje uten kurs på dato står med «Uten data», og med gult bare ved 3 av 3
+    aksje uten kurs på dato står med «Ingen kurs» (var «Uten data»), og med gult bare ved 3 av 3
     på siste børsdag."""
     if not kurser or kurser[-1].dato != dato:
         return Rute(
@@ -314,7 +317,7 @@ def med_perioden(rute: Rute, serie: list[Kursrad], start: date, siste: date) -> 
     Endringen er fra start, dagen den første kursen i perioden er fra, til
     siste børsdag, regnet som i oversikten (periodeendring), og ruta er like
     stor som de andre. Signalet og rammen er siste børsdag, som før. En rute
-    uten kurs siste børsdag står med «Uten data»."""
+    uten kurs siste børsdag står med «Ingen kurs» (var «Uten data»)."""
     if rute.uten_data:
         return replace(rute, lik_stoerrelse=True)
     utfall = periodeendring(serie, start, siste)

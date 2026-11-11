@@ -514,11 +514,12 @@ class TestSiden:
         html = _side(klient)
         rute = re.search(
             # Story 8.23 (A4): ruta har en title med symbolet, endringen og styrken.
-            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: uten data">\s*<span class="ticker">MTFJ</span>.*?</a>',
+            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: ingen kurser ennå">\s*<span class="ticker">MTFJ</span>.*?</a>',
             html,
             re.S,
         )
-        assert rute and "Uten data" in rute.group(0)
+        # Story 8.26 (tillegg 2): «Ingen kurs» i ruta, var «Uten data».
+        assert rute and f'<span class="endring">{UTEN_DATA}</span>' in rute.group(0) and UTEN_DATA == "Ingen kurs"
 
     def test_hver_rute_lenker_til_aksjesiden(self, klient):
         """Hver rute lenker til aksjesiden, også MTFJ uten kurser, som svarer
@@ -582,7 +583,8 @@ class TestSiden:
         )
         assert 'class="merke"' not in html
         for symbol, _navn, endring, _volum, styrke in rader:
-            assert endringer[symbol] == endring, symbol
+            # Story 8.26 (tillegg 2): ruta har den korte teksten, tabellen den lange.
+            assert {UTEN_DATA: "Ingen kurser ennå"}.get(endringer[symbol], endringer[symbol]) == endring, symbol
             if re.fullmatch(r"\d av 3", styrke):
                 assert styrker[symbol] == styrke, symbol
             else:
@@ -1245,7 +1247,7 @@ class TestFargetrinnene:
             )
             assert len(ruter) == 15, adresse
             for trinn, symbol, endring in ruter:
-                ventet = "ingen" if endring in ("Uten data", "–") else fargetrinn(_tall(endring))
+                ventet = "ingen" if endring in (UTEN_DATA, "–") else fargetrinn(_tall(endring))
                 assert trinn == ventet, (adresse, symbol, endring)
                 sett.add(trinn)
         assert len(sett - {"ingen"}) >= 3, sett

@@ -45,6 +45,7 @@ from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, forrige_boersdag, innevaerende_boersdag, norsk_dato
 from boersometer import (
     GRENSE_STERK,
+    UTEN_DATA,
     annen_grunn_i_kartet,
     bygg_boersometer,
     bygg_rute,
@@ -752,7 +753,8 @@ def boersometer():
     børsdagen med kurs før den. Story 8.6b, b: hovedindeksen står som et tall
     i linja «Mål mot børsen», for dagen som vises, og søylene står bare på
     oversikten."""
-    felles = {"aktiv": BOERSOMETER}
+    # Story 8.26 (tillegg 2): teksten i en rute uten kurser, fra boersometer.py.
+    felles = {"aktiv": BOERSOMETER, "uten_kurs_kort": UTEN_DATA}
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     if g.get("demo_mangler"):

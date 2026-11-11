@@ -187,7 +187,7 @@ class TestBoersometeret:
         html = _html(klient, "/boersometer")
         ruter = re.findall(r'<a class="rute [^"]*" href="[^"]+" title="([^"]+)">', html)
         assert len(ruter) == 15
-        assert all(re.fullmatch(r"[A-Z]+: ([+-]?[\d,]+\xa0%|uten data|–)(, .+)?", r) for r in ruter), ruter
+        assert all(re.fullmatch(r"[A-Z]+: ([+-]?[\d,]+\xa0%|ingen kurser ennå|–)(, .+)?", r) for r in ruter), ruter
         assert any(re.search(r", \d av 3$", r) for r in ruter)
 
     def test_smaa_ruter_viser_endringen_og_styrken(self):

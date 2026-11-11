@@ -48,6 +48,7 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 3. **«Spill av hele omvisningen».** *Forslag:* lenken står bare på siste steg med «Vis meg rundt». I hele omvisningen går «Neste» videre til neste side som før, og siste steg har «Ferdig».
 4. **«Vis meg rundt» og en annen side.** *Forslag:* «Vis meg rundt» lagrer ingenting, så boksen lukkes når man går til en annen side, og en omvisning som er i gang, fortsetter ikke av den.
 5. **Ved 390 px.** *Forslag:* knappene brytes over flere linjer som sideknappene i dag, uten rulling.
+6. **Ordene for en aksje uten kurser (tillegg 2).** *Forslag:* rådets ord, «ingen kurser ennå», under «–» i raden på oversikten og i Min liste, og «uten kurser» i båndet over radene. På børsometeret står «Ingen kurs» i ruta, fordi den må få plass i en stor rute (`STOR`, 207 px, som «Uten data»), og «Ingen kurser ennå» i tabellen under kartet og når man peker på ruta. «Ukjent» bak «?» ved Retning sier at det også gjelder en aksje uten kurser. Aksjesiden for en aksje uten kurser sier alt «Det finnes ingen kurser for … ennå», og står som før. «venter på henting» står for aksjene som venter, i del 5.
 
 ## Delene
 
@@ -74,3 +75,11 @@ Hver del har tester med «Ville feilet hvis» i `tests/test_vis_meg_rundt_8_26.p
 - **«Den ekte versjonen»** i demolinja åpnes i en ny fane, med `target="_blank"`, `rel="noreferrer"`, pila ↗ og «(åpnes i en ny fane)» for skjermlesere, som lenken til investorsiden. Adressen er den samme (`EKTE_VERSJONEN_URL`). Det er den eneste lenken ut av appen som åpnet i samme fane; en test sjekker alle malene.
 
 **Ville feilet hvis:** filteret, linja om det eller adressene sto igjen, `?signal=` skjulte rader, setningen om råd ble borte fra oversikten, eller en lenke ut av appen åpnet i samme fane.
+
+### 4) «uten data» sier hvorfor (tillegg 2, ønsket kl. 17:44)
+
+- `UTEN_DATA_TEKST` i `markedsoversikt.py` er «ingen kurser ennå», og båndet over radene sier «N uten kurser». `UTEN_DATA` i `boersometer.py` er «Ingen kurs», og tabellen under kartet og `title` sier «Ingen kurser ennå»; styrken i tabellen er «–», så teksten ikke står to ganger.
+- Hjelpen «Ingen kurser ennå» i vinduet «Oppdatert» og «Ukjent» bak «?» ved Retning er rettet, og `docs/hjelp.md` om demoen.
+- Testene som så etter «uten data» som tekst på sidene, er rettet til de nye ordene; kommentarene og docstringene står.
+
+**Ville feilet hvis:** en side fortsatt sa «uten data», raden for MTFJ i demoen ikke sa «ingen kurser ennå», ruta ikke sa «Ingen kurs», teksten ikke fikk plass i en stor rute, eller «Ukjent» ikke forklarte en aksje uten kurser.

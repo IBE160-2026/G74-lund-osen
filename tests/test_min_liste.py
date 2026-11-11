@@ -420,7 +420,7 @@ class TestSidene:
             assert '<span class="under">★ = Min liste</span></th>' in thead.split("</th>", 1)[0] + "</th>"
             rader = [r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S) if '<td class="selskap">' in r]
             # Story 8.2a, b: _rekkefoelge teller ikke radene uten data.
-            assert len(rader) == len(_rekkefoelge(html)) + sum(">uten data<" in r for r in rader) > 0
+            assert len(rader) == len(_rekkefoelge(html)) + sum(">ingen kurser ennå<" in r for r in rader) > 0
             for rad in rader:
                 assert rad.count("<td") == 5
 

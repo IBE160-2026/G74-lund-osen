@@ -351,12 +351,13 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst i
         # tabellen, ikke bare navnet under den.
+        # Story 8.26 (tillegg 2): «uten data» heter «ingen kurser ennå».
         "uten_data": Hjelpetekst(
-            "Uten data:",
+            "Ingen kurser ennå:",
             # Gjennomgangen 24.10 (BH7): nederst uten sortering. Sortert på
             # Selskap står den etter navnet.
             "en aksje uten en eneste kurs står nederst i tabellen uten sortering, med «–» i hver kolonne og "
-            "«uten data» og med lenke til aksjesiden.",
+            "«ingen kurser ennå» og med lenke til aksjesiden.",
             (
                 # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
                 (PRD, "en aksje uten en eneste kursrad har en rad nederst i tabellen"),
@@ -424,7 +425,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         },
         "ukjent": Hjelpetekst(
             f"{UKJENT_RETNING.symbol} {UKJENT_RETNING.tekst}:",
-            f"det finnes ingen vurdering for dagen, og grunnen står under "
+            # Story 8.26 (tillegg 2): også en aksje uten kurser.
+            f"det finnes ingen vurdering for dagen, eller aksjen har ingen kurser ennå, og grunnen står under "
             f"signalstyrken. Det er ikke en femte retning: «{INGEN}» betyr at "
             f"sjekkene ble regnet uten at noen slo ut.",
             ((PRD, "«Ukjent» er ikke en femte retning i FR-704"), (MARKEDSOVERSIKT, "UKJENT_RETNING")),

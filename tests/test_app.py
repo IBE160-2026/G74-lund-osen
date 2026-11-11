@@ -243,7 +243,7 @@ def test_aksje_uten_data_navngis_i_fotnoten(klient, monkeypatch):
     html = klient.get("/").data.decode("utf-8")
 
     assert "Uten data i denne kilden" not in html
-    assert ["DNB Bank", "–", "–", "– uten data", "– Ukjent"] in _tabell(html).uten_data
+    assert ["DNB Bank", "–", "–", "– ingen kurser ennå", "– Ukjent"] in _tabell(html).uten_data
 
 
 def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
@@ -260,7 +260,7 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     assert "Equinor" in html
     # Story 8.2a, b (U23): en rad med «uten data», ikke en fotnote.
     assert "Uten data i denne kilden" not in html
-    assert ["DNB Bank", "–", "–", "– uten data", "– Ukjent"] in _tabell(html).uten_data
+    assert ["DNB Bank", "–", "–", "– ingen kurser ennå", "– Ukjent"] in _tabell(html).uten_data
     assert '<a href="/aksje/DNB">DNB Bank</a>' in html
     side = klient.get("/aksje/DNB")
     assert side.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in side.data.decode("utf-8")
@@ -353,7 +353,7 @@ class TestTidsstempler:
         rader = re.findall(r'<tr(?! class="del)[^>]*>.*?</tr>', kropp, re.DOTALL)
         # Story 8.2a, b: og en rad uten data for hver av de andre aksjene i
         # migrasjonen, også med fem kolonner.
-        assert len([rad for rad in rader if ">uten data<" not in rad]) == 2
+        assert len([rad for rad in rader if ">ingen kurser ennå<" not in rad]) == 2
         for rad in rader:
             assert rad.count("</td>") == 5
 
@@ -970,7 +970,11 @@ class _Tabell(HTMLParser):
         if tag == "tbody":
             self._i_kropp = False
         elif (
-            tag == "tr" and self._i_kropp and not self._i_del and self.rader and self.rader[-1][3:4] == ["– uten data"]
+            tag == "tr"
+            and self._i_kropp
+            and not self._i_del
+            and self.rader
+            and self.rader[-1][3:4] == ["– ingen kurser ennå"]
         ):
             self.uten_data.append(self.rader.pop())
             self.del_av.pop()
@@ -1994,7 +1998,7 @@ class TestStory80e:
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
         # Story 8.2a, b: og de 13 aksjene uten kurser (gjennomgangen 24.10, BH4).
-        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten data"]
+        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten kurser"]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
@@ -2055,13 +2059,13 @@ class TestStory80e:
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         assert tabell.ekstra["bak"] == [
             "signalstyrke 2 eller mer",
-            "signalstyrke 0 eller 1 og 1 uten signal og 12 uten data",
+            "signalstyrke 0 eller 1 og 1 uten signal og 12 uten kurser",
         ]
         assert tabell.ekstra["antall"] == ["1", "14"]
         _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         # Gjennomgangen 24.10 (VG4): MOWI går fra uten data til uten signal.
-        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal og 11 uten data"
+        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal og 11 uten kurser"
         assert tabell.ekstra["antall"] == ["1", "14"] and len(tabell.uten_data) == 11
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
@@ -2313,7 +2317,7 @@ def _deler_i_rekkefoelge(html: str) -> tuple[list[str], list[str]]:
     finn = lambda del_: [
         re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1)
         for rad in re.findall(r"<tr[ >].*?</tr>", del_, re.S)
-        if '<span class="linje">' in rad and '<span class="merke mangler">uten data</span>' not in rad
+        if '<span class="linje">' in rad and '<span class="merke mangler">ingen kurser ennå</span>' not in rad
     ]
     return finn(ut), finn(oevrige)
 
@@ -2325,10 +2329,10 @@ class TestStory82aRadUtenData:
 
     @staticmethod
     def _rekkefoelge(html: str) -> list[tuple[str, bool]]:
-        """(symbol, uten data) for hver rad, i rekkefølgen de står."""
+        """(symbol, ingen kurser ennå) for hver rad, i rekkefølgen de står."""
         tabell = html.split("<table>", 1)[1].split("</table>", 1)[0]
         return [
-            (re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1), ">uten data<" in rad)
+            (re.search(r'<span class="linje">([A-Z0-9]+)', rad).group(1), ">ingen kurser ennå<" in rad)
             for rad in re.findall(r"<tr[ >].*?</tr>", tabell, re.S)
             if '<td class="selskap">' in rad
         ]

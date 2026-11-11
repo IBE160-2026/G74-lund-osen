@@ -376,7 +376,7 @@ class TestVelgDag:
         for rad in rader:
             tekst = _synlig(rad).replace("3 av 3 siste børsdag", "")
             assert "av 3" not in tekst, tekst
-            assert "ikke vurdert" in tekst or "uten data" in tekst, tekst
+            assert "ikke vurdert" in tekst or "ingen kurser ennå" in tekst, tekst
         assert "Tabellen viser tirsdag 15.09" in _synlig(html)
         # Gjennomgangen (VG8): fotnoten om «ikke vurdert» står for dagen.
         assert fotnoten(html)

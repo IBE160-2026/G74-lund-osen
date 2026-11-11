@@ -281,3 +281,54 @@ class TestFilteretOgLenken:
             for lenke in re.findall(r"<a [^>]*>", tekst):
                 if "http" in lenke or "ekte_versjonen_url" in lenke or "{{ adresse }}" in lenke:
                     assert 'target="_blank"' in lenke and 'rel="noreferrer"' in lenke, (mal.name, lenke)
+
+
+# --- 4) Tillegg 2: «uten data» sier hvorfor ---------------------------------
+
+
+class TestIngenKurserEnnaa:
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_ingen_side_sier_uten_data(self, versjon, request):
+        """Ønsket kl. 17:44: ville feilet hvis en side fortsatt sa «uten data»
+        uten å si hvorfor."""
+        k = request.getfixturevalue(versjon)
+        for sti in ("/", "/min-liste?vis=alle", "/boersometer"):
+            assert not re.search(r"[Uu]ten data", _side(k, sti)), sti
+
+    def test_raden_uten_kurser_sier_det(self, klient):
+        """Ville feilet hvis raden for en aksje uten en eneste kurs (MTFJ i
+        demoen) ikke sa «ingen kurser ennå» under «–», som «for kort
+        historikk» sier sitt, eller båndet ikke talte dem som «uten kurser»."""
+        side = _side(klient, "/")
+        rad = side.split('<a href="/aksje/MTFJ">', 1)[1].split("</tr>", 1)[0]
+        assert '– <span class="merke mangler">ingen kurser ennå</span>' in rad
+        assert "Ukjent" in rad
+        assert re.search(r"og 1 uten kurser</span>", side)
+
+    def test_boersometeret_sier_ingen_kurs(self, klient):
+        """Ville feilet hvis ruta sa «Uten data», eller tabellen under kartet
+        ikke sa «Ingen kurser ennå»."""
+        import boersometer
+
+        side = _side(klient, "/boersometer")
+        rute = side.split('href="/aksje/MTFJ"', 1)[1].split("</a>", 1)[0]
+        assert boersometer.UTEN_DATA == "Ingen kurs"
+        assert '<span class="endring">Ingen kurs</span>' in rute
+        assert 'title="MTFJ: ingen kurser ennå"' in side
+        tabell = side.split("<table", 1)[1].split("</table>", 1)[0]
+        assert "Ingen kurser ennå" in tabell
+
+    def test_ingen_kurs_faar_plass_i_en_stor_rute(self):
+        """Ville feilet hvis den nye teksten gjorde en stor rute for smal, så
+        grensen for store ruter (STOR) ikke lenger gjaldt."""
+        import boersometer
+
+        bredde = boersometer.stor_bredde("AKRBP", None, False, boersometer.UTEN_DATA)
+        assert bredde <= boersometer.STOR[0]
+
+    def test_ukjent_forklares_bak_spoersmaalstegnet(self):
+        """Ville feilet hvis «Ukjent» bak «?» ved Retning ikke sa at det også
+        gjelder en aksje uten kurser."""
+        tekst = ht.hjelpetekster()["ukjent"].tekst
+        assert "eller aksjen har ingen kurser ennå" in tekst
+        assert ht.hjelpetekster()["uten_data"].tittel == "Ingen kurser ennå:"

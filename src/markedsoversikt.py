@@ -442,7 +442,9 @@ def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
 # «–» i raden for en aksje uten en eneste kurs.
 # Gjennomgangen 24.10 (BH13): et annet navn enn UTEN_DATA i boersometer.py,
 # som har stor forbokstav.
-UTEN_DATA_TEKST = "uten data"
+# Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 2): sier hvorfor, som
+# «for kort historikk». Var «uten data».
+UTEN_DATA_TEKST = "ingen kurser ennå"
 
 
 @dataclass(frozen=True)
