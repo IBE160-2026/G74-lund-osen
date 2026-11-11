@@ -4097,7 +4097,9 @@ AVTRYKK_I_KOM_I_GANG = {
     "Med Docker Desktop": "440935debadb3cea3dc714c75663de5b576648547ec3295953836948b83d1cbd",
     "Uten Docker, med uv": "a1d3d1cf96d7b4b5a0e9f1428ed3876b508939fe326ab67bfeabaa9b63dbc3f0",
     # Story 3.6 (del C): snarveien og at mobil kommer senere. Var 6cd3d9de....
-    "Slik virker dobbeltklikket": "d8dccde4ebf446178d189f629af18ec0b6143f4545a1828cd6d5397c346c2c46",
+    # Story 3.6 (svaret 11.11 kl. 13:47, spørsmål 8): setningen om en snarvei
+    # til en annen kopi. Var d8dccde4....
+    "Slik virker dobbeltklikket": "3a938e6aff6ae67156ed5d4028460e10fb30be3944023d694f65cc5e71698f62",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 

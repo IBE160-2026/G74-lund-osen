@@ -231,6 +231,71 @@ class TestSnarveien:
         self._tilby(tmp_path, "ekte", "j")
         assert Path(self._maalet(lnk)[0]) == tmp_path / "rot" / "Start den ekte versjonen.cmd"
 
+    @staticmethod
+    def _pek(lnk: Path, maal: Path) -> None:
+        lnk.parent.mkdir(parents=True, exist_ok=True)
+        _ps(
+            f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}'); $s.TargetPath = '{maal}'; $s.Save()",
+            {},
+        )
+
+    @staticmethod
+    def _annen_kopi(tmp_path) -> Path:
+        annen = tmp_path / "annen"
+        annen.mkdir()
+        for fil in ("Start den ekte versjonen.cmd", "Start demoen.cmd"):
+            (annen / fil).write_text("@echo off\n", encoding="utf-8")
+        return annen
+
+    @pytest.mark.parametrize(
+        ("versjon", "navn", "fil"),
+        [("ekte", "OSE Signal", "Start den ekte versjonen.cmd"), ("demo", "OSE Signal (demo)", "Start demoen.cmd")],
+    )
+    def test_en_snarvei_til_en_annen_kopi_ja_flytter_den_hit(self, tmp_path, versjon, navn, fil):
+        """Spørsmål 8 (gruppens svar 11.11 kl. 13:47). Ville feilet hvis en
+        snarvei til en annen kopi som finnes, ble stående uten spørsmål,
+        hvis vinduet ikke sa hvilken mappe den peker på, eller hvis ja ikke
+        rettet den hit med ikonet og mappa til denne kopien."""
+        annen = self._annen_kopi(tmp_path)
+        lnk = tmp_path / "skrivebord" / f"{navn}.lnk"
+        self._pek(lnk, annen / fil)
+        svar, rot, _ = self._tilby(tmp_path, versjon, "j")
+        assert f"starter kopien i {annen}." in svar.stdout, svar.stdout + svar.stderr
+        assert "starter nå denne kopien" in svar.stdout
+        maal, ikonet, mappe = self._maalet(lnk)
+        assert Path(maal) == rot / fil and Path(mappe) == rot
+        assert Path(ikonet.rsplit(",", 1)[0]) == rot / "src" / "static" / "ikon.ico"
+        assert not (rot / "data").exists() and not (annen / "data").exists()
+
+    @pytest.mark.parametrize(
+        ("versjon", "navn", "fil"),
+        [("ekte", "OSE Signal", "Start den ekte versjonen.cmd"), ("demo", "OSE Signal (demo)", "Start demoen.cmd")],
+    )
+    def test_en_snarvei_til_en_annen_kopi_nei_huskes_i_denne_kopien(self, tmp_path, versjon, navn, fil):
+        """Spørsmål 8. Ville feilet hvis nei flyttet snarveien, ble husket i
+        den andre kopien eller ikke ble husket, så vinduet spurte hver gang."""
+        annen = self._annen_kopi(tmp_path)
+        lnk = tmp_path / "skrivebord" / f"{navn}.lnk"
+        self._pek(lnk, annen / fil)
+        svar, rot, _ = self._tilby(tmp_path, versjon, "n")
+        assert (
+            f"starter kopien i {annen}." in svar.stdout
+            and "Snarveien er som før. Vinduet spør ikke igjen." in svar.stdout
+        )
+        assert Path(self._maalet(lnk)[0]) == annen / fil
+        assert (rot / "data" / f"snarvei-nei-{versjon}").exists() and not (annen / "data").exists()
+        # Neste gang svares ja, men neiet er husket, så det spørres ikke.
+        svar, _, _ = self._tilby(tmp_path, versjon, "j")
+        assert svar.stdout.strip() == "" and Path(self._maalet(lnk)[0]) == annen / fil
+
+    def test_en_snarvei_hit_med_andre_store_bokstaver_gir_ikke_spoersmaalet(self, tmp_path):
+        """Spørsmål 8. Ville feilet hvis en snarvei til denne kopien, skrevet
+        med andre store og små bokstaver, ble regnet som en annen kopi."""
+        rot = tmp_path / "rot"
+        self._pek(tmp_path / "skrivebord" / "OSE Signal.lnk", Path(str(rot / "Start den ekte versjonen.cmd").upper()))
+        svar, rot, _ = self._tilby(tmp_path, "ekte", "n")
+        assert svar.stdout.strip() == "" and not (rot / "data").exists()
+
     @pytest.mark.parametrize("svar", [" ", "nei", "x"])
     def test_alt_annet_enn_ja_er_nei(self, tmp_path, svar):
         """Ville feilet hvis et tomt svar (bare Enter) eller et annet svar
@@ -288,3 +353,9 @@ class TestDokumentene:
         inst = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
         assert "snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen" in inst
         assert "Ikonet er de tre søylene fra logoen" in inst and "Mobil kommer i en senere versjon." in inst
+        # Spørsmål 8 (gruppens svar 11.11 kl. 13:47): én setning om en
+        # snarvei til en annen kopi. Ville feilet hvis den manglet.
+        assert (
+            "Starter snarveien en annen kopi av appen, sier vinduet hvilken mappe den peker på, og spør én gang "
+            "om den skal starte denne kopien i stedet." in inst
+        )
