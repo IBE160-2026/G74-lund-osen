@@ -79,7 +79,7 @@
         synlig; uten skriptet skjer ingenting. Siden er aktiv, eller
         omvisning_side der siden har et annet merke i stripa enn sitt eget,
         som «Følg en aksje», som merker oversikten eller Min liste. #}
-    {% if omvisning %}<div id="omvisning" hidden data-side="{{ omvisning_side|default(aktiv|default('')) }}" data-steg="{{ omvisning|tojson|forceescape }}"></div>{% endif %}
+    {% if omvisning %}<div id="omvisning" hidden data-side="{{ omvisning_side|default(aktiv, true)|default('', true) }}" data-steg="{{ omvisning|tojson|forceescape }}"></div>{% endif %}
   </header>
 
   <main>

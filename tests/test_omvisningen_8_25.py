@@ -11,6 +11,7 @@ import html
 import json
 import re
 import shutil
+import sqlite3
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -248,6 +249,10 @@ class TestEtterBygget:
         readme = (ROT / "README.md").read_text(encoding="utf-8")
         ekstra = readme[readme.index("**Ekstra, ferdig**") : readme.index("**Neste i v1**")]
         assert "«Spill av omvisningen»" in ekstra
+        # Gjennomgangen (VG5): ville feilet hvis README-en sa et annet antall
+        # sider enn omvisningen går gjennom, som «fem» da «Følg en aksje» kom.
+        tall = {5: "fem", 6: "seks", 7: "sju"}[len(OMVISNINGEN_SIDER)]
+        assert f"{tall} av sidene" in ekstra
         hjelpen = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "«Spill av omvisningen»" in hjelpen and "«Nei takk»" in hjelpen
 
@@ -265,6 +270,9 @@ class TestOppfoerselenMedNode(TestLogikkenMedNode):
         assert self._kjoer(f"o.fortsett({lagret}, '/aksje/BRFE', 21)") == {"i": 6, "retning": -1}
         assert self._kjoer(f"o.fortsett({lagret}, '/folg', 21)") is None
         assert self._kjoer(f"o.fortsett({lagret}, '/', 21)") is None
+        # Gjennomgangen (BH4): en aksje valgt på «Følg en aksje» er en annen
+        # adresse, så omvisningen lukkes.
+        assert self._kjoer("o.fortsett(o.tilstand(18, 1, '/folg'), '/folg?kode=BRFE', 23)") is None
 
     def test_en_gammel_eller_oedelagt_tilstand_fortsetter_ikke(self):
         """ECH5, BH6: ville feilet hvis en indeks utenfor stegene, eller tekst
@@ -361,8 +369,9 @@ class TestFoelgEnAksje:
         foerste = sidene.index("folg")
         assert sidene[foerste - 1] == "min_liste"
         assert sidene[foerste + len(rundturer()["folg"])] == "innstillinger"
-        assert [(s["anker"], s["tittel"]) for s in steg if s["side"] == "folg"] == [
-            (s.anker, s.tittel) for s in rundturer()["folg"]
+        # Gjennomgangen (BH7): også teksten.
+        assert [(s["anker"], s["tittel"], s["tekst"]) for s in steg if s["side"] == "folg"] == [
+            (s.anker, s.tittel, s.tekst) for s in rundturer()["folg"]
         ]
 
     def test_foelg_en_aksje_er_folg_i_omvisningen(self, klient):
@@ -375,6 +384,37 @@ class TestFoelgEnAksje:
         # Stripa merker fortsatt oversikten, som før.
         side = klient.get("/folg").data.decode("utf-8")
         assert re.search(r'<a class="sideknapp" href="/" aria-current="page">', side)
+
+    def test_full_liste_har_tittelen_men_ikke_soeket(self, klient):
+        """Gjennomgangen (VG2, BH3, ECH4): hjelpen sier at «Følg en aksje»
+        bare viser tittelen når lista er full. Ville feilet hvis tittelen
+        forsvant med full liste, så siden ble hoppet over, eller søket sto,
+        så steget pekte på et felt som ikke virker."""
+        koder = re.findall(r'href="/folg\?kode=([A-Z]+)"', klient.get("/folg").data.decode("utf-8"))
+        for kode in koder:
+            klient.post("/folg", data={"kode": kode})
+            side = klient.get("/folg").data.decode("utf-8")
+            if "Lista er full. Fjern en aksje for å følge en annen." in side:
+                break
+        else:
+            pytest.fail("lista ble aldri full")
+        assert _dataene(side)[0] == "folg"
+        assert 'id="folg-tittel"' in side and 'id="q"' not in side
+
+    def test_basefeil_paa_folg_er_ikke_folg(self, klient, monkeypatch):
+        """Gjennomgangen (ECH1, VG1): når basen ikke kan åpnes, svarer
+        /folg med feilsiden på samme adresse. Ville feilet hvis feilsiden ga
+        skriptet navnet folg, så omvisningen fortsatte der og lastet siden på
+        nytt igjen og igjen."""
+
+        def feil(*_a, **_k):
+            raise sqlite3.OperationalError("disk I/O error")
+
+        monkeypatch.setattr(app_modul, "aapne_base", feil)
+        svar = klient.get("/folg")
+        assert svar.status_code == 503
+        m = re.search(r'<div id="omvisning" hidden data-side="([^"]*)"', svar.data.decode("utf-8"))
+        assert m is None or m.group(1) != "folg"
 
 
 @pytest.mark.skipif(NODE is None, reason="Node finnes ikke på maskinen")
@@ -393,6 +433,17 @@ class TestStartenMedNode(TestLogikkenMedNode):
         ):
             assert self._kjoer(f"o.startAdresse({json.dumps(side)}, {json.dumps(her)})") is None, side
         assert self._kjoer("o.fortsett(o.tilstand(0, 1, '/'), '/', 21)") == {"i": 0, "retning": 1}
+
+    def test_fortsetter_bare_paa_siden_steget_hoerer_til(self):
+        """Gjennomgangen (ECH1, VG1): ville feilet hvis omvisningen fortsatte
+        på en side med et annet navn enn steget, som feilsiden på samme
+        adresse, og sendte brukeren dit igjen."""
+        steg = '[{"side":"min_liste"},{"side":"folg"}]'
+        assert self._kjoer(f"o.paaSiden({steg}, 1, 'folg')") is True
+        assert self._kjoer(f"o.paaSiden({steg}, 1, '')") is False
+        assert self._kjoer(f"o.paaSiden({steg}, 5, 'folg')") is False
+        skriptet = SKRIPTET.read_text(encoding="utf-8")
+        assert "if (videre && OMVISNING.paaSiden(steg, videre.i, SIDE))" in skriptet
 
     def test_skriptet_bruker_startadressen(self):
         """Ville feilet hvis knappen og tilbudet ikke brukte startAdresse, eller

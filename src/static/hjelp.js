@@ -286,6 +286,13 @@ const OMVISNING = {
     return tast === "Escape" && !vinduAapent;
   },
 
+  // Om steget i hører til siden (gjennomgangen av «Følg en aksje», ECH1):
+  // en feilside på samme adresse, som når basen ikke kan åpnes, har et annet
+  // navn, og da lukkes omvisningen i stedet for å laste siden på nytt.
+  paaSiden(steg, i, side) {
+    return Boolean(steg[i]) && steg[i].side === side;
+  },
+
   // Tilbudet første gang: bare på oversikten, og bare før det er besvart.
   skalTilby(side, svar) {
     return side === "oversikt" && svar === null;
@@ -492,7 +499,7 @@ if (typeof module === "object" && module.exports) {
   function oppstart() {
     const lagret = les(sessionStorage, OMVISNING.STEGET);
     const videre = lagret === null ? null : OMVISNING.fortsett(lagret, her(), steg.length);
-    if (videre) {
+    if (videre && OMVISNING.paaSiden(steg, videre.i, SIDE)) {
       gaaTil(videre.i, videre.retning);
       return;
     }
