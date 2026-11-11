@@ -34,6 +34,10 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 
+*Svar 2026-11-11 kl. 13:49 (gruppens svar):* tilbudet første gang og et nei huskes i nettleseren, som bygget (spørsmål 3). Rådet anbefalte det.
+
+*Svar 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B (8.22) er flettet (spørsmål 7). Omvisningen flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
+
 1. **Hvor står knappen?** *Forslag:* ved siden av «Vis meg rundt» øverst, på de samme sidene, og skjult til skriptet er lastet, så den aldri står uten å virke. Med «Vis hjelp» av står den ikke, som «Vis meg rundt».
 2. **Hvilken aksjeside?** *Forslag:* den første aksjen i tabellen på oversikten, som omvisningen leser når den går fra oversikten. I demoen er det BRFE. Min liste vises med «Alle», så tabellen har aksjer også uten stjerner.
 3. **Hvordan huskes tilbudet første gang og et nei?** *Forslag:* i nettleseren (`localStorage`), ikke i basen, så det trengs ingen migrasjon, og storyen kan flettes når som helst. Tilbudet står øverst på oversikten til det er besvart, med «Spill av omvisningen» og «Nei takk», og begge svarene huskes. Hvor omvisningen er mellom sidene, står i `sessionStorage`. Alternativet er en rad i `innstilling`, som krever en ny migrasjon og fletting kl. 23:50–23:58; da gjelder svaret maskinen, ikke nettleseren.
