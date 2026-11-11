@@ -3189,6 +3189,8 @@ uten KI. 5B.4 måler KI-tillegget. Blandes de, vet ingen hva som ble målt.
 
 *Avgjort 2026-11-08 kl. 11:51 (gruppens svar):* brukertesten, story 8.1 og 10.4, tas tirsdag 10.11, ikke onsdag, som svaret kl. 11:47 sa. Det endrer svaret 07.11 kl. 22:51, som ga tirsdag 10.11 eller onsdag 11.11, eller begge dagene. Svaret kl. 11:47 står ikke ellers i repoet. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
+*Avgjort 2026-11-10 kl. 22:26 og 22:30 (gruppens svar):* del B ble tatt 10.11 med samme person, rett etter 8.1. Med KI på hjalp teksten ham å forstå helheten i forhold til enkeltaksjen. Svaret med KI av og aksjen ble ikke notert. Notatene står i `docs/brukertest.md`. Svarene er ført etter instruksjonen kl. 22:35 i `docs/ai-prompts/2026-11-10.md`.
+
 ### Story 10.5: Lenke til selskapets side på NewsWeb
 
 *Lagt til 2026-09-28, med plan B.*
@@ -3754,6 +3756,8 @@ noteres det, med tidspunkt.
 *Avgjort 2026-11-08 kl. 11:51 (gruppens svar):* brukertesten, story 8.1 og 10.4, tas tirsdag 10.11, ikke onsdag, som svaret kl. 11:47 sa. Det endrer svaret 07.11 kl. 22:51, som ga tirsdag 10.11 eller onsdag 11.11, eller begge dagene. Svaret kl. 11:47 står ikke ellers i repoet. Svaret er ført etter instruksjonen kl. 13:00 i `docs/ai-prompts/2026-11-08.md`.
 
 *Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* webserveren migrerer basen når den startes, og skriver også ønskene (2.12) og innstillingene (8.10), så det åpne punktet om migreringen i `spec-8-1-brukertesten.md` og `docs/brukertest.md` er besvart (regel 22). Rådet anbefalte at `--les-boerslista` migrerer først tirsdag. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
+
+*Avgjort 2026-11-10 kl. 22:26 og 22:30 (gruppens svar):* brukertesten er tatt 10.11 med én testperson, med den ekte versjonen og dataene fra 09.11. Personen forklarte uoppfordret, med KI av, hvorfor en aksje skilte seg ut, men brukte over 5 minutter, så kravet om under 5 minutter ble ikke oppfylt. Notatene og funnene står i `docs/brukertest.md` og `docs/ux-logg.md`. Svarene er ført etter instruksjonen kl. 22:35 i `docs/ai-prompts/2026-11-10.md`.
 
 ### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 
