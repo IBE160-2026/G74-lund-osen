@@ -51,6 +51,14 @@ siste demodag:
 
 Da lages bare teksten om dagen, og tekstene for aksjene staar. ki_dagen
 importeres bare inne i lag_dagsteksten og dagens_promptavtrykk.
+
+Story 10.10 (spoersmaal 6 i spec-10-10-rikere-ki-tekster.md): med
+--eksempel lages tekstene av eksempelskriveren i ki_eksempel.py, i formene
+fra reglene, uten modell og uten Ollama. Radene har modellnavnet
+«eksempeltekst», saa merket paa siden ikke sier Gemma:
+
+    uv run python src/demo_ki.py --eksempel
+    uv run python src/demo_ki.py --eksempel --dagen
 """
 
 import hashlib
@@ -122,6 +130,9 @@ def promptavtrykk() -> str:
         + ki_prompt.MOTSATT_VEI
         + ki_prompt.ORDLYDEN
         + inspect.getsource(ki_prompt.ordlyd_om_hovedindeksen)
+        # Story 10.10: setningen om de siste 20 boersdagene.
+        + ki_prompt.SETNINGEN_20
+        + inspect.getsource(ki_prompt.setning_om_retningene)
     )
     return hashlib.sha256(tekst.encode("utf-8")).hexdigest()
 
@@ -284,6 +295,10 @@ def dagens_promptavtrykk() -> str:
     import ki_dagen
 
     tekst = ki_dagen.REGLER_DAGEN + inspect.getsource(ki_dagen.lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
+    # Story 10.10: setningen om navnene.
+    tekst += ki_dagen.SETNINGEN_NAVN + inspect.getsource(ki_dagen.setning_om_navnene)
+    # Svaret 11.11 kl. 19:30: formen for én bransje og reglene() som velger den.
+    tekst += ki_dagen.BRANSJEFORMEN + inspect.getsource(ki_dagen.reglene)
     return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 
@@ -320,7 +335,7 @@ def lag_dagsteksten(modell, fil: Path = DAGFIL, skriv: Callable[[str], None] = p
     aa faa en bedre tekst (FR-604): bestaar teksten ikke kontrollen, staar
     raden som den ble."""
     import demo
-    from dagsgrunnlag import dagsgrunnlag
+    from dagsgrunnlag import dagsgrunnlag, vanlig_fra
     from ki_dagen import lag_dagsrad
     from ki_tekst import _kursene
     from lagring_sqlite import SqliteVurderingslager
@@ -336,9 +351,10 @@ def lag_dagsteksten(modell, fil: Path = DAGFIL, skriv: Callable[[str], None] = p
             lager = SqliteVurderingslager(tilkobling, klokke, demo.DEMOUNIVERS)
             serier, indeksserie = _kursene(tilkobling, demo.DEMOUNIVERS)
             vurderinger = {a.symbol: lager.les(a.symbol, dag) for a in demo.DEMOUNIVERS}
+            tidligere = {a.symbol: lager.les_periode(a.symbol, vanlig_fra(dag), dag) for a in demo.DEMOUNIVERS}
         finally:
             tilkobling.close()
-    grunnlag = dagsgrunnlag(dag, demo.DEMOUNIVERS, vurderinger, serier, indeksserie)
+    grunnlag = dagsgrunnlag(dag, demo.DEMOUNIVERS, vurderinger, serier, indeksserie, tidligere=tidligere)
     if grunnlag is None:
         raise UgyldigDemoKI("ingen aksje er vurdert paa siste demodag")
     start = time.perf_counter()
@@ -376,11 +392,22 @@ def main(argv: list[str] | None = None) -> None:
         description="Lager KI-tekstene i demoen med Gemma i Ollama, én gang, i src/demo_ki_tekster.json."
     )
     tolker.add_argument("--dagen", action="store_true", help="bare teksten om dagen, i src/demo_ki_dagen.json")
+    tolker.add_argument(
+        "--eksempel",
+        action="store_true",
+        help="eksempeltekster i formene fra reglene, uten modell og uten Ollama (ki_eksempel.py)",
+    )
     valg = tolker.parse_args(argv)
-    modell = OllamaModell()
-    if grunn := modell.sjekk():
-        print(f"Ingen KI-tekster: {grunn}. Fila er ikke endret.")
-        sys.exit(1)
+    if valg.eksempel:
+        # Story 10.10, spoersmaal 6: uten Ollama, merket «eksempeltekst».
+        from ki_eksempel import EksempelModell
+
+        modell = EksempelModell()
+    else:
+        modell = OllamaModell()
+        if grunn := modell.sjekk():
+            print(f"Ingen KI-tekster: {grunn}. Fila er ikke endret.")
+            sys.exit(1)
     try:
         if valg.dagen:
             lag_dagsteksten(modell)

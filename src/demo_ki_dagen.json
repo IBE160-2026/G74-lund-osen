@@ -5,6 +5,8 @@
     "grunnlag": {
       "aksjer": 15,
       "bedre_enn_indeksen": 7,
+      "bransje_mest_ned": "Finans",
+      "bransje_mest_opp": "Sjømat",
       "bransjer": {
         "Energi": {
           "med_endring": 4,
@@ -28,20 +30,51 @@
         }
       },
       "hovedindeksen": "falt",
+      "hovedindeksen_uka": "falt",
       "med_kurs": 14,
       "skilte_seg_ut": 7,
+      "skilte_seg_ut_andre": 2,
       "skilte_seg_ut_blandet": 3,
+      "skilte_seg_ut_mot_vanlig": "flere",
+      "skilte_seg_ut_navn": [
+        {
+          "navn": "Brattfjell Energi",
+          "retning": "negativ",
+          "styrke": 3
+        },
+        {
+          "navn": "Kvitstein Mineral",
+          "retning": "positiv",
+          "styrke": 3
+        },
+        {
+          "navn": "Laksevik Sjømat",
+          "retning": "blandet",
+          "styrke": 3
+        },
+        {
+          "navn": "Trygghavn Forsikring",
+          "retning": "blandet",
+          "styrke": 3
+        },
+        {
+          "navn": "Havdyp Olje",
+          "retning": "blandet",
+          "styrke": 2
+        }
+      ],
       "skilte_seg_ut_negativ": 2,
       "skilte_seg_ut_positiv": 2,
+      "skilte_seg_ut_vanlig": 3,
       "ukedag": "fredag"
     },
-    "avtrykk": "abb7478ef8d9262a222ab440a05c26e9a40eaa446faabc91f58c1340b26c7d6a",
-    "promptavtrykk": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7",
-    "regelen": "Aksjer 15, fredag. Hovedindeksen falt. Bedre enn indeksen 7 av 14. Skilte seg ut 7: positiv 2, negativ 2, blandet 3. Energi: steg 1 av 4. Finans: steg 0 av 2. Materialer: steg 2 av 2. Shipping: steg 2 av 2. Sjømat: steg 2 av 2.",
-    "tekst": "Hovedindeksen falt fredag. 7 av 14 aksjer gjorde det bedre enn indeksen. 7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet. I energi steg 1 av 4 aksjer. I materialer steg 2 av 2 aksjer.",
+    "avtrykk": "cd4235ec0e6b41fd510a0651a0cb7e3e388e6b98f8832d79702c5d689cd93fe8",
+    "promptavtrykk": "cf1e7f7577f9f3afa07d1b7ca0db65845d9daecf9ef6cbf4ab472a6a33340c7a",
+    "regelen": "Aksjer 15, fredag. Hovedindeksen falt. Bedre enn indeksen 7 av 14. Skilte seg ut 7: positiv 2, negativ 2, blandet 3. Navnene: Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv), Laksevik Sjømat (3 av 3, blandet), Trygghavn Forsikring (3 av 3, blandet), Havdyp Olje (2 av 3, blandet), og 2 andre. Energi: steg 1 av 4. Finans: steg 0 av 2. Materialer: steg 2 av 2. Shipping: steg 2 av 2. Sjømat: steg 2 av 2. Høyest snitt: Sjømat. Lavest snitt: Finans. Mot vanlig: flere, snittet 3. Hovedindeksen siste fem børsdager: falt.",
+    "tekst": "Hovedindeksen falt fredag.\nDe siste fem børsdagene falt hovedindeksen.\n7 av 14 aksjer gjorde det bedre enn indeksen.\n7 skilte seg ut: 2 med positiv retning, 2 negativ og 3 blandet.\nDet var flere enn vanlig: snittet de siste 20 børsdagene er 3.\nBlant dem var Brattfjell Energi (3 av 3, negativ), Kvitstein Mineral (3 av 3, positiv), Laksevik Sjømat (3 av 3, blandet), Trygghavn Forsikring (3 av 3, blandet), Havdyp Olje (2 av 3, blandet) og 2 andre.\nI snitt steg sjømat mest.\nI snitt falt finans mest.",
     "besto": true,
     "grunn": null,
-    "promptversjon": "dag-1",
+    "promptversjon": "dag-2",
     "tjeneste": "lokal",
     "modell": "gemma4:e4b",
     "modell_id": "dc35e8d9c606",

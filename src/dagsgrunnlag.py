@@ -17,23 +17,72 @@ steg i hver bransje. Ingen kurs, prosent, volum eller forholdstall
 Spesifikasjonen spec-10-6-ki-teksten-om-dagen-paa-forsiden.md, spoersmaal
 2-4: retningene gjelder dem som skilte seg ut, bransjene er de med minst
 MINST_I_BRANSJEN aksjer med en endring, og ukedagen er med.
+
+Story 10.10 (gruppens svar 10.11 kl. 16:18): grunnlaget har ogsaa navnene
+paa aksjene som skilte seg ut, med styrken og retningen for hver, 3 av 3
+foerst og hoeyst MEST_NAVN navn, og resten som antall, og bransjen med
+hoeyest og lavest snitt, regnet som snittet paa Boersometeret (snitt i
+boersometer.py: endringen for aksjene i bransjen som har en endring).
+Bransjene er de samme som i feltet bransjer. Snittene sammenlignes slik de
+vises, med to desimaler, og to like snitt gir ingen bransje (spoersmaal 1 og
+2 i spec-10-10-rikere-ki-tekster.md). Navnene staar i rekkefoelgen styrke,
+navn og symbol, ikke tabellens, fordi forsiden regner grunnlaget paa nytt
+med sorteringen den har (spoersmaal 3). Ingen kurs, prosent eller
+forholdstall: bare navn, antall og retninger, som foer.
+
+Rader laget med promptversjon dag-1 har ikke de nye feltene.
+for_promptversjon tar dem ut, saa forsiden kan sammenligne en gammel rad
+med grunnlaget regnet naa (spoersmaal 5).
 """
 
+import math
 from collections.abc import Mapping
 from datetime import date
 from types import MappingProxyType
 
+from boersdag import UtenforKalenderen, forrige_boersdag
 from dagene import MINST_I_BRANSJEN, STEG, _endringen, _retningen_paa_dagen, bevegelse
 from hovedindeks import indeksendring, sammenlign
 from kursdata import Aksje, Kursrad
+from markedsoversikt import endring_i_prosent
 from signalberegning import BLANDET, NEGATIV, POSITIV, STANDARD
-from tallformat import ukedag
+from tallformat import avrundet, ukedag
 from vurderingsdata import Grunn, Vurdering
 
 RETNINGENE = (POSITIV, NEGATIV, BLANDET)
 # Feltene for retningene blant dem som skilte seg ut, i samme rekkefoelge.
 SKILTE_SEG_UT = "skilte_seg_ut"
 RETNINGSFELTENE = {POSITIV: "skilte_seg_ut_positiv", NEGATIV: "skilte_seg_ut_negativ", BLANDET: "skilte_seg_ut_blandet"}
+
+# Story 10.10: navnene, resten som antall, og bransjene med hoeyest og lavest
+# snitt. Feltene finnes bare naar de har noe aa si.
+NAVNENE = "skilte_seg_ut_navn"
+ANDRE = "skilte_seg_ut_andre"
+MEST_OPP = "bransje_mest_opp"
+MEST_NED = "bransje_mest_ned"
+# Gjennomgangen (BH5): norsk alfabetisk rekkefoelge, Æ, Ø og Å sist, og uten
+# hensyn til store og smaa bokstaver.
+_NORSK = str.maketrans({"æ": "{", "ø": "|", "å": "}", "ä": "{", "ö": "|"})
+
+
+def alfabetisk(navn: str) -> str:
+    """Noekkelen for norsk alfabetisk rekkefoelge."""
+    return navn.casefold().translate(_NORSK)
+
+
+MEST_NAVN = 5
+# Story 10.10, tillegget kl. 17:21: antallet mot vanlig og hovedindeksen
+# siste uke (spoersmaal 11 og 12).
+VANLIG = "skilte_seg_ut_vanlig"
+MOT_VANLIG = "skilte_seg_ut_mot_vanlig"
+FLERE, FAERRE, LIKE_MANGE = "flere", "færre", "like mange"
+UKA = "hovedindeksen_uka"
+VINDU_VANLIG = 20
+MINST_VANLIG = 10
+UKE_DAGER = 5
+# Feltene promptversjon dag-1 ikke har (spoersmaal 5).
+NYE_FELT = (NAVNENE, ANDRE, MEST_OPP, MEST_NED, VANLIG, MOT_VANLIG, UKA)
+DAG_1 = "dag-1"
 
 
 def _indeksen_paa(serie: list[Kursrad], dag: date) -> float | None:
@@ -51,13 +100,16 @@ def dagsgrunnlag(
     serier: Mapping[str, list[Kursrad]],
     indeksserie: list[Kursrad] | None,
     terskel: int = STANDARD.terskel,
+    tidligere: Mapping[str, Mapping[date, Vurdering | Grunn]] | None = None,
 ) -> MappingProxyType | None:
     """Grunnlaget for dag, eller None naar ingen aksje i lista er vurdert den
     dagen: da er det ingenting aa si om dagen.
 
     vurderinger er den lagrede vurderingen for dag per symbol, eller en grunn
     eller None. serier er kursene for aksjene i lista, og indeksserie
-    hovedindeksen, eller None naar basen ikke har den.
+    hovedindeksen, eller None naar basen ikke har den. Story 10.10
+    (tillegget kl. 17:21): tidligere er de lagrede vurderingene foer dag per
+    symbol, til antallet mot vanlig (vanlig).
     """
     vurderte = [v for a in lista if isinstance(v := vurderinger.get(a.symbol), Vurdering)]
     if not vurderte:
@@ -77,16 +129,163 @@ def dagsgrunnlag(
     grunnlag[SKILTE_SEG_UT] = len(ut)
     for navn, felt in RETNINGSFELTENE.items():
         grunnlag[felt] = sum(1 for v in ut if v.retning == navn)
+    # Story 10.10: navnene, 3 av 3 foerst. Vurderingen har ikke navnet, saa
+    # det hentes fra aksjen i lista.
+    utslag = utslagene(lista, vurderinger, terskel)
+    if utslag:
+        grunnlag[NAVNENE] = [
+            {"navn": navn, "styrke": styrke, "retning": retning.lower()}
+            for styrke, navn, _symbol, retning in utslag[:MEST_NAVN]
+        ]
+        if len(utslag) > MEST_NAVN:
+            grunnlag[ANDRE] = len(utslag) - MEST_NAVN
     bransjer: dict[str, dict[str, int]] = {}
+    snitt: dict[str, float] = {}
     for sektor in dict.fromkeys(a.sektor for a in lista):
         endringer = [_endringen(list(serier.get(a.symbol, [])), dag) for a in lista if a.sektor == sektor]
         med = [e for e in endringer if e is not None]
         if len(med) < MINST_I_BRANSJEN:
             continue
         bransjer[sektor] = {"steg": sum(1 for e in med if bevegelse(e) == STEG), "med_endring": len(med)}
+        snitt[sektor] = avrundet(sum(med) / len(med), "endring")
     if bransjer:
         grunnlag["bransjer"] = bransjer
+    grunnlag.update(mest_opp_og_ned(snitt))
+    # Story 10.10, tillegget kl. 17:21 (spoersmaal 11 og 12).
+    grunnlag.update(vanlig(dag, lista, tidligere or {}, len(ut), terskel))
+    uka = uka_for_hovedindeksen(indeksserie, dag)
+    if uka is not None:
+        grunnlag[UKA] = uka
     return MappingProxyType(grunnlag)
+
+
+def dagene_foer(dag: date, antall: int) -> list[date]:
+    """De antall boersdagene foer dag etter boerskalenderen, eldst foerst,
+    som «siste fem boersdager» (gjennomgangen, BH5). Tom utenfor kalenderen."""
+    dager: list[date] = []
+    try:
+        d = dag
+        for _ in range(antall):
+            d = forrige_boersdag(d)
+            dager.append(d)
+    except (UtenforKalenderen, ValueError):
+        return []
+    return dager[::-1]
+
+
+def vanlig_fra(dag: date) -> date:
+    """Den foerste dagen vanlig() leser, saa hentingen og forsiden leser det
+    samme vinduet og ikke hele historikken (gjennomgangen, BH6)."""
+    dager = dagene_foer(dag, VINDU_VANLIG)
+    return dager[0] if dager else dag
+
+
+def vanlig(
+    dag: date,
+    lista: tuple[Aksje, ...],
+    tidligere: Mapping[str, Mapping[date, Vurdering | Grunn]],
+    antall: int,
+    terskel: int = STANDARD.terskel,
+) -> dict[str, object]:
+    """Antallet som skilte seg ut mot snittet for de VINDU_VANLIG boersdagene
+    foer dag etter boerskalenderen (spoersmaal 11, gjennomgangen BH5). En dag
+    telles bare naar minst én aksje i lista er vurdert den dagen. Snittet
+    rundes til et heltall, med halve opp, og sammenlignes slik det staar. Med
+    faerre enn MINST_VANLIG vurderte dager er feltene borte."""
+    antallene = []
+    for d in dagene_foer(dag, VINDU_VANLIG):
+        paa_dagen = [tidligere.get(a.symbol, {}).get(d) for a in lista]
+        vurderte = [v for v in paa_dagen if isinstance(v, Vurdering)]
+        if vurderte:
+            antallene.append(sum(1 for v in vurderte if v.styrke >= terskel))
+    if len(antallene) < MINST_VANLIG:
+        return {}
+    snittet = math.floor(sum(antallene) / len(antallene) + 0.5)
+    mot = FLERE if antall > snittet else FAERRE if antall < snittet else LIKE_MANGE
+    return {VANLIG: snittet, MOT_VANLIG: mot}
+
+
+def uka_for_hovedindeksen(indeksserie: list[Kursrad] | None, dag: date) -> str | None:
+    """steg, falt eller uendret for hovedindeksen de siste fem boersdagene,
+    fra sluttkursen fem boersdager foer dag til dag, slik endringen vises
+    (spoersmaal 12). Bare retningen, ikke tallet (beslutningen 04.10). None
+    uten rad paa dag eller paa dagen fem boersdager foer."""
+    paa_dag = {rad.dato: rad for rad in indeksserie or []}
+    if dag not in paa_dag:
+        return None
+    foer = dag
+    try:
+        for _ in range(UKE_DAGER):
+            foer = forrige_boersdag(foer)
+    except (UtenforKalenderen, ValueError):
+        return None
+    if foer not in paa_dag:
+        return None
+    return bevegelse(endring_i_prosent([paa_dag[foer], paa_dag[dag]]))
+
+
+def mest_opp_og_ned(snitt: Mapping[str, float]) -> dict[str, str]:
+    """Bransjen med hoeyest snitt over 0 og den med lavest under 0, slik
+    snittene vises (avrundet). To like snitt gir ingen for den siden
+    (spoersmaal 2)."""
+    ut: dict[str, str] = {}
+    for felt, verdier in (
+        (MEST_OPP, {n: v for n, v in snitt.items() if v > 0}),
+        (MEST_NED, {n: -v for n, v in snitt.items() if v < 0}),
+    ):
+        if not verdier:
+            continue
+        stoerst = max(verdier.values())
+        beste = [n for n, v in verdier.items() if v == stoerst]
+        if len(beste) == 1:
+            ut[felt] = beste[0]
+    return ut
+
+
+def utslagene(
+    lista: tuple[Aksje, ...], vurderinger: Mapping[str, Vurdering | Grunn | None], terskel: int = STANDARD.terskel
+) -> list[tuple[int, str, str, str]]:
+    """(styrke, navn, symbol, retning) for aksjene som skilte seg ut, 3 av 3
+    foerst og saa norsk alfabetisk (spoersmaal 3)."""
+    return sorted(
+        (
+            (v.styrke, a.navn, a.symbol, v.retning)
+            for a in lista
+            if isinstance(v := vurderinger.get(a.symbol), Vurdering) and v.styrke >= terskel
+        ),
+        key=lambda u: (-u[0], alfabetisk(u[1]), u[1], u[2]),
+    )
+
+
+def min_liste_linje(
+    lista: tuple[Aksje, ...],
+    vurderinger: Mapping[str, Vurdering | Grunn | None],
+    merkede: set[str] | frozenset[str],
+    terskel: int = STANDARD.terskel,
+) -> str | None:
+    """Linja om Min liste under teksten om dagen (spoersmaal 10). Appen
+    skriver den av lista slik den er naa, med navnene etter de samme reglene
+    som i teksten, eller at ingen skilte seg ut. None naar ingen av de merkede
+    er vurdert den dagen."""
+    mine = tuple(a for a in lista if a.symbol in merkede)
+    if not any(isinstance(vurderinger.get(a.symbol), Vurdering) for a in mine):
+        return None
+    ut = utslagene(mine, vurderinger, terskel)
+    if not ut:
+        return "Ingen av aksjene i Min liste skilte seg ut."
+    deler = [f"{navn} ({styrke} av 3, {retning.lower()})" for styrke, navn, _s, retning in ut[:MEST_NAVN]]
+    if len(ut) > MEST_NAVN:
+        deler.append(f"{len(ut) - MEST_NAVN} andre")
+    oppramsing = deler[0] if len(deler) == 1 else ", ".join(deler[:-1]) + " og " + deler[-1]
+    return f"I Min liste skilte {oppramsing} seg ut."
+
+
+def for_promptversjon(grunnlag: Mapping[str, object] | None, promptversjon: str) -> Mapping[str, object] | None:
+    """Grunnlaget slik en rad med promptversjonen har det: uten de nye
+    feltene for dag-1 (story 10.10, spoersmaal 5), ellers urørt."""
+    if grunnlag is None or promptversjon != DAG_1:
+        return grunnlag
+    return MappingProxyType({n: v for n, v in grunnlag.items() if n not in NYE_FELT})
 
 
 def som_vanlig(grunnlag: Mapping[str, object] | None) -> dict | None:

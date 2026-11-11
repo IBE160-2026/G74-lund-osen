@@ -3299,6 +3299,94 @@ Det vi lærte: steg 0 og sluttmarkøren stoppet begge innlimingene før noe ble 
 
 ---
 
+## 10.11.2026 – Brukertesten, fem storyer, notatene og målingen, og en natt med fire vinduer
+
+*Joakim og Marian.*
+
+Om morgenen ble basen gjort klar til brukertesten: `--les-boerslista` migrerte basen, med en kopi før, og en prøvekjøring på en kopi ga 20 sider, alle 200 (kl. 11:34, `096bebd7`). Så tok vi brukertesten med én testperson, med den ekte versjonen og dataene fra 09.11.
+
+Etter testen ble fem storyer flettet i fire PR-er, etter svaret kl. 11:52, der rådet anbefalte alt: 2.4 (#133, `2c1a17af`), 2.6 og 8.14 (#134, `a2427bee`), 8.7 (#135, `2d0cfc8b`) og 8.9 (#136, `eb3ba928`). Kl. 15:30 valgte vi at hovedindeksen også hentes når bare den mangler; rådet anbefalte å la det være som før. Samtidig ble tre ting bygget i andre vinduer:
+- **Bransjeforslaget** (kl. 13:41): et forslag til bransje for alle 297 aksjene i børslista, i en fil som aldri committes. Vi sjekket lista kl. 14:43 og tok ut MULTI, og kl. 15:22 avgjorde vi at SCOIN er ute, som 08.11. Del B fører lista inn i koden.
+- **Målingen med bonuskvoten** (2.13b, svaret kl. 13:48, rådet anbefalte det): flettet kl. 21:10 (#137, `178107d9`) og kjørt én gang kl. 00:05–00:11 med en kopi av basen før. 167 aksjer ble målt med 167 kall fra bonuskvoten, 296 er igjen der, og 280 av 297 aksjer har nå en måling.
+- **Notatene** (8.21, svarene kl. 14:32, 14:44 og 15:57): egne notater på aksjesiden med «slik gikk det etterpå», bare fakta, og tenkte kjøp og salg. Vi flyttet dem inn i v1; rådet anbefalte onsdag. Flettet kl. 23:50 med en ny tabell (#139, `3919dd48`).
+
+Brukertesten (`aab75387`, flettet kl. 01:08 i `10265324`): testpersonen brukte over 5 minutter på del A av testen, så kravet i 8.1 om under 5 minutter ble ikke oppfylt. Med KI-teksten på forsto personen helheten bedre (10.4). De ti funnene står som U103–U112 i `docs/ux-logg.md`. Siden hoppet, noen sider var vanskelige å finne fram på, Min liste fikk flest merknader, «Følg en aksje» krevde at man kjente navnene, og personen ville notere og ønsket anbefalinger. Kl. 13:54 sa vi ja til del A og B, og kl. 14:07 til del C, der rådet anbefalte det:
+- **Del A** (8.23): funnene på sidene. Flettet kl. 03:41 (#142, `7fb9b1fd`).
+- **Del B** (8.22): «Følg en aksje» og Min liste. PR #138 var grønn kl. 02:52 og ventet på oss.
+- **Del C** (3.6): ikonet og snarveien. Den var i arbeid da maskinen startet på nytt, se 11.11.
+
+Ønsket om mer KI-hjelp ga instruksjonen «Rikere KI-tekster» (10.10), limt inn kl. 16:28. Etter svaret kl. 16:18 skulle den ikke flettes, og den ble ikke startet i natt. «Spill av omvisningen» (8.25, svaret kl. 22:59) ble bygget kl. 23:02–03:16 og ventet på oss som PR #143. Notatene fikk to ting til etter flettingen (8.24, `38a0a0e9`, kl. 02:03).
+
+Natten gikk med fire vinduer i samme repo: vindu 1 med flettingen, del A og del C, ekstravinduet med 2.13b og målingen, et tredje vindu med notatene, brukertesten, 8.24 og omvisningen, og vindu 4 med del B. Tillegg 3 og 5 til del B (svarene kl. 22:44 og 22:55) kom aldri fram til vindu 4.
+
+**Utfordringer**
+
+1. **Vindu 1 ble lukket midt i en kommando.**
+   *Problem:* kl. 16:42 ba rådet oss lukke Visual Studio Code for å frigjøre minne, uten å se at vindu 1 gikk i terminalen der. Arbeidet stoppet midt i første kjøring av mutantene for #133. Vindu 4 ble også lukket ved en feil samme ettermiddag.
+   *Løsning:* instruksjonen kl. 16:47 sjekket tilstanden før noe annet, uten å endre noe: ingen låsfil, ingen mutant liggende igjen (fila var lik kopien), og en pytest som kjørte, hørte til del B og ble ikke rørt. Så ble alle ti mutantene kjørt på nytt. Vindu 4 fikk den samme sjekken kl. 17:47.
+   *KI sin rolle:* feilen var rådets. Claude Code tok opp vinduet, sjekket tilstanden mot instruksjonen og fortsatte uten en commit med halve endringer.
+
+2. **Ventekommandoer ble stoppet av lite minne.**
+   *Problem:* Claude Code stoppet ventekommandoen i notatvinduet kl. 20:13, og i vindu 4 før kl. 19:34, fordi maskinen hadde lite minne.
+   *Løsning:* notatvinduet kjørte delen i forgrunnen i stedet. Tilleggene kl. 23:05 og 23:14 sa at et vindu selv starter ventekommandoen igjen uten å spørre, at den bruker lite minne og at den ikke bruker git i stilletidene.
+   *KI sin rolle:* etter tilleggene startet Claude Code ventingen igjen selv, og sesjonsloggene sier når den ble stoppet.
+
+3. **Testkjøringer kom i veien for hverandre.**
+   *Problem:* fire vinduer delte én maskin, og notatene trengte hele settet før flettingen kl. 23:50. Del A startet likevel to kjøringer mens en annen pytest kjørte, kl. 21:49 og kl. 23:52. PR #139 fikk konflikt med main tre ganger da de andre vinduene flettet, så CI startet ikke før kl. 21:31.
+   *Løsning:* svaret kl. 17:42 sa at bare ett vindu kjører pytest om gangen, og rådet anbefalte det. Tilleggene om testene i natt holdt de andre vinduene unna pytest kl. 22:15–23:50. Etter kl. 23:52 startet del A hver kjøring gjennom et skript som venter til ingen annen pytest kjører.
+   *KI sin rolle:* Claude Code førte bruddene på regelen i sesjonsloggen i stedet for å skjule dem, og summen av delene ble sjekket mot `--collect-only` hver gang.
+
+Det vi lærte: brukertesten viste at det vi syntes var tydelig, ikke var det for en ny bruker. Ønsket om anbefalinger må møtes med en forklaring, ikke med råd (NFR-06). Testpersonen forsto hvorfor appen ikke gir dem.
+
+---
+
+## 11.11.2026 – Omstarten kl. 04:29, del C, del B og omvisningen flettet, og KI-tekster som venter
+
+*Joakim og Marian.*
+
+Windows Update startet maskinen på nytt kl. 04:29 (hendelse 1074), midt i rettingen av en test i del C som hadde feilet i CI kl. 04:23. At innloggingen var gått ut, står i instruksjonen kl. 16:44 i dagsfila og ikke i noen annen fil. Alle vinduene var lukket om morgenen.
+
+Statusen kl. 10:29 og 10:33, med samme tekst i to vinduer, var bare lesing. Kveldsjobben 10.11 ble ferdig uten FEIL-linjer, og kjøringen kl. 10:33 fant hvilke PR-er som ble flettet i natt. Tillegg 3 og 5 til del B hadde aldri kommet fram, og «Rikere KI-tekster» ble aldri startet. Statusen er ført i ettertid i `ce33771c`.
+
+Vinduene ble tatt opp igjen med /resume, hver med en fortsettelse der steg 0 beskrev tilstanden fra statusen:
+- **Del C** kl. 11:52: lenketesten rettet i `0e354030`, og PR #144 grønn.
+- **Del B** kl. 11:56: main inn, og tillegg 3 og 5 gitt på nytt (14:14).
+- **Omvisningen** kl. 11:59: main inn (14:50).
+- **KI-tekstene** ble bygget på grenen `10-10-rikere-ki-tekster`, med de første commitene kl. 11:20, og ligger i PR #145.
+
+Så kom svarene. Rådet anbefalte alt.
+- **Del C** (kl. 13:47 og 13:49): spørsmål 8 om snarveien til en annen kopi ble bygget. Flettet kl. 15:21 (#144, `078c7c28`). README-en fikk lista «Ekstra, ferdig».
+- **Del B** (kl. 14:29): flettet kl. 16:04 (#138, `dcb0bc6f`).
+- **Omvisningen** (kl. 13:49 og 14:33): stegene fra «Følg en aksje» kom med etter del B. Flettet kl. 17:10 (#143, `c53df5b1`).
+
+Kl. 16:26 avgjorde vi at bildegrenene beholdes, så bildene i PR-ene står og endringene kan vises (`c46f63ac`); rådet anbefalte det. KI-tekstene (10.10) er ikke flettet. De venter i PR #145 på svaret kl. 16:05, se utfordring 4.
+
+**Utfordringer**
+
+1. **Omstarten midt i del C.**
+   *Problem:* Windows Update startet maskinen kl. 04:29 uten at noen var der. Del C stoppet midt i rettingen, med én endret fil som ikke var committet, og alle vinduene ble lukket.
+   *Løsning:* først en status med bare lesing, fra hendelsesloggene, worktreene, PR-ene og scratchpad-mappene, og så én fortsettelse per vindu, der steg 0 sa hva som skulle være sant. Endringen i del C sto i worktreen, og instruksjonene sto ordrett i scratchpad. Det som aldri kom fram, tillegg 3 og 5, ble gitt på nytt.
+   *KI sin rolle:* Claude Code leste tilstanden, uten å endre noe, fra det som sto i repoet, dagsfilene, sesjonsloggene og scratchpad. Gruppen avgjorde hva hvert vindu skulle fortsette med.
+
+2. **Instruksjoner i feil vindu.**
+   *Problem:* kl. 11:41 ble et tillegg om statusinstruksjonen limt inn i statusvinduet, ikke i vinduet for del C. Kl. 14:18 ble fortsettelsen av KI-tekstene limt inn i vinduet for del C.
+   *Løsning:* begge stoppet i steg 0, og ingenting ble gjort. Begge står i dagsfila med Utført-linje. Fra kl. 14:26 sier hver instruksjon hvilken økt den er for, og steg 0 stopper hvis vinduet er et annet.
+   *KI sin rolle:* Claude Code så at teksten ikke passet vinduet, og stoppet.
+
+3. **Lite minne med fire vinduer.**
+   *Problem:* ventekommandoen i omvisningen ble stoppet av lite minne, og instruksjonen kl. 11:59 ble limt inn på nytt kl. 13:49. Ventingen i KI-tekstene ble også stoppet, og en pytest der overlappet med en annen kl. 11:55–12:02.
+   *Løsning:* tilleggene om ventingen kl. 14:18 og 14:27, likt for vinduene: en ventekommando som stoppes, startes igjen uten å spørre, en pytest som stoppes, kjøres på nytt når ingen annen kjører, og main flettes inn ved flettingen, ikke før. Flettingene gikk i rekkefølge: del C, del B og så omvisningen.
+   *KI sin rolle:* Claude Code lot hver del av hele settet vente på pytest fra de andre vinduene, ofte i flere omganger (sesjonsloggen for del C).
+
+4. **Demotekster skrevet av appen, men merket «Laget av KI».**
+   *Problem:* Ollama skulle ikke startes, så eksempeltekstene i demoen for 10.10 skrives av en fast skriver i appen (`src/ki_eksempel.py`), med merket «Laget av KI» og modellen «eksempeltekst (lokal)». Spesifikasjonen sier selv at merket da «ikke helt» stemmer for demoen (spørsmål 6 på grenen).
+   *Løsning:* svaret kl. 16:05 er tekster fra Gemma. Svaret står i instruksjonen kl. 16:44 i dagsfila, men er ennå ikke ført i spesifikasjonen. Det venter med resten av 10.10 i PR #145.
+   *KI sin rolle:* Claude Code foreslo den faste skriveren, pekte selv på at merket ikke stemte, og la det fram som et spørsmål. Gruppen avgjorde.
+
+Det vi lærte: arbeid som står i dagsfila og sesjonsloggen, overlever en omstart. En instruksjon må si hvilket vindu den er for. Minnet på maskinen setter grensen for hvor mange vinduer som kan jobbe samtidig. Og merkingen av KI-tekst må stemme også i demoen. Bildegrenene beholdes, så endringene kan vises (svaret kl. 16:26).
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
