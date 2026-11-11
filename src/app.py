@@ -1073,7 +1073,8 @@ def _tabellsiden(aktiv: str):
         "index.html",
         # Story 8.21 (tillegget kl. 14:44): alle notatene samlet nederst i Min
         # liste, nyeste først, med lenke til aksjen. Bare med bryteren på.
-        alle_notater=_alle_notatene() if i_lista else None,
+        alle_notater=_alle_notatene(valg is not None and valg.periode == VELG) if i_lista else None,
+        alle_notater_tidligere_dag=valg is not None and valg.periode == VELG,
         alle_notater_indeks=_indeksen_for_grafen()[0] if i_lista else None,
         # Story 8.24: skjemaene ved notatene sender tilbake til samme liste.
         alle_notater_vis="min-liste-alle" if alle else "min-liste",
@@ -1451,7 +1452,6 @@ def _notatene(
         app.logger.warning("Notatene kunne ikke leses: %s", type(feil).__name__)
         return None
     # Tillegget kl. 14:44: høyst ett åpent tenkt kjøp per aksje.
-    aapent = any(k.aapent and k.symbol == post.aksje.symbol for k in kjoepene.values())
     return [
         _Notatet(
             notat,
@@ -1461,11 +1461,20 @@ def _notatene(
             bygg_handelen(kjoepene[notat.id], rader, indeks, indeks_feilet=indeks_feilet)
             if notat.id in kjoepene
             else None,
-            kan_kjoepe=notat.id not in kjoepene and not aapent and post.ut is None,
+            kan_kjoepe=_kan_kjoepe(notat, kjoepene, post),
             aksje=post.aksje,
         )
         for notat in notatene
     ]
+
+
+def _kan_kjoepe(notat, kjoepene: dict, post) -> bool:
+    """Regelen for «Noter et tenkt kjøp», lik på aksjesiden og i Min liste
+    (story 8.24, gjennomgangen BH2): notatet har ikke et kjøp, aksjen har ikke
+    et åpent kjøp, og aksjen står i lista. Om siden kan notere i det hele
+    tatt (siste dag, ikke fjernet i kveld), avgjøres for siden."""
+    aapent = any(k.aapent and k.symbol == notat.symbol for k in kjoepene.values())
+    return notat.id not in kjoepene and not aapent and post.ut is None
 
 
 @dataclass(frozen=True)
@@ -1483,10 +1492,12 @@ class _Notatet:
     # aksjen, om et kjøp eller salg kan noteres, og om aksjen fjernes i kveld.
     siste_dag: date | None = None
     kan_handle: bool = False
-    fjernes: bool = False
+    # Gjennomgangen av 8.24 (ECH3, ECH5): hvorfor knappene for kjøp og salg
+    # mangler, én gang per aksje, ved det nyeste notatet.
+    merknad: str | None = None
 
 
-def _alle_notatene() -> list | None:
+def _alle_notatene(tidligere_dag: bool = False) -> list | None:
     """Alle notatene i basen, for «Mine notater» nederst i Min liste, den
     nyeste notatdagen først, hvert med «Etterpå» og det tenkte kjøpet, som på
     aksjesiden. Serien og vurderingene leses én gang per aksje med notater.
@@ -1518,14 +1529,24 @@ def _alle_notatene() -> list | None:
         return None
     # Story 8.24: de samme reglene som på aksjesiden. Høyst ett åpent kjøp per
     # aksje, bare for en aksje i lista som ikke fjernes i kveld, og bare med
-    # sjekkene for siste dag med kurser.
-    aapne = {k.symbol for k in kjoepene.values() if k.aapent}
+    # sjekkene for siste dag med kurser. Gjennomgangen (ECH1): viser Min liste
+    # en tidligere dag, står ingen knapper for kjøp og salg, som på aksjesiden.
     ut = []
+    sett = set()
     for notat in notatene:
         if notat.symbol not in per_aksje:
             continue
         post, rader, vurderingene = per_aksje[notat.symbol]
-        kan_handle = post.ut is None and bool(rader) and notat.symbol not in fjernes
+        kan_handle = post.ut is None and bool(rader) and notat.symbol not in fjernes and not tidligere_dag
+        merknad = None
+        if notat.symbol not in sett:
+            sett.add(notat.symbol)
+            if notat.symbol in fjernes:
+                merknad = f"{post.aksje.navn} fjernes fra lista ved hentingen i kveld og får ingen nye kurser, så et tenkt kjøp eller salg kan ikke noteres."
+            elif post.ut is not None:
+                merknad = f"{post.aksje.navn} er tatt ut av lista, så et tenkt kjøp eller salg kan ikke noteres."
+            elif not rader:
+                merknad = f"{post.aksje.navn} har ingen kurser ennå, så et tenkt kjøp eller salg kan ikke noteres."
         ut.append(
             _Notatet(
                 notat,
@@ -1535,11 +1556,11 @@ def _alle_notatene() -> list | None:
                 bygg_handelen(kjoepene[notat.id], rader, indeks, indeks_feilet=indeks_feilet)
                 if notat.id in kjoepene
                 else None,
-                kan_kjoepe=notat.id not in kjoepene and notat.symbol not in aapne and post.ut is None,
+                kan_kjoepe=_kan_kjoepe(notat, kjoepene, post),
                 aksje=post.aksje,
                 siste_dag=rader[-1].dato if rader else None,
                 kan_handle=kan_handle,
-                fjernes=notat.symbol in fjernes,
+                merknad=merknad,
             )
         )
     return ut

@@ -1231,3 +1231,65 @@ class TestUtenSpoersmaalstegn:
         from hjelpetekster import hjelpetekster
 
         assert "notatene" not in hjelpetekster()
+
+
+class TestMinListeEtterGjennomgangen:
+    def test_knappen_sender_aksjens_egen_siste_dag(self, klient, demobase):
+        """VG1: ville feilet hvis knappen i Min liste sendte siste dag for hele
+        lista i stedet for aksjens egen."""
+        c = sqlite3.connect(demobase)
+        c.execute("DELETE FROM kurs WHERE symbol = ? AND dato = '2026-10-09'", (AKSJE,))
+        c.commit()
+        c.close()
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        assert _kjoepsknapp(_min_liste_delen(klient))["dag"] == "2026-10-08"
+
+    def test_aksjen_som_fjernes_med_et_aapent_kjoep(self, klient, demobase):
+        """VG2, BH7: ville feilet hvis Min liste tilbød et salg for en aksje som
+        fjernes i kveld, eller tok bort «Slett»."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        _kjoep_i_basen(demobase, rad[0], "2026-10-07")
+        klient.post("/fjern", data={"symbol": AKSJE, "tilbake": "oversikten", "bekreftet": "1"})
+        delen = _min_liste_delen(klient)
+        assert not _salgsknapp(delen) and "/notat/slett" in delen
+
+    def test_salget_foer_kjoepet_har_kursen(self, klient, demobase):
+        """BH7: ville feilet hvis Min liste tilbød et salg før kjøpet hadde
+        fått sluttkursen."""
+        felt = TestTenkteKjoep()._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        assert not _salgsknapp(_min_liste_delen(klient))
+
+    def test_aksje_tatt_ut_i_min_liste(self, klient, demobase):
+        """VG3, ECH5: ville feilet hvis Min liste tilbød kjøp for en aksje som
+        er tatt ut, ikke sa hvorfor, eller tok bort «Slett»."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        c = sqlite3.connect(demobase)
+        c.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", ("2026-10-12", AKSJE))
+        c.commit()
+        c.close()
+        delen = _min_liste_delen(klient, "/min-liste?vis=alle")
+        assert not _kjoepsknapp(delen) and "/notat/slett" in delen
+        assert "er tatt ut av lista, så et tenkt kjøp eller salg kan ikke noteres" in _tekst(delen)
+
+    def test_en_valgt_dag_gir_ingen_knapper_for_kjoep(self, klient, demobase):
+        """ECH1, VG3: ville feilet hvis Min liste for en tidligere dag tilbød et
+        kjøp med sjekkene for siste dag."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        delen = _min_liste_delen(klient, "/min-liste?dag=2026-10-01")
+        assert not _kjoepsknapp(delen) and "/notat/slett" in delen
+        assert "knappene står når Min liste viser siste børsdag" in _tekst(delen)
+
+    def test_merknaden_staar_en_gang_per_aksje(self, klient, demobase):
+        """ECH3: ville feilet hvis grunnen sto ved hvert notat for aksjen."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-02", "tekst": "y"})
+        klient.post("/fjern", data={"symbol": AKSJE, "tilbake": "oversikten"})
+        assert _tekst(_min_liste_delen(klient)).count("fjernes fra lista ved hentingen i kveld") == 1
+
+    def test_slett_har_navnet_paa_aksjen(self, klient, demobase):
+        """ECH4: ville feilet hvis to aksjer med notat samme dag fikk like
+        etiketter på «Slett» i Min liste."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        assert 'aria-label="Slett notatet om Brattfjell Energi fra 01.10"' in _min_liste_delen(klient)
