@@ -273,6 +273,12 @@ class TestFilteretOgLenken:
             '<span class="skjult"> (åpnes i en ny fane)</span>'
         )
 
+    def test_teksten_for_skjermlesere_er_skjult_i_demolinja(self):
+        """Ville feilet hvis «(åpnes i en ny fane)» sto synlig i demolinja,
+        fordi stilen bare skjuler .skjult der den har en egen regel."""
+        regel = _regel("header.stripe .eksempeltall .skjult")
+        assert "position: absolute" in regel and "clip: rect(0 0 0 0)" in regel
+
     def test_alle_lenker_ut_av_appen_i_ny_fane(self):
         """Ville feilet hvis en annen lenke ut av appen i malene åpnet i samme
         fane."""
