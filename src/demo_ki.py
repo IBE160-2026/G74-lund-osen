@@ -297,6 +297,8 @@ def dagens_promptavtrykk() -> str:
     tekst = ki_dagen.REGLER_DAGEN + inspect.getsource(ki_dagen.lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
     # Story 10.10: setningen om navnene.
     tekst += ki_dagen.SETNINGEN_NAVN + inspect.getsource(ki_dagen.setning_om_navnene)
+    # Svaret 11.11 kl. 19:30: formen for én bransje og reglene() som velger den.
+    tekst += ki_dagen.BRANSJEFORMEN + inspect.getsource(ki_dagen.reglene)
     return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 

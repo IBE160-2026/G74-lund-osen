@@ -313,7 +313,7 @@ AVTRYKK = {
     # Story 10.10. Teksten til dag-1 staar i src/ki_dagen.py paa 059dc10c.
     # Tillegget kl. 17:21: tre nye former, og versjonen staar som dag-2, fordi den ikke er
     # flettet. Var f0377e8f....
-    "dag-2": "b087ac4a2426ecdb9cec2e9550d67c7579c7ca29b3d247d510ee102cce82e2c8",
+    "dag-2": "cf1e7f7577f9f3afa07d1b7ca0db65845d9daecf9ef6cbf4ab472a6a33340c7a",
 }
 
 
@@ -321,6 +321,8 @@ def promptens_avtrykk() -> str:
     tekst = REGLER_DAGEN + inspect.getsource(lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
     # Story 10.10: setningen om navnene.
     tekst += ki_dagen.SETNINGEN_NAVN + inspect.getsource(ki_dagen.setning_om_navnene)
+    # Svaret 11.11 kl. 19:30: formen for én bransje og reglene() som velger den.
+    tekst += ki_dagen.BRANSJEFORMEN + inspect.getsource(ki_dagen.reglene)
     return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 
@@ -394,7 +396,8 @@ class _Teller(FalskModell):
         self.feil_for_aksjene = feil_for_aksjene
 
     def lag_tekst(self, prompt):
-        if prompt.startswith(REGLER_DAGEN):
+        # Svaret 11.11 kl. 19:30: reglene har formen for én bransje bare uten «mest».
+        if prompt.startswith(REGLER_DAGEN.split("{bransjeformen}")[0]):
             self.dagkall += 1
             self.kall += 1
             return Modellsvar(tekst="Hovedindeksen steg tirsdag.", modell="gemma4:e4b")

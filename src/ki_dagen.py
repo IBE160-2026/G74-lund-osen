@@ -78,16 +78,15 @@ Opplysningene under er regnet ut av appen for én børsdag og for aksjene i list
 - hovedindeksen_uka: om hovedindeksen steg, falt eller var uendret de siste fem børsdagene. Feltet kan mangle.
 
 Regler for teksten:
-- Skriv tre til ni korte setninger, med disse formene. Sett inn tallene og ordene for feltene i ‹ ›:
+- Skriv tre til ni korte setninger, med disse formene og i denne rekkefølgen. Sett inn tallene og ordene for feltene i ‹ ›:
   - «Hovedindeksen steg ‹ukedag›.», «Hovedindeksen falt ‹ukedag›.» eller «Hovedindeksen var uendret ‹ukedag›.», etter feltet hovedindeksen.
+  - «De siste fem børsdagene steg hovedindeksen.», «De siste fem børsdagene falt hovedindeksen.» eller «De siste fem børsdagene var hovedindeksen uendret.», etter feltet hovedindeksen_uka.
   - «‹bedre_enn_indeksen› av ‹med_kurs› aksjer gjorde det bedre enn indeksen.»
   - «‹skilte_seg_ut› skilte seg ut: ‹skilte_seg_ut_positiv› med positiv retning, ‹skilte_seg_ut_negativ› negativ og ‹skilte_seg_ut_blandet› blandet.» Ta bare med retningene som har minst én aksje. Er skilte_seg_ut 0, skriver du «Ingen aksjer skilte seg ut.»
-  - Om navnene skriver du formen for navnene denne dagen, som står under opplysningene, ordrett og som én setning, når den står der. Den har formen «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹skilte_seg_ut_andre› andre.»
-  - «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.», med navnet på bransjen med små bokstaver. Nevn høyst to bransjer.
-  - «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.», med navnet på bransjen med små bokstaver.
   - «Det var flere enn vanlig: snittet de siste 20 børsdagene er ‹skilte_seg_ut_vanlig›.», med «flere enn», «færre enn» eller «like mange som» etter feltet skilte_seg_ut_mot_vanlig.
-  - «De siste fem børsdagene steg hovedindeksen.», «De siste fem børsdagene falt hovedindeksen.» eller «De siste fem børsdagene var hovedindeksen uendret.», etter feltet hovedindeksen_uka.
-- Mangler et felt, skriver du ikke setningen for det.
+  - Om navnene skriver du formen for navnene denne dagen, som står under opplysningene, ordrett og som én setning, når den står der. Den har formen «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹skilte_seg_ut_andre› andre.»
+  - «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.», med navnet på bransjen med små bokstaver.
+{bransjeformen}- Mangler et felt, skriver du ikke setningen for det.
 - Skriv tallene som i opplysningene. Ikke nevn andre tall, prosenter, kurser eller beløp.
 - Ikke si noe om hovedindeksen, bransjene, retningene eller hvor mange som steg eller falt utenom formene.
 - Ikke skriv «i dag», «i går» eller «i kveld». Bruk ukedagen.
@@ -116,11 +115,29 @@ def setning_om_navnene(grunnlag: Mapping[str, object]) -> str | None:
     return f"Blant dem var {oppramsing}."
 
 
+# Svaret 11.11 kl. 19:30: formen med antallet i én bransje er med i reglene
+# bare naar verken bransjen som steg mest eller den som falt mest kan staa,
+# fordi modellen ellers valgte to bransjer selv.
+BRANSJEFORMEN = (
+    "  - «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.», med navnet på bransjen med små bokstaver. "
+    "Nevn høyst to bransjer.\n"
+)
+
+
+def reglene(grunnlag: Mapping[str, object]) -> str:
+    """Reglene for dagen, med formen for én bransje bare uten «mest»."""
+    uten_mest = MEST_OPP not in grunnlag and MEST_NED not in grunnlag
+    return REGLER_DAGEN.replace("{bransjeformen}", BRANSJEFORMEN if uten_mest else "")
+
+
 def lag_dagsprompt(grunnlag: Mapping[str, object]) -> str:
     """Reglene, grunnlaget som JSON og setningen med navnene. Ingenting annet
     kommer med."""
     prompt = (
-        REGLER_DAGEN + "\nOpplysningene:\n" + json.dumps(_vanlig(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+        reglene(grunnlag)
+        + "\nOpplysningene:\n"
+        + json.dumps(_vanlig(grunnlag), ensure_ascii=False, sort_keys=True)
+        + "\n"
     )
     setning = setning_om_navnene(grunnlag)
     if setning:
@@ -378,7 +395,10 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
         tekst = _ta_ut(tekst, treff)
     for treff in list(_F_BRANSJE.finditer(tekst)):
         navn = " ".join(treff.group(1).lower().split())
-        if navn not in bransjer:
+        # Svaret 11.11 kl. 19:30: med «mest» i grunnlaget står ikke formen.
+        if MEST_OPP in grunnlag or MEST_NED in grunnlag:
+            grunner.append(f"1: «{treff.group(0)}», formen står ikke når bransjen som steg eller falt mest kan stå")
+        elif navn not in bransjer:
             grunner.append(f"1: bransjen «{treff.group(1)}» står ikke i grunnlaget")
         else:
             for funnet, felt in ((treff.group(2), "steg"), (treff.group(3), "med_endring")):

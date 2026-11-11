@@ -271,3 +271,60 @@ def test_linja_om_min_liste_har_egen_stil():
 
     stil = (Path(__file__).resolve().parents[1] / "src" / "static" / "stil.css").read_text(encoding="utf-8")
     assert ".boersdagen p.min-liste-linje {" in stil and ".boersdagen .merke-app {" in stil
+
+
+class TestSvaret1930:
+    """Svaret 11.11 kl. 19:30: formen for én bransje bare uten «mest», og
+    rekkefølgen i reglene."""
+
+    MED_MEST = {
+        **TestKontrollen.GRUNNLAG,
+        "bransjer": {"Energi": {"steg": 1, "med_endring": 2}},
+        "bransje_mest_opp": "Energi",
+    }
+    UTEN_MEST = {**TestKontrollen.GRUNNLAG, "bransjer": {"Energi": {"steg": 1, "med_endring": 2}}}
+
+    def test_formen_for_en_bransje_er_ikke_i_reglene_med_mest(self):
+        """Ville feilet hvis reglene hadde formen «I ‹bransje› steg …» når
+        bransjen som steg eller falt mest kan stå, eller manglet den uten."""
+        from ki_dagen import BRANSJEFORMEN, lag_dagsprompt
+
+        assert BRANSJEFORMEN not in lag_dagsprompt(self.MED_MEST)
+        assert BRANSJEFORMEN not in lag_dagsprompt({**self.UTEN_MEST, "bransje_mest_ned": "Energi"})
+        assert BRANSJEFORMEN in lag_dagsprompt(self.UTEN_MEST)
+        assert "{bransjeformen}" not in lag_dagsprompt(self.MED_MEST) + lag_dagsprompt(self.UTEN_MEST)
+
+    def test_kontrollen_stopper_formen_med_mest(self):
+        """Ville feilet hvis «I energi steg 1 av 2 aksjer.» besto når bransjen
+        som steg mest står i grunnlaget."""
+        svar = kontroller_dagen("I energi steg 1 av 2 aksjer.", self.MED_MEST)
+        assert not svar.besto and any("falt mest kan stå" in g for g in svar.grunner), svar.grunner
+        assert kontroller_dagen("I energi steg 1 av 2 aksjer.", self.UTEN_MEST).besto
+
+    def test_rekkefoelgen_i_reglene(self):
+        """Ville feilet hvis formene sto i en annen rekkefølge enn i svaret:
+        hovedindeksen, fem børsdager, bedre enn indeksen, skilte seg ut, vanlig,
+        navnene og bransjene."""
+        from ki_dagen import lag_dagsprompt
+
+        regler = lag_dagsprompt(self.UTEN_MEST)
+        merker = [
+            "«Hovedindeksen steg ‹ukedag›.»",
+            "«De siste fem børsdagene steg hovedindeksen.»",
+            "«‹bedre_enn_indeksen› av ‹med_kurs›",
+            "«‹skilte_seg_ut› skilte seg ut:",
+            "«Det var flere enn vanlig:",
+            "«Blant dem var ‹navn›",
+            "«I snitt steg ‹bransje_mest_opp› mest.»",
+            "«I ‹bransje› steg ‹steg›",
+        ]
+        plasser = [regler.index(m) for m in merker]
+        assert plasser == sorted(plasser)
+
+    def test_eksempelskriveren_foelger_rekkefoelgen(self):
+        """Ville feilet hvis den falske modellen skrev formene i en annen
+        rekkefølge enn reglene."""
+        tekst = tekst_om_dagen({**self.MED_MEST, "hovedindeksen": "steg"})
+        deler = ["Hovedindeksen steg", "De siste fem", "skilte seg ut:", "Det var flere", "I snitt steg"]
+        plasser = [tekst.index(d) for d in deler]
+        assert plasser == sorted(plasser)

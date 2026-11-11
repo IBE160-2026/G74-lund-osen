@@ -85,9 +85,10 @@ def tekst_om_aksjen(grunnlag: Mapping[str, object], ordlyd: str | None = None) -
 
 
 def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
-    """Formene i promptversjon dag-2: hovedindeksen, bedre enn indeksen, de
-    som skilte seg ut med retningene og navnene, og bransjene med hoeyest og
-    lavest snitt. Bare feltene som finnes, og ingen retning med 0."""
+    """Formene i promptversjon dag-2, i rekkefoelgen fra svaret 11.11 kl.
+    19:30: hovedindeksen, de siste fem boersdagene, bedre enn indeksen, de som
+    skilte seg ut med antallet mot vanlig rett etter, navnene, og til slutt
+    bransjene. Bare feltene som finnes, og ingen retning med 0."""
     setninger = []
     ukedag = grunnlag["ukedag"]
     indeksen = grunnlag.get("hovedindeksen")
@@ -95,6 +96,11 @@ def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
         setninger.append(f"Hovedindeksen var uendret {ukedag}.")
     elif indeksen in ("steg", "falt"):
         setninger.append(f"Hovedindeksen {indeksen} {ukedag}.")
+    uka = grunnlag.get("hovedindeksen_uka")
+    if uka == "uendret":
+        setninger.append("De siste fem børsdagene var hovedindeksen uendret.")
+    elif uka in ("steg", "falt"):
+        setninger.append(f"De siste fem børsdagene {uka} hovedindeksen.")
     if "bedre_enn_indeksen" in grunnlag:
         setninger.append(
             f"{grunnlag['bedre_enn_indeksen']} av {grunnlag['med_kurs']} aksjer gjorde det bedre enn indeksen."
@@ -113,6 +119,11 @@ def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
                 retninger.append(f"{grunnlag[felt]} {'med ' if not retninger else ''}{ord_}")
         retninger[0] += " retning"
         setninger.append(f"{ut} skilte seg ut: {_og(retninger)}.")
+    if "skilte_seg_ut_vanlig" in grunnlag:
+        mot = {"flere": "flere enn", "færre": "færre enn", "like mange": "like mange som"}[
+            grunnlag["skilte_seg_ut_mot_vanlig"]
+        ]
+        setninger.append(f"Det var {mot} vanlig: snittet de siste 20 børsdagene er {grunnlag['skilte_seg_ut_vanlig']}.")
     navnene = [f"{n['navn']} ({n['styrke']} av 3, {n['retning']})" for n in grunnlag.get("skilte_seg_ut_navn") or ()]
     if navnene:
         if grunnlag.get("skilte_seg_ut_andre"):
@@ -122,17 +133,6 @@ def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
         setninger.append(f"I snitt steg {str(grunnlag['bransje_mest_opp']).lower()} mest.")
     if "bransje_mest_ned" in grunnlag:
         setninger.append(f"I snitt falt {str(grunnlag['bransje_mest_ned']).lower()} mest.")
-    # Tillegget kl. 17:21 (spoersmaal 11 og 12).
-    if "skilte_seg_ut_vanlig" in grunnlag:
-        mot = {"flere": "flere enn", "færre": "færre enn", "like mange": "like mange som"}[
-            grunnlag["skilte_seg_ut_mot_vanlig"]
-        ]
-        setninger.append(f"Det var {mot} vanlig: snittet de siste 20 børsdagene er {grunnlag['skilte_seg_ut_vanlig']}.")
-    uka = grunnlag.get("hovedindeksen_uka")
-    if uka == "uendret":
-        setninger.append("De siste fem børsdagene var hovedindeksen uendret.")
-    elif uka in ("steg", "falt"):
-        setninger.append(f"De siste fem børsdagene {uka} hovedindeksen.")
     return " ".join(setninger)
 
 
