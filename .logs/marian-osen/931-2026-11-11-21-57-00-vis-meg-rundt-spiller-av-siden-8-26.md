@@ -1,0 +1,33 @@
+# «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven (story 8.26)
+
+## 2026-11-11 kl. 21:57 — Marian Osen
+
+### Oppgave
+Instruksjonen kl. 18:01, etter gruppens svar 11.11 kl. 16:58, 17:06, 17:12 og 17:21, med tilleggene 1–4 (kl. 18:02), 6 (kl. 19:43), 8 (kl. 19:56), 10 (kl. 20:18) og 12 (kl. 20:35). Ny story med spesifikasjon, spørsmål og forslag, tester, mutanter, bilder før og etter, gjennomgang, hele settet, PR og CI grønn, uten fletting før gruppens ja.
+
+### Plan
+- Kvotesjekken først (regel 15). Story 8.26 på grenen `8-26-vis-meg-rundt-spiller-av-siden` i worktreen `G74-lund-osen-8-26`, fra origin/main (`7fd5320c`).
+- Spesifikasjonen: `_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md`, med delene, spørsmålene 1–11, mutantene og tre triager.
+- Delene én etter én, hver med tester i `tests/test_vis_meg_rundt_8_26.py` og én mutant, og så gjennomgangene.
+
+### Resultat
+- Kvoten kl. 18:02: 0 kall brukt i dag (GMT), 20 igjen, `extraLimit` 296. Ingen andre API-kall.
+- Del 1 (`e06fa3e6`): «Vis meg rundt» åpner boksen fra omvisningen med stegene for siden, med «Ferdig» og «Spill av hele omvisningen» på siste steg; knappene står i raden øverst. Rettet-linjer under 8.9.
+- Del 2 (`d24de09a`): hjelpevinduet, brikkene i «Slik leser du tabellen», «?» ved Hovedindeksen, «Dine egne aksjer», beskjeden om taket, KI-bryterne oransje; punktet om spørsmål 5 i 8.2b lukket.
+- Del 3 (`1b180fcf`): fotnoten og innledningen på aksjesiden tatt bort, NFR-06 i innledningene.
+- Del 4 og tillegg 8 (`4d2ee9ec`, `66163a36`): «ingen kurser ennå» fra én konstant overalt, med hvorfor og navnet fra demodataene.
+- Del 5 (`c922edcc`): stjernen ved «Følg» med migrasjon 0013, aksjene som venter nederst i tabellen, «appen følger».
+- Del 6 (`8846fbc1`): filteret på signalet tatt bort (Rettet-linjer i PRD-en og under 8.11 og 8.23), «Den ekte versjonen» i en ny fane.
+- Tillegg 6 (`d1a9e775`), 10 (`bbce8602`) og 12 (`67ea74e2`): ankrene, lenkefargen, og «Din egen liste» som på tavla med siden `/eodhd-demo` i demoen (Rettet-linje for spørsmål 9 i 8.22).
+- Mutanter: én per del og for tilleggene 6, 8, 10 og 12, alle fanget, og hver fil lik HEAD etterpå.
+- Gjennomganger: tre runder (35, 30 og 30 funn). Ett høyt (VG1 i andre runde) og flere på middels er rettet; VG1 i første runde og ECH2 i andre står åpne som spørsmål 9 og 10.
+- Main (10.10) ble flettet inn i `aebf1f47`, med bildene tatt på nytt og høyden på oversikten ved 390 px målt (4534). Hele settet i seks deler etter det: 5439 bestått, 37 hoppet over (5476, likt `--collect-only`).
+- PR #146 med bildene fra `pr-8-26-bilder` (før og etter, også ved 390 px). Ikke flettet.
+- Tilleggene 5, 7, 9, 11, 13 og 14 kom aldri til vinduet; tillegg 15 (kl. 20:46) stoppet i steg 0, fordi det bygger på tillegg 14. Instruksjonen og tilleggene ligger ordrett i scratchpad og føres i dagsfila 11.11 med flettingen.
+- Ventingen: ingen ventekommando ble stoppet. Ingen pytest kl. 22:15–23:50 og ingen git i stilletidene.
+
+### Åpne punkter
+- PR #146 venter på gruppens svar på spørsmål 1–11; med migrasjon 0013 kan den bare flettes kl. 23:50–23:58.
+- Spørsmål 9 (VG1, middels): testene av boksen i nettleseren søker i kildeteksten.
+- Spørsmål 10 (ECH2, middels): forklaringen på hvorfor en aksje er uten kurser, som tillegg 8 har den.
+- Tilleggene 5, 7, 9, 11, 13 og 14 er ikke limt inn i vinduet, og tillegg 15 venter på tillegg 14.
