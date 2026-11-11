@@ -4573,6 +4573,8 @@ Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan
 
 *Avgjort 2026-11-10 kl. 14:44 (gruppens svar):* notatet skrives under signalet og kursgrafen, alle notatene står samlet nederst i Min liste, og Innstillinger får bryteren «Notater», som rådet anbefalte. Tenkte kjøp og salg flyttes inn i v1 og bygges i samme story i natt; rådet anbefalte onsdag, men gruppen valgte i natt. Svaret kl. 14:32 om at nettsiden skriver notatene, gjelder også de tenkte kjøpene og salgene. Svaret er ført etter tillegget kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 21:36):* plassen i svaret kl. 14:44 gjelder ikke lenger. «Mine notater» står nederst på aksjesiden, etter «Signalet dag for dag» og knappen til investorsiden, fordi siden ble lang, med skjemaet, de to nyeste notatene og «Vis alle (N)». Det bygges i story 8.27, tillegg 1 (`spec-8-27-mine-notater-i-panel.md`). Rådet anbefalte det. Svaret kl. 14:32 om at nettsiden skriver notatene, og resten av svaret kl. 14:44 står.
+
 *Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel, med oppdiktede eksempler merket «Eksempeltall». Rådet anbefalte det. Svaret er ført etter tillegg 2 kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
