@@ -42,11 +42,11 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-demo.png)
 *«Mine notater» på aksjesiden for BRFE i demoen, med «Etterpå» under hvert notat og et tenkt kjøp og salg, bare i prosent, med oppdiktede selskaper («Eksempeltall»).*
 
-![Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen og ett åpent tenkt kjøp, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-min-liste-demo.png)
-*Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen, med oppdiktede selskaper («Eksempeltall»).*
+![Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen, knappene ved hvert notat og ett åpent tenkt kjøp, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-min-liste-demo.png)
+*Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen og de samme knappene som på aksjesiden, med oppdiktede selskaper («Eksempeltall»).*
 
 ![Innstillinger i demoen med de tre bryterne «Vis hjelp», «Vis KI-tekst» og «Vis notater», med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/innstillinger-demo.png)
-*Innstillinger i demoen, med bryteren «Notater» og «?» ved den, med oppdiktede selskaper («Eksempeltall»).*
+*Innstillinger i demoen, med bryteren «Notater» og forklaringen under den, med oppdiktede selskaper («Eksempeltall»).*
 
 </details>
 

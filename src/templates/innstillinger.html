@@ -1,5 +1,4 @@
 {% extends "_ramme.html" %}
-{% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_rundtur.html" import rundtur with context -%}
 {#- Story 8.10 (FR-110, utdraget 08.11 §4): «Innstillinger» med «Vis hjelp».
     Et skjema per valg, som virker uten skript. Skjemaet skriver bare
@@ -38,7 +37,9 @@
       start. Av skjuler notatene på aksjesidene og i Min liste, og sletter
       ingenting. Valget står i tabellen notatvalg fra 0012. #}
   <div class="valg">
-    <h2>Notater {{ hjelpeknapp("hjelp-notatene", "Hjelp: notatene") }}</h2>
+    {#- Story 8.24 (gruppens svar 10.11 kl. 22:59): uten «?», fordi
+        forklaringen står under bryteren, som ved Hjelp og KI-tekst. #}
+    <h2>Notater</h2>
     <form method="post" action="/innstillinger">
       <input type="hidden" name="navn" value="vis_notater">
       <input type="hidden" name="til" value="{{ 'av' if valgene.vis_notater else 'paa' }}">
@@ -48,5 +49,4 @@
   </div>
   <p class="nederst">Valgene gjelder alle sidene og lagres på denne maskinen.</p>
 </section>
-{{ hjelpevindu("hjelp-notatene", "Notater", [("", ["notatene"])]) }}
 {% endblock %}
