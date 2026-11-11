@@ -750,3 +750,29 @@ class TestEtterGjennomgangenAvTillegg6Og8:
         nav = side.split('<nav class="visvalg" id="visvalget"', 1)[1].split("</nav>", 1)[0]
         lenkene = re.findall(r'<a class="visknapp" href="([^"]+)"', nav)
         assert len(lenkene) == 2 and all(lenke.endswith("#visvalget") for lenke in lenkene)
+
+
+# --- 8) Tillegg 10: lenkene har samme farge før og etter besøk ---------------
+
+
+class TestLenkene:
+    def test_en_felles_regel_uten_spesifisitet(self):
+        """Ønsket kl. 20:06: ville feilet hvis lenkene ikke hadde en felles
+        regel som gir samme farge før og etter besøk, så navnet i et notat
+        sto blått og så lilla, eller regelen overstyrte lenker med egen farge."""
+        regel = _regel("a")
+        assert "color: inherit" in regel
+        assert "text-underline-offset: 4px" in regel
+
+    def test_ingen_regel_gir_lenker_nettleserens_farger(self):
+        """Ville feilet hvis en regel ga en lenke blått eller lilla, eller
+        :visited fikk en egen farge."""
+        for velger, innhold in re.findall(r"([^{}]*:visited[^{]*)\{([^}]*)\}", STIL):
+            assert "color: inherit" in innhold, velger
+        assert not re.search(r"color:\s*(blue|purple|#00e|#551a8b)", STIL, re.I)
+
+    def test_lenkene_i_notatene_har_ingen_egen_farge(self, klient):
+        """Ville feilet hvis navnet i et notat fikk en egen farge i stedet for
+        den felles regelen."""
+        notatene = _side(klient, "/min-liste").split('id="mine-notater"', 1)[1]
+        assert re.search(r'<a href="/aksje/[A-Z]+">', notatene)

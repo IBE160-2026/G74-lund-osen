@@ -114,6 +114,12 @@ code { font-family: ui-monospace, Consolas, monospace; }
 
 /* Designregler §5: fokus i blekk på lys bakgrunn, oransje på blekk. */
 *:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.26 (gruppens ønske 11.11 kl. 20:06, tillegg 10): alle lenker har
+   samme farge før og etter besøk, i samme stil som navnene i tabellene, så
+   ingen lenke viser nettleserens blå eller lilla. Regelen gjelder også en
+   besøkt lenke, fordi stilarket går foran nettleserens, og en lenke med egen
+   farge, som i demolinja og .knapp, står som før, fordi a er svakest. */
+a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
 header.stripe *:focus-visible { outline-color: var(--oransje); }
 
 /* Stripa øverst. */
