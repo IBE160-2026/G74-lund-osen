@@ -2420,8 +2420,10 @@ def _detaljer(tekst: str) -> dict[str, str]:
 
 # Story 3.3g: setningen om regelen kl. 14:48 (svaret 19.10 under
 # «Prioritering» i epics.md), rett under listene i «Status».
+# Story 3.6 (gjennomgangen, ECH5 og BH7): med lista «Ekstra, ferdig» sier
+# setningen hvilken «Ekstra» den gjelder. Var «under «Ekstra»,».
 REGELEN_FOR_EKSTRA = (
-    "Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
+    "Det som står under «Ekstra, hvis tiden rekker», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
     "før README-prøven, senest én uke før innleveringen."
 )
 
@@ -4131,7 +4133,9 @@ AVTRYKK_I_KOM_I_GANG = {
     # Story 3.6 (del C): snarveien og at mobil kommer senere. Var 6cd3d9de....
     # Story 3.6 (svaret 11.11 kl. 13:47, spørsmål 8): setningen om en snarvei
     # til en annen kopi. Var d8dccde4....
-    "Slik virker dobbeltklikket": "3a938e6aff6ae67156ed5d4028460e10fb30be3944023d694f65cc5e71698f62",
+    # Gjennomgangen av spørsmål 8 (ECH1): fila for neiet heter «snarvei-nei…».
+    # Var 3a938e6a....
+    "Slik virker dobbeltklikket": "1f7571e7722d7518d56a3c977562e85bbead28d8385327f10656ac5ced0de3f6",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 

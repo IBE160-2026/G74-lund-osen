@@ -196,6 +196,8 @@ class TestSnarveien:
         svar, rot, skrivebord = self._tilby(tmp_path, versjon, "j")
         lnk = skrivebord / f"{navn}.lnk"
         assert lnk.exists(), svar.stdout + svar.stderr
+        # Gjennomgangen av spørsmål 8 (VG1): spørsmålet står i vinduet.
+        assert f"Lage snarveien «{navn}» på skrivebordet? Skriv j" in svar.stdout
         maal, ikonet, mappe = self._maalet(lnk)
         assert Path(maal) == rot / fil
         # Ikonet er fila i src\static, og den finnes (gjennomgangen, VG5).
@@ -228,16 +230,27 @@ class TestSnarveien:
             f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}'); $s.TargetPath = '{tmp_path / 'borte' / 'x.cmd'}'; $s.Save()",
             {},
         )
-        self._tilby(tmp_path, "ekte", "j")
+        svar, _, _ = self._tilby(tmp_path, "ekte", "j")
         assert Path(self._maalet(lnk)[0]) == tmp_path / "rot" / "Start den ekte versjonen.cmd"
+        # Gjennomgangen av spørsmål 8 (VG2): en død snarvei er ikke en annen
+        # kopi, så den tilbys som før, uten å si hvilken mappe.
+        assert "Lage snarveien «OSE Signal»" in svar.stdout and "starter kopien i" not in svar.stdout
+        assert "ligger på skrivebordet" in svar.stdout
 
     @staticmethod
-    def _pek(lnk: Path, maal: Path) -> None:
+    def _pek(lnk: Path, maal: Path, argumenter: str = "") -> None:
         lnk.parent.mkdir(parents=True, exist_ok=True)
         _ps(
-            f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}'); $s.TargetPath = '{maal}'; $s.Save()",
+            f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}'); $s.TargetPath = '{maal}'; "
+            f"$s.Arguments = '{argumenter}'; $s.Save()",
             {},
         )
+
+    @staticmethod
+    def _argumentene(lnk: Path) -> str:
+        return _ps(
+            f"Write-Output ('[' + (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}').Arguments + ']')", {}
+        ).stdout.strip()
 
     @staticmethod
     def _annen_kopi(tmp_path) -> Path:
@@ -255,12 +268,17 @@ class TestSnarveien:
         """Spørsmål 8 (gruppens svar 11.11 kl. 13:47). Ville feilet hvis en
         snarvei til en annen kopi som finnes, ble stående uten spørsmål,
         hvis vinduet ikke sa hvilken mappe den peker på, eller hvis ja ikke
-        rettet den hit med ikonet og mappa til denne kopien."""
+        rettet den hit med ikonet og mappa til denne kopien. Gjennomgangen:
+        eller hvis spørsmålet ikke sa denne kopien (VG1), eller argumenter
+        fra den gamle snarveien ble stående (ECH3)."""
         annen = self._annen_kopi(tmp_path)
         lnk = tmp_path / "skrivebord" / f"{navn}.lnk"
-        self._pek(lnk, annen / fil)
+        self._pek(lnk, annen / fil, "--gammel")
+        assert self._argumentene(lnk) == "[--gammel]"
         svar, rot, _ = self._tilby(tmp_path, versjon, "j")
         assert f"starter kopien i {annen}." in svar.stdout, svar.stdout + svar.stderr
+        assert f"Skal den starte denne kopien ({rot}) i stedet? Skriv j" in svar.stdout
+        assert self._argumentene(lnk) == "[]"
         assert "starter nå denne kopien" in svar.stdout
         maal, ikonet, mappe = self._maalet(lnk)
         assert Path(maal) == rot / fil and Path(mappe) == rot
@@ -283,7 +301,10 @@ class TestSnarveien:
             and "Snarveien er som før. Vinduet spør ikke igjen." in svar.stdout
         )
         assert Path(self._maalet(lnk)[0]) == annen / fil
-        assert (rot / "data" / f"snarvei-nei-{versjon}").exists() and not (annen / "data").exists()
+        # Gjennomgangen (ECH1): neiet har sin egen fil, så det ikke stopper
+        # tilbudet om en snarvei som senere blir død.
+        assert (rot / "data" / f"snarvei-nei-flytt-{versjon}").exists() and not (annen / "data").exists()
+        assert not (rot / "data" / f"snarvei-nei-{versjon}").exists()
         # Neste gang svares ja, men neiet er husket, så det spørres ikke.
         svar, _, _ = self._tilby(tmp_path, versjon, "j")
         assert svar.stdout.strip() == "" and Path(self._maalet(lnk)[0]) == annen / fil
@@ -293,8 +314,36 @@ class TestSnarveien:
         med andre store og små bokstaver, ble regnet som en annen kopi."""
         rot = tmp_path / "rot"
         self._pek(tmp_path / "skrivebord" / "OSE Signal.lnk", Path(str(rot / "Start den ekte versjonen.cmd").upper()))
+        # Gjennomgangen (BH5): snarveien har faktisk lagret stien med store bokstaver.
+        assert self._maalet(tmp_path / "skrivebord" / "OSE Signal.lnk")[0].isupper()
         svar, rot, _ = self._tilby(tmp_path, "ekte", "n")
         assert svar.stdout.strip() == "" and not (rot / "data").exists()
+
+    def test_et_nei_til_aa_flytte_stopper_ikke_tilbudet_naar_den_blir_doed(self, tmp_path):
+        """Gjennomgangen av spørsmål 8 (ECH1, middels). Ville feilet hvis et
+        nei til å la snarveien starte denne kopien ble husket i samme fil som
+        et nei til å lage den, så en snarvei som ble død da den andre kopien
+        ble slettet, aldri ble tilbudt på nytt."""
+        annen = self._annen_kopi(tmp_path)
+        lnk = tmp_path / "skrivebord" / "OSE Signal.lnk"
+        self._pek(lnk, annen / "Start den ekte versjonen.cmd")
+        self._tilby(tmp_path, "ekte", "n")
+        shutil.rmtree(annen)
+        svar, rot, _ = self._tilby(tmp_path, "ekte", "j")
+        assert "Lage snarveien «OSE Signal»" in svar.stdout, svar.stdout + svar.stderr
+        assert Path(self._maalet(lnk)[0]) == rot / "Start den ekte versjonen.cmd"
+
+    def test_en_snarvei_til_noe_annet_blir_staaende(self, tmp_path):
+        """Gjennomgangen av spørsmål 8 (ECH3). Ville feilet hvis en snarvei
+        med samme navn til noe annet enn startfila, her en annen fil i den
+        andre mappa, ble regnet som en annen kopi og kunne overskrives."""
+        annen = self._annen_kopi(tmp_path)
+        noe = annen / "noe annet.cmd"
+        noe.write_text("@echo off\n", encoding="utf-8")
+        lnk = tmp_path / "skrivebord" / "OSE Signal.lnk"
+        self._pek(lnk, noe)
+        svar, rot, _ = self._tilby(tmp_path, "ekte", "j")
+        assert svar.stdout.strip() == "" and Path(self._maalet(lnk)[0]) == noe and not (rot / "data").exists()
 
     @pytest.mark.parametrize("svar", [" ", "nei", "x"])
     def test_alt_annet_enn_ja_er_nei(self, tmp_path, svar):

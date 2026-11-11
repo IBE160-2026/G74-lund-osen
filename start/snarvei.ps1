@@ -38,11 +38,19 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
         $lik = $false
         try { $lik = [IO.Path]::GetFullPath($maal) -ieq [IO.Path]::GetFullPath($her) } catch { }
         if ($lik) { return }
-        if (Test-Path -LiteralPath $maal) { $annen = Split-Path -Parent $maal }
+        if (Test-Path -LiteralPath $maal) {
+            # Bare en snarvei til samme startfil i en annen mappe er en annen
+            # kopi. En snarvei brukeren har laget til noe annet, står
+            # (gjennomgangen, ECH3).
+            if ((Split-Path -Leaf $maal) -ne $fil) { return }
+            $annen = Split-Path -Parent $maal
+        }
     }
-    # Et nei, til å lage snarveien eller til å la den starte denne kopien,
-    # huskes i data-mappa til denne kopien, så hver kopi spør bare én gang.
-    $huske = Join-Path $Rot "data\snarvei-nei-$Versjon"
+    # Et nei huskes i data-mappa til denne kopien, så hver kopi spør bare én
+    # gang. Et nei til å la snarveien starte denne kopien har sin egen fil,
+    # så en snarvei som senere blir død, tilbys på nytt (gjennomgangen, ECH1).
+    if ($annen) { $huske = Join-Path $Rot "data\snarvei-nei-flytt-$Versjon" }
+    else { $huske = Join-Path $Rot "data\snarvei-nei-$Versjon" }
     if (Test-Path -LiteralPath $huske) { return }
     if ($annen) {
         Write-Host "Snarveien «$navn» på skrivebordet starter kopien i $annen."
@@ -51,6 +59,8 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
         $spoersmaal = "Lage snarveien «$navn» på skrivebordet? Skriv j og trykk Enter for ja, eller bare Enter for nei"
     }
     if ($env:OSE_START_SVAR_SNARVEI) {
+        # Testene: spørsmålet skrives, så teksten kan prøves (gjennomgangen, VG1).
+        Write-Host $spoersmaal
         $svar = $env:OSE_START_SVAR_SNARVEI
     } else {
         $svar = Read-Host $spoersmaal
@@ -70,6 +80,7 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
         $skall = New-Object -ComObject WScript.Shell
         $snarvei = $skall.CreateShortcut($lnk)
         $snarvei.TargetPath = $her
+        $snarvei.Arguments = ''
         $snarvei.WorkingDirectory = $Rot
         $snarvei.IconLocation = (Join-Path $Rot 'src\static\ikon.ico') + ',0'
         $snarvei.Description = $navn
