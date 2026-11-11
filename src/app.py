@@ -74,7 +74,15 @@ from historikk import (
     maanedsnavn,
     perioden,
 )
-from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, omvisningen, rundturer
+from hjelpetekster import (
+    ANTALL_SJEKKER,
+    DEMO_UTEN_KURSER,
+    UTEN_KURSER_HVORFOR,
+    Hjelp,
+    hjelpetekster,
+    omvisningen,
+    rundturer,
+)
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
 from investorsider import demoside
 from justeringsdager import justeringsdager
@@ -113,6 +121,7 @@ from lagring_sqlite import (
     les_merket,
 )
 from markedsoversikt import (
+    UTEN_DATA_TEKST,
     Sortering,
     antall_vurdert,
     bygg_oversikt,
@@ -254,6 +263,12 @@ def soeylestyrke(endring: float) -> str:
 
 app.jinja_env.filters["soeylestyrke"] = soeylestyrke
 app.jinja_env.globals["soeylegrense"] = tall(GRENSE_STERK, "grense")
+# Story 8.26 (tillegg 8): ordene og forklaringen for en aksje uten kurser,
+# likt på alle sidene.
+app.jinja_env.globals["uten_data_tekst"] = UTEN_DATA_TEKST
+app.jinja_env.globals["uten_data_kort"] = UTEN_DATA
+app.jinja_env.globals["uten_kurser_hvorfor"] = UTEN_KURSER_HVORFOR
+app.jinja_env.globals["demo_uten_kurser"] = DEMO_UTEN_KURSER
 # Story 8.26 (tillegg 3): beskjeden når appen følger så mange aksjer den kan.
 app.jinja_env.globals["full_tekst"] = valg.FULL
 # Story 8.26 (tillegg 3): ønsket om å følge. Eget navn, fordi oversikten har

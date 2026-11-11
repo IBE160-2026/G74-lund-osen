@@ -441,7 +441,12 @@ def test_boblen_i_demoen(demoklient):  # noqa: F811
         lenke = boble.lenker[0]
         assert lenke == {"href": f"/investorside/{aksje.symbol}"}, lenke
         assert _ren(boble.tekst["investorboble"]) == f"Investorsiden til {aksje.navn}"
-        assert "pil" not in boble.tekst and "↗" not in html
+        # Story 8.26 (tillegg 4): lenken «Den ekte versjonen» i demolinja har
+        # pila; boblen har den ikke.
+        assert (
+            "pil" not in boble.tekst
+            and "↗" not in html.split('<p class="eksempeltall">', 1)[0] + html.split("</header>", 1)[1]
+        )
         assert "newsweb" not in html.lower()
         if 'id="signalet-dag-for-dag"' in html:
             assert html.index('class="investorboble"') > html.index(
@@ -499,7 +504,7 @@ def test_boblen_i_den_ekte_versjonen_uten_kurser(klient):  # noqa: F811
         tilkobling.close()
     svar = klient.get("/aksje/DNB")
     html = svar.get_data(as_text=True)
-    assert svar.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in html
+    assert svar.status_code == 200 and "ingen kursgraf og ingen sjekker for DNB Bank." in html
     boble = _boblen(html)
     assert boble is not None
     lenke = boble.lenker[0]

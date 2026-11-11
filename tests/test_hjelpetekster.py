@@ -342,7 +342,9 @@ class TestSidene:
         # grafen har en dag merket, som ved den første knappen.
         for adresse in SIDENE + ("/aksje/BRFE?periode=siste",):
             _side(klient, adresse)
-        assert bedt_om == set(hjelpetekster())
+        # Story 8.26 (tillegg 8): teksten om demoen står bare i demoen, som
+        # test_vis_meg_rundt_8_26.py viser.
+        assert bedt_om == set(hjelpetekster()) - {"uten_data_demo"}
 
     def test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer(self, klient, base):
         """Story 8.0c, den nye delen 2 (godkjent 13.10 kl. 15:36): «?» ved

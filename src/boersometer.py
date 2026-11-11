@@ -36,7 +36,14 @@ from datetime import date
 from hjelpetekster import ANTALL_SJEKKER
 from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
-from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand, periodeendring
+from markedsoversikt import (
+    IKKE_VURDERT,
+    UTEN_DATA_TEKST,
+    endring_i_prosent,
+    grunn_med_tall,
+    les_tilstand,
+    periodeendring,
+)
 from signalberegning import STANDARD, Parametre
 from tallformat import avrundet, dato, tall, ukedag
 from tilstand import Art
@@ -66,9 +73,9 @@ VOLUMORD = {LAV: "lavt", VANLIG: "vanlig", HOEY: "høyt"}
 # Rammen, etter styrken (designregler.md §3).
 GUL, MOERK = "gul", "moerk"
 # Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 2): «Uten data» sa ikke
-# hvorfor. Ruta sier «Ingen kurs», kort nok til grensen for store ruter
-# (STOR), og tabellen og title sier «Ingen kurser ennå», som oversikten.
-UTEN_DATA = "Ingen kurs"
+# hvorfor. Tillegg 8 (ønsket kl. 19:51): de samme ordene som raden på
+# oversikten, også i ruta og i begge kolonnene i tabellen.
+UTEN_DATA = UTEN_DATA_TEKST[0].upper() + UTEN_DATA_TEKST[1:]
 
 # Story 8.6b, c: fem fargetrinn etter endringen slik den vises, med grensene i
 # prosent. Navnene er klassene i malen og fargene i :root i stil.css.

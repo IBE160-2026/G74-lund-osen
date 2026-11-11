@@ -306,36 +306,74 @@ class TestFilteretOgLenken:
 
 
 class TestIngenKurserEnnaa:
+    """Tillegg 2 og tillegg 8 (gruppens ønske 11.11 kl. 19:51): de samme ordene
+    og den samme forklaringen overalt der det sto «uten data»."""
+
     @pytest.mark.parametrize("versjon", ["klient", "ekte"])
     def test_ingen_side_sier_uten_data(self, versjon, request):
-        """Ønsket kl. 17:44: ville feilet hvis en side fortsatt sa «uten data»
-        uten å si hvorfor."""
+        """Ville feilet hvis en side fortsatt sa «uten data» uten å si hvorfor."""
         k = request.getfixturevalue(versjon)
         for sti in ("/", "/min-liste?vis=alle", "/boersometer"):
             assert not re.search(r"[Uu]ten data", _side(k, sti)), sti
 
-    def test_raden_uten_kurser_sier_det(self, klient):
-        """Ville feilet hvis raden for en aksje uten en eneste kurs (MTFJ i
-        demoen) ikke sa «ingen kurser ennå» under «–», som «for kort
-        historikk» sier sitt, eller båndet ikke talte dem som «uten kurser»."""
-        side = _side(klient, "/")
-        rad = side.split('<a href="/aksje/MTFJ">', 1)[1].split("</tr>", 1)[0]
-        assert '– <span class="merke mangler">ingen kurser ennå</span>' in rad
-        assert "Ukjent" in rad
-        assert re.search(r"og 1 uten kurser</span>", side)
-
-    def test_boersometeret_sier_ingen_kurs(self, klient):
-        """Ville feilet hvis ruta sa «Uten data», eller tabellen under kartet
-        ikke sa «Ingen kurser ennå»."""
+    def test_alle_stedene_sier_det_samme(self, klient):
+        """Tillegg 8: ville feilet hvis ett av stedene for MTFJ i demoen sa
+        noe annet enn UTEN_DATA_TEKST: raden på oversikten og i Min liste,
+        ruta og begge kolonnene i tabellen på børsometeret, aksjesiden og
+        hjelpen bak «?» ved «Oppdatert»."""
         import boersometer
+        import demo
+        from markedsoversikt import UTEN_DATA_TEKST
 
+        ordene = UTEN_DATA_TEKST.lower()
+        assert demo.UTEN_KURSER == "MTFJ" and ordene == "ingen kurser ennå"
+        funnet = {}
+        for sti in ("/", "/min-liste?vis=alle"):
+            rad = _side(klient, sti).split('<a href="/aksje/MTFJ">', 1)[1].split("</tr>", 1)[0]
+            funnet[sti] = re.search(r'<span class="merke mangler">([^<]+)</span>', rad).group(1)
         side = _side(klient, "/boersometer")
         rute = side.split('href="/aksje/MTFJ"', 1)[1].split("</a>", 1)[0]
-        assert boersometer.UTEN_DATA == "Ingen kurs"
-        assert '<span class="endring">Ingen kurs</span>' in rute
-        assert 'title="MTFJ: ingen kurser ennå"' in side
+        funnet["ruta"] = re.search(r'<span class="endring">([^<]+)</span>', rute).group(1)
+        funnet["title"] = re.search(r'title="MTFJ: ([^"]+)"', side).group(1)
         tabell = side.split("<table", 1)[1].split("</table>", 1)[0]
-        assert "Ingen kurser ennå" in tabell
+        rad = tabell.split("MTFJ", 1)[1].split("</tr>", 1)[0]
+        cellene = [re.sub(r"<[^>]+>", "", c).strip() for c in re.findall(r"<td[^>]*>(.*?)</td>", rad, re.S)]
+        funnet["tabellen, endring"], funnet["tabellen, styrke"] = cellene[0], cellene[-1]
+        aksjesiden = _side(klient, "/aksje/MTFJ")
+        funnet["aksjesiden"] = re.search(r'<p class="ingen-kurser">\s*<strong>([^<]+)</strong>', aksjesiden).group(1)
+        vindu = _side(klient, "/").split('id="hjelp-hentet"', 1)[1].split('<p class="lukkes">', 1)[0]
+        funnet["hjelpen"] = re.search(r"<strong>(Ingen[^<]*):</strong>", vindu).group(1)
+        assert {navn: tekst.lower() for navn, tekst in funnet.items()} == {navn: ordene for navn in funnet}, funnet
+        assert boersometer.UTEN_DATA.lower() == ordene
+
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_hvorfor_staar_bak_spoersmaalstegnet_og_paa_aksjesiden(self, versjon, request):
+        """Tillegg 8: ville feilet hvis «?» ved «Oppdatert» eller aksjesiden
+        ikke sa hvorfor, med den samme forklaringen."""
+        hvorfor = ht.UTEN_KURSER_HVORFOR
+        assert "nettopp er lagt til og venter på hentingen om kvelden" in hvorfor
+        assert "kilden ikke har kurser for den" in hvorfor
+        k = request.getfixturevalue(versjon)
+        vindu = _side(k, "/").split('id="hjelp-hentet"', 1)[1].split('<p class="lukkes">', 1)[0]
+        assert hvorfor in html.unescape(vindu)
+        if versjon == "klient":
+            assert hvorfor in html.unescape(_side(k, "/aksje/MTFJ"))
+
+    def test_demoen_sier_hvilken_aksje_med_vilje(self, klient):
+        """Tillegg 8: ville feilet hvis demoen ikke sa at den oppdiktede aksjen
+        med vilje er uten kurser, med navnet fra demodataene, eller den ekte
+        versjonen sa det."""
+        import demo
+
+        navn = next(a.navn for a in demo.DEMOUNIVERS if a.symbol == demo.UTEN_KURSER)
+        setningen = f"I demoen er {navn} med vilje uten kurser, så du ser hvordan det ser ut."
+        assert ht.DEMO_UTEN_KURSER == setningen
+        assert setningen in html.unescape(_side(klient, "/").split('id="hjelp-hentet"', 1)[1])
+        assert setningen in html.unescape(_side(klient, "/aksje/MTFJ"))
+
+    def test_den_ekte_versjonen_sier_ikke_demoen(self, ekte):
+        """Ville feilet hvis den ekte versjonen sa noe om demoen bak «?»."""
+        assert "I demoen er" not in _side(ekte, "/")
 
     def test_bare_en_aksje_uten_kurser_sier_ennaa(self):
         """Gjennomgangen (ECH4, VG5): ville feilet hvis en aksje med kurser,
@@ -353,15 +391,15 @@ class TestIngenKurserEnnaa:
         assert med.uten_data and not med.aldri_kurs
         assert uten.uten_data and uten.aldri_kurs
         mal = (ROT / "src" / "templates" / "boersometer.html").read_text(encoding="utf-8")
-        assert "'Ingen kurser ennå' if rute.aldri_kurs else 'Ingen kurs den dagen'" in mal
+        assert "uten_kurs_kort if rute.aldri_kurs else 'Ingen kurs den dagen'" in mal
 
-    def test_ingen_kurs_faar_plass_i_en_stor_rute(self):
-        """Ville feilet hvis den nye teksten gjorde en stor rute for smal, så
-        grensen for store ruter (STOR) ikke lenger gjaldt."""
+    def test_en_rute_uten_kurser_er_ikke_stor(self):
+        """Ville feilet hvis grensen for store ruter regnet med en kortere
+        tekst enn den ruta viser, så teksten ble for bred for en stor rute."""
         import boersometer
 
         bredde = boersometer.stor_bredde("AKRBP", None, False, boersometer.UTEN_DATA)
-        assert bredde <= boersometer.STOR[0]
+        assert bredde > boersometer.STOR[0]
 
     def test_ukjent_forklares_bak_spoersmaalstegnet(self):
         """Ville feilet hvis «Ukjent» bak «?» ved Retning ikke sa at det også

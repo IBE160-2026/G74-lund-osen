@@ -21,7 +21,8 @@ skjevhet, og retningen forklares med +1 og -1 (FR-704, rettet 13.10).
 
 from dataclasses import dataclass
 
-from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING
+from demo import DEMOUNIVERS, UTEN_KURSER
+from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING, UTEN_DATA_TEKST
 from signalberegning import (
     BLANDET,
     INGEN,
@@ -142,6 +143,19 @@ def _grensene(m: Parametre) -> str:
         f"{_vis(m.noytralsone * 100, 'grense')}, {_vis(m.volumfaktor, 'faktor')} ganger, "
         f"{vinduene} og terskelen {_vis(m.terskel, 'heltall')}"
     )
+
+
+# Story 8.26 (gruppens ønske 11.11 kl. 19:51, tillegg 8): hvorfor en aksje
+# står med «ingen kurser ennå», likt overalt der det står, og i demoen
+# navnet på aksjen som med vilje er uten kurser, fra demodataene.
+UTEN_KURSER_HVORFOR = (
+    "appen har ingen kurser for aksjen ennå, fordi den nettopp er lagt til og venter på hentingen om kvelden, "
+    "eller fordi kilden ikke har kurser for den."
+)
+DEMO_UTEN_KURSER = (
+    f"I demoen er {next(a.navn for a in DEMOUNIVERS if a.symbol == UTEN_KURSER)} med vilje uten kurser, "
+    "så du ser hvordan det ser ut."
+)
 
 
 def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
@@ -355,11 +369,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # tabellen, ikke bare navnet under den.
         # Story 8.26 (tillegg 2): «uten data» heter «ingen kurser ennå».
         "uten_data": Hjelpetekst(
-            "Ingen kurser ennå:",
+            UTEN_DATA_TEKST[0].upper() + UTEN_DATA_TEKST[1:] + ":",
             # Gjennomgangen 24.10 (BH7): nederst uten sortering. Sortert på
             # Selskap står den etter navnet.
-            "en aksje uten en eneste kurs står nederst i tabellen uten sortering, med «–» i hver kolonne og "
-            "«ingen kurser ennå» og med lenke til aksjesiden. En aksje som venter på hentingen, står under, uten lenke.",
+            # Story 8.26 (tillegg 8): først hvorfor, så hvor raden står.
+            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen uten sortering, med «–» og lenke til "
+            "aksjesiden, og en aksje som venter, står under med «venter på henting», uten lenke.",
             (
                 # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
                 (PRD, "en aksje uten en eneste kursrad har en rad nederst i tabellen"),
@@ -367,6 +382,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (MARKEDSOVERSIKT, "class RadUtenData"),
             ),
         ),
+        # Story 8.26 (tillegg 8): bare i demoen, med navnet fra demodataene.
+        "uten_data_demo": Hjelpetekst("", DEMO_UTEN_KURSER, (("src/demo.py", 'UTEN_KURSER = "MTFJ"'),)),
         "signalstyrke": Hjelpetekst(
             "Signalstyrke:",
             # Story 8.20a (del J): «Skilte seg ut», som oversikten sier.

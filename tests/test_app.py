@@ -263,7 +263,7 @@ def test_uleselig_symbol_navngis_i_fotnoten(klient, monkeypatch):
     assert ["DNB Bank", "–", "–", "– ingen kurser ennå", "– Ukjent"] in _tabell(html).uten_data
     assert '<a href="/aksje/DNB">DNB Bank</a>' in html
     side = klient.get("/aksje/DNB")
-    assert side.status_code == 200 and "Det finnes ingen kurser for DNB Bank ennå" in side.data.decode("utf-8")
+    assert side.status_code == 200 and "ingen kursgraf og ingen sjekker for DNB Bank." in side.data.decode("utf-8")
 
 
 @pytest.mark.parametrize("hentet", [None, "2026-09-21T15:40:00"], ids=["mangler", "uten-tidssone"])
