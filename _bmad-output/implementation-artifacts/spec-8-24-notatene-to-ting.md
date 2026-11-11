@@ -2,7 +2,7 @@
 title: 'Story 8.24: Notatene, to ting etter flettingen'
 type: 'feature'
 created: '2026-11-11'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'f68c6f89'
 context:
@@ -77,3 +77,7 @@ Blind Hunter med bare diffen, uten bildene og `tests/test_docker.py`, og Edge Ca
 - *Rettet:* BH4 og ECH3 (grunnen står én gang per aksje, ved det nyeste notatet), BH5 og ECH5 (Min liste sier hvorfor knappene mangler for en aksje som er tatt ut eller ikke har kurser), BH7 (salget før kjøpet har kursen) og ECH4 (navnet på aksjen i etiketten på «Slett» i Min liste).
 - *Ført:* ECH2 og BH6 (svaret fra Min liste beholder «Alle», men ikke perioden, sorteringen eller filteret), ECH6 (en side åpnet før kveldshentingen gir 400 etter den, som på aksjesiden), VG4 (testen for ett åpent kjøp sjekker ikke knappen ved notatet med kjøpet), VG6 og BH8 (ingen test sjekker hjelpereglene på Innstillinger, nå uten «?») og BH10 (skjemaene har ingen CSRF-token; Origin sjekkes, som før).
 - *Ikke en feil:* BH9 (teksten under bryteren sier fortsatt at et tenkt kjøp eller salg får neste sluttkurs).
+
+*Lagt til 2026-11-11:* hele settet alene i fem deler på `ae9e395e`: 5083 bestått og 24 hoppet over (5107, lik `--collect-only`). Mutantene A og B ble kjørt på nytt på `ae9e395e`, og begge ble fanget. CI var grønn på head-en `ae9e395e` (run 42935503846).
+
+*Lagt til 2026-11-11:* 8.24 er flettet med PR #141 i `38a0a0e9` kl. 02:03, låst til head-en `ae9e395e`, etter instruksjonen kl. 23:01 10.11 i `docs/ai-prompts/2026-11-10.md`. Main var ikke endret siden grenen ble laget, så det var ingenting å flette inn. Treet på main etter `git pull --ff-only` er likt treet på `ae9e395e`. Ingen funn på middels eller over sto åpne.
