@@ -319,3 +319,9 @@ Blind Hunter med bare diffen `0e7fd7c5..d1fe78c5`, og Edge Case Hunter og Verifi
 *Lav*
 - *Rettet:* BH13 (hjelpen sier «Vis KI-tekst»), ECH5 (en feil i oppslaget gir ingen linje, ikke 500), ECH6 (kolonnen merkes over alle tbody-ene), ECH7 (boksen prøver øverst og beholder det bare hvis det hjelper).
 - *Ført:* BH4 og ECH5 (oversikten leses to ganger på sidene med eget tidspunkt), BH7, BH10 og ECH8 (ordene om rammen følger `STANDARD`, som appen bruker), BH12, BH15, VG9, VG10, VG11.
+
+### Mutantene for tilleggene 5–20 og hele settet (12.11 kl. 00:06–00:46)
+
+Én mutant per tillegg, med en kopi av fila før og sha256 mot HEAD etter (`mutanter-t5-20.py` i scratchpad). Alle 14 ble fanget, og hver fil var lik HEAD etterpå: M13 (tillegg 17, den grå brikken kunne velges), M14 (overskriften sa siste børsdag med «Vis dagen»), M15 (uten «Oppdatert» på sidene uten eget tidspunkt), M16 (bryteren på aksjesiden i 14 px), M17 (steget om signalstyrken pekte på hele tabellen), M18 (en tekst med «kontrollsjekken»), M19 (eksempelboksen tilbake), M20 (omvisningen med stegene som gjentas), M21 (uten steget «Signalet forklart»), M22 (uten setningen om den første knappen), M23 (uten prøven uten ramme), M24 (ankeret `#ferdige-lister` borte), M25 (kortene i alfabetisk rekkefølge), M26 (uten setningen når lista ikke er full).
+
+Hele settet i seks deler etter tilleggene: 5524 bestått og 24 hoppet over, til sammen 5548, likt `--collect-only`. Den første runden viste tester som sjekket det som sto før (bildet av investorsiden står 38 px lenger ned med «Oppdatert …», brikkene i steg 3 og kortene, «lenke til aksjesiden», «uten ramme» i `docs/hjelp.md` og «Signalet forklart» uten sjekker); de er rettet. Bildene i `docs/appen/` er tatt på nytt med høydene i `test_docker.py`.
