@@ -284,7 +284,8 @@ class TestKalleneRegnesAvLista:
         monkeypatch.setattr(valg, "KVOTE", 25)
         monkeypatch.setattr(valg, "TAK", 20)
         html = _html(klient, "/min-liste")
-        avsnitt = html.split("<h3>Følg flere aksjer</h3>", 1)[1].split("</p>", 1)[0]
+        # Story 8.26 (tillegg 14): teksten står bak «?» ved «Følg flere aksjer».
+        avsnitt = html.split('<div id="hjelp-flere" class="hjelpevindu"', 1)[1].split("</p>", 1)[0]
         # Story 8.26: «Appen kan følge», ikke «Lista kan ha». Gjennomgangen
         # (BH1): påstanden om kallene sto i en kommentar.
         assert "Appen kan følge opptil 20 aksjer" in avsnitt and "av de 25 kallene" in avsnitt

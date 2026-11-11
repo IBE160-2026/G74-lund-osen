@@ -638,9 +638,11 @@ def _oppdatert_overalt():
         if leser is None:
             return {"hentet_felles": None}
         tider = [post.hentet for post in leser.oversikt(idag()) if post.nyeste is not None and post.hentet]
-    except BASEFEIL:
+        return {"hentet_felles": min(tider) if tider else None}
+    except Exception:  # noqa: BLE001
+        # Gjennomgangen (ECH5): linja er pynt; en feil her skal ikke gi 500 på
+        # «Følg en aksje» eller Innstillinger, som før ikke leste oversikten.
         return {"hentet_felles": None}
-    return {"hentet_felles": min(tider) if tider else None}
 
 
 class _BasenFeilet(Exception):
@@ -1182,7 +1184,8 @@ def _tabellsiden(aktiv: str):
         # len(poster), og definisjonen fra 14.10 står (gjennomgangen, BH5).
         # Story 8.26 (tillegg 3, gjennomgangen ECH3): aksjene som venter, er
         # med, som radene, «Min liste N» og «appen følger 16 av 18».
-        antall_aksjer=len(rader) + len(alle_uten_data),
+        # Gjennomgangen av tillegg 17 (ECH2): med «Vis dagen» er M radene den dagen.
+        antall_aksjer=(len(vist) if annen_dag else len(rader)) + len(alle_uten_data),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som

@@ -325,8 +325,15 @@ const FOLGLISTA = {
   // Sammenligningen for sorteringen: «omsatt» (høyest median først, ikke
   // målt sist), «navn» (A–Å, med Æ, Ø og Å sist) og «bransje» (rangen, så
   // navnet). Likt ordnes etter navnet og så tickeren.
+  // Gjennomgangen (ECH1): samme nøkkel som ferdige_lister._norsk, med æ, ø og
+  // å sist, ikke localeCompare, som i nb regner «aa» som å.
+  norsk(navn) {
+    return navn.toLowerCase().replace(/æ/g, "{0").replace(/ø/g, "{1").replace(/å/g, "{2");
+  },
   sammenlign(a, b, sortering) {
-    const navn = a.navn.localeCompare(b.navn, "nb") || (a.kode < b.kode ? -1 : a.kode > b.kode ? 1 : 0);
+    const na = FOLGLISTA.norsk(a.navn);
+    const nb = FOLGLISTA.norsk(b.navn);
+    const navn = (na < nb ? -1 : na > nb ? 1 : 0) || (a.kode < b.kode ? -1 : a.kode > b.kode ? 1 : 0);
     if (sortering === "navn") return navn;
     if (sortering === "bransje") return Number(a.rang) - Number(b.rang) || navn;
     const ma = a.median === "" ? null : Number(a.median);
@@ -393,7 +400,8 @@ if (typeof module === "object" && module.exports) {
     const tabell = th.closest("table");
     const antall = th.parentElement.cells.length;
     const celler = [th];
-    for (const rad of tabell.tBodies[0] ? tabell.tBodies[0].rows : []) {
+    // Gjennomgangen (ECH6): alle tbody-ene, ikke bare den første.
+    for (const rad of tabell.querySelectorAll("tbody tr")) {
       if (celler.length > RADENE_I_KOLONNEN) break;
       if (rad.cells.length === antall && rad.cells[th.cellIndex].tagName === "TD") celler.push(rad.cells[th.cellIndex]);
     }
@@ -541,14 +549,24 @@ if (typeof module === "object" && module.exports) {
     boksen.focus();
     // Story 8.26 (tillegg 18): boksen står ikke over det som er merket. Dekker
     // den det nederst til høyre, flyttes den til venstre.
-    boksen.classList.remove("til-venstre");
+    // Dekker den også der, står boksen øverst når det merkede står i nedre
+    // halvdel av vinduet.
+    boksen.classList.remove("til-venstre", "oeverst");
     const merkede = kolonnen.length ? kolonnen : [del];
-    const b = boksen.getBoundingClientRect();
-    const dekker = merkede.some((el) => {
-      const r = el.getBoundingClientRect();
-      return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
-    });
-    if (dekker) boksen.classList.add("til-venstre");
+    function dekker() {
+      const b = boksen.getBoundingClientRect();
+      return merkede.some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
+      });
+    }
+    if (dekker()) boksen.classList.add("til-venstre");
+    if (dekker()) {
+      // Gjennomgangen (ECH7): prøv øverst, og behold det bare hvis det hjelper.
+      boksen.classList.remove("til-venstre");
+      boksen.classList.add("oeverst");
+      if (dekker()) boksen.classList.remove("oeverst");
+    }
   }
 
   function start() {

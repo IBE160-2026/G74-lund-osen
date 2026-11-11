@@ -241,7 +241,8 @@ def test_ingressen_i_historikken_er_kort(klient):
     # Ingressen var 60 ord før 8.2b, med navnet for BRFE.
     assert len(ingress.split()) <= 25, ingress
     vinduet = _vindu(html, "hjelp-historikk")
-    assert "lest fra basen og aldri regnet på nytt" in vinduet and "signalstyrke 2 eller mer" in vinduet
+    # Story 8.26 (tillegg 18): «lest fra basen» er tatt ut; at det aldri regnes på nytt, står.
+    assert "Det regnes aldri på nytt." in vinduet and "signalstyrke 2 eller mer" in vinduet
 
 
 def test_endringen_har_alltid_ukedagen_og_datoen(klient):

@@ -125,6 +125,8 @@
       <span class="plassstrek" aria-hidden="true">{% for i in range(egne.tak) %}<span class="{{ 'brukt' if i < egne.antall else 'ledig' }}"></span>{% endfor %}</span>
     </div>
   </div>
+  {#- Gjennomgangen (ECH3): med «Vis hjelp» av står teksten om kallene her. #}
+  {% if vis_hjelp is defined and not vis_hjelp %}<p class="uten-hjelp">Appen kan følge opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre.</p>{% endif %}
   {% if egne.full %}
   <p class="flere-setning">Bytt ut en aksje for å følge en annen. Byttet skjer ved neste henting.</p>
   {% else %}

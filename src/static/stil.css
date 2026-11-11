@@ -1509,6 +1509,7 @@ td.omvisning-kolonne { background-color: color-mix(in srgb, var(--oransje) 14%, 
 th.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje), inset 0 3px 0 var(--oransje); }
 .omvisning-kolonne.omvisning-kolonne-siste { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje), inset 0 -3px 0 var(--oransje); }
 .omvisning.til-venstre { right: auto; left: 16px; }
+.omvisning.oeverst { bottom: auto; top: 16px; }
 @media (forced-colors: active) { .omvisning-kolonne { outline: 3px solid Highlight; outline-offset: -3px; } }
 .omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);

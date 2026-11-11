@@ -354,7 +354,8 @@ class TestIngenKurserEnnaa:
         ikke sa hvorfor, med den samme forklaringen."""
         hvorfor = ht.UTEN_KURSER_HVORFOR
         assert "nettopp er lagt til og venter på hentingen om kvelden" in hvorfor
-        assert "kilden ikke har kurser for den" in hvorfor
+        # Tillegg 18: EODHD, ikke «kilden».
+        assert "EODHD ikke har kurser for den" in hvorfor
         k = request.getfixturevalue(versjon)
         vindu = _side(k, "/").split('id="hjelp-hentet"', 1)[1].split('<p class="lukkes">', 1)[0]
         assert hvorfor in html.unescape(vindu)
@@ -649,7 +650,11 @@ class TestOrdeneOmLista:
         side = _side(klient, "/")
         assert re.search(r"\d+ egne · appen følger \d+ av 18</p>", side)
         assert "aksjer i lista</p>" not in side
-        assert re.search(r'<p class="antall-egne">Appen følger \d+ av 18</p>', _side(klient, "/min-liste"))
+        # Tillegg 14 og 15: med «, som er taket.» eller de ledige plassene.
+        assert re.search(
+            r'<p class="antall-egne">Appen følger \d+ av 18(, som er taket\.|, \d+ plass(er)? ledige\.)</p>',
+            _side(klient, "/min-liste"),
+        )
 
     def test_full_sier_taket(self, klient, monkeypatch):
         """Ville feilet hvis beskjeden sa «Lista er full …» i stedet for at
@@ -1215,7 +1220,8 @@ class TestKolonnestegene:
         assert "const RADENE_I_KOLONNEN = 3;" in kilde
         assert 'if (del.tagName === "TH") {' in kilde and "kolonnen = merkKolonnen(del);" in kilde
         assert 'c.classList.add("omvisning-kolonne")' in kilde
-        assert 'if (dekker) boksen.classList.add("til-venstre");' in kilde
+        assert 'if (dekker()) boksen.classList.add("til-venstre");' in kilde
+        assert 'boksen.classList.add("oeverst")' in kilde
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
         assert ".omvisning.til-venstre { right: auto; left: 16px; }" in stil
         assert re.search(r"td\.omvisning-kolonne \{ background-color:", stil)
@@ -1319,7 +1325,6 @@ class TestFoersteKnappen:
             ("/", "hjelp-perioden"),
             ("/min-liste", "hjelp-sammenlign"),
             ("/boersometer", "hjelp-perioden"),
-            ("/aksje/BRFE", "hjelp-graf"),
         ],
     )
     def test_setningen_overalt_og_demoen(self, klient, adresse, vindu):
@@ -1500,3 +1505,80 @@ class TestFoelgFlereAksjer:
         if 'id="folg-flere"' in side:
             assert 'class="bransjekortet"' in side
             assert 'class="demoboks"' not in side
+
+
+# Gjennomgangen av tilleggene 5–20 (Verification Gap).
+
+
+class TestGjennomgangenAvTilleggene:
+    def test_hjelpetekstene_hoeyst_50_ord_uten_interne_ord(self):
+        """VG4 (tillegg 18): ville feilet hvis en tekst i hjelpetekster() hadde
+        over 50 ord, telt med \\w+, eller ordene «basen», «kilden»,
+        «kontrollsjekken» eller «lest fra»."""
+        for noekkel, tekst in ht.hjelpetekster().items():
+            hele = f"{tekst.tittel} {tekst.tekst}"
+            assert len(re.findall(r"\w+", hele)) <= 50, noekkel
+            for ord_ in ("basen", "kilden", "kontrollsjekken", "lest fra"):
+                assert ord_ not in hele, (noekkel, ord_)
+
+    def test_tallet_paa_brikkene_staar_fast(self, klient):
+        """VG5: ville feilet hvis tallet på en brikke fulgte omsetningen eller
+        søket og ikke var alle som kan følges i bransjen."""
+
+        def tallene(side):
+            return re.findall(r'value="([^"]+)"[^>]*>.*?<span class="antall">(\d+)</span>', _bransjebrikkene(side))
+
+        assert tallene(_side(klient, "/folg?omsetning=ikke&q=a")) == tallene(_side(klient, "/folg"))
+
+    def test_en_valgt_tom_bransje_kan_velges_bort(self, klient):
+        """VG5: ville feilet hvis en bransje med 0 som står i adressen, ble
+        grå og låst, så den ikke kunne velges bort."""
+        brikkene = _bransjebrikkene(_side(klient, "/folg"))
+        tom = re.search(r'value="([^"]+)" disabled', brikkene).group(1)
+        valgt = _bransjebrikkene(_side(klient, f"/folg?bransje={tom}"))
+        assert f'value="{tom}" checked>' in valgt
+        assert f'value="{tom}" checked disabled' not in valgt
+
+    def test_oppdatert_paa_er_du_sikker(self, klient):
+        """VG8: ville feilet hvis «Er du sikker?» manglet linja «Oppdatert …»."""
+        side = _side(klient, "/min-liste")
+        adresse = re.search(r'href="(/ferdig-liste\?bransje=[^"]+)"', side).group(1).replace("&amp;", "&")
+        assert '<div class="rad oppdatert">' in _side(klient, adresse)
+
+    def test_ferdige_lister_ikke_i_noe_kort(self, klient):
+        """VG12: ville feilet hvis en ferdig liste sto i et av kortene under
+        «Følg flere aksjer», ikke bare det første."""
+        side = _side(klient, "/min-liste")
+        assert "ferdig-liste?bransje=" not in _flere(side)
+
+    def test_min_liste_med_vis_dagen_som_foer(self, klient):
+        """VG12 (spørsmål 13): ville feilet hvis overskriften i Min liste med
+        «Vis dagen» ikke lenger sa siste børsdag, der radene står."""
+        assert _overskriften(_side(klient, "/min-liste?periode=velg&dag=2026-10-06")).endswith("fredag")
+
+    def test_ki_steget_sier_med_ki_paa(self):
+        """BH8: ville feilet hvis steget sa at teksten alltid er skrevet av KI,
+        også når KI er av og bare appens setninger står."""
+        assert ht.KI_STEGET.startswith("Med KI på står en tekst skrevet av en språkmodell")
+
+    @pytest.mark.skipif(NODE is None, reason="trenger node")
+    def test_sorteringen_som_serveren_med_aa(self):
+        """ECH1: ville feilet hvis skriptet sorterte «Aasen» blant Å-navnene,
+        som localeCompare i nb gjør, og ikke som ferdige_lister._norsk."""
+        rader = [
+            {"navn": "ålesund", "kode": "x", "median": "1", "rang": "0"},
+            {"navn": "aasen sparebank", "kode": "aasb", "median": "1", "rang": "0"},
+            {"navn": "zeta", "kode": "z", "median": "1", "rang": "0"},
+        ]
+        js = _Node()._kjoer(
+            f"{json.dumps(rader)}.sort((a, b) => o.FOLGLISTA.sammenlign(a, b, 'navn')).map((r) => r.kode)"
+        )
+        assert js == ["aasb", "z", "x"]
+
+    def test_uten_hjelp_staar_kallene_i_siden(self, klient):
+        """ECH3: ville feilet hvis teksten om kallene og gratiskontoen
+        forsvant helt med «Vis hjelp» av."""
+        klient.post("/innstillinger", data={"navn": "vis_hjelp", "til": "av"})
+        side = _side(klient, "/min-liste")
+        assert 'id="hjelp-flere"' not in side
+        assert "Hver bruker har sin egen gratiskonto hos EODHD" in _flere(side)

@@ -166,7 +166,9 @@ UNDER_TERSKELEN = " eller ".join(str(n) for n in range(STANDARD.terskel))
 # Story 8.26 (gruppens svar 11.11 kl. 18:09, tillegg 5): hvorfor den første
 # knappen i periodevalget heter «Fredag» i demoen. Dagen og datoen fra
 # demodataene (SLUTTDATO), ikke skrevet inn for hånd.
-FOERSTE_KNAPP = "Den første knappen heter etter dagen kursene er fra: «I dag», «I går» eller ukedagen."
+# Gjennomgangen (VG3): uten eksemplene, så vinduene holder seg under 60 ord;
+# «I dag», «I går» og ukedagen står i docs/hjelp.md.
+FOERSTE_KNAPP = "Den første knappen heter etter dagen kursene er fra."
 DEMO_FOERSTE_KNAPP = (
     f"I demoen er det {UKEDAGER[SLUTTDATO.weekday()].lower()} {SLUTTDATO:%d.%m}, den siste dagen med oppdiktede kurser."
 )
@@ -414,8 +416,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "ringen": Hjelpetekst(
             "",
-            f"Ringen rundt tallet er svart ved {terskel} av {ANTALL_SJEKKER} og oransje ved {ANTALL_SJEKKER} "
-            f"av {ANTALL_SJEKKER}. Uten ring: {UNDER_TERSKELEN} av {ANTALL_SJEKKER}.",
+            # Gjennomgangen (VG3): de samme ordene som rammen, så vinduene holder
+            # seg under 60 ord (8.20a). Ringen ved 2 og 3 av 3 står i docs/hjelp.md.
+            f"Uten ring: {UNDER_TERSKELEN} av {ANTALL_SJEKKER}.",
             ((INDEX_MAL, "pille to-av-tre"), (AKSJE_MAL, '"to-av-tre"')),
         ),
         "signalstyrke": Hjelpetekst(
@@ -636,8 +639,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Gjennomgangen (BH16): hvor perioden slutter, og at snittet følger den.
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
             "den første knappen viser siste børsdag. De andre viser endringen i perioden, i fargen og "
-            "snittet, og «Vis dagen» en dag du velger. Ved en periode er rutene like store, fordi volumet "
-            "mot vanlig gjelder én dag. Rammen er signalet siste børsdag.",
+            "snittet, og «Vis dagen» en dag du velger. Ved en periode er rutene like store. "
+            "Rammen er signalet siste børsdag.",
             (
                 (BOERSOMETER, "def vekt("),
                 (MARKEDSOVERSIKT, "def periodeendring("),
@@ -838,8 +841,8 @@ TAVLA_SJEKKENE = "Hver sjekk gir +1, 0 eller -1. Signalstyrken er hvor mange som
 # KI_ANKER er id-en til «Signalet forklart» på aksjesiden (app.KI_ANKER).
 KI_ANKER = "ki-teksten"
 KI_STEGET = (
-    "Teksten er skrevet av en språkmodell og merket «Laget av KI». Den bygger bare på det appen har "
-    "regnet ut. Bryteren slår den av og på."
+    "Med KI på står en tekst skrevet av en språkmodell, merket «Laget av KI». Den bygger bare på det "
+    "appen har regnet ut. Bryteren slår den av og på."
 )
 
 

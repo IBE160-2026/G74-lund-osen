@@ -116,7 +116,15 @@ class TestStegene:
         """Del B: ville feilet hvis omvisningen hadde egne tekster, ikke de
         samme som «Vis meg rundt» i hjelpetekster.py."""
         sider = rundturer()
-        venta = [(side, s.anker, s.tittel, s.tekst) for side in OMVISNINGEN_SIDER for s in sider[side]]
+        # Story 8.26 (tillegg 20): uten stegene som gjentar en side før.
+        from hjelpetekster import GJENTATT_I_OMVISNINGEN
+
+        venta = [
+            (side, s.anker, s.tittel, s.tekst)
+            for side in OMVISNINGEN_SIDER
+            for s in sider[side]
+            if (side, s.anker) not in GJENTATT_I_OMVISNINGEN
+        ]
         assert [(s["side"], s["anker"], s["tittel"], s["tekst"]) for s in omvisningen()] == venta
 
     def test_skriptet_har_knappene_tastaturet_og_rollen(self):
