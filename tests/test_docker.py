@@ -3461,8 +3461,8 @@ class TestReadmeForNybegynnere:
             # Rådets funn 20.10: demoen viser kombinasjonene av de tre sjekkene.
             # Story 3.4h: investorsidene i demoen. Var «... og ki-tekst laget
             # med gemma».
-            # Story 10.10 (spørsmål 6): eksempeltekstene. Var «ki-tekst fra gemma».
-            "alle 10 fargekombinasjonene av de tre sjekkene, eksempeltekster i ki-formene og investorsider",
+            # Story 10.10: eksempeltekstene en stund, og så Gemma igjen etter svaret 11.11 kl. 16:05.
+            "alle 10 fargekombinasjonene av de tre sjekkene, ki-tekst fra gemma og investorsider",
             # Story 8.16: periodene i kursgrafen er flettet.
             # Story 8.20a (del J): «Vis dagen» ved datoen.
             "periodene i kursgrafen med «vis dagen»",

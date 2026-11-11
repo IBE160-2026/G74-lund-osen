@@ -452,32 +452,39 @@ class TestVersjon6:
 
 
 class TestDemoen:
-    """Del D: eksempeltekstene i demoen, merket som før (FR-602)."""
+    """Del D: demotekstene fra Gemma i de nye formene, merket som før (FR-602).
+    Svaret 11.11 kl. 16:05 (spørsmål 6): Gemma, ikke eksempeltekster, og
+    eksempelskriveren er den falske modellen i testene."""
 
-    def test_demotekstene_er_eksempeltekster_i_de_nye_formene(self):
+    def test_demotekstene_er_fra_gemma_i_de_nye_formene(self):
         """Ville feilet hvis demoen hadde tekster med en gammel versjon, uten
-        de nye formene, med tall som er 0, eller merket som Gemma."""
+        de nye formene, med tall som er 0, en tekst som ikke besto, eller en
+        annen modell enn Gemma."""
+        from ki_lokal import MODELL
+
         radene = demo_ki.les_radene(prompt=demo_ki.promptavtrykk())
-        assert radene and all(r.modell == MODELLNAVN and r.besto for r in radene)
+        assert radene and all(r.modell == MODELL and r.besto for r in radene)
         assert all(" 0 " not in r.tekst and " 0." not in r.tekst and " 0," not in r.tekst for r in radene)
         dagen = demo_ki.les_dagsraden(prompt=demo_ki.dagens_promptavtrykk())
-        assert dagen.promptversjon == "dag-2" and dagen.modell == MODELLNAVN and dagen.besto
+        assert dagen.promptversjon == "dag-2" and dagen.modell == MODELL and dagen.besto
         assert "Blant dem var " in dagen.tekst and "I snitt steg " in dagen.tekst
 
-    def test_demotekstene_er_det_skriveren_gir(self, tmp_path):
-        """Ville feilet hvis teksten om dagen i fila var endret for hånd, så
-        den ikke er det eksempelskriveren gir for demodagen."""
+    def test_grunnlaget_er_det_samme_som_den_falske_modellen_faar(self, tmp_path):
+        """Ville feilet hvis grunnlaget eller regelen i fila for dagen var
+        endret, så demoteksten ikke er laget av demodagen slik den er nå."""
         fil = tmp_path / "dagen.json"
         rad = demo_ki.lag_dagsteksten(EksempelModell(), fil=fil, skriv=lambda _: None)
-        assert rad.tekst == demo_ki.les_dagsraden().tekst
-        assert rad.regelen == demo_ki.les_dagsraden().regelen
+        lagret = demo_ki.les_dagsraden()
+        assert demo_ki.avtrykk(rad) == demo_ki.avtrykk(lagret) and rad.regelen == lagret.regelen
+        assert rad.besto and rad.modell == MODELLNAVN
 
-    def test_tekstene_for_aksjene_er_det_skriveren_gir(self, tmp_path):
-        """Gjennomgangen (VG8): ville feilet hvis en av de 13 tekstene i fila
-        ikke var det eksempelskriveren gir for demodagen."""
+    def test_grunnlagene_for_aksjene_er_de_samme(self, tmp_path):
+        """Gjennomgangen (VG8): ville feilet hvis grunnlaget for en av de 13
+        tekstene i fila ikke var det demodagen gir nå."""
         radene = demo_ki.lag_tekstene(EksempelModell(), fil=tmp_path / "tekstene.json", skriv=lambda _: None)
-        lagret = {r.emne.symbol: r.tekst for r in demo_ki.les_radene()}
-        assert {r.emne.symbol: r.tekst for r in radene} == lagret
+        lagret = {r.emne.symbol: demo_ki.avtrykk(r) for r in demo_ki.les_radene()}
+        assert {r.emne.symbol: demo_ki.avtrykk(r) for r in radene} == lagret
+        assert all(r.besto for r in radene)
 
     def test_kommandoen_med_eksempel_starter_ikke_ollama(self, tmp_path, monkeypatch):
         """Gjennomgangen (VG8): ville feilet hvis --eksempel likevel brukte

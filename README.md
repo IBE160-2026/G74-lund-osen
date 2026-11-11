@@ -113,7 +113,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Periodene i kursgrafen med «Vis dagen», sjekkene, justeringsdagene, signaldagene, datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
 - Min liste, med stjernen foran hvert selskap, ferdige lister, egne aksjer og «Innstillinger», og børsometeret som et kart, med knappene
 - KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
-- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, eksempeltekster i KI-formene og investorsider
+- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
 
 **Ekstra, ferdig**
 
