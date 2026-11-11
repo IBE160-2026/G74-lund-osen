@@ -60,6 +60,7 @@ KI_VISNING = "src/ki_visning.py"
 MOENSTRENE = "src/moenstrene.py"
 # Story 2.12: å velge og bytte aksjer.
 VALG = "src/valg.py"
+FERDIGE_LISTER = "src/ferdige_lister.py"
 # Story 10.6: teksten om dagen paa forsiden.
 DAGSGRUNNLAG = "src/dagsgrunnlag.py"
 KI_DAGEN = "src/ki_dagen.py"
@@ -653,6 +654,24 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (VALG, "GRENSE_MNOK = 32.0"),
                 (VALG, "def utenfor_maalingen("),
                 (VALG, "def ta_i_bruk("),
+            ),
+        ),
+        # Story 8.22: hjelpen ved «Følg en aksje», med lista, sorteringen og
+        # merkene, i tre setninger (story 8.0c). Tillegg 3 (svarene 10.11 kl.
+        # 22:44): sorteringen i stedet for forslagene, og at den ikke er en
+        # rangering etter kursen (NFR-06).
+        "foelg_en_aksje": Hjelpetekst(
+            "",
+            "Lista har alle aksjene på Oslo Børs som har en bransje og ikke er i lista di, og bransjen er fast "
+            "for hver aksje, fra kontrollsjekken 10.11, så du velger den ikke selv. «Mest omsatt først» ordner "
+            "etter median omsetning de 3 siste månedene og er ingen rangering etter kursen eller signalet. En "
+            "aksje som ikke er målt, står med «ikke målt ennå», og en som omsettes for under 32 MNOK om dagen, "
+            "eller ikke er målt, merkes «Utenfor målingen» når du velger den.",
+            (
+                (FERDIGE_LISTER, "def foelgbare("),
+                (FERDIGE_LISTER, "def sorter("),
+                (FERDIGE_LISTER, "def bransjen("),
+                (VALG, "GRENSE_MNOK = 32.0"),
             ),
         ),
         # Story 10.6 (utdraget 08.11 §3): hjelpen ved «Børsdagen kort

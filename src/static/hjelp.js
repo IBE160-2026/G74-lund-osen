@@ -189,3 +189,47 @@
   });
   rot.classList.add("hjelpefelt");
 })();
+
+// Story 8.22 (spørsmål 8): søket i «Følg en aksje» mens man skriver. Alle
+// radene står i siden; skriptet skjuler dem som ikke har teksten i tickeren
+// eller navnet (hver for seg, som ferdige_lister.filtrer, gjennomgangen BH5),
+// og sier hvor mange som vises. Uten skriptet gjør knappen «Vis» det samme på
+// serveren. Et klikk på en bransje, en omsetning eller en sortering sender
+// skjemaet; med tastaturet krysser mellomrom av en bransje og flytter
+// piltastene valget uten å laste siden, og «Vis» sender
+// det (gjennomgangen, BH4, ECH2, WCAG 3.2.2). Står her fordi sidene bare har
+// ett skript (8.0f), og gjelder bare siden med lista. Tillegg 3: radene er
+// rader i en tabell, som på oversikten.
+(function () {
+  const felt = document.querySelector("input[data-folgsok]");
+  const lista = document.getElementById("foelgbare");
+  if (!felt || !lista) return;
+  const rader = Array.from(lista.querySelectorAll("tr[data-kode]"));
+  const antall = document.getElementById("antall-vist");
+  const ingen = document.getElementById("ingen-treff");
+  function filtrer() {
+    const tekst = felt.value.trim().toLowerCase();
+    let vist = 0;
+    for (const rad of rader) {
+      const med = !tekst || rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst);
+      rad.hidden = !med;
+      if (med) vist += 1;
+    }
+    if (antall) antall.textContent = String(vist);
+    if (ingen) ingen.hidden = vist > 0;
+  }
+  felt.addEventListener("input", filtrer);
+  let klikk = false;
+  for (const gruppe of felt.form.querySelectorAll("fieldset")) {
+    gruppe.addEventListener("pointerdown", () => {
+      klikk = true;
+    });
+    gruppe.addEventListener("keydown", () => {
+      klikk = false;
+    });
+    gruppe.addEventListener("change", () => {
+      if (klikk) felt.form.submit();
+      klikk = false;
+    });
+  }
+})();

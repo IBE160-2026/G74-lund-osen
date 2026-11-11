@@ -306,7 +306,12 @@ class TestMerkingen:
         """Ville feilet hvis en GET skrev til basen, for eksempel ved å merke
         noe når siden vises."""
         foer = demo_sti().read_bytes()
-        for adresse in ("/", "/min-liste", "/min-liste?vis=alle", "/aksje/KVST"):
+        # Story 8.22 (gjennomgangen, VG6): «Følg en aksje» med filteret, søket og byttet.
+        sidene = ("/", "/min-liste", "/min-liste?vis=alle", "/aksje/KVST", "/folg")
+        sidene += ("/folg?bransje=Kraft&omsetning=ikke&q=x", "/folg?bytt=BRFE", "/folg?kode=HVLK")
+        # Tillegg 3 til 8.22: siden «Er du sikker?» før en ferdig liste.
+        sidene += ("/ferdig-liste?bransje=Energi",)
+        for adresse in sidene:
             assert demo.get(adresse).status_code == 200, adresse
         assert demo_sti().read_bytes() == foer
 

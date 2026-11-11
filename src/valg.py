@@ -12,7 +12,8 @@ Spesifikasjonen er spec-2-12-velge-og-bytte-aksjer.md:
   fila fra malinger.md §40, uten kall (spørsmål 2).
 - Taket er TAK aksjer: lista, pluss ønskene om å følge, minus ønskene om å
   fjerne (spørsmål 5, avgjørelsen 21.10 kl. 16:47).
-- Brukeren velger bransjen blant de 13 (spørsmål 4, svaret 08.11 kl. 11:57).
+- Bransjen er den faste i ferdige_lister.BRANSJE, og brukeren velger den ikke
+  selv (story 8.22, svaret 10.11 kl. 13:38, som erstatter svaret 08.11 kl. 11:57).
 - Omsetningen er den siste målingen i omsetning (2.13). Under GRENSE_MNOK,
   eller ikke målt, er aksjen «Utenfor målingen» (spørsmål 7).
 """
@@ -110,6 +111,38 @@ def kallene(i_lista: int, folg: int, fjern: int) -> tuple[int, int, int]:
     sist = i_lista * KALL_PER_AKSJE + INDEKSKALL
     neste = (i_lista + folg - fjern) * KALL_PER_AKSJE + INDEKSKALL
     return sist, neste, KVOTE - neste
+
+
+@dataclass(frozen=True)
+class SisteHenting:
+    """Story 8.22, tillegg 4 (svaret 10.11 kl. 22:50): dagen for den siste
+    hentingen og seriene som ble lagret den dagen. Hver serie er ett kall,
+    så serier er det minste antallet kall hentingen brukte."""
+
+    dag: date
+    serier: int
+
+
+def siste_henting(tilkobling: sqlite3.Connection) -> SisteHenting | None:
+    """Den siste hentingen, regnet av basen alene: uten kall og uten å lese
+    .env (AD-10). Dagen er den siste i kursserie.hentet og
+    indeksserie.hentet, i Europe/Oslo, og serier er seriene som sist ble
+    hentet den dagen. Kallene var minst så mange (gjennomgangen, BH2, ECH3):
+    et kall som feilet, et nytt forsøk, målingen med bonuskvoten og en serie
+    som ble hentet to ganger samme dag, telles ikke. En verdi som ikke kan
+    leses, hoppes over (ECH4). Feil i basen går til kalleren, som skjuler
+    delen som før. None: ingen henting har lagret en serie."""
+    hentet = []
+    for tabell in ("kursserie", "indeksserie"):
+        for (verdi,) in tilkobling.execute(f"SELECT hentet FROM {tabell}"):
+            try:
+                hentet.append(datetime.fromisoformat(verdi).astimezone(OSLO).date())
+            except (ValueError, TypeError):
+                continue
+    if not hentet:
+        return None
+    dag = max(hentet)
+    return SisteHenting(dag, sum(d == dag for d in hentet))
 
 
 def har_tabellene(tilkobling: sqlite3.Connection) -> bool:
@@ -352,7 +385,15 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
 
     Å følge legger aksjen inn med inn = dato, eller tar den inn igjen (ut blir
     NULL). Gjennomgangen (BH1, VG1): har lista alt TAK aksjer, avvises ønsket
-    med grunnen. Gir linjene til utskriften."""
+    med grunnen. Gir linjene til utskriften.
+
+    Story 8.22 (spørsmål 3): bransjen er den faste i ferdige_lister.BRANSJE
+    når aksjen står der, ikke den i ønsket, og en egen aksje i lista med en
+    annen bransje i aksje får den faste. De 15 og aksjer som er tatt ut,
+    røres ikke. Et ønske om å følge MULTI eller SCOIN avvises (gjennomgangen, ECH4)."""
+    # Inne i funksjonen, fordi ferdige_lister importerer valg.
+    from ferdige_lister import UTE, fast_bransje
+
     linjer: list[str] = []
     dag = dato.isoformat()
     neste = (dato + timedelta(days=1)).isoformat()
@@ -362,6 +403,7 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
             "WHERE tatt_i_bruk IS NULL AND avvist IS NULL ORDER BY handling = 'folg', id"
         ).fetchall()
         for id_, handling, symbol, navn, sektor in ventende:
+            sektor = fast_bransje(symbol) or sektor
             rad = tilkobling.execute("SELECT inn, ut FROM aksje WHERE symbol = ?", (symbol,)).fetchone()
             if handling == FJERN:
                 if rad is None or rad[1] is not None:
@@ -376,6 +418,14 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
                 tilkobling.execute("UPDATE aksje SET ut = ? WHERE symbol = ?", (ut, symbol))
                 linjer.append(f"{symbol} er tatt ut av lista fra {ut}. Det som er lagret, står.")
             else:
+                # Gjennomgangen av 8.22 (ECH4): et ønske fra før 8.22 om å
+                # følge en aksje gruppen har tatt ut, avvises med grunnen.
+                if symbol in UTE:
+                    tilkobling.execute(
+                        "UPDATE oenske SET avvist = ? WHERE id = ?", (f"{dag}: kan ikke følges (story 8.22)", id_)
+                    )
+                    linjer.append(f"{symbol} er ikke tatt inn: aksjen kan ikke følges.")
+                    continue
                 i_lista = tilkobling.execute("SELECT count(*) FROM aksje WHERE ut IS NULL").fetchone()[0]
                 if i_lista >= TAK:
                     tilkobling.execute(
@@ -392,6 +442,12 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
                     tilkobling.execute("UPDATE aksje SET ut = NULL, sektor = ? WHERE symbol = ?", (sektor, symbol))
                 linjer.append(f"{symbol} er tatt inn i lista fra {dag}.")
             tilkobling.execute("UPDATE oenske SET tatt_i_bruk = ? WHERE id = ?", (dag, id_))
+        for symbol in sorted(egne_i_lista(tilkobling)):
+            fast = fast_bransje(symbol)
+            gammel = tilkobling.execute("SELECT sektor FROM aksje WHERE symbol = ?", (symbol,)).fetchone()[0]
+            if fast is not None and fast != gammel:
+                tilkobling.execute("UPDATE aksje SET sektor = ? WHERE symbol = ?", (fast, symbol))
+                linjer.append(f"{symbol} har fått bransjen {fast} fra kontrollsjekken (var {gammel}).")
     return linjer
 
 
