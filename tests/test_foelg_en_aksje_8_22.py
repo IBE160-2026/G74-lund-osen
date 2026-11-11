@@ -66,7 +66,10 @@ class TestLista:
         assert "ikke målt ennå" in rad_c and '<a class="knapp" href="/folg?kode=NYC"' in rad_c
         assert ">Følg</a>" in rad_c
         rad_a = html.split('data-kode="nya" data-navn="ny aksje asa"', 1)[1].split("</tr>", 1)[0]
-        assert 'ca. 50,0 MNOK<span class="fra">målt 22.10</span>' in rad_a and "Utenfor målingen" not in rad_a
+        assert (
+            'ca. 50,0 MNOK<span class="skjult">, </span><span class="fra">målt 22.10</span>' in rad_a
+            and "Utenfor målingen" not in rad_a
+        )
         rad_b = html.split('data-kode="nyb" data-navn="ny b asa"', 1)[1].split("</tr>", 1)[0]
         assert "Utenfor målingen" in rad_b and "</svg>Helse</span>" in rad_b
 
@@ -88,7 +91,9 @@ class TestLista:
         assert celler == ["selskap", "tall omsetning", "valg"]
         selskap = rad.split('<td class="selskap">', 1)[1].split("</td>", 1)[0]
         assert re.fullmatch(
-            r'Ny Aksje ASA<span class="linje">NYA · <svg class="bransjesymbol".*</svg>Kraft</span>', selskap, re.S
+            r'Ny Aksje ASA<span class="skjult">, </span><span class="linje">NYA · <svg class="bransjesymbol".*</svg>Kraft</span>',
+            selskap,
+            re.S,
         )
         assert ">Følg</a></td>" in rad.split('<td class="valg">', 1)[1]
         css = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
@@ -102,6 +107,11 @@ class TestLista:
         assert '<a class="knapp" href="/folg?kode=NYA&amp;bytt=DNB" aria-label="Bytt inn Ny Aksje ASA">' in html
         skjema = html.split('<form class="folgfilter"', 1)[1].split("</form>", 1)[0]
         assert '<input type="hidden" name="bytt" value="DNB">' in skjema
+        # Gjennomgangen (VG11): byttet med flere bransjer og sorteringen.
+        html = _side(klient, "/folg?bytt=DNB&bransje=Kraft&bransje=Helse&sorter=navn")
+        assert _rader(html) == ["NYA", "NYB", "NYC", "NYD"]
+        assert '<th><span class="skjult">Bytt inn</span></th>' in html
+        assert '<input type="radio" name="sorter" value="navn" checked>' in html
 
     def test_hjelpen_ved_spoersmaalstegnet(self, klient):  # noqa: F811
         """Ville feilet hvis «?» manglet, eller hjelpen ikke sa at «Mest omsatt
@@ -165,8 +175,22 @@ class TestFilteret:
         regel = css.split(valgt, 1)[1].split("}", 1)[0]
         assert "background: var(--oransje)" in regel and "gul" not in regel
         assert '.innstillingsbryter[aria-checked="true"] .spor { background: var(--oransje); }' in css
-        merke = css.split(".valgbrikke.valgt::before {", 1)[1].split("}", 1)[0]
+        assert "color: var(--blekk)" in regel
+        # Gjennomgangen (VG1): hakemerket gjelder også de avkryssede, ikke bare «Alle».
+        hele = ":where(.side-oversikt) .valgbrikke:has(input:checked)::before, :where(.side-oversikt) .valgbrikke.valgt::before {"
+        merke = css.split(hele, 1)[1].split("}", 1)[0]
         assert 'content: "✓"' in merke
+        # VG2: boksen er usynlig, men kan nås med tastaturet, og fokus står rundt brikken.
+        boksen = css.split(":where(.side-oversikt) .valgbrikke input {", 1)[1].split("}", 1)[0]
+        assert "opacity: 0" in boksen and "display: none" not in boksen and "visibility" not in boksen
+        fokus = css.split(":where(.side-oversikt) .valgbrikke:has(input:focus-visible),", 1)[1].split("}", 1)[0]
+        assert "outline: 3px solid var(--blekk)" in fokus
+        # VG10, VG12: tabellen får plass ved 390 px, og det valgte synes i høykontrast.
+        assert ":where(.side-oversikt) .folgtabell table { min-width: 0; }" in css
+        assert re.search(
+            r"@media \(forced-colors: active\) \{\s*:where\(\.side-oversikt\) \.valgbrikke:has\(input:checked\)[^}]*Highlight",
+            css,
+        )
 
     def test_maalt_omsetning(self, klient, stier):  # noqa: F811
         """Spørsmål 6: ville feilet hvis «Over 32 MNOK», «Under 32 MNOK» eller
@@ -266,6 +290,26 @@ class TestFunksjonene:
         assert sorter([self.A, self.B, self.C], "bransje") == [self.C, self.A, self.B]
 
 
+def test_hjelpen_sier_sorteringen_og_er_du_sikker():
+    """Gjennomgangen av tillegg 3 (VG6, VG8): ville feilet hvis docs/hjelp.md
+    sa «høyst tre» eller «ordnet etter navnet» igjen, ikke sa at «Mest omsatt
+    først» ikke er en rangering etter kursen, ikke sa hvordan bransjene krysses
+    av med tastaturet, eller ikke nevnte «Er du sikker?»."""
+    hjelp = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+    foelg = hjelp.split("### Hvordan følger jeg andre aksjer?", 1)[1].split("\n### ", 1)[0]
+    for ord_ in (
+        "«Mest omsatt først»",
+        "«A–Å»",
+        "«Bransje»",
+        "ingen rangering etter kursen eller signalet",
+        "mellomrom",
+    ):
+        assert ord_ in foelg, ord_
+    assert "høyst tre" not in foelg and "ordnet etter navnet" not in foelg
+    ferdige = hjelp.split("### Hva er de ferdige listene og filteret?", 1)[1].split("\n### ", 1)[0]
+    assert "«Er du sikker?»" in ferdige and "én knapp per bransje" in ferdige
+
+
 def test_skriptet_filtrerer_paa_det_samme_som_serveren():
     """Spørsmål 8: ville feilet hvis skriptet lette i noe annet enn data-kode
     og data-navn hver for seg (små bokstaver, som serveren lager), ikke
@@ -328,6 +372,48 @@ class TestDemoen:
         assert set(_rader(_side(k, "/folg?omsetning=ikke"))) == {"LYSV", "SKRH", "TNDT", "VKVF"}
         assert _rader(_side(k, "/folg?q=fjord")) == ["FJHE"]
 
+    def test_brikkene_og_det_valgte_i_demoen(self, tmp_path, monkeypatch):
+        """Gjennomgangen (VG3): ville feilet hvis sorteringen, avkrysningen
+        for flere bransjer, «Alle» eller linja om omsetningen ikke sto i
+        demoen, eller «Bransje» ga en annen rekkefølge der."""
+        k = self._klient(tmp_path, monkeypatch)
+        html = _side(k, "/folg?bransje=Kraft&bransje=Helse")
+        for verdi in ("omsatt", "navn", "bransje"):
+            assert f'name="sorter" value="{verdi}"' in html
+        assert '<input type="radio" name="sorter" value="omsatt" checked>' in html
+        for b in ("Helse", "Kraft"):
+            assert f'<input type="checkbox" name="bransje" value="{b}" checked>' in html
+        assert '<a class="valgbrikke" href="/folg">Alle</a>' in html
+        assert "Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet." in html
+        assert _rader(_side(k, "/folg?bransje=Kraft&bransje=Helse&sorter=bransje")) == [
+            "FJHE",
+            "SKRH",
+            "BRKR",
+            "HVLK",
+            "LYSV",
+            "STRM",
+        ]
+
+    def test_de_ferdige_listene_og_er_du_sikker_i_demoen(self, tmp_path, monkeypatch):
+        """Gjennomgangen (VG4): ville feilet hvis demoen ikke hadde én knapp
+        med ikon og antall for hver av de elleve bransjelistene (som hjelpen
+        sier), eller siden «Er du sikker?» manglet aksjene, «Avbryt», «Bruk
+        denne lista» eller demoboksen."""
+        k = self._klient(tmp_path, monkeypatch)
+        min_liste = _side(k, "/min-liste")
+        knappene = re.findall(
+            r'<a class="knapp ferdigknapp" href="(/ferdig-liste\?bransje=[^"]+)"><svg class="bransjesymbol".*?<span class="antall">\d+</span>',
+            min_liste,
+            re.S,
+        )
+        assert len(knappene) == 11
+        assert "ferdige lister for elleve bransjer" in (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        html = _side(k, "/ferdig-liste?bransje=Kraft")
+        assert "Er du sikker?" in html and "Havlys Kraft" in html
+        assert '<a class="knapp" href="/min-liste#ferdige-lister">Avbryt</a>' in html
+        assert "Bruk denne lista</button>" in html
+        assert "Demoen henter ingenting, så lista står som «Venter på henting»." in html
+
     def test_bare_oppdiktede_selskaper_i_demoen(self, tmp_path, monkeypatch):
         """Ville feilet hvis en ekte ticker fra BRANSJE, eller navnet på en av
         de 15 ekte aksjene, sto i «Følg en aksje», de ferdige
@@ -339,6 +425,9 @@ class TestDemoen:
         ekte = set(ferdige_lister.BRANSJE) - oppdiktet
         k = self._klient(tmp_path, monkeypatch)
         sidene = ("/folg", "/folg?bransje=Kraft", "/folg?omsetning=ikke", "/folg?kode=HVLK", "/min-liste", "/")
+        # Gjennomgangen av tillegg 3 (VG5): aksjene i de ferdige listene står på siden «Er du sikker?».
+        sidene += tuple(re.findall(r'href="(/ferdig-liste\?bransje=[^"]+)"', _side(k, "/min-liste")))
+        assert len(sidene) == 6 + 11
         for adresse in sidene:
             html = k.get(adresse).data.decode("utf-8").split("<main>", 1)[1]
             for aksje in AKSJEUNIVERS:

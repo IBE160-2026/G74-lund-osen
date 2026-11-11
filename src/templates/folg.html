@@ -78,8 +78,8 @@
         høyre. #}
     {% macro rad(a) -%}
       <tr class="foelgbar" data-kode="{{ a.kode|lower }}" data-navn="{{ a.navn|lower }}"{% if a.kode not in treff %} hidden{% endif %}>
-        <td class="selskap">{{ a.navn }}<span class="linje">{{ a.kode }} · {{ bransjesymbol(a.bransje) }}{{ a.bransje }}</span></td>
-        <td class="tall omsetning">{% if a.median is not none %}ca. {{ (a.median / mill)|tall('mnok') }} MNOK<span class="fra">{{ 'regnet av kursene til' if a.kursene else 'målt' }} {{ a.dag|dato }}</span>{% if a.utenfor %}<span class="utenformerke">Utenfor målingen</span>{% endif %}{% else %}<span class="ikke-maalt">ikke målt ennå</span>{% endif %}</td>
+        <td class="selskap">{{ a.navn }}<span class="skjult">, </span><span class="linje">{{ a.kode }} · {{ bransjesymbol(a.bransje) }}{{ a.bransje }}</span></td>
+        <td class="tall omsetning">{% if a.median is not none %}ca. {{ (a.median / mill)|tall('mnok') }} MNOK<span class="skjult">, </span><span class="fra">{{ 'regnet av kursene til' if a.kursene else 'målt' }} {{ a.dag|dato }}</span>{% if a.utenfor %}<span class="utenformerke">Utenfor målingen</span>{% endif %}{% else %}<span class="ikke-maalt">ikke målt ennå</span>{% endif %}</td>
         <td class="valg"><a class="knapp" href="/folg?kode={{ a.kode }}{% if gammel %}&amp;bytt={{ gammel.symbol }}{% endif %}" aria-label="{{ 'Bytt inn' if gammel else 'Følg' }} {{ a.navn }}">{{ 'Bytt inn' if gammel else 'Følg' }}</a></td>
       </tr>
     {%- endmacro %}
@@ -108,9 +108,12 @@
         <legend>Sorter</legend>
         {% for verdi, tekst in sorteringer %}<label class="valgbrikke"><input type="radio" name="sorter" value="{{ verdi }}"{% if verdi == valgt_sortering %} checked{% endif %}> {{ tekst }}</label>{% endfor %}
       </fieldset>
+      {#- Gjennomgangen av tillegg 3 (BH11, ECH1): «Vis» også etter brikkene, så
+          tastaturet ikke må gå tilbake forbi alle bransjene. #}
+      <p class="vis-nederst"><button type="submit" class="knapp">Vis</button></p>
     </form>
     <h2 class="alle-tittel">Alle som kan følges{% if valgte_bransjer %} i {{ (valgte_bransjer[:-1]|join(", ") ~ " og " ~ valgte_bransjer[-1]) if valgte_bransjer|length > 1 else valgte_bransjer[0] }}{% endif %}</h2>
-    <p class="antall-vist"><span id="antall-vist">{{ treff|length }}</span> av {{ rader|length }} vises.{% if valgt_sortering == omsatt %} Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet.{% endif %}</p>
+    <p class="antall-vist"><span id="antall-vist">{{ treff|length }}</span> av {{ rader|length }} vises.{% if valgt_sortering == omsatt and rader|selectattr("median")|list %} Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet.{% endif %}</p>
     <div class="tabellboks folgtabell" role="region" aria-label="Aksjene som kan følges" tabindex="0">
     <table>
       <thead>

@@ -159,11 +159,11 @@ class TestErDuSikker:
         setning = re.search(r"<p>(.*?)</p>", delen, re.S).group(1)
         assert (
             setning
-            == "Velger du en bransje, byttes lista di ut med de mest omsatte aksjene i bransjen ved neste henting."
+            == "Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen."
         )
         assert re.search(
             r'<a class="knapp ferdigknapp" href="/ferdig-liste\?bransje=Kraft"><svg class="bransjesymbol".*?</svg>'
-            r'Kraft <span class="antall">2</span></a>',
+            r'Kraft <span class="antall">2</span><span class="skjult"> aksjer</span></a>',
             delen,
             re.S,
         )
@@ -183,6 +183,23 @@ class TestErDuSikker:
         assert '<input type="hidden" name="bransje" value="Kraft">' in skjema
         assert '<a class="knapp" href="/min-liste#ferdige-lister">Avbryt</a>' in skjema
         assert '<button type="submit" class="knapp hoved">Bruk denne lista</button>' in skjema
+
+    def test_en_aksje_og_ingen_som_venter(self, klient, monkeypatch):  # noqa: F811
+        """Gjennomgangen (ECH5, ECH6): ville feilet hvis siden sa «de 1 mest
+        omsatte aksjene», eller at ønskene som venter forsvinner når ingen
+        venter. Med et ønske som venter, står setningen."""
+        import lagring_sqlite
+
+        maal(lagring_sqlite.BASE_STI, [("NYA", 50e6)])
+        monkeypatch.setattr(ferdige_lister, "BRANSJE", {"NYA": "Kraft"})
+        html = klient.get("/ferdig-liste?bransje=Kraft").data.decode("utf-8")
+        assert "Lista di blir den mest omsatte aksjen i " in html and "de 1 mest" not in html
+        assert "Ønskene som venter" not in html
+        assert "<title>Er du sikker? Kraft — OSE Signal</title>" in html
+        l = lager(lagring_sqlite.BASE_STI)
+        l.folg("NYB", "Helse")
+        l._t.close()
+        assert "Ønskene som venter, forsvinner." in klient.get("/ferdig-liste?bransje=Kraft").data.decode("utf-8")
 
     def test_ukjent_bransje_gir_404(self, klient, monkeypatch):  # noqa: F811
         """Ville feilet hvis en bransje uten liste, eller ingen bransje, ga
@@ -210,10 +227,7 @@ class TestSiden:
         assert not re.search(r"NYA</span> <span class=\"utenformerke\">", ferdig)
         # BH3: hva knappen gjør, før den trykkes.
         assert "Lista di blir de 2 mest omsatte aksjene i " in ferdig
-        assert (
-            "Kraft ved neste henting, og 15 aksjer som er i lista nå, fjernes. Ønskene som venter, forsvinner."
-            in ferdig
-        )
+        assert "Kraft ved neste henting, og 15 aksjer som er i lista nå, fjernes." in ferdig
         assert "er ikke et råd om hva du bør følge" in ferdig
         svar = klient.post("/ferdig-liste", data={"bransje": "Kraft"})
         assert svar.status_code == 303

@@ -430,7 +430,7 @@ def foelgbare(
 ) -> list[Foelgbar]:
     """Story 8.22: alle aksjene i lista over Oslo Børs som kan følges, uten
     dem i opptatt (i lista eller venter på å bli fulgt), sortert etter navnet
-    (spørsmål 5, NFR-06). Medianen er den samme som i bransjelistene og
+    (spørsmål 5, NFR-06). Siden sorterer dem med sorter() (tillegg 3). Medianen er den samme som i bransjelistene og
     merket: regnet av kursene for aksjene i medianer (medianene()), ellers
     den siste målingen i omsetning (2.13). Har den siste målingen feil, er
     aksjen ikke målt, som i Valglager.omsetning. Bare lesing."""
@@ -514,7 +514,9 @@ def sorter(rader: list[Foelgbar], sortering: str) -> list[Foelgbar]:
     if sortering == NAVN:
         return sorted(rader, key=lambda a: (_norsk(a.navn), a.kode))
     if sortering == BRANSJEN:
-        return sorted(rader, key=lambda a: (BRANSJENE.index(a.bransje), _norsk(a.navn), a.kode))
+        # Gjennomgangen (BH4): en ukjent bransje sist, ikke en feil.
+        rang = {b: i for i, b in enumerate(BRANSJENE)}
+        return sorted(rader, key=lambda a: (rang.get(a.bransje, len(rang)), _norsk(a.navn), a.kode))
     return sorted(rader, key=lambda a: (a.median is None, -(a.median or 0.0), _norsk(a.navn), a.kode))
 
 

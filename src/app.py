@@ -2353,7 +2353,10 @@ def folg_side():
     # med søket, omsetningen, sorteringen og byttet.
     i_adressen = set(request.args.getlist("bransje"))
     valgte_bransjer = [b for b in valg.BRANSJENE if b in i_adressen]
-    uten_bransjer = urlencode([(k, v) for k, v in request.args.items(multi=True) if k != "bransje"])
+    # Gjennomgangen (ECH4): ikke feil= eller ukjente parametre.
+    uten_bransjer = urlencode(
+        [(k, v) for k, v in request.args.items(multi=True) if k in ("q", "omsetning", "sorter", "bytt")]
+    )
     valgt_omsetning = request.args.get("omsetning") or ""
     if valgt_omsetning not in {v for v, _ in ferdige_lister.OMSETNINGSFILTER}:
         valgt_omsetning = ""

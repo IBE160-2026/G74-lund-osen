@@ -6,13 +6,15 @@
     «Utenfor målingen», hva som fjernes (8.11, BH3) og det åpne tenkte
     kjøpet (8.21). #}
 {% from "_bransjer.html" import bransjesymbol -%}
-{% block tittel %}Er du sikker? — OSE Signal{% endblock %}
+{% block tittel %}Er du sikker? {{ bransje }} — OSE Signal{% endblock %}
 {% block side %}side-oversikt{% endblock %}
 {% block innhold %}
 <section class="bekreft ferdig-bekreft" aria-labelledby="bekreft-tittel">
   <h1 class="overskrift" id="bekreft-tittel">Er du sikker?</h1>
   {%- set ut = egne.lista|rejectattr("symbol", "in", aksjene|map(attribute="symbol")|list)|list %}
-  <p class="foer-knappen">Lista di blir de {{ aksjene|length }} mest omsatte aksjene i {{ bransjesymbol(bransje) }}{{ bransje }} ved neste henting{% if ut %}, og {{ ut|length }} {{ "aksje" if ut|length == 1 else "aksjer" }} som er i lista nå, fjernes{% endif %}. Ønskene som venter, forsvinner.</p>
+  {#- Gjennomgangen (ECH5, ECH6): entall for én aksje, og setningen om
+      ønskene bare når noen venter. #}
+  <p class="foer-knappen">Lista di blir {{ "den mest omsatte aksjen" if aksjene|length == 1 else "de " ~ aksjene|length ~ " mest omsatte aksjene" }} i {{ bransjesymbol(bransje) }}{{ bransje }} ved neste henting{% if ut %}, og {{ ut|length }} {{ "aksje" if ut|length == 1 else "aksjer" }} som er i lista nå, fjernes{% else %}, og ingen av aksjene som er i lista nå, fjernes{% endif %}.{% if egne.ventende %} Ønskene som venter, forsvinner.{% endif %}</p>
   <ol class="ferdig-liste">
     {% for a in aksjene %}<li><span class="navn">{{ a.navn }}</span> <span class="linje">{{ a.symbol }}</span>{% if a.symbol in egne.ferdige_utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}</li>{% endfor %}
   </ol>

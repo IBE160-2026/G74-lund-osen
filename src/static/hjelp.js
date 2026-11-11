@@ -194,8 +194,9 @@
 // radene står i siden; skriptet skjuler dem som ikke har teksten i tickeren
 // eller navnet (hver for seg, som ferdige_lister.filtrer, gjennomgangen BH5),
 // og sier hvor mange som vises. Uten skriptet gjør knappen «Vis» det samme på
-// serveren. Et klikk på en bransje eller en omsetning sender skjemaet; med
-// tastaturet flytter piltastene valget uten å laste siden, og «Vis» sender
+// serveren. Et klikk på en bransje, en omsetning eller en sortering sender
+// skjemaet; med tastaturet krysser mellomrom av en bransje og flytter
+// piltastene valget uten å laste siden, og «Vis» sender
 // det (gjennomgangen, BH4, ECH2, WCAG 3.2.2). Står her fordi sidene bare har
 // ett skript (8.0f), og gjelder bare siden med lista. Tillegg 3: radene er
 // rader i en tabell, som på oversikten.

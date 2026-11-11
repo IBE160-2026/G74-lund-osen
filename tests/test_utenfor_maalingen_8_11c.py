@@ -174,7 +174,9 @@ class TestFoelgSiden:
         assert "omsetning de 3 siste månedene er 0,1 MNOK, regnet av kursene til 22.09." in side
         assert "så den merkes «Utenfor målingen»" in side
         # Tillegg 3 til 8.22: omsetningen står i en egen kolonne, med dagen under.
-        assert 'MNOK<span class="fra">regnet av kursene til 22.09</span>' in _side("/folg?q=DnB")
+        assert 'MNOK<span class="skjult">, </span><span class="fra">regnet av kursene til 22.09</span>' in _side(
+            "/folg?q=DnB"
+        )
 
     def test_dagen_er_aksjens_siste_dag_med_kurser(self, egen):
         """Gjennomgangen (BH1, ECH1, BH10): ville feilet hvis teksten sa den
@@ -189,7 +191,7 @@ class TestFoelgSiden:
         """Del C: ville feilet hvis en aksje appen aldri har hentet, mistet
         målingen fra 2.13 i søket."""
         maal(egen, [("NYB", 40e6)])
-        assert 'ca. 40,0 MNOK<span class="fra">målt 22.10</span>' in _side("/folg?q=NYB")
+        assert 'ca. 40,0 MNOK<span class="skjult">, </span><span class="fra">målt 22.10</span>' in _side("/folg?q=NYB")
 
 
 class TestTeksten:

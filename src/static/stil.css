@@ -1230,8 +1230,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .knapp.hoved { background: var(--blekk); color: var(--hvit); border-color: var(--blekk); }
 :where(.side-oversikt) .demoboks { margin: 14px 0 0; padding: 10px 12px; border: 1px solid var(--strek-2); border-radius: 10px;
                                    color: var(--dempet); font-size: 14px; }
-/* Story 8.22 (gjennomgangen av bildet): 860 px, så en rad med merket «Utenfor målingen» og
-   «Følg» får plass på én linje i forslagskortet. Var 720 px. */
+/* Story 8.22 (gjennomgangen av bildet): 860 px, så tabellen og brikkene får plass. Var 720 px. */
 :where(.side-oversikt) .folg { max-width: 860px; }
 /* Story 8.22: bransjen med symbolet ved aksjen, i tekstfargen og 15 px, som i tabellen. */
 :where(.side-oversikt) .folg .bransjesymbol { width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
@@ -1250,7 +1249,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .valgbrikke:has(input:checked), :where(.side-oversikt) .valgbrikke.valgt {
   background: var(--oransje); color: var(--blekk); border-color: var(--oransje); font-weight: 600; }
 :where(.side-oversikt) .valgbrikke:has(input:checked)::before, :where(.side-oversikt) .valgbrikke.valgt::before {
-  content: "✓"; font-weight: 700; }
+  content: "✓" / ""; font-weight: 700; }
 :where(.side-oversikt) .valgbrikke input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
 :where(.side-oversikt) .valgbrikke:has(input:focus-visible), :where(.side-oversikt) a.valgbrikke:focus-visible {
   outline: 3px solid var(--blekk); outline-offset: 2px; }
@@ -1262,6 +1261,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Tillegg 3 (svarene 10.11 kl. 22:44): radene i samme kort og med samme svarte kolonnerad som
    tabellen på oversikten. Tabellen er smalere enn den, så den får plass ved 390 px. */
 :where(.side-oversikt) .folgtabell { margin: 8px 0; }
+:where(.side-oversikt) .folgfilter .vis-nederst { margin: 0; }
 :where(.side-oversikt) .folgtabell table { min-width: 0; }
 :where(.side-oversikt) .foelgbar[hidden] { display: none; }
 :where(.side-oversikt) .folgtabell td.omsetning { font-weight: 600; }

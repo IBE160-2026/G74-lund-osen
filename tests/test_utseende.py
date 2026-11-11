@@ -249,6 +249,11 @@ def sidene(klient, monkeypatch, demobase):  # noqa: F811 - fikstur fra test_demo
     # sortert, så rammetestene og lenkene prøves på den nye siden.
     sider["min liste i demoen"] = klient.get("/min-liste").data.decode("utf-8")
     sider["alle i min liste"] = klient.get("/min-liste?vis=alle&sorter=kurs&orden=synkende").data.decode("utf-8")
+    # Tillegg 3 til 8.22 (gjennomgangen, VG9, ECH7): «Følg en aksje» og «Er du sikker?».
+    sider["følg i demoen"] = klient.get("/folg?bransje=Kraft&bransje=Helse&sorter=navn").data.decode("utf-8")
+    svar = klient.get("/ferdig-liste?bransje=Energi")
+    assert svar.status_code == 200
+    sider["er du sikker i demoen"] = svar.data.decode("utf-8")
     demo_sti().write_bytes(b"ikke en sqlite-base" * 10)
     svar = klient.get("/")
     assert svar.status_code == 503
@@ -340,6 +345,10 @@ class TestRammen:
                     # Tillegg 3 til 8.22: knappen for hver ferdige liste går til
                     # siden «Er du sikker?» for bransjen.
                     or re.fullmatch(r"/ferdig-liste\?bransje=[A-Za-z%0-9]+", href)
+                    # Tillegg 3: «Følg» på radene, «Alle» med resten av filteret, og
+                    # «Avbryt» tilbake til de ferdige listene.
+                    or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
+                    or href in ("/min-liste#ferdige-lister", "/#dine-egne-aksjer")
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.

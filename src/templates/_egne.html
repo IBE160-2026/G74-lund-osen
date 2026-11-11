@@ -90,7 +90,7 @@
     <li class="kort-steg">
       <span class="stegnummer" aria-hidden="true">3</span>
       <h4>Velg aksjene dine</h4>
-      <p>Start med en bransjeliste, eller følg aksjene én og én, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}. I «Følg en aksje» står alle aksjene på Oslo Børs som kan følges, med bransjen og den målte omsetningen.</p>
+      <p>Start fra en ferdig liste, eller følg aksjene én og én, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}. I «Følg en aksje» står alle aksjene på Oslo Børs som kan følges, med bransjen og den målte omsetningen.</p>
       <ul class="kallene">
         <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
         <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>
@@ -123,10 +123,10 @@
       den. #}
   {% if egne.ferdige %}
   <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Velger du en bransje, byttes lista di ut med de mest omsatte aksjene i bransjen ved neste henting.</p>
+  <p>Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen.</p>
   <ul class="ferdige-knapper">
   {% for bransje, aksjene in egne.ferdige.items() %}
-    <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></a></li>
+    <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
   {% endfor %}
   </ul>
   {% endif %}
