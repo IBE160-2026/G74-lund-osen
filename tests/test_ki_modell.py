@@ -21,9 +21,11 @@ from ki_prompt import (
     PROMPTVERSJON,
     REGLER,
     SAMME_VEI,
+    SETNINGEN_20,
     UTENFOR,
     lag_prompt,
     ordlyd_om_hovedindeksen,
+    setning_om_retningene,
 )
 from kilogg import Emne
 
@@ -92,7 +94,7 @@ AVTRYKK = {
     "5": "822dcd4981bfeb515b8ba470a2b8e29bc7a0982f3a8807050ba406bea46d8dea",
     # Story 10.10: kortere setninger og ingen tall som er 0. Teksten til
     # versjon 5 staar i src/ki_prompt.py paa 059dc10c.
-    "6": "e1eccd2d5ef3ad0fd11d1d75d7b44b6860dcc4f8399bffaa6f8ac79ca115df1d",
+    "6": "616fb2db920cb839c6a0d4429986e6cbb242ee1764cd55056c72d3d9fc943db6",
 }
 
 
@@ -110,6 +112,9 @@ def _promptteksten() -> str:
         + MOTSATT_VEI
         + ORDLYDEN
         + inspect.getsource(ordlyd_om_hovedindeksen)
+        # Story 10.10: setningen om de siste 20 boersdagene.
+        + SETNINGEN_20
+        + inspect.getsource(setning_om_retningene)
     )
 
 
@@ -223,7 +228,7 @@ class TestPrompten:
         avtrykket for 6 ble endret stille eller var det samme som for 5
         (gjennomgangen, VG9)."""
         assert PROMPTVERSJON == "6"
-        assert AVTRYKK["6"] == "e1eccd2d5ef3ad0fd11d1d75d7b44b6860dcc4f8399bffaa6f8ac79ca115df1d"
+        assert AVTRYKK["6"] == "616fb2db920cb839c6a0d4429986e6cbb242ee1764cd55056c72d3d9fc943db6"
         assert AVTRYKK["6"] != AVTRYKK["5"]
 
     def test_modellen_skriver_ikke_om_dagen(self):

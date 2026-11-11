@@ -636,6 +636,8 @@ def _moenstrene(tekst: str, grunnlag: Mapping[str, object]) -> tuple[str, list[s
         # Story 10.10: tall som er 0, tas ikke med (versjon 6).
         if _antall(ord_) == 0:
             return "tall som er 0, tas ikke med"
+        if felt not in grunnlag:
+            return f"grunnlaget har ikke {felt}"
         return None if _antall(ord_) == grunnlag[felt] else f"grunnlaget sier {felt} {grunnlag[felt]}"
 
     def skift(m: re.Match[str]) -> str | None:

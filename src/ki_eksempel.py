@@ -16,6 +16,7 @@ import json
 from collections.abc import Mapping
 
 from ki_modell import Modellsvar
+from ki_prompt import setning_om_retningene
 
 MODELLNAVN = "eksempeltekst"
 TJENESTE = "lokal"
@@ -74,12 +75,10 @@ def tekst_om_aksjen(grunnlag: Mapping[str, object], ordlyd: str | None = None) -
         setninger.append(MERKET)
     if ordlyd:
         setninger.append(ordlyd)
-    if "siste_20_vurdert" in grunnlag:
-        retninger = [f"{ord_} {grunnlag[felt]}" for felt, ord_ in _RETNINGENE if grunnlag.get(felt)]
-        vurdert = grunnlag["siste_20_vurdert"]
-        start = "Av de siste 20 børsdagene" if vurdert == 20 else f"Av de {vurdert} vurderte børsdagene av de siste 20"
-        if retninger:
-            setninger.append(f"{start} var signalet {_og(retninger)}.")
+    # Story 10.10: den ferdige setningen appen gir i prompten (ki_prompt.py).
+    setning = setning_om_retningene(grunnlag)
+    if setning:
+        setninger.append(setning)
     if grunnlag.get("siste_5_samme_vei"):
         setninger.append(
             f"Aksjen gikk samme vei som hovedindeksen {grunnlag['siste_5_samme_vei']} av de "

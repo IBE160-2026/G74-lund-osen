@@ -194,8 +194,8 @@ Regler for teksten:
 - Siden viser kursen, endringen og målingene. Du kan vise til dem, for eksempel «se endringen i tabellen», men ikke gjenta tallene.
 - Om hovedindeksen kan teksten bare bruke setningen etter «Ordlyden om hovedindeksen:» under opplysningene, ordrett og som en egen setning, eller ikke si noe om hovedindeksen. Står det ingen ordlyd, skal teksten ikke si noe om hovedindeksen.
 - Setningene om mønstrene kan likevel si hvor mange dager aksjen gikk samme vei som hovedindeksen, med formen under.
-- Etter sjekkene kommer én kort setning for hvert mønster som står i opplysningene, med tallene derfra. Bruk disse formene og sett inn tallene for feltene i ‹ ›: «Av de ‹siste_20_vurdert› vurderte børsdagene av de siste 20 var signalet positivt ‹siste_20_positiv›, negativt ‹siste_20_negativ›, blandet ‹siste_20_blandet› og uten retning ‹siste_20_ingen›.», «Aksjen gikk samme vei som hovedindeksen ‹siste_5_samme_vei› av de ‹siste_5_kunne_telles› dagene som kunne telles av de siste 5 børsdagene.» og «Den siste måneden skiftet retningen ‹siste_måned_skift› ganger.» Med siste_måned_merke skriver du «minst» foran tallet. Er alle 20 vurdert, begynner setningen «Av de siste 20 børsdagene var signalet …». Skriv aldri navnet på et felt eller tegnene ‹ › i teksten. Står ingen mønstre i opplysningene, skriver du ingen setning om dem.
-- Tall som er 0, tar du ikke med: skriv ikke «positivt 0» eller de andre retningene med 0, og er siste_5_samme_vei eller siste_måned_skift 0, skriver du ikke den setningen.
+- Etter sjekkene kommer én kort setning for hvert mønster som står i opplysningene, med tallene derfra. For de siste 20 børsdagene bruker du setningen etter «Setningen om de siste 20 børsdagene:» under opplysningene, ordrett, når den står der. For de to andre bruker du disse formene og setter inn tallene for feltene i ‹ ›: «Aksjen gikk samme vei som hovedindeksen ‹siste_5_samme_vei› av de ‹siste_5_kunne_telles› dagene som kunne telles av de siste 5 børsdagene.» og «Den siste måneden skiftet retningen ‹siste_måned_skift› ganger.» Med siste_måned_merke skriver du «minst» foran tallet. Skriv aldri navnet på et felt eller tegnene ‹ › i teksten. Står ingen mønstre i opplysningene, skriver du ingen setning om dem.
+- Tall som er 0, tar du ikke med: skriv ikke «positivt 0» eller de andre retningene med 0, og er siste_5_samme_vei eller siste_måned_skift 0, skriver du ikke den setningen. Et felt som er 0, står ikke i opplysningene, og da tar du ikke med den delen av formen.
 - Mønstrene sier bare hva som har skjedd. Ikke si hva de betyr for kursen videre, ikke sammenlign tallene med hverandre, og ikke finn mønstre selv. Ikke bruk ordene «mønster», «tendens», «pleier», «gjentar seg» eller «oftere».
 - Ikke si noe om bransjen, børsen eller hvor mange aksjer som steg eller falt. Appen skriver det selv over teksten.
 - Hovedindeksen og bransjen er ikke en del av regelen. Ikke si at de forklarer signalet.
@@ -225,13 +225,41 @@ def ordlyd_om_hovedindeksen(grunnlag: Mapping[str, object]) -> str | None:
     return SAMME_VEI if aksjen == indeksen else MOTSATT_VEI
 
 
+# Story 10.10: Gemma skrev alle fire retningene i formen for moenster 1, ogsaa
+# med 0 og med tall som ikke sto i opplysningene (11.11). Appen gir derfor
+# setningen ferdig, som ordlyden om hovedindeksen, og kontrollen leser den
+# som foer, tall for tall.
+SETNINGEN_20 = "\nSetningen om de siste 20 børsdagene: {setning}\n"
+_RETNINGSORDENE = (
+    ("siste_20_positiv", "positivt"),
+    ("siste_20_negativ", "negativt"),
+    ("siste_20_blandet", "blandet"),
+    ("siste_20_ingen", "uten retning"),
+)
+
+
+def setning_om_retningene(grunnlag: Mapping[str, object]) -> str | None:
+    """Setningen om retningene de siste 20 boersdagene, med bare retningene
+    som ikke er 0, eller None uten moenster 1."""
+    vurdert = grunnlag.get("siste_20_vurdert")
+    deler = [f"{ord_} {grunnlag[felt]}" for felt, ord_ in _RETNINGSORDENE if grunnlag.get(felt)]
+    if not vurdert or not deler:
+        return None
+    start = "Av de siste 20 børsdagene" if vurdert == 20 else f"Av de {vurdert} vurderte børsdagene av de siste 20"
+    oppramsing = deler[0] if len(deler) == 1 else ", ".join(deler[:-1]) + " og " + deler[-1]
+    return f"{start} var signalet {oppramsing}."
+
+
 def lag_prompt(grunnlag: Mapping[str, object]) -> str:
-    """Reglene, grunnlaget som JSON og ordlyden om hovedindeksen naar den
-    finnes. Ingenting annet kommer med."""
+    """Reglene, grunnlaget som JSON, setningen om de siste 20 boersdagene og
+    ordlyden om hovedindeksen naar de finnes. Ingenting annet kommer med."""
     prompt = REGLER
     if grunnlag.get("merke"):
         prompt += UTENFOR
     prompt += "\nOpplysningene:\n" + json.dumps(dict(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
+    setning = setning_om_retningene(grunnlag)
+    if setning:
+        prompt += SETNINGEN_20.format(setning=setning)
     ordlyd = ordlyd_om_hovedindeksen(grunnlag)
     if ordlyd:
         prompt += ORDLYDEN.format(ordlyd=ordlyd)

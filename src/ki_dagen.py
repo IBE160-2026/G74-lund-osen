@@ -82,7 +82,7 @@ Regler for teksten:
   - «Hovedindeksen steg ‹ukedag›.», «Hovedindeksen falt ‹ukedag›.» eller «Hovedindeksen var uendret ‹ukedag›.», etter feltet hovedindeksen.
   - «‹bedre_enn_indeksen› av ‹med_kurs› aksjer gjorde det bedre enn indeksen.»
   - «‹skilte_seg_ut› skilte seg ut: ‹skilte_seg_ut_positiv› med positiv retning, ‹skilte_seg_ut_negativ› negativ og ‹skilte_seg_ut_blandet› blandet.» Ta bare med retningene som har minst én aksje. Er skilte_seg_ut 0, skriver du «Ingen aksjer skilte seg ut.»
-  - «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹navn› (‹styrke› av 3, ‹retning›).», med alle navnene i skilte_seg_ut_navn, i den rekkefølgen de står, og skrevet som der. Med skilte_seg_ut_andre slutter setningen med «og ‹skilte_seg_ut_andre› andre.»
+  - Om navnene skriver du formen for navnene denne dagen, som står under opplysningene, ordrett og som én setning, når den står der. Den har formen «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹skilte_seg_ut_andre› andre.»
   - «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.», med navnet på bransjen med små bokstaver. Nevn høyst to bransjer.
   - «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.», med navnet på bransjen med små bokstaver.
   - «Det var flere enn vanlig: snittet de siste 20 børsdagene er ‹skilte_seg_ut_vanlig›.», med «flere enn», «færre enn» eller «like mange som» etter feltet skilte_seg_ut_mot_vanlig.
@@ -98,11 +98,34 @@ Regler for teksten:
 """
 
 
+# Story 10.10: Gemma satte punktum foer «og 2 andre» (11.11), saa appen gir
+# setningen med navnene ferdig, som setningen om de siste 20 boersdagene for
+# én aksje. Kontrollen leser den som foer, navn for navn.
+SETNINGEN_NAVN = "\nFormen for navnene denne dagen er «{setning}»\n"
+
+
+def setning_om_navnene(grunnlag: Mapping[str, object]) -> str | None:
+    """«Blant dem var …» med navnene i grunnlaget og resten som antall, eller
+    None uten navn."""
+    deler = [f"{n['navn']} ({n['styrke']} av 3, {n['retning']})" for n in grunnlag.get(NAVNENE) or ()]
+    if not deler:
+        return None
+    if grunnlag.get(ANDRE):
+        deler.append(f"{grunnlag[ANDRE]} andre")
+    oppramsing = deler[0] if len(deler) == 1 else ", ".join(deler[:-1]) + " og " + deler[-1]
+    return f"Blant dem var {oppramsing}."
+
+
 def lag_dagsprompt(grunnlag: Mapping[str, object]) -> str:
-    """Reglene og grunnlaget som JSON. Ingenting annet kommer med."""
-    return (
+    """Reglene, grunnlaget som JSON og setningen med navnene. Ingenting annet
+    kommer med."""
+    prompt = (
         REGLER_DAGEN + "\nOpplysningene:\n" + json.dumps(_vanlig(grunnlag), ensure_ascii=False, sort_keys=True) + "\n"
     )
+    setning = setning_om_navnene(grunnlag)
+    if setning:
+        prompt += SETNINGEN_NAVN.format(setning=setning)
+    return prompt
 
 
 def _vanlig(verdi):

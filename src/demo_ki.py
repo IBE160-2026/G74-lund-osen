@@ -130,6 +130,9 @@ def promptavtrykk() -> str:
         + ki_prompt.MOTSATT_VEI
         + ki_prompt.ORDLYDEN
         + inspect.getsource(ki_prompt.ordlyd_om_hovedindeksen)
+        # Story 10.10: setningen om de siste 20 boersdagene.
+        + ki_prompt.SETNINGEN_20
+        + inspect.getsource(ki_prompt.setning_om_retningene)
     )
     return hashlib.sha256(tekst.encode("utf-8")).hexdigest()
 
@@ -292,6 +295,8 @@ def dagens_promptavtrykk() -> str:
     import ki_dagen
 
     tekst = ki_dagen.REGLER_DAGEN + inspect.getsource(ki_dagen.lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
+    # Story 10.10: setningen om navnene.
+    tekst += ki_dagen.SETNINGEN_NAVN + inspect.getsource(ki_dagen.setning_om_navnene)
     return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 

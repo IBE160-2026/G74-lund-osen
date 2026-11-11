@@ -313,12 +313,14 @@ AVTRYKK = {
     # Story 10.10. Teksten til dag-1 staar i src/ki_dagen.py paa 059dc10c.
     # Tillegget kl. 17:21: tre nye former, og versjonen staar som dag-2, fordi den ikke er
     # flettet. Var f0377e8f....
-    "dag-2": "e3d36a47454c681c7477bd18863edc3324d0d642573025bcc69cc4c41f8217b9",
+    "dag-2": "b087ac4a2426ecdb9cec2e9550d67c7579c7ca29b3d247d510ee102cce82e2c8",
 }
 
 
 def promptens_avtrykk() -> str:
     tekst = REGLER_DAGEN + inspect.getsource(lag_dagsprompt) + inspect.getsource(ki_dagen._vanlig)
+    # Story 10.10: setningen om navnene.
+    tekst += ki_dagen.SETNINGEN_NAVN + inspect.getsource(ki_dagen.setning_om_navnene)
     return hashlib.sha256(tekst.replace("\r\n", "\n").encode("utf-8")).hexdigest()
 
 
@@ -715,8 +717,8 @@ class TestDemoen:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
         side = app_modul.app.test_client().get("/").data.decode("utf-8")
         tekst = les_dagsraden().tekst
-        # Story 10.10 (spoersmaal 6): eksempelteksten, ikke Gemma.
-        assert "Skrevet av eksempeltekst (lokal) da kursene ble hentet." in side
+        # Story 10.10 (svaret 11.11 kl. 16:05): Gemma i demoen.
+        assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
         from ki_visning import prikkede_tall
 
         assert str(prikkede_tall(tekst)) in side and DAGEN_UTEN not in side
