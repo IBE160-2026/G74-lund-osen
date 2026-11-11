@@ -90,6 +90,9 @@ AVTRYKK = {
     # Teksten til
     # versjon 4 staar i src/ki_prompt.py paa 7c55913d.
     "5": "822dcd4981bfeb515b8ba470a2b8e29bc7a0982f3a8807050ba406bea46d8dea",
+    # Story 10.10: kortere setninger og ingen tall som er 0. Teksten til
+    # versjon 5 staar i src/ki_prompt.py paa 059dc10c.
+    "6": "e1eccd2d5ef3ad0fd11d1d75d7b44b6860dcc4f8399bffaa6f8ac79ca115df1d",
 }
 
 
@@ -209,10 +212,17 @@ class TestPrompten:
         """Story 10.9, del E: versjon 4 er flettet, og enhver endring gir
         ny versjon (svaret 25.10 kl. 20:54 b), saa den nye prompten er versjon 5. Ville feilet hvis prompten fikk en annen tekst
         uten ny versjon, eller avtrykket for versjon 5 var det samme som for
-        versjon 4 (FR-605)."""
-        assert PROMPTVERSJON == "5"
+        versjon 4 (FR-605). Story 10.10: versjonen er 6, og avtrykket for 5
+        staar."""
         assert AVTRYKK["5"] == "822dcd4981bfeb515b8ba470a2b8e29bc7a0982f3a8807050ba406bea46d8dea"
         assert AVTRYKK["5"] != AVTRYKK["4"]
+
+    def test_versjon_6(self):
+        """Story 10.10: ose.db har tekster med versjon 5, saa den nye
+        prompten er versjon 6. Ville feilet hvis prompten fikk en annen tekst
+        uten ny versjon, eller avtrykket for 6 var det samme som for 5."""
+        assert PROMPTVERSJON == "6"
+        assert AVTRYKK["6"] != AVTRYKK["5"]
 
     def test_modellen_skriver_ikke_om_dagen(self):
         """Story 10.2i, gruppens svar 5.11 kl. 19:13 og 23:36 (BH6, BH7):
@@ -685,7 +695,8 @@ class TestKontrollen:
     @staticmethod
     def _eksempel(moenster: str) -> str:
         eksempel = re.sub(r"\(\?:([^|)]*)[^)]*\)\??", r"\1", moenster)
-        return eksempel.replace("\\b", "").replace("\\w*", "")
+        # Story 10.10: «følg med» har \s+ mellom ordene.
+        return eksempel.replace("\\b", "").replace("\\w*", "").replace("\\s+", " ")
 
     @pytest.mark.parametrize("moenster", RAAD)
     def test_3_hvert_ord_i_lista_stopper(self, moenster):
