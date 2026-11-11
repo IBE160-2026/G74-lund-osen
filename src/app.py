@@ -1967,6 +1967,15 @@ BOERSDAGEN_ANKER = "boersdagen-kort-fortalt"
 # Periodeknappene og «Velg dag» gaar til kursgrafen, og bryteren til
 # KI-teksten.
 GRAFANKER = "kursgrafen"
+# Story 8.26 (gruppens ønske 11.11 kl. 19:36, tillegg 6): periodevalget på
+# oversikten, i Min liste og på børsometeret holder plassen på samme måte.
+PERIODEANKER = "perioden"
+INNSTILLINGSANKER = {
+    innstillinger.VIS_HJELP: "hjelp-valget",
+    innstillinger.VIS_KI_TEKST: "ki-valget",
+    innstillinger.VIS_NOTATER: "notater-valget",
+}
+app.jinja_env.globals["periodeanker"] = PERIODEANKER
 KI_ANKER = "ki-teksten"
 
 
@@ -2589,7 +2598,8 @@ def lagre_innstilling():
     if not innstillinger.har_tabellen(tilkobling, innstillinger.TABELL[navn]):
         abort(404)
     innstillinger.sett(tilkobling, navn, til == PAA)
-    svar = redirect("/innstillinger", code=303)
+    # Story 8.26 (tillegg 6): tilbake til bryteren, så siden står i ro.
+    svar = redirect("/innstillinger#" + INNSTILLINGSANKER[navn], code=303)
     if navn == innstillinger.VIS_KI_TEKST:
         # Story 8.10b: kapselen også, som bryteren ved teksten.
         svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)

@@ -180,7 +180,9 @@
     {% if valg and vist_tabell %}
       <h2 class="sammenlign-tittel" id="sammenlign-med">Sammenlign siste børsdag med</h2>
       {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
-      <div class="periodehode">{{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign siste børsdag med") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign siste børsdag med", ekstra=[("vis", "alle")] if alle else []) }}</div>
+      {#- Story 8.26 (gruppens ønske 11.11 kl. 19:36, tillegg 6): ankeret
+          holder periodevalget i vinduet etter et trykk, som på aksjesiden (U36). #}
+      <div class="periodehode" id="{{ periodeanker }}">{{ hjelpeknapp("hjelp-sammenlign", "Hjelp: sammenlign siste børsdag med") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Sammenlign siste børsdag med", anker=periodeanker, ekstra=[("vis", "alle")] if alle else []) }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Øverst i hver rad står siste børsdag, {{ siste_dag|ukedag }} {{ siste_dag|dato }}. Linja under er {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen den dagen, endringen derfra til siste børsdag og signalet som er lagret for dagen.</p>
@@ -246,7 +248,8 @@
         sier hva tallene gjelder (gruppens svar 23.10 kl. 12:35, a). #}
     {% if valg %}
       {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
-      <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten", ekstra=[("vis", "min")] if bare_min else []) }}</div>
+      {#- Story 8.26 (tillegg 6): ankeret holder periodevalget i vinduet. #}
+      <div class="periodehode" id="{{ periodeanker }}">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, sidesti, valg.dag, foerste_valgbare, siste_dag, "Periode for oversikten", anker=periodeanker, ekstra=[("vis", "min")] if bare_min else []) }}</div>
       {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
       {% if valg.periode == "velg" %}
         <p class="periodelinje">Tabellen viser {{ valg.dag|ukedag }} {{ valg.dag|dato }}: sluttkursen, endringen den dagen og signalet som er lagret for dagen. En oransje strek og «{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag» viser aksjene som fikk {{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag.</p>

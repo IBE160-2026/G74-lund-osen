@@ -328,6 +328,12 @@ class TestRammen:
                 if href.endswith("#aksjene") and href != "#aksjene":
                     assert re.search(r'(?<![\w-])id="aksjene"', html), (navn, href)
                     href = href.removesuffix("#aksjene")
+                # Story 8.26 (tillegg 6): periodevalget og filteret holder plassen
+                # med et anker, som må finnes på siden.
+                for anker in ("perioden", "filteret"):
+                    if href.endswith("#" + anker) and href != "#" + anker:
+                        assert re.search(rf'(?<![\w-])id="{anker}"', html), (navn, href)
+                        href = href.removesuffix("#" + anker)
                 href = href.replace("?vis=min&amp;", "?").replace("?vis=min", "") or "/"
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (

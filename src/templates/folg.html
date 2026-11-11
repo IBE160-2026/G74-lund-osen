@@ -85,7 +85,10 @@
       </tr>
     {%- endmacro %}
     <p class="antall-folg"><span id="antall-alle">{{ alle|length }}</span> aksjer på {{ 'Demo Børs' if eksempeltall else 'Oslo Børs' }} kan følges. {{ hjelpeknapp("hjelp-folg", "Hjelp: følg en aksje") }}</p>
-    <form class="folgfilter" method="get" action="/folg">
+    {#- Story 8.26 (gruppens ønske 11.11 kl. 19:36, tillegg 6): filteret
+        holder plassen etter et klikk på en brikke, en omsetning eller en
+        sortering, og etter «Vis» og «Alle». #}
+    <form class="folgfilter" id="filteret" method="get" action="/folg#filteret">
       {% if gammel %}<input type="hidden" name="bytt" value="{{ gammel.symbol }}">{% endif %}
       <div class="sok">
         <label for="q">Søk på ticker eller navn</label>
@@ -98,7 +101,7 @@
           lenke som tar bort bransjene. #}
       <fieldset class="bransjefilter">
         <legend>Bransje</legend>
-        <a class="valgbrikke{% if not valgte_bransjer %} valgt{% endif %}" href="{{ alle_bransjer }}"{% if not valgte_bransjer %} aria-current="true"{% endif %}>Alle</a>
+        <a class="valgbrikke{% if not valgte_bransjer %} valgt{% endif %}" href="{{ alle_bransjer }}#filteret"{% if not valgte_bransjer %} aria-current="true"{% endif %}>Alle</a>
         {% for b in bransjene %}<label class="valgbrikke"><input type="checkbox" name="bransje" value="{{ b }}"{% if b in valgte_bransjer %} checked{% endif %}> {{ bransjesymbol(b) }}{{ b }}</label>{% endfor %}
       </fieldset>
       <fieldset class="omsetningsfilter">

@@ -66,7 +66,9 @@
         (designregler §2), i stedet for skjemaet for «Velg dag» fra 8.6. En
         dag uten kurs gir fortsatt børsdagen før. #}
     {#- Gruppens svar 04.11 kl. 10:04: «?» for periodene står først i raden, foran knappene. #}
-    <div class="periodehode">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret", kursdager=kursdager) }}</div>
+    {#- Story 8.26 (gruppens ønske 11.11 kl. 19:36, tillegg 6): ankeret
+        holder periodevalget i vinduet etter et trykk, som på aksjesiden. #}
+    <div class="periodehode" id="{{ periodeanker }}">{{ hjelpeknapp("hjelp-perioden", "Hjelp: periodene") }} {{ periodevalg(knapper, valg.periode, "/boersometer", valg.dag, foerste, siste, "Periode for børsometeret", anker=periodeanker, kursdager=kursdager) }}</div>
     {% if valg.beskjed %}<p class="periodebeskjed" role="status">{{ valg.beskjed }}</p>{% endif %}
     {% if ugyldig %}<p class="forklaring">Datoen kunne ikke leses, så siden viser siste børsdag.</p>{% endif %}
     {% if foer_foerste %}<p class="forklaring">{{ valgt|dato }} er før første kurs, så siden viser første børsdag med kurs, {{ dagen|dato }}.</p>

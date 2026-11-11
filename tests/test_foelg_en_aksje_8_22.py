@@ -160,10 +160,11 @@ class TestFilteret:
         bransje, var merket med en bransje valgt, eller mistet søket,
         omsetningen, sorteringen eller byttet."""
         html = _side(klient)
-        assert '<a class="valgbrikke valgt" href="/folg" aria-current="true">Alle</a>' in html
+        assert '<a class="valgbrikke valgt" href="/folg#filteret" aria-current="true">Alle</a>' in html
         html = _side(klient, "/folg?q=ny&bransje=Kraft&omsetning=over&sorter=navn&bytt=DNB&bransje=Helse")
         assert (
-            '<a class="valgbrikke" href="/folg?q=ny&amp;omsetning=over&amp;sorter=navn&amp;bytt=DNB">Alle</a>' in html
+            '<a class="valgbrikke" href="/folg?q=ny&amp;omsetning=over&amp;sorter=navn&amp;bytt=DNB#filteret">Alle</a>'
+            in html
         )
 
     def test_det_valgte_er_oransje_med_et_merke(self):
@@ -384,7 +385,7 @@ class TestDemoen:
         assert '<input type="radio" name="sorter" value="omsatt" checked>' in html
         for b in ("Helse", "Kraft"):
             assert f'<input type="checkbox" name="bransje" value="{b}" checked>' in html
-        assert '<a class="valgbrikke" href="/folg">Alle</a>' in html
+        assert '<a class="valgbrikke" href="/folg#filteret">Alle</a>' in html
         assert "Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet." in html
         assert _rader(_side(k, "/folg?bransje=Kraft&bransje=Helse&sorter=bransje")) == [
             "FJHE",

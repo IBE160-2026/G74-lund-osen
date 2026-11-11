@@ -620,3 +620,52 @@ class TestOrdeneOmLista:
         monkeypatch.setattr(valg, "TAK", 0)
         side = _side(klient, "/")
         assert f'<p class="full">{valg.FULL}</p>' in side and "Lista er full" not in side
+
+
+# --- 7) Tillegg 6: siden står i ro ved et trykk på en periode ----------------
+
+
+class TestSidenStaarIRo:
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    @pytest.mark.parametrize("sti", ["/", "/?vis=min", "/min-liste?vis=alle", "/boersometer"])
+    def test_periodevalget_har_ankeret(self, versjon, sti, request):
+        """Ønsket kl. 19:36: ville feilet hvis en periode, en pil eller «Vis
+        dagen» på oversikten, i Min liste eller på børsometeret lastet siden
+        uten ankeret, så den hoppet til toppen, eller ankeret ikke fantes."""
+        side = _side(request.getfixturevalue(versjon), sti)
+        valget = side.split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
+        lenkene = re.findall(r'<a (?:class="pil" )?href="([^"]+)"', valget)
+        assert lenkene and all(lenke.endswith("#perioden") for lenke in lenkene), lenkene
+        assert re.search(r'<form method="get" action="[^"#]*#perioden">', valget)
+        assert side.count('id="perioden"') == 1
+        assert re.search(r'<div class="periodehode" id="perioden">', side)
+
+    def test_aksjesiden_holder_plassen_som_foer(self, klient):
+        """8.2a (U36): ville feilet hvis aksjesiden mistet ankeret til
+        kursgrafen."""
+        valget = _side(klient, "/aksje/BRFE").split('<nav class="periodevalg"', 1)[1].split("</nav>", 1)[0]
+        assert all(h.endswith("#kursgrafen") for h in re.findall(r'<a (?:class="pil" )?href="([^"]+)"', valget))
+
+    def test_filteret_i_foelg_en_aksje_holder_plassen(self, klient):
+        """Ville feilet hvis en brikke, en omsetning, en sortering, «Vis»
+        eller «Alle» i «Følg en aksje» lastet siden uten ankeret."""
+        side = _side(klient, "/folg?bransje=Kraft")
+        assert '<form class="folgfilter" id="filteret" method="get" action="/folg#filteret">' in side
+        alle = re.search(r'<a class="valgbrikke[^"]*" href="([^"]+)"[^>]*>Alle</a>', side).group(1)
+        assert alle.endswith("#filteret")
+
+    @pytest.mark.parametrize(
+        "navn, anker", [("vis_hjelp", "hjelp-valget"), ("vis_ki_tekst", "ki-valget"), ("vis_notater", "notater-valget")]
+    )
+    def test_bryterne_i_innstillinger_sender_tilbake_til_bryteren(self, klient, navn, anker):
+        """Ville feilet hvis en bryter i Innstillinger sendte til toppen av
+        siden, eller ankeret ikke fantes."""
+        svar = klient.post("/innstillinger", data={"navn": navn, "til": "av"})
+        assert svar.status_code == 303 and svar.headers["Location"].endswith(f"/innstillinger#{anker}")
+        assert f'id="{anker}"' in _side(klient, "/innstillinger")
+
+    def test_omvisningen_ser_bort_fra_ankeret(self):
+        """Ville feilet hvis omvisningen sammenlignet adressen med ankeret, så
+        den lukket seg etter et trykk på en periode."""
+        skriptet = SKRIPTET.read_text(encoding="utf-8")
+        assert "return window.location.pathname + window.location.search;" in skriptet
