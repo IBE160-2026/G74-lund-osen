@@ -74,7 +74,49 @@ Ikke rettet, lave:
 ## Åpent til gruppen har svart
 
 8. **En snarvei til en annen kopi** (BH2 og ECH4, middels). Pakkes en ny ZIP ut i en ny mappe, starter «OSE Signal» fortsatt den gamle kopien, og den nye spør ikke, fordi snarveien finnes. *Forslag:* slik instruksjonen sier. Snarveien rettes bare når mappen den peker på, er slettet, og installasjonen kan si at man sletter snarveien for å få en ny.
-   *Besvart 2026-11-11 kl. 13:47:* ikke som forslaget. Startskriptet spør om snarveien skal peke hit. Se «Spørsmål 8, slik gruppen svarte».
+   *Besvart 2026-11-11 kl. 13:47:* ikke som forslaget. Startskriptet spør om snarveien skal peke hit. Se «Spørsmål 8, slik gruppen svarte». Ingenting står åpent etter gjennomgangen av svaret.
+
+## Spørsmål 8, slik gruppen svarte (11.11)
+
+Bygget etter svaret kl. 13:47, i `d4dd5382`, og rettet etter gjennomgangen i `f8eaec8f`.
+
+- **Hva skjer:** finnes snarveien og starter den samme startfil i en annen kopi som finnes, sier vinduet hvilken mappe den peker på. Så spør det én gang om den skal starte denne kopien i stedet.
+  - Ja retter snarveien hit, med målet, mappa og ikonet, og nullstiller argumentene.
+  - Nei huskes i data-mappa til denne kopien, i `data\snarvei-nei-flytt-<versjon>`, ved siden av det andre neiet.
+  - En snarvei til en mappe som er slettet, rettes som før.
+  - En snarvei som starter denne kopien, også skrevet med andre store og små bokstaver, gir ikke spørsmålet.
+  - Det gjelder begge snarveiene, og installasjonen sier det med én setning.
+- **Ville feilet hvis:**
+  - en snarvei til en annen kopi ble stående uten spørsmål, vinduet ikke sa mappa, eller ja ikke rettet den hit (`test_en_snarvei_til_en_annen_kopi_ja_flytter_den_hit`, ekte og demo);
+  - nei flyttet snarveien, ble husket i den andre kopien eller ikke ble husket (`…_nei_huskes_i_denne_kopien`);
+  - en snarvei hit ble regnet som en annen kopi (`…_hit_med_andre_store_bokstaver_…`);
+  - installasjonen manglet setningen (`TestDokumentene`).
+- **Mutanten:** en snarvei til en annen kopi som finnes, blir stående uten spørsmål, slik det var før svaret. Den ble fanget av fire tester. Fila var lik før og etter og lik HEAD (sha256).
+
+### Gjennomgangen 11.11 kl. 14:36–14:55 og triagen
+
+Blind Hunter (bare diffen) hadde 7 funn. Edge Case Hunter og Verification Gap (grenen, bare lesing) hadde 5 og 4 funn. Ingen var høye. Rettet i `f8eaec8f`:
+
+- **ECH1 og BH1 (middels):** et nei til å la snarveien starte denne kopien ble husket i samme fil som et nei til å lage den. Ble den andre kopien slettet, ble snarveien død og ble aldri tilbudt på nytt. Neiet har nå sin egen fil, `snarvei-nei-flytt-<versjon>`, og installasjonen sier at man sletter fila som begynner med `snarvei-nei` (test, og mutanten med samme fil ble fanget).
+- **VG1 (middels):** spørsmålet om å starte denne kopien ble aldri prøvd, fordi testene svarer gjennom miljøvariabelen. Spørsmålet skrives nå også da, og teksten prøves for begge spørsmålene. Mutanten uten spørsmålet ble fanget av seks tester.
+- **ECH3 og BH2:** en snarvei med samme navn til noe annet enn startfila, for eksempel en brukeren har laget selv, ble regnet som en annen kopi og kunne overskrives. Nå er bare samme startfil i en annen mappe en annen kopi, og argumentene fra den gamle snarveien nullstilles ved ja (tester).
+- **VG2:** testen for den døde snarveien sjekker at den tilbys som før, uten å si en mappe.
+- **BH5:** testen med store bokstaver sjekker at snarveien faktisk lagret stien slik.
+- **ECH5 og BH7:** regelsetningen etter listene sier «Ekstra, hvis tiden rekker», fordi «Ekstra, ferdig» er ferdig.
+
+Ikke rettet, lave:
+
+- **BH3 og ECH2:** `GetFullPath` gjør ikke om korte 8.3-navn, subst-stasjoner eller junctions, så samme kopi nådd på to måter kan gi spørsmålet. Svarer man nei, huskes det, og ingenting går tapt. Testene bruker lange stier.
+- **BH4:** et ja huskes ikke. Bruker man to kopier vekselvis, spør hver av dem når den andre har snarveien. Det følger av svaret: ja flytter snarveien hit.
+- **ECH4:** en snarvei vi ikke har laget, med en miljøvariabel eller relativ sti, kan regnes som død og tilbys på nytt. Ja overskriver den da, men bare etter spørsmålet.
+- **BH6:** et nei som ikke kan skrives, er prøvd for spørsmålet om å lage snarveien. Spørsmålet om å flytte den bruker de samme linjene.
+- **VG3:** ingen test har en sti som bare `GetFullPath` gjør lik, som en relativ sti.
+- **VG4:** et gammelt nei til å lage snarveien stopper også spørsmålet om å flytte den. Det følger av at et nei huskes. Fila slettes for å bli spurt igjen.
+- **Kosmetisk:** en lang kommentarlinje i toppen av `snarvei.ps1`.
+
+## README-en etter svaret kl. 13:49
+
+`7153b37a`: «Status» har lista «Ekstra, ferdig» rett etter «Ferdig». Den har målingen av omsetningen og notatene, som ikke lenger står under «Ekstra, hvis tiden rekker», og ikonet med snarveien. Brukertesten er flyttet fra «Neste i v1» til setningen om det som er ferdig rundt appen. I `tests/test_docker.py` står kommentarer om svaret og «Ville feilet hvis» for den nye lista: den mangler, står et annet sted, har for mange eller for få punkter, eller et punkt står i en annen liste. Det gjelder også om brukertesten står igjen i en liste.
 
 ## Mutantene
 
