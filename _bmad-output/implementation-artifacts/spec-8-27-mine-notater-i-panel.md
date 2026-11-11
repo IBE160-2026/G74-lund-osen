@@ -101,3 +101,43 @@ Panelet sier i demoen at notatene står til demoen startes på nytt.
 *Venter:* 8.26 bygger om omvisningen og «Vis meg rundt», og var ikke flettet 11.11 kl. 22:21 (main sto på `db89c5ba`). Steget legges inn når 8.26 er flettet og main er flettet inn i grenen, etter forslaget i spørsmål 13. Er 8.26 ikke flettet når resten av 8.27 er grønn, venter steget, og PR-en sier det.
 
 **Ville feilet hvis:** steget manglet i den hele omvisningen eller i «Vis meg rundt» for Min liste, sto med «Notater» av, eller manglet linja om demoen i demoen.
+
+## Gjennomgangen 11.11
+
+Blind Hunter fikk bare diffen for `src/` og `tests/` (`db89c5ba..ad144136`, med panelet som det sto da). Edge Case Hunter og Verification Gap fikk repoet, i samme agent, og leste fram til `a9555a75`. Ingen av dem kjørte noe. Blind Hunter hadde 15 funn, Edge Case Hunter 11 og Verification Gap 10.
+
+**Rettet** i `a9555a75` (Blind Hunter) og `01de7712` (de to andre):
+- BH1 (middels): `#notatpanel` sto igjen i adressen, så panelet åpnet seg igjen etter «Lukk» og en ny lasting. Ankeret tas bort.
+- BH2 (middels): en basefeil mens panelet ble laget, ga 500. Nå står panelet uten notater.
+- BH4 (middels): stien i `tilbake` var dekodet; den kodes igjen.
+- BH5 (middels): «Vis alle» var lukket etter et trykk på et notat under den. Skjemaene der sender `alle=1`.
+- BH7, BH13: testene sjekker svaret, og docstringen sier det testen krever.
+- BH8, BH9, BH11: Esc uten popover i nettleseren, mellomrom som holdes inne, og lagring som er slått av.
+- BH10: panelet heter «Mine notater, panelet» for skjermleseren.
+- BH12: bokstaver med aksent sorteres som bokstaven uten.
+- ECH1 (middels): panelet hadde knapper for kjøp og salg når siden viste en tidligere dag. Nå som i Min liste, med samme linje.
+- ECH3: på siden for en aksje uten kurser sier panelet det, i stedet for å by fram valget.
+- ECH4: Esc lukket både hjelpen og panelet. Nå lytter panelet på vei ned og lukker bare når ingen annen boks er åpen.
+- ECH5: en side fra hurtigbufferen med panelet satt inn, lastes på nytt.
+- ECH6: `tilbake` godtas opp til 2048 tegn.
+- ECH9: fokus går til knappen når panelet skjules.
+- VG1 (høy): fire eldre tester leste hele siden, der panelets `<template>` har de samme notatene. De leser nå siden uten panelet (`_uten_panelet` i `tests/test_notater.py`).
+- VG2, VG3: avgjørelsene i panelet står i `NOTATPANEL` i `hjelp.js` og testes med Node, som omvisningen i 8.25, og reglene for hjelpen over panelet har en test.
+- VG4, VG6, VG7, VG9: nye tester for en tidligere dag, en aksje som er tatt ut eller uten kurser, og `tilbake` ved «Slett».
+
+**Står åpent** til gruppen svarer (regel 25):
+- BH15 og ECH2 (middels): hver side leser alle notatene til panelet, også når det aldri åpnes. Det følger av forslaget i spørsmål 11. Graden er ikke satt ned.
+
+**Ikke rettet, med grunn:**
+- BH3: `tilbake` godtas fra alle skjemaene for notatene, men bare som en sti i appen. Rutene sjekker Origin (`_samme_side`), som de andre skjemaene.
+- BH6: erstattet av testene med Node (VG2).
+- BH14: delen nederst har ingen `<section>` inni seg.
+- ECH7: dagen står i skjemaet («siste dag med kurs for aksjen du velger»), og skjemaet på aksjesiden godtar også en aksje som fjernes i kveld.
+- ECH8: 1056 px er gruppens valg, som for hjelpen (8.0f). Bildene ved 1056 px viser plassen.
+- ECH10: knappen på feilsidene er en lenke, og bryteren kan ikke leses der.
+- ECH11: to like knapper når panelet er åpent ved delen nederst; panelet har eget navn (BH10).
+- VG5, VG8, VG10 (lav): rekkefølgen kommer fra samme funksjon som i Min liste, og sidene i testen er de seks med stripa.
+
+## Bildene i `docs/appen/`
+
+Knappen øverst endrer toppen av hver side, så alle 16 bildene er tatt på nytt fra demoen med DevTools-protokollen i Edge uten vindu, med tilbudet om omvisningen besvart. Metoden ble først prøvd mot `min-liste-demo.png` og `oversikten-topp-demo.png`, som ble byte for byte de samme på main. Ved 1280 px er høydene de samme. Ved 390 px blir tre bilder 52 px høyere (børsometeret, investorsiden og «Følg en aksje»), fordi knappene går over tre rader. *Åpent punkt:* `oversikten-390-demo.png` er 4810 px i repoet, men main målte 4758 px mellom kl. 22:22 og 22:26 (klokka lest før og etter) med samme metode. Med knappen blir oversikten 4810 px.
