@@ -342,6 +342,11 @@ class TestRammen:
                     or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
                     # Story 8.9: stegene i «Vis meg rundt» peker på en id på samme side.
                     or (href.startswith("#") and re.search(rf'(?<![\w-])id="{re.escape(href[1:])}"', html))
+                    # Story 3.6: ikonet i fanen, som finnes i src/static.
+                    or (
+                        href in ("/static/ikon.svg", "/static/ikon-32.png", "/static/ikon-180.png")
+                        and (FONTS.parent / href.removeprefix("/static/")).is_file()
+                    )
                     or re.fullmatch(r"/aksje/[A-Z0-9]+", href)
                     or re.fullmatch(
                         r"/min-liste\?(vis=alle&amp;)?sorter=(selskap|kurs|endring|signal|retning)&amp;orden=(synkende|stigende)",

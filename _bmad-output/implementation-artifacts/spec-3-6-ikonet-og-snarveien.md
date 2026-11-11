@@ -82,3 +82,11 @@ Ikke rettet, lave:
 - `Set-Content` for et nei utenfor `try` (ECH1)
 
 Den sjette, `New-Item` utenfor `try`, overlevde. `New-Item -Force` feiler ikke når `data` er en fil, så det er `Set-Content` som feiler der, og den er fanget. Hver fil var lik før og etter (sha256).
+
+## CI etter gjennomgangen: lenketesten i test_utseende.py (11.11)
+
+Pytest i CI feilet på `ec558aec` kl. 04:23 i `TestRammen::test_hver_lenke_gaar_til_en_side_som_finnes`, med `('tom base', '/static/ikon.svg')`. Kl. 04:29 startet Windows Update maskinen på nytt midt i rettingen, og den ble gjort ferdig 11.11 etter instruksjonen kl. 11:52.
+
+- **Årsaken:** testen går gjennom hver `href` på sidene, også i `<head>`, mot en liste over lovlige adresser. Stilarket står på lista med sitt eget mønster (2.7a). Ikonlenkene fra 3.6 er `<link rel="icon">` og `<link rel="apple-touch-icon">` i `_ramme.html`, og de manglet der. Lenkene i appen er riktige, så rettingen er i testen.
+- **Rettingen:** lista har nå nøyaktig de tre adressene `/static/ikon.svg`, `/static/ikon-32.png` og `/static/ikon-180.png`, og bare når fila finnes i `src/static`. Ingen andre adresser slippes gjennom, og ingen sjekk er tatt bort.
+- **Ville feilet hvis** en side lenket til en annen ikonfil enn de tre, for eksempel `/static/ikon-64.png`, eller hvis en av de tre filene manglet i `src/static`.
