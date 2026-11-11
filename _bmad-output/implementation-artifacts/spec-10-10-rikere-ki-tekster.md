@@ -13,6 +13,12 @@ context:
   - '{project-root}/docs/brukertest.md'
 ---
 
+*Svar 2026-11-11 kl. 16:05 (gruppens svar):* forslagene i spørsmål 1–5 og 7–9 er godtatt som bygget. Demoen skal vise tekster fra Gemma i de nye formene (spørsmål 6), og gruppen ser demotekstene før flettingen. Rådet anbefalte alt.
+
+*Svar 2026-11-11 kl. 17:21 (gruppens svar):* teksten om børsdagen skal si mer, med tre nye deler: hvilke av aksjene i Min liste som skilte seg ut, om flere eller færre enn vanlig skilte seg ut, og hovedindeksen siste uke. Rådet anbefalte de to første, og gruppen valgte også den tredje. Delene står under «Tillegget kl. 17:21», med spørsmål 10–12.
+
+Begge svarene er gjengitt fra instruksjonen kl. 17:41, fordi instruksjonen kl. 16:05 aldri kom til dette vinduet.
+
 Skrevet 11.11 i instruksjonen kl. 11:00, «Rikere KI-tekster». Den ble først gitt 10.11 kl. 16:28 og ble aldri startet. Instruksjonen er kopiert til scratchpad og føres i dagsfila sammen med flettingen, etter gruppens ja. Storyen bygges nå, og spørsmålene under har hvert et forslag som koden bygger på. Gruppen svarer før PR-en flettes (svaret kl. 16:18: ingen fletting før det).
 
 **Svaret 10.11 kl. 16:18** (gruppens svar, gjengitt fra instruksjonen, fordi svaret ikke står andre steder i repoet; slått opp med `git grep` 11.11): teksten om børsdagen får navnene på aksjene som skilte seg ut og retningen deres, og bransjene som steg og falt mest i snitt. Teksten om én aksje får kortere setninger uten tall som er 0. Rådet anbefalte det. Flettingen og føringen i dagsfila og `epics.md` kommer i en egen instruksjon etter gruppens ja.
@@ -156,3 +162,13 @@ Ingen funn står åpent på middels eller over.
 - **Bildene:** alle bildene i `docs/appen/` er tatt på nytt med DevTools-protokollen, fra en demobase i en midlertidig mappe og waitress på en ledig port. Bildet av aksjesiden og oversikten ved 390 px er nye, og oversikten ved 390 px er 4602 px høy (var 4444). De andre er byte for byte de samme.
 - **README-en:** punktene under «Status» har høyst 20 ord (testen i `tests/test_docker.py`), så punktet om KI-teksten om dagen står som før. Punktet om demoen sier «eksempeltekster i KI-formene», ikke «KI-tekst fra Gemma».
 - **Hele settet** i fire deler: 1622 + 1489 + 1304 + 818 = 5233, likt `--collect-only`. Del 1 og 3 ble kjørt på nytt etter rettingene og besto (1599 bestått og 23 hoppet over, og 1304 bestått). Del 1 gikk kl. 11:55–12:02, mens to andre vinduer kjørte pytest. Det skulle ikke skjedd.
+
+## Tillegget kl. 17:21 (instruksjonen kl. 17:41)
+
+Tre nye deler i teksten om børsdagen, etter gruppens svar kl. 17:21. Appen regner ut, modellen skriver i faste former, og kontrollen (FR-603) sjekker hvert tall. Spørsmålene under har hvert et forslag, og koden bygger på forslaget.
+
+10. **Står Min liste i KI-teksten eller som en linje appen skriver?** Min liste kan endres etter at teksten er skrevet, og forsiden viser teksten bare når grunnlaget er det samme som det siden regner ut (FR-607). Med Min liste i grunnlaget ville teksten forsvinne hver gang lista endres. *Forslag:* en linje appen skriver under teksten, av lista slik den er nå, merket «Skrevet av appen.»: «I Min liste skilte Bravo (3 av 3, negativ) og Alfa (2 av 3, positiv) seg ut.» eller «Ingen av aksjene i Min liste skilte seg ut.» Navnene følger de samme reglene som i teksten. Linja står bare når teksten vises og minst én aksje i Min liste er vurdert den dagen (`min_liste_linje` i `src/dagsgrunnlag.py`).
+11. **Hva er «vanlig»?** *Forslag:* snittet av hvor mange som skilte seg ut de 20 børsdagene før dagen, regnet av de lagrede vurderingene. En dag telles bare når minst én aksje i lista er vurdert, og med færre enn 10 slike dager står ikke delen, som for mønster 1. Snittet rundes til et heltall med halve opp, fordi grunnlaget bare har antall (beslutningen 04.10) og kontrollen stopper desimaltall. Sammenligningen bruker det rundede tallet, så teksten aldri sier «flere enn snittet på 3» om 3. Formen: «Det var flere enn vanlig: snittet de siste 20 børsdagene er 3.», med «færre enn» eller «like mange som».
+12. **Hva er «endringen» i hovedindeksen siste uke?** Grunnlaget har ingen prosenter (beslutningen 04.10). *Forslag:* bare retningen, fra sluttkursen fem børsdager før til dagen, slik endringen vises med to desimaler: «De siste fem børsdagene falt hovedindeksen.» Mangler indeksen en av de to dagene, står ikke delen.
+
+Rader med dag-1 sammenlignes fortsatt uten de nye feltene (spørsmål 5). Versjonen står som dag-2, fordi dag-2 ikke er flettet og ingen tekst i `data/db/ose.db` har den. Avtrykket for dag-2 er satt på nytt.
