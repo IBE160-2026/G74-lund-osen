@@ -192,7 +192,8 @@ class TestSiden:
         """Ville feilet hvis KI-teksten sto foer regelforklaringen (V1).
         Story 8.2b, c (U66): etter grafen og foer historikken."""
         skriv_kirad(kirad(aksje))
-        html = side(klient)
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg øverst.
+        html = re.sub(r' data-steg="[^"]*"', "", side(klient))
         assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("Signalet forklart")
         assert html.index("Signalet forklart") < html.index("Signalet dag for dag")
         assert TEKST in html

@@ -531,6 +531,8 @@ class TestForsiden:
         assert "Børsdagen kort fortalt" in side and "Laget av KI" in side
         assert '<span class="tall">1</span> skilte seg ut' in side
         assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg øverst.
+        side = re.sub(r' data-steg="[^"]*"', "", side)
         assert side.index('class="tabell') < side.index("boersdagen-kort-fortalt")
 
     def test_grunnlaget_maa_stemme_med_siden(self, klient):
@@ -665,6 +667,7 @@ class TestHjelpen:
 
     def test_hjelpen_har_ordene_fra_utdraget_i_tre_setninger(self):
         tekst = hjelpetekster()["boersdagen_kort_fortalt"].tekst
+        # Story 8.26 (tillegg 18): høyst tre setninger og 50 ord; begynnelsen står som før.
         assert tekst.startswith("Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI).")
         assert "tall med prikket strek står i det modellen fikk, og den gir ikke råd." in tekst
 

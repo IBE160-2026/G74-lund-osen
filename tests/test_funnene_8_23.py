@@ -387,8 +387,9 @@ class TestTreAvTreDetSisteAaret:
         assert alle_sjekkene_det_siste_aaret(None, date(2026, 10, 9), 3) is None
         assert alle_sjekkene_det_siste_aaret({}, date(2026, 10, 9), 3) is None
         bare_grunn = {date(2026, 10, 8): Grunn.SIGNAL_IKKE_REGNET}
+        # Story 8.26 (tillegg 17): bare grunner er ikke vurdert.
         assert alle_sjekkene_det_siste_aaret(bare_grunn, date(2026, 10, 9), 3) == AlleSjekkene(
-            0, None, date(2026, 10, 8)
+            0, None, date(2026, 10, 8), vurdert=False
         )
 
     def test_aaret_og_grensen(self, monkeypatch):

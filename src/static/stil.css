@@ -1278,7 +1278,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): antallet på hver
    bransje, og en bransje uten aksjer som kan følges, er grå og kan ikke velges. */
 :where(.side-oversikt) .valgbrikke .antall { font-weight: 400; color: var(--dempet); }
-:where(.side-oversikt) .valgbrikke.tom { color: var(--dempet); border-style: dashed; cursor: default; opacity: 0.6; }
+:where(.side-oversikt) .valgbrikke.tom { color: var(--dempet); cursor: default; opacity: 0.55; }
 /* «Vis» skjules av skriptet (hidden), som ellers overstyres av display på .knapp. */
 .folgfilter button[hidden] { display: none; }
 :where(.side-oversikt) .valgbrikke:has(input:focus-visible), :where(.side-oversikt) a.valgbrikke:focus-visible {

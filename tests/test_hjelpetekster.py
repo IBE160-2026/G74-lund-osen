@@ -344,7 +344,8 @@ class TestSidene:
             _side(klient, adresse)
         # Story 8.26 (tillegg 8): teksten om demoen står bare i demoen, som
         # test_vis_meg_rundt_8_26.py viser.
-        assert bedt_om == set(hjelpetekster()) - {"uten_data_demo"}
+        # Story 8.26 (tillegg 5): også setningen om fredag 09.10 står bare i demoen.
+        assert bedt_om == set(hjelpetekster()) - {"uten_data_demo", "foerste_knapp_demo"}
 
     def test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer(self, klient, base):
         """Story 8.0c, den nye delen 2 (godkjent 13.10 kl. 15:36): «?» ved
@@ -440,11 +441,13 @@ class TestSidene:
                 "hjelp-selskap": ["selskap"],
                 "hjelp-sluttkurs": ["sluttkurs"],
                 "hjelp-endring": ["endring", "utbyttejustert"],
-                "hjelp-signalstyrke": ["signalstyrke", "uten_styrke", "ikke_raad"],
+                # Story 8.26 (tillegg 7): «Uten ring» etter signalstyrken.
+                "hjelp-signalstyrke": ["signalstyrke", "ringen", "uten_styrke", "ikke_raad"],
                 "hjelp-retning": ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"],
                 "hjelp-hentet": ["data_hentet", "uten_data"],
                 # Story 8.17a: periodevalget over søylene og tabellen.
-                "hjelp-perioden": ["perioden_oversikten"],
+                # Story 8.26 (tillegg 5): den første knappen.
+                "hjelp-perioden": ["perioden_oversikten", "foerste_knapp"],
                 # Story 2.12: «Dine egne aksjer» under tabellen.
                 "hjelp-egne": ["dine_egne_aksjer"],
                 # Story 10.6: «Børsdagen kort fortalt» under tabellen.
@@ -462,7 +465,7 @@ class TestSidene:
                 # Story 2.9c: den stiplede linja, når basen har indeksen.
                 # Story 8.16: periodene i samme vindu som grafen.
                 "hjelp-graf": ["grafen", "indekslinja", "perioden"],
-                "hjelp-styrke": ["signalstyrke", "ikke_raad_kort"],
+                "hjelp-styrke": ["signalstyrke", "ringen", "ikke_raad_kort"],
                 "hjelp-retning-aksje": [
                     "retning_aksje",
                     "positiv_aksje",
@@ -494,7 +497,8 @@ class TestSidene:
         om styrken. Det er fortsatt fem kolonner (FR-101)."""
         html = _side(klient, "/")
         assert re.search(
-            r'<th class="tall"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
+            # Story 8.26 (tillegg 18): kolonnen har id-en omvisningen merker.
+            r'<th class="tall" id="kolonne-signal"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
             r'<button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>',
             html,
         )

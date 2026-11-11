@@ -96,9 +96,7 @@ Til faglærer:
 4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
 5. **Lukk vinduet** for å stoppe appen.
 
-**Omvisningen:** første gang tilbyr appen en omvisning av de seks sidene, som du kan spille av igjen med «Spill av omvisningen» øverst, og «Vis meg rundt» viser siden du står på.
-
-**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
+**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen. Første gang tilbyr appen en omvisning av seks av sidene, som du kan spille av igjen med «Spill av omvisningen» øverst, og «Vis meg rundt» viser siden du står på. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
 
 <a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
 
@@ -123,7 +121,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - Egne notater på aksjesiden, med tenkte kjøp og salg
 - Ikonet i fanen og snarveien på skrivebordet i Windows, også for demoen
 - Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
-- «Spill av omvisningen» og «Vis meg rundt» øverst på sidene: omvisningen av seks sider, ett steg om gangen og med tilbudet første gang, og stegene for siden du står på
+- «Spill av omvisningen» gjennom seks av sidene, og «Vis meg rundt» for siden du står på
 
 **Neste i v1**
 

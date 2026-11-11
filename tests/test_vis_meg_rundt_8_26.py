@@ -1296,11 +1296,14 @@ class TestOmvisningenUtenGjentakelser:
 class TestReadmeOmvisningen:
     def test_setningen_etter_dobbeltklikket(self):
         """Ville feilet hvis «Kom i gang» ikke sa rett etter dobbeltklikket at
-        appen tilbyr omvisningen, «Spill av omvisningen» og «Vis meg rundt»."""
+        appen tilbyr omvisningen, «Spill av omvisningen» og «Vis meg rundt».
+        Setningen står i avsnittet «Første gang», fordi «Kom i gang» har fem
+        avsnitt (3.5i)."""
         readme = (ROT / "README.md").read_text(encoding="utf-8")
         etter = readme[readme.index("5. **Lukk vinduet** for å stoppe appen.") :]
         neste = etter.split("\n\n", 2)[1]
-        assert neste.startswith("**Omvisningen:** første gang tilbyr appen en omvisning")
+        assert neste.startswith("**Første gang**")
+        assert "Første gang tilbyr appen en omvisning av seks av sidene" in neste
         assert "«Spill av omvisningen» øverst" in neste and "«Vis meg rundt» viser siden du står på" in neste
 
     def test_linja_under_ekstra(self):
@@ -1308,7 +1311,7 @@ class TestReadmeOmvisningen:
         «Vis meg rundt»», som før knappene kom i raden øverst."""
         readme = (ROT / "README.md").read_text(encoding="utf-8")
         assert "«Spill av omvisningen» ved «Vis meg rundt»" not in readme
-        assert "- «Spill av omvisningen» og «Vis meg rundt» øverst på sidene:" in readme
+        assert "- «Spill av omvisningen» gjennom seks av sidene, og «Vis meg rundt» for siden du står på" in readme
 
 
 # Tillegg 5 (gruppens svar 11.11 kl. 18:09): den første knappen i periodevalget.

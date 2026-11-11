@@ -2461,7 +2461,8 @@ class TestStory815Sortering:
         ) == [("descending", "endring", "stigende")]
         stigende = self._side(tabell, "/?sorter=retning&orden=stigende")
         assert re.search(
-            r'<th aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende#aksjene">',
+            # Story 8.26 (tillegg 18): kolonnen har id-en omvisningen merker.
+            r'<th id="kolonne-retning" aria-sort="ascending"><a class="sorter valgt" href="/\?sorter=retning&amp;orden=synkende#aksjene">',
             stigende,
         )
 

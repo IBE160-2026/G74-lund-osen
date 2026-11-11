@@ -284,10 +284,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # viser linja.
         "soeylene": Hjelpetekst(
             "Søylene:",
-            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "endringen for hver aksje, fra størst fall til størst stigning. "
+            # Story 8.26 (tillegg 18): høyst 50 ord og høyst tre setninger (8.0c).
             # Gruppens svar 04.11 kl. 09:58: lys og mørk, som i børsometeret.
-            f"En søyle er mørk fra {soeylegrense} opp eller ned, som i børsometeret. "
+            f"endringen for hver aksje, fra størst fall til størst stigning, mørk fra {soeylegrense} opp eller ned. "
             # Gjennomgangen av 8.2b (VG2): grå ved 0,00 % står igjen.
             "Den stiplede linja er indeksen: grønn når den steg, rød når den falt, grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
@@ -326,7 +325,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Story 8.2b, b (U16): det som er tatt ut av ingressen.
             # Story 8.20a (del E): hoeyst 60 ord. Pilene staar ved maaneden.
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "det appen skrev om aksjen hver børsdag. Det regnes aldri på nytt. "
+            "det appen skrev om aksjen hver børsdag, aldri regnet på nytt. "
             f"Uka og måneden teller dagene med signalstyrke {terskel} eller mer, og "
             f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} har ring. "
             "Klikk på en dag med kurs for å se hele siden for den dagen.",
@@ -605,10 +604,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "perioden_oversikten": Hjelpetekst(
             "Periodene:",
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "den første knappen viser siste børsdag. De andre viser endringen fra den første kursen i "
-            "perioden til siste børsdag, og sluttkursen og signalet gjelder siste børsdag. "
-            "«Vis dagen» viser en dag du velger, med signalet som er lagret for den. "
-            "Søylene følger samme periode eller dag.",
+            "den første knappen viser siste børsdag, og de andre endringen fra den første kursen i "
+            "perioden til siste børsdag. «Vis dagen» viser en dag du velger, med signalet som er lagret "
+            "for den. Søylene følger samme periode eller dag.",
             (
                 (PERIODER, "def startdag("),
                 (PERIODER, "def foerste_kursdag("),
@@ -638,7 +636,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Story 8.20b (U95): teksten fra utkastet i spesifikasjonen for 8.20.
             # Gjennomgangen (BH16): hvor perioden slutter, og at snittet følger den.
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "den første knappen viser siste børsdag. De andre viser endringen i perioden, i fargen og "
+            "den første knappen viser siste børsdag, de andre endringen i perioden, i fargen og "
             "snittet, og «Vis dagen» en dag du velger. Ved en periode er rutene like store. "
             "Rammen er signalet siste børsdag.",
             (
@@ -694,9 +692,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "",
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
             "Først skriver appen hvor lenge signalet har vært slik, og hva hovedindeksen, bransjen og lista "
-            "gjorde samme dag. Med KI på kommer en tekst fra en språkmodell, merket «Laget av KI». "
-            "Den fikk bare det appen har regnet ut, aldri kurser eller volumer. "
-            "Tall med prikket strek er sjekket.",
+            "gjorde samme dag. Med KI på kommer en tekst fra en språkmodell, merket «Laget av KI», som "
+            "bare fikk det appen har regnet ut, aldri kurser, prosenter eller volumer. Tall med prikket strek er sjekket.",
             (
                 (DAGENE, "def setning_om_dagene("),
                 (DAGENE, "def setning_om_samme_dag("),
@@ -741,10 +738,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "dine_egne_aksjer": Hjelpetekst(
             "",
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "Appen følger opptil 18 aksjer. «Følg» gir stjerne, og aksjen står i tabellen merket «Egen». "
-            "Den hentes ved neste henting om kvelden og bruker da 1 kall om dagen. "
-            "Signalet er målt på aksjer som omsettes for over 32 MNOK om dagen. "
-            "Andre merkes «Utenfor målingen».",
+            "Appen følger opptil 18 aksjer. «Følg» gir stjerne og merket «Egen», og aksjen hentes ved "
+            "neste henting om kvelden og bruker da 1 kall om dagen. Signalet er målt på aksjer som omsettes "
+            "for over 32 MNOK om dagen, og andre merkes «Utenfor målingen».",
             (
                 (VALG, "TAK = 18"),
                 (VALG, "GRENSE_MNOK = 32.0"),
@@ -759,7 +755,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "foelg_en_aksje": Hjelpetekst(
             "",
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "Lista har aksjene på Oslo Børs med en bransje som appen ikke følger. Tallet på en bransje er "
+            "Lista har aksjene på Oslo Børs med en bransje som appen ikke følger, og tallet på en bransje er "
             "hvor mange som kan følges. «Mest omsatt først» ordner etter median omsetning de 3 siste "
             "månedene, ikke etter signalet. Under 32 MNOK om dagen, eller ikke målt, merkes «Utenfor målingen».",
             (
@@ -775,9 +771,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         "boersdagen_kort_fortalt": Hjelpetekst(
             "",
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "Et kort sammendrag av børsdagen, skrevet av en språkmodell og merket «Laget av KI». Modellen fikk "
-            "bare det appen regnet ut, som hovedindeksen og bransjene som steg og falt mest. Ingen kurser "
-            "eller nyheter. Tall med prikket strek er sjekket. Linja om Min liste skriver appen selv.",
+            # Setningen fra «Modellen fikk» til «nyheter.» står ordrett i docs/hjelp.md (test_ki_dagen).
+            "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). "
+            "Modellen fikk bare det appen regnet ut: hovedindeksen, aksjene som skilte seg ut og bransjene, "
+            # Ordene fra utdraget 08.11 §3; linja om Min liste sier selv «Skrevet av appen».
+            "ingen kurser eller nyheter. Teksten sjekkes før den vises: tall med prikket strek står i det "
+            "modellen fikk, og den gir ikke råd.",
             (
                 (DAGSGRUNNLAG, "def dagsgrunnlag("),
                 (DAGSGRUNNLAG, "Ingen kurs, prosent, volum eller forholdstall"),

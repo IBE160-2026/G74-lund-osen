@@ -86,7 +86,8 @@ class TestLista:
         hode = boksen.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert re.findall(r"<th[^>]*>", hode) == ["<th>", '<th class="tall">', "<th>"]
         assert ">Selskap</th>" in hode and ">Omsetning<span" in hode
-        rad = boksen.split('data-kode="nya" data-navn="ny aksje asa">', 1)[1].split("</tr>", 1)[0]
+        # Story 8.26 (tillegg 17): raden har flere data- for skriptet etter navnet.
+        rad = boksen.split('data-kode="nya" data-navn="ny aksje asa"', 1)[1].split(">", 1)[1].split("</tr>", 1)[0]
         celler = re.findall(r'<td class="([^"]+)">', rad)
         assert celler == ["selskap", "tall omsetning", "valg"]
         selskap = rad.split('<td class="selskap">', 1)[1].split("</td>", 1)[0]
@@ -118,7 +119,8 @@ class TestLista:
         først» ikke er en rangering etter kursen (tillegg 3, NFR-06)."""
         html = _side(klient)
         assert 'popovertarget="hjelp-folg"' in html and '<div id="hjelp-folg" class="hjelpevindu" popover>' in html
-        assert "ingen rangering etter kursen eller signalet" in html.split('<div id="hjelp-folg"', 1)[1]
+        # Story 8.26 (tillegg 18): teksten er kortet til «ikke etter signalet».
+        assert "ikke etter signalet" in html.split('<div id="hjelp-folg"', 1)[1]
 
 
 class TestFilteret:
