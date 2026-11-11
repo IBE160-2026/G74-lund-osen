@@ -2,7 +2,7 @@
 title: "Utdrag fra designtavla til story 8.0d"
 status: aktiv
 created: 2026-10-13
-updated: 2026-10-13T23:18
+updated: 2026-11-10T22:04
 ---
 
 # Utdrag fra designtavla til story 8.0d
@@ -159,6 +159,7 @@ Oversikten på tavla, ovenfra:
 2. Overskriften, innledningen og «3 av 3»-linja, med «Slik leser du tabellen» til høyre (8.0e PR 2).
 3. Hovedindeksen med søylene (2.9 og 2.9b, ikke 8.0d).
 4. «Aksjene» med antallet og valget mellom Alle og Min liste (8.3 og 8.11, ikke 8.0d).
+   *Rettet 2026-11-10 (story 8.23, tillegg 2, gruppens svar kl. 14:53 og 14:59):* valget filtrerer tabellen på oversikten der man står, og beholder perioden og sorteringen, som valget på siden Min liste. Knappen «Min liste» i stripa går til siden.
 5. Tabellen (8.0e og §5).
 6. «Dine egne aksjer» og «Følg en aksje» (2.12, ikke 8.0d).
 7. «Børsdagen kort fortalt» med KI-teksten (10.6, ikke 8.0d).

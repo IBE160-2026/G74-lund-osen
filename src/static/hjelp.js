@@ -87,6 +87,14 @@
     // alt åpent fra en annen knapp, gir «show» ingen toggle, så feltet
     // flyttes hit her.
     const felt = knapp.popoverTargetElement;
+    // Story 8.23 (A3, brukertesten 10.11): et nytt trykk på samme «?» lukker
+    // hjelpen. Knappen har action «show», så klikket stoppes her, og feltet
+    // lukkes som med «Lukk».
+    if (felt && felt.matches(":popover-open") && forrige === knapp) {
+      e.preventDefault();
+      felt.hidePopover();
+      return;
+    }
     if (felt && felt.matches(":popover-open") && forrige !== knapp) {
       lagPlassen(felt, knapp);
       hoeyde(felt);

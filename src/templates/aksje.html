@@ -106,7 +106,7 @@
         signalet ble …» (spørsmål 2 i 8.20). #}
     <div class="sjekkort-rad">
       {% for sjekk in detalj.sjekker %}
-        <section class="sjekkort{% if sjekk.bidro %} bidro{% endif %}" aria-label="Sjekk {{ sjekk.nummer }}: {{ sjekk.navn }}">
+        <section class="sjekkort {{ sjekk.klasse }}{% if sjekk.bidro %} bidro{% endif %}" aria-label="Sjekk {{ sjekk.nummer }}: {{ sjekk.navn }}">
           <div class="topp">
             <span>Sjekk {{ sjekk.nummer }}</span>
             <span class="ga">Ga
@@ -302,6 +302,11 @@
       {% endfor %}
 
       <figcaption>
+        {#- Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): først en kort
+            forklaring i vanlig størrelse av linjene og tegnene, og detaljene bak
+            «Mer om grafen», med de samme setningene som før. #}
+        <p class="graf-kort">{% if graf.har_ma50 %}Linjene er kursen og {{ parametre.ma_vindu }}-dagers snittet{% else %}Linja er kursen{% endif %}{% if graf.har_indeks %}, og den stiplede er hovedindeksen{% endif %}.{% if signal_fra and graf.signaldager %} Prikkene er dager med signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% if graf.baand and graf.volumfelt %} Båndet og søylene viser sjekk 2 og 3.{% elif graf.baand %} Båndet viser sjekk 2.{% elif graf.volumfelt %} Søylene viser sjekk 3.{% endif %}{% if graf.justeringsdager %} De korte strekene nederst er justeringsdager.{% endif %}</p>
+        <details class="mer-om-grafen"><summary>Mer om grafen</summary><p>
         {{ graf.forste_dato|dato }} til {{ graf.siste_dato|dato }}.
         {#- FR-201: 1 år, og de andre periodene, viser bare det serien har. #}
         {% if kort_serie %}Kursserien begynner {{ serien_begynner|dato }}, så grafen viser bare det den har.{% endif %}
@@ -332,6 +337,7 @@
         {% else %}
         <span class="indeksforklaring">Hovedindeksen mangler for perioden, så den er ikke tegnet.</span>
         {% endif %}
+        </p></details>
       </figcaption>
     </figure>
   {% else %}
@@ -458,6 +464,10 @@
     {#- Story 8.2b, b (U16): ingressen er kort, og resten står i hjelpen ved
         «?» (gjennomgangen, BH4: tallene teller terskelen, som oversikten). #}
     <p class="ingress">Det appen skrev om {{ detalj.aksje.navn }} hver børsdag, eller hvorfor det mangler. Velg en dag med kurs for å se hele siden for den dagen.</p>
+    {#- Story 8.23 (tillegg 2): hvor ofte aksjen fikk 3 av 3 det siste året, og
+        sist. Er serien kortere enn et år, står «siden» og den første dagen.
+        Bare antall og datoer (NFR-06). #}
+    {% if alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}.</p>{% endif %}
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>

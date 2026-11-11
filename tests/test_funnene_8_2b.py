@@ -439,11 +439,15 @@ def test_oversikten_har_aksjene_med_antallet_og_valget(klient):
     html = _html(klient, "/?periode=1-uke")
     topp = html.split('<div class="aksjetopp">', 1)[1].split("</nav>", 1)[0]
     assert re.search(r'<h2 class="aksjetittel">Aksjene <span class="antall">15</span></h2>', topp)
+    # Story 8.23 (tillegg 2, B7): «Min liste» filtrerer tabellen på
+    # oversikten (?vis=min), og begge lenkene går til tabellen.
     assert re.search(
-        r'<a class="visknapp" href="/\?periode=1-uke" aria-current="true">Alle <span class="antall">15</span></a>', topp
+        r'<a class="visknapp" href="/\?periode=1-uke#aksjene" aria-current="true">Alle <span class="antall">15</span></a>',
+        topp,
     )
     assert re.search(
-        r'<a class="visknapp" href="/min-liste\?periode=1-uke">Min liste <span class="antall">5</span></a>', topp
+        r'<a class="visknapp" href="/\?vis=min&amp;periode=1-uke#aksjene">Min liste <span class="antall">5</span></a>',
+        topp,
     )
     assert html.index('<div class="aksjetopp">') < html.index('class="tabellboks"')
     assert html.index('<section class="hovedindeks"') < html.index('<div class="aksjetopp">')
@@ -460,8 +464,11 @@ def test_min_liste_har_tittelen_med_antallet(klient):
     assert topp.index("<h1") < topp.index('<nav class="visvalg"')
     assert "justify-content: space-between" in _regel(".listetopp, :where(.side-oversikt) .aksjetopp")
     # Ville feilet hvis tittelen talte en aksje som ikke er merket: under
-    # «Alle» står alle sju som skilte seg ut (mutanten Md1).
-    assert "<mark>3 av 5 i Min liste</mark>" in _html(klient, "/min-liste?vis=alle")
+    # «Alle» står alle sju som skilte seg ut (mutanten Md1). Story 8.23
+    # (tillegg 1): med «Alle» sier tittelen begge tallene.
+    assert '<h1 class="overskrift"><mark>7 av 15</mark> skilte seg ut fredag, 3 av dem i Min liste</h1>' in _html(
+        klient, "/min-liste?vis=alle"
+    )
     _merk(klient, "BRFE", "fjern", "/min-liste")
     assert "<mark>2 av 4 i Min liste</mark>" in _html(klient, "/min-liste")
     for symbol in demo.MERKET_I_DEMOEN:
@@ -516,8 +523,9 @@ def test_valget_paa_oversikten_beholder_sorteringen(klient):
     """BH7, ECH7. Ville feilet hvis «Alle» eller «Min liste» mistet
     sorteringen."""
     topp = _html(klient, "/?sorter=kurs&orden=stigende").split('<div class="aksjetopp">', 1)[1].split("</nav>", 1)[0]
-    assert 'href="/?sorter=kurs&amp;orden=stigende" aria-current="true">Alle' in topp
-    assert 'href="/min-liste?sorter=kurs&amp;orden=stigende">Min liste' in topp
+    assert 'href="/?sorter=kurs&amp;orden=stigende#aksjene" aria-current="true">Alle' in topp
+    # Story 8.23 (tillegg 2, B7): «Min liste» filtrerer på oversikten.
+    assert 'href="/?vis=min&amp;sorter=kurs&amp;orden=stigende#aksjene">Min liste' in topp
 
 
 def test_de_nye_radene_brytes_paa_smal_skjerm():
@@ -974,6 +982,8 @@ def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
     assert len(ruter) == 15
     uten_styrke = 0
     for symbol, rute in ruter.items():
+        # Story 8.23 (A4): lappen (title) gjentar styrken; testen teller teksten i ruta.
+        rute = re.sub(r' title="[^"]*"', "", rute)
         if "uten-data" in re.search(r'<a class="rute ([^"]*)"', rute).group(1).split():
             assert "ikke vurdert" not in rute and "styrke" not in rute, (adresse, symbol)
             assert '<span class="endring">Uten data</span>' in rute

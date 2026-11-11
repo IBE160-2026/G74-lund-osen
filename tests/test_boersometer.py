@@ -236,11 +236,13 @@ class TestStoerrelsen:
 class TestVolumtallet:
     @pytest.mark.parametrize(
         ("forhold", "vist"),
-        [(1.4996, "1,4996"), (1.5004, "1,5004"), (1.5, "1,50"), (0.998, "0,998"), (2.0, "2,00")],
+        [(1.4996, "1,50"), (1.5004, "1,51"), (1.5, "1,50"), (0.998, "0,99"), (1.0004, "1,00"), (2.0, "2,00")],
     )
     def test_tallet_skilles_fra_grensene(self, forhold, vist):
         """Gjennomgangen (BH2, ECH4): ville feilet med «1,50 (vanlig)» og
-        «1,50 (høyt)» ved siden av hverandre, eller «1,00 (lavt)»."""
+        «1,50 (høyt)» ved siden av hverandre, eller «1,00 (lavt)». Story 8.23
+        (A4, brukertesten 10.11): alltid to desimaler, og et tall like ved en
+        grense rundes mot siden det står på."""
         assert vis_volumforhold(forhold) == vist
 
 
@@ -511,7 +513,8 @@ class TestSiden:
         """Ville feilet hvis MTFJ, uten kurser, sto uten merket."""
         html = _side(klient)
         rute = re.search(
-            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ">\s*<span class="ticker">MTFJ</span>.*?</a>',
+            # Story 8.23 (A4): ruta har en title med symbolet, endringen og styrken.
+            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: uten data">\s*<span class="ticker">MTFJ</span>.*?</a>',
             html,
             re.S,
         )
@@ -613,20 +616,23 @@ class TestSiden:
         """Gruppens svar 26.10 kl. 15:21 (f): tabellen under kartet er lukket
         som standard, bak «Se tallene som tabell», og skjermleseren finner
         knappen. Ville feilet med tabellen åpen, uten summary, med tabellen
-        utenfor details, eller med fotnoten inne i den lukkede delen."""
+        utenfor details, eller med fotnoten inne i den lukkede delen.
+        Story 8.23 (tillegg 3, gruppens svar 10.11 kl. 15:54): tabellen står
+        åpen fra start, og knappen lukker den. Navnet på testen står, fordi
+        kvalitetssikringen viser til det."""
         for adresse in ("/boersometer", "/boersometer?dag=2026-10-08", "/boersometer?dag=2026-09-18"):
             html = _side(klient, adresse)
             # Story 8.9: «Vis meg rundt» øverst er også en details, og står for seg.
             details = [d for d in re.findall(r"<details[^>]*>", html) if d != '<details class="rundtur">']
-            assert details == ['<details class="tallene">'], (adresse, details)
-            tallene = html.split('<details class="tallene">', 1)[1].split("</details>", 1)
+            assert details == ['<details class="tallene" open>'], (adresse, details)
+            tallene = html.split('<details class="tallene" open>', 1)[1].split("</details>", 1)
             assert tallene[0].lstrip().startswith("<summary>Se tallene som tabell</summary>")
             assert '<table class="boersometertabell">' in tallene[0] and "</table>" in tallene[0]
             assert html.count('<table class="boersometertabell">') == 1
             assert "fotnote" not in tallene[0]
             # Kartet står over, utenfor details. Story 8.20b: «Hva fargene
             # betyr» er kortet «Slik leser du børsometeret» øverst.
-            assert html.index('<div class="kart"') < html.index('<details class="tallene">')
+            assert html.index('<div class="kart"') < html.index('<details class="tallene" open>')
         fotnote = _side(klient, "/boersometer?dag=2026-09-18")
         assert _fotnoten(fotnote) and fotnote.index("</details>") < fotnote.index('<p class="fotnote">')
         stil = (SRC / "static" / "stil.css").read_text(encoding="utf-8")
@@ -657,10 +663,11 @@ class TestSiden:
 
     def test_hjelpen_sier_det_om_tabellen(self):
         """Regel 19: ville feilet hvis docs/hjelp.md ikke sa at tabellen står
-        bak «Se tallene som tabell» og er lukket (svaret kl. 15:21, f)."""
+        bak «Se tallene som tabell» og er lukket (svaret kl. 15:21, f). Story
+        8.23 (tillegg 3): tabellen er åpen fra start, og knappen lukker den."""
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         avsnitt = hjelp.split("### Hva viser børsometeret?", 1)[1].split("###", 1)[0]
-        assert "bak «Se tallene som tabell». Den er lukket til du åpner den" in avsnitt
+        assert "i en tabell, åpen fra start, og knappen «Se tallene som tabell» lukker og åpner den" in avsnitt
 
     def test_bøyningen_i_linja_over(self, klient, monkeypatch):
         """Gjennomgangen (BH8): ville feilet med «1 aksjer i 1 bransjer»."""
@@ -1333,7 +1340,11 @@ class TestFargetrinnene:
         )
         assert grenser == ["-2\u00a0%", "-0,5\u00a0%", "+0,5\u00a0%", "+2\u00a0%"]
         # Gjennomgangen (BH15): gul ramme gjelder siste børsdag, også en annen dag.
-        assert "Mørk ramme: 2 av 3 på siste børsdag. Gul ramme: 3 av 3 på siste børsdag, også en annen dag." in kortet
+        # Story 8.23 (A4): forklaringen sier også hva ringen og den tykke rammen er.
+        assert (
+            "Den tykke rammen rundt ruta er mørk ved 2 av 3 på siste børsdag og gul ved 3 av 3 på siste børsdag, "
+            "også en annen dag." in kortet
+        )
         # Gjennomgangen (VG5): vinduet for volumet kommer fra Parametre.
         assert f"mot medianen for de {STANDARD.volum_vindu} børsdagene før" in kortet
         assert html.index('<section class="slik-leser"') < html.index('<section class="bransje"')
@@ -1789,9 +1800,13 @@ class TestKartet:
         # Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står på nivå 3, som
         # merket. Svaret kl. 19:21: på nivå 2 skjules styrken bare uten
         # klassen styrke-N, og det står i en egen velger under.
+        # Story 8.23 (A4, brukertesten 10.11, og gjennomgangen BH3, ECH3): små
+        # ruter viser endringen i liten skrift på nivå 1, og styrken står i
+        # lappen der den ikke får plass. Testen leser regelen som skjuler,
+        # foran den første «{» i blokken.
         skjult = {
             0: [".ticker", ".endring", ".merke", ".styrke", ".tekst"],
-            1: [".endring", ".merke", ".styrke", ".tekst"],
+            1: [".merke", ".styrke", ".tekst"],
             2: [".merke", ".tekst"],
         }
         for media, flate in (("(width > 760px)", BRED), ("(width <= 760px)", SMAL)):
@@ -1800,14 +1815,20 @@ class TestKartet:
             (stor, stor_b), (liten, liten_b) = sorted(flate.tekst, key=lambda t: -t[1])
             assert set(blokker) == {f"(width >= {stor_b}px)", f"(width < {stor_b}px)"}, blokker.keys()
             for grense, klasse in ((f"(width >= {stor_b}px)", stor), (f"(width < {stor_b}px)", liten)):
-                velgere = re.findall(r"\.rute\.nivaa-([a-z]+)-(\d) > (\.[a-z]+)", blokker[grense])
+                skjuler = blokker[grense].split("{", 1)[0]
+                velgere = re.findall(r"\.rute\.nivaa-([a-z]+)-(\d) > (\.[a-z]+)", skjuler)
                 assert sorted(velgere) == sorted((klasse, str(n), e) for n, el in skjult.items() for e in el), (
                     grense,
                     velgere,
                 )
-                assert re.findall(r"\.rute\.nivaa-([a-z]+)-2:not\(\.styrke-([a-z]+)\) > \.styrke", blokker[grense]) == [
+                assert re.findall(r"\.rute\.nivaa-([a-z]+)-2:not\(\.styrke-([a-z]+)\) > \.styrke", skjuler) == [
                     (klasse, klasse)
                 ], grense
+                # Og regelen som viser endringen i liten skrift på nivå 1.
+                vis = re.search(r"\n\s*([^{\n]*nivaa-[a-z]+-1 > \.endring[^{]*)\{([^}]*)\}", blokker[grense])
+                assert vis and "font-size: 11px" in vis.group(2) and f"nivaa-{klasse}-1 > .endring" in vis.group(1), (
+                    grense
+                )
             assert liten_b < stor_b
         # I demoen viser noen ruter mer ved 1008 og 328 px enn ved 712 og 288 px.
         klasser = re.findall(r'<a class="rute ([^"]*)"', _side(klient))
