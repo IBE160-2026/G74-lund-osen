@@ -27,12 +27,24 @@ Ukedagen skal vaere grunnlagets, og «i dag», «i går», «i kveld», «i morg
 «dagens» og «gårsdagens» stoppes, fordi teksten ogsaa leses senere
 (spoersmaal 4). Etter gjennomgangen kan resten av teksten, naar formene er
 tatt ut, bare vaere bindeordene i BINDEORD og tegnsetting.
+
+Story 10.10, promptversjon dag-2 (gruppens svar 10.11 kl. 16:18): teksten
+faar navnene paa aksjene som skilte seg ut, med styrken og retningen for
+hver, 3 av 3 foerst, hoeyst fem navn og resten som antall, og bransjen som i
+snitt steg mest og den som i snitt falt mest, regnet som snittet paa
+Boersometeret (dagsgrunnlag.py). Appen regner ut alt, og modellen skriver
+det i faste former. Kontrollen leser hvert navn med styrken og retningen
+ved navnet, og bransjene ved feltet sitt. Et navn som ikke staar i
+grunnlaget, blir staaende igjen naar formene er tatt ut, og stoppes som
+resten. Ord som «bør», «verdt å følge», «følg med» og «vil» stoppes under
+punkt 3 og 4 (NFR-06, lista i ki_kontroll.py).
 """
 
 import json
 import re
 from collections.abc import Mapping
 
+from dagsgrunnlag import ANDRE, MEST_NED, MEST_OPP, NAVNENE
 from ki_kontroll import (
     _EGET_MOENSTER,
     _ENHETER,
@@ -47,7 +59,7 @@ from ki_kontroll import (
 from ki_modell import Modell, ModellFeilet, Modellsvar, _grunn
 from kilogg import DAG, Emne, KIRad, UgyldigKIRad
 
-DAGSPROMPTVERSJON = "dag-1"
+DAGSPROMPTVERSJON = "dag-2"
 
 REGLER_DAGEN = """Du skriver noen korte setninger på norsk om hele børsdagen på Oslo Børs, for en som ikke kjenner reglene i appen.
 Appen gir hver aksje et regelbasert signal. En aksje skilte seg ut når minst to av de tre sjekkene i signalet ga utslag.
@@ -58,21 +70,26 @@ Opplysningene under er regnet ut av appen for én børsdag og for aksjene i list
 - hovedindeksen: om hovedindeksen på Oslo Børs steg, falt eller var uendret. Feltet kan mangle.
 - bedre_enn_indeksen og med_kurs: hvor mange av aksjene med kurs den dagen som gjorde det bedre enn hovedindeksen. Feltene kan mangle.
 - skilte_seg_ut: hvor mange aksjer som skilte seg ut. skilte_seg_ut_positiv, skilte_seg_ut_negativ og skilte_seg_ut_blandet: hvor mange av dem som hadde positiv, negativ og blandet retning.
+- skilte_seg_ut_navn: navnene på aksjene som skilte seg ut, høyst fem, med styrken (3 eller 2 av 3) og retningen for hver. De med 3 av 3 står først. Feltet kan mangle.
+- skilte_seg_ut_andre: hvor mange flere som skilte seg ut, utenom navnene. Feltet kan mangle.
 - bransjer: for hver bransje, steg er hvor mange aksjer som steg, og med_endring hvor mange som hadde en endring den dagen. Feltet kan mangle.
+- bransje_mest_opp og bransje_mest_ned: bransjen der aksjene i snitt steg mest, og bransjen der de i snitt falt mest, regnet ut av appen. Feltene kan mangle.
 
 Regler for teksten:
-- Skriv tre til fem setninger, med disse formene. Sett inn tallene og ordene for feltene i ‹ ›:
+- Skriv tre til sju korte setninger, med disse formene. Sett inn tallene og ordene for feltene i ‹ ›:
   - «Hovedindeksen steg ‹ukedag›.», «Hovedindeksen falt ‹ukedag›.» eller «Hovedindeksen var uendret ‹ukedag›.», etter feltet hovedindeksen.
   - «‹bedre_enn_indeksen› av ‹med_kurs› aksjer gjorde det bedre enn indeksen.»
   - «‹skilte_seg_ut› skilte seg ut: ‹skilte_seg_ut_positiv› med positiv retning, ‹skilte_seg_ut_negativ› negativ og ‹skilte_seg_ut_blandet› blandet.» Ta bare med retningene som har minst én aksje. Er skilte_seg_ut 0, skriver du «Ingen aksjer skilte seg ut.»
+  - «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹navn› (‹styrke› av 3, ‹retning›).», med alle navnene i skilte_seg_ut_navn, i den rekkefølgen de står, og skrevet som der. Med skilte_seg_ut_andre slutter setningen med «og ‹skilte_seg_ut_andre› andre.»
   - «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.», med navnet på bransjen med små bokstaver. Nevn høyst to bransjer.
+  - «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.», med navnet på bransjen med små bokstaver.
 - Mangler et felt, skriver du ikke setningen for det.
 - Skriv tallene som i opplysningene. Ikke nevn andre tall, prosenter, kurser eller beløp.
 - Ikke si noe om hovedindeksen, bransjene, retningene eller hvor mange som steg eller falt utenom formene.
 - Ikke skriv «i dag», «i går» eller «i kveld». Bruk ukedagen.
-- Ikke gi råd om å kjøpe, selge eller holde, og ikke si noe om hva som vil skje.
+- Ikke gi råd om å kjøpe, selge eller holde, ikke skriv «bør», «verdt å følge» eller «følg med», og ikke si noe om hva som vil skje.
 - Ikke gjett på årsaker, som nyheter, resultater, renter eller oljeprisen.
-- Ikke finn mønstre selv, og ikke sammenlign bransjene med hverandre.
+- Ikke finn mønstre selv, og ikke sammenlign aksjene eller bransjene med hverandre utover formene.
 - Skriv aldri navnet på et felt eller tegnene ‹ › i teksten.
 """
 
@@ -101,8 +118,17 @@ def dagsregel(grunnlag: Mapping[str, object]) -> str:
         f"Skilte seg ut {grunnlag['skilte_seg_ut']}: positiv {grunnlag['skilte_seg_ut_positiv']}, "
         f"negativ {grunnlag['skilte_seg_ut_negativ']}, blandet {grunnlag['skilte_seg_ut_blandet']}."
     )
+    navnene = grunnlag.get(NAVNENE) or ()
+    if navnene:
+        oppramsing = ", ".join(f"{n['navn']} ({n['styrke']} av 3, {n['retning']})" for n in navnene)
+        andre = f", og {grunnlag[ANDRE]} andre" if ANDRE in grunnlag else ""
+        deler.append(f"Navnene: {oppramsing}{andre}.")
     for navn, b in (grunnlag.get("bransjer") or {}).items():
         deler.append(f"{navn}: steg {b['steg']} av {b['med_endring']}.")
+    if MEST_OPP in grunnlag:
+        deler.append(f"Høyest snitt: {grunnlag[MEST_OPP]}.")
+    if MEST_NED in grunnlag:
+        deler.append(f"Lavest snitt: {grunnlag[MEST_NED]}.")
     return " ".join(deler)
 
 
@@ -145,10 +171,28 @@ _RETNINGSFELT = {
     "blandet": "skilte_seg_ut_blandet",
 }
 _VERBET = {"steg": "steg", "falt": "falt", "var uendret": "uendret"}
+# Story 10.10: formene for navnene og bransjene med hoeyest og lavest snitt.
+# Navnet leses ordrett fra grunnlaget (_navnet), med styrken og retningen i
+# parentesen etter.
+_I_PARENTES = r"\s*\(\s*(\d{1,4})\s+av\s+3\s*,\s*(positiv|negativ|blandet)\s*\)"
+_F_BLANT = re.compile(r"(?<![\w-])blant\s+dem\s+var(?![\w-])", re.IGNORECASE)
+_F_ANDRE = re.compile(r"(?<![\w-])" + _N + r"\s+andre(?![\w-])", re.IGNORECASE)
+_F_MEST = re.compile(
+    r"(?<![\w-])i\s+snitt\s+(steg|falt)\s+([a-zæøå]+(?:[\s-]+(?:og\s+)?[a-zæøå]+)?)\s+mest(?![\w-])",
+    re.IGNORECASE,
+)
+_MEST_FELT = {"steg": MEST_OPP, "falt": MEST_NED}
 _ORD = re.compile(r"[\w-]+")
 # Tegnsettingen som kan staa mellom formene.
 _TEGN = frozenset(" \t\n.,:;")
 _NAA = re.compile(r"(?<![\w-])(i\s+dag|i\s+går|i\s+kveld|i\s+morgen|dagens|gårsdagens)(?![\w-])", re.IGNORECASE)
+
+
+def _navnet(navn: str) -> re.Pattern[str]:
+    """Navnet ordrett, med hvilket som helst mellomrom der navnet har et
+    (ogsaa et hardt), og styrken og retningen i parentesen etter."""
+    deler = [re.escape(del_) for del_ in str(navn).split()]
+    return re.compile(r"(?<![\w-])" + r"\s+".join(deler) + _I_PARENTES, re.IGNORECASE)
 
 
 def _antall(ord_: str) -> int:
@@ -174,6 +218,34 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
         elif _antall(funnet) != grunnlag[felt]:
             grunner.append(f"2: tallet «{funnet}» ved {felt}")
 
+    # Story 10.10: navnene foerst, fordi et navn kan ha ord og tegn som de
+    # andre formene ellers ville lest.
+    for oppfoering in grunnlag.get(NAVNENE) or ():
+        navn = oppfoering["navn"]
+        alle = list(_navnet(navn).finditer(tekst))
+        if len(alle) > 1:
+            grunner.append(f"1: navnet «{navn}» står {len(alle)} ganger")
+        for treff in alle:
+            if int(treff.group(1)) != oppfoering["styrke"]:
+                grunner.append(f"2: tallet «{treff.group(1)}» ved styrken for {navn}")
+            if treff.group(2).lower() != oppfoering["retning"]:
+                grunner.append(f"1: retningen «{treff.group(2)}» for {navn}, grunnlaget sier {oppfoering['retning']}")
+            tekst = _ta_ut(tekst, treff)
+    for treff in list(_F_BLANT.finditer(tekst)):
+        if not grunnlag.get(NAVNENE):
+            grunner.append(f"1: «{treff.group(0)}», men {NAVNENE} mangler i grunnlaget")
+        tekst = _ta_ut(tekst, treff)
+    for treff in list(_F_ANDRE.finditer(tekst)):
+        ved_feltet(treff.group(1), ANDRE, treff.group(0))
+        tekst = _ta_ut(tekst, treff)
+    for treff in list(_F_MEST.finditer(tekst)):
+        felt = _MEST_FELT[treff.group(1).lower()]
+        navn = " ".join(treff.group(2).lower().split())
+        if felt not in grunnlag:
+            grunner.append(f"1: «{treff.group(0)}», men {felt} mangler i grunnlaget")
+        elif navn != str(grunnlag[felt]).lower():
+            grunner.append(f"1: «{treff.group(0)}», grunnlaget sier {grunnlag[felt]}")
+        tekst = _ta_ut(tekst, treff)
     for treff in list(_F_BEDRE.finditer(tekst)):
         ved_feltet(treff.group(1), "bedre_enn_indeksen", treff.group(0))
         ved_feltet(treff.group(2), "med_kurs", treff.group(0))

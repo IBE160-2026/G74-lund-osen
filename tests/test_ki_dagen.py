@@ -97,7 +97,9 @@ class TestGrunnlaget:
     def test_feltene(self):
         """Ville feilet hvis grunnlaget talte feil: hovedindeksen steg 0,5,
         AAA og CCC gjorde det bedre, AAA og BBB skilte seg ut (styrke 2 og 3),
-        og bare Energi har to aksjer med endring."""
+        og bare Energi har to aksjer med endring. Story 10.10: navnene, A
+        med 3 av 3 foerst, og Energi med snittet 0,5 som bransjen som steg
+        mest; ingen bransje falt."""
         assert dict(grunnlaget()) == {
             "aksjer": 4,
             "ukedag": "fredag",
@@ -108,7 +110,12 @@ class TestGrunnlaget:
             "skilte_seg_ut_positiv": 1,
             "skilte_seg_ut_negativ": 1,
             "skilte_seg_ut_blandet": 0,
+            "skilte_seg_ut_navn": [
+                {"navn": "A", "styrke": 3, "retning": "positiv"},
+                {"navn": "B", "styrke": 2, "retning": "negativ"},
+            ],
             "bransjer": {"Energi": {"steg": 1, "med_endring": 2}},
+            "bransje_mest_opp": "Energi",
         }
 
     def test_bare_heltall_og_tekst(self):
@@ -118,6 +125,10 @@ class TestGrunnlaget:
         def verdier(verdi):
             if isinstance(verdi, dict) or hasattr(verdi, "items"):
                 for v in verdi.values():
+                    yield from verdier(v)
+            elif isinstance(verdi, (list, tuple)):
+                # Story 10.10: navnene er en liste.
+                for v in verdi:
                     yield from verdier(v)
             else:
                 yield verdi
@@ -297,7 +308,11 @@ class TestKontrollen:
 
 # Avtrykket av prompten for dagen (FR-605). Endres prompten, faar den ny
 # versjon, og avtrykket settes paa nytt.
-AVTRYKK = {"dag-1": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7"}
+AVTRYKK = {
+    "dag-1": "186958066d33e1588a31a6a6fa7dc5ca38bf6b8e31ad5242b008bf677c1472f7",
+    # Story 10.10. Teksten til dag-1 staar i src/ki_dagen.py paa 059dc10c.
+    "dag-2": "f0377e8ff13697db3d9d1baa00dcc0c15f7b6f48ca6ce9461b1cf4cd0e3246d0",
+}
 
 
 def promptens_avtrykk() -> str:
@@ -627,7 +642,8 @@ class TestDemoen:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 10, 13, 12, 0).astimezone())
         side = app_modul.app.test_client().get("/").data.decode("utf-8")
         tekst = les_dagsraden().tekst
-        assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
+        # Story 10.10 (spoersmaal 6): eksempelteksten, ikke Gemma.
+        assert "Skrevet av eksempeltekst (lokal) da kursene ble hentet." in side
         from ki_visning import prikkede_tall
 
         assert str(prikkede_tall(tekst)) in side and DAGEN_UTEN not in side

@@ -29,6 +29,7 @@ from dataclasses import dataclass
 
 from markupsafe import Markup, escape
 
+from dagsgrunnlag import for_promptversjon
 from kilogg import KIRad
 from vurderingsdata import Vurdering
 
@@ -195,18 +196,26 @@ class Dagsvisning:
 
 def _vanlig(verdi):
     """Grunnlaget som vanlige dict paa alle nivaaer, saa et grunnlag lest fra
-    loggen kan sammenlignes med et som er regnet naa."""
+    loggen kan sammenlignes med et som er regnet naa. Story 10.10: en liste
+    fra loggen er en tuple, og blir en liste."""
     if isinstance(verdi, Mapping):
         return {n: _vanlig(v) for n, v in verdi.items()}
+    if isinstance(verdi, (list, tuple)):
+        return [_vanlig(v) for v in verdi]
     return verdi
 
 
 def bygg_dagsvisning(rad: KIRad | None, grunnlag: Mapping[str, object] | None) -> Dagsvisning:
     """Teksten om dagen vises bare naar den besto kontrollen, grunnlaget i
     raden er det samme som grunnlaget regnet av det siden viser (FR-607), og
-    vakta ikke stopper den (NFR-06). Ellers er dagen uten KI-tekst."""
+    vakta ikke stopper den (NFR-06). Ellers er dagen uten KI-tekst.
+
+    Story 10.10 (spoersmaal 5): en rad med promptversjon dag-1 sammenlignes
+    med grunnlaget uten feltene dag-2 la til, saa tekstene fra foer
+    flettingen fortsatt vises."""
     if rad is None or grunnlag is None or not rad.besto or rad.tekst is None:
         return Dagsvisning()
+    grunnlag = for_promptversjon(grunnlag, rad.promptversjon)
     if rad.emne.slag != "dag" or _vanlig(rad.grunnlag) != _vanlig(grunnlag):
         return Dagsvisning()
     tekst = unicodedata.normalize("NFC", rad.tekst).translate(_USYNLIGE)
