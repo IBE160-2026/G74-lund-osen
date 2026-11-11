@@ -63,9 +63,6 @@ VALG = "src/valg.py"
 # Story 10.6: teksten om dagen paa forsiden.
 DAGSGRUNNLAG = "src/dagsgrunnlag.py"
 KI_DAGEN = "src/ki_dagen.py"
-# Story 8.21: notatene og bryteren «Notater».
-ETTERPAA = "src/etterpaa.py"
-INNSTILLINGER_MAL = "src/templates/innstillinger.html"
 
 # FR-701: tre sjekker, ingen fjerde.
 ANTALL_SJEKKER = 3
@@ -641,23 +638,6 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (KI_VISNING, "def prikkede_tall("),
                 (KI_KONTROLL, "def kontroller("),
                 (AKSJE_MAL, "Laget av KI."),
-            ),
-        ),
-        # Story 8.21 (tillegget 10.11 kl. 14:44, punkt 1): «?» ved bryteren
-        # «Notater» i Innstillinger: hvordan notatene virker, hvilken kurs som
-        # brukes, og at appen aldri sier om noe var riktig. Under 60 ord.
-        "notatene": Hjelpetekst(
-            "",
-            "Et notat får dagen siden viser, og under står hvor mye aksjen og hovedindeksen endret seg fra "
-            "notatdagen til siste dag med kurser, på kurs justert for utbytte, og signalet de dagene. Noterer du "
-            "noe tenkt ved notatet, regnes det fra den neste sluttkursen appen henter etter trykket. Appen sier "
-            "aldri om noe var riktig, og gir ingen råd.",
-            (
-                (APP, "def skriv_notat("),
-                (ETTERPAA, "def bygg_etterpaa("),
-                (ETTERPAA, "endring_i_prosent"),
-                (APP, "def noter_tenkt_kjoep("),
-                (INNSTILLINGER_MAL, 'value="vis_notater"'),
             ),
         ),
         # Story 2.12 (utdraget 08.11 §1): hjelpen ved «Dine egne aksjer», med
