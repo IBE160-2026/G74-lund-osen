@@ -244,7 +244,8 @@ def _radene(side: str) -> list[str]:
 
 class TestFilteretOgLenken:
     @pytest.mark.parametrize("versjon", ["klient", "ekte"])
-    @pytest.mark.parametrize("sti", ["/", "/min-liste", "/?vis=min"])
+    # Tillegg 9 (gruppens svar 11.11 kl. 20:04): også «Alle» i Min liste.
+    @pytest.mark.parametrize("sti", ["/", "/min-liste", "/?vis=min", "/min-liste?vis=alle"])
     def test_filteret_er_borte(self, versjon, sti, request):
         """Ønsket kl. 17:48: ville feilet hvis raden «Alle», «3 av 3 positiv»
         og «3 av 3 negativ», linja om filteret eller lenken til 2 av 3 sto
@@ -252,7 +253,8 @@ class TestFilteretOgLenken:
         k = request.getfixturevalue(versjon)
         side = _side(k, sti)
         assert 'class="signalfilter"' not in side and 'class="filtertekst"' not in side
-        assert "3 av 3 positiv" not in side and "Filteret viser" not in side and "signal=" not in side
+        assert "3 av 3 positiv" not in side and "3 av 3 negativ" not in side
+        assert "Filteret viser" not in side and "signal=" not in side
 
     def test_alle_og_min_liste_staar(self, klient):
         side = _side(klient, "/")
@@ -875,3 +877,626 @@ class TestEtterGjennomgangenAvTillegg12:
         for antallet appen følger."""
         mal = (ROT / "src" / "templates" / "_egne.html").read_text(encoding="utf-8")
         assert "Start med dagens {{ egne.antall }}{% if egne.ferdige %}" in mal
+
+
+# Tillegg 17 (gruppens svar 11.11 kl. 22:04): brikkene i «Følg en aksje»,
+# overskriften med «Vis dagen», «3 av 3» uten vurderinger og «Oppdatert».
+
+
+def _bransjebrikkene(side: str) -> str:
+    start = side.index('<fieldset class="bransjefilter">')
+    return side[start : side.index("</fieldset>", start)]
+
+
+def _synlige(side: str) -> list[str]:
+    return [
+        rad.split('data-kode="')[1].split('"')[0]
+        for rad in re.findall(r'<tr class="foelgbar"[^>]*>', side)
+        if " hidden>" not in rad
+    ]
+
+
+class TestBrikkeneIFoelg:
+    def test_hver_bransje_har_antallet_og_tom_er_graa(self, klient):
+        """Ville feilet hvis brikkene ikke viste antallet, eller en bransje
+        uten aksjer kunne velges og gi en tom liste (7 av 13 i demoen)."""
+        side = _side(klient, "/folg")
+        brikkene = _bransjebrikkene(side)
+        antall = re.findall(r'value="([^"]+)"([^>]*)>.*?<span class="antall">(\d+)</span>', brikkene)
+        assert len(antall) == 13
+        rader = re.findall(r'<tr class="foelgbar"[^>]*data-bransje="([^"]+)"', side)
+        for bransje, attr, n in antall:
+            assert int(n) == rader.count(bransje), bransje
+            assert ("disabled" in attr) == (n == "0"), bransje
+        tomme = sum(n == "0" for _, _, n in antall)
+        assert tomme > 0
+        assert brikkene.count("valgbrikke tom") == tomme
+
+    def test_alle_radene_staar_i_siden_og_filteret_skjuler(self, klient):
+        """Ville feilet hvis serveren bare sendte radene i filteret, så
+        skriptet ikke kunne vise de andre ved et klikk på en annen brikke."""
+        alle = _side(klient, "/folg")
+        kraft = _side(klient, "/folg?bransje=Kraft")
+        assert alle.count('<tr class="foelgbar"') == kraft.count('<tr class="foelgbar"')
+        synlige = _synlige(kraft)
+        bransjer = {
+            rad.split('data-bransje="')[1].split('"')[0]
+            for rad in re.findall(r'<tr class="foelgbar"[^>]*>', kraft)
+            if " hidden>" not in rad
+        }
+        assert synlige and bransjer == {"Kraft"}
+        n = len(synlige)
+        assert f'<span id="antall-vist">{n}</span> av <span id="antall-filtrert">{n}</span>' in kraft
+
+    def test_radene_har_dataene_skriptet_trenger(self, klient):
+        """Ville feilet hvis en rad manglet bransjen, omsetningen, medianen
+        eller rangen, så skriptet ikke kunne filtrere og sortere."""
+        side = _side(klient, "/folg")
+        for rad in re.findall(r'<tr class="foelgbar"[^>]*>', side):
+            for felt in ("data-bransje", "data-omsetning", "data-median", "data-rang"):
+                assert felt + '="' in rad, (felt, rad)
+            assert re.search(r'data-omsetning="(over|under|ikke)"', rad)
+
+    def test_samme_i_den_ekte_versjonen(self, ekte):
+        """Ville feilet hvis antallet og den grå brikken bare fantes i demoen."""
+        side = _side(ekte, "/folg")
+        assert _bransjebrikkene(side).count('<span class="antall">') == 13
+        assert 'id="antall-filtrert"' in side
+
+    @pytest.mark.skipif(NODE is None, reason="trenger node")
+    def test_skriptet_filtrerer_og_sorterer_som_serveren(self, klient):
+        """Ville feilet hvis FOLGLISTA i hjelp.js ga en annen rekkefølge
+        eller andre rader enn ferdige_lister.filtrer og .sorter."""
+        side = _side(klient, "/folg")
+        rader = [
+            {k: html.unescape(v) for k, v in re.findall(r'data-([a-z]+)="([^"]*)"', rad)}
+            for rad in re.findall(r'<tr class="foelgbar"([^>]*)>', side)
+        ]
+        data = json.dumps(rader)
+        node = _Node()
+        for sortering in ("omsatt", "navn", "bransje"):
+            server = [
+                rad.split('data-kode="')[1].split('"')[0]
+                for rad in re.findall(r'<tr class="foelgbar"[^>]*>', _side(klient, f"/folg?sorter={sortering}"))
+            ]
+            js = node._kjoer(
+                f"{data}.sort((a, b) => o.FOLGLISTA.sammenlign(a, b, {json.dumps(sortering)})).map((r) => r.kode)"
+            )
+            assert js == server, sortering
+        for omsetning in ("over", "under", "ikke"):
+            server = _synlige(_side(klient, f"/folg?omsetning={omsetning}&bransje=Kraft&bransje=Helse"))
+            js = node._kjoer(
+                f"{data}.filter((r) => o.FOLGLISTA.passer(r, '', ['Kraft', 'Helse'], {json.dumps(omsetning)})).map((r) => r.kode)"
+            )
+            assert sorted(js) == sorted(server), omsetning
+        server = _synlige(_side(klient, "/folg?q=FJORD"))
+        js = node._kjoer(f"{data}.filter((r) => o.FOLGLISTA.passer(r, 'FJORD', [], '')).map((r) => r.kode)")
+        assert sorted(js) == sorted(server)
+
+    def test_vis_skjules_av_skriptet_og_klikk_sender_ikke_skjemaet(self):
+        """Ville feilet hvis «Vis» sto med skriptet, eller et klikk på en
+        brikke fortsatt sendte skjemaet og lastet siden."""
+        kilde = SKRIPTET.read_text(encoding="utf-8")
+        blokk = kilde[kilde.index("// Story 8.22 (spørsmål 8): søket i «Følg en aksje»") :]
+        assert 'querySelectorAll("button[type=submit]")) knapp.hidden = true' in blokk
+        assert "form.submit()" not in blokk
+        assert 'skjema.addEventListener("change", oppdater)' in blokk
+        assert "e.preventDefault()" in blokk
+
+
+def _ren(tekst: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", tekst)).strip()
+
+
+def _overskriften(side: str) -> str:
+    return _ren(re.search(r'<h1 class="overskrift">(.*?)</h1>', side, re.S).group(1))
+
+
+def _tre_av_tre(side: str) -> str | None:
+    m = re.search(r'<p class="alle-sjekkene">(.*?)</p>', side, re.S)
+    return _ren(m.group(1)) if m else None
+
+
+class TestOverskriftenMedVisDagen:
+    def test_dagen_tabellen_viser(self, klient):
+        """Ville feilet hvis overskriften sa siste børsdag (fredag) over
+        tabellen for tirsdag 06.10."""
+        assert _overskriften(_side(klient, "/")).endswith("fredag")
+        assert _overskriften(_side(klient, "/?periode=velg&dag=2026-10-06")).endswith("tirsdag")
+        assert _overskriften(_side(klient, "/?periode=velg&dag=2026-10-07")).endswith("onsdag")
+
+    def test_antallet_og_linja_er_dagens(self, klient):
+        """Ville feilet hvis «N av 15» og linja om 3 av 3 var fra siste
+        børsdag og ikke fra radene den valgte dagen. Demoen har ulike tall
+        de to dagene (2 og 3, Lastfjord Container og Brattfjell Energi)."""
+        tirsdag = _side(klient, "/?periode=velg&dag=2026-10-06")
+        onsdag = _side(klient, "/?periode=velg&dag=2026-10-07")
+        assert _overskriften(tirsdag).startswith("2 av 15")
+        assert _overskriften(onsdag).startswith("3 av 15")
+        assert "Lastfjord Container" in _tre_av_tre(tirsdag)
+        assert "Brattfjell Energi" in _tre_av_tre(onsdag)
+        assert _tre_av_tre(tirsdag) != _tre_av_tre(onsdag)
+
+    def test_periode_og_siste_boersdag_som_foer(self, klient):
+        """Ville feilet hvis en periode fikk overskriften for en annen dag."""
+        siste = _side(klient, "/")
+        uke = _side(klient, "/?periode=1-uke")
+        assert _overskriften(uke) == _overskriften(siste)
+        assert _tre_av_tre(uke) == _tre_av_tre(siste)
+
+
+class TestTreAvTreUtenVurdering:
+    def test_varde_systemer_sier_hvorfor(self, klient):
+        """Ville feilet hvis en aksje uten en eneste vurdering fortsatt fikk
+        «3 av 3 aldri siden …» i «Signalet dag for dag»."""
+        side = _side(klient, "/aksje/VRDS")
+        tekst = _ren(re.search(r'<p class="alle-sjekkene-aaret">(.*?)</p>', side, re.S).group(1))
+        assert "aldri" not in tekst
+        assert tekst.startswith("Signalet er ikke regnet ennå: Trenger")
+        assert "dager for å regne signal" in tekst
+
+    def test_en_aksje_med_vurderinger_som_foer(self, klient):
+        """Ville feilet hvis linja om 3 av 3 forsvant for en vurdert aksje."""
+        m = re.search(r'<p class="alle-sjekkene-aaret">(.*?)</p>', _side(klient, "/aksje/BRFE"), re.S)
+        assert m and "3 av 3" in m.group(1)
+
+    def test_vurdert_skiller_grunn_fra_vurdering(self):
+        """Ville feilet hvis vurdert var sann for en aksje med bare grunner."""
+        from datetime import date
+
+        from historikk import alle_sjekkene_det_siste_aaret
+        from vurderingsdata import Grunn
+
+        dag = date(2026, 10, 9)
+        svar = alle_sjekkene_det_siste_aaret({dag: next(iter(Grunn))}, dag, 3)
+        assert svar is not None and svar.vurdert is False and svar.antall == 0
+
+
+SIDENE_UTEN_EGET_TIDSPUNKT = [
+    "/folg",
+    "/folg?kode=BRFE",
+    "/innstillinger",
+    "/investorside/BRFE",
+    "/aksje/MTFJ",
+    "/eodhd-demo",
+]
+
+
+def _tidspunktet(side: str) -> str:
+    return re.search(r"<span>Oppdatert ([^<]+)</span>", side).group(1)
+
+
+class TestOppdatertOveralt:
+    @pytest.mark.parametrize("adresse", SIDENE_UTEN_EGET_TIDSPUNKT)
+    def test_linja_staar_paa_siden(self, klient, adresse):
+        """Ville feilet hvis linja «Oppdatert …» bare sto på oversikten og
+        aksjesidene med kurser."""
+        assert '<div class="rad oppdatert">' in _side(klient, adresse), adresse
+
+    def test_samme_tidspunkt_som_oversikten(self, klient):
+        """Ville feilet hvis sidene uten eget tidspunkt viste et annet enn
+        oversikten (det eldste, FR-101)."""
+        oversikten = _tidspunktet(_side(klient, "/"))
+        for adresse in ("/folg", "/innstillinger"):
+            assert _tidspunktet(_side(klient, adresse)) == oversikten, adresse
+
+    def test_ogsaa_i_den_ekte_versjonen(self, ekte):
+        """Ville feilet hvis linja bare kom i demoen."""
+        for adresse in ("/folg", "/innstillinger"):
+            assert '<div class="rad oppdatert">' in _side(ekte, adresse), adresse
+
+
+# Tillegg 18 (ønsket 11.11 kl. 22:09): bryteren «Vis KI-tekst» som bryterne i Innstillinger.
+
+_BRYTERNE = (
+    (".side-oversikt", ".innstillingsbryter", ""),
+    (".side-oversikt", ".dagsbryter", " button"),
+    (".side-aksje", ".ki-bryter", " button"),
+)
+
+
+def _stilen(side: str, bryter: str, del_: str) -> dict[str, str]:
+    stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+    regel = re.search(r":where\(" + re.escape(side) + r"\) " + re.escape(bryter + del_) + r" \{([^}]*)\}", stil).group(
+        1
+    )
+    return dict((n.strip(), v.strip()) for n, v in (d.split(":", 1) for d in regel.split(";") if ":" in d))
+
+
+class TestKIBryterenSomInnstillinger:
+    def test_samme_skrift_og_stoerrelse(self):
+        """Ville feilet hvis bryteren ved «Børsdagen kort fortalt» eller på
+        aksjesiden hadde en annen skrift, høyde eller kant enn bryterne i
+        Innstillinger (14 px før tillegg 18)."""
+        felles = ("min-height", "padding", "border", "border-radius", "background", "color", "font-weight", "gap")
+        inn = _stilen(*_BRYTERNE[0])
+        assert "font-size" not in inn
+        for side, bryter, del_ in _BRYTERNE[1:]:
+            stil = _stilen(side, bryter, del_)
+            assert "font-size" not in stil, bryter
+            for egenskap in felles:
+                assert stil[egenskap] == inn[egenskap], (bryter, egenskap)
+
+    def test_samme_knott_og_farger(self):
+        """Ville feilet hvis sporet eller knotten hadde en annen størrelse
+        eller farge, av eller på."""
+        stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        for side, bryter, _ in _BRYTERNE:
+            paa = "" if bryter == ".innstillingsbryter" else " "
+            for del_, ord_ in (
+                (" .spor", ("width: 36px", "height: 20px", "background: var(--strek-2)")),
+                (" .spor::after", ("width: 16px", "height: 16px", "background: var(--hvit)")),
+                (paa + '[aria-checked="true"] .spor', ("background: var(--oransje)",)),
+                (paa + '[aria-checked="true"] .spor::after', ("left: 18px", "background: var(--blekk)")),
+            ):
+                regel = re.search(
+                    r":where\(" + re.escape(side) + r"\) " + re.escape(bryter + del_) + r" \{([^}]*)\}", stil
+                )
+                assert regel, (bryter, del_)
+                for o in ord_:
+                    assert o in regel.group(1), (bryter, del_, o)
+
+    @pytest.mark.parametrize("adresse,form", [("/", "dagsbryter"), ("/aksje/BRFE", "ki-bryter")])
+    def test_samme_navn_og_paa_av(self, klient, adresse, form):
+        """Ville feilet hvis bryteren het noe annet enn «Vis KI-tekst», som i
+        Innstillinger, eller manglet «På» og «Av»."""
+        side = _side(klient, adresse)
+        bryter = side.split(f'<form class="{form}"', 1)[1].split("</form>", 1)[0]
+        assert '<span class="navn">Vis KI-tekst</span>' in bryter
+        assert re.search(r'<span class="verdi" aria-hidden="true">(På|Av)</span>', bryter)
+        assert 'role="switch"' in bryter
+
+
+# Tillegg 19 (gruppens svar 11.11 kl. 22:17): eksempelboksen i demoen er borte.
+
+
+class TestEksempelboksenBorte:
+    @pytest.mark.parametrize("adresse", ["/", "/min-liste"])
+    def test_ikke_i_demoen(self, klient, adresse):
+        """Ville feilet hvis eksempelboksen «Eksempeltall: når en endring i
+        lista venter …» fortsatt sto øverst i demoen."""
+        side = _side(klient, adresse)
+        assert "når en endring i lista venter" not in side
+        assert 'class="venter-melding demo"' not in side
+
+    def test_malen_har_ikke_eksempelet(self):
+        """Ville feilet hvis grenen med eksempelet bare var skjult, ikke borte."""
+        mal = (ROT / "src" / "templates" / "index.html").read_text(encoding="utf-8")
+        assert "venter-melding demo" not in mal
+        assert "{% elif eksempeltall and egne %}" not in mal
+
+    def test_den_ekte_beskjeden_naar_en_endring_venter(self, ekte):
+        """Ville feilet hvis den ekte versjonen mistet beskjeden når en endring
+        venter, eller viste den uten."""
+        import sqlite3
+
+        import lagring_sqlite
+
+        assert 'class="venter-melding"' not in _side(ekte, "/")
+        with sqlite3.connect(lagring_sqlite.BASE_STI) as t:
+            symbol = t.execute("SELECT symbol FROM min_liste LIMIT 1").fetchone()
+            symbol = symbol[0] if symbol else t.execute("SELECT symbol FROM aksje LIMIT 1").fetchone()[0]
+            t.execute(
+                "INSERT INTO oenske (handling, symbol, laget) VALUES ('fjern', ?, '2026-10-13T12:00:00+00:00')",
+                (symbol,),
+            )
+        side = _side(ekte, "/")
+        melding = side.split('<p class="venter-melding" role="status">', 1)[1].split("</p>", 1)[0]
+        assert melding == "1 endring i lista tas i bruk ved hentingen etter kl. 22."
+
+
+# Tillegg 18, steg 3 (gruppens svar 11.11 kl. 22:13): stegene om styrken og
+# retningen merker bare kolonnen.
+
+
+class TestKolonnestegene:
+    def test_stegene_peker_paa_kolonnene(self):
+        """Ville feilet hvis «Signalstyrken» eller «Retningen» fortsatt pekte
+        på hele tabellen (aksjene) på oversikten eller i Min liste."""
+        sider = ht.rundturer()
+        for side in ("oversikt", "min_liste"):
+            ankre = {s.tittel: s.anker for s in sider[side]}
+            assert ankre["Signalstyrken"] == "kolonne-signal", side
+            assert ankre["Retningen"] == "kolonne-retning", side
+
+    @pytest.mark.parametrize("adresse", ["/", "/min-liste"])
+    def test_overskriftene_har_ankrene(self, klient, adresse):
+        """Ville feilet hvis kolonneoverskriftene manglet id-ene, så stegene
+        ble hoppet over."""
+        side = _side(klient, adresse)
+        assert re.search(r'<th class="tall" id="kolonne-signal"[^>]*>', side)
+        assert re.search(r'<th id="kolonne-retning"[^>]*>', side)
+
+    def test_skriptet_merker_kolonnen_og_flytter_boksen(self):
+        """Ville feilet hvis skriptet merket hele tabellen for en
+        kolonneoverskrift, tok med flere enn de første radene, eller lot
+        boksen dekke det som er merket."""
+        kilde = SKRIPTET.read_text(encoding="utf-8")
+        assert "const RADENE_I_KOLONNEN = 3;" in kilde
+        assert 'if (del.tagName === "TH") {' in kilde and "kolonnen = merkKolonnen(del);" in kilde
+        assert 'c.classList.add("omvisning-kolonne")' in kilde
+        assert 'if (dekker) boksen.classList.add("til-venstre");' in kilde
+        stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        assert ".omvisning.til-venstre { right: auto; left: 16px; }" in stil
+        assert re.search(r"td\.omvisning-kolonne \{ background-color:", stil)
+        # Overskriften beholder den mørke bakgrunnen, så teksten kan leses.
+        assert not re.search(r"th\.omvisning-kolonne \{[^}]*background", stil)
+
+
+# Tillegg 20 (gruppens svar 11.11 kl. 22:20): KI-tekstene i omvisningen, den
+# hele omvisningen uten stegene som gjentas, og README-en.
+
+
+class TestKIStegene:
+    def test_stegene_finnes_paa_sidene(self):
+        """Ville feilet hvis «Børsdagen kort fortalt» eller «Signalet
+        forklart» manglet som steg, eller pekte på feil del."""
+        sider = ht.rundturer()
+        oversikt = {s.tittel: s.anker for s in sider["oversikt"]}
+        aksje = {s.tittel: s.anker for s in sider["aksje"]}
+        assert oversikt["Børsdagen kort fortalt"] == "boersdagen-kort-fortalt"
+        assert aksje["Signalet forklart"] == app_modul.KI_ANKER == ht.KI_ANKER
+        for side in sider.values():
+            assert len(side) <= ht.MAKS_STEG
+
+    def test_teksten(self):
+        """Ville feilet hvis steget ikke sa at teksten er skrevet av en
+        språkmodell, merket «Laget av KI», bare fra det appen har regnet ut,
+        og at bryteren slår den av og på."""
+        for ord_ in ("språkmodell", "«Laget av KI»", "det appen har regnet ut", "Bryteren slår den av og på"):
+            assert ord_ in ht.KI_STEGET
+        assert len(ht.KI_STEGET.split()) <= 30
+
+    def test_rekkefoelgen_paa_aksjesiden(self):
+        """Ville feilet hvis steget om «Signalet forklart» sto i en annen
+        rekkefølge enn delen på siden (mellom grafen og dag for dag)."""
+        titler = [s.tittel for s in ht.rundturer()["aksje"]]
+        assert titler.index("Kursgrafen") < titler.index("Signalet forklart") < titler.index("Dag for dag")
+
+    def test_delene_har_ankrene_naar_de_vises(self, klient):
+        """Ville feilet hvis ankeret manglet når delen vises, så steget ble
+        hoppet over."""
+        assert 'id="boersdagen-kort-fortalt"' in _side(klient, "/")
+        assert f'id="{ht.KI_ANKER}"' in _side(klient, "/aksje/BRFE")
+
+
+class TestOmvisningenUtenGjentakelser:
+    def test_hopper_over_stegene_som_gjentas(self):
+        """Ville feilet hvis den hele omvisningen hadde «Dagen og perioden»
+        på børsometeret eller «Signalstyrken» og «Retningen» i Min liste."""
+        steg = {(s["side"], s["tittel"]) for s in ht.omvisningen()}
+        for par in (
+            ("boersometer", "Dagen og perioden"),
+            ("min_liste", "Signalstyrken"),
+            ("min_liste", "Retningen"),
+        ):
+            assert par not in steg
+        assert ("oversikt", "Signalstyrken") in steg and ("oversikt", "Dagen og perioden") in steg
+
+    def test_vis_meg_rundt_har_dem(self):
+        """Ville feilet hvis «Vis meg rundt» på sidene mistet stegene."""
+        sider = ht.rundturer()
+        assert "Dagen og perioden" in [s.tittel for s in sider["boersometer"]]
+        assert {"Signalstyrken", "Retningen"} <= {s.tittel for s in sider["min_liste"]}
+
+    def test_telleren_foelger_det_som_spilles(self):
+        """Ville feilet hvis antallet steg i omvisningen talte med stegene som
+        hoppes over (telleren regnes av lista, OMVISNING.teller)."""
+        sider = ht.rundturer()
+        alle = sum(len(sider[s]) for s in ht.OMVISNINGEN_SIDER)
+        assert len(ht.omvisningen()) == alle - len(ht.GJENTATT_I_OMVISNINGEN)
+
+
+class TestReadmeOmvisningen:
+    def test_setningen_etter_dobbeltklikket(self):
+        """Ville feilet hvis «Kom i gang» ikke sa rett etter dobbeltklikket at
+        appen tilbyr omvisningen, «Spill av omvisningen» og «Vis meg rundt»."""
+        readme = (ROT / "README.md").read_text(encoding="utf-8")
+        etter = readme[readme.index("5. **Lukk vinduet** for å stoppe appen.") :]
+        neste = etter.split("\n\n", 2)[1]
+        assert neste.startswith("**Omvisningen:** første gang tilbyr appen en omvisning")
+        assert "«Spill av omvisningen» øverst" in neste and "«Vis meg rundt» viser siden du står på" in neste
+
+    def test_linja_under_ekstra(self):
+        """Ville feilet hvis linja under «Ekstra, ferdig» fortsatt sa «ved
+        «Vis meg rundt»», som før knappene kom i raden øverst."""
+        readme = (ROT / "README.md").read_text(encoding="utf-8")
+        assert "«Spill av omvisningen» ved «Vis meg rundt»" not in readme
+        assert "- «Spill av omvisningen» og «Vis meg rundt» øverst på sidene:" in readme
+
+
+# Tillegg 5 (gruppens svar 11.11 kl. 18:09): den første knappen i periodevalget.
+
+
+def _vinduet(side: str, id_: str) -> str:
+    return side.split(f'<div id="{id_}" class="hjelpevindu"', 1)[1].split('class="lukkes"', 1)[0]
+
+
+class TestFoersteKnappen:
+    @pytest.mark.parametrize(
+        "adresse,vindu",
+        [
+            ("/", "hjelp-perioden"),
+            ("/min-liste", "hjelp-sammenlign"),
+            ("/boersometer", "hjelp-perioden"),
+            ("/aksje/BRFE", "hjelp-graf"),
+        ],
+    )
+    def test_setningen_overalt_og_demoen(self, klient, adresse, vindu):
+        """Ville feilet hvis «?» ved periodevalget på en av sidene ikke sa
+        hvorfor den første knappen heter som den gjør, eller demoen ikke sa
+        at det er fredag 09.10."""
+        tekst = _vinduet(_side(klient, adresse), vindu)
+        assert ht.FOERSTE_KNAPP in tekst
+        assert "I demoen er det fredag 09.10, den siste dagen med oppdiktede kurser." in tekst
+
+    def test_ikke_demosetningen_i_den_ekte_versjonen(self, ekte):
+        """Ville feilet hvis den ekte versjonen sa noe om demoen."""
+        side = _side(ekte, "/")
+        assert ht.FOERSTE_KNAPP in side
+        assert ht.DEMO_FOERSTE_KNAPP not in side
+
+    def test_dagen_fra_demodataene(self):
+        """Ville feilet hvis dagen og datoen var skrevet inn for hånd og ikke
+        regnet av SLUTTDATO i demo.py."""
+        from perioder import UKEDAGER
+
+        dag = UKEDAGER[demo.SLUTTDATO.weekday()].lower()
+        assert ht.DEMO_FOERSTE_KNAPP.startswith(f"I demoen er det {dag} {demo.SLUTTDATO:%d.%m},")
+        kilde = (ROT / "src" / "hjelpetekster.py").read_text(encoding="utf-8")
+        assert "{UKEDAGER[SLUTTDATO.weekday()].lower()} {SLUTTDATO:%d.%m}" in kilde
+        assert "fredag 09.10" not in kilde
+
+    def test_knappen_heter_fredag_i_demoen(self, klient):
+        """Ville feilet hvis den første knappen i demoen het noe annet enn
+        «Fredag»."""
+        assert re.search(r">\s*Fredag\s*<", _side(klient, "/").split('class="periodevalg"', 1)[1])
+
+
+# Tillegg 7 (gruppens svar 11.11 kl. 19:48): «Uten ramme: 0 eller 1 av 3.»
+
+
+class TestUtenRamme:
+    def test_boersometeret(self, klient):
+        """Ville feilet hvis forklaringen på børsometeret manglet prøven uten
+        ramme eller setningen."""
+        side = _side(klient, "/boersometer")
+        rammen = side.split('class="symbolfelt rammefelt"', 1)[1].split("</li>", 1)[0]
+        assert '<span class="proeve uten-ramme"></span>' in rammen
+        assert "Uten ramme: 0 eller 1 av 3." in rammen
+
+    @pytest.mark.parametrize(
+        "adresse,vindu",
+        [("/", "hjelp-signalstyrke"), ("/min-liste", "hjelp-signalstyrke"), ("/aksje/BRFE", "hjelp-styrke")],
+    )
+    def test_ringen_med_de_samme_ordene(self, klient, adresse, vindu):
+        """Ville feilet hvis oversikten, Min liste eller aksjesiden ikke sa
+        hva som er uten ring, med de samme ordene som børsometeret."""
+        side = _side(klient, adresse)
+        assert f'<div id="{vindu}" class="hjelpevindu"' in side, adresse
+        assert "Uten ring: 0 eller 1 av 3." in _vinduet(side, vindu)
+
+    def test_ogsaa_i_den_ekte_versjonen(self, ekte):
+        """Ville feilet hvis setningene bare sto i demoen."""
+        assert "Uten ramme: 0 eller 1 av 3." in _side(ekte, "/boersometer")
+        assert "Uten ring: 0 eller 1 av 3." in _side(ekte, "/")
+
+    def test_regnet_av_terskelen(self):
+        """Ville feilet hvis «0 eller 1» var skrevet for hånd og ikke fulgte
+        terskelen i Parametre."""
+        from signalberegning import STANDARD
+
+        assert ht.UNDER_TERSKELEN == " eller ".join(str(n) for n in range(STANDARD.terskel))
+
+
+# Tillegg 13 (gruppens svar 11.11 kl. 20:33): de ferdige listene bare i steg 3.
+
+
+class TestFerdigeListerBareISteg3:
+    def test_bare_i_steg_3_med_ankeret(self, klient):
+        """Ville feilet hvis «Start fra en ferdig liste» sto under «Følg flere
+        aksjer», eller ankeret #ferdige-lister ikke var i steg 3."""
+        side = _side(klient, "/min-liste")
+        assert side.count('id="ferdige-lister"') == 1
+        steg3 = side.split("Velg aksjene dine</h4>", 1)[1].split("</li>\n  </ol>", 1)[0]
+        assert 'id="ferdige-lister"' in steg3
+        flere = side.split('id="folg-flere"', 1)[1]
+        assert "ferdig-liste?bransje=" not in flere.split("</section>", 1)[0]
+        assert "<h4>Start fra en ferdig liste</h4>" not in side
+
+    def test_avbryt_gaar_til_ankeret(self, klient):
+        """Ville feilet hvis «Avbryt» på «Er du sikker?» pekte et annet sted."""
+        side = _side(klient, "/ferdig-liste?bransje=Kraft")
+        assert 'href="/min-liste#ferdige-lister">Avbryt</a>' in side
+
+
+# Tillegg 14 og 15 (gruppens svar 11.11 kl. 20:39 og forslaget kl. 20:44):
+# «Følg flere aksjer» som rådet tegnet.
+
+
+def _flere(side: str) -> str:
+    return side.split('<div class="flere-topp">', 1)[1].split('<p class="demoboks">', 1)[0]
+
+
+def _foelg_i_demobasen(antall: int) -> None:
+    """Legger inn ønsker om å følge til lista har antall aksjer."""
+    import sqlite3
+
+    with sqlite3.connect(demo_sti()) as t:
+        i_lista = t.execute("SELECT COUNT(*) FROM aksje WHERE ut IS NULL").fetchone()[0]
+        venter = "tatt_i_bruk IS NULL AND avvist IS NULL"
+        i_lista += t.execute(f"SELECT COUNT(*) FROM oenske WHERE handling = 'folg' AND {venter}").fetchone()[0]
+        i_lista -= t.execute(f"SELECT COUNT(*) FROM oenske WHERE handling = 'fjern' AND {venter}").fetchone()[0]
+        for n in range(antall - i_lista):
+            t.execute(
+                "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, 'Kraft', ?)",
+                (f"TEST{n}", f"Testaksje {n}", "2026-10-13T12:00:00+00:00"),
+            )
+
+
+class TestFoelgFlereAksjer:
+    def test_toppen_naar_lista_ikke_er_full(self, klient):
+        """Ville feilet hvis tallet, de ledige plassene, rutene eller
+        setningen og knappen fra forslaget kl. 20:44 manglet."""
+        side = _side(klient, "/min-liste")
+        flere = _flere(side)
+        m = re.search(r'<p class="antall-egne">Appen følger (\d+) av 18, (\d+) plass(?:er)? ledige\.</p>', flere)
+        assert m and int(m.group(1)) + int(m.group(2)) == 18
+        assert 'popovertarget="hjelp-flere"' in flere
+        strek = flere.split('<span class="plassstrek" aria-hidden="true">', 1)[1].split("</span></span>", 1)[0]
+        assert strek.count('class="brukt"') == int(m.group(1))
+        assert strek.count('class="ledig"') == int(m.group(2))
+        assert "Følg en aksje til, eller bytt ut en. Endringen skjer ved neste henting." in flere
+        assert '<a class="knapp hoved" href="/folg">+ Følg en aksje</a>' in flere
+
+    def test_toppen_naar_lista_er_full(self, klient):
+        """Ville feilet hvis en full liste ikke sa «, som er taket.» og
+        setningen om å bytte, eller fortsatt hadde «+ Følg en aksje»."""
+        _foelg_i_demobasen(18)
+        flere = _flere(_side(klient, "/min-liste"))
+        assert '<p class="antall-egne">Appen følger 18 av 18, som er taket.</p>' in flere
+        assert "Bytt ut en aksje for å følge en annen. Byttet skjer ved neste henting." in flere
+        assert 'class="ledig"' not in flere and flere.count('class="brukt"') == 18
+        assert "+ Følg en aksje" not in flere
+
+    def test_kortene_etter_bransje_i_rekkefoelgen_paa_boersometeret(self, klient):
+        """Ville feilet hvis aksjene ikke sto i kort per bransje, i
+        rekkefølgen på børsometeret, med antallet og lenken til aksjesiden."""
+        from boersometer import BRANSJER
+
+        flere = _flere(_side(klient, "/min-liste"))
+        kortene = re.findall(r'<section class="bransjekortet"[^>]*>\s*<h4[^>]*>(.*?)</h4>(.*?)</section>', flere, re.S)
+        assert kortene
+        navn = [re.sub(r"<[^>]+>", "", h).split()[0] for h, _ in kortene]
+        assert navn == sorted(navn, key=BRANSJER.index)
+        for h, innhold in kortene:
+            antall = int(re.search(r'<span class="antall">(\d+)</span>', h).group(1))
+            assert innhold.count("<li>") == antall
+            assert re.search(r'<a class="navn" href="/aksje/[A-Z0-9]+">', innhold)
+            assert re.search(r'<a class="knapp liten" href="/folg\?bytt=', innhold)
+
+    def test_kallene_bak_spoersmaalstegnet(self, klient):
+        """Ville feilet hvis teksten om kallene og gratiskontoen sto i siden
+        og ikke bak «?»."""
+        side = _side(klient, "/min-liste")
+        vinduet = _vinduet(side, "hjelp-flere")
+        assert "Appen kan følge opptil 18 aksjer" in vinduet and "gratiskonto" in vinduet
+        assert "Hver bruker har sin egen gratiskonto" not in _flere(side)
+
+    def test_stilen_tre_kolonner_og_en_ved_390(self):
+        """Ville feilet hvis kortene ikke sto i tre kolonner på bred skjerm og
+        én ved 390 px, eller streken ikke var skjult for skjermlesere."""
+        stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        assert ".bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));" in stil
+        assert re.search(
+            r"@media \(max-width: 600px\) \{\s*:where\(\.side-oversikt\) \.bransjekort \{ grid-template-columns: 1fr; \}",
+            stil,
+        )
+
+    def test_den_ekte_versjonen(self, ekte):
+        """Ville feilet hvis utformingen bare var i demoen, eller boksen om
+        demoen sto i den ekte versjonen."""
+        side = _side(ekte, "/min-liste")
+        if 'id="folg-flere"' in side:
+            assert 'class="bransjekortet"' in side
+            assert 'class="demoboks"' not in side

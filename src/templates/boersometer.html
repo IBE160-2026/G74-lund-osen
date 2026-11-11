@@ -52,8 +52,8 @@
           <span class="skala" aria-hidden="true">{% for trinn, tekst in fargetrinn %}<span class="trinn-{{ trinn }}"></span>{% endfor %}</span>
           <span class="grenser" aria-hidden="true">{% for grense in skalagrenser %}<span>{{ grense }}</span>{% endfor %}</span>
           <span class="skjult">{% for trinn, tekst in fargetrinn %}{{ tekst }}{% if not loop.last %}, {% else %}.{% endif %} {% endfor %}</span></span></li>
-        <li><span class="symbolfelt rammefelt" aria-hidden="true"><span class="proeve ramme-moerk"></span><span class="proeve ramme-gul"></span></span>
-          <span><strong>Rammen</strong> Den tykke rammen rundt ruta er mørk ved {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag og gul ved {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag, også en annen dag. Ringen rundt styrken i ruta viser det samme for siste børsdag, som i tabellen på oversikten.</span></li>
+        <li><span class="symbolfelt rammefelt" aria-hidden="true"><span class="proeve ramme-moerk"></span><span class="proeve ramme-gul"></span><span class="proeve uten-ramme"></span></span>
+          <span><strong>Rammen</strong> Den tykke rammen rundt ruta er mørk ved {{ antall_sjekker - 1 }} av {{ antall_sjekker }} på siste børsdag og gul ved {{ antall_sjekker }} av {{ antall_sjekker }} på siste børsdag, også en annen dag. Ringen rundt styrken i ruta viser det samme for siste børsdag, som i tabellen på oversikten. {{ hjelp.tekst("uten_ramme").tekst }}</span></li>
         <li><span class="symbolfelt stoerrelsefelt" aria-hidden="true"><span></span><span></span><span></span></span>
           <span><strong>Størrelsen</strong> Én dag: jo mer det ble handlet enn vanlig, mot medianen for de {{ volum_vindu }} børsdagene før, jo større rute. En periode: alle rutene er like store.</span></li>
         <li><span class="symbolfelt" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3l14 8-6 2-3 6z"/></svg></span>
@@ -184,7 +184,7 @@
   {% endif %}
   {{ hjelpevindu("hjelp-boersometer", "Børsometer", [("", ["boersometeret", "boersometeret_ruta"])]) }}
   {#- Story 8.17b: periodevalget. #}
-  {% if bransjer %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_boersometeret"])]) }}{% endif %}
+  {% if bransjer %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_boersometeret", "foerste_knapp"] + (["foerste_knapp_demo"] if eksempeltall else []))]) }}{% endif %}
   {#- Story 8.23 (tillegg 3): «?» ved kolonnene i tabellen. #}
   {% if bransjer %}{{ hjelpevindu("hjelp-tabell-endring", "Endring", [("", ["boersometer_endring"])]) }}{{ hjelpevindu("hjelp-tabell-volum", "Volum mot vanlig", [("", ["boersometer_volum"])]) }}{% endif %}
 {% endblock %}

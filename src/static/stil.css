@@ -730,7 +730,7 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
 :where(.side-aksje) .ki-bryter { margin: 10px 0 0; }
 :where(.side-aksje) .ki .ki-bryter { margin: 0; }
 :where(.side-aksje) .ki-bryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
-                                        box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;
+                                        box-sizing: border-box; font: inherit; font-weight: 600;
                                         border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort);
                                         color: var(--blekk); cursor: pointer; }
 :where(.side-aksje) .ki-bryter .spor { position: relative; width: 36px; height: 20px; border-radius: 999px;
@@ -1107,6 +1107,8 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
 :where(.side-oversikt) .fargefelt span { width: 9px; height: 9px; border-radius: 2px; }
 :where(.side-oversikt) .rammefelt .proeve { display: inline-block; box-sizing: border-box; width: 13px; height: 13px; border-width: 3px; border-radius: 2px;
                                             background: var(--trinn-noeytral); box-shadow: none; }
+/* Story 8.26 (tillegg 7): prøven uten ramme, for 0 og 1 av 3. */
+:where(.side-oversikt) .rammefelt .proeve.uten-ramme { border: 1px solid var(--strek-2); }
 :where(.side-oversikt) .stoerrelsefelt { align-items: flex-end; padding-bottom: 9px; box-sizing: border-box; }
 :where(.side-oversikt) .stoerrelsefelt span { background: var(--dempet); border-radius: 1px; width: 6px; height: 6px; }
 :where(.side-oversikt) .stoerrelsefelt span + span { width: 8px; height: 9px; }
@@ -1273,6 +1275,12 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .valgbrikke:has(input:checked)::before, :where(.side-oversikt) .valgbrikke.valgt::before {
   content: "✓" / ""; font-weight: 700; }
 :where(.side-oversikt) .valgbrikke input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
+/* Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): antallet på hver
+   bransje, og en bransje uten aksjer som kan følges, er grå og kan ikke velges. */
+:where(.side-oversikt) .valgbrikke .antall { font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) .valgbrikke.tom { color: var(--dempet); border-style: dashed; cursor: default; opacity: 0.6; }
+/* «Vis» skjules av skriptet (hidden), som ellers overstyres av display på .knapp. */
+.folgfilter button[hidden] { display: none; }
 :where(.side-oversikt) .valgbrikke:has(input:focus-visible), :where(.side-oversikt) a.valgbrikke:focus-visible {
   outline: 3px solid var(--blekk); outline-offset: 2px; }
 @media (forced-colors: active) {
@@ -1341,6 +1349,35 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                border-left: 4px solid var(--oransje); border-radius: 8px; background: var(--kort); color: var(--tekst); }
 :where(.side-oversikt) span.full { display: block; }
 :where(.side-oversikt) .bytt-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 24px; }
+/* Story 8.26 (tillegg 14 og 15): «Følg flere aksjer» som rådet tegnet: tallet og
+   streken med plassene til høyre for overskriften (under på smal skjerm), og
+   aksjene i hvite kort per bransje, tre kolonner på bred skjerm og én ved 390 px. */
+:where(.side-oversikt) .flere-topp { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 24px; margin: 32px 0 8px; }
+:where(.side-oversikt) .flere-topp h3 { margin: 0; }
+:where(.side-oversikt) .plassene { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+:where(.side-oversikt) .plassene .antall-egne { color: var(--blekk); font-weight: 600; }
+:where(.side-oversikt) .plassstrek { display: inline-flex; gap: 3px; }
+:where(.side-oversikt) .plassstrek span { width: 10px; height: 10px; border-radius: 2px; background: var(--strek-2); }
+:where(.side-oversikt) .plassstrek span.brukt { background: var(--blekk); }
+:where(.side-oversikt) .flere-setning { margin: 0 0 16px; color: var(--dempet); }
+:where(.side-oversikt) .flere-handling { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 16px; }
+:where(.side-oversikt) .flere-handling .flere-setning { margin: 0; }
+:where(.side-oversikt) .bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+:where(.side-oversikt) .bransjekortet { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 14px 16px; }
+:where(.side-oversikt) .bransjekortet h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 16px; }
+:where(.side-oversikt) .bransjekortet h4 .antall { color: var(--dempet); font-weight: 400; }
+:where(.side-oversikt) .bransjekortet h4 .bransjesymbol { width: 18px; height: 18px; flex: none; }
+:where(.side-oversikt) .bransjekortet .bytt-lista { display: block; }
+:where(.side-oversikt) .bransjekortet .bytt-lista li { padding: 8px 0; border-top: 1px solid var(--strek); align-items: center; gap: 6px 8px; }
+:where(.side-oversikt) .bransjekortet .selskapet { display: flex; flex-direction: column; min-width: 0; }
+:where(.side-oversikt) .bransjekortet .selskapet .linje { color: var(--dempet); font-size: 12.5px; }
+:where(.side-oversikt) .bransjekortet .knapp.liten { margin-left: auto; min-height: 32px; padding: 0 10px; font-size: 13.5px; }
+@media (max-width: 900px) { :where(.side-oversikt) .bransjekort { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  :where(.side-oversikt) .bransjekort { grid-template-columns: 1fr; }
+  :where(.side-oversikt) .plassene { align-items: flex-start; }
+}
+@media (forced-colors: active) { :where(.side-oversikt) .plassstrek span { border: 1px solid CanvasText; } :where(.side-oversikt) .plassstrek span.brukt { background: CanvasText; } }
 :where(.side-oversikt) .bytt-lista .knapp { margin-left: auto; min-height: 36px; }
 /* Story 2.12 (gjennomgangen, VG2): «Utenfor målingen» på aksjesiden og i
    børsometeret, i grått. */
@@ -1369,7 +1406,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .innstillingsbryter .verdi { color: var(--dempet); font-weight: 400; }
 /* Story 10.6: bryteren «Vis KI-tekst» på oversikten, som på aksjesiden. */
 :where(.side-oversikt) .dagsbryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
-                                           box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;
+                                           box-sizing: border-box; font: inherit; font-weight: 600;
                                            border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort);
                                            color: var(--blekk); cursor: pointer; }
 :where(.side-oversikt) .dagsbryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
@@ -1377,7 +1414,8 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                           background: var(--strek-2); flex: none; }
 :where(.side-oversikt) .dagsbryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
                                                  border-radius: 50%; background: var(--hvit); }
-/* Story 8.26 (svaret kl. 17:21): som bryterne i Innstillinger. */
+/* Story 8.26 (svaret kl. 17:21, tillegg 18 og ønsket kl. 22:09): som bryterne i
+   Innstillinger, med samme skrift, størrelse, knott og «På» og «Av». */
 :where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: var(--oransje); }
 :where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor::after { left: 18px; background: var(--blekk); }
 :where(.side-oversikt) .dagsbryter .verdi { color: var(--dempet); font-weight: 400; }
@@ -1463,6 +1501,15 @@ header.stripe button.sideknapp[hidden] { display: none; }
 /* Story 8.25: boksen står fast nederst til høyre, og delen den peker på,
    rulles øverst og merkes med en kraftig ramme. */
 .omvisning-merket { outline: 3px solid var(--oransje); outline-offset: 4px; border-radius: 6px; scroll-margin-top: 24px; }
+/* Story 8.26 (gruppens svar 11.11 kl. 22:13, tillegg 18): et steg om én kolonne
+   merker overskriften og de første radene med en ramme rundt kolonnen, og
+   boksen flyttes til venstre når den ellers ville dekket den. */
+.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje); scroll-margin-top: 24px; }
+td.omvisning-kolonne { background-color: color-mix(in srgb, var(--oransje) 14%, transparent); }
+th.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje), inset 0 3px 0 var(--oransje); }
+.omvisning-kolonne.omvisning-kolonne-siste { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje), inset 0 -3px 0 var(--oransje); }
+.omvisning.til-venstre { right: auto; left: 16px; }
+@media (forced-colors: active) { .omvisning-kolonne { outline: 3px solid Highlight; outline-offset: -3px; } }
 .omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
              border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }

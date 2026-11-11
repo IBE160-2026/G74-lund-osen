@@ -161,7 +161,7 @@
       setningen om den stiplede linja bare med indeksen, og så streken og
       knappene. Gjennomgangen av 8.20a: snittet når grafen tegner det, også
       en dag uten sjekker (ECH4, VG2), og streken bare når den vises (ECH5). #}
-  {%- set grafhjelp = ((["grafen"] if graf.har_ma50 else ["grafen_uten_snitt"]) + (["indekslinja"] if graf.har_indeks else []) + (["streken"] if graf.merket else []) + ["perioden"]) if graf else [] %}
+  {%- set grafhjelp = ((["grafen"] if graf.har_ma50 else ["grafen_uten_snitt"]) + (["indekslinja"] if graf.har_indeks else []) + (["streken"] if graf.merket else []) + ["perioden", "foerste_knapp"] + (["foerste_knapp_demo"] if eksempeltall else [])) if graf else [] %}
   {%- set vis_grafhjelp = grafhjelp|length > 0 %}
   {#- Story 8.16: periodevalget i designregler.md §2, og overskriften etter
       perioden. Siste børsdag og «Velg dag» viser 6 mnd fram til dagen. #}
@@ -385,7 +385,7 @@
         <form class="ki-bryter" method="post" action="/ki">
           <input type="hidden" name="til" value="{{ ki_til }}">
           <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
-          <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
+          <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">Vis KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
         </form>
       </div>
       {#- Gruppens svar 25.10 kl. 00:51 og 5.11 kl. 19:13 og 23:36: appen
@@ -467,7 +467,11 @@
     {#- Story 8.23 (tillegg 2): hvor ofte aksjen fikk 3 av 3 det siste året, og
         sist. Er serien kortere enn et år, står «siden» og den første dagen.
         Bare antall og datoer (NFR-06). #}
-    {% if alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}.</p>{% endif %}
+    {#- Story 8.26 (tillegg 17): uten en eneste vurdering, som Varde
+        Systemer i demoen, står at signalet ikke er regnet ennå, og hvorfor,
+        som øverst på siden. #}
+    {% if alle_sjekkene and not alle_sjekkene.vurdert %}<p class="alle-sjekkene-aaret">Signalet er ikke regnet ennå: {% if detalj.for_kort_serie %}Trenger {{ detalj.noedvendige_dager }} dager for å regne signal, fikk {{ detalj.antall_dager }}.{% else %}{{ detalj.tekst }}.{% endif %}</p>
+    {% elif alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}.</p>{% endif %}
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>
@@ -530,7 +534,7 @@
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
   {% endif %}
-  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad_kort"])]) }}
+  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ringen", "ikke_raad_kort"])]) }}
   {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
     ("", ["retning_aksje", "positiv_aksje", "negativ_aksje", "blandet_aksje", "ingen_aksje", "ukjent_aksje", "oftere_positiv"]),
   ]) }}

@@ -332,7 +332,10 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
     topp = ki.split('<div class="ki-topp">', 1)[1].split("</form>", 1)[0]
     # Story 10.9, del C: rammen heter «Signalet forklart».
     assert "Signalet forklart</span>" in topp and 'role="switch" aria-checked="true"' in topp
-    assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
+    # Story 8.26 (tillegg 18): «Vis KI-tekst», som bryterne i Innstillinger.
+    assert (
+        '<span class="navn">Vis KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
+    )
     assert html.count('class="ki-bryter"') == 1
     # Gjennomgangen (VG1): gult heter også oransje og baand-ut i stilen.
     # Story 8.26 (gruppens svar 11.11 kl. 17:21): bryteren som er på, er

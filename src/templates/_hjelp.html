@@ -18,7 +18,7 @@
     hjelpen gjelder den. #}
 {#- Story 8.26 (tillegg 12): linjer er tall siden har regnet ut, som kallene
     i «Din egen liste», og står som en liste etter tekstene. #}
-{% macro hjelpevindu(id, tittel, grupper, vist=none, linjer=()) -%}
+{% macro hjelpevindu(id, tittel, grupper, vist=none, linjer=(), avsnitt=()) -%}
 {%- if vis_hjelp is not defined or vis_hjelp -%}
 <div id="{{ id }}" class="hjelpevindu" popover>
   <div class="hjelpetopp">
@@ -37,6 +37,8 @@
       <p>{% if tekst.tittel %}<strong>{{ tekst.tittel }}</strong> {% endif %}{{ tekst.tekst }}</p>
     {% endfor %}
   {% endfor %}
+  {#- Story 8.26 (tillegg 14): avsnitt med tall siden har regnet ut. #}
+  {% for a in avsnitt %}<p>{{ a }}</p>{% endfor %}
   {% if linjer %}<ul class="kallene">{% for linje in linjer %}<li>{{ linje }}</li>{% endfor %}</ul>{% endif %}
   {% if vist %}<p class="vist"><strong>Siden viser</strong> {{ vist }}.</p>{% endif %}
   {#- Story 8.26 (funnene fra demoprøven): hvordan vinduet lukkes. Et nytt

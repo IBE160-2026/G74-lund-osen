@@ -8,6 +8,7 @@ bruker en falsk modell (AD-8), og ingen test kaller Ollama eller EODHD.
 import hashlib
 import inspect
 import json
+import re
 from datetime import date, datetime, timedelta
 
 import pytest
@@ -571,7 +572,8 @@ class TestForsiden:
     def test_min_liste_har_ikke_delen(self, klient):
         """Spørsmål 9: FR-607 gjelder markedsoversikten."""
         forsiden_med(TEKSTEN)
-        assert "Børsdagen kort fortalt" not in html(klient, "/min-liste?vis=alle")
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert "Børsdagen kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html(klient, "/min-liste?vis=alle"))
 
     def test_linja_om_min_liste_under_teksten(self, klient):
         """Story 10.10, spørsmål 10 (gjennomgangen, VG1): ville feilet hvis

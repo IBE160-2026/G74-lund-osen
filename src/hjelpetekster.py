@@ -21,8 +21,9 @@ skjevhet, og retningen forklares med +1 og -1 (FR-704, rettet 13.10).
 
 from dataclasses import dataclass
 
-from demo import DEMOUNIVERS, UTEN_KURSER
+from demo import DEMOUNIVERS, SLUTTDATO, UTEN_KURSER
 from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING, UTEN_DATA_TEKST
+from perioder import UKEDAGER
 from signalberegning import (
     BLANDET,
     INGEN,
@@ -151,11 +152,23 @@ def _grensene(m: Parametre) -> str:
 # navnet på aksjen som med vilje er uten kurser, fra demodataene.
 UTEN_KURSER_HVORFOR = (
     "appen har ingen kurser for aksjen ennå, fordi den nettopp er lagt til og venter på hentingen om kvelden, "
-    "eller fordi kilden ikke har kurser for den."
+    "eller fordi EODHD ikke har kurser for den."
 )
 DEMO_UTEN_KURSER = (
     f"I demoen er {next(a.navn for a in DEMOUNIVERS if a.symbol == UTEN_KURSER)} med vilje uten kurser, "
     "så du ser hvordan det ser ut."
+)
+
+# Story 8.26 (tillegg 7): styrkene under terskelen, «0 eller 1», regnet av
+# Parametre så ordene følger terskelen.
+UNDER_TERSKELEN = " eller ".join(str(n) for n in range(STANDARD.terskel))
+
+# Story 8.26 (gruppens svar 11.11 kl. 18:09, tillegg 5): hvorfor den første
+# knappen i periodevalget heter «Fredag» i demoen. Dagen og datoen fra
+# demodataene (SLUTTDATO), ikke skrevet inn for hånd.
+FOERSTE_KNAPP = "Den første knappen heter etter dagen kursene er fra: «I dag», «I går» eller ukedagen."
+DEMO_FOERSTE_KNAPP = (
+    f"I demoen er det {UKEDAGER[SLUTTDATO.weekday()].lower()} {SLUTTDATO:%d.%m}, den siste dagen med oppdiktede kurser."
 )
 
 
@@ -210,7 +223,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "",
             "For én dag følger størrelsen volumet mot vanlig, og for en periode er rutene like store. "
             f"Gul ramme er {ANTALL_SJEKKER} av {ANTALL_SJEKKER} og mørk {ANTALL_SJEKKER - 1} av "
-            f"{ANTALL_SJEKKER}, begge siste børsdag.",
+            f"{ANTALL_SJEKKER}, begge siste børsdag. Uten ramme: {UNDER_TERSKELEN} av {ANTALL_SJEKKER}.",
             (
                 (BOERSOMETER, "def vekt("),
                 (BOERSOMETER, "def ramme("),
@@ -269,17 +282,15 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # viser linja.
         "soeylene": Hjelpetekst(
             "Søylene:",
-            "endringen for hver aksje, fra størst fall til venstre til størst stigning "
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "endringen for hver aksje, fra størst fall til størst stigning. "
             # Gruppens svar 04.11 kl. 09:58: lys og mørk, som i børsometeret.
-            f"til høyre, mørk fra {soeylegrense} opp eller ned, som i børsometeret, og lys under. "
+            f"En søyle er mørk fra {soeylegrense} opp eller ned, som i børsometeret. "
             # Gjennomgangen av 8.2b (VG2): grå ved 0,00 % står igjen.
-            "Den stiplede linja er indeksen, grønn når den steg, rød når den falt "
-            "og grå ved 0,00 %. "
+            "Den stiplede linja er indeksen: grønn når den steg, rød når den falt, grå ved 0,00 %. "
             # Story 8.2a, c (U20): symbolet over søyla er en lenke.
-            "Et gult bransjesymbol betyr 3 av 3 siste børsdag, et klikk på symbolet viser aksjen, "
-            # Gruppens svar 04.11 kl. 22:23, 2: lenken til børsometeret.
-            # Gruppens svar 05.11 kl. 14:29, 3: «Se dagen» ved én dag.
-            "og «Se dagen» eller «Se perioden» under søylene åpner børsometeret med samme dag eller periode.",
+            # Lenken under søylene til børsometeret forklarer seg selv (tillegg 18).
+            "Et gult bransjesymbol er 3 av 3 siste børsdag.",
             (
                 (PRD, "#### FR-105 — Søylene under hovedindeksen"),
                 (HOVEDINDEKS_MAL, 'class="til-boersometer"'),
@@ -312,7 +323,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Signalet dag for dag:",
             # Story 8.2b, b (U16): det som er tatt ut av ingressen.
             # Story 8.20a (del E): hoeyst 60 ord. Pilene staar ved maaneden.
-            "det appen skrev om aksjen hver børsdag, lest fra basen og aldri regnet på nytt. "
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "det appen skrev om aksjen hver børsdag. Det regnes aldri på nytt. "
             f"Uka og måneden teller dagene med signalstyrke {terskel} eller mer, og "
             f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} har ring. "
             "Klikk på en dag med kurs for å se hele siden for den dagen.",
@@ -340,7 +352,8 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.20a (del J, spoersmaal 10 i 8.20): tittelen som i grafen.
         "utbyttejustert": Hjelpetekst(
             "Kurs justert for utbytte:",
-            "kilden regner kursen om bakover ved hvert nytt utbytte, så et "
+            # Story 8.26 (tillegg 18): EODHD, ikke «kilden».
+            "EODHD regner kursen om bakover ved hvert nytt utbytte, så et "
             "ordinært utbytte ikke ser ut som et kursfall. Endringen, de "
             f"{ANTALL_SJEKKER} sjekkene og kursgrafen bruker den.",
             (
@@ -374,8 +387,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Gjennomgangen 24.10 (BH7): nederst uten sortering. Sortert på
             # Selskap står den etter navnet.
             # Story 8.26 (tillegg 8): først hvorfor, så hvor raden står.
-            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen uten sortering, med «–» og lenke til "
-            "aksjesiden, og en aksje som venter, står under med «venter på henting», uten lenke.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen, med «–». "
+            "En aksje som venter, står under med «venter på henting».",
             (
                 # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
                 (PRD, "en aksje uten en eneste kursrad har en rad nederst i tabellen"),
@@ -383,8 +397,27 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (MARKEDSOVERSIKT, "class RadUtenData"),
             ),
         ),
+        # Story 8.26 (tillegg 5): ved «?» for periodevalget overalt, og i demoen
+        # dagen kursene slutter.
+        "foerste_knapp": Hjelpetekst("", FOERSTE_KNAPP, ((PERIODER, "def foerste_knapp("),)),
+        "foerste_knapp_demo": Hjelpetekst("", DEMO_FOERSTE_KNAPP, (("src/demo.py", "SLUTTDATO = date(2026, 10, 9)"),)),
         # Story 8.26 (tillegg 8): bare i demoen, med navnet fra demodataene.
         "uten_data_demo": Hjelpetekst("", DEMO_UTEN_KURSER, (("src/demo.py", 'UTEN_KURSER = "MTFJ"'),)),
+        # Story 8.26 (gruppens svar 11.11 kl. 19:48, tillegg 7): det som ikke
+        # er merket, med de samme ordene på alle sidene. Rammen på
+        # børsometeret, ringen rundt tallet på oversikten, i Min liste og på
+        # aksjesiden.
+        "uten_ramme": Hjelpetekst(
+            "",
+            f"Uten ramme: {UNDER_TERSKELEN} av {ANTALL_SJEKKER}.",
+            (("src/templates/boersometer.html", 'class="proeve uten-ramme"'), (BOERSOMETER, "def ramme(")),
+        ),
+        "ringen": Hjelpetekst(
+            "",
+            f"Ringen rundt tallet er svart ved {terskel} av {ANTALL_SJEKKER} og oransje ved {ANTALL_SJEKKER} "
+            f"av {ANTALL_SJEKKER}. Uten ring: {UNDER_TERSKELEN} av {ANTALL_SJEKKER}.",
+            ((INDEX_MAL, "pille to-av-tre"), (AKSJE_MAL, '"to-av-tre"')),
+        ),
         "signalstyrke": Hjelpetekst(
             "Signalstyrke:",
             # Story 8.20a (del J): «Skilte seg ut», som oversikten sier.
@@ -568,11 +601,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.17a: periodevalget i oversikten, med søylene og linja.
         "perioden_oversikten": Hjelpetekst(
             "Periodene:",
-            "knappene viser siste børsdag, endringen fra den første kursen i perioden til siste "
-            "børsdag, eller en dag du velger, med signalet som er lagret for den. Ved en periode "
-            "gjelder sluttkursen og signalet siste børsdag, og «fra» med en dato står under "
-            "endringen når kursserien begynner senere. Søylene og den stiplede linja følger samme "
-            "periode eller dag, og oransje strek viser 3 av 3 siste børsdag.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "den første knappen viser siste børsdag. De andre viser endringen fra den første kursen i "
+            "perioden til siste børsdag, og sluttkursen og signalet gjelder siste børsdag. "
+            "«Vis dagen» viser en dag du velger, med signalet som er lagret for den. "
+            "Søylene følger samme periode eller dag.",
             (
                 (PERIODER, "def startdag("),
                 (PERIODER, "def foerste_kursdag("),
@@ -586,11 +619,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # «Sammenlign siste børsdag med» fra 8.20c (U101, spørsmål 19 i 8.20).
         "sammenlign_med": Hjelpetekst(
             "Sammenlign siste børsdag med:",
-            "knappene er de samme som i oversikten, og øverst i hver rad står alltid siste børsdag. "
-            "Med en periode eller en dag du velger, står en linje under hver rad med sluttkursen den "
-            "første dagen i perioden eller dagen du valgte, endringen derfra til siste børsdag og "
-            "signalet som er lagret for dagen, som aldri regnes på nytt. Oransje strek og «3 av 3» "
-            "gjelder siste børsdag.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "øverst i hver rad står alltid siste børsdag. Med en periode eller en dag du velger, står "
+            "en linje under hver rad: sluttkursen den dagen, endringen derfra til siste børsdag og "
+            "signalet som er lagret for dagen. «3 av 3» gjelder siste børsdag.",
             (
                 (MARKEDSOVERSIKT, "def bygg_sammenligning("),
                 (APP, "def _periodestart("),
@@ -602,10 +634,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "Periodene:",
             # Story 8.20b (U95): teksten fra utkastet i spesifikasjonen for 8.20.
             # Gjennomgangen (BH16): hvor perioden slutter, og at snittet følger den.
-            "den første knappen viser siste børsdag, de andre endringen fra den første kursen i "
-            "perioden til siste børsdag, i fargen og snittet, og datoen med «Vis dagen» en dag du "
-            "velger. Ved en periode er rutene like store, fordi volumet mot vanlig gjelder én dag. "
-            "Rammen er signalet siste børsdag.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "den første knappen viser siste børsdag. De andre viser endringen i perioden, i fargen og "
+            "snittet, og «Vis dagen» en dag du velger. Ved en periode er rutene like store, fordi volumet "
+            "mot vanlig gjelder én dag. Rammen er signalet siste børsdag.",
             (
                 (BOERSOMETER, "def vekt("),
                 (MARKEDSOVERSIKT, "def periodeendring("),
@@ -657,10 +689,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Erstatter «kort fortalt» fra svaret 04.11 kl. 22:23, 3.
         "signalet_forklart": Hjelpetekst(
             "",
-            "Først skriver appen hvor lenge signalet har vært slik og hva hovedindeksen, bransjen og lista "
-            "gjorde samme dag. Med KI på kommer en tekst fra en språkmodell, merket «Laget av KI», som bare "
-            "fikk det appen har regnet ut, som sjekkene og antall dager, aldri kurser, prosenter eller "
-            "volumer. Tallene med prikket strek er sjekket før teksten vises.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "Først skriver appen hvor lenge signalet har vært slik, og hva hovedindeksen, bransjen og lista "
+            "gjorde samme dag. Med KI på kommer en tekst fra en språkmodell, merket «Laget av KI». "
+            "Den fikk bare det appen har regnet ut, aldri kurser eller volumer. "
+            "Tall med prikket strek er sjekket.",
             (
                 (DAGENE, "def setning_om_dagene("),
                 (DAGENE, "def setning_om_samme_dag("),
@@ -704,10 +737,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "dine_egne_aksjer": Hjelpetekst(
             "",
-            "Lista kan ha opptil 18 aksjer, og aksjer du følger selv, står i tabellen sammen med de andre, merket "
-            "«Egen». En ny aksje hentes ved neste henting om kvelden og bruker da 1 kall om dagen, og fjerner du den før det, "
-            "brukes ingen kall; valget lagres på denne maskinen. Signalet er målt på aksjer som omsettes for over "
-            "32 MNOK om dagen, og omsettes aksjen mindre, eller er omsetningen ikke målt, merkes den «Utenfor målingen».",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "Appen følger opptil 18 aksjer. «Følg» gir stjerne, og aksjen står i tabellen merket «Egen». "
+            "Den hentes ved neste henting om kvelden og bruker da 1 kall om dagen. "
+            "Signalet er målt på aksjer som omsettes for over 32 MNOK om dagen. "
+            "Andre merkes «Utenfor målingen».",
             (
                 (VALG, "TAK = 18"),
                 (VALG, "GRENSE_MNOK = 32.0"),
@@ -721,11 +755,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # rangering etter kursen (NFR-06).
         "foelg_en_aksje": Hjelpetekst(
             "",
-            "Lista har alle aksjene på Oslo Børs som har en bransje og ikke er i lista di, og bransjen er fast "
-            "for hver aksje, fra kontrollsjekken 10.11, så du velger den ikke selv. «Mest omsatt først» ordner "
-            "etter median omsetning de 3 siste månedene og er ingen rangering etter kursen eller signalet. En "
-            "aksje som ikke er målt, står med «ikke målt ennå», og en som omsettes for under 32 MNOK om dagen, "
-            "eller ikke er målt, merkes «Utenfor målingen» når du velger den.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "Lista har aksjene på Oslo Børs med en bransje som appen ikke følger. Tallet på en bransje er "
+            "hvor mange som kan følges. «Mest omsatt først» ordner etter median omsetning de 3 siste "
+            "månedene, ikke etter signalet. Under 32 MNOK om dagen, eller ikke målt, merkes «Utenfor målingen».",
             (
                 (FERDIGE_LISTER, "def foelgbare("),
                 (FERDIGE_LISTER, "def sorter("),
@@ -738,14 +771,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # hjelpetekst har hoeyst tre (story 8.0c). Utdraget har fem.
         "boersdagen_kort_fortalt": Hjelpetekst(
             "",
-            "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). Modellen fikk bare det appen "
-            "regnet ut: om hovedindeksen steg eller falt, hvor mange aksjer som gjorde det bedre enn indeksen, "
-            "hvor mange som skilte seg ut og med hvilken retning, med navnet, styrken og retningen for høyst "
-            "fem, hvor mange som steg i hver bransje med minst to aksjer med en endring, bransjen som steg "
-            "mest og den som falt mest i snitt, om flere eller færre enn vanlig skilte seg ut, og om "
-            "hovedindeksen steg eller falt de siste fem børsdagene, med ukedagen og antallet aksjer i lista, og "
-            "ingen prosenter, kurser eller nyheter. "
-            "Teksten sjekkes før den vises: tall med prikket strek står i det modellen fikk, og den gir ikke råd.",
+            # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
+            "Et kort sammendrag av børsdagen, skrevet av en språkmodell og merket «Laget av KI». Modellen fikk "
+            "bare det appen regnet ut, som hovedindeksen og bransjene som steg og falt mest. Ingen kurser "
+            "eller nyheter. Tall med prikket strek er sjekket. Linja om Min liste skriver appen selv.",
             (
                 (DAGSGRUNNLAG, "def dagsgrunnlag("),
                 (DAGSGRUNNLAG, "Ingen kurs, prosent, volum eller forholdstall"),
@@ -805,6 +834,15 @@ TAVLA_STYRKEN = "Styrken er hvor mange sjekker som slo ut. Ga noen +1 og noen -1
 TAVLA_SJEKKENE = "Hver sjekk gir +1, 0 eller -1. Signalstyrken er hvor mange som slo ut."
 
 
+# Story 8.26 (gruppens svar 11.11 kl. 22:20, tillegg 20): stegene om KI-tekstene.
+# KI_ANKER er id-en til «Signalet forklart» på aksjesiden (app.KI_ANKER).
+KI_ANKER = "ki-teksten"
+KI_STEGET = (
+    "Teksten er skrevet av en språkmodell og merket «Laget av KI». Den bygger bare på det appen har "
+    "regnet ut. Bryteren slår den av og på."
+)
+
+
 @dataclass(frozen=True)
 class Steg:
     """Ett steg i «Vis meg rundt»: id-en på siden det peker på, et navn og
@@ -823,8 +861,11 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
     volum = _vis(p.volum_vindu, "heltall")
     faktor = _vis(p.volumfaktor, "faktor")
     terskel = _vis(p.terskel, "heltall")
-    styrke = Steg("aksjene", "Signalstyrken", TAVLA_STYRKEN)
-    retning = Steg("aksjene", "Retningen", TAVLA_RETNING)
+    # Story 8.26 (gruppens svar 11.11 kl. 22:13, tillegg 18): stegene om
+    # styrken og retningen merker bare kolonnen, med overskriften og de første
+    # radene (hjelp.js), ikke hele tabellen.
+    styrke = Steg("kolonne-signal", "Signalstyrken", TAVLA_STYRKEN)
+    retning = Steg("kolonne-retning", "Retningen", TAVLA_RETNING)
     sider = {
         "oversikt": (
             Steg(
@@ -844,6 +885,9 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
             styrke,
             retning,
             Steg("slik-leser", "Slik leser du tabellen", "Fargene, strekene og merkene forklart."),
+            # Story 8.26 (gruppens svar 11.11 kl. 22:20, tillegg 20): KI-teksten,
+            # bare når delen vises (anker finnes bare da).
+            Steg("boersdagen-kort-fortalt", "Børsdagen kort fortalt", KI_STEGET),
         ),
         "min_liste": (
             Steg(
@@ -882,6 +926,9 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
                 "Kursgrafen",
                 f"Kursen justert for utbytte, med {ma}-dagers snitt og hovedindeksen når serien og indeksen har dem.",
             ),
+            # Story 8.26 (tillegg 20): «Signalet forklart» står mellom grafen og
+            # «Signalet dag for dag», bare når delen vises.
+            Steg(KI_ANKER, "Signalet forklart", KI_STEGET),
             Steg(
                 "signalet-dag-for-dag",
                 # Ikke «Signalet dag for dag»: toppen står før delene, og
@@ -917,13 +964,23 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
 OMVISNINGEN_SIDER = ("oversikt", "aksje", "boersometer", "min_liste", "folg", "innstillinger")
 
 
+# Story 8.26 (gruppens svar 11.11 kl. 22:20, tillegg 20): stegene den hele
+# omvisningen hopper over, fordi de gjentar et steg fra en side før. «Vis meg
+# rundt» på sidene har dem fortsatt.
+GJENTATT_I_OMVISNINGEN = frozenset(
+    {("boersometer", "velg-dag"), ("min_liste", "kolonne-signal"), ("min_liste", "kolonne-retning")}
+)
+
+
 def omvisningen(p: Parametre = STANDARD) -> list[dict[str, str]]:
     """Stegene i omvisningen, i rekkefølgen sidene står i OMVISNINGEN_SIDER,
-    med de samme tekstene som «Vis meg rundt». Skriptet i hjelp.js leser dem
-    fra rammen."""
+    med de samme tekstene som «Vis meg rundt», uten stegene som gjentar en
+    side før (GJENTATT_I_OMVISNINGEN). Skriptet i hjelp.js leser dem fra
+    rammen."""
     sider = rundturer(p)
     return [
         {"side": side, "anker": s.anker, "tittel": s.tittel, "tekst": s.tekst}
         for side in OMVISNINGEN_SIDER
         for s in sider[side]
+        if (side, s.anker) not in GJENTATT_I_OMVISNINGEN
     ]

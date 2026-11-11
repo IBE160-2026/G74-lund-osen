@@ -124,12 +124,13 @@
 {% block innhold %}
   {#- Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): når en endring
       i lista venter på hentingen etter kl. 22, står det øverst. Demoen henter
-      aldri, så der står et eksempel merket «Eksempeltall» (svaret kl. 15:57). #}
+      aldri, så der står et eksempel merket «Eksempeltall» (svaret kl. 15:57).
+      Story 8.26 (gruppens svar 11.11 kl. 22:17, tillegg 19): eksempelet som
+      sto i demoen når ingen endring ventet, er tatt bort, fordi det forklarte
+      noe som ikke skjer. En endring som venter, står som før. #}
   {% set venter = egne.ventende if egne else 0 %}
   {% if venter %}
     <p class="venter-melding" role="status">{% if eksempeltall %}Eksempeltall: {% endif %}{{ venter }} {{ "endring" if venter == 1 else "endringer" }} i lista tas i bruk ved hentingen etter kl. 22.{% if eksempeltall %} Demoen henter ikke, så {{ "den tas" if venter == 1 else "de tas" }} ikke i bruk her.{% endif %}</p>
-  {% elif eksempeltall and egne %}
-    <p class="venter-melding demo">Eksempeltall: når en endring i lista venter på hentingen etter kl. 22, står det her, for eksempel «1 endring i lista tas i bruk ved hentingen etter kl. 22.». Demoen henter ikke.</p>
   {% endif %}
   {#- Story 8.3: Min liste har overskriften, en kort tekst, knappen «Alle /
       Min liste» med antallet, og samme tabell i samme rekkefølge (FR-102).
@@ -299,8 +300,8 @@
               ved siden av lenken, ikke inne i den. #}
           <th class="tall"{{ ariasort("kurs") }}>{{ sorterlenke("kurs", "Sluttkurs") }} {{ hjelpeknapp("hjelp-sluttkurs", "Hjelp: sluttkurs") }}<span class="under">NOK</span></th>
           <th class="tall"{{ ariasort("endring") }}>{{ sorterlenke("endring", "Endring") }} {{ hjelpeknapp("hjelp-endring", "Hjelp: endring") }}{#- Story 8.17b: i Min liste er øverste linje siste børsdag. #}{% if aktiv == "min_liste" %}{% elif valg and valg.periode == "velg" %}<span class="under">{{ valg.dag|dato }}</span>{% elif periodestart %}<span class="under">{{ periodenavn }}</span>{% endif %}</th>
-          <th class="tall"{{ ariasort("signal") }}>{{ sorterlenke("signal", "Signalstyrke") }} {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
-          <th{{ ariasort("retning") }}>{{ sorterlenke("retning", "Retning") }} {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
+          <th class="tall" id="kolonne-signal"{{ ariasort("signal") }}>{{ sorterlenke("signal", "Signalstyrke") }} {{ hjelpeknapp("hjelp-signalstyrke", "Hjelp: signalstyrken") }}</th>
+          <th id="kolonne-retning"{{ ariasort("retning") }}>{{ sorterlenke("retning", "Retning") }} {{ hjelpeknapp("hjelp-retning", "Hjelp: retning") }}</th>
         </tr>
       </thead>
       {#- Story 8.0e: to deler i samme tabell, hver med sin overskrift i en
@@ -438,18 +439,18 @@
     {% if hovedindeks and hovedindeks.har_soeyler %}{{ hjelpevindu("hjelp-soeylene", "Søylene", [("", ["soeylene"])]) }}{% endif %}
     {% endif %}
     {#- Story 8.17a: periodevalget over søylene og tabellen. #}
-    {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten"])]) }}{% endif %}
+    {% if valg and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-perioden", "Periodene", [("", ["perioden_oversikten", "foerste_knapp"] + (["foerste_knapp_demo"] if eksempeltall else []))]) }}{% endif %}
     {#- Story 8.17b: «Sammenlign med» i Min liste. #}
-    {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign siste børsdag med", [("", ["sammenlign_med"])]) }}{% endif %}
+    {% if valg and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-sammenlign", "Sammenlign siste børsdag med", [("", ["sammenlign_med", "foerste_knapp"] + (["foerste_knapp_demo"] if eksempeltall else []))]) }}{% endif %}
     {% if egne and aktiv != "min_liste" %}{{ hjelpevindu("hjelp-egne", "Dine egne aksjer", [("", ["dine_egne_aksjer"])]) }}{% endif %}
     {#- Story 8.26 (tillegg 12): steg 2 og 3 i «Din egen liste». #}
-    {% if egne and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-noekkel", "Slik bytter du nøkkel", [("", ["bytt_noekkel", "bytt_noekkel_docker"])]) }}{%- set kallene = [egne.kall.faste ~ " kall: de " ~ egne.kall.faste ~ " aksjene", egne.kall.indeks ~ " kall: hovedindeksen"] + ([egne.kall.egne ~ " kall: " ~ ("din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer")] if egne.kall.egne else []) + [egne.kall.margin ~ " kall: margin"] %}{{ hjelpevindu("hjelp-kallene", "Kallene og de ferdige listene", [("", ["kallene_lista", "ferdige_lister_kort"])], linjer=kallene) }}{% endif %}
+    {% if egne and aktiv == "min_liste" %}{{ hjelpevindu("hjelp-noekkel", "Slik bytter du nøkkel", [("", ["bytt_noekkel", "bytt_noekkel_docker"])]) }}{%- set kallene = [egne.kall.faste ~ " kall: de " ~ egne.kall.faste ~ " aksjene", egne.kall.indeks ~ " kall: hovedindeksen"] + ([egne.kall.egne ~ " kall: " ~ ("din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer")] if egne.kall.egne else []) + [egne.kall.margin ~ " kall: margin"] %}{{ hjelpevindu("hjelp-kallene", "Kallene og de ferdige listene", [("", ["kallene_lista", "ferdige_lister_kort"])], linjer=kallene) }}{#- Story 8.26 (tillegg 14): teksten om kallene og gratiskontoen bak «?» ved «Følg flere aksjer», regnet av kvoten, taket og lista som før. #}{{ hjelpevindu("hjelp-flere", "Følg flere aksjer", [], avsnitt=["Appen kan følge opptil " ~ egne.tak ~ " aksjer. Hver aksje bruker " ~ egne.kall.per_aksje ~ " av de " ~ egne.kall.kvote ~ " kallene i døgnet, og hovedindeksen " ~ egne.kall.indeks ~ ". Med " ~ egne.antall ~ " aksjer etter neste henting er " ~ egne.kall.igjen ~ " kall igjen til et nytt forsøk hvis noe feiler, og med " ~ egne.tak ~ " aksjer er " ~ egne.kall.igjen_med_taket ~ " igjen.", "Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre."]) }}{% endif %}
     {% if boersdagen %}{{ hjelpevindu("hjelp-boersdagen", "Børsdagen kort fortalt", [("", ["boersdagen_kort_fortalt"])]) }}{% endif %}
     {{ hjelpevindu("hjelp-selskap", "Selskap", [("", ["selskap"])]) }}
     {{ hjelpevindu("hjelp-sluttkurs", "Sluttkurs", [("", ["sluttkurs"])]) }}
     {{ hjelpevindu("hjelp-endring", "Endring", [("", ["endring", "utbyttejustert"])]) }}
     {{ hjelpevindu("hjelp-signalstyrke", "Signalstyrke", [
-      ("", ["signalstyrke", "uten_styrke", "ikke_raad"]),
+      ("", ["signalstyrke", "ringen", "uten_styrke", "ikke_raad"]),
     ]) }}
     {{ hjelpevindu("hjelp-retning", "Retning", [
       ("", ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"]),

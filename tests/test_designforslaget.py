@@ -465,7 +465,8 @@ def test_ki_delen_heter_navnet_kort_fortalt(klient):
     assert 'aria-labelledby="ki-tittel"' in ki.split(">", 1)[0]
     tittel = ki.split("<h2>", 1)[1].split("</h2>", 1)[0]
     assert tittel.startswith('<span id="ki-tittel">Signalet forklart</span> ')
-    assert "kort fortalt" not in html
+    # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+    assert "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html)
     assert 'popovertarget="hjelp-ki"' in tittel
     # Story 8.20a (del D): modellen står i en egen linje under teksten.
     assert '<p class="merke-ki">Laget av KI.' in ki

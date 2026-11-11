@@ -4,6 +4,7 @@ KI-radene skrives rett i testbasen med SQL, fordi testseriene ikke ligger paa
 inneveerende boersdag og KILogg.skriv avviser alle andre dager.
 """
 
+import re
 import sqlite3
 import subprocess
 import sys
@@ -240,7 +241,8 @@ class TestSiden:
         """FR-601: av og paa kan sammenlignes, og bryteren er synlig."""
         skriv_kirad(kirad(aksje))
         av = side(klient, "av")
-        assert "kort fortalt" not in av and TEKST not in av
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", av) and TEKST not in av
         # Story 8.2b, c (U33): en bryter med «KI-tekst» og «Av» eller «På».
         assert 'role="switch" aria-checked="false"' in av and '<span class="verdi" aria-hidden="true">Av</span>' in av
         paa = side(klient, "paa")
@@ -258,7 +260,11 @@ class TestSiden:
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
         html = side(klient)
-        assert "kort fortalt" not in html and "ki-bryter" not in html.split("</head>", 1)[1]
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert (
+            "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html)
+            and "ki-bryter" not in html.split("</head>", 1)[1]
+        )
 
     def test_en_logg_som_ikke_kan_leses_gir_en_dag_uten_tekst(self, klient, aksje, monkeypatch):
         """NFR-04: for eksempel en base fra foer 0005."""
@@ -437,7 +443,10 @@ class TestGrunnenPaaSiden:
     def test_bryteren_av_viser_ingen_grunn(self, klient, aksje):
         skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
         html = side(klient, "av")
-        assert DAGEN not in html and AKSJEN not in html and "kort fortalt" not in html
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert (
+            DAGEN not in html and AKSJEN not in html and "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html)
+        )
 
     def test_siden_leser_bare(self, klient, aksje):
         """AD-10: aksjesiden skriver ingenting i KI-loggen."""

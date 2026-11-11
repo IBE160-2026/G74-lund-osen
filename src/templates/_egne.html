@@ -113,19 +113,37 @@
       </p>
     </li>
   </ol>
-  <h3>Følg flere aksjer</h3>
-  {#- Story 8.23 (A7, brukertesten 10.11): tallene regnes av kvoten, taket og
-    lista (valg.py), ikke skrevet for hånd. #}
-  <p>Appen kan følge opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Med {{ egne.antall }} aksjer etter neste henting er {{ egne.kall.igjen }} kall igjen til et nytt forsøk hvis noe feiler, og med {{ egne.tak }} aksjer er {{ egne.kall.igjen_med_taket }} igjen. Vil du følge andre, bytter du dem inn for noen av dem appen følger.</p>
-  <p>Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre.</p>
-  {#- Story 8.26 (tillegg 3): «appen følger», ikke «aksjer i lista». #}
-  <p class="antall-egne">Appen følger {{ egne.antall }} av {{ egne.tak }}</p>
-  <ul class="bytt-lista">
-    {% for aksje in egne.lista %}
-      <li><span class="navn">{{ aksje.navn }}</span> <span class="linje">{{ aksje.symbol }}</span>
-        {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp" href="/folg?bytt={{ aksje.symbol }}">Bytt ut</a>{% endif %}</li>
+  {#- Story 8.26 (gruppens svar 11.11 kl. 20:39 og tillegg 15, kl. 20:44):
+      «Følg flere aksjer» som rådet tegnet. Tallene og rutene regnes av lista
+      og taket; teksten om kallene og gratiskontoen står bak «?» (index.html,
+      hjelp-flere). Aksjene samles etter bransje i kort, i rekkefølgen på
+      børsometeret (egne.grupper). #}
+  <div class="flere-topp">
+    <h3 id="folg-flere">Følg flere aksjer {{ hjelpeknapp("hjelp-flere", "Hjelp: følg flere aksjer") }}</h3>
+    <div class="plassene">
+      <p class="antall-egne">Appen følger {{ egne.antall }} av {{ egne.tak }}{% if egne.full %}, som er taket.{% else %}, {{ egne.tak - egne.antall }} {{ "plass" if egne.tak - egne.antall == 1 else "plasser" }} ledige.{% endif %}</p>
+      <span class="plassstrek" aria-hidden="true">{% for i in range(egne.tak) %}<span class="{{ 'brukt' if i < egne.antall else 'ledig' }}"></span>{% endfor %}</span>
+    </div>
+  </div>
+  {% if egne.full %}
+  <p class="flere-setning">Bytt ut en aksje for å følge en annen. Byttet skjer ved neste henting.</p>
+  {% else %}
+  <div class="flere-handling"><p class="flere-setning">Følg en aksje til, eller bytt ut en. Endringen skjer ved neste henting.</p> <a class="knapp hoved" href="/folg">+ Følg en aksje</a></div>
+  {% endif %}
+  <div class="bransjekort">
+    {% for bransje, aksjene in egne.grupper %}
+    <section class="bransjekortet" aria-labelledby="flere-{{ loop.index }}">
+      <h4 id="flere-{{ loop.index }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></h4>
+      <ul class="bytt-lista">
+        {% for aksje in aksjene %}
+        <li><span class="selskapet"><a class="navn" href="/aksje/{{ aksje.symbol }}">{{ aksje.navn }}</a><span class="linje">{{ aksje.symbol }}</span></span>
+          {% if aksje.symbol in egne.egne_symboler %}<span class="egenmerke">Egen</span>{% endif %}{% if aksje.symbol in egne.utenfor %}<span class="utenformerke">Utenfor målingen</span>{% endif %}
+          {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp liten" href="/folg?bytt={{ aksje.symbol }}" aria-label="Bytt ut {{ aksje.navn }}">Bytt ut</a>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
     {% endfor %}
-  </ul>
+  </div>
   {% if eksempeltall %}<p class="demoboks">Demoen henter ingenting, så et valg står som «Venter på henting». I den ekte versjonen hentes aksjen ved neste henting etter kl. 22.</p>{% endif %}
 </section>
 {% endif %}

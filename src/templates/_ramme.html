@@ -63,6 +63,10 @@
           «Innstillinger», med «Spill av omvisningen». #}
       {% block rundtur %}{% endblock %}
     </nav>
+    {#- Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): linja står
+        likt på alle sidene med basen; en side uten sitt eget tidspunkt får
+        det samme som oversikten (hentet_felles). #}
+    {% set hentet = hentet or hentet_felles %}
     {% if hentet %}
     <div class="rad oppdatert">
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>

@@ -309,8 +309,36 @@ const OMVISNING = {
   },
 };
 
+// Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): «Følg en aksje»
+// filtrerer og sorterer i nettleseren med en gang ved klikk på en brikke, en
+// omsetning eller en sortering, som ferdige_lister.filtrer og .sorter gjør på
+// serveren. Rene funksjoner, så testene kan kjøre dem med Node.
+const FOLGLISTA = {
+  // Om raden (dataset fra malen) passer med søket, bransjene og omsetningen.
+  passer(rad, tekst, bransjer, omsetning) {
+    const t = (tekst || "").trim().toLowerCase();
+    if (t && !rad.kode.includes(t) && !rad.navn.includes(t)) return false;
+    if (bransjer.length && !bransjer.includes(rad.bransje)) return false;
+    if (omsetning && rad.omsetning !== omsetning) return false;
+    return true;
+  },
+  // Sammenligningen for sorteringen: «omsatt» (høyest median først, ikke
+  // målt sist), «navn» (A–Å, med Æ, Ø og Å sist) og «bransje» (rangen, så
+  // navnet). Likt ordnes etter navnet og så tickeren.
+  sammenlign(a, b, sortering) {
+    const navn = a.navn.localeCompare(b.navn, "nb") || (a.kode < b.kode ? -1 : a.kode > b.kode ? 1 : 0);
+    if (sortering === "navn") return navn;
+    if (sortering === "bransje") return Number(a.rang) - Number(b.rang) || navn;
+    const ma = a.median === "" ? null : Number(a.median);
+    const mb = b.median === "" ? null : Number(b.median);
+    if ((ma === null) !== (mb === null)) return ma === null ? 1 : -1;
+    return (mb || 0) - (ma || 0) || navn;
+  },
+};
+
 if (typeof module === "object" && module.exports) {
   module.exports = OMVISNING;
+  module.exports.FOLGLISTA = FOLGLISTA;
 }
 
 (function () {
@@ -357,9 +385,27 @@ if (typeof module === "object" && module.exports) {
     return les(sessionStorage, OMVISNING.AKSJEN);
   }
 
+  // Story 8.26 (tillegg 18): et steg som peker på en kolonneoverskrift,
+  // merker overskriften og cellene i kolonnen i de første radene.
+  const RADENE_I_KOLONNEN = 3;
+  let kolonnen = [];
+  function merkKolonnen(th) {
+    const tabell = th.closest("table");
+    const antall = th.parentElement.cells.length;
+    const celler = [th];
+    for (const rad of tabell.tBodies[0] ? tabell.tBodies[0].rows : []) {
+      if (celler.length > RADENE_I_KOLONNEN) break;
+      if (rad.cells.length === antall && rad.cells[th.cellIndex].tagName === "TD") celler.push(rad.cells[th.cellIndex]);
+    }
+    for (const c of celler) c.classList.add("omvisning-kolonne");
+    celler[celler.length - 1].classList.add("omvisning-kolonne-siste");
+    return celler;
+  }
   function fjernMerket() {
     if (merket) merket.classList.remove("omvisning-merket");
     merket = null;
+    for (const c of kolonnen) c.classList.remove("omvisning-kolonne", "omvisning-kolonne-siste");
+    kolonnen = [];
   }
 
   function avslutt() {
@@ -433,8 +479,12 @@ if (typeof module === "object" && module.exports) {
     const del = delen(document.getElementById(s.anker));
     if (aktive === steg) skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));
     fjernMerket();
-    merket = del;
-    del.classList.add("omvisning-merket");
+    if (del.tagName === "TH") {
+      kolonnen = merkKolonnen(del);
+    } else {
+      merket = del;
+      del.classList.add("omvisning-merket");
+    }
     // Gjennomgangen (BH7, ECH7): delen øverst, så boksen nederst dekker
     // mindre av den, også på smal skjerm.
     del.scrollIntoView({ block: "start" });
@@ -489,6 +539,16 @@ if (typeof module === "object" && module.exports) {
       boksen.append(hele);
     }
     boksen.focus();
+    // Story 8.26 (tillegg 18): boksen står ikke over det som er merket. Dekker
+    // den det nederst til høyre, flyttes den til venstre.
+    boksen.classList.remove("til-venstre");
+    const merkede = kolonnen.length ? kolonnen : [del];
+    const b = boksen.getBoundingClientRect();
+    const dekker = merkede.some((el) => {
+      const r = el.getBoundingClientRect();
+      return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
+    });
+    if (dekker) boksen.classList.add("til-venstre");
   }
 
   function start() {
@@ -588,47 +648,80 @@ if (typeof module === "object" && module.exports) {
 })();
 
 // Story 8.22 (spørsmål 8): søket i «Følg en aksje» mens man skriver. Alle
-// radene står i siden; skriptet skjuler dem som ikke har teksten i tickeren
-// eller navnet (hver for seg, som ferdige_lister.filtrer, gjennomgangen BH5),
-// og sier hvor mange som vises. Uten skriptet gjør knappen «Vis» det samme på
-// serveren. Et klikk på en bransje, en omsetning eller en sortering sender
-// skjemaet; med tastaturet krysser mellomrom av en bransje og flytter
-// piltastene valget uten å laste siden, og «Vis» sender
-// det (gjennomgangen, BH4, ECH2, WCAG 3.2.2). Står her fordi sidene bare har
-// ett skript (8.0f), og gjelder bare siden med lista. Tillegg 3: radene er
-// rader i en tabell, som på oversikten.
+// radene står i siden; skriptet skjuler dem som ikke passer (som
+// ferdige_lister.filtrer, gjennomgangen BH5) og sier hvor mange som vises.
+// Story 8.26 (tillegg 17): også bransjene, omsetningen og sorteringen virker
+// med en gang, med klikk og med tastaturet, uten å laste siden, og adressen
+// følger valget. «Vis» står bare uten skriptet. Står her fordi sidene bare
+// har ett skript (8.0f), og gjelder bare siden med lista.
 (function () {
   // Flettingen av 8.22 inn i 8.25: testene laster skriptet i Node, uten side.
   if (typeof document === "undefined") return;
   const felt = document.querySelector("input[data-folgsok]");
   const lista = document.getElementById("foelgbare");
   if (!felt || !lista) return;
+  const skjema = felt.form;
   const rader = Array.from(lista.querySelectorAll("tr[data-kode]"));
   const antall = document.getElementById("antall-vist");
+  const filtrert = document.getElementById("antall-filtrert");
   const ingen = document.getElementById("ingen-treff");
-  function filtrer() {
-    const tekst = felt.value.trim().toLowerCase();
+  const tittel = document.getElementById("alle-tittel");
+  const ordnet = document.getElementById("ordnet-etter");
+  const alle = skjema.querySelector("a.valgbrikke");
+  for (const knapp of skjema.querySelectorAll("button[type=submit]")) knapp.hidden = true;
+  function valgte() {
+    return Array.from(skjema.querySelectorAll("input[name=bransje]:checked")).map((i) => i.value);
+  }
+  function verdi(navn) {
+    const i = skjema.querySelector(`input[name=${navn}]:checked`);
+    return i ? i.value : "";
+  }
+  function oppdater() {
+    const bransjer = valgte();
+    const omsetning = verdi("omsetning");
+    const sortering = verdi("sorter") || "omsatt";
+    rader.sort((a, b) => FOLGLISTA.sammenlign(a.dataset, b.dataset, sortering));
+    lista.append(...rader);
     let vist = 0;
+    let iFilteret = 0;
     for (const rad of rader) {
-      const med = !tekst || rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst);
+      const filter = FOLGLISTA.passer(rad.dataset, "", bransjer, omsetning);
+      const med = filter && FOLGLISTA.passer(rad.dataset, felt.value, bransjer, omsetning);
       rad.hidden = !med;
+      if (filter) iFilteret += 1;
       if (med) vist += 1;
     }
     if (antall) antall.textContent = String(vist);
+    if (filtrert) filtrert.textContent = String(iFilteret);
     if (ingen) ingen.hidden = vist > 0;
+    if (ordnet) ordnet.hidden = sortering !== "omsatt";
+    if (tittel) {
+      const liste = bransjer.length > 1 ? bransjer.slice(0, -1).join(", ") + " og " + bransjer[bransjer.length - 1] : bransjer[0];
+      tittel.textContent = "Alle som kan følges" + (liste ? " i " + liste : "");
+    }
+    if (alle) {
+      alle.classList.toggle("valgt", bransjer.length === 0);
+      if (bransjer.length === 0) alle.setAttribute("aria-current", "true");
+      else alle.removeAttribute("aria-current");
+    }
+    const ledd = new URLSearchParams(new FormData(skjema));
+    try {
+      window.history.replaceState(null, "", "/folg?" + ledd.toString() + "#filteret");
+    } catch {
+      // Uten historikken virker lista likevel.
+    }
   }
-  felt.addEventListener("input", filtrer);
-  let klikk = false;
-  for (const gruppe of felt.form.querySelectorAll("fieldset")) {
-    gruppe.addEventListener("pointerdown", () => {
-      klikk = true;
-    });
-    gruppe.addEventListener("keydown", () => {
-      klikk = false;
-    });
-    gruppe.addEventListener("change", () => {
-      if (klikk) felt.form.submit();
-      klikk = false;
+  felt.addEventListener("input", oppdater);
+  skjema.addEventListener("change", oppdater);
+  skjema.addEventListener("submit", (e) => {
+    e.preventDefault();
+    oppdater();
+  });
+  if (alle) {
+    alle.addEventListener("click", (e) => {
+      e.preventDefault();
+      for (const i of skjema.querySelectorAll("input[name=bransje]:checked")) i.checked = false;
+      oppdater();
     });
   }
 })();

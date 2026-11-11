@@ -339,11 +339,14 @@ class TestSignaletForklart:
 class TestEndringerSomVenter:
     """Tillegg 2 og tillegget om demoen: meldingen øverst."""
 
-    def test_i_demoen_et_eksempel_merket_eksempeltall(self, klient):
-        """Ville feilet hvis meldingen ikke kunne ses i demoen."""
+    def test_i_demoen_ingen_eksempelboks(self, klient):
+        """Story 8.26 (gruppens svar 11.11 kl. 22:17, tillegg 19): eksempelet
+        som sto når ingen endring ventet, er tatt bort. Ville feilet hvis
+        eksempelboksen fortsatt sto i demoen uten en endring som venter."""
         for sti in ("/", "/min-liste"):
             html = _html(klient, sti)
-            assert '<p class="venter-melding demo">Eksempeltall:' in html, sti
+            assert "venter-melding" not in html.split("</head>", 1)[1], sti
+            assert "når en endring i lista venter" not in html, sti
 
     def test_med_en_endring_som_venter(self, klient):
         """Ville feilet hvis en endring som venter, ikke ga meldingen øverst."""

@@ -28,6 +28,7 @@ import re
 import sqlite3
 import sys
 import threading
+from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta, timezone
@@ -44,6 +45,7 @@ import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, forrige_boersdag, innevaerende_boersdag, norsk_dato
 from boersometer import (
+    BRANSJER,
     GRENSE_STERK,
     UTEN_DATA,
     annen_grunn_i_kartet,
@@ -623,6 +625,24 @@ def hent_oversiktsleser() -> Oversiktsleser | None:
     return SqliteOversiktsleser(tilkobling)
 
 
+@app.context_processor
+def _oppdatert_overalt():
+    """Story 8.26 (tillegg 17): tidspunktet i linja «Oppdatert …» for sidene
+    som ikke har sitt eget, som «Følg en aksje», «Er du sikker?»,
+    Innstillinger og sidene i demoen: det eldste tidspunktet en aksje med
+    kurser sist ble hentet, som på oversikten (FR-101). Bare lesing."""
+    if request.endpoint not in _RUTER_MED_BASE or g.get("basefeil"):
+        return {"hentet_felles": None}
+    try:
+        leser = hent_oversiktsleser()
+        if leser is None:
+            return {"hentet_felles": None}
+        tider = [post.hentet for post in leser.oversikt(idag()) if post.nyeste is not None and post.hentet]
+    except BASEFEIL:
+        return {"hentet_felles": None}
+    return {"hentet_felles": min(tider) if tider else None}
+
+
 class _BasenFeilet(Exception):
     """En feil i basen etter at tilkoblingen ble aapnet, for eksempel en base
     som en nyere henting har migrert forbi koden. Gir 503, ikke 500."""
@@ -1069,6 +1089,13 @@ def _tabellsiden(aktiv: str):
         vist = med_perioden(rader, serier, periodestart)
     annen_dag = not i_lista and valg is not None and valg.periode == VELG
     skilte_seg_ut, oevrige = del_i_to(rader if annen_dag else vist)
+    # Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): med «Vis dagen»
+    # sier overskriften og linja om 3 av 3 dagen tabellen viser, ikke siste
+    # børsdag. Radene for en annen dag merker ikke 2 av 3 (8.17a), så de som
+    # skilte seg ut den dagen, regnes av styrken mot terskelen.
+    dagens_rader = vist if annen_dag else rader
+    if annen_dag:
+        skilte_seg_ut = [rad for rad in vist if rad.styrke is not None and rad.styrke >= STANDARD.terskel]
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
     minlista = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling))
     # Story 8.26 (tillegg 3): også stjernen på en aksje som venter.
@@ -1142,7 +1169,7 @@ def _tabellsiden(aktiv: str):
         rader=rader,
         hovedindeks=hovedindeks,
         indeks_feilet=indeks_feilet,
-        dato=sidens_dato(rader),
+        dato=valg.dag if annen_dag else sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
         # Gruppens svar 03.11 kl. 14:28: en rad med eldre dag viser datoen sin.
@@ -1160,13 +1187,13 @@ def _tabellsiden(aktiv: str):
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
         # oversikten, ogsaa naar ingen skilte seg ut.
-        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not bare_merkede,
-        antall_vurdert=antall_vurdert(rader),
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(dagens_rader) and not bare_merkede,
+        antall_vurdert=antall_vurdert(dagens_rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
         sortert=sortert,
         sortering=sortering,
-        tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
+        tre_av_tre=[rad.aksje.navn for rad in dagens_rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
         merkede=merkede,
         antall_merket=antall_merket,
@@ -2273,7 +2300,16 @@ def _egne_regnet() -> dict | None:
         egne_i_lista = len(egne)
         # Story 8.11: de ferdige listene, med merket for omsetningen.
         ferdige = ferdige_lister.lister(g.tilkobling)
+        # Story 8.26 (tillegg 14): aksjene appen følger, samlet etter bransje i
+        # rekkefølgen på børsometeret; en ukjent bransje sist.
+        rang = {b: i for i, b in enumerate(BRANSJER)}
+        grupper: dict[str, list] = {}
+        for aksje in lista:
+            bransje = ferdige_lister.fast_bransje(aksje.symbol) or aksje.sektor or "Uten bransje"
+            grupper.setdefault(bransje, []).append(aksje)
         return {
+            "grupper": sorted(grupper.items(), key=lambda par: (rang.get(par[0], len(rang)), par[0])),
+            "egne_symboler": frozenset(egne),
             "ferdige": ferdige,
             "ferdige_utenfor": frozenset(
                 a.symbol for liste in ferdige.values() for a in liste if valg.utenfor_maalingen(a.median)
@@ -2381,14 +2417,17 @@ def folg_side():
     valgt_sortering = request.args.get("sorter") or ""
     if valgt_sortering not in {v for v, _ in ferdige_lister.SORTERINGER}:
         valgt_sortering = ferdige_lister.OMSATT
-    alle, rader, treff = [], [], set()
+    alle, rader, treff, filtrert, per_bransje = [], [], set(), set(), Counter()
     if valgt is None:
         opptatt = set(i_lista) | {o.symbol for o in lager.ventende() if o.handling == valg.FOLG}
         alle = ferdige_lister.foelgbare(g.tilkobling, opptatt, medianene)
-        rader = ferdige_lister.sorter(
-            ferdige_lister.filtrer(alle, "", valgte_bransjer, valgt_omsetning), valgt_sortering
-        )
-        treff = {a.kode for a in ferdige_lister.filtrer(rader, sok, (), "")}
+        # Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): alle radene
+        # står i siden, så skriptet kan filtrere og sortere med en gang;
+        # filtrert og treff sier hvilke som vises uten skriptet.
+        rader = ferdige_lister.sorter(alle, valgt_sortering)
+        filtrert = {a.kode for a in ferdige_lister.filtrer(alle, "", valgte_bransjer, valgt_omsetning)}
+        treff = {a.kode for a in ferdige_lister.filtrer(alle, sok, valgte_bransjer, valgt_omsetning)}
+        per_bransje = Counter(a.bransje for a in alle)
     # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
     # ikke følges, og siden sier det før skjemaet sendes.
     alt_fulgt = valgt is not None and (
@@ -2408,6 +2447,9 @@ def folg_side():
         alle=alle,
         rader=rader,
         treff=treff,
+        filtrert=filtrert,
+        per_bransje=per_bransje,
+        rang={b: i for i, b in enumerate(valg.BRANSJENE)},
         valgte_bransjer=valgte_bransjer,
         alle_bransjer="/folg" + (f"?{uten_bransjer}" if uten_bransjer else ""),
         valgt_sortering=valgt_sortering,
