@@ -170,6 +170,35 @@ def test_to_hentinger_samme_dag_gir_minst(stier, monkeypatch):  # noqa: F811
     assert 0 < tall <= len(kall) + len(kall2)
 
 
+def test_et_kall_som_feiler_og_proeves_igjen_gir_minst(stier, monkeypatch):  # noqa: F811
+    """Spørsmål 14 (VG2 i gjennomgangen av tillegg 4, svaret 11.11 kl. 14:29):
+    ett kall feiler i kveldens henting og prøves igjen i et nytt forsøk (2.3b)
+    samme kveld. Hentingen brukte da ett kall mer enn seriene den lagret.
+    Ville feilet hvis statusen talte kallene i stedet for seriene og sa mer
+    enn det den vet, hvis den mistet «minst», eller hvis det nye forsøket
+    ikke ble talt med samme dag."""
+    import lagring_sqlite
+    import valg
+    from test_fetch_prices import ETTER_30_MIN, KALL, hovedhenting, kjoer_23
+    from test_valg import med_boersen
+
+    raa, base = stier
+    hovedhenting(stier, feiler=("DNB",))
+    fil, kall2, _ = kjoer_23(raa, base, ETTER_30_MIN)
+    assert fil is not None and kall2 == ["DNB.OL"]
+    brukt = KALL + len(kall2)
+    med_boersen(base)
+    monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
+    monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 9, 23, 12, 0).astimezone())
+    app_modul.app.config["TESTING"] = True
+    andre = _kortene(app_modul.app.test_client().get("/min-liste").data.decode("utf-8"))[1]
+    assert (
+        f'<p class="noekkelstatus virker">Nøkkelen virket ved siste henting 22.09, som brukte minst {KALL} '
+        f"av {valg.KVOTE} kall.</p>"
+    ) in andre
+    assert KALL < brukt
+
+
 def test_uten_henting_staar_hva_man_gjoer(klient, monkeypatch):  # noqa: F811
     """Ville feilet hvis steg 2 sa at nøkkelen virket uten at noen henting
     har lagret kurser, eller ikke pekte på byttet når hentingen har feilet
