@@ -4063,7 +4063,8 @@ AVTRYKK_I_PILENE = {
     # Flettingen av de fem storyene 10.11 (regel 19): «Din egen liste» og
     # investorsiden ved 1280 px i punktet for docs/appen/. Var bea5b6e1....
     # Story 8.21 (tillegg 2): og de tre nye bildene. Var cd526f3e....
-    "Mappestruktur": "e4171fa95aba3be40915855c4d57d6189e96f36db42225c10780cf44f8c11322",
+    # Story 3.6 (gjennomgangen, ECH12): snarveien under start/. Var e4171fa9....
+    "Mappestruktur": "3ea3433e7c85673b00e4b2d364c2e640e2b7ce3771c3163fd042369e28bcf5d1",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye

@@ -12,6 +12,7 @@ import re
 import shutil
 import struct
 import subprocess
+import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -54,9 +55,13 @@ class TestIkonet:
 
     def test_filene_i_repoet_er_det_modulen_lager(self):
         """Ville feilet hvis en fil i src/static var laget av en annen tegning
-        enn src/ikon.py, eller manglet."""
-        for navn, data in ikon.filene().items():
-            assert (STATIC / navn).read_bytes() == data, navn
+        enn src/ikon.py, eller manglet. PNG-ene sammenlignes på pikslene, ikke
+        på bytene, fordi zlib kan pakke likt innhold ulikt (gjennomgangen, BH1)."""
+        assert (STATIC / "ikon.svg").read_text(encoding="utf-8") == ikon.svg()
+        for n in ikon.IKON_STOERRELSER:
+            assert _pikslene((STATIC / f"ikon-{n}.png").read_bytes()) == (n, ikon.tegn(n)), n
+        for n, data in _ico_bildene((STATIC / "ikon.ico").read_bytes()):
+            assert _pikslene(data) == (n, ikon.tegn(n)), n
 
     def test_stoerrelsene(self):
         """Ville feilet hvis en PNG hadde en annen størrelse enn navnet sier,
@@ -66,10 +71,7 @@ class TestIkonet:
             assert data[:8] == b"\x89PNG\r\n\x1a\n"
             assert struct.unpack(">II", data[16:24]) == (n, n)
         ico = (STATIC / "ikon.ico").read_bytes()
-        _, art, antall = struct.unpack("<HHH", ico[:6])
-        assert (art, antall) == (1, len(ikon.ICO_STOERRELSER))
-        stoerrelser = [ico[6 + 16 * i] or 256 for i in range(antall)]
-        assert stoerrelser == list(ikon.ICO_STOERRELSER)
+        assert [n for n, _ in _ico_bildene(ico)] == list(ikon.ICO_STOERRELSER)
 
     def test_soeylene_er_logoen_i_toppen(self):
         """Ville feilet hvis ikonet hadde andre søyler enn logoen i toppen,
@@ -95,13 +97,49 @@ class TestIkonet:
         html = klient.get(sti).get_data(as_text=True)
         for href in ("/static/ikon.svg", "/static/ikon-32.png", "/static/ikon-180.png"):
             assert f'href="{href}"' in html, (sti, href)
-        assert klient.get("/static/ikon.svg").status_code == 200
+            assert klient.get(href).status_code == 200, href
 
     def test_ingen_nye_avhengigheter(self):
         """Ville feilet hvis ikonet trengte et bibliotek utenfor standardbiblioteket."""
         kilde = (ROT / "src" / "ikon.py").read_text(encoding="utf-8")
         importer = set(re.findall(r"^(?:import|from) (\w+)", kilde, re.M))
         assert importer <= {"struct", "zlib", "pathlib"}, importer
+
+
+def _pikslene(png: bytes) -> tuple[int, bytes]:
+    """Bredden og RGBA-pikslene i en PNG fra src/ikon.py (8 bit, farge 6, filter 0)."""
+    assert png[:8] == b"\x89PNG\r\n\x1a\n"
+    pos, idat, n = 8, b"", 0
+    while pos < len(png):
+        lengde, art = struct.unpack(">I4s", png[pos : pos + 8])
+        data = png[pos + 8 : pos + 8 + lengde]
+        assert struct.unpack(">I", png[pos + 8 + lengde : pos + 12 + lengde])[0] == zlib.crc32(art + data)
+        if art == b"IHDR":
+            n, hoeyde, dybde, farge = struct.unpack(">IIBB", data[:10])
+            assert (hoeyde, dybde, farge) == (n, 8, 6)
+        elif art == b"IDAT":
+            idat += data
+        pos += 12 + lengde
+    raa = zlib.decompress(idat)
+    rader = [raa[j * (n * 4 + 1) : (j + 1) * (n * 4 + 1)] for j in range(n)]
+    assert all(r[0] == 0 for r in rader)
+    return n, b"".join(r[1:] for r in rader)
+
+
+def _ico_bildene(ico: bytes) -> list[tuple[int, bytes]]:
+    """Størrelsen og PNG-en for hver oppføring i ICO-katalogen, med alle feltene sjekket."""
+    reservert, art, antall = struct.unpack("<HHH", ico[:6])
+    assert (reservert, art) == (0, 1)
+    ut = []
+    for i in range(antall):
+        b, h, farger, _, plan, bit, lengde, start = struct.unpack("<BBBBHHII", ico[6 + 16 * i : 22 + 16 * i])
+        assert (b, farger, plan, bit) == (h, 0, 1, 32)
+        data = ico[start : start + lengde]
+        n = b or 256
+        assert struct.unpack(">II", data[16:24]) == (n, n)
+        ut.append((n, data))
+    assert start + lengde == len(ico)
+    return ut
 
 
 def _ps(skript: str, miljoe: dict[str, str]) -> subprocess.CompletedProcess:
@@ -122,7 +160,10 @@ class TestSnarveien:
     @staticmethod
     def _tilby(tmp_path, versjon, svar=None, ja=None):
         rot = tmp_path / "rot"
-        rot.mkdir(exist_ok=True)
+        (rot / "src" / "static").mkdir(parents=True, exist_ok=True)
+        (rot / "src" / "static" / "ikon.ico").write_bytes(b"")
+        for fil in ("Start den ekte versjonen.cmd", "Start demoen.cmd"):
+            (rot / fil).write_text("@echo off\n", encoding="utf-8")
         skrivebord = tmp_path / "skrivebord"
         skrivebord.mkdir(exist_ok=True)
         miljoe = {
@@ -137,13 +178,13 @@ class TestSnarveien:
         return _ps(skript, miljoe), rot, skrivebord
 
     @staticmethod
-    def _maalet(lnk: Path) -> tuple[str, str]:
+    def _maalet(lnk: Path) -> tuple[str, str, str]:
         ut = _ps(
             f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}'); "
-            "[Console]::OutputEncoding = [Text.Encoding]::UTF8; Write-Output $s.TargetPath; Write-Output $s.IconLocation",
+            "[Console]::OutputEncoding = [Text.Encoding]::UTF8; Write-Output $s.TargetPath; Write-Output $s.IconLocation; Write-Output $s.WorkingDirectory",
             {},
         ).stdout.splitlines()
-        return ut[0], ut[1]
+        return ut[0], ut[1], ut[2]
 
     @pytest.mark.parametrize(
         ("versjon", "navn", "fil"),
@@ -155,9 +196,12 @@ class TestSnarveien:
         svar, rot, skrivebord = self._tilby(tmp_path, versjon, "j")
         lnk = skrivebord / f"{navn}.lnk"
         assert lnk.exists(), svar.stdout + svar.stderr
-        maal, ikonet = self._maalet(lnk)
+        maal, ikonet, mappe = self._maalet(lnk)
         assert Path(maal) == rot / fil
-        assert ikonet.lower().endswith("ikon.ico,0")
+        # Ikonet er fila i src\static, og den finnes (gjennomgangen, VG5).
+        fil_, nr = ikonet.rsplit(",", 1)
+        assert Path(fil_) == rot / "src" / "static" / "ikon.ico" and Path(fil_).exists() and nr == "0"
+        assert Path(mappe) == rot
 
     def test_nei_huskes_og_spoersmaalet_kommer_ikke_igjen(self, tmp_path):
         """Ville feilet hvis et nei ikke ble husket, så vinduet spurte hver gang."""
@@ -175,6 +219,42 @@ class TestSnarveien:
         svar, rot, _ = self._tilby(tmp_path, "ekte", "n")
         assert svar.stdout.strip() == "" and not (rot / "data" / "snarvei-nei-ekte").exists()
 
+    def test_en_doed_snarvei_tilbys_paa_nytt(self, tmp_path):
+        """Ville feilet hvis en snarvei til en slettet mappe stoppet spørsmålet
+        for alltid (gjennomgangen, BH2)."""
+        self._tilby(tmp_path, "ekte", "j")
+        lnk = tmp_path / "skrivebord" / "OSE Signal.lnk"
+        _ps(
+            f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut('{lnk}'); $s.TargetPath = '{tmp_path / 'borte' / 'x.cmd'}'; $s.Save()",
+            {},
+        )
+        self._tilby(tmp_path, "ekte", "j")
+        assert Path(self._maalet(lnk)[0]) == tmp_path / "rot" / "Start den ekte versjonen.cmd"
+
+    @pytest.mark.parametrize("svar", [" ", "nei", "x"])
+    def test_alt_annet_enn_ja_er_nei(self, tmp_path, svar):
+        """Ville feilet hvis et tomt svar (bare Enter) eller et annet svar
+        enn ja laget snarveien (gjennomgangen, VG4)."""
+        _, rot, skrivebord = self._tilby(tmp_path, "ekte", svar)
+        assert not list(skrivebord.iterdir()) and (rot / "data" / "snarvei-nei-ekte").exists()
+
+    def test_et_nei_som_ikke_kan_huskes_stopper_ikke_appen(self, tmp_path):
+        """Ville feilet hvis et nei som ikke kunne skrives, ga en feil som
+        trap i start.ps1 gjør om til Stopp, som stopper serveren
+        (gjennomgangen, ECH1 og VG6). data er her en fil, ikke en mappe."""
+        rot = tmp_path / "rot"
+        rot.mkdir()
+        (rot / "data").write_text("", encoding="utf-8")
+        skrivebord = tmp_path / "skrivebord"
+        skrivebord.mkdir()
+        skript = (
+            "$ErrorActionPreference = 'Stop'; [Console]::OutputEncoding = [Text.Encoding]::UTF8; "
+            f". '{ROT / 'start' / 'snarvei.ps1'}'; Tilby-Snarvei ekte '{rot}'; Write-Output 'videre'"
+        )
+        svar = _ps(skript, {"OSE_SKRIVEBORD": str(skrivebord), "OSE_START_SVAR_SNARVEI": "n", "OSE_START_SVAR_JA": ""})
+        assert svar.returncode == 0 and "videre" in svar.stdout, svar.stdout + svar.stderr
+        assert "kunne ikke huskes" in svar.stdout
+
     def test_ci_gir_ingen_snarvei(self, tmp_path):
         """Ville feilet hvis CI (OSE_START_SVAR_JA=1) laget en snarvei eller ventet på et svar."""
         svar, rot, skrivebord = self._tilby(tmp_path, "ekte", None, "1")
@@ -187,7 +267,11 @@ class TestStartskriptet:
         før appen svarte."""
         tekst = (ROT / "start" / "start.ps1").read_text(encoding="utf-8-sig")
         assert ". (Join-Path $PSScriptRoot 'snarvei.ps1')" in tekst
-        assert tekst.index("Tilby-Snarvei $Versjon") > tekst.index("if (-not $klar) { Stopp")
+        # Gjennomgangen (VG2, VG3, ECH2): med rota som argument, etter at
+        # nettleseren er åpnet, før ventingen på serveren, og bare mens den kjører.
+        kall = "if (-not $server.HasExited) { Tilby-Snarvei $Versjon (Split-Path -Parent $PSScriptRoot) }"
+        assert tekst.count(kall) == 1
+        assert tekst.index("{ Start-Process $Adresse }") < tekst.index(kall) < tekst.index("$server.WaitForExit()")
         assert (ROT / "start" / "snarvei.ps1").read_bytes().startswith(b"\xef\xbb\xbf")
 
 
@@ -198,7 +282,8 @@ class TestDokumentene:
         """Ville feilet hvis README-en eller installasjonen ikke nevnte
         snarveien, ikonet eller at mobil kommer senere."""
         readme = (ROT / "README.md").read_text(encoding="utf-8")
-        assert "snarveien «OSE Signal» med ikonet på skrivebordet" in readme
+        assert "snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen" in readme
+        assert "Der står også snarveien på skrivebordet i Windows" in readme
         assert "Mobil kommer i en senere versjon" in readme
         inst = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
         assert "snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen" in inst

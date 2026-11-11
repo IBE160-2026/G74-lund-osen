@@ -34,3 +34,51 @@ Forslaget er det som bygges. Spørsmålene står åpne til gruppen har svart.
 - **Del 1, ikonet:** `TestIkonet` i `tests/test_ikonet_og_snarveien_3_6.py`: filene er det `src/ikon.py` lager, størrelsene stemmer, søylene er logoen, hver side har ikonet i fanen, og ingen nye avhengigheter.
 - **Del 2, snarveien:** `start/snarvei.ps1`, som `start.ps1` kaller når appen svarer. `TestSnarveien` (Windows) og `TestStartskriptet`: ja lager snarveien med ikonet og riktig fil, også for demoen, nei huskes, en snarvei som finnes gir ikke spørsmålet, og CI gir ingen snarvei.
 - **Del 3, dokumentene:** README-en og `docs/installasjon.md` sier det, med ikonet og at mobil kommer senere (`TestDokumentene`).
+
+## Gjennomgangen 11.11 kl. 04:10 og triagen
+
+Blind Hunter (bare diffen) hadde 15 funn, og Edge Case Hunter og Verification Gap (grenen, bare lesing) hadde 12 og 9 funn. Ingen var høye. Rettet i commiten etter gjennomgangen:
+
+- **BH1 (middels):** PNG-ene ble sammenlignet byte for byte, så en annen zlib kunne gi feil uten at bildet var endret. Nå sammenlignes pikslene, med CRC og IHDR sjekket.
+- **BH12:** ICO-katalogen sjekkes nå fullt ut: størrelse, farger, plan, bit, lengde og start.
+- **BH2 og ECH4 (middels):** en snarvei til en mappe som er slettet, tilbys på nytt. En snarvei til en annen kopi som finnes, blir stående, som instruksjonen sier («spør ikke igjen hvis snarveien finnes»). Det står åpent til gruppen har svart (regel 25), se under.
+- **ECH1, BH9 og VG6 (middels):** et nei som ikke kunne skrives, ga en feil som `trap` i `start.ps1` gjorde om til `Stopp`, og da stoppet appen. Feilen fanges nå, og vinduet sier at det spør igjen neste gang (test).
+- **ECH2 (middels):** har appen alt stoppet, spørres det ikke. Mens spørsmålet står, venter vinduet på svaret; etter svaret kommer beskjeden om at appen stoppet, som før.
+- **BH3 og ECH5:** rota er nå `Split-Path -Parent $PSScriptRoot`. Det er det `start.ps1` alt gjør `Set-Location` til, og det virker også for en UNC-sti.
+- **BH6:** README-en nevner «OSE Signal (demo)».
+- **BH13 og VG5:** alle tre ikonfilene hentes. Ikonet i snarveien må være `src\static\ikon.ico` og finnes.
+- **VG7:** testene sjekker `WorkingDirectory`.
+- **VG1 (middels):** snarveitestene kjøres i jobben «Snarveien på Windows» i CI, og steget feiler hvis noen hoppes over.
+- **VG2, VG3 og VG4 (middels):** testene sjekker hele kallet, med rota, og at det står etter nettleseren og før ventingen. Et tomt svar, «nei» og «x» er nei (test).
+- **ECH12:** «Mappestruktur» nevner snarveien (regel 19).
+
+Ikke rettet, lave:
+
+- **BH4 og ECH6:** spørsmålet står i samme vindu som waitress. Waitress skriver ikke en linje per side, og Ctrl+C stopper begge, som vinduet sier.
+- **BH5 og ECH3:** et tomt svar huskes som nei. Det følger av instruksjonen («et nei huskes»), og spørsmålet sier «bare Enter for nei».
+- **BH7:** bare j, ja, y og yes er ja.
+- **BH8:** `OSE_START_SVAR_SNARVEI` brukes bare av testene, og de gir alltid `OSE_SKRIVEBORD`.
+- **BH10 og ECH7:** en sti med apostrof i testene. Det gjelder ingen av maskinene våre eller CI.
+- **BH11:** `start.ps1` prøves på teksten og i CI med `OSE_START_SVAR_JA=1`, som hopper over spørsmålet.
+- **BH14 og ECH8:** ikonet har ikke noe avtrykk i adressen. Det er likt i alle versjoner så langt.
+- **BH15 og ECH11:** det tar om lag 10 s å tegne ikonet i testene.
+- **ECH9:** `/favicon.ico` gir 404 i nettleseren. Alle sidene har lenkene.
+- **ECH10:** ICO-fila har bare PNG-bilder. Det virker fra Windows Vista.
+- **VG8:** vaktene for ikke-Windows og for et skrivebord som mangler, er ikke prøvd.
+- **VG9:** fire sider til bruker `_ramme.html`.
+
+## Åpent til gruppen har svart
+
+8. **En snarvei til en annen kopi** (BH2 og ECH4, middels). Pakkes en ny ZIP ut i en ny mappe, starter «OSE Signal» fortsatt den gamle kopien, og den nye spør ikke, fordi snarveien finnes. *Forslag:* slik instruksjonen sier. Snarveien rettes bare når mappen den peker på, er slettet, og installasjonen kan si at man sletter snarveien for å få en ny.
+
+## Mutantene
+
+Én per del før gjennomgangen, alle fanget: den høye søylen hvit (del 1), et nei som ikke huskes (del 2) og installasjonen uten mobil (del 3). Etter gjennomgangen ble seks mutanter kjørt, og fem ble fanget:
+
+- Enter er ja (VG4)
+- ikonet uten `src` (VG5)
+- kallet etter ventingen (VG2)
+- en død snarvei (BH2)
+- `Set-Content` for et nei utenfor `try` (ECH1)
+
+Den sjette, `New-Item` utenfor `try`, overlevde. `New-Item -Force` feiler ikke når `data` er en fil, så det er `Set-Content` som feiler der, og den er fanget. Hver fil var lik før og etter (sha256).

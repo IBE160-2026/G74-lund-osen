@@ -87,7 +87,7 @@ Til faglærer:
 4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
 5. **Lukk vinduet** for å stoppe appen.
 
-**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
+**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
 
 <a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
 
@@ -249,7 +249,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
-- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
+- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også snarveien på skrivebordet i Windows, jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss, og skillen sesjonslogg, som kommer fra faglærer
 - [`README.md`](README.md) — denne fila: hva appen er, hvordan den startes, status og testene
 - [`CLAUDE.md`](CLAUDE.md) — reglene for KI-øktene i repoet, som Claude Code leser når en økt starter

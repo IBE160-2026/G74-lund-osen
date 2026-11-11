@@ -22,7 +22,13 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
     if (-not $skrivebord) { $skrivebord = [Environment]::GetFolderPath('Desktop') }
     if (-not $skrivebord -or -not (Test-Path -LiteralPath $skrivebord)) { return }
     $lnk = Join-Path $skrivebord "$navn.lnk"
-    if (Test-Path -LiteralPath $lnk) { return }
+    # Finnes snarveien, spørres det ikke. Peker den på en mappe som er
+    # slettet, er den død, og da tilbys den på nytt (gjennomgangen, BH2).
+    if (Test-Path -LiteralPath $lnk) {
+        $maal = $null
+        try { $maal = (New-Object -ComObject WScript.Shell).CreateShortcut($lnk).TargetPath } catch { }
+        if (-not $maal -or (Test-Path -LiteralPath $maal)) { return }
+    }
     $huske = Join-Path $Rot "data\snarvei-nei-$Versjon"
     if (Test-Path -LiteralPath $huske) { return }
     if ($env:OSE_START_SVAR_SNARVEI) {
@@ -31,9 +37,13 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
         $svar = Read-Host "Lage snarveien «$navn» på skrivebordet? Skriv j og trykk Enter for ja, eller bare Enter for nei"
     }
     if ($svar -notmatch '^\s*(j|ja|y|yes)\s*$') {
-        New-Item -ItemType Directory -Force -Path (Join-Path $Rot 'data') | Out-Null
-        Set-Content -LiteralPath $huske -Value 'Svaret var nei. Slett fila for å bli spurt igjen.' -Encoding UTF8
-        Write-Host 'Ingen snarvei. Vinduet spør ikke igjen.'
+        try {
+            New-Item -ItemType Directory -Force -Path (Join-Path $Rot 'data') -ErrorAction Stop | Out-Null
+            Set-Content -LiteralPath $huske -Value 'Svaret var nei. Slett fila for å bli spurt igjen.' -Encoding UTF8 -ErrorAction Stop
+            Write-Host 'Ingen snarvei. Vinduet spør ikke igjen.'
+        } catch {
+            Write-Host 'Ingen snarvei. Svaret kunne ikke huskes, så vinduet spør igjen neste gang.'
+        }
         return
     }
     $fil = if ($Versjon -eq 'demo') { 'Start demoen.cmd' } else { 'Start den ekte versjonen.cmd' }
