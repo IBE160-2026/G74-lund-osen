@@ -42,6 +42,8 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 
 *Svaret 11.11 kl. 21:36, slik tillegg 1 kl. 21:40 gjengir det:* på aksjesiden flyttes «Mine notater» nederst, etter «Signalet dag for dag» og knappen til investorsiden, fordi siden ble lang. Delen har skjemaet og de to nyeste notatene for aksjen, og «Vis alle (N)» under, som viser resten på samme side. Lenkene til notatene går fortsatt dit, og bryteren «Notater» skjuler delen som før.
 
+*Svaret 11.11 kl. 22:20, slik tillegg 2 kl. 22:21 gjengir det:* knappen «Mine notater» får et steg i omvisningen: hva panelet er, at det kan flyttes til venstre eller høyre, og at notatene lagres på maskinen, i demoen til den startes på nytt. Steget står i den hele omvisningen og i «Vis meg rundt», helst i delen for Min liste, og bare når bryteren «Notater» er på. Vinduet som gjør «Vis meg rundt» (8.26), bygger om omvisningen, så steget legges inn når 8.26 er flettet og main er flettet inn i grenen. Rådet anbefalte det.
+
 *Svaret 11.11 mellom kl. 21:41 og 21:43 (i økta, klokka lest før og etter):* storyen står under «Ekstra, hvis tiden rekker» bare i `epics.md`, fordi lista ble tatt ut av README-en etter svaret kl. 16:26. Den føres under «Ekstra, ferdig» i README-en når den er flettet, slik 8.25 ble ført.
 
 ## Spørsmål til gruppen før flettingen
@@ -60,6 +62,7 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 10. **Panelet på smal skjerm.** *Forslag:* smalere enn 1056 px er knappen en lenke til «Mine notater» i Min liste, og et åpent panel lukkes når vinduet blir smalere, men valget huskes, så det åpnes igjen når vinduet blir bredt.
 11. **Innholdet i panelet.** *Forslag:* innholdet lages på serveren og står i en `<template>` i hver side, som ikke vises og ikke leses opp, og skriptet setter det inn når panelet åpnes. Skriptet henter da ingenting, som testen fra 8.0f krever (`test_skriptet_henter_ingenting`), og panelet er der med en gang etter lagring. Prisen er at hver side leser alle notatene, som Min liste gjør. Den første utgaven hentet innholdet med `fetch` fra en egen rute, og det ble tatt bort før første commit.
 12. **Eldre tester som er endret etter svarene.** *Forslag:* fire tester sa det motsatte av svarene, og er endret med en linje om svaret: at stripa ikke får en knapp for notatene (8.21, del F), at stripa har fire ikoner (8.10), at «Mine notater» står over «Signalet dag for dag» (8.21), og at ingen del står etter boblen til investorsiden (3.4h). Lenketesten godtar `/min-liste#mine-notater`.
+13. **Steget for knappen i omvisningen (tillegg 2).** *Forslag:* ett steg i delen for Min liste, rett etter stegene for Min liste og før «Følg en aksje», som peker på knappen øverst, med teksten: «Mine notater åpner et panel i kanten av siden med alle notatene dine, og et skjema for et nytt notat. Panelet kan flyttes til venstre eller høyre. Notatene lagres på denne maskinen.» I demoen kommer «, i demoen til den startes på nytt» før punktumet. Steget står i den hele omvisningen og i «Vis meg rundt» for Min liste, og er borte når «Notater» er av. Det står ikke på de andre sidene, så lista i «Vis meg rundt» ikke blir lengre der.
 
 ## Delene
 
@@ -92,3 +95,9 @@ Panelet sier i demoen at notatene står til demoen startes på nytt.
 `src/templates/aksje.html`: «Mine notater» etter boblen til investorsiden, med skjemaet, de to nyeste notatene og «Vis alle (N)».
 
 **Ville feilet hvis:** delen sto over «Signalet dag for dag», viste mer eller mindre enn de to nyeste, eller «Vis alle» manglet et notat.
+
+### F) Steget i omvisningen (tillegg 2)
+
+*Venter:* 8.26 bygger om omvisningen og «Vis meg rundt», og var ikke flettet 11.11 kl. 22:21 (main sto på `db89c5ba`). Steget legges inn når 8.26 er flettet og main er flettet inn i grenen, etter forslaget i spørsmål 13. Er 8.26 ikke flettet når resten av 8.27 er grønn, venter steget, og PR-en sier det.
+
+**Ville feilet hvis:** steget manglet i den hele omvisningen eller i «Vis meg rundt» for Min liste, sto med «Notater» av, eller manglet linja om demoen i demoen.

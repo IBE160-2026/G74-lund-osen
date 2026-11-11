@@ -4704,6 +4704,8 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 
 *Avgjort 2026-11-11 kl. 21:36 (gruppens svar):* på aksjesiden flyttes «Mine notater» nederst, etter «Signalet dag for dag» og knappen til investorsiden, med skjemaet, de to nyeste notatene og «Vis alle (N)». Rådet anbefalte det (Rettet-linje under 8.21).
 
+*Avgjort 2026-11-11 kl. 22:20 (gruppens svar):* knappen «Mine notater» får et steg i omvisningen og i «Vis meg rundt», helst i delen for Min liste, bare når bryteren «Notater» er på, med hva panelet er, at det kan flyttes, og at notatene lagres på maskinen, i demoen til den startes på nytt. Steget legges inn når 8.26 er flettet og main er flettet inn i grenen; ellers venter det. Rådet anbefalte det.
+
 *Avgjort 2026-11-11 mellom kl. 21:41 og 21:43 (gruppens svar i økta):* storyen står under «Ekstra, hvis tiden rekker» bare her, ikke i README-en, etter svaret kl. 16:26, og føres under «Ekstra, ferdig» der når den er flettet. Rådet anbefalte det.
 
 ---
