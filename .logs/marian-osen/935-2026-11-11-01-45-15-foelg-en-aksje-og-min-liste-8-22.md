@@ -124,3 +124,39 @@ Tillegget om ventingen i dag kl. 14:18, likt for vindu 1, 3 og 4. Tillegget har 
 
 ### Åpne punkter
 - Tillegget føres i dagsfila 11.11 med neste fletting fra vinduet. Det står i punktet om dagsfila i `issues.md`.
+
+## 2026-11-11 kl. 16:10 — Marian Osen
+
+### Oppgave
+Instruksjonen kl. 14:31 ba om at del B (8.22, PR #138) ble gjort ferdig og flettet etter gruppens svar kl. 14:29:
+- svarene i spesifikasjonen;
+- tiden for medianene (spørsmål 12) og testen for et kall som feiler (spørsmål 14);
+- fletting etter del C;
+- føringen på main.
+
+### Plan
+- **Steg 0:** dette er økta 03167bd1, og PR #138 var grønn. Utført-linja kl. 14:23 sto i svaret i vinduet. Tillegget sier selv at det føres i dagsfila med neste fletting, og det ble gjort i steg 4.
+- **Kvotesjekken:** 0 kall brukt (GMT), 20 igjen, `extraLimit` 296.
+- **Rekkefølgen:** svarene og målingen, så testen, så gjennomgangen, så venting på del C, så main inn, fletting og føring.
+
+### Resultat
+- **Svaret kl. 14:29 i spesifikasjonen:** `97acd259`, `454b61d3`.
+- **Spørsmål 12:** «Bytt ut» med hele lista (277 rader) tok 0,046, 0,014 og 0,014 s, målt mot en kopi av basen laget med SQLite-backup. Det er under ett sekund, så ingenting huskes i minnet. sha256 for basen var lik før og etter, og kopien ble slettet.
+- **Spørsmål 14:**
+  - Testen kom i `c294a1bc` og ble gjort om etter gjennomgangen i `bdae67a1`. DNB feiler, og steg 2 sier «minst 15». Etter det nye forsøket sier det «minst 16».
+  - Fire mutanter ble kjørt (én før gjennomgangen og tre etter), og alle ble fanget. Filene var like HEAD etterpå.
+- **Gjennomgangen:** 10 funn fra Blind Hunter, 7 fra Edge Case Hunter og 8 fra Verification Gap. BH1 var høy: testen skilte ikke seriene fra kallene. Den er rettet, og ingen funn på middels eller over står åpne.
+- **Main inn:** `6b5b97b6`, med 3.6. Konfliktene var `issues.md` og avtrykkene.
+  - README-en har del B under «Ekstra, ferdig» (svaret kl. 13:49).
+  - Lista «Ekstra, hvis tiden rekker» ble da tom og står ikke, men setningen om regelen står. Testene er rettet etter det.
+  - Bildene er byte for byte de samme.
+- **Testene og CI:** hele settet før hver push, med summen lik `--collect-only` og 0 feilet. Det var 5218 på `454b61d3` og 5247 på `6b5b97b6`. CI var grønn på begge.
+- **Flettingen:** squash-flettet låst til `6b5b97b6` som `dcb0bc6f` kl. 16:04. Grenen er slettet, worktreen er fjernet, og treet på main er likt head-en.
+- **På main:**
+  - done, storyen og svarene: `a39e7681`;
+  - dagsfilene 10.11 og 11.11: `baf80a28`;
+  - kvalitetssikringen: `14be8015`, fordi `test_kvalitetssikring` krever en rad for hver spesifikasjon som er done.
+- **Bildegrenen:** `pr-8-22-bilder` er ikke rørt (ingen andre grener).
+
+### Åpne punkter
+- Bildegrenen `pr-8-22-bilder` på GitHub har bare bildene til PR #138, og kan slettes når gruppen vil.
