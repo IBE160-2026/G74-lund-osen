@@ -21,7 +21,11 @@ Skrevet 10.11 kl. 16:32 i instruksjonen kl. 16:26 («Del B 10.11», vindu 4). In
 - **Kl. 15:22:** SCOIN er ute, som 08.11 kl. 22:03, fordi selskapet er under avvikling. Kilden er den samme.
 - **Kl. 14:59:** ingen fletting. Storyen stopper når PR-en er grønn (steg 3 i instruksjonen).
 - **Kl. 22:50 (tillegg 4, instruksjonen kl. 22:52):** steg 2 i «Din egen liste» blir som på designtavla, men uten felt, og AD-10 og svaret 08.11 kl. 12:39 står. Rådet anbefalte det. Svaret føres i `epics.md` med de andre svarene når del B flettes. Se «Tillegg 4: steg 2 som på tavla» nedenfor.
-- **Kl. 13:54 og 14:53:** instruksjonen viser til dem, men ordlyden er ikke funnet i repoet eller i scratchpad-mappene 10.11 (regel 11). Storyen bygger på det instruksjonen sier om «Følg en aksje» og Min liste, og siterer dem ikke.
+- **Kl. 13:54:** gruppen sa ja til del A og B. Bare feltet i steg 2 bygges ikke, fordi nettsiden aldri skal røre nøkkelen (AD-10, svaret 08.11 kl. 12:39), og resten følger designforslaget. Kilden er instruksjonen 11.11 kl. 11:56, som står ordrett i scratchpad-mappa til økta. Før den sto det her at ordlyden ikke var funnet (regel 11).
+- **Kl. 14:53:** gruppen valgte å starte del B i et nytt vindu med en gang. Rådet anbefalte vindu 1 etter del C. Kilden er den samme.
+- **Kl. 22:44 (tillegg 3, rådet anbefalte alle fire):** kortet «Mest omsatt» tas bort, og lista får sorteringen «Mest omsatt først», «A–Å» og «Bransje», uten «høyst tre». Flere bransjer kan velges samtidig og kombineres med omsetningen, og det valgte er oransje med et merke i tillegg. Radene får stilen fra tabellen på oversikten. «Start fra en ferdig liste» får én knapp per bransje, én kort setning og en side «Er du sikker?», og knappen i steg 3 heter som delen. Se «Tillegg 3 og 5» nedenfor.
+- **Kl. 22:55 (tillegg 5):** to nye bilder fra demoen ved 390 px, «Følg en aksje» og notatene på aksjesiden for BRFE, i README-en etter de andre bildene ved 390 px.
+- Tillegg 3 og 5 ble gitt 10.11 kl. 22:44 og 22:55, men kom aldri fram til vindu 4. De ble gitt på nytt i instruksjonen 11.11 kl. 11:56, etter at Windows Update startet maskinen på nytt kl. 04:29. Svarene kl. 22:44 og 22:55 føres i `epics.md` med de andre svarene når del B flettes.
 
 ## Slått opp 10.11 på `53ff012c` (regel 3)
 
@@ -39,12 +43,12 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 2. **De tre oppdiktede uten bransje i demoen.** *Forslag:* SKRH, TNDT og VKVF får bransjen som står i navnet (Helse, Teknologi og Forbruk) i en egen tabell, `DEMOBRANSJE`, ved siden av `BRANSJE`. Linjene for HVLK og NRDE i `BRANSJE` står som før. Uten tabellen kunne bare to av de fem følges i demoen.
 3. **Egne aksjer som alt er lagt inn.** *Forslag:* siden viser bransjen fra `BRANSJE` med en gang. Ved neste henting tar `ta_i_bruk` ønskene i bruk med bransjen derfra, og retter `aksje.sektor` for de egne aksjene i lista der bransjen er en annen. De 15 og en aksje som er tatt ut, røres ikke. Vurderingene står (AD-7). En bransje som er rettet, gjelder også de tidligere dagene i setningen om bransjen, fordi den leses når siden vises. I den ekte basen venter 3 ønsker og ingen er tatt i bruk, så ingen egen aksje er rettet ennå.
 4. **«Følg» på hver rad.** *Forslag:* knappen åpner «Følge …?» med omsetningen og kallene, som før, og ønsket lagres der. Bare ett trykk ville hoppet over kallene og «Utenfor målingen» (utdraget §1).
-5. **Rekkefølgen i lista.** *Forslag:* etter navnet, aldri etter kursen, endringen eller signalet (NFR-06).
+5. **Rekkefølgen i lista.** *Bortfalt med tillegg 3 (svaret kl. 22:44):* lista kan sorteres «Mest omsatt først», «A–Å» eller «Bransje». Se spørsmål 16 og 17.
 6. **Filteret på omsetning.** *Forslag:* fire valg: «Alle», «Over 32 MNOK», «Under 32 MNOK» og «Ikke målt ennå». Medianen er den samme som i bransjelistene og merket (8.11c).
-7. **De tre forslagene.** *Forslag:* bare når en bransje er valgt. Forslagene er de tre med høyest median omsetning blant de målte i bransjen som ikke er i lista og ikke venter, med medianen som i bransjelistene. Uten valgt bransje står «Velg en bransje, så står de tre mest omsatte du ikke følger, her.» Ordet er «Mest omsatt», aldri «ukens beste».
+7. **De tre forslagene.** *Bortfalt med tillegg 3 (svaret kl. 22:44):* kortet med forslagene er tatt bort, og sorteringen «Mest omsatt først» er i stedet. Det som var foreslått: bare når en bransje er valgt. Forslagene er de tre med høyest median omsetning blant de målte i bransjen som ikke er i lista og ikke venter, med medianen som i bransjelistene. Uten valgt bransje står «Velg en bransje, så står de tre mest omsatte du ikke følger, her.» Ordet er «Mest omsatt», aldri «ukens beste».
 8. **Søk mens man skriver.** *Forslag:* teksten filtrerer radene i nettleseren mens man skriver, på ticker og navn. Det ligger i `hjelp.js`, fordi sidene bare har det ene skriptet (8.0f). Uten skript gjør knappen «Vis» det samme på serveren, og bransjen og omsetningen er et vanlig skjema som virker uten skript. Valg av bransje eller omsetning sender skjemaet med en gang når skriptet kjører.
 9. **Steg 1 i Min liste.** Utdraget har lenken «Åpne eodhd.com». *Forslag:* adressen står som tekst, som i 2.12, fordi sidene ikke har adresser til nettet (kontrollpunktet i `test_hjelpetekster.py`).
-10. **Steg 3 i Min liste.** *Forslag:* kortet har kallene regnet av lista (flyttet fra «Følg flere aksjer») og to knapper: «Velg en bransjeliste», som går til «Start fra en ferdig liste», og «+ Følg en aksje». Når lista er full, står «Lista er full» i stedet for den andre knappen.
+10. **Steg 3 i Min liste.** *Forslag:* kortet har kallene regnet av lista (flyttet fra «Følg flere aksjer») og to knapper: «Start fra en ferdig liste» (het «Velg en bransjeliste» før tillegg 3), som går til delen med samme navn, og «+ Følg en aksje». Når lista er full, står «Lista er full» i stedet for den andre knappen.
 11. **Migrasjon.** *Forslag:* ingen. Bransjen står fortsatt i `oenske.sektor` og `aksje.sektor`, og ingen tabell endres. Storyen kan derfor flettes når som helst etter gruppens ja (steg 2 i instruksjonen).
 
 ## Delene
@@ -61,7 +65,7 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 
 ### C. «Følg en aksje»
 
-Hele lista som kan følges, med antallet, søk mens man skriver, filter på bransje (med symbolet) og målt omsetning, «Følg» på hver rad og «?». Tre forslag øverst etter spørsmål 7. En aksje uten måling merkes «ikke målt ennå». «Bytt ut» bruker den samme lista.
+Hele lista som kan følges, med antallet, søk mens man skriver, filter på bransje (med symbolet) og målt omsetning, «Følg» på hver rad og «?». Tre forslag øverst etter spørsmål 7 (byttet ut med sorteringen i tillegg 3). En aksje uten måling merkes «ikke målt ennå». «Bytt ut» bruker den samme lista.
 
 ### D. «Din egen liste» i Min liste
 
@@ -156,8 +160,62 @@ Gjennomgangen av `a251c087..508a3a16` ga 3 funn fra Blind Hunter, 4 fra Edge Cas
 
 VG2 er middels og bare delvis rettet, så den står som spørsmål 14 (regel 25).
 
+## Flettingen av main 11.11
+
+Instruksjonen 11.11 kl. 11:56, steg 1: main ble flettet inn med 8.23, del A (`45111d53`). Konfliktene var `issues.md`, `docs/hjelp.md`, `app.py`, `_egne.html`, avtrykkene i `test_docker.py` og to bilder. Begge sider er beholdt: stegkortene fra 8.22 med kvoten i steg 1 og avsnittet «Følg flere aksjer» fra 8.23 (A7), kvoten fra tillegg 4 og tallene fra 8.23 i `app.py`, og setningen fra 8.23 om radene i hjelpen. Én test for den faste bransjen leste radene som `<li>` og leser nå tabellraden fra 8.23 (A1). Hele settet ga 5206, lik `--collect-only`, med den ene feilen rettet og fila kjørt på nytt. CI var grønn.
+
+## Tillegg 3 og 5
+
+Bygget etter svarene kl. 22:44 og 22:55, i fire deler med tester og mutanter, og så én gjennomgang av alle fire.
+
+- **Del 1, sorteringen (`013d1974`):** kortet «Mest omsatt» er borte. `ferdige_lister.sorter` ordner «Mest omsatt først» etter median omsetning, med dem som ikke er målt, sist, «A–Å» etter navnet og «Bransje» etter bransjen i samme rekkefølge som filteret. Sorteringen er brikker i samme skjema som filteret (`sorter=`), og «Mest omsatt først» er valgt fra start. Siden og hjelpen sier at det ikke er en rangering etter kursen eller signalet (NFR-06).
+- **Del 2, flere bransjer (`2dbe3a4d`):** bransjene er avkrysning (`bransje=` flere ganger), og omsetningen gjelder i tillegg. «Alle» er en lenke som tar bort bransjene. Det valgte er `--oransje`, som bryterne i Innstillinger og fanen fra 8.23, med tekst i blekk og hakemerket ✓ foran. Gult (`--gul-symbol`) brukes ikke.
+- **Del 3, radene (`42ebdc5a`):** en tabell i samme kort med svart kolonnerad som på oversikten, med navnet og så tickeren og bransjeikonet under, omsetningen i en egen kolonne med dagen den ble målt, og «Følg» til høyre. Skriptet skjuler radene i tabellen mens man skriver.
+- **Del 4, de ferdige listene (`05b527da`):** én knapp per bransje med ikonet og antallet, og én setning. Knappen går til `GET /ferdig-liste?bransje=…`, siden «Er du sikker?». Den viser aksjene, merket «Utenfor målingen», hvor mange som fjernes og et åpent tenkt kjøp (8.21), og leser bare. Ingenting byttes før «Bruk denne lista», som sender til `POST /ferdig-liste` som før.
+- **Tillegg 5 (`66fff077`):** `folg-en-aksje-390-demo.png` (hele siden, 1573 px) og `notatene-brfe-390-demo.png` (bare delen `mine-notater`, 1354 px, fordi hele aksjesiden er for høy). De står i README-en etter de andre bildene ved 390 px og i «Mappestruktur», og avtrykkene er regnet ut på nytt. «Din egen liste» er nå 1454 px (var 1714) og «Følg en aksje» 1252 px (var 1368).
+
+**Mutantene, alle fanget, med filene like HEAD etterpå:** sorteringen er «A–Å» fra start; «Mest omsatt først» med den laveste først; bare den siste bransjen i adressen gjelder; det valgte er gult; skriptet leter etter `li` i stedet for `tr`; «Følg» står i feil celle; `GET /ferdig-liste` bytter lista; «Er du sikker?» sier ikke hvor mange som fjernes; bare «Alle» får hakemerket (VG1).
+
+### Gjennomgangen av tillegg 3
+
+Gjennomgangen av `45111d53..05b527da` ga 14 funn fra Blind Hunter, 12 fra Edge Case Hunter og 12 fra Verification Gap. Rettingene står i `05cd01e4`.
+
+| Funn | Grad | Utfall |
+|---|---|---|
+| ECH2 (`--oransje` er også fargen for 3 av 3 på oversikten) | middels | Står: svaret kl. 22:44 sa den oransje fargen fra bryterne og fanen, og hakemerket skiller det valgte fra 3 av 3. Funnet følger av svaret, så det står som spørsmål 15 (regel 25). |
+| BH3, ECH1, VG8 (hjelpen sa piltastene også for avkrysningsboksene) | middels | Rettet: hjelpen og kommentaren i skriptet sier at bransjene krysses av med mellomrom, med test. |
+| BH11, ECH1 («Vis» bare før 14 bokser) | middels/lav | Rettet: «Vis» står også under sorteringen. |
+| BH5 (setningen i Min liste sa ikke at lista vises før noe byttes) | middels | Rettet: «Velger du en bransje, ser du lista før noe byttes, og …». NFR-06 står på «Er du sikker?». |
+| VG1 (hakemerket var bare testet for «Alle») | høy | Rettet: testen leser hele velgeren, og mutanten ble fanget. |
+| VG2, VG7, VG10, VG12 (fokus, tekstfargen, 390 px og høykontrast uten test) | høy/middels/lav | Rettet: tester for fokusrammen, `opacity: 0` uten `display: none`, tekst i blekk, `min-width: 0` og `forced-colors`. |
+| VG3, VG4, VG5 (demoen bare sjekket gjennom adressen) | høy/middels | Rettet: demotester for brikkene, avkrysningen, «Alle», linja om omsetningen, de elleve knappene og «Er du sikker?», og tickerne på alle de elleve sidene er oppdiktet. |
+| VG6 (`docs/hjelp.md` uten test) | middels | Rettet: test for sorteringen, NFR-06, mellomrom og «Er du sikker?». |
+| VG9, BH14, ECH7 (de nye sidene utenfor rammetestene) | middels/lav | Rettet: «Følg en aksje» og «Er du sikker?» i demoen er med i `sidene` i `test_utseende.py`, og lenkene er lagt til i hvitelista. |
+| ECH3, BH13 (bildene var ikke tatt på nytt i diffen) | middels | Rettet i `66fff077`. «Elleve bransjer» er sjekket mot demoen i en test. |
+| BH1 (`aapne_kjoep` og `eksempeltall` sendes ikke fra ruta) | middels | Avvist: begge kommer fra context processorene, og bildet av siden viser både varselet om KVST og demoboksen. |
+| BH2 (skriptet sender ikke for avkrysningsbokser) | middels | Avvist: skriptet lytter på `change` for hvert fieldset, også for avkrysning. Bildene er tatt med skriptet. |
+| BH4 (`BRANSJENE.index` ved en ukjent bransje) | middels | Rettet: en ukjent bransje sorteres sist. ECH fant at assertene i `ferdige_lister.py` alt hindrer det. |
+| ECH4 («Alle» tok med `feil=` og ukjente parametre) | lav/middels | Rettet: bare `q`, `omsetning`, `sorter` og `bytt`. Et søk som ikke er sendt, følger ikke med (lav, står). |
+| ECH5, ECH6 («de 1 mest omsatte», ønskene som venter) | lav | Rettet: entall, egen tekst når ingen fjernes, og setningen om ønskene bare når noen venter, med test. |
+| BH8, BH9, BH10, ECH12 (skjermlesere: skilletegn, hakemerket, tittelen, antallet) | lav | Rettet. |
+| ECH10 (linja om omsetningen uten målte) | lav | Rettet: bare når minst én rad er målt. |
+| ECH11 (gamle navn og tekster) | lav | Rettet. |
+| BH6 (lista kan endre seg mellom «Er du sikker?» og POST) | lav | Står: POST regner lista på nytt, som før tillegg 3. Spørsmål 18. |
+| BH7 (WAL og sammenligningen av fila) | lav | Står: testbasene bruker samme sjekk som `test_sidene_skriver_aldri` fra før. |
+| BH12 (ingen linje for «A–Å» og «Bransje») | lav | Står: brikken som er merket, sier sorteringen. |
+| ECH8 (`:has()` i eldre nettlesere) | lav | Står: stilarket brukte `:has()` for brikkene fra før. |
+| ECH9 (390 px anslått) | lav | Avvist: bildet ved 390 px viser at tabellen får plass. «Bytt inn» med et langt navn er ikke målt. |
+| ECH10 (tom børsliste), ECH12 (alle 13 valgt) | lav | Står. |
+| VG11 (byttet med flere bransjer og sorteringen) | lav | Rettet: test. |
+
+Funnet på middels som står åpent, er ECH2 (spørsmål 15, regel 25).
+
 ## Spørsmål etter gjennomgangen
 
 12. **Medianene ved hver visning av «Følg en aksje» (ECH5).** *Forslag:* som bygget. Lista trenger omsetningen for alle, og medianene regnes én gang per forespørsel, som på Min liste. Det er ikke målt hvor lang tid det tar med den ekte basen.
 13. **Demotickerne i den ekte versjonen (ECH12).** *Forslag:* som bygget, fordi ingen av dem er på Oslo Børs 10.11. Kommer en av dem på børsen, sjekkes bransjen på nytt.
 14. **Et kall som feiler, i testen for statusen i steg 2 (VG2, tillegg 4).** *Forslag:* som bygget. Teksten sier «minst», så den stemmer også når kall feiler. En test med et kall som feiler og et nytt forsøk i `kjoer_23` kan legges til, men tester da hentingen mer enn siden.
+15. **Den oransje fargen på det valgte (ECH2, tillegg 3).** `--oransje` er også fargen for 3 av 3 på oversikten. *Forslag:* som bygget, fordi svaret kl. 22:44 sa fargen fra bryterne og fanen, og hakemerket skiller det valgte fra 3 av 3. Alternativet er en egen farge for «valgt».
+16. **Sorteringen fra start (tillegg 3).** *Forslag:* «Mest omsatt først», fordi den står først i svaret, med linja om at den ikke er en rangering etter kursen. Alternativet er «A–Å», som før tillegg 3.
+17. **Rekkefølgen i «Bransje» (tillegg 3).** *Forslag:* bransjene i samme rekkefølge som brikkene i filteret (`valg.BRANSJENE`), og navnet innen hver bransje.
+18. **Lista mellom «Er du sikker?» og «Bruk denne lista» (BH6).** *Forslag:* som bygget: POST regner lista på nytt, som før. Står siden åpen over kveldshentingen, kan lista bli en annen enn den som ble vist.
