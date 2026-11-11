@@ -662,9 +662,10 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "",
             "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). Modellen fikk bare det appen "
             "regnet ut: om hovedindeksen steg eller falt, hvor mange aksjer som gjorde det bedre enn indeksen, "
-            "hvor mange som skilte seg ut, med navnet og retningen for høyst fem, og bransjen som steg mest og "
-            "den som falt mest i snitt, med ukedagen og antallet aksjer i lista, og ingen prosenter, kurser "
-            "eller nyheter. "
+            "hvor mange som skilte seg ut og med hvilken retning, med navnet, styrken og retningen for høyst "
+            "fem, hvor mange som steg i hver bransje med minst to aksjer med en endring, og bransjen som steg "
+            "mest og den som falt mest i snitt, med ukedagen og antallet aksjer i lista, og ingen prosenter, "
+            "kurser eller nyheter. "
             "Teksten sjekkes før den vises: tall med prikket strek står i det modellen fikk, og den gir ikke råd.",
             (
                 (DAGSGRUNNLAG, "def dagsgrunnlag("),

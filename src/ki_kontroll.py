@@ -891,7 +891,9 @@ RAAD = (
     r"should\b",
     # Story 10.10 (NFR-06): «verdt å følge» og «følg med».
     r"verdt",
-    r"følg(?:e|er)?\s+med",
+    # Gjennomgangen (BH6): ogsaa «følges med», «følger med» og «fulgte med».
+    r"følg\w*\s+med",
+    r"fulgt\w*\s+med",
 )
 GJETNING = (
     r"trolig",

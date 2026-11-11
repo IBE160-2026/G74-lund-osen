@@ -210,18 +210,20 @@ class TestPrompten:
 
     def test_versjon_5(self):
         """Story 10.9, del E: versjon 4 er flettet, og enhver endring gir
-        ny versjon (svaret 25.10 kl. 20:54 b), saa den nye prompten er versjon 5. Ville feilet hvis prompten fikk en annen tekst
-        uten ny versjon, eller avtrykket for versjon 5 var det samme som for
-        versjon 4 (FR-605). Story 10.10: versjonen er 6, og avtrykket for 5
-        staar."""
+        ny versjon (svaret 25.10 kl. 20:54 b), saa den nye prompten er versjon 5. Ville feilet hvis
+        avtrykket for versjon 5 ble endret, eller var det samme som for
+        versjon 4 (FR-605). Story 10.10: versjonen er 6, og at prompten
+        foelger versjonen, sjekker test_versjonen_foelger_teksten."""
         assert AVTRYKK["5"] == "822dcd4981bfeb515b8ba470a2b8e29bc7a0982f3a8807050ba406bea46d8dea"
         assert AVTRYKK["5"] != AVTRYKK["4"]
 
     def test_versjon_6(self):
         """Story 10.10: ose.db har tekster med versjon 5, saa den nye
-        prompten er versjon 6. Ville feilet hvis prompten fikk en annen tekst
-        uten ny versjon, eller avtrykket for 6 var det samme som for 5."""
+        prompten er versjon 6. Ville feilet hvis versjonen ikke var 6, eller
+        avtrykket for 6 ble endret stille eller var det samme som for 5
+        (gjennomgangen, VG9)."""
         assert PROMPTVERSJON == "6"
+        assert AVTRYKK["6"] == "e1eccd2d5ef3ad0fd11d1d75d7b44b6860dcc4f8399bffaa6f8ac79ca115df1d"
         assert AVTRYKK["6"] != AVTRYKK["5"]
 
     def test_modellen_skriver_ikke_om_dagen(self):

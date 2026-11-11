@@ -189,10 +189,76 @@ _NAA = re.compile(r"(?<![\w-])(i\s+dag|i\s+går|i\s+kveld|i\s+morgen|dagens|går
 
 
 def _navnet(navn: str) -> re.Pattern[str]:
-    """Navnet ordrett, med hvilket som helst mellomrom der navnet har et
-    (ogsaa et hardt), og styrken og retningen i parentesen etter."""
-    deler = [re.escape(del_) for del_ in str(navn).split()]
-    return re.compile(r"(?<![\w-])" + r"\s+".join(deler) + _I_PARENTES, re.IGNORECASE)
+    """Navnet ordrett, med store og smaa bokstaver som i grunnlaget og
+    hvilket som helst mellomrom der navnet har et (ogsaa et hardt), og
+    styrken og retningen i parentesen etter. Navnet normaliseres som
+    teksten (gjennomgangen, ECH5, VG6)."""
+    deler = [re.escape(del_) for del_ in normaliser(str(navn)).split()]
+    return re.compile(r"(?<![\w-])(?-i:" + r"\s+".join(deler) + ")" + _I_PARENTES, re.IGNORECASE)
+
+
+def _navnene(tekst: str, grunnlag: Mapping[str, object]) -> tuple[str, list[str]]:
+    """Setningen med navnene (story 10.10). Gir teksten uten formen, og
+    grunnene.
+
+    Gjennomgangen (BH1, ECH1, BH7, ECH2-ECH4): bruker teksten navnene, skal
+    alle navnene i grunnlaget staa der, i rekkefoelgen der, i én setning
+    etter «Blant dem var», med «og ‹N› andre» bare naar feltet er der. Det
+    lengste navnet leses foerst, saa «BP» ikke finnes inne i «Aker BP», og
+    to aksjer med samme navn leses som to oppfoeringer."""
+    grunner: list[str] = []
+    oppfoeringer = list(grunnlag.get(NAVNENE) or ())
+    funnet: list[tuple[int, int]] = []
+    for navn in sorted({normaliser(str(o["navn"])) for o in oppfoeringer}, key=len, reverse=True):
+        ventet = [(i, o) for i, o in enumerate(oppfoeringer) if normaliser(str(o["navn"])) == navn]
+        alle = list(_navnet(navn).finditer(tekst))
+        if len(alle) > len(ventet):
+            grunner.append(f"1: navnet «{navn}» står {len(alle)} ganger")
+        igjen = list(ventet)
+        for treff in alle:
+            styrke, retning = int(treff.group(1)), treff.group(2).lower()
+            passer = next((p for p in igjen if (p[1]["styrke"], p[1]["retning"]) == (styrke, retning)), None)
+            if passer is None:
+                oppfoering = (igjen or ventet)[0][1]
+                if styrke != oppfoering["styrke"]:
+                    grunner.append(f"2: tallet «{treff.group(1)}» ved styrken for {navn}")
+                if retning != oppfoering["retning"]:
+                    grunner.append(
+                        f"1: retningen «{treff.group(2)}» for {navn}, grunnlaget sier {oppfoering['retning']}"
+                    )
+                passer = igjen[0] if igjen else None
+            if passer is not None:
+                igjen.remove(passer)
+                funnet.append((treff.start(), passer[0]))
+            tekst = _ta_ut(tekst, treff)
+    blant = list(_F_BLANT.finditer(tekst))
+    andre = list(_F_ANDRE.finditer(tekst))
+    for treff in blant:
+        if not oppfoeringer:
+            grunner.append(f"1: «{treff.group(0)}», men {NAVNENE} mangler i grunnlaget")
+    for treff in andre:
+        if ANDRE not in grunnlag:
+            grunner.append(f"1: «{treff.group(0)}», men {ANDRE} mangler i grunnlaget")
+        elif _antall(treff.group(1)) != grunnlag[ANDRE]:
+            grunner.append(f"2: tallet «{treff.group(1)}» ved {ANDRE}")
+    if oppfoeringer and (funnet or blant or andre):
+        if len(blant) != 1:
+            grunner.append("1: «Blant dem var» skal stå én gang foran navnene")
+        if len(funnet) != len(oppfoeringer):
+            grunner.append(f"1: setningen med navnene har {len(funnet)} av {len(oppfoeringer)} navn")
+        if len(andre) > 1 or (ANDRE in grunnlag) != bool(andre):
+            grunner.append(f"1: «og ‹N› andre» skal stå én gang bare når {ANDRE} er i grunnlaget")
+        rekkefoelgen = [i for _start, i in sorted(funnet)]
+        if rekkefoelgen != sorted(rekkefoelgen):
+            grunner.append("1: navnene står ikke i rekkefølgen i grunnlaget")
+        if len(blant) == 1:
+            start = blant[0].end()
+            slutt = max([s for s, _i in funnet] + [t.start() for t in andre] + [start])
+            if any(s < blant[0].start() for s, _i in funnet) or re.search(r"[.!?]", tekst[start:slutt]):
+                grunner.append("1: navnene står ikke i setningen etter «Blant dem var»")
+    for treff in blant + andre:
+        tekst = _ta_ut(tekst, treff)
+    return tekst, grunner
 
 
 def _antall(ord_: str) -> int:
@@ -220,25 +286,14 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
 
     # Story 10.10: navnene foerst, fordi et navn kan ha ord og tegn som de
     # andre formene ellers ville lest.
-    for oppfoering in grunnlag.get(NAVNENE) or ():
-        navn = oppfoering["navn"]
-        alle = list(_navnet(navn).finditer(tekst))
-        if len(alle) > 1:
-            grunner.append(f"1: navnet «{navn}» står {len(alle)} ganger")
-        for treff in alle:
-            if int(treff.group(1)) != oppfoering["styrke"]:
-                grunner.append(f"2: tallet «{treff.group(1)}» ved styrken for {navn}")
-            if treff.group(2).lower() != oppfoering["retning"]:
-                grunner.append(f"1: retningen «{treff.group(2)}» for {navn}, grunnlaget sier {oppfoering['retning']}")
-            tekst = _ta_ut(tekst, treff)
-    for treff in list(_F_BLANT.finditer(tekst)):
-        if not grunnlag.get(NAVNENE):
-            grunner.append(f"1: «{treff.group(0)}», men {NAVNENE} mangler i grunnlaget")
-        tekst = _ta_ut(tekst, treff)
-    for treff in list(_F_ANDRE.finditer(tekst)):
-        ved_feltet(treff.group(1), ANDRE, treff.group(0))
-        tekst = _ta_ut(tekst, treff)
-    for treff in list(_F_MEST.finditer(tekst)):
+    tekst, navnegrunner = _navnene(tekst, grunnlag)
+    grunner += navnegrunner
+    mest = list(_F_MEST.finditer(tekst))
+    # Gjennomgangen (ECH4): hver bransje én gang.
+    for verb in ("steg", "falt"):
+        if sum(1 for t in mest if t.group(1).lower() == verb) > 1:
+            grunner.append(f"1: «I snitt {verb} … mest» står mer enn én gang")
+    for treff in mest:
         felt = _MEST_FELT[treff.group(1).lower()]
         navn = " ".join(treff.group(2).lower().split())
         if felt not in grunnlag:

@@ -14,7 +14,7 @@ import pytest
 
 import demo_ki
 from dagsgrunnlag import ANDRE, MEST_NED, MEST_OPP, NAVNENE, dagsgrunnlag, for_promptversjon, mest_opp_og_ned
-from ki_dagen import DAGSPROMPTVERSJON, REGLER_DAGEN, kontroller_dagen, lag_dagsprompt, lag_dagsrad
+from ki_dagen import DAGSPROMPTVERSJON, REGLER_DAGEN, dagsregel, kontroller_dagen, lag_dagsprompt, lag_dagsrad
 from ki_eksempel import MODELLNAVN, EksempelModell, tekst_om_aksjen, tekst_om_dagen
 from ki_kontroll import kontroller
 from ki_modell import lag_ki_rad
@@ -26,6 +26,8 @@ from test_ki_dagen import FREDAG, TORSDAG
 from vurderingsdata import Vurdering
 
 ROT = Path(__file__).resolve().parents[1]
+HARDT = chr(0xA0)
+MYK = chr(0xAD)
 SPEC = ROT / "_bmad-output" / "implementation-artifacts" / "spec-10-10-rikere-ki-tekster.md"
 
 
@@ -68,7 +70,7 @@ LISTA = (
     Aksje("BBB", "BBB.OL", "Bravo", "Finans"),
     Aksje("EEE", "EEE.OL", "Echo", "Sjømat"),
     Aksje("CCC", "CCC.OL", "Charlie", "Sjømat"),
-    Aksje("DDD", "DDD.OL", "Delta Hav ASA", "Sjømat"),
+    Aksje("DDD", "DDD.OL", "Delta Hav" + HARDT + "ASA", "Sjømat"),
 )
 VURDERINGER = {
     "GGG": vurdering(2, "Positiv"),
@@ -140,11 +142,29 @@ class TestGrunnlagetForDagen:
         assert mest_opp_og_ned({"Energi": 1.0, "Sjømat": 1.0, "Finans": -3.0}) == {MEST_NED: "Finans"}
 
     def test_snittet_sammenlignes_slik_det_vises(self):
-        """Spørsmål 1: 0,004 vises som 0,00, og ville feilet hvis bransjen
-        likevel ble den som steg mest."""
-        serier = dict(SERIER, GGG=to_dager(100, 100.004), AAA=to_dager(100, 100.004))
-        g = grunnlaget(serier=serier)
-        assert g[MEST_OPP] == "Sjømat"
+        """Spørsmål 1 og 2, gjennomgangen (BH3, VG1): 1,001 og 1,004 vises
+        begge som 1,00, og 0,004 og 0,003 som 0,00. Ville feilet hvis
+        snittene ble sammenlignet uten avrunding: da ville Sjømat og Energi
+        blitt «steg mest»."""
+        opp = {s: to_dager(100, 101.001) for s in ("GGG", "AAA")} | {
+            s: to_dager(100, 101.004) for s in ("EEE", "CCC", "DDD")
+        }
+        assert MEST_OPP not in grunnlaget(serier=dict(SERIER, **opp))
+        naer_null = {s: to_dager(100, 100.004) for s in ("GGG", "AAA")} | {
+            s: to_dager(100, 100.003) for s in ("EEE", "CCC", "DDD")
+        }
+        assert MEST_OPP not in grunnlaget(serier=dict(SERIER, **naer_null))
+
+    def test_norsk_alfabetisk_rekkefoelge(self):
+        """Gjennomgangen (BH5): ville feilet med rekkefølgen på kodepunkter,
+        som gir Å foran Æ og Ø, og små bokstaver etter store."""
+        lista = tuple(
+            Aksje(f"S{i}", f"S{i}.OL", navn, "Energi") for i, navn in enumerate(("Ålesund", "Øst", "Ærlig", "berg"))
+        )
+        vurderinger = {a.symbol: vurdering(2, "Positiv") for a in lista}
+        serier = {a.symbol: to_dager(100, 101) for a in lista}
+        g = dagsgrunnlag(FREDAG, lista, vurderinger, serier, INDEKS)
+        assert [n["navn"] for n in g[NAVNENE]] == ["berg", "Ærlig", "Øst", "Ålesund"]
 
     def test_ingen_bransje_steg_naar_alle_falt(self):
         """Ville feilet hvis bransjen med høyest snitt ble «steg mest» når
@@ -222,10 +242,103 @@ class TestKontrollenForDagen:
         assert "Blant dem var Echo (3 av 3, negativ), Foxtrot (3 av 3, positiv)" in tekst
         assert tekst.endswith("og 2 andre. I snitt steg energi mest. I snitt falt finans mest.")
         assert kontroller_dagen(tekst, grunnlaget()).besto, kontroller_dagen(tekst, grunnlaget()).grunner
-        g = dict(grunnlaget())
-        g[NAVNENE] = [*g[NAVNENE][:4], {"navn": "Delta Hav ASA", "styrke": 2, "retning": "positiv"}]
-        tekst = "Blant dem var Delta Hav ASA (2 av 3, positiv) og 2 andre."
+        g = {n: v for n, v in grunnlaget().items() if n != ANDRE}
+        g[NAVNENE] = [{"navn": "Delta Hav" + HARDT + "ASA", "styrke": 2, "retning": "positiv"}]
+        tekst = "Blant dem var Delta Hav ASA (2 av 3, positiv)."
+        assert HARDT not in tekst
         assert kontroller_dagen(tekst, g).besto, kontroller_dagen(tekst, g).grunner
+
+    @pytest.mark.parametrize(
+        ("navnene", "tekst"),
+        [
+            # ECH2: et navn som er slutten av et annet.
+            (
+                [("BP", 3, "positiv"), ("Aker BP", 2, "negativ")],
+                "Blant dem var BP (3 av 3, positiv) og Aker BP (2 av 3, negativ).",
+            ),
+            # ECH3: to aksjer med samme navn.
+            (
+                [("Foo", 3, "positiv"), ("Foo", 2, "negativ")],
+                "Blant dem var Foo (3 av 3, positiv) og Foo (2 av 3, negativ).",
+            ),
+            # ECH5: myk bindestrek i navnet i grunnlaget.
+            ([("Kon" + MYK + "sberg", 3, "positiv")], "Blant dem var Konsberg (3 av 3, positiv)."),
+        ],
+    )
+    def test_vanskelige_navn_bestaar(self, navnene, tekst):
+        """Gjennomgangen (ECH2, ECH3, ECH5): ville feilet hvis en riktig tekst
+        ble stoppet fordi et navn var slutten av et annet, to aksjer hadde
+        samme navn, eller navnet i grunnlaget hadde en myk bindestrek."""
+        g = {n: v for n, v in grunnlaget().items() if n != ANDRE}
+        g[NAVNENE] = [{"navn": n, "styrke": s, "retning": r} for n, s, r in navnene]
+        svar = kontroller_dagen(tekst, g)
+        assert svar.besto, svar.grunner
+
+    @pytest.mark.parametrize(
+        ("fra", "til", "grunn"),
+        [
+            # BH1, ECH1: et navn utelatt, men «og 2 andre» som i feltet.
+            ("Echo (3 av 3, negativ), ", "", "4 av 5 navn"),
+            # BH1: rekkefølgen i grunnlaget.
+            (
+                "Echo (3 av 3, negativ), Foxtrot (3 av 3, positiv)",
+                "Foxtrot (3 av 3, positiv), Echo (3 av 3, negativ)",
+                "rekkefølgen",
+            ),
+            # BH7: et navn utenfor setningen etter «Blant dem var».
+            ("Blant dem var Echo (3 av 3, negativ), ", "Echo (3 av 3, negativ). Blant dem var ", "setningen etter"),
+            # ECH4: «Blant dem var» og bransjen to ganger.
+            ("I snitt falt finans mest.", "I snitt falt finans mest. Blant dem var.", "én gang foran navnene"),
+            ("I snitt falt finans mest.", "I snitt falt finans mest. I snitt steg energi mest.", "mer enn én gang"),
+            # «og N andre» mangler når feltet er der.
+            (" og 2 andre", "", "andre» skal stå én gang"),
+            # VG6: navnet med andre store og små bokstaver.
+            ("Echo (", "ECHO (", "4 av 5 navn"),
+        ],
+    )
+    def test_setningen_med_navnene_stoppes(self, fra, til, grunn):
+        """Gjennomgangen: ville feilet hvis kontrollen godtok en setning der
+        et navn manglet (så «og 2 andre» ble feil), navnene sto i en annen
+        rekkefølge, et navn sto utenfor setningen, en form sto to ganger,
+        «og N andre» manglet, eller navnet var skrevet med andre bokstaver."""
+        tekst = self.tekst()
+        assert fra in tekst
+        svar = kontroller_dagen(tekst.replace(fra, til, 1), grunnlaget())
+        assert not svar.besto and any(grunn in g for g in svar.grunner), svar.grunner
+
+    def test_blant_dem_var_uten_navnene_i_grunnlaget(self):
+        """Gjennomgangen (VG5): ville feilet hvis «Blant dem var» besto uten
+        navnene i grunnlaget, også når resten av setningen er en lovlig form."""
+        g = {n: v for n, v in grunnlaget().items() if n != NAVNENE}
+        svar = kontroller_dagen("Blant dem var 2 andre.", g)
+        assert not svar.besto and any(f"{NAVNENE} mangler" in x for x in svar.grunner), svar.grunner
+
+    @pytest.mark.parametrize(
+        ("setning", "grunn"),
+        [
+            ("Den bør følges.", "3: «bør"),
+            ("Den er verdt å følge.", "3: «verdt"),
+            ("Følg med på den.", "3: «Følg med"),
+            ("Den følges med interesse.", "3: «følges med"),
+            ("Det vil vise seg.", "4: «vil"),
+        ],
+    )
+    def test_raad_stoppes_under_punkt_3_og_4(self, setning, grunn):
+        """Gjennomgangen (VG3, VG4, BH6): ville feilet hvis ordene bare ble
+        stoppet som rest, ikke under punkt 3 og 4, eller hvis «vil» bare ble
+        stoppet med de gamle verbene. Gjelder begge kontrollene."""
+        svar = kontroller_dagen(self.tekst() + " " + setning, grunnlaget())
+        assert not svar.besto and any(g.startswith(grunn) for g in svar.grunner), svar.grunner
+        svar = kontroller(tekst_om_aksjen(TestVersjon6.GRUNNLAG) + " " + setning, TestVersjon6.GRUNNLAG)
+        assert not svar.besto and any(g.startswith(grunn) for g in svar.grunner), svar.grunner
+
+    def test_regelen_har_navnene_og_bransjene(self):
+        """Gjennomgangen (VG2), FR-604: ville feilet hvis regelen i loggen
+        manglet navnene, resten eller bransjene."""
+        regelen = dagsregel(grunnlaget())
+        assert "Navnene: Echo (3 av 3, negativ), Foxtrot (3 av 3, positiv)," in regelen
+        assert ", og 2 andre." in regelen
+        assert "Høyest snitt: Energi." in regelen and "Lavest snitt: Finans." in regelen
 
     @pytest.mark.parametrize(
         ("fra", "til"),
@@ -321,6 +434,16 @@ class TestVersjon6:
         if bevegelse == 1:
             assert kontroller(tekst, riktig).besto, kontroller(tekst, riktig).grunner
 
+    @pytest.mark.parametrize("bevegelse", [1, -1, 0])
+    def test_eksempelskriverens_form_bestaar_for_hvert_fortegn(self, bevegelse):
+        """Gjennomgangen (BH9): ville feilet hvis kontrollen stoppet den
+        riktige korte formen for bevegelsen, også den negative og den uten
+        utslag."""
+        grunnlag = {**self.GRUNNLAG, "bevegelse": bevegelse, "styrke": 2 + abs(bevegelse)}
+        grunnlag["retning"] = "Blandet"
+        svar = kontroller(tekst_om_aksjen(grunnlag), grunnlag)
+        assert svar.besto, svar.grunner
+
     @pytest.mark.parametrize("ord_", ["Den bør følges.", "Den er verdt å følge.", "Følg med på den.", "Den vil stige."])
     def test_raad_og_det_som_vil_skje_stoppes(self, ord_):
         """NFR-06: ville feilet hvis ordene slapp gjennom i teksten om én aksje."""
@@ -347,6 +470,30 @@ class TestDemoen:
         fil = tmp_path / "dagen.json"
         rad = demo_ki.lag_dagsteksten(EksempelModell(), fil=fil, skriv=lambda _: None)
         assert rad.tekst == demo_ki.les_dagsraden().tekst
+        assert rad.regelen == demo_ki.les_dagsraden().regelen
+
+    def test_tekstene_for_aksjene_er_det_skriveren_gir(self, tmp_path):
+        """Gjennomgangen (VG8): ville feilet hvis en av de 13 tekstene i fila
+        ikke var det eksempelskriveren gir for demodagen."""
+        radene = demo_ki.lag_tekstene(EksempelModell(), fil=tmp_path / "tekstene.json", skriv=lambda _: None)
+        lagret = {r.emne.symbol: r.tekst for r in demo_ki.les_radene()}
+        assert {r.emne.symbol: r.tekst for r in radene} == lagret
+
+    def test_kommandoen_med_eksempel_starter_ikke_ollama(self, tmp_path, monkeypatch):
+        """Gjennomgangen (VG8): ville feilet hvis --eksempel likevel brukte
+        Ollama, eller ikke skrev teksten om dagen."""
+        import ki_lokal
+
+        class IkkeOllama:
+            def __init__(self, *args, **kwargs):
+                raise AssertionError("--eksempel skal ikke bruke Ollama")
+
+        monkeypatch.setattr(ki_lokal, "OllamaModell", IkkeOllama)
+        monkeypatch.setattr(demo_ki, "DAGFIL", tmp_path / "dagen.json")
+        lag = demo_ki.lag_dagsteksten
+        monkeypatch.setattr(demo_ki, "lag_dagsteksten", lambda modell: lag(modell, fil=tmp_path / "dagen.json"))
+        demo_ki.main(["--eksempel", "--dagen"])
+        assert demo_ki.les_dagsraden(tmp_path / "dagen.json").modell == MODELLNAVN
 
 
 def test_spesifikasjonen_sier_hvilke_versjoner_brukertesten_brukte():

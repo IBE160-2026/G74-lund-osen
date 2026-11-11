@@ -57,6 +57,16 @@ NAVNENE = "skilte_seg_ut_navn"
 ANDRE = "skilte_seg_ut_andre"
 MEST_OPP = "bransje_mest_opp"
 MEST_NED = "bransje_mest_ned"
+# Gjennomgangen (BH5): norsk alfabetisk rekkefoelge, Æ, Ø og Å sist, og uten
+# hensyn til store og smaa bokstaver.
+_NORSK = str.maketrans({"æ": "{", "ø": "|", "å": "}", "ä": "{", "ö": "|"})
+
+
+def alfabetisk(navn: str) -> str:
+    """Noekkelen for norsk alfabetisk rekkefoelge."""
+    return navn.casefold().translate(_NORSK)
+
+
 MEST_NAVN = 5
 # Feltene promptversjon dag-1 ikke har (spoersmaal 5).
 NYE_FELT = (NAVNENE, ANDRE, MEST_OPP, MEST_NED)
@@ -112,7 +122,7 @@ def dagsgrunnlag(
             for a in lista
             if isinstance(v := vurderinger.get(a.symbol), Vurdering) and v.styrke >= terskel
         ),
-        key=lambda u: (-u[0], u[1], u[2]),
+        key=lambda u: (-u[0], alfabetisk(u[1]), u[1], u[2]),
     )
     if utslag:
         grunnlag[NAVNENE] = [
@@ -164,16 +174,7 @@ def for_promptversjon(grunnlag: Mapping[str, object] | None, promptversjon: str)
 
 def som_vanlig(grunnlag: Mapping[str, object] | None) -> dict | None:
     """Grunnlaget som vanlige dict, saa to grunnlag kan sammenlignes, ogsaa
-    et som er lest fra loggen (MappingProxyType paa alle nivaaer). Story
-    10.10: en liste fra loggen er en tuple, og blir en liste."""
+    et som er lest fra loggen (MappingProxyType paa alle nivaaer)."""
     if grunnlag is None:
         return None
-    return {n: _vanlig(v) for n, v in grunnlag.items()}
-
-
-def _vanlig(verdi):
-    if isinstance(verdi, Mapping):
-        return {n: _vanlig(v) for n, v in verdi.items()}
-    if isinstance(verdi, (list, tuple)):
-        return [_vanlig(v) for v in verdi]
-    return verdi
+    return {n: som_vanlig(v) if isinstance(v, Mapping) else v for n, v in grunnlag.items()}

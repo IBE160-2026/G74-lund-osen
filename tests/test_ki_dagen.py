@@ -602,7 +602,10 @@ class TestHjelpen:
         assert "Dagen er uten KI-tekst." in hjelp
         # Gjennomgangen (BH6, VG6): setningen om hva modellen fikk, ordrett i begge.
         tekst = hjelpetekster()["boersdagen_kort_fortalt"].tekst
-        setningen = tekst[tekst.index("Modellen fikk bare antall:") : tekst.index("nyheter.") + len("nyheter.")]
+        # Story 10.10: «bare det appen regnet ut», fordi modellen ogsaa faar navnene.
+        setningen = tekst[
+            tekst.index("Modellen fikk bare det appen regnet ut:") : tekst.index("nyheter.") + len("nyheter.")
+        ]
         assert setningen in hjelp
         assert "Børsdagen kort fortalt" in (rot / "README.md").read_text(encoding="utf-8")
 

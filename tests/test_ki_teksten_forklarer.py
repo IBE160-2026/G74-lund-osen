@@ -229,7 +229,7 @@ class TestPrompten:
     def test_en_setning_per_sjekk_og_en_om_moenstrene(self):
         """Del E: ville feilet hvis prompten manglet linja om én setning per
         sjekk i fast rekkefølge, eller linja om mønstrene, eller versjonen
-        ikke var 5. Da kan to prompter se ut som én i loggen (FR-605).
+        ikke var 6 (var 5 i 10.9). Da kan to prompter se ut som én i loggen (FR-605).
         Story 10.10: versjon 6 har én kort setning for hvert mønster."""
         assert PROMPTVERSJON == "6"
         reglene = REGLER.split("Regler for teksten:\n", 1)[1].splitlines()
@@ -476,7 +476,7 @@ def test_hjelpen_ved_rammen_har_hoeyst_60_ord(klient):
 # --- Del G: demoen ------------------------------------------------------------------
 
 
-def test_demotekstene_har_versjon_5_og_moenstrene():
+def test_demotekstene_har_promptversjonen_og_moenstrene():
     """Del G: demotekstene er laget på nytt med versjon 5, og grunnlaget har
     mønster 1 med færre enn 20 vurderte dager, fordi vurderingene i demoen
     starter 21.09. Ville feilet hvis en demotekst med versjon 4 sto igjen.

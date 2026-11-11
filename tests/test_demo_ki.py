@@ -168,7 +168,9 @@ class TestFila:
             assert rad.tjeneste == LOKAL and rad.modell in (MODELL, MODELLNAVN), rad.emne.symbol
             assert rad.promptversjon == PROMPTVERSJON, rad.emne.symbol
             if rad.modell == MODELLNAVN:
-                assert rad.modell_id is rad.seed is rad.maskinvare is rad.ollama_versjon is None, rad.emne.symbol
+                assert rad.modell_id is rad.seed is rad.temperatur is rad.maskinvare is rad.ollama_versjon is None, (
+                    rad.emne.symbol
+                )
                 continue
             assert rad.modell_id and rad.ollama_versjon, rad.emne.symbol
             assert rad.seed == SEED and rad.temperatur == TEMPERATUR, rad.emne.symbol
