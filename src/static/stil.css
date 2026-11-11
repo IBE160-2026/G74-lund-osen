@@ -1308,12 +1308,14 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 .rundtur-steg li { margin-bottom: 0.3rem; }
 /* Lukket: lista har ingen boks, så ingenting regnes som synlig tekst (test_hjelpefeltet). */
 .rundtur:not([open]) .rundtur-steg { display: none; }
-/* Story 8.25: «Spill av omvisningen». Boksen står fast nederst til høyre og
-   dekker ikke delen den peker på, som er merket med en kraftig ramme. */
+/* Story 8.25: «Spill av omvisningen». Boksen står fast nederst til høyre, og
+   delen den peker på, rulles øverst og merkes med en kraftig ramme. */
 .spill-av { font: inherit; font-size: 14px; font-weight: 600; padding: 0.3rem 0.8rem; margin: 0.5rem 0 0.25rem 0.5rem;
             border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; cursor: pointer; }
 .rundtur-rad { display: flex; flex-wrap: wrap; align-items: flex-start; }
-.omvisning-merket { outline: 3px solid var(--oransje); outline-offset: 4px; border-radius: 6px; }
+.omvisning-merket { outline: 3px solid var(--oransje); outline-offset: 4px; border-radius: 6px; scroll-margin-top: 24px; }
+/* Gjennomgangen av 8.25 (BH15): en åpen liste står på egen linje, så den er like bred som før. */
+.rundtur-rad .rundtur[open] { flex-basis: 100%; }
 .omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
              border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }

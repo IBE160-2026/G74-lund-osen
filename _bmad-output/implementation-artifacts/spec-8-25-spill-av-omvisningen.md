@@ -60,3 +60,36 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 ### D) Ingen råd, og lik i begge versjonene
 
 **Ville feilet hvis:** en tekst ga råd eller sa noe om hva kursen vil gjøre, eller omvisningen var en annen i den ekte versjonen.
+
+## Bygget 11.11
+
+Bygget på grenen `8-25-spill-av-omvisningen`, i worktreen `G74-lund-osen-8-25`, fra origin/main (`d6e3b4a3`), i `de666402`.
+
+- **Filene:** `OMVISNING` og omvisningen i `src/static/hjelp.js`; `OMVISNINGEN_SIDER` og `omvisningen()` i `src/hjelpetekster.py`; `_omvisningen` i `src/app.py`; dataene i `src/templates/_ramme.html`; knappen i `src/templates/_rundtur.html`; stilen i `src/static/stil.css`; `docs/hjelp.md`, README-en og Rettet-linjene for 8.9.
+- **Tester:** `tests/test_omvisningen_8_25.py`. Logikken i skriptet kjøres med Node (v24 på maskinen), og testene for den hoppes over der Node mangler.
+- **Prøvd i Edge** uten vindu med DevTools-protokollen, mot en demobase i en midlertidig mappe og en server på en ledig port, ikke 8000: tilbudet første gang, «Nei takk» som huskes, alle 21 stegene på de fem sidene med fokus på boksen og delen merket, «Tilbake» over en side, Esc, og en lenke midt i omvisningen, som lukker den.
+- **Bildene:** de åtte bildene i `docs/appen/` som viser toppen av en side med «Vis meg rundt», er tatt på nytt med knappen, med tilbudet besvart og de samme høydene. Bildene av stegene står i PR-en.
+
+## Mutantene
+
+På `de666402` fire, én per del: A (børsometeret før aksjesiden), B (et steg uten delen hoppes ikke over), C (et nei huskes ikke) og D (omvisningen bare i demoen). Alle ble fanget av `tests/test_omvisningen_8_25.py`, og hver fil var lik HEAD etterpå (kopi før, sha256 mot HEAD etter).
+
+## Gjennomgangen 11.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Blind Hunter med bare diffen, uten bildene og `tests/test_docker.py`, og Edge Case Hunter og Verification Gap i samme agent, med repoet. Blind Hunter hadde 15 funn, Edge Case Hunter 9 og Verification Gap 7.
+
+**Høy**
+- *BH1, ECH1 og ECH2, rettet.* En lagret omvisning sendte brukeren videre fra hver side, også fra en lenke i stripa, nettleserens Tilbake, investorsiden og feilsiden, og kunne gi en løkke. Nå lagrer omvisningen adressen den selv gikk til, og fortsetter bare på den (`OMVISNING.fortsett`); ellers lukkes den stille. Prøvd i Edge og med Node.
+
+**Middels**
+- *BH2 og ECH3, rettet.* Retningen tas med til neste side, så «Tilbake» over en side virker.
+- *BH3 og ECH4, rettet.* «Tilbake» virker bare når det finnes et steg før, og «Neste» heter «Ferdig» når det ikke finnes flere (`OMVISNING.knappene`).
+- *BH4, rettet* med BH1: en side med en annen adresse fortsetter ikke omvisningen.
+- *BH5, rettet.* En side fra hurtigbufferen ved Tilbake leser tilstanden på nytt (`pageshow`).
+- *BH14 og VG1, rettet.* Tilstanden, knappene, Esc og tilbudet er rene funksjoner som testene kjører med Node, og en test viser at siden bruker dem.
+- *VG6, ikke en feil.* Instruksjonen kl. 23:02 sier at føringen i dagsfila og `epics.md` kommer i en egen instruksjon etter gruppens ja. Den ligger ordrett i scratchpad til da, og Rettet-linjene sier det.
+
+**Lav**
+- *Rettet:* BH6 og ECH5 (en gammel tilstand starter ikke omvisningen), BH7 og ECH7 (delen rulles øverst, så boksen dekker mindre), BH8 (fokus går tilbake til knappen når det var på siden), BH9 (Esc lukker ikke omvisningen når et hjelpevindu er åpent), BH10 (bare et tomt `<span>` er et merke), BH15 (en åpen liste står på egen linje), VG4 (testen for migrasjonen ser ikke på nummeret), VG5 og VG7 (hjelpen og README-en).
+- *Ført:* BH11 («Steg N av M» teller med steg som hoppes over), BH12 og ECH6 (uten lagring i nettleseren kommer tilbudet igjen, og omvisningen stopper ved første sidebytte; hjelpen sier det), ECH8 (fokus går til boksen ved hvert steg), ECH9 (tilbudet står også på en tom oversikt), VG2 (aksjesiden uten sjekker og uten kurser er ikke testet for seg) og VG3 (testen for demoen og den ekte versjonen sammenligner bare dataene).
+- *Ikke en feil:* BH13 (både «Vis meg rundt» og omvisningen bruker `STANDARD`).

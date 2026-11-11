@@ -191,15 +191,17 @@ class TestFoersteGang:
         """Del C: ville feilet hvis tilbudet kom på andre sider enn
         oversikten, ikke hadde «Nei takk», eller svaret ikke ble husket."""
         skriptet = SKRIPTET.read_text(encoding="utf-8")
-        assert 'SIDE === "oversikt" && les(localStorage, OMVISNING.SVARET) === null' in skriptet
+        assert "OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET))" in skriptet
         assert 'knapp("Nei takk"' in skriptet
         assert 'skriv(localStorage, OMVISNING.SVARET, "nei")' in skriptet
         assert 'skriv(localStorage, OMVISNING.SVARET, "ja")' in skriptet
 
     def test_ingen_migrasjon(self):
-        """Spørsmål 3: ville feilet hvis storyen la til en migrasjon, som bare
-        kan flettes kl. 23:50-23:58."""
-        assert sorted(p.name for p in (ROT / "src" / "migrasjoner").glob("*.sql"))[-1] == "0012_notat.sql"
+        """Spørsmål 3: ville feilet hvis svaret ble lagret i basen, med en
+        migrasjon som bare kan flettes kl. 23:50-23:58. Gjennomgangen (VG4,
+        BH14): ser etter omvisningen i migrasjonene, ikke etter nummeret."""
+        for fil in (ROT / "src" / "migrasjoner").glob("*.sql"):
+            assert "omvisning" not in fil.read_text(encoding="utf-8").lower(), fil.name
 
 
 # --- D) Ingen råd, og lik i begge versjonene ---------------------------------
@@ -241,6 +243,72 @@ class TestEtterBygget:
     def test_readme_og_hjelpen_nevner_omvisningen(self):
         """Regel 19: ville feilet hvis README-en eller hjelpen ikke nevnte
         omvisningen."""
-        assert "«Vis meg rundt», med en omvisning side for side" in (ROT / "README.md").read_text(encoding="utf-8")
+        assert "en omvisning gjennom fem av sidene" in (ROT / "README.md").read_text(encoding="utf-8")
         hjelpen = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "«Spill av omvisningen»" in hjelpen and "«Nei takk»" in hjelpen
+
+
+@pytest.mark.skipif(NODE is None, reason="Node finnes ikke på maskinen")
+class TestOppfoerselenMedNode(TestLogikkenMedNode):
+    """Gjennomgangen (VG1, BH14): det skriptet gjør, kjørt med Node, ikke bare
+    søkt etter i teksten."""
+
+    def test_fortsetter_bare_paa_adressen_omvisningen_gikk_til(self):
+        """BH1, ECH1, ECH2: ville feilet hvis omvisningen fortsatte på en side
+        brukeren gikk til selv, eller på en feilside, og sendte brukeren
+        tilbake."""
+        lagret = "o.tilstand(6, -1, '/aksje/BRFE')"
+        assert self._kjoer(f"o.fortsett({lagret}, '/aksje/BRFE', 21)") == {"i": 6, "retning": -1}
+        assert self._kjoer(f"o.fortsett({lagret}, '/folg', 21)") is None
+        assert self._kjoer(f"o.fortsett({lagret}, '/', 21)") is None
+
+    def test_en_gammel_eller_oedelagt_tilstand_fortsetter_ikke(self):
+        """ECH5, BH6: ville feilet hvis en indeks utenfor stegene, eller tekst
+        som ikke kan leses, startet omvisningen."""
+        assert self._kjoer("o.fortsett(o.tilstand(30, 1, '/'), '/', 21)") is None
+        assert self._kjoer("o.fortsett('6', '/', 21)") is None
+        assert self._kjoer("o.fortsett('{', '/', 21)") is None
+
+    def test_retningen_tas_med_til_neste_side(self):
+        """BH2, ECH3: ville feilet hvis «Tilbake» over en side fortsatte
+        framover på den nye siden."""
+        assert self._kjoer("o.fortsett(o.tilstand(5, -1, '/'), '/', 21).retning") == -1
+        assert self._kjoer("o.fortsett(o.tilstand(5, 1, '/'), '/', 21).retning") == 1
+
+    def test_tilbake_og_ferdig_foelger_stegene_som_finnes(self):
+        """BH3, ECH4: ville feilet hvis «Tilbake» virket uten et steg før, eller
+        «Neste» sto der det ikke er flere steg."""
+        steg = self.STEG
+        assert self._kjoer(f"o.knappene({steg}, 1, 'oversikt', (a) => a !== 'a')") == {
+            "tilbake": False,
+            "ferdig": False,
+        }
+        assert self._kjoer(f"o.knappene({steg}, 3, 'oversikt', () => true)") == {"tilbake": True, "ferdig": True}
+
+    def test_esc_lukker_men_ikke_over_et_hjelpevindu(self):
+        """Del B, BH9: ville feilet hvis Esc ikke lukket omvisningen, eller
+        lukket den når et hjelpevindu var åpent."""
+        assert self._kjoer("o.skalLukke('Escape', false)") is True
+        assert self._kjoer("o.skalLukke('Escape', true)") is False
+        assert self._kjoer("o.skalLukke('Enter', false)") is False
+
+    def test_tilbudet_foerste_gang_og_et_nei(self):
+        """Del C: ville feilet hvis tilbudet kom etter et svar, også et nei,
+        eller på en annen side enn oversikten."""
+        assert self._kjoer("o.skalTilby('oversikt', null)") is True
+        assert self._kjoer("o.skalTilby('oversikt', 'nei')") is False
+        assert self._kjoer("o.skalTilby('oversikt', 'ja')") is False
+        assert self._kjoer("o.skalTilby('min_liste', null)") is False
+
+    def test_skriptet_bruker_funksjonene(self):
+        """Ville feilet hvis siden ikke brukte funksjonene testene kjører."""
+        skriptet = SKRIPTET.read_text(encoding="utf-8")
+        for bit in (
+            "OMVISNING.fortsett(lagret, her(), steg.length)",
+            "OMVISNING.knappene(steg, j, SIDE, finnes)",
+            "OMVISNING.skalLukke(e.key,",
+            "OMVISNING.skalTilby(SIDE,",
+            'document.addEventListener("keydown", tast)',
+            'window.addEventListener("pageshow"',
+        ):
+            assert bit in skriptet, bit

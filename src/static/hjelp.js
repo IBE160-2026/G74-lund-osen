@@ -228,6 +228,48 @@ const OMVISNING = {
   teller(i, antall) {
     return `Steg ${i + 1} av ${antall}`;
   },
+
+  // Tilstanden som lagres når omvisningen går til en side: steget, retningen
+  // og adressen den selv gikk til (gjennomgangen av 8.25, BH1, BH2, ECH1-ECH3).
+  tilstand(i, retning, adresse) {
+    return JSON.stringify({ i, retning, adresse });
+  },
+
+  // Om omvisningen skal fortsette på siden med adressen her: bare når siden
+  // er den omvisningen selv gikk til, så en lenke, nettleserens Tilbake eller
+  // en feilside lukker den i stedet for å sende brukeren videre. Gir
+  // {i, retning} eller null.
+  fortsett(lagret, her, antall) {
+    let t;
+    try {
+      t = JSON.parse(lagret);
+    } catch {
+      return null;
+    }
+    if (!t || typeof t !== "object" || t.adresse !== her) return null;
+    if (!Number.isInteger(t.i) || t.i < 0 || t.i >= antall) return null;
+    return { i: t.i, retning: t.retning === -1 ? -1 : 1 };
+  },
+
+  // Om «Tilbake» virker og om «Neste» heter «Ferdig» ved steg j
+  // (gjennomgangen, BH3, ECH4): bare når det finnes et steg i den retningen.
+  knappene(steg, j, side, finnes) {
+    return {
+      tilbake: OMVISNING.nesteSteg(steg, j - 1, -1, side, finnes) >= 0,
+      ferdig: OMVISNING.nesteSteg(steg, j + 1, 1, side, finnes) < 0,
+    };
+  },
+
+  // Esc lukker omvisningen, men ikke når et hjelpevindu er åpent: da lukker
+  // Esc vinduet først (gjennomgangen, BH9).
+  skalLukke(tast, vinduAapent) {
+    return tast === "Escape" && !vinduAapent;
+  },
+
+  // Tilbudet første gang: bare på oversikten, og bare før det er besvart.
+  skalTilby(side, svar) {
+    return side === "oversikt" && svar === null;
+  },
 };
 
 if (typeof module === "object" && module.exports) {
@@ -285,14 +327,23 @@ if (typeof module === "object" && module.exports) {
     if (boksen) boksen.remove();
     boksen = null;
     document.removeEventListener("keydown", tast);
-    if (fokusFoer && document.contains(fokusFoer)) fokusFoer.focus();
+    // Gjennomgangen (BH8): tilbake dit fokuset var, eller til knappen.
+    const tilbake =
+      fokusFoer && fokusFoer !== document.body && document.contains(fokusFoer)
+        ? fokusFoer
+        : document.querySelector("button.spill-av:not([hidden])");
+    if (tilbake) tilbake.focus();
   }
 
   function tast(e) {
-    if (e.key === "Escape" && boksen) {
+    if (boksen && OMVISNING.skalLukke(e.key, document.querySelector(".hjelpevindu:popover-open") !== null)) {
       e.preventDefault();
       avslutt();
     }
+  }
+
+  function her() {
+    return window.location.pathname + window.location.search;
   }
 
   function knapp(tekst, klasse, handling) {
@@ -305,23 +356,28 @@ if (typeof module === "object" && module.exports) {
   }
 
   function gaaTil(i, retning) {
-    const j = OMVISNING.nesteSteg(steg, i, retning, SIDE, (anker) => document.getElementById(anker) !== null);
+    const j = OMVISNING.nesteSteg(steg, i, retning, SIDE, finnes);
     if (j < 0) return avslutt();
     const s = steg[j];
     if (s.side !== SIDE) {
       const adresse = OMVISNING.adresse(s.side, aksjen());
       if (!adresse) return gaaTil(j + retning, retning);
-      skriv(sessionStorage, OMVISNING.STEGET, String(j));
+      skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, retning, adresse));
       window.location.href = adresse;
       return;
     }
     vis(j);
   }
 
+  function finnes(anker) {
+    return document.getElementById(anker) !== null;
+  }
+
   // Noen anker fra 8.9 er et tomt merke rett foran delen, som
   // <span id="noekkeltallene">. Da merkes delen etter merket.
   function delen(anker) {
-    if (anker.childElementCount === 0 && anker.textContent.trim() === "" && anker.nextElementSibling) {
+    // Gjennomgangen (BH10): bare et tomt <span>, ikke et bilde eller et felt.
+    if (anker.tagName === "SPAN" && anker.childElementCount === 0 && anker.textContent.trim() === "" && anker.nextElementSibling) {
       return anker.nextElementSibling;
     }
     return anker;
@@ -330,11 +386,13 @@ if (typeof module === "object" && module.exports) {
   function vis(j) {
     const s = steg[j];
     const del = delen(document.getElementById(s.anker));
-    skriv(sessionStorage, OMVISNING.STEGET, String(j));
+    skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));
     fjernMerket();
     merket = del;
     del.classList.add("omvisning-merket");
-    del.scrollIntoView({ block: "center" });
+    // Gjennomgangen (BH7, ECH7): delen øverst, så boksen nederst dekker
+    // mindre av den, også på smal skjerm.
+    del.scrollIntoView({ block: "start" });
     if (!boksen) {
       fokusFoer = document.activeElement;
       boksen = document.createElement("div");
@@ -359,9 +417,10 @@ if (typeof module === "object" && module.exports) {
     tekst.textContent = s.tekst;
     const knappene = document.createElement("div");
     knappene.className = "omvisning-knapper";
+    const lov = OMVISNING.knappene(steg, j, SIDE, finnes);
     const tilbake = knapp("Tilbake", "omvisning-tilbake", () => gaaTil(j - 1, -1));
-    tilbake.disabled = j === 0;
-    const siste = j === steg.length - 1;
+    tilbake.disabled = !lov.tilbake;
+    const siste = lov.ferdig;
     knappene.append(
       tilbake,
       knapp(siste ? "Ferdig" : "Neste", "omvisning-neste", () => (siste ? avslutt() : gaaTil(j + 1, 1))),
@@ -402,10 +461,30 @@ if (typeof module === "object" && module.exports) {
     b.hidden = false;
     b.addEventListener("click", start);
   }
-  const lagret = les(sessionStorage, OMVISNING.STEGET);
-  if (lagret !== null && /^[0-9]+$/.test(lagret) && Number(lagret) < steg.length) {
-    gaaTil(Number(lagret), 1);
-  } else if (SIDE === "oversikt" && les(localStorage, OMVISNING.SVARET) === null) {
-    tilby();
+  function oppstart() {
+    const lagret = les(sessionStorage, OMVISNING.STEGET);
+    const videre = lagret === null ? null : OMVISNING.fortsett(lagret, her(), steg.length);
+    if (videre) {
+      gaaTil(videre.i, videre.retning);
+      return;
+    }
+    // En annen side enn den omvisningen gikk til: den lukkes stille.
+    if (lagret !== null) skriv(sessionStorage, OMVISNING.STEGET, null);
+    if (boksen) {
+      fjernMerket();
+      boksen.remove();
+      boksen = null;
+      document.removeEventListener("keydown", tast);
+    }
+    if (OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET)) && !document.querySelector(".omvisning-tilbud")) {
+      tilby();
+    }
   }
+
+  oppstart();
+  // Gjennomgangen (BH5): en side fra hurtigbufferen ved «Tilbake» leser
+  // tilstanden på nytt.
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) oppstart();
+  });
 })();

@@ -1320,7 +1320,7 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Story 8.25: «Spill av omvisningen» ved «Vis meg rundt» (hjelp.js, _rundtur.html, _ramme.html og
 # stil.css). Avtrykkene er regnet ut paa nytt, og bildene med knappen er tatt paa nytt, med samme hoeyder.
-AVTRYKK_BAK_BILDET = "b057b05f933f447edb3de91bbc30d6ce61c2c2548d2dc3a89c2238cba7009c40"
+AVTRYKK_BAK_BILDET = "968c2ec30d874405991fae8dcc34db78c1089a6c1587ade2cb739929b1dc0799"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1757,7 +1757,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # «Mine notater», og var byte for byte det samme (gjennomgangen, VG6).
 # Flettingen av main (2.4, 2.6 og 8.14) inn i 8.21: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.7 og 8.9) inn i 8.21: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "5c64c2266ed52e611bce17657951c3ab6c2a225dd1f9ce6abeecf7fd72710514"
+AVTRYKK_BAK_AKSJESIDEN = "5d2688ef98530ad15f8ffcdc8cd014ff4baab60459709420cf2fbaf8e49c91f4"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1933,17 +1933,17 @@ DE_NYE_BILDENE = {
 # og alle bildene er tatt paa nytt med DevTools-protokollen, med de samme hoeydene. «Din egen liste» er
 # som i 8.11b (1432 px), og de andre er som i 8.11.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    TOPPEN_AV_OVERSIKTEN: "b057b05f933f447edb3de91bbc30d6ce61c2c2548d2dc3a89c2238cba7009c40",
-    "docs/appen/boersometeret-demo.png": "36f076a7b63b4fcb027786d0c57a91ec9f387f678679a34b774d759221c9ca71",
-    "docs/appen/min-liste-demo.png": "e8ac6181965df62342b2ae1d15c7dc2378cfe21f1f8cd57333ea62e6bce29d2e",
-    "docs/appen/oversikten-390-demo.png": "b057b05f933f447edb3de91bbc30d6ce61c2c2548d2dc3a89c2238cba7009c40",
-    "docs/appen/boersometeret-390-demo.png": "36f076a7b63b4fcb027786d0c57a91ec9f387f678679a34b774d759221c9ca71",
-    "docs/appen/din-egen-liste-demo.png": "e8ac6181965df62342b2ae1d15c7dc2378cfe21f1f8cd57333ea62e6bce29d2e",
-    "docs/appen/investorsiden-brfe-demo.png": "e210618091474545a37cd00a417e73062cf5975d571b55fd0ffb24d8f307a893",
-    "docs/appen/investorsiden-brfe-390-demo.png": "e210618091474545a37cd00a417e73062cf5975d571b55fd0ffb24d8f307a893",
-    "docs/appen/notatene-brfe-demo.png": "5c64c2266ed52e611bce17657951c3ab6c2a225dd1f9ce6abeecf7fd72710514",
-    "docs/appen/notatene-min-liste-demo.png": "e8ac6181965df62342b2ae1d15c7dc2378cfe21f1f8cd57333ea62e6bce29d2e",
-    "docs/appen/innstillinger-demo.png": "b3af36feac2c11c1e70f41dc2c91e715ac436d65ac1ca56250d2c7cc78e786f2",
+    TOPPEN_AV_OVERSIKTEN: "968c2ec30d874405991fae8dcc34db78c1089a6c1587ade2cb739929b1dc0799",
+    "docs/appen/boersometeret-demo.png": "19976ec73f2b36ff4986ef87714ef07534f738638fdb5cfa5a611431b17f7ace",
+    "docs/appen/min-liste-demo.png": "cfafdadbd15629fe4a99bd9418b3507418631c9fdb152ffb00c7d7e25532462c",
+    "docs/appen/oversikten-390-demo.png": "968c2ec30d874405991fae8dcc34db78c1089a6c1587ade2cb739929b1dc0799",
+    "docs/appen/boersometeret-390-demo.png": "19976ec73f2b36ff4986ef87714ef07534f738638fdb5cfa5a611431b17f7ace",
+    "docs/appen/din-egen-liste-demo.png": "cfafdadbd15629fe4a99bd9418b3507418631c9fdb152ffb00c7d7e25532462c",
+    "docs/appen/investorsiden-brfe-demo.png": "9a69dc457511b411401f80cd6e14275d955b7fdfcfe0020d760de62b4c39af59",
+    "docs/appen/investorsiden-brfe-390-demo.png": "9a69dc457511b411401f80cd6e14275d955b7fdfcfe0020d760de62b4c39af59",
+    "docs/appen/notatene-brfe-demo.png": "5d2688ef98530ad15f8ffcdc8cd014ff4baab60459709420cf2fbaf8e49c91f4",
+    "docs/appen/notatene-min-liste-demo.png": "cfafdadbd15629fe4a99bd9418b3507418631c9fdb152ffb00c7d7e25532462c",
+    "docs/appen/innstillinger-demo.png": "286e2a3ba24b294f00f28ac51116e33de74c9a12b528e2215c024e0654ad6fdf",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
