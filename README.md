@@ -100,11 +100,11 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 - De tre sjekkene, trend, bevegelse og interesse, styrken for hver aksje hver børsdag, også fra 2027, og regelforklaringen på aksjesiden
 - Hentingen: kursene og hovedindeksen fra kl. 22, første gang på dagtid, med børsdagskontroll og forsøk med kallene som er igjen
 - Oversikten og utseendet fra designforslaget og skissene 06.11, med tydeligere merking, hjelp bak «?» og sortering ved klikk i kolonneraden
-- Periodevalget, hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen, og KI-teksten om dagen
+- Periodevalget, hovedindeksen over tabellen på forsiden med søylene og som stiplet linje i kursgrafen, og KI-teksten om dagen, med navnene på aksjene som skilte seg ut og bransjene som steg og falt mest i snitt
 - Periodene i kursgrafen med «Vis dagen», sjekkene, justeringsdagene, signaldagene, datoene og månedsmerkene, lenken til investorsiden og signalet dag for dag
 - Min liste, med stjernen foran hvert selskap, ferdige lister, egne aksjer og «Innstillinger», og børsometeret som et kart, med knappene
-- KI-teksten forklarer sjekkene og mønstrene, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
-- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, KI-tekst fra Gemma og investorsider
+- KI-teksten forklarer sjekkene og mønstrene i korte setninger, fra en lokal modell eller egen nøkkel, med bryter, bare tekster som besto kontrollen
+- Docker for begge versjonene, og demoen med alle 10 fargekombinasjonene av de tre sjekkene, eksempeltekster i KI-formene og investorsider
 
 **Neste i v1**
 
