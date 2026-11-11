@@ -29,6 +29,7 @@ rekkefølgen squarify legger dem, den største først, så Tab følger kartet.
 Tabellen under beholder rekkefølgen i designregler §4 (bygg_boersometer).
 """
 
+import math
 from dataclasses import dataclass, replace
 from datetime import date
 
@@ -37,7 +38,7 @@ from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand, periodeendring
 from signalberegning import STANDARD, Parametre
-from tallformat import avrundet, dato, desimaler_mot_grense, tall, ukedag
+from tallformat import avrundet, dato, tall, ukedag
 from tilstand import Art
 from vurderingsdata import Grunn, Vurdering
 
@@ -235,12 +236,19 @@ def skalagrenser() -> list[str]:
 
 
 def vis_volumforhold(volumforhold: float, p: Parametre = STANDARD) -> str:
-    """Volumforholdet med så mange desimaler, minst to, at det skilles fra
-    grensene 1 og volumfaktor, som på aksjesiden (gjennomgangen, BH2/ECH4)."""
-    antall = max(
-        desimaler_mot_grense(volumforhold, 1, minst=2), desimaler_mot_grense(volumforhold, p.volumfaktor, minst=2)
-    )
-    return tall(volumforhold, "forhold", antall)
+    """Volumforholdet med to desimaler - story 8.23 (A4, brukertesten 10.11).
+
+    Før stod flere desimaler når to ville rundet til en grense (1 og
+    volumfaktor, gjennomgangen BH2/ECH4). Nå er det alltid to, og et tall
+    som ville rundet til eller over en grense fra den andre siden, rundes
+    mot siden det står på (1,4996 blir 1,49, og 0,998 blir 0,99), så tallet
+    og ordet (stoerrelse) aldri sier ulikt."""
+    vist = round(volumforhold, 2)
+    # Gjennomgangen (BH11, ECH5): bare når ordet for det viste tallet ville
+    # blitt et annet enn ordet for målingen, så 1,0004 står som 1,00 (vanlig).
+    if stoerrelse(vist, p) != stoerrelse(volumforhold, p):
+        vist = math.floor(volumforhold * 100) / 100 if volumforhold < vist else math.ceil(volumforhold * 100) / 100
+    return tall(vist, "forhold", 2)
 
 
 def ramme(styrke: int | None) -> str | None:

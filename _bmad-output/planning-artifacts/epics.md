@@ -4014,6 +4014,8 @@ dagen gjaldt hele børsen eller noen bransjer.
 
 *Avgjort 2026-10-26 kl. 15:21 (gruppens svar):* f) Tabellen under kartet er lukket som standard, bak «Se tallene som tabell»; skjermleseren finner den, og svarene om tabellen kl. 08:43 og 13:00 står.
 
+*Rettet 2026-11-10 (story 8.23, tillegg 3, gruppens svar kl. 15:54):* tabellen under kartet står åpen fra start, og knappen «Se tallene som tabell» lukker den. Rådet anbefalte det. Svaret f) over gjelder ikke lenger.
+
 *Lagt til 2026-10-26 kl. 16:33:* 8.6b, børsometeret som tavla, er squash-flettet i `7f6d9e4`, PR #99, låst til head-en `dea0eae` (spesifikasjonen `spec-8-6b-som-tavla.md`), med svarene kl. 13:00, 13:07 og 15:21: Tab følger rekkefølgen kartet legges i, overskriften er navnet og «snitt» eller «1 aksje» og navnet forsvinner aldri helt, tekstnivået regnes ved 1008 og 328 px når kartet er så bredt, og tabellen står bak «Se tallene som tabell». BH7, ECH4 og BH10 er rettet. Hele settet på `dea0eae`: 3764 bestått og 24 hoppet over. CI var grønn på head-en (40347552446, macOS-jobben kjørt på nytt fordi den ikke fikk en runner). Begge mutantene ble fanget. Bildene er tatt, og gruppen ser dem etterpå (svaret kl. 13:00, d).
 
 ### Story 8.7: Sjekk 2 og 3 i kursgrafen

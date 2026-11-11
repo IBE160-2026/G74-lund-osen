@@ -157,7 +157,8 @@ class TestTabellen:
         eller ringen."""
         html = _side(klient, "/boersometer")
         tabell = html.split('<table class="boersometertabell">', 1)[1].split("</table>", 1)[0]
-        assert re.findall(r'<th scope="col"[^>]*>([^<,]+)', tabell) == [
+        # Story 8.23 (tillegg 3): «?» står etter «Endring» og «Volum mot vanlig».
+        assert [t.strip() for t in re.findall(r'<th scope="col"[^>]*>([^<,]+)', tabell)] == [
             "Selskap",
             "Endring",
             "Volum mot vanlig",

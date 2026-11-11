@@ -230,7 +230,7 @@ def lag_dagsbilde(
 _VERBET = {STEG: ("steg", ""), FALT: ("falt", ""), UENDRET: ("var", " uendret")}
 
 
-def setning_om_samme_dag(bildet: Dagsbilde) -> str | None:
+def setning_om_samme_dag(bildet: Dagsbilde, i_lista: int | None = None) -> str | None:
     """Setningen under KI-teksten om hva hovedindeksen, bransjen og antallene
     gjorde samme dag (gruppens svar 5.11 kl. 19:13 og 23:36). Av de samme
     verdiene som grunnlaget, og uten det som mangler. «Samme dag» passer
@@ -240,7 +240,12 @@ def setning_om_samme_dag(bildet: Dagsbilde) -> str | None:
 
     Gjennomgangen (BH5, VG3, ECH10): naar ingen aksje steg eller falt, er
     antallene ofte ikke regnet, fordi kursene mangler, og da staar de ikke.
-    Uten noe aa si er det ingen setning (None)."""
+    Uten noe aa si er det ingen setning (None).
+
+    Story 8.23 (tillegg 2, gruppens svar kl. 14:53 og 14:59): i_lista er
+    antallet aksjer i lista den dagen. Med det sier setningen hvilken liste
+    tallene gjelder: «13 av de 15 aksjene i lista steg og 2 falt». Det står
+    ikke i Dagsbildet, saa grunnlaget for KI-teksten er som foer."""
     for verdi in (bildet.hovedindeksen, bildet.bransjen):
         if verdi is not None and verdi not in BEVEGELSER:
             raise ValueError(f"hovedindeksen og bransjen maa vaere en av {BEVEGELSER} eller None")
@@ -255,14 +260,12 @@ def setning_om_samme_dag(bildet: Dagsbilde) -> str | None:
         verb, hale = _VERBET[bildet.bransjen]
         deler.append((verb, "bransjen", hale + " i snitt"))
     if bildet.aksjer_steg or bildet.aksjer_falt:
-        aksjer = "aksje" if bildet.aksjer_steg == 1 else "aksjer"
-        deler.append(
-            (
-                "steg",
-                f"{tall(bildet.aksjer_steg, 'heltall')} {aksjer} i lista",
-                f" og {tall(bildet.aksjer_falt, 'heltall')} falt",
-            )
-        )
+        if i_lista and i_lista > 1:
+            hvem = f"{tall(bildet.aksjer_steg, 'heltall')} av de {tall(i_lista, 'heltall')} aksjene i lista"
+        else:
+            aksjer = "aksje" if bildet.aksjer_steg == 1 else "aksjer"
+            hvem = f"{tall(bildet.aksjer_steg, 'heltall')} {aksjer} i lista"
+        deler.append(("steg", hvem, f" og {tall(bildet.aksjer_falt, 'heltall')} falt"))
     if not deler:
         return None
     # Foerste ledd med verbet foerst etter «Samme dag», de andre som vanlig.

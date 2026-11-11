@@ -609,14 +609,15 @@ class TestAdressen:
         dagen, eller «Standard rekkefølge» og stjernen gikk til siste børsdag."""
         _basen()
         uke = klient.get("/?periode=1-uke").data.decode("utf-8")
-        assert 'href="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende"' in uke
+        # Story 8.23 (A2): lenkene i kolonneraden og «Standard rekkefølge» går til tabellen.
+        assert 'href="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende#aksjene"' in uke
         sortert = klient.get("/?periode=1-uke&sorter=endring&orden=synkende").data.decode("utf-8")
         assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', sortert) == ["1-uke"]
         assert "+37,50 %" in _rad(sortert, "EQNR")[1]
-        assert 'href="/?periode=1-uke">Standard rekkefølge</a>' in sortert
+        assert 'href="/?periode=1-uke#aksjene">Standard rekkefølge</a>' in sortert
         assert 'name="tilbake" value="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende"' in sortert
         dagen = klient.get("/?periode=velg&dag=2026-10-07").data.decode("utf-8")
-        assert 'href="/?periode=velg&amp;dag=2026-10-07&amp;sorter=endring&amp;orden=synkende"' in dagen
+        assert 'href="/?periode=velg&amp;dag=2026-10-07&amp;sorter=endring&amp;orden=synkende#aksjene"' in dagen
 
     def test_merkingen_sender_tilbake_med_perioden(self, klient):
         """Ville feilet hvis stjernen sendte tilbake til siste børsdag, eller
