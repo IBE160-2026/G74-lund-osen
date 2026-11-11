@@ -2493,8 +2493,11 @@ def _detaljer(tekst: str) -> dict[str, str]:
 # «Prioritering» i epics.md), rett under listene i «Status».
 # Story 3.6 (gjennomgangen, ECH5 og BH7): med lista «Ekstra, ferdig» sier
 # setningen hvilken «Ekstra» den gjelder. Var «under «Ekstra»,».
+# Story 8.25 (gruppens svar 11.11 kl. 16:26): lista «Ekstra, hvis tiden
+# rekker» står borte, så setningen sier «Ekstra» igjen, som før 3.6. Ville
+# feilet hvis setningen fortsatt viste til en liste som ikke står.
 REGELEN_FOR_EKSTRA = (
-    "Det som står under «Ekstra, hvis tiden rekker», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
+    "Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet "
     "før README-prøven, senest én uke før innleveringen."
 )
 
