@@ -58,6 +58,8 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 8. **«Vis alle (N)».** *Forslag:* N er alle notatene for aksjen. Knappen er en `<details>`, så den virker uten skript, og den står bare når aksjen har mer enn to notater.
 9. **Omvisningen og «Vis meg rundt».** *Forslag:* ingen av dem har et steg for notatene på aksjesiden i dag, så denne storyen endrer dem ikke. Vinduet som gjør «Vis meg rundt», følger den nye rekkefølgen når 8.26 er flettet.
 10. **Panelet på smal skjerm.** *Forslag:* smalere enn 1056 px er knappen en lenke til «Mine notater» i Min liste, og et åpent panel lukkes når vinduet blir smalere, men valget huskes, så det åpnes igjen når vinduet blir bredt.
+11. **Innholdet i panelet.** *Forslag:* innholdet lages på serveren og står i en `<template>` i hver side, som ikke vises og ikke leses opp, og skriptet setter det inn når panelet åpnes. Skriptet henter da ingenting, som testen fra 8.0f krever (`test_skriptet_henter_ingenting`), og panelet er der med en gang etter lagring. Prisen er at hver side leser alle notatene, som Min liste gjør. Den første utgaven hentet innholdet med `fetch` fra en egen rute, og det ble tatt bort før første commit.
+12. **Eldre tester som er endret etter svarene.** *Forslag:* fire tester sa det motsatte av svarene, og er endret med en linje om svaret: at stripa ikke får en knapp for notatene (8.21, del F), at stripa har fire ikoner (8.10), at «Mine notater» står over «Signalet dag for dag» (8.21), og at ingen del står etter boblen til investorsiden (3.4h). Lenketesten godtar `/min-liste#mine-notater`.
 
 ## Delene
 
@@ -69,13 +71,13 @@ Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 
 ### B) Panelet
 
-`src/templates/_notatpanel.html` i rammen, med alle notatene fra `_alle_notatene` i `src/app.py`, og `src/static/hjelp.js` og `src/static/stil.css`: fra 1056 px åpner knappen panelet fast i kanten, siden gir plass, «Flytt» bytter side, «Lukk» og Esc lukker, og valgene huskes i `localStorage`.
+`src/templates/_notatpanel.html` i en `<template>` i rammen, med alle notatene fra `_alle_notatene` i `src/app.py` (`_notatpanelet`), og `src/static/hjelp.js` og `src/static/stil.css`: fra 1056 px åpner knappen panelet fast i kanten, siden gir plass, «Flytt» bytter side, «Lukk» og Esc lukker, og valgene huskes i `localStorage`.
 
 **Ville feilet hvis:** panelet manglet et notat, hadde en annen rekkefølge enn Min liste, sto på en side der bryteren var av, eller ikke ble husket.
 
 ### C) Skjemaet i panelet
 
-På aksjesiden skriver skjemaet for aksjen og dagen siden viser; ellers velges aksjen, og notatet får siste dag med kurs. Ruta `skriv_notat_valgt` skriver bare tabellen notat. Svaret går til siden man sto på (`tilbake`, bare en sti i appen), med `#notatpanel`.
+På aksjesiden skriver skjemaet for aksjen og dagen siden viser; ellers velges aksjen, og notatet får siste dag med kurs. Ruta `skriv_notat_valgt` (`POST /notat`) skriver bare tabellen notat. Svaret går til siden man sto på (`tilbake`, bare en sti i appen, `_panelsiden`), med `#notatpanel`. Knappene ved notatene i panelet sender også `tilbake`.
 
 **Ville feilet hvis:** notatet fikk en annen aksje eller dag, en aksje utenfor lista ble godtatt, svaret gikk til en adresse utenfor appen, eller panelet ikke var åpent etter lagring.
 
