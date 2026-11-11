@@ -172,3 +172,46 @@ Tre nye deler i teksten om børsdagen, etter gruppens svar kl. 17:21. Appen regn
 12. **Hva er «endringen» i hovedindeksen siste uke?** Grunnlaget har ingen prosenter (beslutningen 04.10). *Forslag:* bare retningen, fra sluttkursen fem børsdager før til dagen, slik endringen vises med to desimaler: «De siste fem børsdagene falt hovedindeksen.» Mangler indeksen en av de to dagene, står ikke delen.
 
 Rader med dag-1 sammenlignes fortsatt uten de nye feltene (spørsmål 5). Versjonen står som dag-2, fordi dag-2 ikke er flettet og ingen tekst i `data/db/ose.db` har den. Avtrykket for dag-2 er satt på nytt.
+
+### Mutantene for tillegget
+
+| Del | Fil | Mutanten | Fanget av |
+|---|---|---|---|
+| F (Min liste) | `src/dagsgrunnlag.py` | linja tar med alle aksjene, ikke bare de i Min liste | `TestMinListe` |
+| G (vanlig) | `src/dagsgrunnlag.py` | snittet rundes alltid opp | `TestVanlig` |
+| H (uka) | `src/dagsgrunnlag.py` | fire børsdager i stedet for fem | `TestUka` |
+
+Alle ble fanget, og sha256 mot HEAD var lik.
+
+### Gjennomgangen av tillegget (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+| Funn | Grad | Hva | Triage |
+|---|---|---|---|
+| VG1 | høy | Linja om Min liste på forsiden var ikke testet | Rettet: `test_linja_om_min_liste_under_teksten` |
+| VG2 | høy | Ingen test av at hentingen og forsiden regner det samme grunnlaget med de nye feltene | Rettet: `test_hentingen_og_forsiden_regner_det_samme_grunnlaget` |
+| BH1 | middels | Ingen ny promptversjon for de nye formene | Avvist: dag-2 er ikke flettet, og ingen tekst i `data/db/ose.db` har den, som unntaket i 10.2f–10.2h. Avtrykket er satt på nytt |
+| BH2 | middels | Grunnlaget kan endre seg når data kommer inn senere, for eksempel en indeksrad fem børsdager før, og da forsvinner teksten (FR-607) | **Åpent, spørsmål 13** |
+| VG3, VG4 | middels | Avrundingen og en dag uten vurdering var ikke testet så feil ville vist | Rettet |
+| BH3, BH4, VG5 | lav | Lengden på vinduet og grensen på 10 dager var ikke festet | Rettet |
+| BH5 | lav | «20 børsdager» fulgte kursdatoene, «fem børsdager» kalenderen | Rettet: begge følger børskalenderen (`dagene_foer`) |
+| BH6 | lav | Forsiden leste hele historikken | Rettet: `vanlig_fra` |
+| VG6 | lav | Uten rad på dagen og over en helligdag var ikke testet | Rettet |
+| VG7, VG8 | lav | «like mange», «uendret» og mer enn fem navn i Min liste var ikke prøvd | Rettet |
+| ECH1 | lav | De nye formene kunne stå to ganger | Rettet |
+| ECH2 | lav | Formen sier «de siste 20 børsdagene» også når snittet er regnet av 10–19 dager | Står, og er en del av spørsmål 11 |
+| ECH3 | lav | Klassene for linja om Min liste hadde ingen stil | Rettet i `stil.css` |
+
+### Gemma-tekstene (svaret kl. 16:05)
+
+Ollama ble startet fra dette vinduet kl. 17:46, med `gemma4:e4b`. Første kjøring ga 6 av 13 tekster om aksjene som besto. Gemma skrev «negativt 0» og andre tall som er 0, og fylte ut alle fire retningene, også med tall som ikke sto i opplysningene. Appen sender derfor ikke tall som er 0 (`ki_grunnlag.py`), og gir setningen om de siste 20 børsdagene ferdig (`setning_om_retningene` i `ki_prompt.py`), som ordlyden om hovedindeksen. Da besto alle 13.
+
+Teksten om dagen trengte tre forsøk:
+1. Gemma satte punktum før «og 2 andre».
+2. Etter at appen ga setningen med navnene ferdig, skrev Gemma etiketten «Setningen om navnene:» foran.
+3. Med setningen i anførselstegn besto teksten.
+
+Tekstene står ordrett i PR #145 og i scratchpad.
+
+Gjennomgangen av denne rettingen (Edge Case Hunter) fant fire lave funn. ECH1: setningen står i anførselstegn, og en modell som kopierer dem, stoppes. ECH2: formen i regelen viser «og ‹N› andre» uten forbehold. Begge står, fordi teksten om dagen alt hadde brukt de tre forsøkene. ECH3: én commit var rød uten den neste, og PR-en flettes med squash. ECH4: død kode i `ki_eksempel.py`, rettet.
+
+13. **Hva skjer når data kommer inn etter teksten (BH2)?** Forsiden viser teksten bare når grunnlaget er det samme som det siden regner ut (FR-607). Kommer en kurs eller en indeksrad inn senere for en dag i vinduene, blir grunnlaget annerledes, og teksten for den dagen forsvinner. Det gjaldt også før for bransjene og «bedre enn indeksen». De nye delene har lengre vinduer: 20 og 5 børsdager. *Forslag:* godta det, som før. Hentingen fyller ikke inn eldre dager, og en dag uten tekst sier «Dagen er uten KI-tekst.».
