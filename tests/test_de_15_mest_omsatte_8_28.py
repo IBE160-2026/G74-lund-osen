@@ -50,6 +50,18 @@ class TestLista:
         maal(base, [("M01", 5e6), ("M02", None), ("M04", 9e6)])
         assert [a.symbol for a in ferdige_lister.mest_omsatte(aapne_base(base))] == ["M01"]
 
+    def test_multi_og_scoin_kommer_aldri_med(self, tmp_path, monkeypatch):
+        """Gjennomgangen av 8.28 (ECH1): ville feilet hvis MULTI eller SCOIN,
+        som aldri kan følges (UTE), sto i lista eller i en bransjeliste, også
+        med høyest omsetning og en bransje."""
+        base = tmp_path / "ose.db"
+        med_boersen(base, [("MULTI", "Multi ASA"), ("SCOIN", "Scoin ASA"), ("M01", "Målt 1 ASA")])
+        monkeypatch.setattr(ferdige_lister, "BRANSJE", {"MULTI": "Energi", "SCOIN": "Finans", "M01": "Kraft"})
+        maal(base, [("MULTI", 9e9), ("SCOIN", 8e9), ("M01", 5e6)])
+        tilkobling = aapne_base(base)
+        assert [a.symbol for a in ferdige_lister.mest_omsatte(tilkobling)] == ["M01"]
+        assert {a.symbol for liste in ferdige_lister.lister(tilkobling).values() for a in liste} == {"M01"}
+
     def test_samme_maaling_som_bransjelistene(self, tmp_path, monkeypatch):
         """Ville feilet hvis lista regnet omsetningen på en annen måte enn
         bransjelistene: hver aksje har samme median i begge."""

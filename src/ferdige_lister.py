@@ -641,6 +641,9 @@ def _radene(tilkobling: sqlite3.Connection) -> list[tuple[str, str, float, str |
     # Story 8.22: den faste bransjen foerst, ogsaa for aksjene i lista (spoersmaal 3).
     rader = [(s, n, float(m), fast_bransje(s) or sektorer.get(s)) for s, n, m in maalte if s not in regnet]
     rader += [(s, n, float(m), fast_bransje(s) or b) for s, n, m, b in i_lista]
+    # Gjennomgangen av 8.28 (ECH1): MULTI og SCOIN (UTE) kan aldri følges, så de
+    # står ikke i noen ferdig liste, heller ikke med en bransje i aksje.
+    rader = [r for r in rader if r[0] not in UTE]
     rader.sort(key=lambda r: (-r[2], r[0]))
     return rader
 
