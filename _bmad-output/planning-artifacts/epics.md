@@ -4528,6 +4528,8 @@ NFR-08, `AD-10`
 
 *Avgjort 2026-11-12 kl. 17:31 og 17:44 (gruppens svar):* omvisningen forklarer linja, også i demoen (tillegg 2), og fire steg i omvisningen rettes (tillegg 3). Begge bygges etter at 8.26 er flettet. Rådet anbefalte det.
 
+*Avgjort 2026-11-12 kl. 20:04 (gruppens svar):* spørsmål 1–9 i spesifikasjonen er godtatt, 1–7 som bygget og 8–9 som forslaget, som bygges etter 8.26, og 8.19 flettes i natt etter 10.11. Rådet anbefalte det. Spørsmål 10 (ECH1 og ECH2) står åpent til gruppen har svart. Svaret er gjengitt fra tillegg 5 til instruksjonen kl. 17:03.
+
 ---
 
 ### Story 8.20: UX-rettingene etter gjennomgangen 06.11
