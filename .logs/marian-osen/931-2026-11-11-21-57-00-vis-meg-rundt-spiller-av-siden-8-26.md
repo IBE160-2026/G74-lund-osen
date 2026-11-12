@@ -78,3 +78,25 @@ Tillegg 21 (gruppens svar 12.11 kl. 09:58 om «Brukerutfall» i §7 i PRD-en) og
 ### Åpne punkter
 - PR #146 flettes 12.11 kl. 23:50–23:58, og dagsfilene 11.11 og 12.11, `epics.md`, sprint-status og README-en føres på main etterpå.
 - Ved 390 px er tabellen i «Følg en aksje» kuttet til høyre, også før 8.26 (fra før).
+
+## 2026-11-13 kl. 00:07 — Marian Osen
+
+### Oppgave
+Tillegg 23 til 8.26 (gruppens svar 12.11 kl. 16:23 og ønsket kl. 16:24, limt inn kl. 16:31:10), om README-en som inngangen for faglærer, og flettingen av PR #146 kl. 23:50–23:58 etter tillegg 22, med føringen på main etterpå. Tillegg 24 (limt inn kl. 17:37:51) gjelder tiden etter flettingen og føres i egen seksjon.
+
+### Plan
+- Tillegg 23 på grenen: to linjer under «Til faglærer», «Versjon 1 er ferdig» i ingressen og «Status», fire rader i tabellen om demoen og den ekte versjonen, og antakelsen i `docs/innlevering.md`.
+- Hele settet, ruff, push og CI grønn før kl. 22:10, og ingen commits på grenen etter det. Sjekk av main kl. 22:00, flettingen låst til den testede head-en kl. 23:50–23:58, og føringen på main.
+
+### Resultat
+- Tillegg 23 på grenen: `acce9574` (hovedflyten og brukertesten under «Til faglærer»), `66ea2977` (versjon 1 er ferdig), `431f565d` (forskjellene i tabellen), `ddbd2c91` (`docs/innlevering.md`) og `6d1e138f` (svaret og del 15 i spesifikasjonen). Main (tilbakemeldingen på PRD-en og `technology.md`) ble flettet inn i `82f50471` uten konflikter.
+- Hele settet i seks deler på `82f50471`: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`). ruff er ren. CI grønn på head-en (run 43261288679) kl. 17:52.
+- Kl. 22:00:10 var main uendret (`a93c668f`), og PR-en kunne flettes. Ventekommandoen til kl. 23:50 ble stoppet av lite minne og startet igjen kl. 22:15, etter instruksjonen kl. 18:01.
+- PR #146 er squash-flettet i `719e5f07` kl. 23:51:14, låst til `82f50471`. Treet på main var likt head-en (0 linjer i diffen). Testene for dokumentene på main: 2766 bestått, 7 hoppet over.
+- Føringen på main: dagsfila 11.11 med instruksjonen kl. 18:01 og tilleggene 1–20 (`cc289203`), done og storyen med svarene i `epics.md` (`02ea922e`), og dagsfila 12.11 med tilleggene 21–24 og spørsmålene kl. 20:52 og 23:06 (`19a4d524`). README-en hadde 8.26 under «Ekstra, ferdig» fra grenen.
+
+### Åpne punkter
+- Bunnteksten i appen sier fortsatt «Appen er under utvikling og ikke ferdig.» (`UNDER_ARBEID` i `src/app.py`), mens README-en sier at versjon 1 er ferdig. Tillegg 23 nevnte ikke koden, så den er ikke endret.
+- Faglærers `tilbakemelding-prd.md` (lagt til 12.11) er ikke lenket i «Dokumentene» ennå, slik regel 17 sier.
+- Faglærers `technology.md` i arkitekturmappa (lagt til 12.11) beskriver et annet prosjekt (pytagoras-website-v2).
+- Ved 390 px er tabellen i «Følg en aksje» kuttet til høyre (fra før).
