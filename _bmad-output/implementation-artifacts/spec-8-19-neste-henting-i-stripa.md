@@ -13,6 +13,8 @@ context:
 
 *Svar 2026-11-12 kl. 20:04 (gruppens svar):* spørsmål 1–9 er godtatt, 1–7 som bygget og 8–9 som forslaget, som bygges etter 8.26. 8.19 flettes i natt etter 10.11. Rådet anbefalte det. Gjengitt fra tillegg 5 (kl. 20:10). Svaret nevner ikke spørsmål 10 (ECH1 og ECH2, middels), som ble lagt til etter gjennomgangen. Det står åpent til gruppen har svart (regel 25).
 
+*Svar 2026-11-12 kl. 20:42 (gruppens svar):* spørsmål 10 er godtatt som forslaget: stripa leser den siste kursdagen i basen, den eldste blant aksjene i lista, slik `sidens_dato` gjør, og aksjesiden bruker den samme dagen som oversikten. ECH1 og ECH2 lukkes med svaret, og 8.19 flettes i natt etter 10.11. Rådet anbefalte det. Gjengitt fra tillegg 6 (kl. 20:43). Det bygges etter 8.26, sammen med 8 og 9.
+
 Skrevet 12.11 etter tillegg 1 (kl. 17:04) til instruksjonen kl. 17:03 om 10.11, etter gruppens svar 12.11 kl. 17:01: når 10.11 er grønn og har stoppet for gruppens ja, bygger samme vindu 8.19 som egen story med egen gren, worktree og PR. Rådet anbefalte det. Tillegget er kopiert til scratchpad og føres i dagsfila med flettingen. PR #149 (10.11) var grønn kl. 18:40. Storyen bygges nå, og spørsmålene under har hvert et forslag som koden bygger på. Gruppen svarer før PR-en flettes.
 
 **Svaret 12.11 kl. 17:01** (gjengitt fra tillegget, fordi det ikke står andre steder i repoet): bare i den ekte versjonen står det bak «Oppdatert …» når nye kurser tidligst kan hentes, regnet med børsdagskontrollen (2.3) og grensen kl. 22. Linja sier aldri at en henting kommer, fordi det avhenger av om appen eller kveldsjobben kjører. Demoen viser ingenting, fordi den ikke henter.
@@ -73,8 +75,8 @@ Slått opp i grenen for 8.26 (`origin/8-26-vis-meg-rundt-spiller-av-siden`): `MA
 
 | Funn | Grad | Hva | Triage |
 |---|---|---|---|
-| ECH1 | middels | En henting med `--uten-tidskontroll` før kl. 22 en børsdag hadde dagens kurs, men stripa regner den som forrige børsdag og sier «kan hentes nå» etter kl. 22, når hentingen ikke har noe å hente | **Åpent, spørsmål 10** |
-| ECH2 | middels | En aksje som ble hentet uten raden for dagen (EODHD sen, eller ingen handel), har et nytt `sist_hentet`, så stripa sier «i morgen» mens hentingen prøver den på nytt samme kveld | **Åpent, spørsmål 10** |
+| ECH1 | middels | En henting med `--uten-tidskontroll` før kl. 22 en børsdag hadde dagens kurs, men stripa regner den som forrige børsdag og sier «kan hentes nå» etter kl. 22, når hentingen ikke har noe å hente | Lukket: spørsmål 10 godtatt (svaret 12.11 kl. 20:42), bygges etter 8.26 |
+| ECH2 | middels | En aksje som ble hentet uten raden for dagen (EODHD sen, eller ingen handel), har et nytt `sist_hentet`, så stripa sier «i morgen» mens hentingen prøver den på nytt samme kveld | Lukket: spørsmål 10 godtatt (svaret 12.11 kl. 20:42), bygges etter 8.26 |
 | ECH3 | lav | Etter kl. 23:50 starter hentingen ikke nye forsøk, og bare hovedindeksen kan mangle | Står: «kan hentes nå» er en kveld som før; indeksen er med i spørsmål 10 |
 | ECH4 | lav | Et tidspunkt uten sone ga en tekst før kl. 22 og ingenting etter | Rettet: `neste_henting_tekst` gir ingenting uten sone, med test |
 | ECH5 | lav | `hentet` som krever en dag i 2025 gir ingen tekst | Står: bare gamle baser og testdata (NFR-08) |

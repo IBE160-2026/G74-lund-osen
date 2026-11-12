@@ -4530,6 +4530,8 @@ NFR-08, `AD-10`
 
 *Avgjort 2026-11-12 kl. 20:04 (gruppens svar):* spørsmål 1–9 i spesifikasjonen er godtatt, 1–7 som bygget og 8–9 som forslaget, som bygges etter 8.26, og 8.19 flettes i natt etter 10.11. Rådet anbefalte det. Spørsmål 10 (ECH1 og ECH2) står åpent til gruppen har svart. Svaret er gjengitt fra tillegg 5 til instruksjonen kl. 17:03.
 
+*Avgjort 2026-11-12 kl. 20:42 (gruppens svar):* spørsmål 10 er godtatt som forslaget: stripa leser den siste kursdagen i basen, den eldste blant aksjene i lista, og aksjesiden bruker den samme dagen som oversikten. ECH1 og ECH2 er lukket. Rådet anbefalte det. Svaret er gjengitt fra tillegg 6 til instruksjonen kl. 17:03.
+
 ---
 
 ### Story 8.20: UX-rettingene etter gjennomgangen 06.11
