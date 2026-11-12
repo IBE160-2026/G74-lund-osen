@@ -101,3 +101,20 @@ Tillegg 23 til 8.26 (gruppens svar 12.11 kl. 16:23 og ønsket kl. 16:24, limt in
 - Faglærers `tilbakemelding-prd.md` (lagt til 12.11) er ikke lenket i «Dokumentene» ennå, slik regel 17 sier.
 - Faglærers `technology.md` i arkitekturmappa (lagt til 12.11) beskriver et annet prosjekt (pytagoras-website-v2).
 - Ved 390 px er tabellen i «Følg en aksje» kuttet til høyre (fra før).
+
+## 2026-11-13 kl. 00:40 — Marian Osen
+
+### Oppgave
+Tillegg 24 (gruppens ønske 12.11 kl. 17:35, limt inn kl. 17:37:51): etter at 8.26 var flettet og ført og kveldsjobben var ferdig, telle KI-loggen for story 10.4, skrive en Lagt til-linje i refleksjonsloggen for kvelden 11.11 og lukke punktet om svaret 11.11 kl. 16:05.
+
+### Plan
+- Utført-linja for 8.26 på origin/main (pushet kl. 00:36), og oppgaven for kveldsjobben sto som «Ready» med neste kjøring 13.11 kl. 22:15 (bare lest).
+- Telle `ki_logg` per børsdag, slag og versjon med `mode=ro` og sha256 før og etter, uten tekst og uten kurser.
+
+### Resultat
+- KI-loggen: sha256 `06b9e6be…0b04` før og etter. 19 kvelder, alle børsdagene 19.10–12.11. 294 tekster om aksjene, 288 besto og 6 stoppet (3 kvelden 11.11 med versjon 5 og 3 kvelden 12.11 med versjon 6), alle stoppet av punkt 1 i kontrollen og én også av punkt 2. 4 tekster om dagen (`dag-1` og `dag-2`), alle besto. Én ukes drift er logget. Under del B i `docs/brukertest.md` og i §10 i `docs/kvalitetssikring.md` i `1d8603eb`.
+- Refleksjonsloggen: Lagt til-linja i oppføringen for 11.11 i `91199f3b`, 9 linjer. Svaret kl. 22:17 om nye funksjoner står bare i tillegg 24, og linja sier det.
+- Punktet om svaret 11.11 kl. 16:05 er lukket i `issues.md`.
+
+### Åpne punkter
+- Ingen nye. De fire åpne punktene fra seksjonen over står.
