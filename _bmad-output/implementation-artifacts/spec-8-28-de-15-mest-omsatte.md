@@ -68,3 +68,36 @@ Ingen API-kall. Ingen migrasjon. `data/db/ose.db` røres ikke. Demobaser lages
 bare i midlertidige mapper, og demoserveren går aldri på port 8000.
 
 ## Bygget 12.11
+
+Commitene `89edb931` (spesifikasjonen og storyen) og `4e7e61b4` (lista, testene,
+hjelpen og bildene), og rettingen etter gjennomgangen i commiten etter dem.
+
+**Bildene.** Alle bildene i `docs/appen/` ble tatt på nytt med
+DevTools-protokollen, mot en demobase i en midlertidig mappe og waitress på en
+ledig port, aldri 8000.
+- «Din egen liste» er ny: knappen «De 15 mest omsatte» står først. Bildet er
+  1474 px høyt, mot 1454 før, fordi setningen over knappene går over to linjer.
+- «Mine notater» i Min liste er tatt på nytt fordi delen står lenger ned.
+  Innholdet er det samme.
+- Notatene på aksjesiden ved 390 px ble også nye med koden fra main. Det kommer
+  ikke av 8.28, så fila fra HEAD er lagt tilbake.
+- Resten er byte for byte de samme.
+- Bildene før og etter for PR-en ligger på bildegrenen `pr-8-28-bilder`.
+
+**Mutanten.** Lista fikk 16 aksjer i stedet for 15 (`MEST_OMSATTE_ANTALL + 1`)
+i en kopi av `ferdige_lister.py` på HEAD `4e7e61b4`. To tester feilet. Kopien
+ble lagt tilbake, og git-hashen og sha256 etter samme linjeskift var like HEAD.
+
+**Gjennomgangen med Edge Case Hunter, og triagen:**
+- ECH1 (lav), rettet: MULTI og SCOIN, som aldri kan følges, kunne komme med i
+  lista hvis de hadde en bransje i basen. Da ville «Er du sikker?» lovet 15
+  aksjer og gitt 14. `_radene()` tar dem nå ut for alle de ferdige listene, og en
+  test viser det.
+- ECH2 (lav), står: navnet «De 15 mest omsatte» står også når færre er målt.
+  Antallet ved knappen og teksten på siden sier det riktige tallet, og det skjer
+  bare i en tom eller ny base.
+- ECH3 (lav), står: lista kan endre seg mellom «Er du sikker?» og «Bruk denne
+  lista» hvis hentingen går imellom. Bransjelistene gjør det samme fra før, og
+  det er ikke nytt i 8.28.
+
+Ingen funn på middels eller over.
