@@ -4975,3 +4975,19 @@ Som **gruppe**, vil vi rette de lave funnene som står åpne fra fire storyer, s
 **Avhenger av:** 10.6, 8.8 og 8.11b. **Én økt:** ja.
 
 *Avgjort 2026-11-09 kl. 17:37 (gruppens svar):* forslagene i spørsmål 1 og 3–7 i spesifikasjonen er godtatt. På spørsmål 2 (ECH14 i 10.6) anbefalte rådet a, men gruppen valgte c: neste kveld lages teksten for forrige børsdag når den mangler og hovedindeksen nå er der. Det bygges senere, og ECH14 står åpent som lav. Rådet anbefalte resten. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`.
+
+### Story 9.12: Rådordene i alle malene, taggene i CI og technology.md
+
+*Lagt til 2026-11-12, etter tillegg 2 til 9.11 (kl. 20:10) og gruppens svar 12.11 kl. 20:04 og 20:06:* punkt 26 i §8 i PRD-en og spørsmål 11 og 18 i spesifikasjonen for 9.11. Rådet anbefalte 9.12. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md`, med spørsmålene og forslagene.
+
+Som **gruppe**, vil vi at én test går gjennom alt appen viser etter ordene i rådlista, så et råd ikke kan komme inn i en mal uten at testen feiler.
+
+**Oppfyller:** NFR-06, forslaget i 4.2 i tilbakemeldingen 12.11, punkt 26 i §8 · **Begrenses av:** regel 17 og 19 i `CLAUDE.md`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `tests/test_raadordene_9_12.py` går gjennom malene, hjelpetekstene, omvisningen og `hjelp.js` etter `RAAD` i `src/ki_kontroll.py`, med unntakene og grunnene i testen
+- Jobben `pytest` i CI henter taggene, så testen av endringsloggen mot taggen kjører der
+- `technology.md` fra faglærer er lenket under «Dokumentene», som en referanse som beskriver et annet prosjekt
+- **Ville feilet hvis:** et ord fra rådlista sto i noe appen viser utenfor en nektende setning eller notatene om tenkte kjøp og salg, eller testen ikke leste alle malene
+
+**Avhenger av:** ingen. Flettes etter 9.11. **Én økt:** ja.
