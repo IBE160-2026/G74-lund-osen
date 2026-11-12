@@ -1760,3 +1760,73 @@ class TestUtenKurserEtterSvaret:
         assert "fordi den nettopp er lagt til og venter på hentingen om kvelden" not in hjelpen
         assert "«?» ved «Oppdatert» sier hvorfor: EODHD har ikke gitt kurser for aksjen." in hjelpen
         assert "slutter appen å følge en aksje du har valgt selv" in hjelpen
+
+
+def _til_faglaerer() -> list[str]:
+    """Linjene under «Til faglærer:» i README-en, til første tomme linje."""
+    tekst = (ROT / "README.md").read_text(encoding="utf-8")
+    return tekst.split("Til faglærer:\n", 1)[1].split("\n\n", 1)[0].splitlines()
+
+
+class TestTilFaglaererEtterSvaret:
+    """Tillegg 23 (gruppens svar 12.11 kl. 16:23): README-en er inngangen for
+    faglærer. Rett etter «Prøv appen» står hovedflyten i demoen og
+    brukertesten, som underpunkter, så de fire punktene fra svaret 29.10
+    kl. 19:36 står."""
+
+    def test_hovedflyten_rett_etter_proev_appen(self):
+        """Ville feilet hvis linja om hovedflyten manglet, ikke sto rett etter
+        «Prøv appen», eller brukte andre ord enn appen."""
+        linjene = _til_faglaerer()
+        assert linjene[0].startswith("- Prøv appen: ")
+        assert linjene[1].startswith("  - Hovedflyten i demoen: "), linjene[1]
+        linja = linjene[1]
+        for ord_ in (
+            "øverst i tabellen på oversikten, under «Skilte seg ut»",
+            "«Hvorfor signalet ble …»",
+            "«Signalet forklart»",
+            "«Vis meg rundt» viser siden du står på",
+            "«Spill av omvisningen» alle sidene",
+        ):
+            assert ord_ in linja, ord_
+
+    def test_ordene_finnes_i_appen(self):
+        """Ville feilet hvis en overskrift eller knapp linja nevner, het noe
+        annet i malene."""
+        maler = ROT / "src" / "templates"
+        index = (maler / "index.html").read_text(encoding="utf-8")
+        aksje = (maler / "aksje.html").read_text(encoding="utf-8")
+        rundtur = (maler / "_rundtur.html").read_text(encoding="utf-8")
+        assert '<tr class="del ut"><th colspan="5" scope="rowgroup">Skilte seg ut <span' in index
+        assert "<h2>Hvorfor signalet ble {%" in aksje
+        assert '<span id="ki-tittel">Signalet forklart</span>' in aksje
+        assert "</svg>Vis meg rundt</button>" in rundtur and "</svg>Spill av omvisningen</button>" in rundtur
+
+    def test_hovedflyten_i_demoen_har_aksjer_under_skilte_seg_ut(self, klient):
+        """Ville feilet hvis demoen ikke hadde noen aksje under «Skilte seg
+        ut», så linja viste til en tom del, eller delen ikke sto først i
+        tabellen."""
+        side = _side(klient, "/")
+        tabellen = side.split('id="aksjene"', 1)[1]
+        assert tabellen.index('<tr class="del') == tabellen.index('<tr class="del ut">')
+        ut = tabellen.split('<tr class="del ut">', 1)[1].split("</tbody>", 1)[0]
+        assert 'href="/aksje/' in ut
+
+    def test_brukertesten_med_lenke(self):
+        """Ville feilet hvis linja om brukertesten manglet, ikke sto etter
+        hovedflyten, ikke lenket til docs/brukertest.md, eller ikke sa målet
+        om under 5 minutter og hva som tok tid 10.11."""
+        linja = _til_faglaerer()[2]
+        assert linja.startswith("  - Brukertesten: målet i PRD-en er "), linja
+        assert linja.endswith("[brukertesten](docs/brukertest.md)"), linja
+        assert "på under 5 minutter" in linja and "10.11 tok det over 5 minutter" in linja
+        assert "Etter det har appen fått " in linja
+        assert (ROT / "docs" / "brukertest.md").exists()
+        # Målet står i PRD-en, og at testen tok over 5 minutter i brukertesten.
+        prd = (
+            ROT / "_bmad-output" / "planning-artifacts" / "prds" / "prd-G74-lund-osen-2026-09-20" / "prd.md"
+        ).read_text(encoding="utf-8")
+        assert "| Brukerutfall | En person utenfor gruppen" in prd and "under 5 minutter" in prd
+        brukertest = (ROT / "docs" / "brukertest.md").read_text(encoding="utf-8")
+        assert "| Tiden fra oversikten ble vist til forklaringen | Over 5 minutter" in brukertest
+        assert "gikk seg vill på noen sider" in brukertest

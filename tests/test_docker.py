@@ -2387,6 +2387,7 @@ TIL_FAGLAERER_LENKENE = (
     "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt",
     "_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md",
     "_bmad-output/planning-artifacts/epics.md",
+    "docs/brukertest.md",
     "docs/innlevering.md",
     "docs/vurderingsmatrise.md",
     "docs/kvalitetssikring.md",
@@ -3796,6 +3797,10 @@ class TestReadmeForNybegynnere:
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("med to kommandoer etter at uv er installert", "Tester", f"#{_anker('Tester')}"),
         ]
+        # Story 8.26 (tillegg 23, gruppens svar 12.11 kl. 16:23): hovedflyten
+        # og brukertesten står som underpunkter til «Prøv appen», så de to
+        # første er punktene på øverste nivå.
+        lista = [linje for linje in lista if linje.startswith("- ")]
         assert lista[0].startswith("- Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel"), lista[0]
         assert lista[1].startswith("- Testene: "), lista[1]
         to_foerste = "\n".join(lista[:2])

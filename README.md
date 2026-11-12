@@ -73,6 +73,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](docs/installasjon.md#med-docker-desktop) ([demoen](docs/installasjon.md#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
+  - Hovedflyten i demoen: aksjene som skilte seg ut, står øverst i tabellen på oversikten, under «Skilte seg ut». Klikk en av dem, og les «Hvorfor signalet ble …» og «Signalet forklart» på aksjesiden. «Vis meg rundt» viser siden du står på, og «Spill av omvisningen» alle sidene
+  - Brukertesten: målet i PRD-en er at en person utenfor gruppen forklarer hvorfor en aksje skiller seg ut, på under 5 minutter. 10.11 tok det over 5 minutter, og personen gikk seg vill på noen sider. Etter det har appen fått rikere KI-tekster og «Spill av omvisningen», og første gang tilbyr den «Vis meg rundt»: [brukertesten](docs/brukertest.md)
 - Testene: de automatiske, med to kommandoer etter at uv er installert: [Tester](#tester)
 - Dokumentene:
   - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8 etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), låst i taggen `arbeidskrav-product-brief-v8`
