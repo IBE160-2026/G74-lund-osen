@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: Hent koden
         uses: actions/checkout@v4
+        # Story 9.12 (spørsmål 18 i 9.11): hele historikken med taggene, så
+        # testen av endringsloggen mot taggen prd-vurdert-2026-11-12 kjører her.
+        with:
+          fetch-depth: 0
 
       - name: Sett opp uv og Python 3.13
         uses: astral-sh/setup-uv@v5
