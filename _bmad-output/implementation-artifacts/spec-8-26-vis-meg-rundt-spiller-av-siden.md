@@ -53,6 +53,8 @@ Rådet anbefalte alle unntatt det med to knapper.
 
 *Svar 2026-11-12 kl. 10:16 (tillegg 22, rådet anbefalte alt):* spørsmål 1–9 og 12–22 godtas som bygget. Spørsmål 11: forslag 1, «Nøkkelen? Den ligger under matta, sammen med de 20 kallene.», som bygget. Spørsmål 15: tillegg 11 kommer ikke, fordi det var en pytest-pause for 10.10 som er over, så ingenting mer bygges for det. Spørsmål 10 rettes: forklaringen på en aksje uten kurser gir ikke lenger «nettopp er lagt til og venter på hentingen» som grunn, og sier hva neste henting gjør (del 14). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt, med tillegg 21 og 22.
 
+*Svar 2026-11-12 kl. 16:23 og 16:24 (tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer, og gruppen vil gjøre ferdig alt nå. To linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen (ønsket kl. 16:24) og det som sa at appen er under utvikling, rettes i denne storyen. Rådet anbefalte README-en i en egen runde 13.11; gruppen valgte i dag. Fristen og flettingen fra tillegg 22 står. Se del 15.
+
 ## Spørsmål til gruppen før flettingen
 
 Hvert spørsmål har et forslag. Forslaget er det som er bygget.
@@ -345,3 +347,12 @@ Hele settet i seks deler etter tilleggene: 5524 bestått og 24 hoppet over, til 
 - **`docs/hjelp.md`** følger (regel 19), med at ønsket står som avvist og at en aksje som nettopp er valgt, står med «venter på henting».
 
 **Ville feilet hvis:** forklaringen fortsatt ga «nettopp er lagt til» som grunn, ikke sa hva neste henting gjør eller sa noe annet enn koden, hjelpeteksten begynte med andre ord enn raden eller hadde over tre setninger, eller linja om Matfjord Merkevarer var endret.
+
+### 15) README-en for faglærer (tillegg 23, svaret 12.11 kl. 16:23)
+
+- **«Til faglærer»:** rett etter «Prøv appen» står to underpunkter, så de fire punktene fra svaret 29.10 kl. 19:36 står. Hovedflyten i demoen: aksjene som skilte seg ut, står øverst i tabellen under «Skilte seg ut»; klikk en av dem og les «Hvorfor signalet ble …» og «Signalet forklart»; «Vis meg rundt» viser siden du står på, og «Spill av omvisningen» alle sidene. Ordene er slått opp i `index.html`, `aksje.html` og `_rundtur.html`. Brukertesten, med lenke til `docs/brukertest.md`: målet om under 5 minutter i PRD-en, at det tok over 5 minutter 10.11 og at personen gikk seg vill på noen sider, og hva som er flettet etter det (rikere KI-tekster 11.11, «Spill av omvisningen» 11.11 og tilbudet om «Vis meg rundt»). «Vis meg rundt» fra 8.9 ble flettet 10.11 kl. 19:52, og brukertesten har ikke klokkeslettet, så linja nevner bare tilbudet.
+- **Versjon 1 er ferdig:** ingressen og «Status» sier at versjon 1 er ferdig, og at «Ekstra» er det som er ferdig utover briefen. «Neste i v1» står med README-prøven til den er tatt. Ingressen sier at lista kan ha opptil 18 med «Følg en aksje» (`valg.TAK`). Linja i «Status» om endringer i lista følger tillegg 19: demoen sier at en endring ikke tas i bruk der, og viser ikke lenger et eksempel. Appen selv viser fortsatt «Appen er under utvikling og ikke ferdig.» nederst (`UNDER_ARBEID` i `app.py`); tillegget gjelder README-en, så den er ikke endret.
+- **Tabellen «Demoen og den ekte versjonen»:** fire rader til, KI-tekst, dagen, endringer i lista og notatene, sjekket mot `demo.py`, `.env.example`, `start/start.ps1`, `start/start.sh`, `compose.yaml` og `docs/installasjon.md`.
+- **`docs/innlevering.md`:** Lagt til-linja under «D. Dato for demonstrasjonen». Demomanuset står ikke i filene git sporer.
+
+**Ville feilet hvis:** en av de to linjene manglet, sto et annet sted eller brukte andre ord enn malene; README-en sa at appen er under utvikling; ingressen ikke fulgte `valg.TAK`; «Status» fortsatt sa at demoen viser et eksempel på meldingen; en rad i tabellen manglet eller ikke stemte med koden.
