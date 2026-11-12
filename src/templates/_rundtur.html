@@ -1,21 +1,19 @@
 {#- Story 8.9 (FR-109): «Vis meg rundt». Stegene står i hjelpetekster.py,
-    som hjelpen, og lenker til delene av siden. Uten skript: en knapp som
-    åpner lista. #}
+    som hjelpen.
+    Story 8.26 (gruppens svar 11.11 kl. 16:58 og 17:06): «Vis meg rundt»
+    starter den samme boksen som omvisningen, bare med stegene for siden, og
+    den nummererte lista fra 8.9 er borte, fordi testpersonen 10.11 gikk seg
+    vill når siden hoppet. Begge knappene står i raden øverst etter
+    «Innstillinger», i samme stil som sideknappene, med hvert sitt ikon.
+    Skjult til skriptet viser dem, så de aldri står uten å virke. #}
 {% macro rundtur(side) -%}
 {%- set steg = rundturer.get(side) -%}
 {#- Som «?»: borte når «Vis hjelp» er av i Innstillinger. #}
 {%- if steg and (vis_hjelp is not defined or vis_hjelp) %}
-<div class="rad rundtur-rad">
-<details class="rundtur">
-  <summary>Vis meg rundt</summary>
-  <ol class="rundtur-steg">
-    {%- for s in steg %}
-    <li><a href="#{{ s.anker }}">{{ s.tittel }}</a> {{ s.tekst }}</li>
-    {%- endfor %}
-  </ol>
-</details>
-{#- Story 8.25: omvisningen side for side. Skjult til skriptet viser den. #}
-<button type="button" class="spill-av" hidden>Spill av omvisningen</button>
-</div>
+{%- set data = [] %}
+{%- for s in steg %}{% set _ = data.append({"anker": s.anker, "tittel": s.tittel, "tekst": s.tekst}) %}{% endfor %}
+<button type="button" class="sideknapp vis-meg-rundt" data-steg="{{ data|tojson|forceescape }}" hidden><svg class="ikon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M10.5 5.5l-1.6 3.4-3.4 1.6 1.6-3.4z"/></svg>Vis meg rundt</button>
+{#- Story 8.25: omvisningen side for side. #}
+<button type="button" class="sideknapp spill-av" hidden><svg class="ikon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M6.5 5.2v5.6L11 8z"/></svg>Spill av omvisningen</button>
 {%- endif %}
 {%- endmacro %}
