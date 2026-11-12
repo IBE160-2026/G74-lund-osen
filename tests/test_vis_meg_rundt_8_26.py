@@ -1856,3 +1856,59 @@ class TestReadmenSierAtV1ErFerdig:
         readme = (ROT / "README.md").read_text(encoding="utf-8")
         assert "under utvikling" not in readme
         assert readme.count("Versjon 1 er ferdig") == 2
+
+
+def _tabellraden(navn: str) -> list[str]:
+    """Cellene i raden navn i tabellen «Demoen og den ekte versjonen»."""
+    tekst = (ROT / "README.md").read_text(encoding="utf-8")
+    tabellen = tekst.split("**Demoen og den ekte versjonen:**", 1)[1].split("\n\nTil faglærer:\n", 1)[0]
+    rader = [r for r in tabellen.splitlines() if r.startswith(f"| {navn} |")]
+    assert len(rader) == 1, navn
+    return [c.strip() for c in rader[0].strip("|").split("|")]
+
+
+class TestTabellenOmForskjellene:
+    """Tillegg 23, steg 4 (ønsket 12.11 kl. 16:24): radene for forskjellene
+    mellom demoen og den ekte versjonen, med ordene sjekket mot koden og
+    docs/installasjon.md."""
+
+    def test_ki_teksten(self):
+        """Ville feilet hvis raden sa noe annet enn at demoen har ferdige
+        tekster, og at den ekte er av uten en lokal modell eller egen nøkkel,
+        eller hvis .env.example ikke lenger hadde KI av."""
+        _, demoen, ekte = _tabellraden("KI-tekst")
+        assert demoen == "Ferdige tekster for siste dag, laget én gang med Gemma"
+        assert ekte == "Av, til du velger en lokal modell eller en egen nøkkel til en KI-tjeneste"
+        assert "OSE_KI_TJENESTE=av" in (ROT / ".env.example").read_text(encoding="utf-8")
+        assert "laget én gang med Gemma" in (ROT / "src" / "demo.py").read_text(encoding="utf-8")
+        installasjonen = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
+        assert "Ingen nøkkel følger med appen eller repoet." in installasjonen
+
+    def test_dagen(self):
+        """Ville feilet hvis demoens siste dag ikke var fredag 09.10.2026."""
+        _, demoen, ekte = _tabellraden("Dagen")
+        assert demoen == "Fast: fredag 09.10.2026"
+        assert demo.SLUTTDATO == datetime(2026, 10, 9).date() and demo.SLUTTDATO.weekday() == 4
+        assert ekte == "Den siste børsdagen som er hentet"
+
+    def test_endringer_i_lista(self):
+        """Ville feilet hvis raden sa at demoen tar endringer i bruk."""
+        _, demoen, ekte = _tabellraden("Endringer i lista")
+        assert demoen == "Tas ikke i bruk, fordi demoen ikke henter"
+        assert ekte == "Tas i bruk ved hentingen etter kl. 22"
+
+    def test_notatene(self):
+        """Ville feilet hvis startskriptene ikke lenger lagde demobasen på
+        nytt ved hver start, så raden om notatene ikke stemte."""
+        _, demoen, ekte = _tabellraden("Notatene")
+        assert demoen == "Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start"
+        assert ekte == "Lagres i basen på maskinen"
+        assert "uv run python src/demo.py" in (ROT / "start" / "start.ps1").read_text(encoding="utf-8")
+        assert "uv run python src/demo.py ||" in (ROT / "start" / "start.sh").read_text(encoding="utf-8")
+        assert 'entrypoint: ["python", "src/demo.py"]' in (ROT / "compose.yaml").read_text(encoding="utf-8")
+
+    def test_anbefalingen_som_foer(self):
+        """Ville feilet hvis «Prøv appen» ikke lenger anbefalte demoen først og
+        den ekte etterpå."""
+        linja = _til_faglaerer()[0]
+        assert linja.index("demoen med oppdiktede tall") < linja.index("Prøv gjerne ekte kurser etterpå")

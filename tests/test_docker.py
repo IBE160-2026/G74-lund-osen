@@ -4793,7 +4793,19 @@ class TestHovedveien:
         tekst = README.read_text(encoding="utf-8")
         tabellen = _tabellen()
         rader = [l.split(" | ", 1)[0] for l in tabellen.splitlines() if l.startswith("| ")]
-        assert rader == ["|", "| Kurser", "| Trenger", "| Klar"], rader
+        # Story 8.26 (tillegg 23, ønsket 12.11 kl. 16:24): fire rader til for
+        # forskjellene. Ville feilet hvis en av dem manglet eller sto i en
+        # annen rekkefølge.
+        assert rader == [
+            "|",
+            "| Kurser",
+            "| Trenger",
+            "| Klar",
+            "| KI-tekst",
+            "| Dagen",
+            "| Endringer i lista",
+            "| Notatene",
+        ], rader
         assert tabellen.splitlines()[0] == "| | Demoen | Den ekte versjonen |"
         # Gjennomgangen etter cc7f587 (ECH2): uten skillelinja, eller med feil
         # antall kolonner, viser GitHub ikke tabellen som tabell.
