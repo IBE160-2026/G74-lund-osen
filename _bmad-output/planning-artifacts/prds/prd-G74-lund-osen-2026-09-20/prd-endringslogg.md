@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-12T20:13
+updated: 2026-11-12T21:03
 ---
 
 # Endringslogg for PRD-en
@@ -1616,3 +1616,5 @@ av skjermen. Om oversikten er for tett, er et spørsmål til brukertesten (story
 *Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar på spørsmål 14 og 15 i spesifikasjonen for 9.11):* FR-111, Min liste, er et nytt krav med konsekvenser, i kjernen og bygget. «De 15 mest omsatte» står i FR-412 som ferdig liste, ekstra, og bygges i natt som egen story. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte.
 
 *Avgjort 2026-11-12 kl. 20:09 og 20:10 (gruppens svar):* «Lær noe nytt» kommer ikke i v1, og de åtte kravene som sto som ekstra og ikke bygget, står som «senere»: endringen i kroner under prosenten (FR-101), merket for endret signalstyrke (FR-107), «Lær noe nytt» (FR-109), høy og lav og endringen i kroner (FR-203), «Se nærmere» (FR-205), kommende eks.dato i kursgrafen (FR-207), eks.datoer ført for hånd (FR-414) og «Sign in with ChatGPT» (FR-608). «Ekstra» er det som er bygget utover briefen. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 20:21 og 20:40 (gruppens ønske og svar):* en språkrunde gjennom hele `prd.md` på bokmål, uten at meningen, ID-ene, tallene eller ankrene endres. Konsekvensene er punktlister. Sluttkursen og den justerte sluttkursen er skrevet med vanlige ord, og kodeordene står bare i ordlista, FR-406 og FR-408. Overskriften i FR-302 har «fram», og det gamle ankeret står. Punkt 22 i §8 har fristen «Før innleveringen». Rådet anbefalte det.
