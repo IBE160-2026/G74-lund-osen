@@ -4684,6 +4684,8 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 *Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* tilbudet første gang og et nei huskes i nettleseren, som bygget (spørsmål 3). Rådet anbefalte det.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 09:58, story 8.26, tillegg 21):* tilbudet første gang starter ikke lenger hele omvisningen, men «Vis meg rundt» for oversikten, med teksten «Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.» og knappene «Vis meg rundt» og «Nei takk». Hele omvisningen er 23 steg på seks sider, og målet «Brukerutfall» i §7 i PRD-en er at en person utenfor gruppen gjennomfører hovedflyten og forklarer hvorfor en aksje skiller seg ut, under 5 minutter, uten hjelp. Svaret huskes i nettleseren som før, og «Spill av omvisningen» står øverst som før. Rådet anbefalte det. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 21, som lagres i `docs/ai-prompts/2026-11-12.md` etter gruppens ja.
+
 *Avgjort 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B er flettet (spørsmål 7), og flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
 
 *Avgjort 2026-11-11 kl. 16:26 (gruppens svar):* lista «Ekstra, hvis tiden rekker» står borte fra README-en, og setningen under listene sier «Ekstra» igjen. Bildegrenene beholdes, så bildene i PR-ene står, og så gruppen kan vise endringene i refleksjonsloggen og rapporten. Rådet anbefalte det.

@@ -1303,15 +1303,30 @@ class TestReadmeOmvisningen:
         etter = readme[readme.index("5. **Lukk vinduet** for å stoppe appen.") :]
         neste = etter.split("\n\n", 2)[1]
         assert neste.startswith("**Første gang**")
-        assert "Første gang tilbyr appen en omvisning av seks av sidene" in neste
-        assert "«Spill av omvisningen» øverst" in neste and "«Vis meg rundt» viser siden du står på" in neste
+        # Tillegg 21 (svaret 12.11 kl. 09:58): første gang tilbys «Vis meg
+        # rundt» på oversikten, ikke hele omvisningen.
+        assert "Første gang tilbyr appen «Vis meg rundt» på oversikten." in neste
+        assert "en omvisning av seks av sidene" not in neste
+        assert "«Spill av omvisningen» øverst viser alle sidene" in neste
+        assert "«Vis meg rundt» viser siden du står på" in neste
 
     def test_linja_under_ekstra(self):
         """Ville feilet hvis linja under «Ekstra, ferdig» fortsatt sa «ved
-        «Vis meg rundt»», som før knappene kom i raden øverst."""
+        «Vis meg rundt»», som før knappene kom i raden øverst, eller ikke sa
+        at «Vis meg rundt» tilbys første gang på oversikten (tillegg 21)."""
         readme = (ROT / "README.md").read_text(encoding="utf-8")
         assert "«Spill av omvisningen» ved «Vis meg rundt»" not in readme
-        assert "- «Spill av omvisningen» gjennom seks av sidene, og «Vis meg rundt» for siden du står på" in readme
+        linja = "- «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene"
+        assert linja in readme
+
+    def test_hjelpen_om_tilbudet_og_ferdig(self):
+        """Tillegg 21, steg 3: ville feilet hvis hjelpen fortsatt sa at
+        omvisningen tilbys første gang, eller ikke sa hvor «Ferdig» går."""
+        hjelpen = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        assert "tilbys «Vis meg rundt» for oversikten øverst på den, ikke hele omvisningen" in hjelpen
+        assert "tilbys omvisningen øverst" not in hjelpen
+        assert "«Ferdig» går dit, med det første navnet valgt" in hjelpen
+        assert "går «Ferdig» til tabellen" in hjelpen
 
 
 # Tillegg 5 (gruppens svar 11.11 kl. 18:09): den første knappen i periodevalget.
@@ -1585,3 +1600,109 @@ class TestGjennomgangenAvTilleggene:
         side = _side(klient, "/min-liste")
         assert 'id="hjelp-flere"' not in side
         assert "Hver bruker har sin egen gratiskonto hos EODHD" in _flere(side)
+
+
+# Tillegg 21 (gruppens svar 12.11 kl. 09:58, «Brukerutfall» i §7 i PRD-en):
+# tilbudet første gang starter «Vis meg rundt» for oversikten, og det siste
+# steget der viser vei til navnene under «Skilte seg ut».
+
+
+def _funksjonen(navn: str) -> str:
+    skriptet = SKRIPTET.read_text(encoding="utf-8")
+    start = skriptet.index(f"  function {navn}(")
+    return skriptet[start : skriptet.index("\n  }\n", start)]
+
+
+def _del_ut(side: str) -> str | None:
+    """tbody-en med raden «Skilte seg ut» i tabellen #aksjene, eller None."""
+    tabellen = side[side.index('id="aksjene"') :]
+    for tbody in tabellen.split("<tbody>")[1:]:
+        tbody = tbody.split("</tbody>", 1)[0]
+        if '<tr class="del ut">' in tbody:
+            return tbody
+    return None
+
+
+class TestTilbudetOgVeienVidere:
+    def test_tilbudet_starter_vis_meg_rundt_for_oversikten(self):
+        """Tillegg 21, steg 1: ville feilet hvis ja i tilbudet første gang
+        startet hele omvisningen på 23 steg, og ikke «Vis meg rundt» for
+        oversikten, eller teksten ikke sa hva brukeren får."""
+        tilby = _funksjonen("tilby")
+        assert 'knapp("Vis meg rundt", "omvisning-ja"' in tilby
+        assert "visSiden(sidensListe)" in tilby and "start()" not in tilby
+        assert 'skriv(localStorage, OMVISNING.SVARET, "ja")' in tilby
+        assert 'knapp("Nei takk"' in tilby
+        assert "tekst.textContent = OMVISNING.TILBUDET" in tilby
+
+    @pytest.mark.skipif(NODE is None, reason="trenger node")
+    def test_teksten_i_tilbudet(self):
+        """Tillegg 21, steg 1: ville feilet hvis tilbudet fortsatt sa at
+        omvisningen viser sidene i appen."""
+        tekst = _Node()._kjoer("o.TILBUDET")
+        assert tekst == "Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen."
+
+    @pytest.mark.skipif(NODE is None, reason="trenger node")
+    def test_linja_bare_paa_oversikten_med_vis_meg_rundt(self):
+        """Tillegg 21, steg 2: ville feilet hvis linja sto i hele omvisningen,
+        som går videre til aksjesiden selv, eller i «Vis meg rundt» på en
+        annen side enn oversikten."""
+        n = _Node()
+        ut = n._kjoer("o.videre('oversikt', true, true)")
+        assert ut == {
+            "linje": "Klikk så et navn under «Skilte seg ut» for å se hvorfor aksjen skilte seg ut.",
+            "maal": "ut",
+        }
+        assert n._kjoer("o.videre('oversikt', false, true)") is None
+        for side in ("min_liste", "boersometer", "aksje", "folg", "innstillinger"):
+            assert n._kjoer(f"o.videre('{side}', true, true)") is None, side
+
+    @pytest.mark.skipif(NODE is None, reason="trenger node")
+    def test_linja_naar_ingen_aksje_staar_der(self):
+        """Tillegg 21, steg 2: ville feilet hvis linja pekte på «Skilte seg ut»
+        også når ingen aksje står der, eller «Ferdig» ikke gikk til tabellen."""
+        ingen = _Node()._kjoer("o.videre('oversikt', true, false)")
+        assert ingen == {"linje": "Klikk så et navn i tabellen for å se sjekkene for aksjen.", "maal": "tabellen"}
+
+    def test_linja_bare_paa_det_siste_steget_og_ikke_et_eget_steg(self):
+        """Tillegg 21, steg 2: ville feilet hvis linja sto på andre steg enn
+        det siste, over knappene, eller var et eget steg, så MAKS_STEG = 7
+        ikke lenger holdt."""
+        vis = _funksjonen("vis")
+        assert "const videre = siste ? OMVISNING.videre(SIDE, aktive !== steg, foersteNavn() !== null) : null;" in vis
+        assert vis.index("boksen.append(linja)") < vis.index("boksen.append(knappene)") < vis.index("omvisning-hele")
+        stegene = ht.rundturer()["oversikt"]
+        assert len(stegene) <= ht.MAKS_STEG == 7
+        assert not any("Klikk så et navn" in s.tekst for s in stegene)
+
+    def test_ferdig_gaar_til_skilte_seg_ut(self):
+        """Tillegg 21, steg 2: ville feilet hvis «Ferdig» bare lukket boksen,
+        og ikke ga fokus til det første navnet under «Skilte seg ut», eller
+        til tabellen når ingen aksje står der."""
+        vis = _funksjonen("vis")
+        assert "const ferdig = videre ? () => tilNavnene(videre.maal) : avslutt;" in vis
+        assert "siste ? ferdig() : gaaTil(j + 1, 1)" in vis
+        foerste = _funksjonen("foersteNavn")
+        assert 'document.querySelector("#aksjene tr.del.ut")' in foerste
+        assert 'a[href^="/aksje/"]' in foerste
+        til = _funksjonen("tilNavnene")
+        assert til.index("avslutt();") < til.index("navnet.focus(")
+        assert 'document.getElementById("aksjene")' in til and "tabellen.focus(" in til
+
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_siden_har_det_skriptet_leter_etter(self, versjon, request):
+        """Tillegg 21: ville feilet hvis oversikten ikke hadde raden «Skilte
+        seg ut» med en lenke til en aksjeside i samme del av tabellen #aksjene,
+        som skriptet gir fokus til, eller hadde den med en sortering, der
+        «Ferdig» skal gå til tabellen. Likt i demoen og i den ekte versjonen."""
+        k = request.getfixturevalue(versjon)
+        delen = _del_ut(_side(k, "/"))
+        assert delen is not None and 'href="/aksje/' in delen
+        sortert = _side(k, "/?sorter=signal&orden=synkende")
+        assert 'id="aksjene"' in sortert and _del_ut(sortert) is None
+
+    def test_uten_vis_meg_rundt_kommer_ikke_tilbudet(self):
+        """Tillegg 21: ville feilet hvis tilbudet kom uten knappen «Vis meg
+        rundt» på siden, der ja ikke ville gjort noe."""
+        oppstart = _funksjonen("oppstart")
+        assert "sidensListe &&" in oppstart

@@ -49,6 +49,8 @@ Tilleggene 5, 7, 9, 11, 13 og 14 er ikke limt inn i vinduet. Tillegg 15 (kl. 20:
 
 Rådet anbefalte alle unntatt det med to knapper.
 
+*Svar 2026-11-12 kl. 09:58 (tillegg 21, rådet anbefalte det):* etter målet «Brukerutfall» i §7 i PRD-en starter tilbudet første gang «Vis meg rundt» for oversikten, ikke hele omvisningen, og det siste steget der viser vei til navnene under «Skilte seg ut». Det retter tillegg 20, steg 3, om det appen tilbyr første gang. Se del 13.
+
 ## Spørsmål til gruppen før flettingen
 
 Hvert spørsmål har et forslag. Forslaget er det som er bygget.
@@ -325,3 +327,11 @@ Blind Hunter med bare diffen `0e7fd7c5..d1fe78c5`, og Edge Case Hunter og Verifi
 Én mutant per tillegg, med en kopi av fila før og sha256 mot HEAD etter (`mutanter-t5-20.py` i scratchpad). Alle 14 ble fanget, og hver fil var lik HEAD etterpå: M13 (tillegg 17, den grå brikken kunne velges), M14 (overskriften sa siste børsdag med «Vis dagen»), M15 (uten «Oppdatert» på sidene uten eget tidspunkt), M16 (bryteren på aksjesiden i 14 px), M17 (steget om signalstyrken pekte på hele tabellen), M18 (en tekst med «kontrollsjekken»), M19 (eksempelboksen tilbake), M20 (omvisningen med stegene som gjentas), M21 (uten steget «Signalet forklart»), M22 (uten setningen om den første knappen), M23 (uten prøven uten ramme), M24 (ankeret `#ferdige-lister` borte), M25 (kortene i alfabetisk rekkefølge), M26 (uten setningen når lista ikke er full).
 
 Hele settet i seks deler etter tilleggene: 5524 bestått og 24 hoppet over, til sammen 5548, likt `--collect-only`. Den første runden viste tester som sjekket det som sto før (bildet av investorsiden står 38 px lenger ned med «Oppdatert …», brikkene i steg 3 og kortene, «lenke til aksjesiden», «uten ramme» i `docs/hjelp.md` og «Signalet forklart» uten sjekker); de er rettet. Bildene i `docs/appen/` er tatt på nytt med høydene i `test_docker.py`.
+
+### 13) Tilbudet første gang og veien videre (tillegg 21, svaret 12.11 kl. 09:58)
+
+- **Tilbudet:** `tilby()` i `hjelp.js` sier `OMVISNING.TILBUDET`, «Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.», med «Vis meg rundt» og «Nei takk». Ja huskes som før og starter `visSiden` med stegene fra knappen «Vis meg rundt» på oversikten, ikke `start()`. Uten den knappen, som når oversikten ikke har aksjer å vise, kommer ikke tilbudet, fordi ja ikke ville gjort noe. «Spill av omvisningen» står øverst som før.
+- **Det siste steget:** `OMVISNING.videre(side, bareSiden, harNavn)` gir linja og målet for «Ferdig», bare på oversikten og bare i «Vis meg rundt». Med et navn under «Skilte seg ut» (`#aksjene tr.del.ut`) står «Klikk så et navn under «Skilte seg ut» for å se hvorfor aksjen skilte seg ut.», og «Ferdig» lukker boksen og gir fokus til det første navnet. Uten, for eksempel med en sortering eller når ingen fikk 2 av 3, står «Klikk så et navn i tabellen for å se sjekkene for aksjen.», og «Ferdig» går til tabellen. Linja står over knappene og er ikke et eget steg, så `MAKS_STEG = 7` gjelder. Hele omvisningen har ikke linja.
+- **README-en og hjelpen:** «Første gang tilbyr appen «Vis meg rundt» på oversikten. «Spill av omvisningen» øverst viser alle sidene, og «Vis meg rundt» viser siden du står på.» Linja under «Ekstra, ferdig» og avsnittet i `docs/hjelp.md` følger. Rettet-linjer under svaret 11.11 kl. 13:49 i spesifikasjonen for 8.25 og i `epics.md`.
+
+**Ville feilet hvis:** tilbudet startet hele omvisningen eller fortsatt sa at omvisningen viser sidene, linja sto i hele omvisningen, på en annen side eller som et eget steg, «Ferdig» bare lukket boksen, eller linja og «Ferdig» pekte på «Skilte seg ut» når ingen aksje står der.

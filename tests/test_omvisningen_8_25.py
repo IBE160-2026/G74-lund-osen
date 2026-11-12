@@ -229,8 +229,12 @@ class TestRaadOgVersjonene:
         """Del D, NFR-06: ville feilet hvis et steg eller tilbudet ga råd eller
         sa noe om hva kursen vil gjøre."""
         skriptet = SKRIPTET.read_text(encoding="utf-8")
-        tilbudet = re.search(r'tekst\.textContent = "([^"]+)"', skriptet).group(1)
-        for tekst in [*(f"{s['tittel']} {s['tekst']}" for s in omvisningen()), tilbudet]:
+        # Story 8.26 (tillegg 21): tilbudet står i OMVISNING.TILBUDET, og
+        # linjene på det siste steget i «Vis meg rundt» på oversikten sjekkes også.
+        tilbudet = re.search(r'TILBUDET: "([^"]+)"', skriptet).group(1)
+        linjene = re.findall(r'linje: "([^"]+)"', skriptet)
+        assert len(linjene) == 2
+        for tekst in [*(f"{s['tittel']} {s['tekst']}" for s in omvisningen()), tilbudet, *linjene]:
             for ord_ in RAADSORD:
                 assert not re.search(ord_, tekst, re.IGNORECASE), (ord_, tekst)
 

@@ -307,6 +307,24 @@ const OMVISNING = {
   skalTilby(side, svar) {
     return side === "oversikt" && svar === null;
   },
+
+  // Story 8.26 (tillegg 21, gruppens svar 12.11 kl. 09:58, «Brukerutfall» i
+  // §7 i PRD-en): tilbudet starter «Vis meg rundt» for oversikten, ikke hele
+  // omvisningen på 23 steg, så en ny bruker kommer fort til en aksje selv.
+  TILBUDET: "Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.",
+
+  // Linja på det siste steget i «Vis meg rundt» på oversikten, og hvor
+  // «Ferdig» går: til det første navnet under «Skilte seg ut», eller til
+  // tabellen når ingen aksje står der (en annen dag, en sortering, ingen med
+  // 2 av 3). null på de andre sidene og i hele omvisningen, som går videre
+  // til aksjesiden selv.
+  videre(side, bareSiden, harNavn) {
+    if (side !== "oversikt" || !bareSiden) return null;
+    if (harNavn) {
+      return { linje: "Klikk så et navn under «Skilte seg ut» for å se hvorfor aksjen skilte seg ut.", maal: "ut" };
+    }
+    return { linje: "Klikk så et navn i tabellen for å se sjekkene for aksjen.", maal: "tabellen" };
+  },
 };
 
 // Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): «Følg en aksje»
@@ -472,6 +490,31 @@ if (typeof module === "object" && module.exports) {
     return document.getElementById(anker) !== null;
   }
 
+  // Story 8.26 (tillegg 21): det første navnet under «Skilte seg ut» i
+  // tabellen på oversikten, eller null når delen ikke står der.
+  function foersteNavn() {
+    const del = document.querySelector("#aksjene tr.del.ut");
+    const tbody = del ? del.closest("tbody") : null;
+    return tbody ? tbody.querySelector('a[href^="/aksje/"]') : null;
+  }
+
+  // «Ferdig» på det siste steget: boksen lukkes, og fokus går til det første
+  // navnet under «Skilte seg ut», eller til tabellen.
+  function tilNavnene(maal) {
+    avslutt();
+    const navnet = maal === "ut" ? foersteNavn() : null;
+    if (navnet) {
+      navnet.closest("tbody").querySelector("tr.del.ut").scrollIntoView({ block: "start" });
+      navnet.focus({ preventScroll: true });
+      return;
+    }
+    const tabellen = document.getElementById("aksjene");
+    if (!tabellen) return;
+    if (!tabellen.hasAttribute("tabindex")) tabellen.tabIndex = -1;
+    tabellen.scrollIntoView({ block: "start" });
+    tabellen.focus({ preventScroll: true });
+  }
+
   // Noen anker fra 8.9 er et tomt merke rett foran delen, som
   // <span id="noekkeltallene">. Da merkes delen etter merket.
   function delen(anker) {
@@ -524,12 +567,23 @@ if (typeof module === "object" && module.exports) {
     const tilbake = knapp("Tilbake", "omvisning-tilbake", () => gaaTil(j - 1, -1));
     tilbake.disabled = !lov.tilbake;
     const siste = lov.ferdig;
+    // Story 8.26 (tillegg 21): på det siste steget i «Vis meg rundt» på
+    // oversikten står én linje til, og «Ferdig» går til navnene.
+    const videre = siste ? OMVISNING.videre(SIDE, aktive !== steg, foersteNavn() !== null) : null;
+    const ferdig = videre ? () => tilNavnene(videre.maal) : avslutt;
     knappene.append(
       tilbake,
-      knapp(siste ? "Ferdig" : "Neste", "omvisning-neste", () => (siste ? avslutt() : gaaTil(j + 1, 1))),
+      knapp(siste ? "Ferdig" : "Neste", "omvisning-neste", () => (siste ? ferdig() : gaaTil(j + 1, 1))),
       knapp("Lukk", "omvisning-lukk", avslutt),
     );
-    boksen.append(teller, tittel, tekst, knappene);
+    boksen.append(teller, tittel, tekst);
+    if (videre) {
+      const linja = document.createElement("p");
+      linja.className = "omvisning-videre";
+      linja.textContent = videre.linje;
+      boksen.append(linja);
+    }
+    boksen.append(knappene);
     // Story 8.26 (svaret kl. 16:58): siste steg med «Vis meg rundt» har
     // «Ferdig» og lenken til hele omvisningen.
     if (siste && aktive !== steg) {
@@ -587,16 +641,19 @@ if (typeof module === "object" && module.exports) {
 
   // Første gang appen åpnes: tilbudet øverst på oversikten, én gang. Et
   // svar, ja eller nei, huskes i nettleseren.
+  // Story 8.26 (tillegg 21): ja starter «Vis meg rundt» for oversikten, ikke
+  // hele omvisningen. «Spill av omvisningen» står øverst som før.
   function tilby() {
     const rad = document.createElement("div");
     rad.className = "omvisning-tilbud";
     rad.setAttribute("role", "region");
     rad.setAttribute("aria-label", "Omvisning");
     const tekst = document.createElement("p");
-    tekst.textContent = "Første gang her? Omvisningen viser sidene i appen, ett steg om gangen.";
-    const ja = knapp("Spill av omvisningen", "spill-av", () => {
+    tekst.textContent = OMVISNING.TILBUDET;
+    const ja = knapp("Vis meg rundt", "omvisning-ja", () => {
       rad.remove();
-      start();
+      skriv(localStorage, OMVISNING.SVARET, "ja");
+      visSiden(sidensListe);
     });
     const nei = knapp("Nei takk", "omvisning-nei", () => {
       skriv(localStorage, OMVISNING.SVARET, "nei");
@@ -623,6 +680,8 @@ if (typeof module === "object" && module.exports) {
     }
     gaaTil(0, 1);
   }
+  // Stegene for siden, som tilbudet første gang også bruker.
+  let sidensListe = null;
   for (const b of document.querySelectorAll("button.vis-meg-rundt[hidden]")) {
     let liste;
     try {
@@ -630,6 +689,7 @@ if (typeof module === "object" && module.exports) {
     } catch {
       continue;
     }
+    if (sidensListe === null) sidensListe = liste;
     b.hidden = false;
     b.addEventListener("click", () => visSiden(liste));
   }
@@ -652,7 +712,13 @@ if (typeof module === "object" && module.exports) {
     // lenger boksen fra «Vis meg rundt», så hele omvisningen gjelder igjen.
     aktive = steg;
     stedet = SIDE;
-    if (OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET)) && !document.querySelector(".omvisning-tilbud")) {
+    // Tillegg 21: uten «Vis meg rundt» på siden (ingen aksjer å vise) kommer
+    // tilbudet ikke, og det huskes ikke som besvart.
+    if (
+      sidensListe &&
+      OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET)) &&
+      !document.querySelector(".omvisning-tilbud")
+    ) {
       tilby();
     }
   }
