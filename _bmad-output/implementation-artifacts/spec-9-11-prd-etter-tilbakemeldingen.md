@@ -313,3 +313,57 @@ Ingen funn på middels eller over står åpne (regel 25).
   (spørsmål 16).
 - BH10–BH12, BH17, BH27, ECH4 og resten av spørsmålene: forslagene er godtatt som
   bygget. BH27 (taggene i CI) og punkt 26 (testen av alle malene) bygges i 9.12.
+
+## Språkrunden (tillegg 5)
+
+Gruppens ønske 12.11 kl. 20:21 om en nøye språkgjennomgang, og svarene kl. 20:40.
+Rådet anbefalte det. Tillegget ble limt inn kl. 20:43 og føres i
+`docs/ai-prompts/2026-11-12.md`. Runden er gjort på grenen før steg 2 i tillegg 1.
+
+**Lengden**, målt med `wc -l -w -c`:
+
+| `prd.md` | Linjer | Ord | Byte |
+|---|---:|---:|---:|
+| Før språkrunden (`3ae521b4`) | 1 721 | 14 205 | 89 050 |
+| Etter språkrunden og rettingene etter gjennomgangen | 1 831 | 14 698 | 93 025 |
+
+Teksten ble ikke kortere i ord, selv om tillegget ba om det. Den ble om lag
+3 % lengre. Delte setninger gjentar subjektet, og hver konsekvens står nå på sin
+egen linje. Kodeordene er også erstattet av lengre vanlige ord: `close` er blitt
+«sluttkursen», og `adjusted_close` er blitt «den justerte sluttkursen».
+Etter runden er ingen setninger i løpende tekst over 30 ord.
+
+**Eksempler på endringene:**
+- FR-102, før: «et klikk på Endring gir størst oppgang først, og et nytt klikk
+  størst nedgang først». Etter: «Et klikk på Endring gir den største oppgangen
+  først, og et nytt klikk den største nedgangen først.»
+- FR-101, før: «| Sluttkurs | `close` for siste børsdag |». Etter: «| Sluttkurs |
+  Sluttkursen for siste børsdag |». Raden med `close` står i ordlista, fordi
+  hjelpetekstene siterer den.
+- FR-203, før: «lenken til investorsiden har `target="_blank"`». Etter: «Lenken
+  til investorsiden åpnes i en ny fane i den ekte versjonen.»
+- FR-204: kolonnen «Svar» med 200, 404 og 503 heter nå «Hva brukeren får», med
+  «Aksjesiden», «Siden finnes ikke» og «En feilside».
+- §4.6, før: «EODHD spørres derfor ikke før tallene sendes». Etter: «Derfor
+  trengs ikke en egen tillatelse fra EODHD».
+- Forklaringen av justert og ujustert sluttkurs står i ordlista. FR-101, FR-407
+  og FR-202 viser dit.
+- Punkt 22 i §8 har fristen «Før innleveringen» (svaret kl. 20:40).
+
+**Gjennomgangen med Blind Hunter**, krav for krav før og etter, og triagen:
+- BH1 (middels): NFR-08 gjaldt bare én vei etter runden. Rettet: «Mangler den
+  ene av sluttkursen og den justerte sluttkursen, brukes ikke den andre i
+  stedet.»
+- BH2 (middels): 400 i konsekvensen i FR-111 var falt ut. Den er tatt inn igjen.
+- BH3 og BH8 (lav): FR-104 sier «Der står også», og FR-401 sier «Unntaket fra
+  sperren».
+- BH4 og BH5 (lav): grunnen er tatt inn igjen i FR-406, FR-101 og FR-407.
+- BH6 (lav): i «Kort fortalt» står nå «lagres, regnes aldri på nytt og
+  etterfylles ikke». Tillegget ba om «regnes aldri på nytt», og «etterfylles
+  ikke» er beholdt.
+- BH7 (lav): ordlyden i FR-203 stemmer med koden, som en agent leste 12.11. Ingen
+  endring.
+- BH9 (lav): åtte klossete setninger er skrevet om.
+- BH10 (lav): `lang="no"` står igjen i parentes i NFR-05.
+
+Ingen funn på middels eller over står åpne (regel 25).
