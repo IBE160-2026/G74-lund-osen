@@ -97,3 +97,7 @@ Kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad): fange
   - `stripa-etter-i-kveld.png`: «nye kurser fra kl. 22 i kveld».
   - `stripa-etter-naa.png`: «nye kurser kan hentes nå».
 - **Bildene i `docs/appen/`** er tatt på nytt og er byte for byte de samme, fordi demoen ikke viser linja. Avtrykkene i `tests/test_docker.py` er regnet ut på nytt.
+
+## Hele settet
+
+I fire deler etter filnavn, én om gangen og bare når ingen annen pytest kjørte, kl. 19:21–19:43 på `66fdfefd`: 1653 + 1784 + 1188 + 800 = 5425, likt `--collect-only`. To tester i `test_docker.py` feilet, fordi avsnittet om stripa sto først under «Når kan jeg hente?», og svaret skal begynne med «Hent etter kl. 22». Avsnittet står nå etter det første, og `test_docker.py`, `test_neste_henting.py` og `test_readme.py` besto (181).
