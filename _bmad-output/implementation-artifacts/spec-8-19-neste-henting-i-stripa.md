@@ -66,3 +66,34 @@ Slått opp i grenen for 8.26 (`origin/8-26-vis-meg-rundt-spiller-av-siden`): `MA
    - **«Signalet forklart» på aksjesiden:** får sin egen tekst. Først appens egne setninger, så KI-teksten om sjekkene, merket «Laget av KI», med tallene med prikket strek sjekket mot det appen regnet ut.
    - **«Hovedindeksen» og «Dag for dag»:** får småtingene.
    - **Boksen «Slik leser du tabellen» og hjelpen:** følger der de sier det samme (regel 19).
+
+## Gjennomgangen 12.11 (Edge Case Hunter)
+
+| Funn | Grad | Hva | Triage |
+|---|---|---|---|
+| ECH1 | middels | En henting med `--uten-tidskontroll` før kl. 22 en børsdag hadde dagens kurs, men stripa regner den som forrige børsdag og sier «kan hentes nå» etter kl. 22, når hentingen ikke har noe å hente | **Åpent, spørsmål 10** |
+| ECH2 | middels | En aksje som ble hentet uten raden for dagen (EODHD sen, eller ingen handel), har et nytt `sist_hentet`, så stripa sier «i morgen» mens hentingen prøver den på nytt samme kveld | **Åpent, spørsmål 10** |
+| ECH3 | lav | Etter kl. 23:50 starter hentingen ikke nye forsøk, og bare hovedindeksen kan mangle | Står: «kan hentes nå» er en kveld som før; spørsmål 10 dekker indeksen |
+| ECH4 | lav | Et tidspunkt uten sone ga en tekst før kl. 22 og ingenting etter | Rettet: `neste_henting_tekst` gir ingenting uten sone, med test |
+| ECH5 | lav | `hentet` som krever en dag i 2025 gir ingen tekst | Står: bare gamle baser og testdata (NFR-08) |
+| ECH6 | lav | Aksjesiden for en aksje som er tatt ut av lista, sier «kan hentes nå» for alltid | Står: med i spørsmål 10 |
+| ECH7 | lav | Hjelpen viste bare timen for grensen | Rettet: `grensen_som_tekst`, brukt av stripa og hjelpen, med test |
+| ECH8 | lav | En demobase uten demomerket viser linja | Står: da er det ikke demoen etter `er_demobase` |
+
+10. **Skal stripa lese den siste kursdagen i basen i stedet for tidspunktet (ECH1, ECH2, ECH6)?** Tidspunktet i «Oppdatert» sier når hentingen gikk, ikke hvilken dag den fikk. Med den siste kursdagen (den eldste blant aksjene i lista, som `sidens_dato`) ville stripa sett det samme som hentingen. Det krever at hver side med «Oppdatert» gir den dagen til rammen, og 8.26 endrer hvilke sider som har «Oppdatert» (`hentet_felles`). *Forslag:* ja, bygget etter at main med 8.26 er flettet inn, sammen med tillegg 2 og 3, og aksjesiden bruker den samme dagen som oversikten. Funnene står åpne til gruppen har svart (regel 25).
+
+## Mutanten
+
+| Fil | Mutanten | Fanget av |
+|---|---|---|
+| `src/boersdag.py` | grenen «før kl. 22 en børsdag gir i dag» tatt bort i `neste_henting` | `test_teksten` (tre tilfeller), `test_klokkeslettet_kommer_fra_tidsgrensen` og `test_den_ekte_versjonen_viser_linja` |
+
+Kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad): fanget, og fila var lik HEAD etterpå.
+
+## Bildene
+
+- **Bildegrenen** `8-19-bilder` (flettes ikke) har stripa før og etter, fra en testbase for den ekte versjonen i en midlertidig mappe, med oppdiktede kurser for én aksje og klokka satt fast:
+  - `stripa-foer.png`: main.
+  - `stripa-etter-i-kveld.png`: «nye kurser fra kl. 22 i kveld».
+  - `stripa-etter-naa.png`: «nye kurser kan hentes nå».
+- **Bildene i `docs/appen/`** er tatt på nytt og er byte for byte de samme, fordi demoen ikke viser linja. Avtrykkene i `tests/test_docker.py` er regnet ut på nytt.

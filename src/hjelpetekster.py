@@ -21,8 +21,7 @@ skjevhet, og retningen forklares med +1 og -1 (FR-704, rettet 13.10).
 
 from dataclasses import dataclass
 
-from boersdag import TIDSGRENSE
-from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING
+from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING, grensen_som_tekst
 from signalberegning import (
     BLANDET,
     INGEN,
@@ -338,11 +337,11 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             ),
         ),
         # Story 8.19 (U60): det som staar bak «Oppdatert …» i den ekte versjonen.
-        # Timen regnes av TIDSGRENSE, som stripa.
+        # Grensen regnes av TIDSGRENSE, som i stripa (grensen_som_tekst).
         "neste_henting": Hjelpetekst(
             "Neste henting:",
-            f"i den ekte versjonen står bak tidspunktet når nye kurser tidligst kan hentes, fra kl. "
-            f"{TIDSGRENSE.hour} en børsdag, men ikke om de blir hentet: det avhenger av at appen eller kveldsjobben kjører. "
+            f"i den ekte versjonen står bak tidspunktet når nye kurser tidligst kan hentes, fra "
+            f"{grensen_som_tekst()} en børsdag, men ikke om de blir hentet: det avhenger av at appen eller kveldsjobben kjører. "
             "Demoen henter ikke og viser det ikke.",
             (
                 (BOERSDAG, "def neste_henting("),

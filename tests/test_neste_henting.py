@@ -81,6 +81,8 @@ class TestTilfellene:
         """Ville feilet hvis «kl. 22» sto fast i koden eller malen."""
         monkeypatch.setattr(boersdag, "TIDSGRENSE", time(21, 30))
         assert neste_henting_tekst(ONSDAG_HENTET, kl(11, 12, 15)) == "nye kurser fra kl. 21.30 i kveld"
+        # Gjennomgangen (ECH7): hjelpen viser grensen på samme måte.
+        assert "fra kl. 21.30 en børsdag" in hjelpetekster()["neste_henting"].tekst
         assert neste_henting_tekst(ONSDAG_HENTET, kl(11, 12, 21, 45)) == "nye kurser kan hentes nå"
 
     def test_hentingen_og_stripa_har_samme_grense(self):
@@ -92,6 +94,13 @@ class TestTilfellene:
         dekker."""
         monkeypatch.setattr(boersdag, "dekker", lambda aar: aar == 2026)
         assert neste_henting_tekst(kl(12, 30, 22, 15), kl(12, 30, 23)) is None
+
+    @pytest.mark.parametrize("hentet", [datetime(2026, 11, 11, 22, 15), "2026-11-11", None])
+    def test_tidspunkt_uten_sone_gir_ingen_tekst(self, hentet):
+        """Gjennomgangen (ECH4): ville feilet hvis et tidspunkt uten sone
+        ga en tekst før kl. 22 og en feil etter."""
+        for naa in (kl(11, 12, 15), kl(11, 12, 23)):
+            assert neste_henting_tekst(hentet, naa) is None
 
     def test_dagen_er_en_dato_eller_none(self):
         assert neste_henting(ONSDAG_HENTET, kl(11, 12, 22, 30)) is None
@@ -142,7 +151,7 @@ class TestHjelpen:
         docs/hjelp.md ikke sa at linja ikke lover en henting, og at demoen
         ikke viser den."""
         tekst = hjelpetekster()["neste_henting"].tekst
-        assert f"fra kl. {TIDSGRENSE.hour} en børsdag" in tekst
+        assert f"fra kl. {TIDSGRENSE.hour} en børsdag" in tekst  # kl. 22, uten minutter
         assert (
             "men ikke om de blir hentet: det avhenger av at appen eller kveldsjobben kjører" in tekst
             and "Demoen henter ikke" in tekst
