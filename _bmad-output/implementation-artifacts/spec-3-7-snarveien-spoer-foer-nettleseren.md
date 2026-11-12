@@ -130,3 +130,9 @@ Ikke rettet, lave:
 
 24. **Spørsmål 17, et svar som ikke er 1, 2 eller 3** (ECH13, lav). *Forslag:* bare 3 og bare Enter huskes som nei. Et annet svar gjelder bare denne gangen, fordi `j` er svaret på de andre spørsmålene i vinduet.
 25. **Spørsmål 8 og 11 etter ECH3, ECH4 og ECH5** (middels). *Forslag:* som bygget. Linja om modellen står bare for siste børsdag, og på forsiden bare når ingen aksje har en rad. Vinduet leser tjenesten og adressen som hentingen leser dem, med miljøet først. Funnene står åpne til gruppen har svart (regel 25).
+
+## Bildene av linja 12.11
+
+Tatt etter tillegg 1 med en testbase uten demomerket og uten rader i KI-loggen (`forsiden_med(None)` i `tests/test_ki_dagen.py`, med `BASE_STI` i en midlertidig mappe), før på `a93c668f` og etter på `d3cbb938`, med waitress på en ledig port og Edge uten vindu, 1280 px. Bildene ligger utenfor repoet. På aksjesiden for EQNR, fredag 30.10, sto før «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» og etter «Ingen KI-tekst for denne dagen. Den lages når kursene hentes, på en maskin med en språkmodell. Slik slår du den på». Under «Børsdagen kort fortalt» sto før «Dagen er uten KI-tekst.» og etter den samme setningen med de samme to setningene og lenken.
+
+26. **Fargen på lenken** (fra bildene, lav). Lenken «Slik slår du den på» står i nettleserens blå med understrek, mens resten av rammen er i blekk. *Forslag:* lenken får fargen til teksten rundt, med understrek, i `stil.css`. Det endrer avtrykkene bak alle bildene i `docs/appen/`, så det bygges etter gruppens svar, med bildene tatt på nytt.
