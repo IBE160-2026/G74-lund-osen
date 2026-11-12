@@ -315,7 +315,7 @@ class TestSvaret1930:
             "«‹skilte_seg_ut› skilte seg ut:",
             "«Det var flere enn vanlig:",
             "«Blant dem var ‹navn›",
-            "«I snitt steg ‹bransje_mest_opp› mest.»",
+            "«I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.»",
             "«I ‹bransje› steg ‹steg›",
         ]
         plasser = [regler.index(m) for m in merker]
