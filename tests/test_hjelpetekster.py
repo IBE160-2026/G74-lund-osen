@@ -374,7 +374,11 @@ class TestSidene:
         # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
         # med «?» ved siden av (BH2, svar 5).
         stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
-        assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        # Story 8.19: linja om neste henting kan staa inne i den samme <span>.
+        assert re.search(
+            r"Oppdatert [^<]+(?:<span class=\"neste-henting\">[^<]*</span>)?</span>\s*" + knapp.format("hjelp-hentet"),
+            stripa,
+        )
         assert "data hentet" not in oversikt
         detalj = _side(klient, "/aksje/BRFE")
         for tekst, vindu in (
@@ -394,7 +398,11 @@ class TestSidene:
         # og hvert vindu har én knapp. Rettet 04.11 (gruppens svar kl. 09:58):
         # vinduene for Ga og Målt mot har én knapp i hvert sjekkort, under.
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
-        assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        # Story 8.19: linja om neste henting kan staa inne i den samme <span>.
+        assert re.search(
+            r"Oppdatert [^<]+(?:<span class=\"neste-henting\">[^<]*</span>)?</span>\s*" + knapp.format("hjelp-hentet"),
+            stripa,
+        )
         # Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): ett «?» per kort,
         # ved navnet, og ingen ved «Ga» eller «Målt mot». Rettet fra svaret
         # 04.11 kl. 09:58, der de sto i alle tre kortene. Ville feilet med et
@@ -439,7 +447,8 @@ class TestSidene:
                 "hjelp-endring": ["endring", "utbyttejustert"],
                 "hjelp-signalstyrke": ["signalstyrke", "uten_styrke", "ikke_raad"],
                 "hjelp-retning": ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"],
-                "hjelp-hentet": ["data_hentet", "uten_data"],
+                # Story 8.19: neste henting.
+                "hjelp-hentet": ["data_hentet", "neste_henting", "uten_data"],
                 # Story 8.17a: periodevalget over søylene og tabellen.
                 "hjelp-perioden": ["perioden_oversikten"],
                 # Story 2.12: «Dine egne aksjer» under tabellen.
@@ -450,7 +459,7 @@ class TestSidene:
             "/aksje/BRFE": {
                 # Story 8.0d, PR 3: «data hentet» står ved «Oppdatert» i stripa,
                 # og endringen er et eget nøkkeltall.
-                "hjelp-hentet": ["data_hentet_aksje"],
+                "hjelp-hentet": ["data_hentet_aksje", "neste_henting"],
                 # U5 (story 2.7b): sluttkursen for dagen siden viser.
                 # Story 8.20a (del E): høyst 60 ord i hvert vindu, med
                 # tekstene fra utkastet i spesifikasjonen for 8.20.

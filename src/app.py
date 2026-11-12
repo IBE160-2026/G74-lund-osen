@@ -122,6 +122,7 @@ from markedsoversikt import (
     eldre_enn_nyeste,
     ingen_skilte_seg_ut,
     med_perioden,
+    neste_henting_tekst,
     neste_orden,
     norsk_tid,
     oppdatert,
@@ -254,6 +255,20 @@ app.jinja_env.filters["soeylestyrke"] = soeylestyrke
 app.jinja_env.globals["soeylegrense"] = tall(GRENSE_STERK, "grense")
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
+
+
+def _neste_henting(tid: datetime) -> str | None:
+    """Story 8.19 (U60): bak «Oppdatert …», naar nye kurser tidligst kan
+    hentes, med klokka sidene bruker. Bare den ekte versjonen viser det
+    (_ramme.html), fordi demoen ikke henter. Et tidspunkt uten sone gir
+    ingenting, som en dag kalenderen ikke dekker."""
+    try:
+        return neste_henting_tekst(tid, naa())
+    except ValueError:
+        return None
+
+
+app.jinja_env.filters["neste_henting"] = _neste_henting
 
 
 def naa() -> datetime:

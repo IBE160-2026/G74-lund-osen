@@ -138,7 +138,8 @@ KVOTE_URL = "https://eodhd.com/api/user"
 # docs/hjelp.md) og klokkeslettene i demoen staar for seg, og testene sier
 # fra naar de ikke foelger med (gjennomgangen 17.10, ECH5). Docstringene
 # her sier kl. 22:00, og ingen test leser dem (gjennomgangen 20.10, BH6).
-TIDSGRENSE = time(22, 0)
+# Story 8.19: konstanten staar i boersdag.py, saa webserveren kan bruke den.
+TIDSGRENSE = boersdag.TIDSGRENSE
 
 
 def _grensen() -> str:

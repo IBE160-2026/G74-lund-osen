@@ -21,6 +21,7 @@ skjevhet, og retningen forklares med +1 og -1 (FR-704, rettet 13.10).
 
 from dataclasses import dataclass
 
+from boersdag import TIDSGRENSE
 from markedsoversikt import RETNINGSVISNING, UKJENT_RETNING
 from signalberegning import (
     BLANDET,
@@ -41,6 +42,8 @@ SIGNALBEREGNING = "src/signalberegning.py"
 MARKEDSOVERSIKT = "src/markedsoversikt.py"
 AKSJEDETALJ = "src/aksjedetalj.py"
 APP = "src/app.py"
+# Story 8.19: neste henting i stripa.
+BOERSDAG = "src/boersdag.py"
 INDEX_MAL = "src/templates/index.html"
 # Story 8.6: hovedindeksen og søylene står i en delmal, som oversikten og
 # børsometeret bruker.
@@ -332,6 +335,19 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
                 (PRD, "##### Hvor gamle dataene er"),
                 (MARKEDSOVERSIKT, "def sidens_tidsstempel("),
                 (MARKEDSOVERSIKT, "def eldre_enn_nyeste("),
+            ),
+        ),
+        # Story 8.19 (U60): det som staar bak «Oppdatert …» i den ekte versjonen.
+        # Timen regnes av TIDSGRENSE, som stripa.
+        "neste_henting": Hjelpetekst(
+            "Neste henting:",
+            f"i den ekte versjonen står bak tidspunktet når nye kurser tidligst kan hentes, fra kl. "
+            f"{TIDSGRENSE.hour} en børsdag, men ikke om de blir hentet: det avhenger av at appen eller kveldsjobben kjører. "
+            "Demoen henter ikke og viser det ikke.",
+            (
+                (BOERSDAG, "def neste_henting("),
+                (MARKEDSOVERSIKT, "def neste_henting_tekst("),
+                (APP, "def _neste_henting("),
             ),
         ),
         "data_hentet_aksje": Hjelpetekst(

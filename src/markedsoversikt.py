@@ -670,3 +670,27 @@ def oppdatert(tid: datetime, i_aar: int) -> str:
     Norge, og ukedagen sier fredag.
     """
     return f"{ukedag(tid.astimezone(NORSK_TID).date())} {norsk_tid(tid, i_aar)}"
+
+
+def neste_henting_tekst(hentet: datetime, naa: datetime) -> str | None:
+    """Story 8.19 (U60): det som staar bak «Oppdatert …» i den ekte
+    versjonen, naar nye kurser tidligst kan hentes. «i kveld» og «i morgen»
+    naar dagen er i dag eller i morgen, ukedagen innen en uke, og ellers
+    ukedagen og datoen. None naar kalenderen ikke dekker dagen (NFR-08)."""
+    try:
+        dag = boersdag.neste_henting(hentet, naa)
+    except UtenforKalenderen:
+        return None
+    if dag is None:
+        return "nye kurser kan hentes nå"
+    grense = boersdag.TIDSGRENSE
+    kl = f"kl. {grense.hour}" if not grense.minute else f"kl. {grense:%H.%M}"
+    idag = boersdag.norsk_dato(naa)
+    dager = (dag - idag).days
+    if dager == 0:
+        return f"nye kurser fra {kl} i kveld"
+    if dager == 1:
+        return f"nye kurser fra {kl} i morgen"
+    if dager < 7:
+        return f"nye kurser fra {ukedag(dag)} {kl}"
+    return f"nye kurser fra {ukedag(dag)} {dato(dag, idag.year)} {kl}"
