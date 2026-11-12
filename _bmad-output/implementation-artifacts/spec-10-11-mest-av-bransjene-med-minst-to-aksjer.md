@@ -109,3 +109,7 @@ Tre lesere i parallell, uten å kjøre pytest eller endre noe. Blind Hunter lest
 | ECH6 | lav | En lengre fast frase kan gjøre at Gemma bommer oftere | Står: måles i kveldshentingen etter flettingen |
 
 Ingen funn står åpent på middels eller over.
+
+## Hele settet
+
+I fire deler etter filnavn, én om gangen og bare når ingen annen pytest kjørte, kl. 18:11–18:34 på `eec91492`: 1653 (1630 bestått og 23 hoppet over) + 1784 (1783 og 1) + 1186 + 800 = 5423, likt `--collect-only`. ruff og testene for dokumentene besto.
