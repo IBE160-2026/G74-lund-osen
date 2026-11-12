@@ -4991,3 +4991,5 @@ Som **gruppe**, vil vi at én test går gjennom alt appen viser etter ordene i r
 - **Ville feilet hvis:** et ord fra rådlista sto i noe appen viser utenfor en nektende setning eller notatene om tenkte kjøp og salg, eller testen ikke leste alle malene
 
 **Avhenger av:** ingen. Flettes etter 9.11. **Én økt:** ja.
+
+*Avgjort 2026-11-12 kl. 20:44 (gruppens svar):* forslagene i spesifikasjonen for 9.12 godtas som bygget, og 9.12 flettes uten nytt stopp, sist av alle, etter bildene av appen i README-en (3.3k). Rådet anbefalte det. Svaret er ført etter tillegg 7 til 9.11 kl. 20:52 i `docs/ai-prompts/2026-11-12.md`.

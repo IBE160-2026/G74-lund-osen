@@ -47,6 +47,11 @@ og 20:06. Rådet anbefalte 9.12. Worktreen `G74-lund-osen-9-12`, grenen
    endringsloggen, og NFR-06 sier at testen finnes.
 8. **Flettingen.** *Forslag:* etter 9.11, når gruppen har sagt ja (tillegg 2).
 
+*Svar 2026-11-12 kl. 20:44 (gruppens svar):* forslagene i spørsmål 1–8 godtas som
+bygget. 9.12 flettes uten nytt stopp, sist av alle, etter bildene av appen i
+README-en (3.3k). Rådet anbefalte det. Svaret er ført etter tillegg 7 til 9.11,
+limt inn kl. 20:52, som føres i `docs/ai-prompts/2026-11-12.md`.
+
 ## Delene
 
 ### A) Testen
