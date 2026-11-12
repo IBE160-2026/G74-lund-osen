@@ -4708,6 +4708,8 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 
 *Avgjort 2026-11-11 mellom kl. 21:41 og 21:43 (gruppens svar i økta):* storyen står under «Ekstra, hvis tiden rekker» bare her, ikke i README-en, etter svaret kl. 16:26, og føres under «Ekstra, ferdig» der når den er flettet. Rådet anbefalte det.
 
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 3):* alle 14 spørsmålene i spesifikasjonen godtas som bygget, også innholdet i en `<template>` på hver side (spørsmål 11) og knappene for et tenkt kjøp og salg i panelet på alle sidene (spørsmål 14). PR #147 flettes etter 8.26, som flettes 12.11 kl. 23:50–23:58, med steget fra svaret kl. 22:20 bygget etter forslaget i spørsmål 13, uten at gruppen ser på den igjen. Rådet anbefalte det.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

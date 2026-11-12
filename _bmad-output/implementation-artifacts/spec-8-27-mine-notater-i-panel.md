@@ -50,6 +50,8 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 
 Hvert spørsmål har et forslag. Forslaget er det som er bygget.
 
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 3):* alle 14 godtas som bygget. Steget i spørsmål 13 bygges etter forslaget når 8.26 er flettet, og PR #147 flettes etter 8.26. Rådet anbefalte det.
+
 1. **Hjelpen og panelet samtidig.** *Forslag:* mens panelet er åpent, åpnes hjelpen ved «?» over panelet, på samme side, og knappen «Flytt» i hjelpen er borte. Siden gir da plass til ett felt, ikke to, så den ikke blir smal ved 1280 px. Når hjelpen lukkes, står panelet der igjen.
 2. **Knappene ved notatene i panelet.** *Forslag:* de samme som i Min liste, «Noter et tenkt kjøp», «Noter et tenkt salg» og «Slett», med de samme reglene, og svaret går tilbake til siden man står på, med panelet åpent.
 3. **Dagen for et notat fra panelet utenfor aksjesiden.** *Forslag:* siste dag med kurs for aksjen man velger, som aksjesiden viser uten «Vis dagen». Skjemaet sier det.
@@ -128,8 +130,8 @@ Blind Hunter fikk bare diffen for `src/` og `tests/` (`db89c5ba..ad144136`, med 
 - Etter pausen kl. 23:50 (ikke fra gjennomgangen): `test_to_av_tre_er_en_hvit_pille_og_en_av_tre_er_tekst` i `tests/test_utseende.py` leste hele oversikten og fant «1 av 3» som pille i panelets `<template>`. Testen gjelder tabellen og leser nå siden uten panelet, som VG1. *Åpent punkt (lav):* notatene viser styrken som pille også ved 1 og 0 av 3, som i Min liste siden 8.21, mens tabellen har dem uten pille (gruppen 14.10 kl. 19:59). Panelet viser det nå på alle sidene. Det er ikke endret her.
 - Hele settet kl. 23:55–00:13: fire eldre tester leste hele siden og fant innholdet i panelet, som VG1: `test_gult_en_dag_uten_vurdering` og `test_ingen_raad_og_ingen_ki` i `tests/test_boersometer.py`, `test_hvert_vindu_har_bare_sine_tekster` i `tests/test_hjelpetekster.py` og `test_bransjen_er_fast` i `tests/test_valg.py`. De tar ut panelet. Den andre gjelder NFR-06, og står som spørsmål 14.
 
-**Står åpent** til gruppen svarer (regel 25):
-- BH15 og ECH2 (middels): hver side leser alle notatene til panelet, også når det aldri åpnes. Det følger av forslaget i spørsmål 11. Graden er ikke satt ned.
+**Lukket med svaret** 12.11 kl. 10:16 (regel 25):
+- BH15 og ECH2 (middels): hver side leser alle notatene til panelet, også når det aldri åpnes. Det følger av forslaget i spørsmål 11, som gruppen godtok som bygget. Graden ble ikke satt ned; funnet er lukket av svaret.
 
 **Ikke rettet, med grunn:**
 - BH3: `tilbake` godtas fra alle skjemaene for notatene, men bare som en sti i appen. Rutene sjekker Origin (`_samme_side`), som de andre skjemaene.
