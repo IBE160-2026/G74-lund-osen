@@ -101,3 +101,9 @@ ble lagt tilbake, og git-hashen og sha256 etter samme linjeskift var like HEAD.
   det er ikke nytt i 8.28.
 
 Ingen funn på middels eller over.
+
+**Hele settet** i tre deler, aldri samtidig med en annen pytest: 1 919 bestått og
+23 hoppet over, 2 152 bestått og 1 hoppet over, og 1 316 bestått og 1 feilet.
+Testen som feilet, var `test_hver_lenke_gaar_til_en_side_som_finnes`, som ikke
+kjente adressen til den nye lista. Den er utvidet, og del 3 ga etterpå 1 317
+bestått. Summen er 5 412, lik `--collect-only`. Ruff er grønn.
