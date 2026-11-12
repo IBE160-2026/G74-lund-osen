@@ -3315,7 +3315,7 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 
 *Rettet 2026-11-11 (story 10.10, gruppens svar 10.11 kl. 16:18 og 11.11 kl. 17:21 og 19:30):* grunnlaget for teksten om dagen har nå også navnene på dem som skilte seg ut (høyst fem, med styrke og retning), bransjen som steg og falt mest i snitt (bare navnet, ingen prosent), antallet mot snittet for de siste 20 børsdagene og retningen på hovedindeksen de siste fem børsdagene. Når bransjen som steg eller falt mest kan stå, står ikke formen med antallet som steg i én bransje. Rekkefølgen i teksten er fast. Uka er med som retning, ikke som antall. Se story 10.10.
 
-*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* bransjen som steg eller falt mest i snitt regnes bare av bransjene med minst to aksjer med en endring, og teksten sier det: «I snitt falt ‹bransje› mest av bransjene med minst to aksjer.» Se story 10.11.
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* bransjen som steg eller falt mest i snitt regnes bare av bransjene med minst to aksjer med en endring, og teksten sier det: «I snitt falt ‹bransje_mest_ned› mest av bransjene med minst to aksjer.» Se story 10.11.
 
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 

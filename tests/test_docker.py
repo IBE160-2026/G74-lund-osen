@@ -1341,8 +1341,9 @@ HOEYDE_PAA_BILDET = 1864
 # og bildene med knappen er tatt paa nytt.
 # Gjennomgangen av «Følg en aksje» i 8.25: _ramme.html. Bildene er byte for byte de samme.
 # Story 10.11: «mest av bransjene med minst to aksjer» (ki_dagen.py, hjelpetekster.py og
-# demo_ki_dagen.json fra Gemma). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt; bare
-# oversikten ved 390 px er ny, med samme hoeyde.
+# demo_ki_dagen.json fra Gemma). Avtrykkene er regnet ut paa nytt, fordi hjelpetekster.py er med bak alle
+# bildene, og alle bildene er tatt paa nytt. Bare oversikten ved 390 px er ny, med samme hoeyde; de andre er
+# byte for byte de samme (gjennomgangen, BH7).
 AVTRYKK_BAK_BILDET = "7f55cd94f6587a6a1c7d18e72d5e62aeb04181e0ce6bd5e7a15228a4252f7d50"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
@@ -2020,8 +2021,9 @@ DE_NYE_BILDENE = {
 # tilbudet om omvisningen besvart, som i 8.25. Aksjesiden og oversikten ved 390 px (4810 px) har Gemma-teksten.
 # Story 10.10, svaret kl. 19:30: ki_dagen.py, ki_eksempel.py og teksten om dagen. Bildene er tatt paa nytt;
 # bare oversikten ved 390 px er ny, med samme hoeyde.
-# Story 10.11: avtrykkene er regnet ut paa nytt (hjelpetekster.py og demo_ki_dagen.json). Bare
-# oversikten ved 390 px er ny; notatene-brfe-390-demo.png er som paa main, som i 10.10.
+# Story 10.11: avtrykkene er regnet ut paa nytt (hjelpetekster.py og demo_ki_dagen.json). Alle bildene er
+# tatt paa nytt, og bare oversikten ved 390 px er ny. notatene-brfe-390-demo.png er som paa main, fordi
+# den klippes ut med en fremgangsmaate dette vinduet ikke har, som i 10.10; den viser ikke teksten om dagen.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     "docs/appen/folg-en-aksje-demo.png": "56a3fae29b381198ceecb739ceb7db61140c3d4cba67332e789c9f63866d7f50",
     TOPPEN_AV_OVERSIKTEN: "7f55cd94f6587a6a1c7d18e72d5e62aeb04181e0ce6bd5e7a15228a4252f7d50",

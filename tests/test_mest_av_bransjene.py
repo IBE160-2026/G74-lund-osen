@@ -19,7 +19,7 @@ from ki_eksempel import EksempelModell, tekst_om_dagen
 from ki_visning import bygg_dagsvisning
 from kilogg import Emne, KIRad
 from kursdata import Aksje
-from test_ki_dagen import AVTRYKK, FREDAG
+from test_ki_dagen import AVTRYKK, FREDAG, promptens_avtrykk
 from test_rikere_ki_tekster import LISTA, SERIER, VURDERINGER, grunnlaget, to_dager, vurdering
 
 ROT = Path(__file__).resolve().parents[1]
@@ -34,13 +34,17 @@ class TestFormene:
         assert MINST_I_BRANSJEN == 2 and AV_BRANSJENE == "av bransjene med minst to aksjer"
         assert f"mest {AV_BRANSJENE}.»" in REGLER_DAGEN
         assert REGLER_DAGEN.count(f"mest {AV_BRANSJENE}.»") == 2
+        # Gjennomgangen (VG3): forklaringen av feltene sier det samme.
+        assert f"bransje_mest_ned: {AV_BRANSJENE}, bransjen" in REGLER_DAGEN
+        assert "{av_bransjene}" not in REGLER_DAGEN
         assert "«I snitt steg ‹bransje_mest_opp› mest.»" not in lag_dagsprompt(grunnlaget())
 
     def test_versjonen_er_dag_3(self):
         """FR-605: ville feilet hvis de nye formene fikk samme versjon som
         tekstene kveldshentingen alt kan ha skrevet med dag-2."""
         assert DAGSPROMPTVERSJON == "dag-3"
-        assert AVTRYKK["dag-3"] != AVTRYKK["dag-2"]
+        # Gjennomgangen (BH4, VG5): avtrykket av prompten slik den er, ikke bare konstantene.
+        assert promptens_avtrykk() == AVTRYKK["dag-3"] != AVTRYKK["dag-2"]
 
     def test_de_nye_formene_bestaar(self):
         """Ville feilet hvis kontrollen stoppet formene prompten gir, alene,
@@ -124,8 +128,10 @@ class TestEnAksjeBlirAldriMest:
 
     @pytest.mark.parametrize(("verb", "bransje"), [("falt", "industri"), ("steg", "telekom"), ("falt", "konsum")])
     def test_kontrollen_stopper_en_bransje_med_en_aksje(self, verb, bransje):
-        """Ville feilet hvis teksten kunne si at en bransje med én aksje med
-        en endring steg eller falt mest."""
+        """Ville feilet hvis kontrollen godtok navnet på en bransje med én
+        aksje i formen. Den stoppes fordi grunnlaget har en annen bransje
+        (gjennomgangen, BH3 og VG6); at den aldri kommer i grunnlaget, sier
+        testen over."""
         svar = kontroller_dagen(f"I snitt {verb} {bransje} mest {AV_BRANSJENE}.", self.grunnlaget())
         assert not svar.besto
 
@@ -138,7 +144,8 @@ class TestTekstene:
         rad = lag_dagsrad(Emne.dagen(FREDAG), naa, EksempelModell())
         felt = {f: getattr(rad, f) for f in rad.__dataclass_fields__}
         gammel = KIRad(**{**felt, "grunnlag": naa, "promptversjon": "dag-2", "tekst": "I snitt falt finans mest."})
-        assert bygg_dagsvisning(gammel, naa).vist
+        # Gjennomgangen (BH5): det er dag-2-teksten som vises.
+        assert bygg_dagsvisning(gammel, naa).tekst == "I snitt falt finans mest."
 
     def test_demoteksten_har_de_nye_formene(self):
         """Ville feilet hvis demoteksten om dagen var laget med en gammel
@@ -151,6 +158,9 @@ class TestTekstene:
     def test_hjelpen_sier_grensen(self):
         """Regel 19: ville feilet hvis hjelpen på siden eller docs/hjelp.md
         ikke sa at «mest» bare gjelder bransjene med minst to aksjer."""
-        assert "minst to aksjer" in hjelpetekster()["boersdagen_kort_fortalt"].tekst
+        # Gjennomgangen (BH1, ECH2, VG1): «minst to aksjer» sto der fra før, saa testen ser etter «av dem».
+        assert "minst to aksjer med en endring, og av dem bransjen som steg mest" in (
+            hjelpetekster()["boersdagen_kort_fortalt"].tekst
+        )
         hjelp = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "Bransjen som steg eller falt mest regnes bare av bransjene med minst to aksjer med en endring" in hjelp

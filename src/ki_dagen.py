@@ -86,7 +86,7 @@ Opplysningene under er regnet ut av appen for én børsdag og for aksjene i list
 - skilte_seg_ut_navn: navnene på aksjene som skilte seg ut, høyst fem, med styrken (3 eller 2 av 3) og retningen for hver. De med 3 av 3 står først. Feltet kan mangle.
 - skilte_seg_ut_andre: hvor mange flere som skilte seg ut, utenom navnene. Feltet kan mangle.
 - bransjer: for hver bransje, steg er hvor mange aksjer som steg, og med_endring hvor mange som hadde en endring den dagen. Feltet kan mangle.
-- bransje_mest_opp og bransje_mest_ned: av bransjene med minst to aksjer, bransjen der aksjene i snitt steg mest, og bransjen der de i snitt falt mest, regnet ut av appen. Feltene kan mangle.
+- bransje_mest_opp og bransje_mest_ned: {av_bransjene}, bransjen der aksjene i snitt steg mest, og bransjen der de i snitt falt mest, regnet ut av appen. Feltene kan mangle.
 - skilte_seg_ut_vanlig og skilte_seg_ut_mot_vanlig: snittet av hvor mange som skilte seg ut de siste 20 børsdagene, som et helt tall, og om det var flere, færre eller like mange denne dagen. Feltene kan mangle.
 - hovedindeksen_uka: om hovedindeksen steg, falt eller var uendret de siste fem børsdagene. Feltet kan mangle.
 
@@ -98,7 +98,7 @@ Regler for teksten:
   - «‹skilte_seg_ut› skilte seg ut: ‹skilte_seg_ut_positiv› med positiv retning, ‹skilte_seg_ut_negativ› negativ og ‹skilte_seg_ut_blandet› blandet.» Ta bare med retningene som har minst én aksje. Er skilte_seg_ut 0, skriver du «Ingen aksjer skilte seg ut.»
   - «Det var flere enn vanlig: snittet de siste 20 børsdagene er ‹skilte_seg_ut_vanlig›.», med «flere enn», «færre enn» eller «like mange som» etter feltet skilte_seg_ut_mot_vanlig.
   - Om navnene skriver du formen for navnene denne dagen, som står under opplysningene, ordrett og som én setning, når den står der. Den har formen «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹skilte_seg_ut_andre› andre.»
-  - «I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.» og «I snitt falt ‹bransje_mest_ned› mest av bransjene med minst to aksjer.», med navnet på bransjen med små bokstaver.
+  - «I snitt steg ‹bransje_mest_opp› mest {av_bransjene}.» og «I snitt falt ‹bransje_mest_ned› mest {av_bransjene}.», med navnet på bransjen med små bokstaver.
 {bransjeformen}- Mangler et felt, skriver du ikke setningen for det.
 - Skriv tallene som i opplysningene. Ikke nevn andre tall, prosenter, kurser eller beløp.
 - Ikke si noe om hovedindeksen, bransjene, retningene eller hvor mange som steg eller falt utenom formene.
@@ -108,6 +108,9 @@ Regler for teksten:
 - Ikke finn mønstre selv, og ikke sammenlign aksjene eller bransjene med hverandre utover formene.
 - Skriv aldri navnet på et felt eller tegnene ‹ › i teksten.
 """
+# Gjennomgangen av 10.11 (BH2, ECH1, VG2): prompten faar AV_BRANSJENE herfra,
+# saa prompten, kontrollen og eksempelskriveren sier det samme om grensen.
+REGLER_DAGEN = REGLER_DAGEN.replace("{av_bransjene}", AV_BRANSJENE)
 
 
 # Story 10.10: Gemma satte punktum foer «og 2 andre» (11.11), saa appen gir
