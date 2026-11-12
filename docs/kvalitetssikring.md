@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-13T00:22
+updated: 2026-11-13T00:38
 ---
 
 # Kvalitetssikring
@@ -1178,6 +1178,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 *Lagt til 2026-10-16:* raden «KI-forklaringen» sier «KI-laget er ikke bygget». Det stemte 13.10, men nå finnes testene for kontrollen, loggen og visningen. Kontrollen i FR-603 (story 10.2a, PR #48, `77ebf31`): `tests/test_ki_modell.py`, med `TestKontrollen` og `TestRaden`. Loggen i FR-604 (story 4.2 og 4.3): `tests/test_kilogg.py`, der kontrakttestene kjøres mot både minnet og SQLite, og `tests/test_kilogg_sqlite.py`. Visningen (story 10.3, PR #50 og #51): `tests/test_ki_visning.py`, med `TestSiden::test_vakten_paa_siden` og `TestGrunnenPaaSiden`. Talt 16.10: 207 tester i `test_ki_modell.py`, 106 i `test_kilogg.py`, 49 i `test_kilogg_sqlite.py` og 67 i `test_ki_visning.py`. Teksten lages ennå ikke i hentingen (story 10.2b, PR #49, ikke flettet), så ingen KI-tekst er laget med ekte data. Én ukes logget drift begynner når PR #49 er flettet, og målingen av bidraget er story 10.4.
 
 *Lagt til 2026-10-23 kl. 14:51:* raden «Brukerutfall»: opplegget for brukertesten står i `spec-8-1-brukertesten.md`, og skjemaet er `docs/brukertest.md`. Testen tas neste uke, med story 10.4 rett etter, med samme person og samme aksje (gruppens svar 23.10 kl. 12:29). Kriteriet er ikke målt ennå.
+
+*Lagt til 2026-11-13 (tillegg 24, story 10.4):* raden «KI-forklaringen»: én ukes drift er logget. KI-loggen har 19 kvelder, alle børsdagene fra 19.10 til 12.11, telt fra `ki_logg` med `mode=ro` og samme sha256 før og etter. 294 tekster om aksjene ble laget, 288 besto kontrollen i FR-603 og 6 ble stoppet (3 kvelden 11.11 med versjon 5 og 3 kvelden 12.11 med versjon 6), med versjon 2 av instruksjonen 19.10–23.10, versjon 3 26.10–06.11, versjon 5 09.11–11.11 og versjon 6 12.11. De 4 tekstene om dagen (09.11–12.11, `dag-1` og `dag-2`) besto. Tallene for hver kveld står under del B i `docs/brukertest.md`.
 
 ## 11. Feil vi fant og rettet
 
