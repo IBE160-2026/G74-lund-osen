@@ -25,6 +25,8 @@ Skrevet 12.11 etter instruksjonen «Ny liten story etter 3.6: snarveien spør f�
 
 *Tillegg 4 (limt inn 12.11 kl. 17:02), en rettelse fra rådet:* svaret 11.11 kl. 22:07 hadde én del til, som instruksjonen ikke tok med: får vinduet ikke svar på spørsmålet om snarveien innen 30 sekunder, lages ingen snarvei, og den tilbys igjen neste gang.
 
+*Svar 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag godtas som bygget, også spørsmål 26, så lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. PR-en flettes i natt etter 8.27. Rådet anbefalte det.
+
 ## Spørsmål til gruppen
 
 Forslaget er det som bygges (regel 3).
@@ -69,6 +71,7 @@ Forslaget er det som bygges (regel 3).
 18. **Variablene for testene og CI.** *Forslag:* `OSE_START_SVAR_KI` (1, 2 eller 3), `OSE_START_SVAR_KI_TJENESTE` (g, a eller o) og `OSE_START_SVAR_KI_NOEKKEL` (bare testene, med falske nøkler), og `OSE_START_OLLAMA_URL` og `OSE_START_OLLAMA_VENT` (adressen og ventetiden i testene). `OSE_START_SVAR_JA=1` gir verken spørsmål eller endring i `.env`, og CI laster aldri ned Ollama eller modellen.
 19. **Mac (`start.sh`).** *Forslag:* ikke i denne storyen. En senere story kan stille samme spørsmål i `start.sh`, med `brew install ollama` når Homebrew finnes, ellers https://ollama.com/download, og samme valg for egen nøkkel. Til da har en ny `.env` på Mac `lokal`, og hentingen sier fra når Ollama mangler.
 20. **Svar 1 i planen for KI-laget (15.10).** Der står «Ingenting installeres på Windows» om kveldshentingen på gruppens PC. Tillegg 2 installerer Ollama på brukerens maskin etter et ja. *Forslag:* svar 1 gjelder fortsatt kveldsjobben, som bruker Ollama i Docker, og får en datert linje om det når gruppen har svart.
+    *Svar 12.11 kl. 19:06:* som bygget. Linja står under svar 1 i `epics.md`.
 21. **README-en.** *Forslag:* innenfor reglene fra 3.5i (fem avsnitt og høyst 25 ord per steg) får linja om den ekte versjonen to setninger: at den første gang tilbyr å hente Gemma, en gratis lokal modell for KI-teksten, eller å bruke egen API-nøkkel, og at appen virker uten KI-tekst. Minnet står som det er målt: modellen er prøvd på en maskin med 15,7 GB minne (`malinger.md` §19). Raden «KI-tekst» i tabellen «Demoen og den ekte versjonen» kommer med 8.26 og følger når main med 8.26 er flettet inn.
 
 ### Tillegg 4: fristen på 30 sekunder
@@ -113,6 +116,8 @@ Blind Hunter (bare diffen), Edge Case Hunter og Verification Gap (grenen, bare l
 - **BH18, VG9–VG12, VG14 og VG15:** `"$valg"` før `.Trim()`, fristen på 30 sekunder, modellen og adressen mot `ki_lokal.py`, stedene vinduet viser til, `OSE_START_SVAR_JA=1` alene, framdrift på stderr fra den falske `ollama`, og én linje fra hentingen er prøvd.
 - **Testene:** `ProgramFiles` og `LOCALAPPDATA` peker til midlertidige mapper, og `OSE_KI_TJENESTE` fra `conftest.py` tas bort, så ingen ekte Ollama på PC-en finnes eller startes av testene.
 
+*Lukket 2026-11-12 (gruppens svar kl. 19:06, tillegg 5):* ECH3, ECH4 og ECH5 (middels, spørsmål 25) og ECH13 (lav, spørsmål 24) er lukket som bygget. Ingen funn på middels eller over står åpne.
+
 Ikke rettet, lave:
 
 - **BH5:** et svar som er skrevet uten Enter når fristen går ut, forkastes. Fristen er for hele svaret.
@@ -129,10 +134,13 @@ Ikke rettet, lave:
 ## Spørsmål til gruppen etter gjennomgangen
 
 24. **Spørsmål 17, et svar som ikke er 1, 2 eller 3** (ECH13, lav). *Forslag:* bare 3 og bare Enter huskes som nei. Et annet svar gjelder bare denne gangen, fordi `j` er svaret på de andre spørsmålene i vinduet.
+    *Svar 12.11 kl. 19:06:* som bygget. ECH13 er lukket.
 25. **Spørsmål 8 og 11 etter ECH3, ECH4 og ECH5** (middels). *Forslag:* som bygget. Linja om modellen står bare for siste børsdag, og på forsiden bare når ingen aksje har en rad. Vinduet leser tjenesten og adressen som hentingen leser dem, med miljøet først. Funnene står åpne til gruppen har svart (regel 25).
+    *Svar 12.11 kl. 19:06:* som bygget. ECH3, ECH4 og ECH5 er lukket.
 
 ## Bildene av linja 12.11
 
 Tatt etter tillegg 1 med en testbase uten demomerket og uten rader i KI-loggen (`forsiden_med(None)` i `tests/test_ki_dagen.py`, med `BASE_STI` i en midlertidig mappe), før på `a93c668f` og etter på `d3cbb938`, med waitress på en ledig port og Edge uten vindu, 1280 px. Bildene ligger utenfor repoet. På aksjesiden for EQNR, fredag 30.10, sto før «Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.» og etter «Ingen KI-tekst for denne dagen. Den lages når kursene hentes, på en maskin med en språkmodell. Slik slår du den på». Under «Børsdagen kort fortalt» sto før «Dagen er uten KI-tekst.» og etter den samme setningen med de samme to setningene og lenken.
 
 26. **Fargen på lenken** (fra bildene, lav). Lenken «Slik slår du den på» står i nettleserens blå med understrek, mens resten av rammen er i blekk. *Forslag:* lenken får fargen til teksten rundt, med understrek, i `stil.css`. Det endrer avtrykkene bak alle bildene i `docs/appen/`, så det bygges etter gruppens svar, med bildene tatt på nytt.
+    *Svar 12.11 kl. 19:06:* ja. Det bygges når main med 8.27 er flettet inn i grenen.

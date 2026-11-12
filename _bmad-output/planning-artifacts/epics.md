@@ -2749,6 +2749,8 @@ Spesifikasjonen er `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 
 *Avgjort 2026-11-12 kl. 16:46 (gruppens svar, tillegg 3):* spørsmålet tilbyr også egen API-nøkkel til Gemini, Anthropic eller OpenAI. Rådet anbefalte det.
 
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag i spesifikasjonen godtas som bygget, også spørsmål 26: lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. Funnene som sto åpne til svaret (ECH3, ECH4, ECH5 og ECH13), er lukket. PR #148 flettes etter 8.27. Rådet anbefalte det.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -2968,6 +2970,7 @@ på papir.
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger:
 1. Kveldshentingen går på PC-en den går på i dag (15,7 GB og RTX 4070), med Ollama i Docker som i `malinger.md` §19, alltid med grafikkort. Ingenting installeres på Windows.
+   *Presisert 2026-11-12 (story 3.7, spørsmål 20, gruppens svar 12.11 kl. 19:06):* svar 1 gjelder fortsatt kveldsjobben, som bruker Ollama i Docker. Startskriptet i 3.7 kan installere Ollama på brukerens egen maskin, bare etter et ja (tillegg 2). Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 2. Raden står når den finnes, også når modellen feilet (FR-604).
 3. Kjøres hentingen på nytt samme dag og vurderingen endrer seg, vises dagen uten KI-tekst (FR-602).
 4. Bryteren huskes i en informasjonskapsel nå. 8.10b flytter bryteren til innstillingene og bruker samme kapsel.
