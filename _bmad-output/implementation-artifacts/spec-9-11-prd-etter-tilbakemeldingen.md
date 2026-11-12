@@ -94,6 +94,33 @@ funnene i §5 og de to refleksjonsspørsmålene i §7.
     historikken står i endringsloggen og taggen. *Forslag:* som skrevet.
 13. **Flettingen.** *Forslag:* tidligst etter 8.26 i natt, med main flettet inn i
     grenen først, og hele settet på nytt etter det.
+14. **Min liste har ikke eget FR** (BH5). Den er kjerne og står i ordlista, men
+    har ingen kravtekst med konsekvenser. *Forslag:* et nytt FR, FR-111, i en
+    egen story, fordi et nytt krav er en avgjørelse og ikke en omskriving.
+15. **«De 15 mest omsatte» er borte uten en beslutning** (VG-B4). Taggen hadde den
+    som ferdig liste i FR-412; koden har bare §3-lista og bransjelistene, og jeg
+    fant ingen datert linje som tok den ut. *Forslag:* teksten følger koden, og
+    gruppen avgjør om lista skal bygges eller strykes.
+16. **Status for 3.4 i sprintstatusen** (VG12, regel 12). Tabellen i §2 sier
+    «ja» for FR-411, fordi demoen er flettet, men `sprint-status.yaml` har
+    `3-4-demoversjonen: review`. *Forslag:* 3.4 settes til `done` i en egen
+    commit utenfor 9.11, eller tabellen sier «delvis».
+17. **Pekere i koden til §8 og en Rettet-linje i prd.md** (ECH4). `src/app.py`,
+    `aksje_uten_kurser.html`, `tilstand.py`, `vurderingsdata.py`, `boersdag.py`
+    og `meldinger.py` viser til tekst som nå står i endringsloggen. `src/` er
+    ikke endret, fordi `app.py` og malene står bak avtrykkene til bildene.
+    *Forslag:* pekerne rettes neste gang filene endres av en annen grunn.
+18. **Taggene i CI** (BH27). Testen som sjekker endringsloggen ordrett mot taggen,
+    hoppes over i CI, fordi checkout ikke henter taggene. *Forslag:* `fetch-tags`
+    i `tester.yml` i en egen story; lokalt kjører den.
+19. **Overskrifter som sier mindre enn kravet** (BH10–BH12): «aksjedetaljen» i
+    overskriftene, «De tre tilstandene» med fem i tabellen, og «Visningen når
+    KI-laget er av» som også dekker på. *Forslag:* de står, fordi
+    hjelpetekstene og eldre filer viser til overskriftene; ordlista forklarer
+    «aksjedetaljen».
+20. **SM-2 «fra første fungerende versjon»** (BH17). Bruken er ført fra 4.11.
+    *Forslag:* terskelen står, fordi den er et suksessmål og en avgjørelse;
+    statusen sier at brukslogga har én linje 12.11.
 
 ## Delene
 
@@ -142,8 +169,9 @@ Målt med `wc -l -w -c`:
 | Fil | Linjer | Ord | Byte |
 |---|---:|---:|---:|
 | `prd.md` i taggen | 2 264 | 28 752 | 185 850 |
-| `prd.md` etter | 1 631 | 13 310 | 83 943 |
-| `prd-endringslogg.md` | 1 611 | 20 132 | 129 621 |
+| `prd.md` etter, før gjennomgangen | 1 631 | 13 310 | 83 943 |
+| `prd.md` etter triagen | 1 672 | 13 777 | 86 612 |
+| `prd-endringslogg.md` etter triagen | 1 616 | 20 154 | 131 383 |
 
 ## Stikkord til refleksjonsrapporten (§7 i tilbakemeldingen)
 
@@ -177,3 +205,85 @@ riktige tall, og kan det skrives som en testbar konsekvens?**
 - `malinger.md` §19 har tekstene fra prøven som viste feil tall skrevet med ord.
 
 ## Bygget 12.11
+
+Commitene `409f81f0` (spesifikasjonen og storyen), `1ecd7213` (omskrivingen) og
+`d38e1101` (CLAUDE.md), og rettingene etter gjennomgangen i commiten etter dem.
+
+## Mutanten
+
+Én mutant: «*Konsekvenser:*» ble fjernet fra FR-108 i en kopi av `prd.md` på HEAD
+`d38e1101`. `test_hvert_krav_har_konsekvenser` feilet (1 feilet, 9 bestått).
+Kopien ble lagt tilbake, og sha256 for fila var lik `git show HEAD:` etterpå
+(`cbd4a583…`), med ren arbeidskopi.
+
+## Gjennomgangen 12.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Fire uavhengige lesere: Blind Hunter leste bare de endrede filene, Edge Case
+Hunter hele repoet, og Verification Gap gikk krav for krav mot taggen og koden, i
+to deler (§1–4.2, og 4.4–vedlegget). 27 + 8 + 13 + 12 funn.
+
+### Triage
+
+**Rettet i prd.md:**
+- BH1 og VG-B1 (middels): konsekvensen i NFR-06 var usann. Malene sier «ikke et
+  råd» og har notatene om tenkte kjøp og salg. Den sier nå hva testene sjekker.
+- BH2: FR-602 nevner at visningen har en egen, kortere liste. FR-603 viser til
+  lista i kontrollen.
+- BH3: FR-604 skiller en modell som feiler for én aksje fra en lokal modell som
+  ikke svarer i det hele tatt.
+- BH4: MA50 fra første punkt gjelder 6 mnd. Med 1 år begynner linja etter 50 dager.
+- BH5 (delvis): setningen om det som er uten FR. Min liste er spørsmål 14.
+- BH6 og VG3: kronene står i FR-101 med regelen, uten byggestatus.
+- BH7: 16 kall i begrunnelsen for FR-401.
+- BH8: «sensuren» i FR-411.
+- BH9: §3 sier «sektor», kravene «bransje».
+- BH13 (delvis): punkt 23 og AD-8 er ute av kravteksten. Henvisningene til
+  reglene i `CLAUDE.md` står, fordi de er krav til repoet.
+- BH14: «Ikke bygget (§2)» er ute av kravene; tabellen i §2 bærer statusen.
+- BH15: FR-608 sier at malen gir KI av for en ny bruker.
+- BH16 og VG-B7: SM-1 har FR-402, FR-602 og NFR-03, og SM-8 har FR-607.
+- BH18 (delvis): FR-408 har unntaket for tom base.
+- BH19, BH21: ordlyden.
+- VG1: 6 mnd fram til dagen, med dagen merket, i FR-201.
+- VG2: datoen i overskriften er den eldste.
+- VG4, VG5, VG8, VG13: konsekvensene i FR-106, FR-105, FR-108 og «Hvor gamle
+  dataene er».
+- VG6: grafen merker justeringsdagene i perioden, og teksten teller siste år.
+- VG7: rammen «Signalet forklart» etter grafen.
+- VG9: 503, demo uten base og hull i serien i FR-204.
+- VG10: tilbudet heter «Spill av omvisningen».
+- VG11: tickeren, «Lær noe nytt», høy og lav ikke i grafen, gul ramme, norsk tid
+  i FR-107, og grensene i FR-205.
+- VG-B2: §6 sier at lista over Oslo Børs er EODHDs, lest av koden.
+- VG-B3: grunnlaget i FR-607 slik `dagsgrunnlag.py` har det.
+- VG-B5 og VG-B6: SM-8 med modell og promptversjon 3, og at 0 stoppet er et
+  varsel etter motmålet; brukslogga har én linje.
+- VG-B8: unntaket i FR-413 og NFR-01 gjaldt kjøringen 10.11.
+- VG-B9: definisjonene i FR-606A.
+- VG-B10: bildene i demoen lages fra testdata.
+- VG-B11: «resultat» står ikke i lista over årsaker.
+- VG-B12: kveldsjobben kjører commiten main hadde ved midnatt.
+
+**Rettet i testene og endringsloggen:**
+- BH23 og ECH1 (middels): endringsloggen har «Endringer etter 12.11» nederst, og
+  tellingen og kontrollen mot taggen gjelder bare delen fra taggen. CLAUDE.md sier
+  hvor nye linjer føres.
+- BH24 og ECH7: en test for de andre daterte merkene, storynummer, commiter,
+  «bygget per» og navn utenom gruppelinja.
+- BH25: konsekvensen kan ikke være tom, og UJ-1 og ordlista testes.
+- BH26: tabellen i §2 og FR-ID-ene må være like; FR-605A er ute av raden.
+- ECH2: lenkesjekken tar ikke med `tilbakemelding-prd.md#`.
+- ECH3: tabellradene strippes før de splittes.
+- ECH5: innledningen sier at rekkefølgen følger den første datoen i linja.
+- ECH8: setningen i story 9.11 er tydeligere.
+
+**Ikke rettet, med grunn:**
+- BH10–BH12, BH17, BH27, VG12, VG-B4 og ECH4: spørsmål 14–20.
+- BH20 (lav): regel 21 krever hardt mellomrom i det sidene viser. Dokumentene har
+  desimalkomma, og eksemplet i FR-706 er sitert fra taggen.
+- BH22 (lav): 51 dager er forklart i FR-101 og FR-204.
+- ECH6 (lav): ankeret `utenfor-v1` er dobbelt, som i taggen. Ingen lenke bruker
+  `#utenfor-v1-1`.
+- BH18, resten (lav): «Ukentlig» i SM-3 er gruppens frist.
+
+Ingen funn på middels eller over står åpne (regel 25).
