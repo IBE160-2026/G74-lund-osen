@@ -418,7 +418,8 @@
         {#- Story 10.10, spørsmål 10: linja om Min liste skrives av appen, ikke av KI. #}
         {% if boersdagen.min_liste %}<p class="min-liste-linje">{{ boersdagen.min_liste }} <span class="merke-app">Skrevet av appen.</span></p>{% endif %}
       {% else %}
-        <p class="uten">{{ boersdagen.uten }}</p>
+        {#- Story 3.7 (tillegg 1): en dag uten modell lenker til installasjonen. #}
+        <p class="uten">{{ boersdagen.uten }}{% if boersdagen.lenke %} <a href="{{ ki_teksten_url }}">Slik slår du den på</a>{% endif %}</p>
       {% endif %}
     </section>
     {% endif %}

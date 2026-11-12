@@ -214,8 +214,9 @@ class TestSiden:
         """Ville feilet med et tomt felt (V3)."""
         html = side(klient)
         assert (
-            '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>'
-            in html
+            # Story 3.7 (tillegg 1): i den ekte versjonen sier linja når
+            # teksten lages, med lenken til installasjonen.
+            f'<p class="uten">{MODELL}</p>' in html
         )
 
     @pytest.mark.parametrize(
@@ -396,6 +397,13 @@ def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(t
 
 DAGEN = "Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk."
 AKSJEN = "Ingen KI-tekst for denne aksjen: teksten ble ikke laget i hentingen."
+# Story 3.7 (tillegg 1, spoersmaal 8): en dag uten rad er i den ekte versjonen
+# en dag uten modell, med lenken til installasjonen. DAGEN gjelder demoen.
+MODELL = (
+    "Ingen KI-tekst for denne dagen. Den lages når kursene hentes, på en maskin med en språkmodell. "
+    '<a href="https://github.com/IBE160-2026/G74-lund-osen/blob/main/docs/installasjon.md#ki-teksten">'
+    "Slik slår du den på</a>"
+)
 
 
 class TestGrunnenPaaSiden:
@@ -410,23 +418,23 @@ class TestGrunnenPaaSiden:
         assert ki.tilstand == INGEN_FOR_AKSJEN and ki.grunn == AKSJEN
 
     def test_ingen_rader_for_dagen_paa_siden(self, klient, aksje):
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_rader_for_andre_aksjer_men_ikke_denne(self, klient, aksje):
         """Ville feilet hvis siden ga grunnen for dagen (B1)."""
         skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
         html = side(klient)
-        assert f'<p class="uten">{AKSJEN}</p>' in html and DAGEN not in html
+        assert f'<p class="uten">{AKSJEN}</p>' in html and DAGEN not in html and MODELL not in html
 
     def test_en_rad_for_en_annen_dag_teller_ikke(self, klient, aksje):
         """Bare rader for samme dag sier at hentingen laget tekster den dagen."""
         skriv_kirad(kirad(aksje - timedelta(days=1), emne=Emne.aksje("DNB", aksje - timedelta(days=1))))
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_dagsteksten_teller_ikke_som_en_aksje(self, klient, aksje):
         """En rad for dagen (10.6) er ikke en tekst for en aksje."""
         skriv_kirad(kirad(aksje, emne=Emne.dagen(aksje)))
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_rader_som_foer(self, klient, aksje):
         skriv_kirad(kirad(aksje))
@@ -458,7 +466,7 @@ class TestGrunnenPaaSiden:
     def test_en_melding_teller_ikke_som_en_aksje(self, klient, aksje):
         """VG1: bare rader for andre aksjer gir grunnen for aksjen."""
         skriv_kirad(kirad(aksje, emne=Emne.melding("x", aksje)))
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_en_rad_som_ikke_kan_leses_endrer_ikke_svaret(self, klient, aksje, monkeypatch):
         """BH2, ECH, VG2: radene for andre aksjer og dager tolkes ikke."""
@@ -520,7 +528,9 @@ class TestStory816bDenValgteDagen:
         """Ville feilet hvis dagen uten KI-rad viste teksten for siste dag,
         eller ikke teksten appen har for en dag uten KI-tekst."""
         html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
-        assert f'<p class="uten">{DAGEN}</p>' in html
+        # Story 3.7 (gjennomgangen, ECH4): en eldre dag kan ikke få teksten
+        # senere (AD-7), så der står grunnen som før, uten linja om modellen.
+        assert f'<p class="uten">{DAGEN}</p>' in html and "på en maskin med en språkmodell" not in html
         assert TEKST not in html
 
     def test_ki_teksten_proeves_mot_vurderingen_for_dagen(self, klient, aksje):

@@ -507,6 +507,9 @@ def test_demogrunnen_ikke_for_siste_dag(klient, monkeypatch):
     html = _html(klient, "/aksje/BRFE")
     assert "demoen har KI-tekst bare" not in html
     assert "Ingen KI-tekst for denne dagen" in html
+    # Story 3.7 (gjennomgangen, VG4): linja om modellen og lenken står bare i
+    # den ekte versjonen. Ville feilet hvis demoen fikk dem.
+    assert "på en maskin med en språkmodell" not in html and app_modul.KI_TEKSTEN_URL not in html
 
 
 def test_tittelen_i_min_liste_bare_med_en_vurdert_merket(klient):

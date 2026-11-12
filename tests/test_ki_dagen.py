@@ -19,7 +19,7 @@ from dagsgrunnlag import dagsgrunnlag
 from hjelpetekster import hjelpetekster
 from ki_dagen import DAGSPROMPTVERSJON, REGLER_DAGEN, kontroller_dagen, lag_dagsprompt, lag_dagsrad
 from ki_modell import ModellFeilet, Modellsvar
-from ki_visning import DAGEN_AV, DAGEN_UTEN, KAPSEL, PERIODEN_UTEN, bygg_dagsvisning
+from ki_visning import DAGEN_AV, DAGEN_UTEN, DAGEN_UTEN_MODELL, KAPSEL, PERIODEN_UTEN, bygg_dagsvisning
 from kilogg import Emne, KIRad
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import SqliteKILogg, aapne_base
@@ -544,10 +544,29 @@ class TestForsiden:
         forsiden_med(TEKSTEN, besto=False)
         side = html(klient)
         assert TEKSTEN not in side and DAGEN_UTEN in side
+        # Story 3.7 (tillegg 1, spørsmål 8): en tekst kontrollen stoppet, har en
+        # rad, og er ikke en dag uten modell. Ville feilet hvis siden blandet dem.
+        assert DAGEN_UTEN_MODELL not in side and "Slik slår du den på" not in side
 
     def test_uten_rad(self, klient):
         forsiden_med(None)
-        assert DAGEN_UTEN in html(klient)
+        side = html(klient)
+        # Story 3.7 (tillegg 1): i den ekte versjonen sier linja når teksten
+        # lages, med lenken til installasjonen. Ville feilet uten linja eller lenken.
+        assert (
+            f'<p class="uten">{DAGEN_UTEN_MODELL} <a href="https://github.com/IBE160-2026/G74-lund-osen/blob/main/'
+            'docs/installasjon.md#ki-teksten">Slik slår du den på</a></p>'
+        ) in side
+
+    def test_uten_dagstekst_men_med_tekster_for_aksjene_staar_ikke_linja(self, klient):
+        """Story 3.7 (gjennomgangen, ECH5). Ville feilet hvis forsiden sa at
+        maskinen trenger en modell når aksjene har KI-tekst den dagen."""
+        from test_ki_visning import kirad
+
+        forsiden_med(None)
+        skriv_kirad(kirad(FREDAG))
+        side = html(klient)
+        assert DAGEN_UTEN in side and DAGEN_UTEN_MODELL not in side and "Slik slår du den på" not in side
 
     def test_bryteren_slaar_av_begge_ki_tekstene(self, klient):
         """FR-601: ville feilet hvis bryteren ikke slo av teksten om dagen,
