@@ -367,7 +367,8 @@ def _vinduene(html: str) -> dict[str, str]:
     vinduene = {}
     for id_, innhold in deler:
         uten_topp = innhold.split("</div>", 1)[1]
-        vinduene[id_] = _synlig(uten_topp.split('<p class="vist">')[0])
+        # Story 8.26: linja om hvordan vinduet lukkes, telles ikke.
+        vinduene[id_] = _synlig(uten_topp.split('<p class="vist">')[0].split('<p class="lukkes">')[0])
     return vinduene
 
 

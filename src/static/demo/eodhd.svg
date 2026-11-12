@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-labelledby="eodhd-t eodhd-d">
+  <title id="eodhd-t">Gratiskonto i demoen</title>
+  <desc id="eodhd-d">En dør med et skilt der det står API, og en dørmatte med et hjørne som er løftet. Under matta ligger en stor nøkkel og en lapp der det står 20. En figur bøyer seg ned og løfter matta.</desc>
+  <g stroke="#16181D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 272 V248 Q140 232 260 240 T412 246 V272 Z" fill="#ECEAE4"/>
+    <rect x="58" y="70" width="110" height="172" rx="6" fill="#D6D3CA"/>
+    <rect x="72" y="84" width="82" height="62" rx="4" fill="#ECEAE4"/>
+    <circle cx="148" cy="166" r="6" fill="#F2B53A"/>
+    <path d="M148 172 v10" fill="none" stroke-width="3"/>
+    <rect x="86" y="36" width="54" height="26" rx="5" fill="#F8DE9C"/>
+    <path d="M113 62 v8" fill="none" stroke-width="2.5"/>
+    <path d="M44 250 L196 250 L214 236 L62 236 Z" fill="#C9C4B8"/>
+    <path d="M196 250 Q226 246 238 226 L214 236 Z" fill="#ECEAE4"/>
+    <circle cx="178" cy="243" r="7" fill="#F2B53A"/>
+    <path d="M185 243 h26 M203 243 v6 M209 243 v6" fill="none" stroke-width="3"/>
+    <rect x="120" y="238" width="24" height="12" rx="2" fill="#FFFFFF" stroke-width="2"/>
+    <circle cx="300" cy="150" r="10" fill="#FFFFFF"/>
+    <circle cx="296" cy="148" r="1.6" fill="#16181D" stroke="none"/>
+    <path d="M300 160 Q290 186 276 204 M276 204 L262 244 M276 204 L298 244" fill="none"/>
+    <path d="M294 172 L250 214 M290 180 L240 226" fill="none"/>
+  </g>
+  <text x="101" y="54" font-family="'DejaVu Sans', Arial, sans-serif" font-weight="700" font-size="13" fill="#16181D">API</text>
+  <text x="124" y="248" font-family="'DejaVu Sans', Arial, sans-serif" font-weight="700" font-size="9" fill="#16181D">20</text>
+</svg>

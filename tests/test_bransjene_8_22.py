@@ -182,9 +182,10 @@ def test_siden_viser_den_faste_bransjen_for_et_oenske_som_venter(klient, stier, 
     l.folg("NYB", "Kraft")
     l._t.close()
     side = klient.get("/").data.decode("utf-8")
-    # Story 8.23 (A1) gjorde radene til rader i en tabell, med bransjen i en egen celle.
+    # Story 8.23 (A1) gjorde radene til rader i en tabell. Story 8.26 (svaret
+    # 11.11 kl. 17:12): bransjen står under navnet, som på oversikten.
     rad = side.split('<tr class="egen-rad">')[1].split("</tr>")[0]
-    assert "</svg>Helse</td>" in rad and "Kraft" not in rad
+    assert "</svg>Helse</span>" in rad and "Kraft" not in rad
 
 
 def test_demoen_foelger_med_den_faste_bransjen(tmp_path, monkeypatch):

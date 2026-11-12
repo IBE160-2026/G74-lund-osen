@@ -86,7 +86,8 @@ class TestLista:
         hode = boksen.split("<thead>", 1)[1].split("</thead>", 1)[0]
         assert re.findall(r"<th[^>]*>", hode) == ["<th>", '<th class="tall">', "<th>"]
         assert ">Selskap</th>" in hode and ">Omsetning<span" in hode
-        rad = boksen.split('data-kode="nya" data-navn="ny aksje asa">', 1)[1].split("</tr>", 1)[0]
+        # Story 8.26 (tillegg 17): raden har flere data- for skriptet etter navnet.
+        rad = boksen.split('data-kode="nya" data-navn="ny aksje asa"', 1)[1].split(">", 1)[1].split("</tr>", 1)[0]
         celler = re.findall(r'<td class="([^"]+)">', rad)
         assert celler == ["selskap", "tall omsetning", "valg"]
         selskap = rad.split('<td class="selskap">', 1)[1].split("</td>", 1)[0]
@@ -118,7 +119,8 @@ class TestLista:
         først» ikke er en rangering etter kursen (tillegg 3, NFR-06)."""
         html = _side(klient)
         assert 'popovertarget="hjelp-folg"' in html and '<div id="hjelp-folg" class="hjelpevindu" popover>' in html
-        assert "ingen rangering etter kursen eller signalet" in html.split('<div id="hjelp-folg"', 1)[1]
+        # Story 8.26 (tillegg 18): teksten er kortet til «ikke etter signalet».
+        assert "ikke etter signalet" in html.split('<div id="hjelp-folg"', 1)[1]
 
 
 class TestFilteret:
@@ -127,7 +129,8 @@ class TestFilteret:
         serveren, så siden uten skript viste alle."""
         html = _side(klient, "/folg?q=ny+b")
         assert _rader(html) == ["NYB"] and _rader(html, synlige=False) == ["NYA", "NYB", "NYC", "NYD"]
-        assert '<span id="antall-vist">1</span> av 4 vises.' in html
+        # Story 8.26 (tillegg 17): antallet i filteret står i et eget felt for skriptet.
+        assert '<span id="antall-vist">1</span> av <span id="antall-filtrert">4</span> vises.' in html
         assert 'id="ingen-treff" hidden' in html
         html = _side(klient, "/folg?q=zzz")
         assert _rader(html) == [] and 'id="ingen-treff">' in html
@@ -151,7 +154,7 @@ class TestFilteret:
         assert _rader(html) == ["NYA", "NYB", "NYC", "NYD"]
         for b in ("Helse", "Kraft"):
             assert f'<input type="checkbox" name="bransje" value="{b}" checked>' in html
-        assert '<h2 class="alle-tittel">Alle som kan følges i Helse og Kraft</h2>' in html
+        assert '<h2 class="alle-tittel" id="alle-tittel">Alle som kan følges i Helse og Kraft</h2>' in html
         assert _rader(_side(klient, "/folg?bransje=Kraft&bransje=Helse&omsetning=under")) == ["NYB"]
         assert _rader(_side(klient, "/folg?bransje=Helse&bransje=Tull")) == ["NYB"]
 
@@ -160,10 +163,11 @@ class TestFilteret:
         bransje, var merket med en bransje valgt, eller mistet søket,
         omsetningen, sorteringen eller byttet."""
         html = _side(klient)
-        assert '<a class="valgbrikke valgt" href="/folg" aria-current="true">Alle</a>' in html
+        assert '<a class="valgbrikke valgt" href="/folg#filteret" aria-current="true">Alle</a>' in html
         html = _side(klient, "/folg?q=ny&bransje=Kraft&omsetning=over&sorter=navn&bytt=DNB&bransje=Helse")
         assert (
-            '<a class="valgbrikke" href="/folg?q=ny&amp;omsetning=over&amp;sorter=navn&amp;bytt=DNB">Alle</a>' in html
+            '<a class="valgbrikke" href="/folg?q=ny&amp;omsetning=over&amp;sorter=navn&amp;bytt=DNB#filteret">Alle</a>'
+            in html
         )
 
     def test_det_valgte_er_oransje_med_et_merke(self):
@@ -240,7 +244,8 @@ class TestSorteringen:
         assert 'class="forslagene"' not in html and "høyst tre" not in html
         linja = "Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet."
         assert linja in html.split('<p class="antall-vist">', 1)[1].split("</p>", 1)[0]
-        assert linja not in _side(klient, "/folg?sorter=navn")
+        # Story 8.26 (tillegg 17): linja står skjult, så skriptet kan vise den ved «Mest omsatt først».
+        assert f'<span id="ordnet-etter" hidden> {linja}</span>' in _side(klient, "/folg?sorter=navn")
         for ord_ in ("ukens beste", "anbefal", "beste aksje", "vinner"):
             assert ord_ not in html.lower()
 
@@ -306,7 +311,8 @@ def test_hjelpen_sier_sorteringen_og_er_du_sikker():
     ):
         assert ord_ in foelg, ord_
     assert "høyst tre" not in foelg and "ordnet etter navnet" not in foelg
-    ferdige = hjelp.split("### Hva er de ferdige listene og filteret?", 1)[1].split("\n### ", 1)[0]
+    # Story 8.26: filteret er tatt bort, så overskriften er bare de ferdige listene.
+    ferdige = hjelp.split("### Hva er de ferdige listene?", 1)[1].split("\n### ", 1)[0]
     assert "«Er du sikker?»" in ferdige and "én knapp per bransje" in ferdige
 
 
@@ -319,12 +325,13 @@ def test_skriptet_filtrerer_paa_det_samme_som_serveren():
     js = (ROT / "src" / "static" / "hjelp.js").read_text(encoding="utf-8")
     del_ = js.split("Story 8.22", 1)[1]
     assert 'querySelector("input[data-folgsok]")' in del_
-    assert "rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst)" in del_
+    # Story 8.26 (tillegg 17): søket, brikkene og sorteringen virker med en gang
+    # i FOLGLISTA, uten å sende skjemaet; «Vis» står bare uten skriptet.
+    assert "!rad.kode.includes(t) && !rad.navn.includes(t)" in js
     assert 'lista.querySelectorAll("tr[data-kode]")' in del_
-    assert 'felt.addEventListener("input", filtrer)' in del_ and "rad.hidden = !med" in del_
-    assert "toLowerCase()" in del_ and 'getElementById("antall-vist")' in del_
-    assert 'addEventListener("pointerdown"' in del_ and "if (klikk) felt.form.submit()" in del_
-    assert 'addEventListener("keydown"' in del_ and "requestSubmit" not in del_
+    assert 'felt.addEventListener("input", oppdater)' in del_ and "rad.hidden = !med" in del_
+    assert "toLowerCase()" in js and 'getElementById("antall-vist")' in del_
+    assert "form.submit()" not in del_ and "requestSubmit" not in del_
     mal = (ROT / "src" / "templates" / "folg.html").read_text(encoding="utf-8")
     assert 'data-kode="{{ a.kode|lower }}" data-navn="{{ a.navn|lower }}"' in mal and "data-folgsok" in mal
 
@@ -383,7 +390,7 @@ class TestDemoen:
         assert '<input type="radio" name="sorter" value="omsatt" checked>' in html
         for b in ("Helse", "Kraft"):
             assert f'<input type="checkbox" name="bransje" value="{b}" checked>' in html
-        assert '<a class="valgbrikke" href="/folg">Alle</a>' in html
+        assert '<a class="valgbrikke" href="/folg#filteret">Alle</a>' in html
         assert "Ordnet etter median omsetning de 3 siste månedene, ikke etter kursen eller signalet." in html
         assert _rader(_side(k, "/folg?bransje=Kraft&bransje=Helse&sorter=bransje")) == [
             "FJHE",

@@ -328,6 +328,12 @@ class TestRammen:
                 if href.endswith("#aksjene") and href != "#aksjene":
                     assert re.search(r'(?<![\w-])id="aksjene"', html), (navn, href)
                     href = href.removesuffix("#aksjene")
+                # Story 8.26 (tillegg 6): periodevalget og filteret holder plassen
+                # med et anker, som må finnes på siden.
+                for anker in ("perioden", "filteret", "visvalget"):
+                    if href.endswith("#" + anker) and href != "#" + anker:
+                        assert re.search(rf'(?<![\w-])id="{anker}"', html), (navn, href)
+                        href = href.removesuffix("#" + anker)
                 href = href.replace("?vis=min&amp;", "?").replace("?vis=min", "") or "/"
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
@@ -335,8 +341,6 @@ class TestRammen:
                     # Story 8.6: børsometeret, fra knappen i stripa. Story 8.10:
                     # «Innstillinger», fra knappen i stripa.
                     or href in ("/boersometer", "/innstillinger")
-                    # Story 8.11: filteret på signalet, med resten av adressen.
-                    or re.fullmatch(r"/(min-liste)?\?([a-z]+=[A-Za-z0-9-]+&amp;)*signal=(positiv|negativ)", href)
                     # Story 2.12: «Følg en aksje» og «Bytt ut».
                     or re.fullmatch(r"/folg(\?bytt=[A-Z0-9-]+)?", href)
                     # Story 8.22: steg 3 i «Din egen liste» går til bransjelistene
@@ -349,6 +353,9 @@ class TestRammen:
                     # «Avbryt» tilbake til de ferdige listene.
                     or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
                     or href in ("/min-liste#ferdige-lister", "/#dine-egne-aksjer")
+                    # Story 8.26 (tillegg 12): «Åpne eodhd.com» i demoen, og
+                    # tilbake til Min liste fra den siden.
+                    or href in ("/eodhd-demo", "/min-liste#din-egen-liste")
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
@@ -730,11 +737,11 @@ class TestOversikten:
         )
         # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
         # Story 8.2a, b (gjennomgangen 24.10, BH4): «og N uten data» for seg.
-        uten_data = html.count('<span class="merke mangler">uten data</span>')
+        uten_data = html.count('<span class="merke mangler">ingen kurser ennå</span>')
         uten = html.count('<span class="merke mangler">') - uten_data
         assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (
             f" og {uten} uten signal" if uten else ""
-        ) + (f" og {uten_data} uten data" if uten_data else "")
+        ) + (f" og {uten_data} uten kurser" if uten_data else "")
         stil = _stil(html)
         assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
         skjult = _regel(stil, ".merke.skjult")
@@ -994,8 +1001,9 @@ class TestStilarket:
         # 8.10: «Innstillinger» (innstillinger.html) den åttende. Story 8.21:
         # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
         # Tillegg 3 til 8.22: «Er du sikker?» før en ferdig liste
-        # (ferdig_liste.html) er den tiende.
-        assert sider == 10
+        # (ferdig_liste.html) er den tiende. Story 8.26 (tillegg 12): siden for
+        # «Åpne eodhd.com» i demoen (eodhd_demo.html) er den ellevte.
+        assert sider == 11
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,

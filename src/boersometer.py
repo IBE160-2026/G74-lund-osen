@@ -36,7 +36,14 @@ from datetime import date
 from hjelpetekster import ANTALL_SJEKKER
 from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
-from markedsoversikt import IKKE_VURDERT, endring_i_prosent, grunn_med_tall, les_tilstand, periodeendring
+from markedsoversikt import (
+    IKKE_VURDERT,
+    UTEN_DATA_TEKST,
+    endring_i_prosent,
+    grunn_med_tall,
+    les_tilstand,
+    periodeendring,
+)
 from signalberegning import STANDARD, Parametre
 from tallformat import avrundet, dato, tall, ukedag
 from tilstand import Art
@@ -65,7 +72,10 @@ LAV, VANLIG, HOEY = "lav", "vanlig", "hoey"
 VOLUMORD = {LAV: "lavt", VANLIG: "vanlig", HOEY: "høyt"}
 # Rammen, etter styrken (designregler.md §3).
 GUL, MOERK = "gul", "moerk"
-UTEN_DATA = "Uten data"
+# Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 2): «Uten data» sa ikke
+# hvorfor. Tillegg 8 (ønsket kl. 19:51): de samme ordene som raden på
+# oversikten, også i ruta og i begge kolonnene i tabellen.
+UTEN_DATA = UTEN_DATA_TEKST[0].upper() + UTEN_DATA_TEKST[1:]
 
 # Story 8.6b, c: fem fargetrinn etter endringen slik den vises, med grensene i
 # prosent. Navnene er klassene i malen og fargene i :root i stil.css.
@@ -87,6 +97,9 @@ class Rute:
     styrke: int | None
     tekst: str | None
     uten_data: bool = False
+    # Gjennomgangen av 8.26 (ECH4): uten en eneste kurs til og med dagen, ikke
+    # bare uten kurs på dagen. Bare da sier tabellen «Ingen kurser ennå».
+    aldri_kurs: bool = False
     siste_styrke: int | None = None
     er_siste: bool = True
     # Story 8.17b (gruppens svar 23.10 kl. 12:35, b): ved en periode er
@@ -280,7 +293,7 @@ def bygg_rute(
     p: Parametre = STANDARD,
 ) -> Rute:
     """Ruta for én aksje på dato. kurser er kursradene til og med dato. En
-    aksje uten kurs på dato står med «Uten data», og med gult bare ved 3 av 3
+    aksje uten kurs på dato står med «Ingen kurser ennå», eller «Ingen kurs» når den har eldre kurser (var «Uten data»), og med gult bare ved 3 av 3
     på siste børsdag."""
     if not kurser or kurser[-1].dato != dato:
         return Rute(
@@ -290,6 +303,7 @@ def bygg_rute(
             styrke=None,
             tekst=UTEN_DATA,
             uten_data=True,
+            aldri_kurs=not kurser,
             siste_styrke=siste_styrke,
             er_siste=er_siste,
         )
@@ -314,7 +328,7 @@ def med_perioden(rute: Rute, serie: list[Kursrad], start: date, siste: date) -> 
     Endringen er fra start, dagen den første kursen i perioden er fra, til
     siste børsdag, regnet som i oversikten (periodeendring), og ruta er like
     stor som de andre. Signalet og rammen er siste børsdag, som før. En rute
-    uten kurs siste børsdag står med «Uten data»."""
+    uten kurs siste børsdag står med «Ingen kurser ennå» eller «Ingen kurs» (var «Uten data»)."""
     if rute.uten_data:
         return replace(rute, lik_stoerrelse=True)
     utfall = periodeendring(serie, start, siste)

@@ -21,9 +21,12 @@
   <h1 class="overskrift">{{ aksje.navn }}</h1>
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }}</p>
 
+  {#- Story 8.26 (gruppens ønske 11.11 kl. 19:51, tillegg 8): de samme ordene
+      som raden på oversikten og børsometeret, og hvorfor, som bak «?» ved
+      «Oppdatert». #}
   <p class="ingen-kurser">
-    Det finnes ingen kurser for {{ aksje.navn }} ennå, så siden har ingen kursgraf og ingen sjekker.
-    {% if eksempeltall %}I demoen mangler kursene med vilje.{% endif %}
+    <strong>{{ uten_data_kort }}</strong>: {{ uten_kurser_hvorfor }} Siden har derfor ingen kursgraf og ingen sjekker for {{ aksje.navn }}.
+    {% if eksempeltall and aksje.symbol == demo_uten_kurser_symbol %}{{ demo_uten_kurser }}{% endif %}
   </p>
 
   {#- Story 3.4h (spørsmål 5): boblen nederst, også uten kurser. #}
