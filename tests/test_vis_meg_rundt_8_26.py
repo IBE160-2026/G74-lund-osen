@@ -1830,3 +1830,29 @@ class TestTilFaglaererEtterSvaret:
         brukertest = (ROT / "docs" / "brukertest.md").read_text(encoding="utf-8")
         assert "| Tiden fra oversikten ble vist til forklaringen | Over 5 minutter" in brukertest
         assert "gikk seg vill på noen sider" in brukertest
+
+
+class TestReadmenSierAtV1ErFerdig:
+    """Tillegg 23, steg 2: README-en sier ikke lenger at appen er under
+    utvikling, og linja i «Status» om endringer i lista følger tillegg 19."""
+
+    def test_status_om_endringer_i_lista_i_demoen(self):
+        """Ville feilet hvis «Status» fortsatt sa at demoen viser et eksempel
+        på meldingen, som tillegg 19 tok bort, eller hvis malen ikke lenger
+        sa at demoen ikke tar endringen i bruk."""
+        readme = (ROT / "README.md").read_text(encoding="utf-8")
+        status = readme.split("\n## Status\n", 1)[1].split("\n## ", 1)[0]
+        assert "viser et eksempel på meldingen" not in readme
+        assert (
+            "Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter "
+            "ikke, og sier at en endring ikke tas i bruk der." in status
+        )
+        index = (ROT / "src" / "templates" / "index.html").read_text(encoding="utf-8")
+        assert "Demoen henter ikke, så {{" in index and "ikke i bruk her." in index
+
+    def test_ingen_linje_sier_under_utvikling(self):
+        """Ville feilet hvis README-en noe sted sa at appen eller prosjektet er
+        under utvikling."""
+        readme = (ROT / "README.md").read_text(encoding="utf-8")
+        assert "under utvikling" not in readme
+        assert readme.count("Versjon 1 er ferdig") == 2

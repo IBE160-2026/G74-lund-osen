@@ -3401,9 +3401,15 @@ class TestReadmeForNybegynnere:
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
         # Story 3.3g: «Status» begynner med at prosjektet er under utvikling.
+        # Story 8.26 (tillegg 23, gruppens svar 12.11 kl. 16:23): «Status»
+        # begynner med at versjon 1 er ferdig, sier hva «Ekstra, ferdig» er,
+        # og at README-prøven står under «Neste i v1» til den er tatt. Ville
+        # feilet hvis README-en fortsatt sa at prosjektet er under utvikling.
         assert status.startswith(
-            "\nProsjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.\n"
-        ), status[:200]
+            "\nVersjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra, ferdig» er det som er "
+            "ferdig utover briefen, og prøven av README-en på en ren maskin står under «Neste i v1» til den er tatt.\n"
+        ), status[:300]
+        assert "under utvikling" not in status
         for innhold in (
             "hentingen",
             "Docker",
@@ -3637,7 +3643,18 @@ class TestReadmeForNybegynnere:
         # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».
         # Rett etter setningen om raad, som instruksjonen kl. 11:15 sier (VG 12.10).
-        assert "selge. Den er under utvikling og ikke ferdig." in beskrivelse
+        # Story 8.26 (tillegg 23, gruppens svar 12.11 kl. 16:23): setningen
+        # sier at versjon 1 er ferdig, og hva «Ekstra» er. Ville feilet hvis
+        # beskrivelsen fortsatt sa at appen er under utvikling og ikke ferdig.
+        assert (
+            "selge. Versjon 1 er ferdig, og «Ekstra» under «Status» er det som er ferdig utover briefen." in beskrivelse
+        )
+        assert "under utvikling" not in beskrivelse and "ikke ferdig" not in beskrivelse
+        # Tillegg 23: taket fra «Følg en aksje» står også. Ville feilet hvis
+        # TAK i valg.py endret seg uten at beskrivelsen fulgte.
+        import valg
+
+        assert f"med «Følg en aksje» kan lista ha opptil {valg.TAK}." in beskrivelse
 
     def test_hvorfor_bare_15_aksjer(self):
         """12.10 kl. 10:22: spoersmaalet staar i docs/hjelp.md under

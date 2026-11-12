@@ -4,7 +4,7 @@
 
 Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten 2026.
 
-OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse (handelsvolum) – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
+OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt, og med «Følg en aksje» kan lista ha opptil 18. Tre enkle sjekker – trend, bevegelse og interesse (handelsvolum) – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI kan forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Versjon 1 er ferdig, og «Ekstra» under «Status» er det som er ferdig utover briefen.
 
 ![Toppen av oversikten i demoen, med overskriften, ingressen og «Slik leser du tabellen», med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-topp-demo.png)
 *Toppen av oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
@@ -104,7 +104,7 @@ Til faglærer:
 
 ## Status
 
-Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.
+Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra, ferdig» er det som er ferdig utover briefen, og prøven av README-en på en ren maskin står under «Neste i v1» til den er tatt.
 
 **Ferdig**
 
@@ -131,7 +131,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
-«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter ikke, og viser et eksempel på meldingen om dem, merket «Eksempeltall». Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter ikke, og sier at en endring ikke tas i bruk der. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
