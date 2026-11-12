@@ -36,6 +36,7 @@ Planen for KI-laget ble vist i chatten 15.10 kl. 15:43 og er ført kort i Utfør
 
 - Svar 2: raden står når den finnes, også når modellen feilet. `lag_ki_rad` gir alltid en rad, også når modellen feiler, så hentingen kan skrive den (PR F).
 - Svar 5: `av` er et eget valg i `OSE_KI_TJENESTE`. Med KI av kalles ikke `lag_ki_rad`, og ingen rad skrives (PR F).
+  *Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):* `.env.example` har nå `lokal`, ikke `av`, så KI-teksten står på i en ny installasjon. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor. `av` er fortsatt et eget valg, og en `.env` som finnes fra før, endres ikke. Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 - Svar 10: grunnlaget for én aksje har ingen antall, så de lovlige tallene i punkt 2 er styrken og regelens faste tall.
 
 **Mutantene** (planen kl. 15:43): E1–E4 hvert av de fire punktene slått av; E5 «femti» slipper gjennom; E6 «fordi ingen sjekk ga utslag» stoppes.

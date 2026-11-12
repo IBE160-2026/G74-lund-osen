@@ -2733,6 +2733,22 @@ Spesifikasjonen er `spec-3-6-ikonet-og-snarveien.md`.
 
 *Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
 
+### Story 3.7: Snarveien spør før nettleseren, og KI-teksten på en ny PC
+
+*Lagt til 2026-11-12, etter instruksjonen «Ny liten story etter 3.6: snarveien spør før nettleseren åpnes» (limt inn 12.11 kl. 16:48) og tillegg 1–4, som føres i `docs/ai-prompts/2026-11-12.md` med flettingen.* 3.7 var neste ledige nummer i Epic 3.
+
+Som **bruker i Windows**, vil jeg se spørsmålet om snarveien før nettleseren dekker vinduet, og få KI-teksten på en ny PC uten å lese installasjonen først, så appen virker som lovet første gang.
+
+Spesifikasjonen er `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
+
+*Avgjort 2026-11-11 kl. 22:07 (gruppens svar):* snarveien spør før nettleseren åpnes, og får vinduet ikke svar innen 30 sekunder, lages ingen snarvei, og den tilbys igjen neste gang (rettelsen fra rådet 12.11, tillegg 4). Funnet fra demoprøven 11.11 kl. 22:06: snarveien kom ikke på skrivebordet, fordi spørsmålet sto i vinduet bak nettleseren. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:32 (gruppens svar, tillegg 1):* KI-teksten står på når den ekte versjonen installeres på en ny PC: `.env.example` har `OSE_KI_TJENESTE=lokal`, og uten modell sier hentingen det i én linje, og sidene sier at teksten lages når maskinen har en modell, med lenke til installasjonen. Det retter svar 5 under Epic 10. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:41 (gruppens svar, tillegg 2):* startskriptet tilbyr å hente Gemma første gang den ekte versjonen startes, som planen 05.10 sa (FR-608). Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:46 (gruppens svar, tillegg 3):* spørsmålet tilbyr også egen API-nøkkel til Gemini, Anthropic eller OpenAI. Rådet anbefalte det.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -2956,6 +2972,7 @@ på papir.
 3. Kjøres hentingen på nytt samme dag og vurderingen endrer seg, vises dagen uten KI-tekst (FR-602).
 4. Bryteren huskes i en informasjonskapsel nå. 8.10b flytter bryteren til innstillingene og bruker samme kapsel.
 5. «av» er et eget valg i `OSE_KI_TJENESTE`. `.env.example` har «av», og README-en sier hvordan KI slås på. Uten variabelen gjelder «lokal», som i FR-608. Ført også under FR-608 i PRD-en.
+   *Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):* `.env.example` har nå `lokal`, ikke `av`, så KI-teksten står på i en ny installasjon. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor. `av` er fortsatt et eget valg, og en `.env` som finnes fra før, endres ikke. Ført også under FR-608 i PRD-en og i story 3.7. Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 6. `0005` gir plass til dagsteksten i 10.6, med en dato som eneste emne.
 7. 3.4b kommer rett etter 10.3. Demotekstene lages med Gemma lokalt av de oppdiktede demodataene, i en egen avtalt kjøring.
 8. Adressen til Ollama er `OSE_KI_OLLAMA_URL`, med `http://127.0.0.1:11434` som standard og `http://ollama:11434` i compose. Porten publiseres bare på 127.0.0.1.

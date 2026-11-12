@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-11T00:32
+updated: 2026-11-12T17:13
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -1647,6 +1647,8 @@ ChatGPT Plus eller Pro med «Sign in with ChatGPT» kommer senere (story 10.8). 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* egen nøkkel til Gemini, Anthropic og OpenAI (story 10.7) er v1, fordi briefen v8 nevner den under «Data og kilder» (svaret kl. 16:12). ChatGPT med «Sign in with ChatGPT» (story 10.8) er «Ekstra, hvis tiden rekker».
 
 *Lagt til 2026-10-15 (gruppens svar 5 på planen for KI-laget, instruksjonen kl. 15:53):* `av` er et eget valg i `OSE_KI_TJENESTE`. Da lages ingen KI-tekst, og hentingen går som før. `.env.example` har `av`, og README-en sier hvordan KI slås på. Uten variabelen gjelder `lokal`.
+
+*Lagt til 2026-11-12 (gruppens svar 12.11 kl. 16:32, story 3.7):* `.env.example` har nå `lokal`, så KI-teksten står på i en ny installasjon, som standarden over sier. Svarer ikke Ollama, lages ingen KI-tekst, hentingen sier hvorfor, og kursene hentes som før (NFR-04). Første gang den ekte versjonen startes med dobbeltklikk på Windows, tilbyr startskriptet å hente Gemma eller å bruke egen nøkkel (svarene kl. 16:41 og 16:46). En `.env` som finnes fra før, endres ikke.
 
 ### 4.6A Plan A: KI-laget over meldinger (utenfor v1)
 
