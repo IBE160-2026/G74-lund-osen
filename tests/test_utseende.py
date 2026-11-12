@@ -305,6 +305,10 @@ class TestRammen:
                 # README-en paa GitHub, bare i demoen, og laster ingenting.
                 if verdi == app_modul.EKTE_VERSJONEN_URL and verdi in lenker and 'class="eksempeltall"' in html:
                     continue
+                # Story 3.7 (tillegg 1): en dag uten modell lenker til installasjonen
+                # paa GitHub, bare i den ekte versjonen, og laster ingenting.
+                if verdi == app_modul.KI_TEKSTEN_URL and verdi in lenker and 'class="eksempeltall"' not in html:
+                    continue
                 assert not re.match(r"(https?:)?//", verdi), (navn, verdi)
             # Story 2.7a: skriftene står i stilarket, ikke i siden.
             for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html + _stil(html)):
@@ -355,6 +359,8 @@ class TestRammen:
                     or (re.fullmatch(r"/investorside/[A-Z0-9]+", href) and 'class="eksempeltall"' in html)
                     # Story 3.3i (U51): den ekte versjonen i README-en, bare i demoen.
                     or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
+                    # Story 3.7 (tillegg 1): installasjonen paa GitHub, bare i den ekte versjonen.
+                    or (href == app_modul.KI_TEKSTEN_URL and 'class="eksempeltall"' not in html)
                     # Story 8.9: stegene i «Vis meg rundt» peker på en id på samme side.
                     or (href.startswith("#") and re.search(rf'(?<![\w-])id="{re.escape(href[1:])}"', html))
                     # Story 3.6: ikonet i fanen, som finnes i src/static.

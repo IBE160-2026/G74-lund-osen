@@ -309,6 +309,11 @@ def _mappe_med_skriptet(tmp_path, navn, git):
     ingen nettkall."""
     (tmp_path / "start").mkdir()
     (tmp_path / "start" / navn).write_bytes(SKRIPTENE[navn].read_bytes())
+    if navn == "start.ps1":
+        # Story 3.7: den ekte versjonen kaller Tilby-KI i ki-modell.ps1, som
+        # bruker frist.ps1, foer hentingen.
+        for fil in ("ki-modell.ps1", "frist.ps1"):
+            (tmp_path / "start" / fil).write_bytes((SKRIPTENE[navn].parent / fil).read_bytes())
     if git == "klon":
         # Uten init -b, som krever git 2.28 (BH10, ECH2).
         subprocess.run(["git", "init", "-q", str(tmp_path)], check=True, capture_output=True)

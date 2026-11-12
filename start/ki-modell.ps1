@@ -105,7 +105,8 @@ function Ki-FinnOllama {
     $c = Get-Command ollama -ErrorAction SilentlyContinue
     if ($c) { return $c.Source }
     # Der installasjonen legger den for brukeren, og for hele maskinen (ECH8).
-    $mapper = @((Join-Path $env:LOCALAPPDATA 'Programs\Ollama'))
+    $mapper = @()
+    if ($env:LOCALAPPDATA) { $mapper += (Join-Path $env:LOCALAPPDATA 'Programs\Ollama') }
     if ($env:ProgramFiles) { $mapper += (Join-Path $env:ProgramFiles 'Ollama') }
     foreach ($mappe in $mapper) {
         foreach ($fil in 'ollama.exe', 'ollama.cmd') {
