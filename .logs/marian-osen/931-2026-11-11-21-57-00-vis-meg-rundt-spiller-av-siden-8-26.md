@@ -94,6 +94,7 @@ Tillegg 23 til 8.26 (gruppens svar 12.11 kl. 16:23 og ønsket kl. 16:24, limt in
 - Kl. 22:00:10 var main uendret (`a93c668f`), og PR-en kunne flettes. Ventekommandoen til kl. 23:50 ble stoppet av lite minne og startet igjen kl. 22:15, etter instruksjonen kl. 18:01.
 - PR #146 er squash-flettet i `719e5f07` kl. 23:51:14, låst til `82f50471`. Treet på main var likt head-en (0 linjer i diffen). Testene for dokumentene på main: 2766 bestått, 7 hoppet over.
 - Føringen på main: dagsfila 11.11 med instruksjonen kl. 18:01 og tilleggene 1–20 (`cc289203`), done og storyen med svarene i `epics.md` (`02ea922e`), og dagsfila 12.11 med tilleggene 21–24 og spørsmålene kl. 20:52 og 23:06 (`19a4d524`). README-en hadde 8.26 under «Ekstra, ferdig» fra grenen.
+- Testene for dokumentene etter føringen: 2 feilet, fordi 8.26 er done uten rader i tabellene i `docs/kvalitetssikring.md`, som ved 8.25. Radene står i `9180be06`: 26 mutanter, alle fanget, og 127 funn i triagen (60 rettet, 11 avvist, 56 utsatt). I runden for tilleggene 10 og 12 hadde Verification Gap 7 funn, men VG3–VG6 står ikke i triagen.
 
 ### Åpne punkter
 - Bunnteksten i appen sier fortsatt «Appen er under utvikling og ikke ferdig.» (`UNDER_ARBEID` i `src/app.py`), mens README-en sier at versjon 1 er ferdig. Tillegg 23 nevnte ikke koden, så den er ikke endret.
