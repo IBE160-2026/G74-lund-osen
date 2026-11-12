@@ -2275,11 +2275,19 @@ def _egne_regnet() -> dict | None:
                 utenfor_tekst[rad["symbol"]] = valg.utenfor_tekst(median, maalt, kursene=kursene)
         egne_i_lista = len(egne)
         # Story 8.11: de ferdige listene, med merket for omsetningen.
-        ferdige = ferdige_lister.lister(g.tilkobling)
+        # Story 8.28 (FR-412): og «De 15 mest omsatte» på hele børsen, av de
+        # samme radene, regnet én gang.
+        ferdige, mest_omsatte = ferdige_lister.begge(g.tilkobling)
         return {
             "ferdige": ferdige,
+            "mest_omsatte": mest_omsatte,
+            "mest_omsatte_navn": ferdige_lister.MEST_OMSATTE,
+            "mest_omsatte_noekkel": ferdige_lister.MEST_OMSATTE_NOEKKEL,
             "ferdige_utenfor": frozenset(
-                a.symbol for liste in ferdige.values() for a in liste if valg.utenfor_maalingen(a.median)
+                a.symbol
+                for liste in (*ferdige.values(), mest_omsatte)
+                for a in liste
+                if valg.utenfor_maalingen(a.median)
             ),
             "rader": rader,
             "symboler": frozenset(r["symbol"] for r in rader if r["status"] != "venter"),
@@ -2470,8 +2478,16 @@ def ferdig_liste_side():
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     egne = _egne()
-    bransje = request.args.get("bransje", "")
-    aksjene = egne["ferdige"].get(bransje) if egne else None
+    # Story 8.28: ?liste=mest-omsatte er «De 15 mest omsatte», og ellers er
+    # lista bransjen i ?bransje=, som før.
+    mest = request.args.get("liste") == ferdige_lister.MEST_OMSATTE_NOEKKEL
+    bransje = "" if mest else request.args.get("bransje", "")
+    if not egne:
+        aksjene = None
+    elif mest:
+        aksjene = egne["mest_omsatte"]
+    else:
+        aksjene = egne["ferdige"].get(bransje)
     if not aksjene:
         abort(404)
     return render_template(
@@ -2480,6 +2496,7 @@ def ferdig_liste_side():
         sidesti="/ferdig-liste",
         egne=egne,
         bransje=bransje,
+        mest=mest,
         aksjene=aksjene,
     )
 
@@ -2492,11 +2509,18 @@ def bruk_ferdig_liste():
     lager = _valglager()
     if lager is None:
         abort(404)
-    lista = ferdige_lister.lister(g.tilkobling).get(request.form.get("bransje", ""))
+    # Story 8.28: «De 15 mest omsatte» har flere bransjer, så hver aksje
+    # følges med sin egen. En bransjeliste sender bransjen, som før.
+    if request.form.get("liste") == ferdige_lister.MEST_OMSATTE_NOEKKEL:
+        lista = ferdige_lister.mest_omsatte(g.tilkobling)
+        aksjer = [(a.symbol, a.bransje) for a in lista]
+    else:
+        lista = ferdige_lister.lister(g.tilkobling).get(request.form.get("bransje", ""))
+        aksjer = [(a.symbol, request.form["bransje"]) for a in lista or []]
     if not lista:
         abort(400)
     try:
-        lager.bruk_liste([(a.symbol, request.form["bransje"]) for a in lista])
+        lager.bruk_liste(aksjer)
     except (valg.UgyldigValg, valg.ListaErFull):
         abort(400)
     return redirect(VALG_TILBAKE["min_liste"], code=303)

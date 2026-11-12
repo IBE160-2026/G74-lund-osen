@@ -159,7 +159,8 @@ class TestErDuSikker:
         setning = re.search(r"<p>(.*?)</p>", delen, re.S).group(1)
         assert (
             setning
-            == "Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen."
+            # Story 8.28: setningen gjelder også «De 15 mest omsatte» på hele børsen.
+            == "Velger du en liste, ser du den før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene på børsen eller i bransjen."
         )
         assert re.search(
             r'<a class="knapp ferdigknapp" href="/ferdig-liste\?bransje=Kraft"><svg class="bransjesymbol".*?</svg>'

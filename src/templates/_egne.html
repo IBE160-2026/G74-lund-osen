@@ -99,7 +99,7 @@
       </ul>
       <p class="stegknapper">
         {#- Tillegg 3: knappen har samme navn som delen den går til. #}
-        {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>{% endif %}
+        {% if egne.ferdige or egne.mest_omsatte %}<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>{% endif %}
         {% if egne.full %}<span class="full">Lista er full. Fjern en aksje for å følge en annen.</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
       </p>
     </li>
@@ -121,10 +121,15 @@
       og én kort setning. Aksjene, det som fjernes, og knappen som bytter,
       står på siden «Er du sikker?» (/ferdig-liste), og ingenting byttes før
       den. #}
-  {% if egne.ferdige %}
+  {#- Story 8.28 (FR-412): «De 15 mest omsatte» på hele børsen står først,
+      med antallet, og går til den samme siden «Er du sikker?». #}
+  {% if egne.ferdige or egne.mest_omsatte %}
   <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen.</p>
+  <p>Velger du en liste, ser du den før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene på børsen eller i bransjen.</p>
   <ul class="ferdige-knapper">
+  {% if egne.mest_omsatte %}
+    <li><a class="knapp ferdigknapp" href="/ferdig-liste?liste={{ egne.mest_omsatte_noekkel }}">{{ egne.mest_omsatte_navn }} <span class="antall">{{ egne.mest_omsatte|length }}</span><span class="skjult"> {{ "aksje" if egne.mest_omsatte|length == 1 else "aksjer" }}</span></a></li>
+  {% endif %}
   {% for bransje, aksjene in egne.ferdige.items() %}
     <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
   {% endfor %}
