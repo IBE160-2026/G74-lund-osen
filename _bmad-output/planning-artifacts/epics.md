@@ -4692,6 +4692,39 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 *Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43054754599), og hele settet lokalt før flettingen: 5252 bestått og 37 hoppet over.
 
+### Story 8.26: «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven
+
+*Lagt til 2026-11-13, etter instruksjonen 11.11 kl. 18:01 i `docs/ai-prompts/2026-11-11.md`, med tilleggene 1–20 der og tilleggene 21–24 i `docs/ai-prompts/2026-11-12.md`.* 8.25 var brukt, så dette er 8.26. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md`, med spørsmålene, svarene, triagen av gjennomgangene og mutantene.
+
+Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» viser meg delene av siden der jeg står, uten at siden hopper, at knappene står sammen med sideknappene, og at funnene fra demoprøven er rettet, så sidene er roligere og sier det de viser.
+
+**Oppfyller:** FR-109, svarene 11.11 kl. 16:58–22:20 og 12.11 kl. 09:58–16:24 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 22
+
+**Kontroll — hva testen ser etter:**
+- «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og den nummererte lista fra 8.9 er borte
+- «Vis meg rundt» og «Spill av omvisningen» står i raden øverst etter «Innstillinger», med hvert sitt ikon
+- Tilbudet første gang starter «Vis meg rundt» for oversikten, og det siste steget der viser vei til navnene under «Skilte seg ut»
+- En aksje uten kurser har de samme ordene og den samme forklaringen på hvorfor overalt
+- En aksje som følges, får stjerne med en gang, og en aksje som venter på henting, står nederst med «venter på henting» (migrasjon 0013)
+- Filteret på signalet er borte, og «Følg flere aksjer» og «Din egen liste» er bygget som på tavla
+- README-en har hovedflyten og brukertesten under «Til faglærer» og forskjellene mellom demoen og den ekte versjonen
+- Alt er likt i demoen og den ekte versjonen, og ingen tekst gir råd
+- **Ville feilet hvis:** siden hoppet eller lista fra 8.9 sto, en knapp manglet i raden øverst, tilbudet startet hele omvisningen, ordene for en aksje uten kurser var ulike, stjernen manglet eller en aksje som venter, sto uten merket, eller en rad i tabellen i README-en ikke stemte med koden
+
+**Avhenger av:** 8.9, 8.25. **Én økt:** nei, delene ble bygget etter hverandre.
+
+*Avgjort 2026-11-11 kl. 16:58–17:53 (gruppens svar og ønsker, tilleggene 1–4):* «Vis meg rundt» spiller av siden, knappene står øverst (rådet anbefalte én knapp, gruppen valgte to), funnene fra demoprøven rettes, fotnoten og filteret tas bort, «uten data» sier hvorfor, en aksje som følges, får stjerne, og «Den ekte versjonen» åpnes i en ny fane.
+
+*Avgjort 2026-11-11 kl. 18:09–22:20 (gruppens svar og ønsker, tilleggene 5–20):* siden står i ro, de samme ordene overalt, lenkene har samme farge før og etter besøk, «Din egen liste» og «Følg flere aksjer» som på tavla, brikkene, hjelpetekstene, bryterne og stegene i omvisningen. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 09:58 (gruppens svar, tillegg 21):* tilbudet første gang starter «Vis meg rundt» for oversikten, etter målet «Brukerutfall» i §7 i PRD-en. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 22):* spørsmål 1–9 og 12–22 godtas som bygget, spørsmål 11 etter forslag 1, tillegg 11 kommer ikke (spørsmål 15), og forklaringen på en aksje uten kurser rettes (spørsmål 10). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt. Rådet anbefalte alt.
+
+*Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
+
+*Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

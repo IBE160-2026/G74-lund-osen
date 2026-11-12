@@ -2,7 +2,7 @@
 title: 'Story 8.26: «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven'
 type: 'feature'
 created: '2026-11-11'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '7fd5320c'
 context:
@@ -12,6 +12,8 @@ context:
 ---
 
 Skrevet 11.11 i instruksjonen kl. 18:01, etter gruppens svar 11.11 kl. 16:58, 17:06, 17:12 og 17:21, med tilleggene 1–4 (ønskene kl. 17:44, svaret kl. 17:47 og ønskene kl. 17:48 og 17:53). Instruksjonen kl. 18:01 erstatter instruksjonen kl. 16:58 og tilleggene kl. 17:06 og 17:12, som aldri kom til vinduet, og tillegget kl. 17:38, som stoppet i steg 0. 8.25 er brukt, så dette er 8.26. Storyen flettes ikke før gruppens ja. Svarene står ikke i repoet ennå; det som står her om dem, er hentet fra instruksjonen og tilleggene.
+
+*Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`, etter gruppens ja 12.11 kl. 10:16 og 16:23. Bunnteksten «Appen er under utvikling og ikke ferdig.» står åpen til gruppen har svart (del 15).
 
 ## Storyen
 
