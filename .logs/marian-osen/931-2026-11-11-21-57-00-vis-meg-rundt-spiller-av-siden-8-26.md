@@ -57,3 +57,24 @@ Tilleggene 5, 7, 9, 13, 14, 16, 17, 18, 19 og 20 til 8.26, og tillegg 15 som sto
 - Spørsmål 12–22 i spesifikasjonen venter på gruppen. Spørsmål 22 (VG3, middels) står åpent til gruppen har svart (regel 25).
 - Tillegg 11 er ikke limt inn i vinduet.
 - Ved 390 px er tabellen i «Følg en aksje» kuttet til høyre («Føl…»), også før 8.26 (kontaktarket på bildegrenen).
+
+## 2026-11-12 kl. 11:03 — Marian Osen
+
+### Oppgave
+Tillegg 21 (gruppens svar 12.11 kl. 09:58 om «Brukerutfall» i §7 i PRD-en) og tillegg 22 (svaret kl. 10:16 på spørsmålene i PR #146) til 8.26. Begge kom til vinduet 12.11, kl. 10:04:34 og 10:20:02 (fra `date`), og er lagret ordrett i scratchpad. Tillegg 22 sier ja til flettingen kl. 23:50–23:58 med begge tilleggene.
+
+### Plan
+- Bilder før fra demoen på HEAD, så tillegg 21 i `hjelp.js`, tester, README-en og hjelpen; deretter tillegg 22.
+- Én commit per tillegg, én mutant per tillegg mot HEAD, hele settet i seks deler, push og CI grønn før kl. 22:10. Flettingen kl. 23:50–23:58, og føringen på main etterpå.
+
+### Resultat
+- Tillegg 21 (`500e795a`): tilbudet første gang starter «Vis meg rundt» for oversikten (`OMVISNING.TILBUDET`, `visSiden`), ikke hele omvisningen, og kommer ikke uten knappen. Det siste steget i «Vis meg rundt» på oversikten har linja om å klikke et navn under «Skilte seg ut» (`OMVISNING.videre`), og «Ferdig» gir fokus til det første navnet, eller til tabellen når ingen aksje står der. Prøvd i Edge mot demoen: tilbudet gir steg 1 av 7, og «Ferdig» gir fokus til Brattfjell Energi, eller til `#aksjene` når tabellen er sortert. README-en, hjelpen, Rettet-linjer under svaret 11.11 kl. 13:49 i spesifikasjonen for 8.25 og i `epics.md`, og del 13.
+- Tillegg 22 (`5dd9af96`): forklaringen på en aksje uten kurser sier at EODHD ikke har gitt kurser, og at appen slutter å følge en aksje brukeren har valgt selv hvis EODHD heller ikke gir kurser ved neste henting (`valg.uten_rader`), uten «nettopp er lagt til». Svarene i spesifikasjonen, og VG1, ECH2 og VG3 lukket i triagen.
+- Bildene i `docs/appen/` er like (16 av 16); bare avtrykkene er nye. Bildene før og etter fra demoen ligger i `tillegg-21/` på bildegrenen (`c3da99f6`), og PR-en har dem.
+- Mutantene M27 (linja i hele omvisningen) og M28 (den gamle grunnen tilbake) ble fanget, og filene var like HEAD etterpå (`git hash-object`, og sha256 uten CR).
+- Hele settet i seks deler på `5dd9af96`: 5540 bestått og 24 hoppet over (5564, likt `--collect-only`). Den første runden etter tillegg 21 viste at linja under «Ekstra» må si «seks av sidene» (VG5 i 8.25), og avtrykkene.
+- Brudd: den første runden av hele settet ble stoppet da tillegg 22 kom, fordi den testet en arbeidskopi som endret seg. Del 3 av den runden fortsatte i egen venv til tidsgrensen, fordi stoppen av prosessen ble avslått; mine neste kjøringer ventet på den med `vent.sh`.
+
+### Åpne punkter
+- PR #146 flettes 12.11 kl. 23:50–23:58, og dagsfilene 11.11 og 12.11, `epics.md`, sprint-status og README-en føres på main etterpå.
+- Ved 390 px er tabellen i «Følg en aksje» kuttet til høyre, også før 8.26 (fra før).
