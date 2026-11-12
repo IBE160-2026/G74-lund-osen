@@ -76,7 +76,7 @@ Til faglærer:
 - Testene: de automatiske, med to kommandoer etter at uv er installert: [Tester](#tester)
 - Dokumentene:
   - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8 etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), låst i taggen `arbeidskrav-product-brief-v8`
-  - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md) (ferdig 3.11, låst i taggen `prd-ferdig-2026-11-03`), med [«Kort fortalt»](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt) først
+  - Plan og krav: [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md) (skrevet om 12.11 etter [tilbakemeldingen fra faglærer](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd.md); versjonen ved fristen står i taggen `prd-ferdig-2026-11-03`), med [«Kort fortalt»](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt) først
   - [Arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md) og [epics og stories](_bmad-output/planning-artifacts/epics.md)
   - [Leveranselista](docs/innlevering.md): kravene i emnet og hvor de står
   - [Vurderingsmatrisen for del 1](docs/vurderingsmatrise.md): status per kriterium
@@ -214,7 +214,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 **Plan og krav**
 
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md): versjon 8, laget etter [tilbakemeldingen fra faglærer 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) på versjon 7 (taggen `arbeidskrav-product-brief-v7`), og låst i taggen `arbeidskrav-product-brief-v8` (commit `52023c9`)
-- [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/), med begrunnelser og målinger
+- [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/), med begrunnelser og målinger: skrevet om 12.11 etter [tilbakemeldingen fra faglærer](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd.md) på versjonen i taggen `prd-vurdert-2026-11-12`, med historikken i [endringsloggen](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd-endringslogg.md)
 - [Relevanseksperimentet](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md)
 - [Arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md)
 - [Epics og stories](_bmad-output/planning-artifacts/epics.md)
