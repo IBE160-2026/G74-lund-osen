@@ -4196,7 +4196,8 @@ AVTRYKK_I_PILENE = {
     # i «Dokumentene». Var d80b9ef9..., og cda0d0fd... med «kort fortalt»,
     # som test_de_gamle_ordene_staar_ikke_igjen ikke tillater.
     # Story 8.22 (regel 19): kontrollsjekken av bransjene 10.11. Var cd15079a....
-    "Dokumentene": "79d0a921c1d032371e8edbd66e512e9c1b4428161007557b7acef7ce68f814cd",
+    # Story 9.12 (regel 17 og 19): technology.md fra faglærer 12.11. Var 79d0a921....
+    "Dokumentene": "6e536a48f8f3022f26e08693815b320498c090d7513559e5ae020b6ce2e0204a",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i

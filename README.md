@@ -217,6 +217,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/), med begrunnelser og målinger
 - [Relevanseksperimentet](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md)
 - [Arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md)
+- [Teknologioversikt fra faglærer](_bmad-output/planning-artifacts/architecture/technology.md): en referanse faglærer la inn 12.11, som beskriver et annet prosjekt, Website V2 hos Pytagoras Forlag, ikke OSE Signal
 - [Epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Designregler](_bmad-output/planning-artifacts/designregler.md)
 - [Utdrag fra designtavla 13.10](_bmad-output/planning-artifacts/designutdrag-2026-10-13.md): grunnlaget for planen til story 8.0d
