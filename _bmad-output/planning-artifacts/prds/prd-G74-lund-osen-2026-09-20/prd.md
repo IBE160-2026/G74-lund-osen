@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-12T18:25
+updated: 2026-11-12T18:38
 ---
 
 # PRD — OSE Signal
@@ -99,7 +99,7 @@ koden.
 
 **UJ-1. Kari** følger 12 aksjer ved siden av studiene. Hun åpner appen om
 kvelden, etter at hentingen er gjort. Første gang tilbyr appen omvisningen
-(«Vis meg rundt»), og hun kan si nei. Oversikten viser at to aksjer har 3 av 3
+(«Spill av omvisningen»), og hun kan si «Nei takk». Oversikten viser at to aksjer har 3 av 3
 og står øverst under «Skilte seg ut». Hun åpner den ene og leser de tre sjekkene
 under «Hvorfor signalet ble 3», hver med verdien den ga og målingen bak, og ser
 volumsøylene og 50-dagers snittet i kursgrafen. Med KI på står en kort tekst
@@ -196,11 +196,11 @@ koden 12.11.
 | FR-607 | KI-teksten om dagen | ekstra | ja |
 | FR-608 | Valg av tjeneste og egne nøkler | kjerne | ja |
 | FR-608 | ChatGPT med «Sign in with ChatGPT» | ekstra | nei |
-| FR-602A–FR-606A | KI-laget over meldinger (vedlegg A) | senere | nei |
+| FR-602A–FR-604A, FR-606A | KI-laget over meldinger (vedlegg A) | senere | nei |
 | FR-701–FR-706 | Signalet og forklaringen | kjerne | ja |
 
-Uten eget FR, men i kjernen: Min liste, «Signalet dag for dag» på aksjesiden og
-lenken til investorsiden. Uten eget FR, som ekstra og bygget: egne notater på
+Uten eget FR, men i kjernen: Min liste (spørsmål i spesifikasjonen for 9.11).
+Uten eget FR, som ekstra og bygget: egne notater på
 aksjesiden med tenkte kjøp og salg, «Følg en aksje» og «Din egen liste». De står
 i `epics.md`.
 
@@ -240,7 +240,7 @@ De 15 aksjene appen starter med, oppfyller begge kravene:
 2. **Universet dekker minst åtte sektorer.** Kravet gjelder lista som helhet,
    ikke det enkelte symbolet.
 
-Det brukeren ser, heter «bransje»; koden og kravene sier «sektor». Appen har 13
+Det brukeren ser, heter «bransje»; koden og denne delen sier «sektor». Appen har 13
 bransjer (`designregler.md` §4), og de 15 hører til 8 av dem.
 
 Antallet er utledet av API-kvoten: EODHD på gratisnivå gir 20 kall i døgnet,
@@ -304,6 +304,10 @@ Sluttkursen er den ujusterte, mens prosenten regnes på `adjusted_close`. På en
 justeringsdag stemmer derfor ikke differansen mellom to sluttkurser med
 prosenten, og dagen merkes (FR-407).
 
+Endringen i kroner skal stå på en mindre linje under prosenten, regnet av
+`adjusted_close` for de samme to dagene, så de to alltid peker samme vei.
+Sorteringen er fortsatt på prosent, og det er fortsatt fem kolonner.
+
 Tabellen er delt i «Skilte seg ut», aksjene med styrke på terskelen eller over
 (FR-705), og «Øvrige aksjer». Selskapscellen har også merkene «Egen» og
 «Utenfor målingen» (FR-412), og stjernen for Min liste.
@@ -338,7 +342,7 @@ stemmer med radene.
 *Konsekvenser:* tabellen har fem kolonner for hver periode og hvert filter; en
 aksje uten vurdering for dagen har «–» og grunnen i Signalstyrke og «Ukjent» i
 Retning, aldri 0 og aldri «Ingen»; en aksje uten kurser står nederst med «uten
-data»; antallet rader er antallet aksjer i lista; ingen side gjør et API-kall.
+data»; endringen i kroner har samme fortegn som prosenten; antallet rader er antallet aksjer i lista; ingen side gjør et API-kall.
 
 ##### Hvor gamle dataene er
 
@@ -346,11 +350,13 @@ Stripa øverst sier når dataene sist ble oppdatert, og tidspunktet er det
 **eldste** hentetidspunktet blant aksjene som vises. En rad hentet tidligere enn
 de nyeste har «hentet» med tidspunktet under navnet, og en rad med en eldre dag
 enn sidens har «siste kurs» med ukedag og dato. Det er ingen sjette kolonne.
+Ukedagen i overskriften og datoen under den er den eldste dagen blant radene,
+mens hovedindeksen, søylene og linja over tabellen gjelder den nyeste (FR-104).
 Tidsstempler vises i norsk tid.
 
 *Konsekvenser:* med én aksje hentet tidligere enn de andre viser stripa den
-eldste tiden, og raden har sin egen; en side med én fersk rad og fjorten gamle
-ser aldri fersk ut.
+eldste tiden, og raden har sin egen; med én aksje med en eldre dag har
+overskriften den eldre ukedagen.
 
 ##### Navigasjon til aksjedetaljen
 
@@ -447,7 +453,8 @@ falt.
   dag eller periode i børsometeret.
 - Ingen nye kall og ingen ny lagring: endringen er den i FR-101.
 
-*Konsekvenser:* antallet søyler er antallet aksjer med kurs for dagen; søylene
+*Konsekvenser:* antallet søyler er antallet aksjer med en endring for dagen, og
+en aksje uten kurs dagen før navngis under søylene; søylene
 står sortert fra lavest til høyest endring; søylene og tabellen viser samme
 endring for samme aksje og periode.
 
@@ -456,23 +463,24 @@ endring for samme aksje og periode.
 Børsometeret er en egen side, i stripa mellom Markedsoversikt og Min liste. Det
 viser lista som er aktiv som et kart med én rute per aksje, ordnet etter bransje:
 farge for endringen, størrelse for volumet mot vanlig, ramme for signalet, og
-snittet av endringen per bransje ved navnet. En bransje med én aksje merkes «1
-aksje». Siden har periodevalget fra FR-101, forklaringen «Slik leser du
+snittet av endringen per bransje ved navnet. En aksje med 3 av 3 har gul ramme.
+En bransje med én aksje merkes «1 aksje». Siden har periodevalget fra FR-101, forklaringen «Slik leser du
 børsometeret» og en tabell med de samme tallene. Ingen nye kall og ingen ny
 tabell.
 
 *Konsekvenser:* snittet for en bransje er snittet av endringene i FR-101 for
-aksjene i bransjen; antallet ruter er antallet aksjer med kurs; tabellen og
-rutene viser samme endring.
+aksjene i bransjen; antallet ruter er antallet aksjer i lista, og en aksje uten
+kurs for dagen har «Uten data»; tabellen og rutene viser samme endring.
 
 #### FR-107 — Endret signalstyrke siden forrige børsdag
 
 Når signalstyrken har endret seg siden forrige lagrede børsdag, står et lite
 merke under den, for eksempel «var 1 mandag», i markedsoversikten og i Min
-liste. Merket regnes av lagrede vurderinger og aldri på nytt (FR-408). Det har
+liste. Ukedagen er forrige børsdag i norsk tid. Merket regnes av lagrede
+vurderinger og aldri på nytt (FR-408). Det har
 ingen pil, fordi pilene står for retning (FR-103). Mangler den forrige raden,
 eller har den en grunn, står det ikke noe merke. Merket skjules når en
-sammenligning med en annen dag er valgt. Ikke bygget (§2).
+sammenligning med en annen dag er valgt.
 
 *Konsekvenser:* med styrke 1 forrige børsdag og 3 i dag står «var 1 <ukedag>»;
 med samme styrke, en forrige rad med grunn eller ingen forrige rad står ingenting.
@@ -480,7 +488,7 @@ med samme styrke, en forrige rad med grunn eller ingen forrige rad står ingenti
 #### FR-108 — Filter på signalet
 
 Over tabellen velges «Alle», «3 av 3 positiv» eller «3 av 3 negativ», med
-antallet i hver. Filteret viser aksjene med styrke 3 og den retningen, innenfor
+antallet ved de to filtrene. Filteret viser aksjene med styrke 3 og den retningen, innenfor
 lista som vises, også i Min liste. Rekkefølgen er fortsatt FR-102. Teksten ved
 filteret sier at det viser hva sjekkene ga, og at det ikke er et råd; filteret
 heter ikke «topp» (NFR-06, FR-703). Gir filteret ingen aksjer, står det hvor
@@ -504,8 +512,10 @@ bruker, så hjelpen ikke kan si én ting mens koden gjør en annen.
   liste, «Følg en aksje» og Innstillinger, ett steg om gangen, med «Tilbake»,
   «Neste» og «Lukk». Første gang appen åpnes, tilbys omvisningen én gang, og et
   nei huskes i nettleseren.
-- **«Lær noe nytt».** En liten boks med ett kontrollert tips per dag, fra en fast
-  liste. Ikke bygget (§2).
+- **«Lær noe nytt».** En liten boks i oversikten med ett tips per dag, fra en fast
+  liste. KI kan skrive utkast, men hvert tips kontrolleres og rettes av en av oss
+  før det tas inn, og er merket med hvem og når. Dagens tips velges etter en
+  regel i koden, ut fra datoen eller dagens tall.
 
 Hjelpen og omvisningen skjules når «Vis hjelp» er av (FR-110). Ingen tekst kan
 leses som et råd (NFR-06).
@@ -538,15 +548,15 @@ på `adjusted_close` skiller seg med mer enn 0,1 prosentpoeng
 gir samme utslag, så appen sier «justeringsdag», ikke «utbytte».
 
 - Oversikten merker endringen «justeringsdag» for dagen.
-- Aksjesiden forklarer merket ved endringen, markerer justeringsdagene det siste
-  året i kursgrafen, og sier hvor mange det var og datoen for den siste, eller at
-  det ikke var noen.
+- Aksjesiden forklarer merket ved endringen, markerer justeringsdagene i
+  perioden kursgrafen viser, og sier hvor mange det var det siste året og datoen
+  for den siste, eller at det ikke var noen.
 - Historikken sier ingenting om neste justering (NFR-06).
 
 *Konsekvenser:* en serie der `close` falt 3 % og `adjusted_close` 0 % gir en
 justeringsdag; et avvik på 0,1 prosentpoeng eller mindre gir det ikke; ordet
-«utbytte» står ikke ved merket; antallet i teksten er antallet markerte dager i
-grafen det siste året.
+«utbytte» står ikke ved merket; med 1 år valgt er antallet i teksten antallet
+markerte dager i grafen.
 
 ---
 
@@ -558,7 +568,9 @@ grafen det siste året.
 
 Kursgrafen har periodevalget fra FR-101, med de samme knappene: siste børsdag,
 1 uke, 1 mnd, 3 mnd, 6 mnd, I år og 1 år, og datofeltet med «Vis dagen». Grafen
-åpner med 6 mnd. Startdagen for hver periode er den samme i oversikten og grafen,
+åpner med 6 mnd. Siste børsdag og en dag valgt i datofeltet viser 6 mnd fram
+til dagen, med dagen merket, endringen den dagen og signalet som er lagret for
+den. Startdagen for hver periode er den samme i oversikten og grafen,
 og regelen testes med faste datoer rundt helger, helligdager og nyttår (NFR-08).
 Har serien færre dager enn perioden, tegnes det som finnes, med datoene på aksen.
 
@@ -573,7 +585,8 @@ aldri på nytt (FR-408).
 *Konsekvenser:* 6 mnd er valgt når siden åpnes; startdagen for 1 mnd er den
 samme på aksjesiden og i oversikten for samme dag; med 100 dager i serien og 1
 år valgt tegnes de 100 dagene og ingen tomme dager foran; med en dag valgt
-viser sjekkene den lagrede vurderingen for dagen.
+viser sjekkene den lagrede vurderingen for dagen, og grafen viser 6 mnd fram
+til den med dagen merket.
 
 #### FR-202 — MA50-linjen tegnes oppå kursen
 
@@ -601,9 +614,11 @@ grensestrek og en tekst sier hvorfor; markedsoversikten viser `close` og grafen
 Aksjesiden viser i tillegg:
 
 - Lenken «Markedsoversikt» tilbake til oversikten (FR-101)
+- Tickeren ved selskapsnavnet, for eksempel EQNR
 - De tre sjekkene ved navn under «Hvorfor signalet ble N», med verdien hver av
   dem ga og målingen bak den (FR-706)
-- KI-teksten under sjekkene, «Signalet forklart», når KI er på (FR-602)
+- Rammen «Signalet forklart» etter kursgrafen, med appens setninger om
+  sjekkene, bryteren og KI-teksten når KI er på (FR-602)
 - «Signalet dag for dag», de lagrede vurderingene måned for måned, med skillet i
   FR-409
 - Lenken til selskapets investorside, som åpnes i nettleseren og aldri hentes av
@@ -613,7 +628,7 @@ Aksjesiden viser i tillegg:
 - Notatene, når «Vis notater» er på (FR-110)
 - Høy og lav for dagen ved sluttkursen, og endringen i kroner ved prosenten.
   Høy og lav vises bare når begge finnes og lav ≤ sluttkurs ≤ høy, ellers «–»
-  (NFR-08). Ikke bygget (§2)
+  (NFR-08), og de tegnes ikke i grafen
 
 *Konsekvenser:* aksjesiden har alle tre sjekkene også når de ga 0; lenken til
 investorsiden har `target="_blank"` i den ekte versjonen og peker aldri på
@@ -627,10 +642,12 @@ hull i serien, kan det ikke regnes, og aksjesiden svarer som vanlig:
 
 | Tilfelle | Svar | Hva siden viser |
 |---|---|---|
-| For kort serie eller hull | 200 | Grafen så langt dataene rekker, uten MA50 når snittet ikke finnes, og «Signalet kunne ikke regnes» med grunnen. Ingen sjekker |
+| For kort serie | 200 | Grafen så langt dataene rekker, uten MA50 når snittet ikke finnes, og «Signalet kunne ikke regnes» med antallet dager. Ingen sjekker |
+| Hull i en lang nok serie | 200 | Grafen, og at det ikke finnes noen vurdering for dagen fordi signalet ikke kunne regnes |
 | Aksje i lista uten en eneste kurs | 200 | En beskjed om at det ikke finnes kurser ennå, uten graf og sjekker |
 | Symbol utenfor lista | 404 | — |
-| Base uten en eneste kurs, før første henting | 404 | — |
+| Base uten en eneste kurs, før første henting, eller demo uten demobase | 404 | — |
+| Basen kan ikke leses | 503 | — |
 
 **Kursen finnes selv om snittet ikke kan regnes**, og da vises den. Begrunnelse:
 en 404 sier at aksjen ikke finnes, og NFR-03 sier at manglende data for én aksje
@@ -644,7 +661,8 @@ antallet dager; en aksje i lista uten kurser gir 200; et symbol utenfor lista gi
 
 Aksjesiden har delen «Se nærmere», rett under kursgrafen, med tre spørsmål
 brukeren kan sjekke selv. Den gir ikke råd (NFR-06). Svarene regnes av tall appen
-allerede har, uten nye kall og uten ny tabell. Ikke bygget (§2).
+allerede har, uten nye kall og uten ny tabell. Grensene står i parametrene
+beregningen bruker.
 
 1. «Børsen, bransjen eller selskapet?»: aksjens endring mot hovedindeksen og mot
    snittet av de andre i samme bransje i lista. Svarene er «Børsen», «Bransjen»,
@@ -680,7 +698,7 @@ sjekket. Er den sjekket for mer enn 7 dager siden, vises den i grått med
 «sjekket <dato>, kan være endret». En dato som har passert uten at kursserien
 viser en justering (FR-407), merkes «ikke bekreftet». Ingen dato vises uten at
 den er sjekket (NFR-08), og uten dato står det ingenting. I demoen er datoene
-oppdiktet og merket «Eksempeltall» (FR-411). Ikke bygget (§2).
+oppdiktet og merket «Eksempeltall» (FR-411).
 
 *Konsekvenser:* en dato sjekket for 8 dager siden er grå med teksten; en dato
 uten sjekkdato vises ikke.
@@ -701,8 +719,8 @@ hvordan henting gjøres, ikke en feil.
 Hentekommandoen:
 
 1. nekter på en børsdag før kl. 22:00 norsk tid, fordi dagens rad ikke er
-   endelig før (punkt 23 i endringsloggen, §8), unntatt første henting i en tom
-   base, som henter forrige børsdag (FR-402)
+   endelig før og en vurdering ikke kan skrives om (`malinger.md` §37), unntatt
+   første henting i en tom base, som henter forrige børsdag (FR-402)
 2. tar i bruk endringene i lista brukeren har bedt om (FR-412)
 3. sjekker basen først: har den kursene for børsdagen for alle i lista, gjøres
    ingen kall til kursene (FR-402), og det som mangler av hovedindeksen,
@@ -714,7 +732,7 @@ Hentekommandoen:
 
 **Kveldsjobben.** Oppgaveplanlegging på en PC i gruppen starter hentekommandoen
 hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45, fra en egen arbeidskopi
-av main. Tapte kjøringer tas ikke igjen. Før noe annet startes, sjekker jobben
+av main på commiten main hadde ved midnatt. Tapte kjøringer tas ikke igjen. Før noe annet startes, sjekker jobben
 med basen bare for lesing og uten kall om børsdagen alt er ferdig. Er den det,
 startes verken Docker Desktop eller den lokale modellen. Etter hentingen måler
 jobben omsetning med kallene som er igjen (FR-413). Loggen skrives under
@@ -726,7 +744,8 @@ dobbeltklikket er den bevisste handlingen. Er det ingenting nytt å hente, gir d
 i en klon aldri henter med gruppens nøkkel.
 
 Begrunnelse: en container startes på nytt hver gang, og henting ved oppstart
-ville brukt 15 kall per start mot en dagskvote på 20.
+ville brukt ett kall per aksje og ett for indeksen ved hver start, 16 med 15
+aksjer, mot en dagskvote på 20.
 
 *Konsekvenser:* å starte webserveren gir 0 kall; en kjøring på en børsdag kl.
 21:59 gir 0 kall og en melding; to kjøringer samme kveld gir kall bare i den
@@ -778,7 +797,9 @@ krav om å hente oftere: kravet gjelder hva en henting gjør når den først skj
 ##### Minste historikk: 175 handelsdager
 
 Hver henting dekker **minst 175 handelsdager** per symbol: 125 for seks måneder
-i grafen (FR-201) og 50 til, så MA50 finnes på grafens første punkt (FR-202).
+i grafen (FR-201) og 50 til, så MA50 finnes på første punkt når grafen viser 6
+mnd (FR-202). Med 1 år valgt begynner MA50-linja etter de første 50 dagene i
+serien.
 **I praksis hentes et helt år**, fordi ett kall koster det samme uansett
 intervall (`malinger.md` §2), og gratisnivået gir ett år.
 
@@ -820,7 +841,8 @@ første henting på dagtid i en tom base skriver vurderingene og KI-tekstene for
 børsdagen rett før, én gang. Spørsmålet «hva sa løsningen om EQNR for to uker
 siden?» besvares av «Signalet dag for dag» på aksjesiden (FR-203).
 
-*Konsekvenser:* å skrive en vurdering for en tidligere børsdag gir en feil; en rad
+*Konsekvenser:* å skrive en vurdering for en tidligere børsdag gir en feil, utenom
+første henting i en tom base; en rad
 med grunn skriver aldri over en rad med vurdering samme dag; målingene på raden
 gir samme fortegn som sjekkene med parametrene for dagen.
 
@@ -866,7 +888,7 @@ gir 15 vurderinger og ingen indeksrad; en lørdag i svaret lagres ikke.
 #### FR-411 — Demoversjonen har oppdiktede tall i en egen base
 
 Appen kan vises fram uten EODHD-nøkkel og uten data fra EODHD. Demoen er
-hovedveien for vurderingen, fordi vurderingen ikke skal avhenge av at noen
+hovedveien for faglærer og sensor, fordi sensuren ikke skal avhenge av at noen
 oppretter konto hos en ekstern tjeneste (`docs/innlevering.md`). En egen
 kommando lager demobasen.
 
@@ -887,8 +909,9 @@ kommando lager demobasen.
 - Demobasen ligger aldri i imaget eller i repoet.
 - Alt brukeren ser i v1, kan vises i demoen, også KI av og på, med ferdige
   KI-tekster. Der demoen ikke kan gjøre det samme fordi den ikke henter, forklarer
-  en boks hvordan det er i den ekte versjonen. Lista i demoen kan byttes, men det
-  hentes aldri.
+  en boks hvordan det er i den ekte versjonen, gjerne med et bilde laget fra
+  testdata, aldri med ekte kurser. Lista i demoen kan byttes, men det hentes
+  aldri.
 
 *Konsekvenser:* demokommandoen kjørt to ganger gir byte for byte samme kurser; hver
 side fra demobasen har «Eksempeltall»; hentekommandoen mot demobasen nekter og
@@ -938,8 +961,9 @@ bakover fra børsdagen. Tallet og datoen lagres i basen, og rådata skrives unde
 - Rekkefølgen er først aksjene som aldri er målt, uten aksjene i lista, og så den
   eldste målingen først. Datoen står ved hvert tall.
 - Den bruker ikke bonuskvoten, og stopper hvis bonuskvoten endrer seg. Ett
-  unntak er avgjort: et eget valg bruker bonuskvoten én gang til aksjene som
-  mangler en måling, og lar minst 200 kall stå igjen i den (NFR-01).
+  unntak ble avgjort for kjøringen 10.11: et eget valg brukte bonuskvoten til
+  aksjene som manglet en måling, og lot minst 200 kall stå igjen i den. Valget
+  finnes fortsatt i koden (NFR-01).
 
 *Konsekvenser:* med 0 kall igjen gjøres ingen måling; en kjøring før hentingen er
 ferdig gir 0 kall; uten det egne valget endrer bonuskvoten seg aldri.
@@ -952,7 +976,7 @@ dato har datoen den ble sjekket og hvor den ble lest. Et selskap får ingen dato
 før vilkårene for nettstedet er lest og ført i `docs/kilder-og-rettigheter.md`.
 Sidene leses av en av oss og hentes aldri av programmet. Kommandoen gjør ingen
 nettkall, og webserveren skriver ikke tabellen. Lista sjekkes minst én gang i
-uka, og dagen før en eks.dato. Ikke bygget (§2).
+uka, og dagen før en eks.dato.
 
 Begrunnelse: kursserien finner dagen først når den har skjedd, EODHDs kalender
 svarer 403 på gratisnivået, og Euronext er ute (`begrunnelser.md` §11).
@@ -1009,7 +1033,8 @@ erstatter den aldri.
 KI-teksten vises bare når grunnlaget i loggen (FR-604) stemmer med vurderingen
 som vises: samme styrke, samme retning og samme fortegn for de tre sjekkene.
 Ellers vises siden som en dag uten KI-tekst. Ved visningen stoppes også en tekst
-med ord om kjøp, salg eller anbefaling, selv om den besto kontrollen.
+med ord fra en egen, kortere liste om kjøp, salg og anbefaling, selv om den
+besto kontrollen.
 
 *Konsekvenser:* sjekkene er de samme med KI av og på, og det eneste som skiller
 sidene, er KI-teksten; en logget tekst med en annen styrke enn vurderingen vises
@@ -1029,11 +1054,12 @@ på en sikkerhetsscore fra modellen:
 2. **Tallene.** Bare antall fra grunnlaget og regelens faste tall, som 50 i MA50,
    er lov. Tall skrevet med ord sjekkes også. Desimaltall, prosent og enheter
    stoppes alltid.
-3. **Råd.** Teksten har ingen ord fra rådlista, som «bør», «råd», «anbefal»,
-   «investerings-», «behold» og «verdt» (NFR-06).
+3. **Råd.** Teksten har ingen ord fra rådlista i kontrollen, blant annet «bør»,
+   «råd», «anbefal», «investerings-», «behold» og «verdt» (NFR-06).
 4. **Gjetning.** Teksten har ingen ord som gjetter eller spår, som «trolig»,
    «sannsynligvis», «kan tyde på», «antyde» og «forventes», og nevner ingen årsak
-   som ikke står i grunnlaget, som nyheter, resultater eller kontrakter. En
+   som ikke står i grunnlaget, som nyheter, kontrakter eller rapporter. Ordet
+   «resultat» står ikke i lista, fordi det i prøven viste til sjekkene. En
    forklaring av regelen selv er lov, som «fordi ingen sjekk ga utslag». Grunnlaget
    har ingen årsaker, så en årsak i teksten er alltid gjettet.
 
@@ -1062,11 +1088,12 @@ rad:
 | Om teksten besto kontrollen i FR-603, og ellers hvorfor ikke | En tekst som ikke vises, skal fortsatt finnes |
 | Promptversjon, tjeneste, modell, modell-ID, seed, temperatur, om modellen kjørte med eller uten grafikkort, og Ollama-versjonen for den lokale | To tekster kan bare sammenlignes når dette er kjent (`malinger.md` §19, FR-605) |
 
-Det er én rad per aksje og børsdag, også når modellen feiler: da har raden ingen
-tekst og sier at modellen feilet (NFR-04). Finnes raden, kalles ikke modellen på
+Det er én rad per aksje og børsdag, også når modellen feiler for en aksje: da
+har raden ingen tekst og sier at modellen feilet (NFR-04). Finnes raden, kalles ikke modellen på
 nytt, og en rad kan verken endres eller slettes. Loggen skrives i
-hentekommandoen; siden skriver aldri i den. Svarer ikke den lokale modellen før
-hentingen, skrives ingen rader for dagen, og utskriften sier at samme kommando
+hentekommandoen; siden skriver aldri i den. Svarer ikke den lokale modellen i
+det hele tatt når hentingen sjekker den før første tekst, skrives ingen rader
+for dagen, og utskriften sier at samme kommando
 kan kjøres igjen samme kveld med 0 kall til EODHD.
 
 Loggingen startet ved første kjøring, ikke da eksempelsettet skulle lages: skrus
@@ -1100,10 +1127,11 @@ meldinger, står i FR-606A i vedlegg A.
 
 Under tabellen i markedsoversikten står noen setninger om hele børsdagen,
 «Børsdagen kort fortalt», skrevet av KI. Grunnlaget er bare antall og retninger:
-retningen på hovedindeksen og for uka, hvor mange som gikk bedre enn indeksen og
-hvor mange som hadde kurs, hvor mange som skilte seg ut per retning, navnene på
-høyst fem av dem med styrke og retning, bransjene som steg og falt mest, og hvor
-mange som hadde uvanlig volum. Ingen prosenter. Teksten lages én gang i
+ukedagen, retningen på hovedindeksen og for uka, hvor mange som gikk bedre enn
+indeksen og hvor mange som hadde kurs, hvor mange som skilte seg ut per retning,
+navnene på høyst fem av dem med styrke og retning, antall som steg per bransje,
+bransjene som steg og falt mest, og om flere eller færre enn vanlig skilte seg
+ut. Ingen prosenter. Teksten lages én gang i
 hentekommandoen, med ett kall til modellen per børsdag (NFR-02), logges som i
 FR-604 og FR-605, og er merket med modellen. Kontrollen i FR-603 gjelder, og
 teksten vises bare når grunnlaget stemmer med det siden viser. Den gir ikke råd
@@ -1115,8 +1143,8 @@ teksten som ikke står i grunnlaget, stopper den; med KI av vises den ikke.
 #### FR-608 — Valg av tjeneste
 
 Tjenesten velges i `.env` med `OSE_KI_TJENESTE`: `lokal`, `gemini`, `anthropic`,
-`openai` eller `av`. Uten variabelen gjelder `lokal`, og malen `.env.example`
-har `av`. Den lokale modellen trenger verken nøkkel eller konto. Det er én
+`openai` eller `av`. Uten variabelen gjelder `lokal`. Malen `.env.example`
+har `av`, så KI er av for en ny bruker til README-en sier hvordan den slås på. Den lokale modellen trenger verken nøkkel eller konto. Det er én
 tjeneste per kjøring, uten stille overgang til en annen. Feiler tjenesten, blir
 det ingen tekst og en rad i loggen (FR-604, NFR-04). Nøklene heter
 `OSE_KI_GEMINI_NOKKEL`, `OSE_KI_ANTHROPIC_NOKKEL` og `OSE_KI_OPENAI_NOKKEL`, og
@@ -1232,7 +1260,8 @@ Med målingen kan brukeren regne etter:
 > Trend +1 (+3,1 % mot MA50) · Bevegelse −1 (−3,5 % mot 1,1 % standardavvik) ·
 > Interesse −1 (volum 4,95 × medianen) → styrke 3, retning blandet
 
-De tre tallene til høyre er grunnlaget, og de to til venstre er utledet av dem.
+Tallene i parentes er grunnlaget, og styrken og retningen etter pila er utledet
+av dem.
 Ingen vekting og ingen skjult formel. Er medianvolumet 0, står «–» med grunnen i
 stedet for forholdstallet.
 
@@ -1256,8 +1285,8 @@ Bonuskvoten (`extraLimit`) brukes bare til å fullføre kveldens hovedhenting:
 er det færre kall igjen av dagens 20 enn hentingen trenger, men bonusen dekker
 resten, hentes det, og utskriften sier hvor mange kall som tas fra bonusen.
 Dekker heller ikke bonusen det, blir det 0 kall. Første henting i en tom base,
-nye forsøk og målingen av omsetning bruker aldri bonuskvoten, med det ene
-unntaket i FR-413.
+nye forsøk og målingen av omsetning bruker aldri bonuskvoten, utenom kjøringen
+10.11 i FR-413.
 
 Ett bulk-kall er ikke et alternativ: det koster 100 kall. Ett kall per symbol er
 eneste vei, og det er denne begrensningen som gir universet på 15. Ingen del av v1 krever
@@ -1266,7 +1295,7 @@ konto hos EODHD, og KI-teksten lages med den lokale modellen.
 
 *Konsekvenser:* med 15 aksjer bruker en henting 16 kall og lar 4 stå; med 3 kall
 igjen og bonus nok bruker hentingen bonusen og sier det; et nytt forsøk med 0
-kall igjen av dagens 20 gjør ingen kall; ingen test gjør et API-kall (AD-8).
+kall igjen av dagens 20 gjør ingen kall; ingen test gjør et API-kall.
 
 ### NFR-02 — Brukeren venter aldri på en henting
 
@@ -1279,8 +1308,8 @@ nettsperren i testene stopper ethvert nettkall fra en side.
 
 ### NFR-03 — Manglende data stopper ikke hovedflyten
 
-Ved kildefeil, manglende data eller dager uten tydelige signaler verken stopper
-hovedflyten eller tvinger fram et resultat. Siste kjente data vises med
+Ved kildefeil, manglende data eller dager uten tydelige signaler stopper
+løsningen verken hovedflyten eller tvinger fram et resultat. Siste kjente data vises med
 tidsstempel, og signalstyrke 0 er et gyldig svar (FR-702).
 
 *Konsekvenser:* en base der én aksje mangler alle kurser, gir 200 på oversikten
@@ -1308,10 +1337,12 @@ Signalstyrke og retning beskriver hva sjekkene slo ut på, ikke hva brukeren bø
 gjøre. Ingen del av grensesnittet formuleres som en anbefaling om kjøp eller
 salg: ikke malene, ikke hjelpen og ikke KI-tekstene.
 
-*Konsekvenser:* ingen tekst i malene, hjelpen eller KI-tekstene inneholder ord
-fra rådlista i FR-603; KI-tekstene kontrolleres når de lages og når de vises.
-Hjelpen, omvisningen og flere av sidene har en slik test. En test som går
-gjennom alle malene, er et åpent punkt (§8).
+*Konsekvenser:* ingen KI-tekst som vises, har et ord fra rådlista i FR-603, og
+kontrollen skjer når teksten lages og når den vises; hjelpetekstene og
+omvisningen har ingen ord fra rådordene testene for hjelpen bruker. Ord som
+«råd», «kjøp» og «salg» står bare der en side sier at noe ikke er et råd, og i
+notatene om tenkte kjøp og salg. En test som går gjennom alle malene, er et
+åpent punkt (§8, punkt 26).
 
 ### NFR-07 — Rådata bevares fra første kjøring
 
@@ -1358,14 +1389,14 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 
 | ID | Mål | Hva vi måler | Terskel | Frist | Krav |
 |---|---|---|---|---|---|
-| SM-1 | Brukerutfall | En person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering | FR-101, FR-102, FR-109, FR-201, FR-202, FR-706 |
+| SM-1 | Brukerutfall | En person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering | FR-101, FR-102, FR-109, FR-201, FR-202, FR-402, FR-602, FR-706, NFR-03 |
 | SM-2 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon, ført i brukslogga | Løpende | FR-401, FR-412, NFR-02 |
 | SM-3 | Drift | Én henting fullfører innenfor kvoten; ved kildefeil vises siste kjente data med tidsstempel | Én kommando gjør hele hentingen, også migrasjonene. Ingen stopp ved manglende data | Ukentlig | FR-401, FR-402, FR-406, FR-408, NFR-01, NFR-03 |
 | SM-4 | Dager uten signal | Dager uten tydelige signaler håndteres uten at hovedflyten stopper eller tvinger fram et resultat | Signalstyrke 0 forekommer og vises korrekt | Løpende | FR-702, FR-703, FR-409, NFR-03 |
 | SM-5 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig | Minst tre dager i uka de to siste ukene, ført i brukslogga | Ved prosjektinnlevering | FR-101, FR-401 |
 | SM-6 | Grensesnitt og stabilitet | Hovedflyten fungerer uten feil i en demonstrasjon | Hovedflyten gjennomført uten feil eller manuelle inngrep | Ved demonstrasjonen | FR-101, FR-201, FR-204, FR-411, NFR-03 |
 | SM-7 | Riktige beregninger | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består, og en kontroll for hånd stemmer med appen (`malinger.md` §6) | Ved hver testkjøring | FR-701, FR-702, FR-703, FR-704, NFR-08 |
-| SM-8 | KI-forklaringen | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og hver tekst er logget | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen | FR-601, FR-602, FR-603, FR-604, FR-605, NFR-04 |
+| SM-8 | KI-forklaringen | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og hver tekst er logget | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen | FR-601, FR-602, FR-603, FR-604, FR-605, FR-607, NFR-04 |
 | SM-9 | Kjørbar for andre | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler: demoen uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin | Senest én uke før innleveringen | FR-411, FR-608, NFR-01 |
 
 **Hovedflyten** er: åpne markedsoversikten, se hvilke aksjer som skiller seg ut,
@@ -1378,9 +1409,12 @@ den er på. SM-1 og SM-6 måler denne flyten, som brukerreisen UJ-1 beskriver.
   at personen forklarte uoppfordret hvorfor en aksje skilte seg ut, men brukte
   over 5 minutter (`docs/brukertest.md`). Terskelen står.
 - SM-8: uka 29.10–04.11 er logget, med 75 tekster, 15 på hver av de fem
-  børsdagene, og alle besto kontrollen.
+  børsdagene, laget med `gemma4:e4b` lokalt og promptversjon 3. Alle besto
+  kontrollen, og 0 ble stoppet; etter motmålet under er det et varsel, ikke en
+  suksess. Promptversjonen er 6 i dag, så uka gjelder en eldre prompt.
 - SM-2 og SM-5 føres i [brukslogga](../../../../docs/brukslogg.md) fra 4.11, én
   linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk.
+  Brukslogga har én linje 12.11.
 - SM-9: README-prøven tas når v1 er ferdig bygget.
 - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
 
@@ -1618,8 +1652,15 @@ Loggingen starter ved første kjøring.
 
 #### FR-606A — Relevansskalaen
 
-KI-vurderingen av en melding i samlekategorien gir én av de tre verdiene i
-FR-606. Meldinger vurdert som *påvirker direkte* eller *kan påvirke* vises. *Lite
+KI-vurderingen av en melding i samlekategorien gir én av tre verdier:
+
+| Verdi | Betyr |
+|---|---|
+| **Påvirker selskapet direkte** | Saken har konkret betydning for selskapets drift, kontrakter, eierskap eller resultat |
+| **Kan påvirke** | Saken kan få betydning, men det er ikke gitt |
+| **Lite relevant** | Saken har ingen praktisk betydning for en sparer |
+
+ Meldinger vurdert som *påvirker direkte* eller *kan påvirke* vises. *Lite
 relevant* skjules bak bryteren **Anbefalt**/**Alle**, skjult, men ikke borte.
 Grensen `[FORELØPIG]` kan ikke avgjøres på papir (punkt 2).
 

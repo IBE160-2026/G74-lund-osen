@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-12T18:25
+updated: 2026-11-12T18:38
 ---
 
 # Endringslogg for PRD-en
@@ -17,7 +17,7 @@ tekst, slik briefen fikk versjon 8 i story 9.6.
 
 Fra 12.11 er `prd.md` et levende dokument, som README-en: teksten endres der den
 står, og historikken står her, i git og i taggene. En ny endring i et krav føres
-her som en ny linje under kravet, med dato.
+nederst, under «Endringer etter 12.11», som en datert linje med kravets ID.
 
 ## Tilbakemeldingen 12.11 og hva som er gjort
 
@@ -39,7 +39,8 @@ her som en ny linje under kravet, med dato.
 
 Hver linje står ordrett, med linjenummeret i taggen og, når den sto inne i en
 setning, en liste eller en tabellrad, hvor. Innenfor hvert krav står linjene etter
-datoen de har. Overskriftene er de gamle.
+den første datoen i linja, så en linje som begynner med en eldre dato, står
+først. Overskriftene er de gamle.
 
 ### Innledningen
 
@@ -1609,3 +1610,7 @@ mer enn antall aksjer. 15 aksjer gir 16 kall og margin 4.
 
 **Antall rader per skjermbilde avgjøres ikke her.** 15 er valgt av kvoten, ikke
 av skjermen. Om oversikten er for tett, er et spørsmål til brukertesten (story 8.1).
+
+## Endringer etter 12.11
+
+Ingen ennå.

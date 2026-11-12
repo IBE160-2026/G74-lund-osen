@@ -26,6 +26,14 @@ TAGGENS_STI = "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20
 # «Rettet» og «Lagt til», også med liten forbokstav, slik de står i taggen.
 HISTORIKK = re.compile(r"(?i)\b(rettet|lagt til)\b")
 TAGGENS_ANTALL = 275
+# Nye daterte linjer etter omskrivingen står under denne overskriften.
+NYE_LINJER = "\n## Endringer etter 12.11\n"
+# Andre daterte merker fra taggen, og storynummer og commiter (4.4).
+ANDRE_MERKER = re.compile(
+    r"\*\(?(Endret|Avgjort|Presisert|Skrevet inn|Skrevet om|Skjerpet|Merknad|Tillegg|Flyttet til v1|"
+    r"Delvis flyttet|Tatt inn i v1|Ute av v1|Utenfor v1|Frist endret|Utvidet|Lukket|Talt på nytt)\b"
+)
+STORY_ELLER_COMMIT = re.compile(r"(?i)\bstory \d|`[0-9a-f]{7,8}`|\bbygget per\b")
 # Hver FR- og NFR-ID som står i taggen.
 TAGGENS_ID = (
     "FR-101",
@@ -234,18 +242,45 @@ def test_ingen_rettet_eller_lagt_til_i_prd():
     assert HISTORIKK.findall(_prd()) == []
 
 
+def test_ingen_andre_daterte_merker_storynummer_eller_navn_i_prd():
+    """4.1 og 4.4, og regel 20. Ville feilet hvis et annet datert merke fra
+    taggen, som «Presisert» eller «Ute av v1», et storynummer, en commit,
+    «bygget per», eller et navn utenom gruppelinja sto i prd.md."""
+    tekst = _prd()
+    assert ANDRE_MERKER.findall(tekst) == []
+    assert STORY_ELLER_COMMIT.findall(tekst) == []
+    uten_gruppelinja = "\n".join(linje for linje in tekst.splitlines() if not linje.startswith("**Gruppe:**"))
+    assert re.findall(r"\b(Marian|Joakim)\b", uten_gruppelinja) == []
+
+
+def test_brukerreisen_og_ordlista():
+    """4.3. Ville feilet hvis UJ-1 manglet climax eller edge, eller ordlista
+    ikke hadde 8–10 ord."""
+    tekst = _prd()
+    uj = tekst.split("### Brukerreisen UJ-1\n", 1)[1].split("\n### ", 1)[0]
+    assert "**UJ-1." in uj and "*Climax:*" in uj and "*Edge:*" in uj
+    ordlista = tekst.split("### Ordliste\n", 1)[1].split("\n---\n", 1)[0]
+    rader = [r for r in ordlista.splitlines() if r.startswith("| **")]
+    assert 8 <= len(rader) <= 10, len(rader)
+
+
 def test_endringsloggen_har_like_mange_linjer_som_taggen():
     """Ingenting går tapt: hver «Rettet» og «Lagt til» i taggen står i
     endringsloggen. Ville feilet hvis en linje falt ut, eller en ble skrevet
-    to ganger."""
-    assert len(HISTORIKK.findall(ENDRINGSLOGGEN.read_text(encoding="utf-8"))) == TAGGENS_ANTALL
+    to ganger. Nye linjer etter 12.11 står under NYE_LINJER og telles
+    ikke (regel 19)."""
+    fra_taggen = ENDRINGSLOGGEN.read_text(encoding="utf-8").split(NYE_LINJER, 1)[0]
+    assert len(HISTORIKK.findall(fra_taggen)) == TAGGENS_ANTALL
 
 
 def test_hvert_krav_har_konsekvenser():
     """4.2. Ville feilet hvis et FR eller NFR i prd.md, også i vedlegg A,
-    manglet «*Konsekvenser:*»."""
+    manglet «*Konsekvenser:*», eller konsekvensen var tom."""
     uten = [k for k, tekst in _kravene(_prd()).items() if "*Konsekvenser:*" not in tekst]
     assert uten == []
+    for k, tekst in _kravene(_prd()).items():
+        etter = tekst.split("*Konsekvenser:*", 1)[1].split("\n\n", 1)[0]
+        assert len(etter.split()) >= 5, k
 
 
 def test_hver_id_i_taggen_har_en_overskrift_i_prd():
@@ -265,7 +300,7 @@ def test_hvert_sm_har_id_og_krav():
     assert len(rader) >= 9
     kravene = set(_kravene(tekst))
     for nr, rad in enumerate(rader, start=1):
-        celler = [c.strip() for c in rad.strip("|").split("|")]
+        celler = [c.strip() for c in rad.strip().strip("|").split("|")]
         assert celler[0] == f"SM-{nr}", rad
         krav = ID.findall(celler[-1])
         assert krav, rad
@@ -275,13 +310,14 @@ def test_hvert_sm_har_id_og_krav():
 def test_tabellen_over_omfanget_har_hvert_fr():
     """4.5. Ville feilet hvis et FR manglet i tabellen «Kjerne, ekstra og
     senere», en rad hadde en annen status enn kjerne, ekstra eller senere,
-    eller noe annet enn ja eller nei under «Bygget?»."""
+    eller noe annet enn ja eller nei under «Bygget?», eller tabellen hadde et
+    FR som ikke finnes."""
     tekst = _prd()
     del2 = tekst.split("### Kjerne, ekstra og senere\n", 1)[1].split("\n### ", 1)[0]
     rader = [r for r in del2.splitlines() if r.startswith("| FR-")]
     dekket = set()
     for rad in rader:
-        fr, _, status, bygget = [c.strip() for c in rad.strip("|").split("|")]
+        fr, _, status, bygget = [c.strip() for c in rad.strip().strip("|").split("|")]
         assert status in ("kjerne", "ekstra", "senere"), rad
         assert bygget in ("ja", "nei"), rad
         for bit in fr.split(", "):
@@ -293,7 +329,7 @@ def test_tabellen_over_omfanget_har_hvert_fr():
             else:
                 dekket |= set(ender)
     fr_id = {i for i in TAGGENS_ID if i.startswith("FR-")}
-    assert fr_id <= dekket, sorted(fr_id - dekket)
+    assert dekket == fr_id, (sorted(fr_id - dekket), sorted(dekket - fr_id))
 
 
 def test_ankrene_fra_taggen_finnes():
@@ -310,7 +346,7 @@ def test_alle_lenker_til_ankre_i_prd_virker():
     brutt = [a for a in re.findall(r"\]\(#([^)\s]+)\)", _prd()) if a not in egne]
     filene = [ROT / "README.md", *(ROT / "docs").rglob("*.md"), *(ROT / "_bmad-output").rglob("*.md")]
     for fil in filene:
-        for anker in re.findall(r"prd\.md#([^)\s>\]]+)", fil.read_text(encoding="utf-8")):
+        for anker in re.findall(r"(?<![\w-])prd\.md#([^)\s>\]]+)", fil.read_text(encoding="utf-8")):
             if anker not in egne:
                 brutt.append(f"{fil.relative_to(ROT)}: {anker}")
     assert brutt == []

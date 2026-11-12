@@ -4989,7 +4989,7 @@ Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som 
 - Hvert FR og NFR har én gjeldende tekst og «*Konsekvenser:*», med de samme ID-ene. Brukerreisen UJ-1, ordlista, tabellen «Kjerne, ekstra og senere», SM-1–SM-9 med krav, og plan A i vedlegg A
 - Alle «Rettet»- og «Lagt til»-linjene og kommentaren om status står ordrett i `prd-endringslogg.md`, ordnet etter krav og dato, med tabellen over tilbakemeldingen øverst. Resonnement som ikke er krav, står i §13 i `begrunnelser.md`
 - Kodenavnene og commitene som gikk ut av kravene, står i tabellen under, der de ikke sto i arkitekturen eller her fra før
-- **Ville feilet hvis:** et «Rettet» eller «Lagt til» sto igjen i `prd.md`, endringsloggen hadde et annet antall enn taggen, et krav manglet konsekvenser eller en ID fra taggen, et SM manglet ID eller krav, eller en lenke til et anker i `prd.md` var brutt (`tests/test_prd_9_11.py`)
+- **Ville feilet hvis:** et «Rettet» eller «Lagt til» sto igjen i `prd.md`, endringsloggen hadde et annet antall enn taggen, et krav manglet konsekvenser eller en ID fra taggen, et SM manglet ID eller krav, eller en lenke til et anker i `prd.md` ikke virket (`tests/test_prd_9_11.py`)
 
 **Avhenger av:** ingen. **Én økt:** ja.
 
