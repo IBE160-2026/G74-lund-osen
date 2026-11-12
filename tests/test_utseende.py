@@ -344,7 +344,8 @@ class TestRammen:
                     or (href == "#ferdige-lister" and 'id="ferdige-lister"' in html)
                     # Tillegg 3 til 8.22: knappen for hver ferdige liste går til
                     # siden «Er du sikker?» for bransjen.
-                    or re.fullmatch(r"/ferdig-liste\?bransje=[A-Za-z%0-9]+", href)
+                    # Story 8.28: «De 15 mest omsatte» er ?liste=mest-omsatte.
+                    or re.fullmatch(r"/ferdig-liste\?(bransje=[A-Za-z%0-9]+|liste=mest-omsatte)", href)
                     # Tillegg 3: «Følg» på radene, «Alle» med resten av filteret, og
                     # «Avbryt» tilbake til de ferdige listene.
                     or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
