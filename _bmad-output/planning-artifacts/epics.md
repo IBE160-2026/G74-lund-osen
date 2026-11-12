@@ -3315,6 +3315,8 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 
 *Rettet 2026-11-11 (story 10.10, gruppens svar 10.11 kl. 16:18 og 11.11 kl. 17:21 og 19:30):* grunnlaget for teksten om dagen har nå også navnene på dem som skilte seg ut (høyst fem, med styrke og retning), bransjen som steg og falt mest i snitt (bare navnet, ingen prosent), antallet mot snittet for de siste 20 børsdagene og retningen på hovedindeksen de siste fem børsdagene. Når bransjen som steg eller falt mest kan stå, står ikke formen med antallet som steg i én bransje. Rekkefølgen i teksten er fast. Uka er med som retning, ikke som antall. Se story 10.10.
 
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* bransjen som steg eller falt mest i snitt regnes bare av bransjene med minst to aksjer med en endring, og teksten sier det: «I snitt falt ‹bransje› mest av bransjene med minst to aksjer.» Se story 10.11.
+
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 
 *Lagt til 2026-10-05, gruppens beslutning 04.10.*
@@ -3422,6 +3424,26 @@ Som **bruker**, vil jeg at KI-tekstene sier hvilke aksjer og bransjer som skilte
 *Avgjort 2026-11-11 kl. 19:30 (gruppens svar):* formen med antallet i én bransje står bare uten «mest», rekkefølgen er fast, og storyen flettes i kveld. Rådet anbefalte det. Spørsmål 13 (BH2) står åpent til gruppen har svart.
 
 *Ferdig 2026-11-11:* PR #145 er squash-flettet i `e5268b30`, låst til head-en `497548e0`.
+
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* formene med «mest» er nå «I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.» og det samme med «falt», i promptversjon dag-3, og kontrollen godtar bare dem. Formene uten «av bransjene med minst to aksjer» i dag-2 gjelder ikke lenger. Se story 10.11.
+
+### Story 10.11: «mest av bransjene med minst to aksjer» i teksten om børsdagen
+
+*Lagt til 2026-11-12, etter instruksjonen kl. 17:03 12.11 (føres i dagsfila med flettingen) og gruppens svar 11.11 kl. 22:04 på funn 4 fra demoprøven.* 10.11 var neste ledige nummer i Epic 10. Spesifikasjonen står i [`spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md`](../implementation-artifacts/spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md), med spørsmålene og forslagene.
+
+Som **bruker**, vil jeg at teksten om børsdagen sier at bransjen som steg eller falt mest er regnet av bransjene med minst to aksjer, så den ikke ser feil ut når børsometeret viser en bransje med én aksje som falt mer.
+
+**Oppfyller:** FR-607, FR-603, svaret 11.11 kl. 22:04 · **Begrenses av:** FR-605, NFR-06, `AD-7`, `AD-10`, regel 19
+
+**Kontroll — hva testen ser etter:**
+- Formene med «mest» i prompten sier «av bransjene med minst to aksjer», og prompten har versjon dag-3
+- Kontrollen godtar bare de nye formene for «mest»
+- En bransje med én aksje med en endring blir aldri «mest»
+- Grunnlaget og tallene er de samme som i dag-2, og en tekst med dag-2 vises fortsatt
+- Hjelpen ved «Børsdagen kort fortalt» og `docs/hjelp.md` sier det samme
+- **Ville feilet hvis:** en form med «mest» uten «av bransjene med minst to aksjer» besto, eller en bransje med én aksje ble «mest»
+
+*Avgjort 2026-11-11 kl. 22:04 (gruppens svar):* formene med «mest» i teksten om børsdagen sier at bransjen er den som steg eller falt mest av bransjene med minst to aksjer (funn 4 fra demoprøven). Rådet anbefalte det. Svaret er gjengitt fra instruksjonen kl. 17:03 12.11, fordi det ikke står andre steder i repoet.
 
 ---
 
