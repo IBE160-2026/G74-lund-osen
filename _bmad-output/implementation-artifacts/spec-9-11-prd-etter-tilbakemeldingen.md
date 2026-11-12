@@ -122,6 +122,22 @@ funnene i §5 og de to refleksjonsspørsmålene i §7.
     *Forslag:* terskelen står, fordi den er et suksessmål og en avgjørelse;
     statusen sier at brukslogga har én linje 12.11.
 
+*Svar 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene godtas
+som bygget, med tre avgjørelser. Spørsmål 14: Min liste får sitt eget krav,
+FR-111, med konsekvenser, i 9.11. Spørsmål 15: «De 15 mest omsatte» står i FR-412
+og bygges i natt som egen story (tillegg 2). Spørsmål 16: tabellen står med ja for
+FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag.
+PR-en flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at
+lista bygges, som gruppen valgte. Svarene er ført etter tillegg 1 og 2, limt inn
+kl. 20:10, som føres i `docs/ai-prompts/2026-11-12.md`.
+
+*Svar 2026-11-12 kl. 20:09 og 20:10 (gruppens svar):* «Lær noe nytt» kommer ikke
+i v1, og de åtte kravene som sto som ekstra og ikke bygget, står som «senere»:
+FR-101 (kronene), FR-107, FR-109 («Lær noe nytt»), FR-203 (høy, lav og kronene),
+FR-205, FR-207, FR-414 og FR-608 («Sign in with ChatGPT»). Rådet anbefalte det.
+Svaret er ført etter tillegg 3, limt inn kl. 20:12. Tabellen i §2 og kravteksten
+sier det, §8 lister de åtte under «v1.1», og «De 15 mest omsatte» står som ekstra.
+
 ## Delene
 
 ### A) Taggen
@@ -287,3 +303,13 @@ to deler (§1–4.2, og 4.4–vedlegget). 27 + 8 + 13 + 12 funn.
 - BH18, resten (lav): «Ukentlig» i SM-3 er gruppens frist.
 
 Ingen funn på middels eller over står åpne (regel 25).
+
+**Lukket med svaret 12.11 kl. 20:04 og 20:06:**
+- BH5: FR-111 er skrevet, med konsekvenser, og står som kjerne og bygget i §2
+  (spørsmål 14).
+- VG-B4: «De 15 mest omsatte» står i FR-412 og i §2 som ekstra, ikke bygget, til
+  storyen fra tillegg 2 er flettet (spørsmål 15).
+- VG12: tabellen står med ja for FR-411; 3.4 settes til done etter prøven fredag
+  (spørsmål 16).
+- BH10–BH12, BH17, BH27, ECH4 og resten av spørsmålene: forslagene er godtatt som
+  bygget. BH27 (taggene i CI) og punkt 26 (testen av alle malene) bygges i 9.12.

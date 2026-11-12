@@ -5011,3 +5011,5 @@ Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som 
 | `src/migrasjoner/0002_vurdering.sql` | FR-408 | Tabellen `vurdering`, uten kolonnen for meldinger |
 | `src/tilstand.py` | FR-409 | Tilstandene, også «ikke i lista» |
 | `issuerSign`, `issuerName`, `category`, `publishedTime` | FR-501 | Feltene i NewsWeb-målingene, plan A (`malinger.md`) |
+
+*Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene i spesifikasjonen godtas som bygget, med tre avgjørelser. Min liste får sitt eget krav, FR-111, i 9.11 (spørsmål 14). «De 15 mest omsatte» står i FR-412 og bygges i natt som egen story i Epic 8 (spørsmål 15). Tabellen står med ja for FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag (spørsmål 16). PR #150 flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte. Svaret er ført etter tillegg 1 og 2 kl. 20:10 i `docs/ai-prompts/2026-11-12.md`.

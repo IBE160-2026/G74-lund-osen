@@ -202,6 +202,8 @@ TAGGENS_ANKRE = (
     "vurderinger-etterfylles-ikke-og-det-er-med-vilje",
 )
 ID = re.compile(r"\bN?FR-\d{3}A?\b|\bNFR-\d\d\b")
+# Gruppens svar 12.11 kl. 20:04 (spørsmål 14): Min liste får eget krav.
+NYE_KRAV = ("FR-111",)
 KRAVOVERSKRIFT = re.compile(r"^(#{3,4}) ((?:FR-\d{3}A?|NFR-\d\d)) — .+$", re.MULTILINE)
 
 
@@ -285,9 +287,9 @@ def test_hvert_krav_har_konsekvenser():
 
 def test_hver_id_i_taggen_har_en_overskrift_i_prd():
     """De samme ID-ene. Ville feilet hvis et krav fra taggen manglet som
-    overskrift i prd.md, eller et nytt krav var kommet til uten at
-    konstanten ble endret."""
-    assert sorted(_kravene(_prd())) == sorted(TAGGENS_ID)
+    overskrift i prd.md, eller et nytt krav var kommet til uten at NYE_KRAV
+    ble endret. FR-111 (Min liste) kom til etter svaret 12.11 kl. 20:04."""
+    assert sorted(_kravene(_prd())) == sorted(TAGGENS_ID + NYE_KRAV)
 
 
 def test_hvert_sm_har_id_og_krav():
@@ -328,7 +330,7 @@ def test_tabellen_over_omfanget_har_hvert_fr():
                 dekket |= {f"FR-{n}{suffiks}" for n in range(fra, til + 1)}
             else:
                 dekket |= set(ender)
-    fr_id = {i for i in TAGGENS_ID if i.startswith("FR-")}
+    fr_id = {i for i in TAGGENS_ID + NYE_KRAV if i.startswith("FR-")}
     assert dekket == fr_id, (sorted(fr_id - dekket), sorted(dekket - fr_id))
 
 
@@ -390,3 +392,46 @@ def test_konstantene_stemmer_med_taggen():
     for bit in biter:
         bit = re.split(r"\n\n### ", bit, maxsplit=1)[0].rstrip()
         assert bit in tag, bit[:80]
+
+
+# Gruppens svar 12.11 kl. 20:09 og 20:10: de åtte står som «senere».
+SENERE = (
+    ("FR-101", "Endringen i kroner under prosenten"),
+    ("FR-107", "Merket for endret signalstyrke"),
+    ("FR-109", "«Lær noe nytt»"),
+    ("FR-203", "Høy og lav og endringen i kroner"),
+    ("FR-205", "«Se nærmere»"),
+    ("FR-207", "Kommende eks.dato i kursgrafen"),
+    ("FR-414", "Eks.datoer ført for hånd"),
+    ("FR-608", "ChatGPT med «Sign in with ChatGPT»"),
+)
+
+
+def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
+    """Gruppens svar 12.11 kl. 20:09 og 20:10. Ville feilet hvis en av de åtte
+    sto som ekstra eller kjerne i tabellen i §2, manglet i tabellen eller i
+    lista under «v1.1» i §8, eller kravteksten ikke sa at den ikke er i v1.
+    Ekstra er det som er bygget utover briefen, så det feiler også hvis en
+    annen ekstra-rad enn «De 15 mest omsatte» sto uten «ja»."""
+    tekst = _prd()
+    del2 = tekst.split("### Kjerne, ekstra og senere\n", 1)[1].split("\n### ", 1)[0]
+    status = {}
+    for rad in del2.splitlines():
+        if rad.startswith("| FR-"):
+            fr, krav, s, _ = [c.strip() for c in rad.strip().strip("|").split("|")]
+            status[(fr, krav)] = s
+    v11 = tekst.split("### v1.1 — vurderes etter at v1 er kontrollert\n", 1)[1].split("\n---\n", 1)[0]
+    kravene = _kravene(tekst)
+    for fr, krav in SENERE:
+        assert status.get((fr, krav)) == "senere", (fr, krav, status.get((fr, krav)))
+        assert f"({fr})" in v11, fr
+        assert "ikke i v1" in " ".join(kravene[fr].split()).lower(), fr
+    ekstra_uten_bygg = [
+        k for k, s in status.items() if s == "ekstra" and k not in (("FR-412", "«De 15 mest omsatte»"),)
+    ]
+    del2_rader = {
+        (r.split("|")[1].strip(), r.split("|")[2].strip()): r.split("|")[4].strip()
+        for r in del2.splitlines()
+        if r.startswith("| FR-")
+    }
+    assert [k for k in ekstra_uten_bygg if del2_rader[k] != "ja"] == []
