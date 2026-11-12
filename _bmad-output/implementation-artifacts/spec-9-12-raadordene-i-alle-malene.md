@@ -66,3 +66,16 @@ og 20:06. Rådet anbefalte 9.12. Worktreen `G74-lund-osen-9-12`, grenen
 Ingen API-kall. `src/` er ikke endret. `data/db/ose.db` røres ikke.
 
 ## Bygget 12.11
+
+Commitene `e81c2387` (spesifikasjonen og storyen), `0f197813` (testen),
+`3e83744b` (CI) og `349f052b` (README-en).
+
+**Mutanten.** «Du bør kjøpe aksjene med gul ramme.» ble satt inn i en kopi av
+`boersometer.html` på HEAD `349f052b`. `test_ingen_raad_i_det_appen_viser`
+feilet (1 feilet, 3 bestått). Kopien ble lagt tilbake. Arbeidskopien har CRLF,
+så sha256 ble sammenlignet etter samme linjeskift. Den var lik `git show HEAD:`
+(`bcef846e…`), git-hashen var lik HEAD, og arbeidskopien var ren.
+
+**Hele settet** i tre deler, aldri samtidig med en annen pytest: 2 013 bestått
+og 23 hoppet over, 2 132 bestått og 1 hoppet over, og 1 238 bestått. Summen er
+5 407, lik `--collect-only`. Ruff er grønn.
