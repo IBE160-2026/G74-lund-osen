@@ -51,6 +51,8 @@ Rådet anbefalte alle unntatt det med to knapper.
 
 *Svar 2026-11-12 kl. 09:58 (tillegg 21, rådet anbefalte det):* etter målet «Brukerutfall» i §7 i PRD-en starter tilbudet første gang «Vis meg rundt» for oversikten, ikke hele omvisningen, og det siste steget der viser vei til navnene under «Skilte seg ut». Det retter tillegg 20, steg 3, om det appen tilbyr første gang. Se del 13.
 
+*Svar 2026-11-12 kl. 10:16 (tillegg 22, rådet anbefalte alt):* spørsmål 1–9 og 12–22 godtas som bygget. Spørsmål 11: forslag 1, «Nøkkelen? Den ligger under matta, sammen med de 20 kallene.», som bygget. Spørsmål 15: tillegg 11 kommer ikke, fordi det var en pytest-pause for 10.10 som er over, så ingenting mer bygges for det. Spørsmål 10 rettes: forklaringen på en aksje uten kurser gir ikke lenger «nettopp er lagt til og venter på hentingen» som grunn, og sier hva neste henting gjør (del 14). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt, med tillegg 21 og 22.
+
 ## Spørsmål til gruppen før flettingen
 
 Hvert spørsmål har et forslag. Forslaget er det som er bygget.
@@ -179,7 +181,7 @@ Blind Hunter med bare diffen fra `7fd5320c`, uten bildene; Edge Case Hunter og V
 - *BH2 og ECH5, rettet.* En stjerne fra «Følg» ble liggende når ønsket ble avvist eller slettet, og kunne følge med aksjen fra en ferdig liste. Nå ryddes den (`_rydd_stjernene`). At en aksje fra en ferdig liste ikke får stjerne, følger av svaret, som gjelder «Følg», og hjelpen sier «med «Følg»».
 - *BH8 og VG2, rettet.* Testen av triggeren prøvde ikke et ønske som er avvist eller tatt i bruk, et ønske om å fjerne eller UPDATE.
 - *VG3, rettet.* «Angre» i et bytte har en test.
-- *VG1, åpent, spørsmål 9.* Testene av boksen søker i kildeteksten; ingen test kjører siden i en nettleser. Forslaget er å la det stå, med prøvingen i Edge.
+- *VG1, åpent, spørsmål 9.* Testene av boksen søker i kildeteksten; ingen test kjører siden i en nettleser. Forslaget er å la det stå, med prøvingen i Edge. *Lukket 12.11 med svaret kl. 10:16:* godtatt som bygget.
 
 *Lav*
 - *Rettet:* ECH7 (en aksje som venter, står ikke med «Velg dag»), BH15 (kommentarene om høydene i `test_docker.py`), BH16 («Ukjent» og hjelpen om raden sier «venter på hentingen» og at raden ikke har lenke), BH17 (docstringen sier 13), VG7 (kommentarene ved `SqliteMinlistelager` og `_SKRIVERE`).
@@ -224,7 +226,7 @@ Blind Hunter med bare diffen fra `059a4228`, og Edge Case Hunter og Verification
 
 *Middels*
 - *ECH1, BH1, BH2 og VG3, rettet* med VG1.
-- *ECH2, BH3 og VG2, åpent, spørsmål 10.* Forklaringen fra tillegg 8 sier «venter på hentingen» om en aksje som står i lista uten kurser.
+- *ECH2, BH3 og VG2, åpent, spørsmål 10.* Forklaringen fra tillegg 8 sier «venter på hentingen» om en aksje som står i lista uten kurser. *Lukket 12.11 med svaret kl. 10:16:* rettet i del 14 (tillegg 22).
 
 *Lav*
 - *Rettet:* BH4 (setningen om demoen bare på siden for MTFJ), BH6, ECH3 og VG4 (ankeret i Innstillinger slås opp før noe skrives, og en test knytter ankrene til valgene), BH12 (kommentaren i stilen), BH16 (hjelpen), ECH6 (kommentarene i `boersometer.py`), ECH7 («Alle» og «Min liste» i Min liste holder plassen).
@@ -311,7 +313,7 @@ Blind Hunter med bare diffen `0e7fd7c5..d1fe78c5`, og Edge Case Hunter og Verifi
 
 *Høy*
 - *VG1 og VG2, rettet.* Eldre tester sto med gamle tekster og gammel markup («kilden», «Appen følger N av 18</p>», «lest fra basen», `<h3>Følg flere aksjer</h3>`, omvisningen med alle stegene, og søket i «Følg en aksje» med `form.submit()`). De er rettet til det som er bygget, med en kommentar ved hver.
-- *VG3, rettet og spørsmål 22.* Tre vinduer gikk over 60 ord på aksjesiden og børsometeret. Teksten om ringen og den første knappen er kortet, og vinduet for kursgrafen er uten setningen om den første knappen. Funnet følger av et svar og står åpent (regel 25).
+- *VG3, rettet og spørsmål 22.* Tre vinduer gikk over 60 ord på aksjesiden og børsometeret. Teksten om ringen og den første knappen er kortet, og vinduet for kursgrafen er uten setningen om den første knappen. Funnet følger av et svar og står åpent (regel 25). *Lukket 12.11 med svaret kl. 10:16:* godtatt som bygget.
 
 *Middels*
 - *Rettet:* BH8 (steget om KI-teksten sier «Med KI på»), BH9 (ringen, se VG3), ECH1 (skriptet sorterer med samme nøkkel som `ferdige_lister._norsk`, så «Aasen» står under A), ECH2 (M i overskriften er radene den valgte dagen), ECH3 (med «Vis hjelp» av står teksten om kallene i siden), VG4 (en test av 50 ord og de interne ordene), VG5 (tester av at tallet står fast og at en valgt tom bransje kan velges bort), VG12 (testen ser på alle kortene, og overskriften i Min liste med «Vis dagen» er testet).
@@ -335,3 +337,11 @@ Hele settet i seks deler etter tilleggene: 5524 bestått og 24 hoppet over, til 
 - **README-en og hjelpen:** «Første gang tilbyr appen «Vis meg rundt» på oversikten. «Spill av omvisningen» øverst viser alle sidene, og «Vis meg rundt» viser siden du står på.» Linja under «Ekstra, ferdig» og avsnittet i `docs/hjelp.md` følger. Rettet-linjer under svaret 11.11 kl. 13:49 i spesifikasjonen for 8.25 og i `epics.md`.
 
 **Ville feilet hvis:** tilbudet startet hele omvisningen eller fortsatt sa at omvisningen viser sidene, linja sto i hele omvisningen, på en annen side eller som et eget steg, «Ferdig» bare lukket boksen, eller linja og «Ferdig» pekte på «Skilte seg ut» når ingen aksje står der.
+
+### 14) Hvorfor en aksje er uten kurser (tillegg 22, svaret 12.11 kl. 10:16, spørsmål 10)
+
+- **`UTEN_KURSER_HVORFOR`:** «EODHD har ikke gitt kurser for aksjen. Gir EODHD ingen kurser ved neste henting heller, slutter appen å følge en aksje du har valgt selv.» Det er det `valg.uten_rader` gjør: en egen aksje som er forsøkt hentet uten en eneste kurs, tas ut kvelden etter, og ønsket merkes avvist. De 15 faste aksjene tas ikke ut, og setningen sier derfor «en aksje du har valgt selv». Grunnen «nettopp er lagt til og venter på hentingen» er tatt bort, fordi en aksje som venter, står med «venter på henting».
+- **Hjelpeteksten `uten_data`** bak «?» ved «Oppdatert» begynner med «Ingen kurser ennå:», ordene fra raden, og har tre setninger (8.0c): hvorfor, hva neste henting gjør, og raden med aksjen som venter i én setning. Aksjesiden uten kurser bruker den samme setningen. Linja om Matfjord Merkevarer i demoen står som før.
+- **`docs/hjelp.md`** følger (regel 19), med at ønsket står som avvist og at en aksje som nettopp er valgt, står med «venter på henting».
+
+**Ville feilet hvis:** forklaringen fortsatt ga «nettopp er lagt til» som grunn, ikke sa hva neste henting gjør eller sa noe annet enn koden, hjelpeteksten begynte med andre ord enn raden eller hadde over tre setninger, eller linja om Matfjord Merkevarer var endret.

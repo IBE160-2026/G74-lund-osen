@@ -353,9 +353,10 @@ class TestIngenKurserEnnaa:
         """Tillegg 8: ville feilet hvis «?» ved «Oppdatert» eller aksjesiden
         ikke sa hvorfor, med den samme forklaringen."""
         hvorfor = ht.UTEN_KURSER_HVORFOR
-        assert "nettopp er lagt til og venter på hentingen om kvelden" in hvorfor
-        # Tillegg 18: EODHD, ikke «kilden».
-        assert "EODHD ikke har kurser for den" in hvorfor
+        # Tillegg 22 (svaret 12.11 kl. 10:16, spørsmål 10): ikke «nettopp er
+        # lagt til», og EODHD, ikke «kilden» (tillegg 18).
+        assert "nettopp er lagt til" not in hvorfor
+        assert hvorfor.startswith("EODHD har ikke gitt kurser for aksjen.")
         k = request.getfixturevalue(versjon)
         vindu = _side(k, "/").split('id="hjelp-hentet"', 1)[1].split('<p class="lukkes">', 1)[0]
         assert hvorfor in html.unescape(vindu)
@@ -1706,3 +1707,56 @@ class TestTilbudetOgVeienVidere:
         rundt» på siden, der ja ikke ville gjort noe."""
         oppstart = _funksjonen("oppstart")
         assert "sidensListe &&" in oppstart
+
+
+# Tillegg 22 (gruppens svar 12.11 kl. 10:16, spørsmål 10): hvorfor en aksje er
+# uten kurser, uten «nettopp er lagt til», og hva neste henting gjør.
+
+
+class TestUtenKurserEtterSvaret:
+    def test_ikke_venter_paa_hentingen_som_grunn(self):
+        """Ville feilet hvis forklaringen fortsatt ga «nettopp er lagt til og
+        venter på hentingen» som grunn, når en aksje som venter, står med
+        «venter på henting»."""
+        hvorfor = ht.UTEN_KURSER_HVORFOR
+        assert "nettopp" not in hvorfor and "venter på hentingen" not in hvorfor
+        assert "EODHD har ikke gitt kurser for aksjen." in hvorfor
+
+    def test_sier_hva_neste_henting_gjoer_som_koden(self):
+        """Ville feilet hvis forklaringen ikke sa hva som skjer når EODHD heller
+        ikke gir kurser ved neste henting, eller sa noe annet enn
+        valg.uten_rader gjør: bare en aksje brukeren har valgt selv, tas ut."""
+        import valg
+
+        assert "Gir EODHD ingen kurser ved neste henting heller, slutter appen å følge en aksje du har valgt selv." in (
+            ht.UTEN_KURSER_HVORFOR
+        )
+        kilden = Path(valg.__file__).read_text(encoding="utf-8")
+        funksjonen = kilden[kilden.index("def uten_rader(") :].split(chr(10) + "def ", 1)[0]
+        assert "egne_i_lista(tilkobling)" in funksjonen and "UPDATE aksje SET ut = ?" in funksjonen
+
+    @pytest.mark.parametrize("versjon", ["klient", "ekte"])
+    def test_hjelpen_begynner_med_ordene_fra_raden(self, versjon, request):
+        """Ville feilet hvis hjelpeteksten bak «?» ved «Oppdatert» begynte med
+        «Uten data», ikke «Ingen kurser ennå» som raden, eller hadde over tre
+        setninger (8.0c). Likt i demoen og i den ekte versjonen."""
+        k = request.getfixturevalue(versjon)
+        vindu = html.unescape(_side(k, "/").split('id="hjelp-hentet"', 1)[1].split('<p class="lukkes">', 1)[0])
+        assert "<strong>Ingen kurser ennå:</strong> EODHD har ikke gitt kurser for aksjen." in vindu
+        assert "Uten data" not in vindu
+        tekst = ht.hjelpetekster()["uten_data"].tekst
+        assert len(re.findall(r"[.!?](?:\s|$)", tekst)) <= 3, tekst
+
+    def test_matfjord_i_demoen_som_foer(self, klient):
+        """Ville feilet hvis linja om Matfjord Merkevarer i demoen var endret
+        eller borte."""
+        vindu = html.unescape(_side(klient, "/").split('id="hjelp-hentet"', 1)[1])
+        assert "I demoen er Matfjord Merkevarer med vilje uten kurser, så du ser hvordan det ser ut." in vindu
+
+    def test_hjelpen_i_docs_foelger(self):
+        """Regel 19: ville feilet hvis docs/hjelp.md fortsatt ga «nettopp er
+        lagt til og venter på hentingen» som grunn."""
+        hjelpen = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        assert "fordi den nettopp er lagt til og venter på hentingen om kvelden" not in hjelpen
+        assert "«?» ved «Oppdatert» sier hvorfor: EODHD har ikke gitt kurser for aksjen." in hjelpen
+        assert "slutter appen å følge en aksje du har valgt selv" in hjelpen

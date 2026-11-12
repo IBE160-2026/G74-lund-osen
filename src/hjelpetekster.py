@@ -150,9 +150,13 @@ def _grensene(m: Parametre) -> str:
 # Story 8.26 (gruppens ønske 11.11 kl. 19:51, tillegg 8): hvorfor en aksje
 # står med «ingen kurser ennå», likt overalt der det står, og i demoen
 # navnet på aksjen som med vilje er uten kurser, fra demodataene.
+# Story 8.26 (gruppens svar 12.11 kl. 10:16, spørsmål 10, tillegg 22): ikke
+# «nettopp er lagt til og venter på hentingen», fordi en aksje som venter,
+# står med «venter på henting». Det som skjer ved neste henting, er
+# valg.uten_rader: en aksje brukeren har valgt selv, tas ut.
 UTEN_KURSER_HVORFOR = (
-    "appen har ingen kurser for aksjen ennå, fordi den nettopp er lagt til og venter på hentingen om kvelden, "
-    "eller fordi EODHD ikke har kurser for den."
+    "EODHD har ikke gitt kurser for aksjen. Gir EODHD ingen kurser ved neste henting heller, "
+    "slutter appen å følge en aksje du har valgt selv."
 )
 DEMO_UTEN_KURSER = (
     f"I demoen er {next(a.navn for a in DEMOUNIVERS if a.symbol == UTEN_KURSER)} med vilje uten kurser, "
@@ -389,8 +393,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Selskap står den etter navnet.
             # Story 8.26 (tillegg 8): først hvorfor, så hvor raden står.
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen, med «–» og lenke til aksjesiden. "
-            "En aksje som venter, står under med «venter på henting».",
+            # Tillegg 22: tre setninger (8.0c), så raden og aksjen som venter i én.
+            UTEN_KURSER_HVORFOR + " Raden står nederst i tabellen, med «–» og lenke til aksjesiden, "
+            "og en aksje som venter, står under med «venter på henting».",
             (
                 # Gjennomgangen 24.10 (BH1): den daterte linja fra 8.2a.
                 (PRD, "en aksje uten en eneste kursrad har en rad nederst i tabellen"),
