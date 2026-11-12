@@ -4522,6 +4522,12 @@ NFR-08, `AD-10`
 
 **Avhenger av:** 8.0d for stripa. **Én økt:** avgjøres i planen.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 17:01, tillegg 1 til 10.11):* bare den ekte versjonen viser bak «Oppdatert …» når nye kurser tidligst kan hentes, for eksempel «nye kurser fra kl. 22 i kveld» eller «nye kurser fra mandag kl. 22», og linja sier aldri at en henting kommer. Demoen viser den ikke, fordi den ikke henter. `TIDSGRENSE` står nå i `boersdag.py`, ikke i `fetch_prices.py`, så webserveren slipper å importere hentingen (AD-10), og `fetch_prices.TIDSGRENSE` er den samme. Spesifikasjonen står i [`spec-8-19-neste-henting-i-stripa.md`](../implementation-artifacts/spec-8-19-neste-henting-i-stripa.md).
+
+*Avgjort 2026-11-12 kl. 17:01 (gruppens svar):* 8.19 bygges som egen story etter 10.11, med formen over. Rådet anbefalte det. Gjengitt fra tillegg 1 til instruksjonen kl. 17:03 12.11.
+
+*Avgjort 2026-11-12 kl. 17:31 og 17:44 (gruppens svar):* omvisningen forklarer linja, også i demoen (tillegg 2), og fire steg i omvisningen rettes (tillegg 3). Begge bygges etter at 8.26 er flettet. Rådet anbefalte det.
+
 ---
 
 ### Story 8.20: UX-rettingene etter gjennomgangen 06.11
