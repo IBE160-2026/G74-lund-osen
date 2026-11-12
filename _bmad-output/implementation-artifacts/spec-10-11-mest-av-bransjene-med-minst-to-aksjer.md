@@ -12,6 +12,8 @@ context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-10-10-rikere-ki-tekster.md'
 ---
 
+*Svar 2026-11-12 kl. 19:06 (gruppens svar):* forslagene i alle seks spørsmålene er godtatt som bygget, og PR #149 flettes i natt etter 3.7. Rådet anbefalte det. Gjengitt fra tillegg 4 (kl. 19:50).
+
 Skrevet 12.11 etter instruksjonen kl. 17:03, «Ny liten story i Epic 10: KI-teksten om dagen sier «av bransjene med minst to aksjer»». Instruksjonen er kopiert til scratchpad og føres i dagsfila sammen med flettingen, etter gruppens ja. 10.11 var neste ledige nummer i Epic 10 (`sprint-status.yaml` og `epics.md` har 10.1–10.10, og ingen åpen PR eller gren har 10.11). Storyen bygges nå, og spørsmålene under har hvert et forslag som koden bygger på. Gruppen svarer før PR-en flettes.
 
 **Svaret 11.11 kl. 22:04** (gruppens svar på funn 4 fra demoprøven, gjengitt fra instruksjonen, fordi svaret ikke står andre steder i repoet; slått opp med `git grep` i `origin/main` og grenene til de åpne PR-ene 12.11): formene med «mest» i teksten om børsdagen sier at bransjen er den som steg eller falt mest av bransjene med minst to aksjer. Ønsket 12.11 kl. 16:51 er at alt gjøres ferdig i dag og i natt. Rådet anbefalte det.
@@ -101,8 +103,8 @@ Tre lesere i parallell, uten å kjøre pytest eller endre noe. Blind Hunter lest
 | BH7 | lav | Kommentaren i `test_docker.py` sa ikke hvorfor alle avtrykkene ble endret | Rettet |
 | BH8 | lav | Rettet-linja under 10.6 i `epics.md` hadde ‹bransje› | Rettet: ‹bransje_mest_ned› |
 | VG7 | lav | Spørsmål 4 sa en annen ordlyd enn hjelpen | Rettet i spørsmål 4 |
-| ECH3 | lav | Tekstene med dag-2 fra kveldshentingen i kveld får den gamle formen | Spørsmål 6 |
-| ECH5 | lav | «mest» når bare én bransje er med | Spørsmål 5 |
+| ECH3 | lav | Tekstene med dag-2 fra kveldshentingen i kveld får den gamle formen | Lukket: spørsmål 6 godtatt som bygget (svaret 12.11 kl. 19:06) |
+| ECH5 | lav | «mest» når bare én bransje er med | Lukket: spørsmål 5 godtatt som bygget (svaret 12.11 kl. 19:06) |
 | BH6 | lav | `dagsregel` sier «Høyest snitt» uten grensen | Står: regelen er det appen regnet ut (FR-604), og grunnlaget skulle ikke endres |
 | VG4 | lav | Testen av dag-2 bruker grunnlaget regnet nå, ikke et fast fra dag-2 | Står: `test_grunnlaget_er_det_samme_som_den_falske_modellen_faar` og grunnlagets avtrykk i demofila (`cd4235ec…`, uendret) dekker det |
 | ECH4 | lav | Bransjenavn på tre ord eller med tankestrek leses ikke | Står: gjaldt også dag-2, og ingen bransje i appen har det |

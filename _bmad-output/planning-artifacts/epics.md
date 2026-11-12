@@ -3445,6 +3445,8 @@ Som **bruker**, vil jeg at teksten om børsdagen sier at bransjen som steg eller
 
 *Avgjort 2026-11-11 kl. 22:04 (gruppens svar):* formene med «mest» i teksten om børsdagen sier at bransjen er den som steg eller falt mest av bransjene med minst to aksjer (funn 4 fra demoprøven). Rådet anbefalte det. Svaret er gjengitt fra instruksjonen kl. 17:03 12.11, fordi det ikke står andre steder i repoet.
 
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar):* forslagene i alle seks spørsmålene i spesifikasjonen er godtatt som bygget, og PR #149 flettes i natt etter 3.7. Rådet anbefalte det. Svaret er gjengitt fra tillegg 4 til instruksjonen kl. 17:03.
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
