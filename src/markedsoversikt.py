@@ -689,3 +689,38 @@ def oppdatert(tid: datetime, i_aar: int) -> str:
     Norge, og ukedagen sier fredag.
     """
     return f"{ukedag(tid.astimezone(NORSK_TID).date())} {norsk_tid(tid, i_aar)}"
+
+
+def grensen_som_tekst() -> str:
+    """TIDSGRENSE slik stripa og hjelpen viser den: «kl. 22», eller
+    «kl. 21.30» med minutter (gjennomgangen av 8.19, ECH7)."""
+    grense = boersdag.TIDSGRENSE
+    return f"kl. {grense.hour}" if not grense.minute else f"kl. {grense:%H.%M}"
+
+
+def neste_henting_tekst(kursdag: date, naa: datetime) -> str | None:
+    """Story 8.19 (U60): det som staar bak «Oppdatert …» i den ekte
+    versjonen, naar nye kurser tidligst kan hentes. kursdag er den siste
+    kursdagen i basen, den eldste blant aksjene i lista, som sidens_dato
+    (spoersmaal 10). «i kveld» og «i morgen» naar dagen er i dag eller i
+    morgen, ukedagen innen en uke, og ellers ukedagen og datoen. None naar
+    kalenderen ikke dekker dagen (NFR-08)."""
+    # Gjennomgangen (ECH4): noe annet enn en dato gir aldri en tekst.
+    if not isinstance(kursdag, date) or isinstance(kursdag, datetime):
+        return None
+    try:
+        dag = boersdag.neste_henting(kursdag, naa)
+    except UtenforKalenderen:
+        return None
+    if dag is None:
+        return "nye kurser kan hentes nå"
+    kl = grensen_som_tekst()
+    idag = boersdag.norsk_dato(naa)
+    dager = (dag - idag).days
+    if dager == 0:
+        return f"nye kurser fra {kl} i kveld"
+    if dager == 1:
+        return f"nye kurser fra {kl} i morgen"
+    if dager < 7:
+        return f"nye kurser fra {ukedag(dag)} {kl}"
+    return f"nye kurser fra {ukedag(dag)} {dato(dag, idag.year)} {kl}"
