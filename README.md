@@ -130,7 +130,7 @@ Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra
 - «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
 - Bak «Oppdatert» øverst: når nye kurser tidligst kan hentes, i den ekte versjonen
 - «De 15 mest omsatte» på hele børsen som ferdig liste, ved siden av bransjelistene
-- «Din egen liste: kom i gang» som tavla, og styrken for én dag vist likt i tabellen, notatene og «Signalet dag for dag»
+- «Din egen liste: kom i gang» som tavla, og styrken for én dag likt overalt
 
 **Neste i v1**
 
