@@ -159,8 +159,10 @@ class TestTekstene:
         """Regel 19: ville feilet hvis hjelpen på siden eller docs/hjelp.md
         ikke sa at «mest» bare gjelder bransjene med minst to aksjer."""
         # Gjennomgangen (BH1, ECH2, VG1): «minst to aksjer» sto der fra før, saa testen ser etter «av dem».
-        assert "minst to aksjer med en endring, og av dem bransjen som steg mest" in (
+        # Etter 8.26 er hjelpen paa siden høyst 50 ord (spørsmål 4): den sier «bransjene med minst to aksjer».
+        assert "skilte seg ut og bransjene med minst to aksjer, ingen kurser" in (
             hjelpetekster()["boersdagen_kort_fortalt"].tekst
         )
         hjelp = (ROT / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        assert "minst to aksjer med en endring, og av dem bransjen som steg mest" in hjelp
         assert "Bransjen som steg eller falt mest regnes bare av bransjene med minst to aksjer med en endring" in hjelp
