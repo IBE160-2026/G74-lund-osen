@@ -273,10 +273,11 @@ class TestOmvisningenOmLinja:
 
     def test_bare_steget_om_dagen_er_ulikt(self):
         """Ville feilet hvis demoen og den ekte versjonen hadde ulik omvisning
-        i noe annet enn steget om dagen på oversikten."""
+        i noe annet enn steget om dagen på oversikten og steget for «Mine
+        notater», som har linja om demoen fra 8.27."""
         ekte, demoen = ht.omvisningen(), ht.omvisningen(demo=True)
         ulike = [(e["side"], e["tittel"]) for e, m in zip(ekte, demoen, strict=True) if e != m]
-        assert ulike == [("oversikt", "Dagen og perioden")]
+        assert ulike == [("oversikt", "Dagen og perioden"), ("min_liste", "Mine notater")]
 
     def test_skriptet_merker_linja_og_fjerner_merket(self):
         """Ville feilet hvis hjelp.js ikke merket den andre delen, eller lot
