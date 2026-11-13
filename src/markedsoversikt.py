@@ -698,16 +698,18 @@ def grensen_som_tekst() -> str:
     return f"kl. {grense.hour}" if not grense.minute else f"kl. {grense:%H.%M}"
 
 
-def neste_henting_tekst(hentet: datetime, naa: datetime) -> str | None:
+def neste_henting_tekst(kursdag: date, naa: datetime) -> str | None:
     """Story 8.19 (U60): det som staar bak «Oppdatert …» i den ekte
-    versjonen, naar nye kurser tidligst kan hentes. «i kveld» og «i morgen»
-    naar dagen er i dag eller i morgen, ukedagen innen en uke, og ellers
-    ukedagen og datoen. None naar kalenderen ikke dekker dagen (NFR-08)."""
-    # Gjennomgangen (ECH4): et tidspunkt uten sone gir aldri en tekst.
-    if not isinstance(hentet, datetime) or hentet.utcoffset() is None:
+    versjonen, naar nye kurser tidligst kan hentes. kursdag er den siste
+    kursdagen i basen, den eldste blant aksjene i lista, som sidens_dato
+    (spoersmaal 10). «i kveld» og «i morgen» naar dagen er i dag eller i
+    morgen, ukedagen innen en uke, og ellers ukedagen og datoen. None naar
+    kalenderen ikke dekker dagen (NFR-08)."""
+    # Gjennomgangen (ECH4): noe annet enn en dato gir aldri en tekst.
+    if not isinstance(kursdag, date) or isinstance(kursdag, datetime):
         return None
     try:
-        dag = boersdag.neste_henting(hentet, naa)
+        dag = boersdag.neste_henting(kursdag, naa)
     except UtenforKalenderen:
         return None
     if dag is None:

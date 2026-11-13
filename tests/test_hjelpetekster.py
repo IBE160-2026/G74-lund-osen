@@ -379,7 +379,8 @@ class TestSidene:
         stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         # Story 8.19: linja om neste henting kan staa inne i den samme <span>.
         assert re.search(
-            r"Oppdatert [^<]+(?:<span class=\"neste-henting\">[^<]*</span>)?</span>\s*" + knapp.format("hjelp-hentet"),
+            r"Oppdatert [^<]+(?:<span class=\"neste-henting\" id=\"neste-henting\">[^<]*</span>)?</span>\s*"
+            + knapp.format("hjelp-hentet"),
             stripa,
         )
         assert "data hentet" not in oversikt
@@ -403,7 +404,8 @@ class TestSidene:
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
         # Story 8.19: linja om neste henting kan staa inne i den samme <span>.
         assert re.search(
-            r"Oppdatert [^<]+(?:<span class=\"neste-henting\">[^<]*</span>)?</span>\s*" + knapp.format("hjelp-hentet"),
+            r"Oppdatert [^<]+(?:<span class=\"neste-henting\" id=\"neste-henting\">[^<]*</span>)?</span>\s*"
+            + knapp.format("hjelp-hentet"),
             stripa,
         )
         # Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): ett «?» per kort,

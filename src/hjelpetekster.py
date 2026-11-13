@@ -864,6 +864,32 @@ KI_STEGET = (
     "appen har regnet ut. Bryteren slår den av og på."
 )
 
+# Story 8.19 (tillegg 3, gruppens svar 12.11 kl. 17:44, spørsmål 9): stegene
+# om styrken og retningen sier det briefen sier er viktigst. Ordene fra
+# tillegget er forslag; «kjøpe eller selge» står ikke, fordi ingen tekst i
+# omvisningen kan ha ordene i RAADSORD (test_omvisningen_8_25).
+STEGET_STYRKEN = (
+    f"Tre sjekker – trend, bevegelse og interesse (T, B og I) – gir hver +1, 0 eller -1. Styrken er "
+    f"hvor mange som slo ut, fra 0 av {ANTALL_SJEKKER} til {ANTALL_SJEKKER} av {ANTALL_SJEKKER}."
+)
+STEGET_RETNINGEN = f"{TAVLA_RETNING} Ga noen +1 og noen -1, står det {BLANDET}. Det er ikke et råd."
+# «Signalet forklart» har sin egen tekst, ikke den samme som «Børsdagen kort
+# fortalt»: først appens setninger, så KI-teksten om sjekkene.
+STEGET_SIGNALET_FORKLART = (
+    "Først appens egne setninger om signalet og dagen. Med KI på kommer en tekst om sjekkene fra en "
+    "språkmodell, merket «Laget av KI». Tall med prikket strek er sjekket mot det appen regnet ut."
+)
+
+# Story 8.19 (tillegg 2, gruppens svar 12.11 kl. 17:31, spørsmål 8): steget om
+# dagen sier hva linja bak «Oppdatert» betyr. I den ekte versjonen merker
+# steget også linja (NESTE_HENTING_ANKER i _ramme.html); demoen henter ikke
+# og sier at den ekte versjonen viser det.
+NESTE_HENTING_ANKER = "neste-henting"
+NESTE_HENTING_STEGET = "Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes."
+NESTE_HENTING_STEGET_DEMO = (
+    "Den ekte versjonen viser bak «Oppdatert» øverst når nye kurser tidligst kan hentes; demoen henter ikke."
+)
+
 
 @dataclass(frozen=True)
 class Steg:
@@ -873,11 +899,16 @@ class Steg:
     anker: str
     tittel: str
     tekst: str
+    # Story 8.19 (spørsmål 8): en id til som merkes sammen med anker, når
+    # siden har den. Tom når steget bare merker anker.
+    ogsaa: str = ""
 
 
-def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
+def rundturer(p: Parametre = STANDARD, demo: bool = False) -> dict[str, tuple[Steg, ...]]:
     """Stegene for hver side, med tallene fra p. Nøkkelen er siden, som
-    malene gir til makroen i _rundtur.html."""
+    malene gir til makroen i _rundtur.html. demo er sann i demoen, som ikke
+    henter (story 8.19, spørsmål 8); bare steget om dagen på oversikten er
+    ulikt."""
     ma = _vis(p.ma_vindu, "heltall")
     volatilitet = _vis(p.volatilitet_vindu, "heltall")
     volum = _vis(p.volum_vindu, "heltall")
@@ -886,17 +917,21 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
     # Story 8.26 (gruppens svar 11.11 kl. 22:13, tillegg 18): stegene om
     # styrken og retningen merker bare kolonnen, med overskriften og de første
     # radene (hjelp.js), ikke hele tabellen.
-    styrke = Steg("kolonne-signal", "Signalstyrken", TAVLA_STYRKEN)
-    retning = Steg("kolonne-retning", "Retningen", TAVLA_RETNING)
+    styrke = Steg("kolonne-signal", "Signalstyrken", STEGET_STYRKEN)
+    retning = Steg("kolonne-retning", "Retningen", STEGET_RETNINGEN)
+    dagen = "Knappene og datoen velger hvilken dag eller periode tabellen viser."
     sider = {
         "oversikt": (
             Steg(
-                "velg-dag", "Dagen og perioden", "Knappene og datoen velger hvilken dag eller periode tabellen viser."
+                "velg-dag",
+                "Dagen og perioden",
+                f"{dagen} {NESTE_HENTING_STEGET_DEMO if demo else NESTE_HENTING_STEGET}",
+                "" if demo else NESTE_HENTING_ANKER,
             ),
             Steg(
                 "hovedindeks-tittel",
                 "Hovedindeksen",
-                "Søylene viser endringen for hver aksje, og den stiplede linja hovedindeksen.",
+                "Søylene viser endringen for hver aksje, og den stiplede linja er hovedindeksen.",
             ),
             Steg(
                 "aksjene",
@@ -950,13 +985,13 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
             ),
             # Story 8.26 (tillegg 20): «Signalet forklart» står mellom grafen og
             # «Signalet dag for dag», bare når delen vises.
-            Steg(KI_ANKER, "Signalet forklart", KI_STEGET),
+            Steg(KI_ANKER, "Signalet forklart", STEGET_SIGNALET_FORKLART),
             Steg(
                 "signalet-dag-for-dag",
                 # Ikke «Signalet dag for dag»: toppen står før delene, og
                 # rekkefølgen på siden leses av overskriftene (test_ki_visning).
                 "Dag for dag",
-                "Det appen skrev om aksjen hver børsdag, en måned om gangen.",
+                "Det appen skrev om aksjen, lagret hver børsdag og aldri regnet på nytt, en måned om gangen.",
             ),
         ),
         "innstillinger": (
@@ -995,14 +1030,14 @@ GJENTATT_I_OMVISNINGEN = frozenset(
 )
 
 
-def omvisningen(p: Parametre = STANDARD) -> list[dict[str, str]]:
+def omvisningen(p: Parametre = STANDARD, demo: bool = False) -> list[dict[str, str]]:
     """Stegene i omvisningen, i rekkefølgen sidene står i OMVISNINGEN_SIDER,
     med de samme tekstene som «Vis meg rundt», uten stegene som gjentar en
     side før (GJENTATT_I_OMVISNINGEN). Skriptet i hjelp.js leser dem fra
-    rammen."""
-    sider = rundturer(p)
+    rammen. demo som i rundturer."""
+    sider = rundturer(p, demo)
     return [
-        {"side": side, "anker": s.anker, "tittel": s.tittel, "tekst": s.tekst}
+        {"side": side, "anker": s.anker, "tittel": s.tittel, "tekst": s.tekst, "ogsaa": s.ogsaa}
         for side in OMVISNINGEN_SIDER
         for s in sider[side]
         if (side, s.anker) not in GJENTATT_I_OMVISNINGEN

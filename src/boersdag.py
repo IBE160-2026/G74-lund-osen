@@ -176,17 +176,6 @@ def norsk_dato(oeyeblikk: datetime) -> date:
 # --- Story 8.19: neste henting i stripa ---------------------------------------
 
 
-def boersdagen_hentet(hentet: datetime) -> date:
-    """Boersdagen en henting paa tidspunktet hentet hadde kursene for, med
-    reglene i fetch_prices: paa en boersdag foer TIDSGRENSE den forrige
-    boersdagen (foerste henting, story 2.3c, eller --uten-tidskontroll),
-    ellers inneverende boersdag."""
-    dag = norsk_dato(hentet)
-    if er_boersdag(dag) and hentet.astimezone(OSLO).time() < TIDSGRENSE:
-        return forrige_boersdag(dag)
-    return innevaerende_boersdag(dag)
-
-
 def neste_boersdag(dag: date) -> date:
     """Foerste boersdag etter dag. Reiser UtenforKalenderen naar kalenderen
     ikke dekker aaret den maa slaa opp (NFR-08: ingen gjetning)."""
@@ -197,15 +186,17 @@ def neste_boersdag(dag: date) -> date:
     return neste
 
 
-def neste_henting(hentet: datetime, naa: datetime) -> date | None:
+def neste_henting(kursdag: date, naa: datetime) -> date | None:
     """Dagen nye kurser tidligst kan hentes, fra TIDSGRENSE, eller None naar
-    de kan hentes naa. Den sier aldri at en henting kommer, bare naar
+    de kan hentes naa. kursdag er den siste kursdagen i basen, den eldste
+    blant aksjene i lista (spoersmaal 10, svaret 12.11 kl. 20:42), ikke
+    tidspunktet for hentingen. Den sier aldri at en henting kommer, bare naar
     hentingen i fetch_prices tidligst ville faatt nye kurser: paa en
     boersdag foer TIDSGRENSE henter den ingenting, og ellers henter den
-    inneverende boersdag naar den er nyere enn den som er hentet."""
+    inneverende boersdag naar den er nyere enn kursdag."""
     idag = norsk_dato(naa)
     if er_boersdag(idag) and naa.astimezone(OSLO).time() < TIDSGRENSE:
         return idag
-    if innevaerende_boersdag(idag) > boersdagen_hentet(hentet):
+    if innevaerende_boersdag(idag) > kursdag:
         return None
     return neste_boersdag(idag)

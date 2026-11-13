@@ -284,13 +284,13 @@ ONSKE_FOLG = valg.FOLG
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 
 
-def _neste_henting(tid: datetime) -> str | None:
+def _neste_henting(kursdag: date) -> str | None:
     """Story 8.19 (U60): bak «Oppdatert …», naar nye kurser tidligst kan
-    hentes, med klokka sidene bruker. Bare den ekte versjonen viser det
-    (_ramme.html), fordi demoen ikke henter. Et tidspunkt uten sone gir
-    ingenting, som en dag kalenderen ikke dekker."""
+    hentes, med klokka sidene bruker. kursdag er kursdag_felles fra
+    _oppdatert_overalt (spoersmaal 10). Bare den ekte versjonen viser det
+    (_ramme.html), fordi demoen ikke henter."""
     try:
-        return neste_henting_tekst(tid, naa())
+        return neste_henting_tekst(kursdag, naa())
     except ValueError:
         return None
 
@@ -563,7 +563,8 @@ def _omvisningen():
     lesing, og lik i demoen og i den ekte versjonen."""
     if not innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_HJELP]:
         return {"omvisning": None}
-    return {"omvisning": omvisningen(STANDARD)}
+    # Story 8.19 (spørsmål 8): steget om dagen er ulikt i demoen.
+    return {"omvisning": omvisningen(STANDARD, bool(g.get("eksempeltall")))}
 
 
 @app.context_processor
@@ -587,7 +588,7 @@ def _hjelp():
     return {
         "hjelp": Hjelp(hjelpetekster(STANDARD)),
         # Story 8.9: stegene i «Vis meg rundt», fra samme fil.
-        "rundturer": rundturer(STANDARD),
+        "rundturer": rundturer(STANDARD, bool(g.get("eksempeltall"))),
         "parametre": STANDARD,
         "antall_sjekker": ANTALL_SJEKKER,
         "blandet": BLANDET,
@@ -645,19 +646,29 @@ def _oppdatert_overalt():
     """Story 8.26 (tillegg 17): tidspunktet i linja «Oppdatert …» for sidene
     som ikke har sitt eget, som «Følg en aksje», «Er du sikker?»,
     Innstillinger og sidene i demoen: det eldste tidspunktet en aksje med
-    kurser sist ble hentet, som på oversikten (FR-101). Bare lesing."""
+    kurser sist ble hentet, som på oversikten (FR-101). Bare lesing.
+
+    Story 8.19 (spørsmål 10, svaret 12.11 kl. 20:42): kursdag_felles er den
+    siste kursdagen i basen, den eldste blant aksjene i lista, slik
+    sidens_dato gjør på oversikten. Linja om neste henting regnes av den på
+    alle sidene, også aksjesiden, så den ser det samme som hentingen."""
+    ingen = {"hentet_felles": None, "kursdag_felles": None}
     if request.endpoint not in _RUTER_MED_BASE or g.get("basefeil"):
-        return {"hentet_felles": None}
+        return ingen
     try:
         leser = hent_oversiktsleser()
         if leser is None:
-            return {"hentet_felles": None}
-        tider = [post.hentet for post in leser.oversikt(idag()) if post.nyeste is not None and post.hentet]
-        return {"hentet_felles": min(tider) if tider else None}
+            return ingen
+        poster = [post for post in leser.oversikt(idag()) if post.nyeste is not None]
+        tider = [post.hentet for post in poster if post.hentet]
+        return {
+            "hentet_felles": min(tider) if tider else None,
+            "kursdag_felles": min((post.nyeste.dato for post in poster), default=None),
+        }
     except Exception:  # noqa: BLE001
         # Gjennomgangen (ECH5): linja er pynt; en feil her skal ikke gi 500 på
         # «Følg en aksje» eller Innstillinger, som før ikke leste oversikten.
-        return {"hentet_felles": None}
+        return ingen
 
 
 class _BasenFeilet(Exception):
