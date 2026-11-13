@@ -1362,7 +1362,8 @@ HOEYDE_PAA_BILDET = 1864
 # Avtrykkene er regnet ut paa nytt, og de tre bildene med notatene er nye.
 # Flettingen av main (8.19) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.28) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-AVTRYKK_BAK_BILDET = "beda67bb1e1890717bc649d75f97b1a244633af5200ce994ce3331f50be81ab5"
+# Story 3.3k (tillegg 1): linja nederst og UNDER_ARBEID_TEKST i avtrykket; avtrykket er regnet ut paa nytt.
+AVTRYKK_BAK_BILDET = "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1832,7 +1833,8 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Avtrykkene er regnet ut paa nytt, og de tre bildene med notatene er nye.
 # Flettingen av main (8.19) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.28) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "c37c11ced36394bccb2cbdd2aa395592bf8176e0da7f708ea8b64c1a0bd3da8d"
+# Story 3.3k (tillegg 1): linja nederst og UNDER_ARBEID_TEKST i avtrykket; avtrykket er regnet ut paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "0897d2fb1101977df68a3a4fca397ad1a3bf1ed0c934323d485c80b5d769a6a7"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2114,21 +2116,24 @@ DE_NYE_BILDENE = {
 # Avtrykkene er regnet ut paa nytt, og de tre bildene med notatene er nye.
 # Flettingen av main (8.19) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt.
 # Flettingen av main (8.28) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Story 3.3k (tillegg 1): linja nederst sier «Versjon 1 er ferdig.», og avtrykket har
+# UNDER_ARBEID_TEKST med. Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt: de med
+# bunnen av siden er nye (bare linja nederst er endret), de andre byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "b86c060f4ed1e19a818ba26fa8d24695c76856397ad46255151960bb7af471b4",
-    TOPPEN_AV_OVERSIKTEN: "beda67bb1e1890717bc649d75f97b1a244633af5200ce994ce3331f50be81ab5",
-    "docs/appen/boersometeret-demo.png": "c875e955db2f9e1b96200e8cbd2862309440aadd4b5e73117533519737e42cb3",
-    "docs/appen/min-liste-demo.png": "b20b4a95ad4bb64e2404851d305dfb198f2efac03c0dd226411fb191688eca24",
-    "docs/appen/oversikten-390-demo.png": "beda67bb1e1890717bc649d75f97b1a244633af5200ce994ce3331f50be81ab5",
-    "docs/appen/boersometeret-390-demo.png": "c875e955db2f9e1b96200e8cbd2862309440aadd4b5e73117533519737e42cb3",
-    "docs/appen/din-egen-liste-demo.png": "b20b4a95ad4bb64e2404851d305dfb198f2efac03c0dd226411fb191688eca24",
-    "docs/appen/investorsiden-brfe-demo.png": "9696969b01ca6c534edb20be3855ddc572b0d71d795fc0fe346aef0f65bbe159",
-    "docs/appen/investorsiden-brfe-390-demo.png": "9696969b01ca6c534edb20be3855ddc572b0d71d795fc0fe346aef0f65bbe159",
-    "docs/appen/folg-en-aksje-390-demo.png": "b86c060f4ed1e19a818ba26fa8d24695c76856397ad46255151960bb7af471b4",
-    "docs/appen/notatene-brfe-390-demo.png": "c37c11ced36394bccb2cbdd2aa395592bf8176e0da7f708ea8b64c1a0bd3da8d",
-    "docs/appen/notatene-brfe-demo.png": "c37c11ced36394bccb2cbdd2aa395592bf8176e0da7f708ea8b64c1a0bd3da8d",
-    "docs/appen/notatene-min-liste-demo.png": "b20b4a95ad4bb64e2404851d305dfb198f2efac03c0dd226411fb191688eca24",
-    "docs/appen/innstillinger-demo.png": "57e07847533ee9266917346bca5e8f255b4f01b645e420c76a58b2f67deaeca7",
+    "docs/appen/folg-en-aksje-demo.png": "93b6b99592389708b13482c221cb8dd828507c7549d3e9db3aa605661bf7f38d",
+    TOPPEN_AV_OVERSIKTEN: "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
+    "docs/appen/boersometeret-demo.png": "5feb3d86d45c814deb29991f6903a92711592034739776c70a0367d2952cff3b",
+    "docs/appen/min-liste-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
+    "docs/appen/oversikten-390-demo.png": "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
+    "docs/appen/boersometeret-390-demo.png": "5feb3d86d45c814deb29991f6903a92711592034739776c70a0367d2952cff3b",
+    "docs/appen/din-egen-liste-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
+    "docs/appen/investorsiden-brfe-demo.png": "7958e9e02210890fb1c1a75b6dd7ea2b930447c599c59e91fca9f08925f848d6",
+    "docs/appen/investorsiden-brfe-390-demo.png": "7958e9e02210890fb1c1a75b6dd7ea2b930447c599c59e91fca9f08925f848d6",
+    "docs/appen/folg-en-aksje-390-demo.png": "93b6b99592389708b13482c221cb8dd828507c7549d3e9db3aa605661bf7f38d",
+    "docs/appen/notatene-brfe-390-demo.png": "0897d2fb1101977df68a3a4fca397ad1a3bf1ed0c934323d485c80b5d769a6a7",
+    "docs/appen/notatene-brfe-demo.png": "0897d2fb1101977df68a3a4fca397ad1a3bf1ed0c934323d485c80b5d769a6a7",
+    "docs/appen/notatene-min-liste-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
+    "docs/appen/innstillinger-demo.png": "b1ec40c753247018c7e7af93c139ca3cd05db88f1d4d44b23fcf338b624eb0f4",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2159,6 +2164,10 @@ def _avtrykk_bak_bildet(filene: tuple[str, ...] = MALENE_BAK_BILDET) -> str:
     for fil in sorted(set(filer)):
         sum_.update(fil.encode("utf-8") + b"\0" + (ROT / fil).read_bytes().replace(b"\r\n", b"\n") + b"\0")
     sum_.update(b"EKSEMPELTALL_MERKE\0" + app_modul.EKSEMPELTALL_MERKE.encode("utf-8"))
+    # Story 3.3k (tillegg 1): linja nederst står på alle sidene, også oversikten, som ikke
+    # har app.py i lista. Uten den endret oversikten ved 390 px seg mens avtrykket sto.
+    linja = app_modul.UNDER_ARBEID_TEKST if app_modul.UNDER_ARBEID else ""
+    sum_.update(b"UNDER_ARBEID_TEKST\0" + linja.encode("utf-8"))
     return sum_.hexdigest()
 
 
