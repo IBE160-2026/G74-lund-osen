@@ -242,3 +242,4 @@
 - [x] 2026-11-12 [snarveien-spoer-foer-nettleseren-3-7](929-2026-11-12-18-11-37-snarveien-spoer-foer-nettleseren-3-7.md) — fargen på lenken «Slik slår du den på» (spørsmål 26) bygges etter svaret, med bildene tatt på nytt (løst 2026-11-13: dekket av regelen for lenker fra 8.26, med test i `fb7369a4`; bildene var like)
 - [x] 2026-11-13 [mest-av-bransjene-10-11-og-8-19](928-2026-11-13-14-39-31-mest-av-bransjene-10-11-og-8-19.md) — 8.19 (PR #151) flettes etter Utført-linja for 8.27, med hele settet, CI og «Ekstra, ferdig» i README-en (løst 2026-11-13)
 - [ ] 2026-11-13 [mest-av-bransjene-10-11-og-8-19](928-2026-11-13-14-39-31-mest-av-bransjene-10-11-og-8-19.md) — ECH6 (lav): mål om Gemma bommer oftere med «mest av bransjene med minst to aksjer» i kveldshentingene
+- [ ] 2026-11-13 [de-15-mest-omsatte-8-28](927-2026-11-13-21-54-06-de-15-mest-omsatte-8-28.md) — bildegrenen `pr-8-28-bilder` viser «Din egen liste» fra før 8.26; bildet på main er det gjeldende
