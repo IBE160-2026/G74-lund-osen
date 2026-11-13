@@ -4809,6 +4809,12 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 
 *Avgjort 2026-11-13 kl. 10:18 (gruppens svar):* med 8.26 har raden øverst sju knapper. De står på én rad ved 1280 px med mindre luft i knappene, og to rader beholdes hvis det blir for trangt eller klikkflaten blir lavere (spørsmål 15 i spesifikasjonen). Rekkefølgen er endret: 3.7 og 10.11 flettes før 8.27, og PR #147 flettes når Utført-linja for 10.11 står på origin/main, med main flettet inn i grenen på nytt og hele settet før flettingen. Rådet anbefalte det.
 
+*Avgjort 2026-11-13 (gruppens svar, kl. 18:07 i økta):* radene for 10.11 i `docs/kvalitetssikring.md` føres på main fra vinduet for 8.27, fordi main var rød i CI uten dem (`b92ebe0a`).
+
+*Avgjort 2026-11-13 kl. 18:24 og 18:26 (gruppens svar, felles tillegg for køen):* kveldshentingen hoppes over i kveld, hele settet kjøres i CI, og rekkefølgen er 8.27, 8.19, 8.28, 9.11, 8.29, bildene 3.3k og 9.12. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 8.27 er flettet med PR #147 i `2a363adb` kl. 18:50, låst til head-en `9244203f` (main med 3.7 og 10.11 flettet inn), etter instruksjonen 11.11 kl. 21:25 og tillegg 1–2 i `docs/ai-prompts/2026-11-11.md`, tillegg 3 i `docs/ai-prompts/2026-11-12.md` og svarene 13.11 i `docs/ai-prompts/2026-11-13.md`. De sju knappene står på én rad ved 1280 px (spørsmål 15). Hele settet lokalt i fire deler kl. 18:10–18:33 (`date`), hver del bare når ingen annen pytest kjørte: 5793, likt `--collect-only`, og hele settet i CI (run 43470073941), alle fire jobbene grønne. Testene for dokumentene besto på `9244203f`.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

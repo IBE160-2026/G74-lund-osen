@@ -2,7 +2,7 @@
 title: 'Story 8.27: «Mine notater» i et panel fra en knapp øverst'
 type: 'feature'
 created: '2026-11-11'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'db89c5ba'
 context:
@@ -162,6 +162,10 @@ Kjørt kl. 23:52 på `39548c04`, én om gangen: kopi av fila før, én endring, 
 
 Del F er ikke bygget (venter på 8.26), og har ingen mutant.
 
+*Lagt til 2026-11-13:* del F ble bygget etter at 8.26 var flettet, og mutanten F (steget står med «Notater» av) ble fanget av `TestSteget` 13.11 kl. 01:11. Mutanten G for raden (`padding: 0 10px`) ble fanget av `TestRaden` kl. 10:30. Begge filene var like HEAD etterpå.
+
 ## Bildene i `docs/appen/`
 
 Knappen øverst endrer toppen av hver side, så alle 16 bildene er tatt på nytt fra demoen med DevTools-protokollen i Edge uten vindu, med tilbudet om omvisningen besvart. Metoden ble først prøvd mot `min-liste-demo.png` og `oversikten-topp-demo.png`, som ble byte for byte de samme på main. Ved 1280 px er høydene de samme. Ved 390 px blir tre bilder 52 px høyere (børsometeret, investorsiden og «Følg en aksje»), fordi knappene går over tre rader. *Åpent punkt:* `oversikten-390-demo.png` er 4810 px i repoet, men main målte 4758 px mellom kl. 22:22 og 22:26 (klokka lest før og etter) med samme metode. Med knappen blir oversikten 4810 px.
+
+*Ferdig 2026-11-13:* PR #147 er squash-flettet i `2a363adb` kl. 18:50, låst til head-en `9244203f` (main med 3.7, 10.11 og radene for 10.11 i kvalitetssikringen flettet inn), etter gruppens svar 12.11 kl. 10:16 og 13.11 kl. 10:18. Hele settet lokalt i fire deler kl. 18:10–18:33 (5793, som `--collect-only`) og i CI (run 43470073941), alle fire jobbene grønne. Ingen funn på middels eller over står åpne.
