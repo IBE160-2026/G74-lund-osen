@@ -551,6 +551,9 @@ class TestSiden:
         mellom = html[html.index("</section>", historikken) : investorsiden]
         assert "<section" not in mellom and "<h2" not in mellom
         etter = html[investorsiden:].split('<div id="hjelp-', 1)[0]
+        # Story 8.27 (tillegg 1, gruppens svar 11.11 kl. 21:36): «Mine notater»
+        # står etter boblen, og ingen annen del.
+        etter = re.sub(r'<section class="notater" id="mine-notater".*?</section>', "", etter, flags=re.S)
         assert "<section" not in etter and "<h2" not in etter
 
     @pytest.mark.parametrize("adresse, dagen", [("", "fredag 09.10"), ("?dag=2026-10-06", "tirsdag 06.10")])

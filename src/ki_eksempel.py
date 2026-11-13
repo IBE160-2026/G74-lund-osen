@@ -15,6 +15,7 @@ den er laget av Gemma (FR-602). Ingen nettkall, ingen fil og ingen klokke.
 import json
 from collections.abc import Mapping
 
+from ki_dagen import AV_BRANSJENE
 from ki_modell import Modellsvar
 from ki_prompt import setning_om_retningene
 
@@ -85,8 +86,8 @@ def tekst_om_aksjen(grunnlag: Mapping[str, object], ordlyd: str | None = None) -
 
 
 def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
-    """Formene i promptversjon dag-2, i rekkefoelgen fra svaret 11.11 kl.
-    19:30: hovedindeksen, de siste fem boersdagene, bedre enn indeksen, de som
+    """Formene i promptversjon dag-3 (story 10.11: «mest» med
+    AV_BRANSJENE), i rekkefoelgen fra svaret 11.11 kl. 19:30: hovedindeksen, de siste fem boersdagene, bedre enn indeksen, de som
     skilte seg ut med antallet mot vanlig rett etter, navnene, og til slutt
     bransjene. Bare feltene som finnes, og ingen retning med 0."""
     setninger = []
@@ -130,9 +131,9 @@ def tekst_om_dagen(grunnlag: Mapping[str, object]) -> str:
             navnene.append(f"{grunnlag['skilte_seg_ut_andre']} andre")
         setninger.append(f"Blant dem var {_og(navnene)}.")
     if "bransje_mest_opp" in grunnlag:
-        setninger.append(f"I snitt steg {str(grunnlag['bransje_mest_opp']).lower()} mest.")
+        setninger.append(f"I snitt steg {str(grunnlag['bransje_mest_opp']).lower()} mest {AV_BRANSJENE}.")
     if "bransje_mest_ned" in grunnlag:
-        setninger.append(f"I snitt falt {str(grunnlag['bransje_mest_ned']).lower()} mest.")
+        setninger.append(f"I snitt falt {str(grunnlag['bransje_mest_ned']).lower()} mest {AV_BRANSJENE}.")
     return " ".join(setninger)
 
 

@@ -315,6 +315,8 @@ AVTRYKK = {
     # Tillegget kl. 17:21: tre nye former, og versjonen staar som dag-2, fordi den ikke er
     # flettet. Var f0377e8f....
     "dag-2": "cf1e7f7577f9f3afa07d1b7ca0db65845d9daecf9ef6cbf4ab472a6a33340c7a",
+    # Story 10.11: formene med «mest» sier «av bransjene med minst to aksjer».
+    "dag-3": "fd1f011d0d433374d1f28c16cbcbf0f225f07ea331d3165af6381ecad166bc7f",
 }
 
 

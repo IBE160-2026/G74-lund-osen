@@ -1,0 +1,66 @@
+{#- Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): innholdet i panelet
+    «Mine notater», i en <template> i rammen, som skriptet viser når panelet
+    åpnes (notatpanel fra _notatpanelet i app.py).
+    Alle notatene, de nyeste først, med det samme som «Mine notater» i Min
+    liste (_notat.html), og et skjema for et nytt notat: på aksjesiden for
+    aksjen og dagen siden viser, ellers med et valg blant aksjene i lista.
+    Skjemaene sender med siden man står på (panel_tilbake), så svaret kommer
+    tilbake dit med panelet åpent. -#}
+{% from "_notat.html" import notatet with context -%}
+{%- set panelnotater = notatpanel.notatene -%}
+{%- set panel_aksjen = notatpanel.aksjen -%}
+{%- set panel_valget = notatpanel.valget -%}
+{%- set panel_tilbake = notatpanel.tilbake -%}
+{%- set panel_indeks = notatpanel.indeks -%}
+{%- set panel_maks = notatpanel.maks -%}
+{#- Del D: demobasen lages på nytt hver gang demoen starter. #}
+{% if eksempeltall %}<p class="notatgrense notatpanel-demo">I demoen står notatene til demoen startes på nytt, fordi demobasen lages på nytt da.</p>{% endif %}
+{% if panelnotater is none %}
+<p class="uten">Notatene kan ikke leses fra basen nå.</p>
+{% else %}
+{% if panel_aksjen %}
+{%- set a = panel_aksjen %}
+{% if a.uten_kurser %}
+<p class="uten">{{ a.navn }} har ingen kurser ennå, så et notat kan ikke skrives for den før kursene er hentet.</p>
+{% elif a.tatt_ut %}
+<p class="uten">{{ a.navn }} er tatt ut av lista, så et nytt notat kan ikke skrives for den.</p>
+{% elif not a.har_kurs %}
+<p class="uten">Et notat får dagen siden viser, og {{ a.dag|ukedag }} {{ a.dag|dato }} har ingen kurs for {{ a.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
+{% else %}
+<form class="nytt-notat" method="post" action="/aksje/{{ a.symbol }}/notat">
+  <input type="hidden" name="dag" value="{{ a.dag.isoformat() }}">
+  <input type="hidden" name="vis" value="{{ a.vis }}">
+  <input type="hidden" name="tilbake" value="{{ panel_tilbake }}">
+  <label for="notatpanel-tekst">Notat om {{ a.navn }}, med datoen {{ a.dag|ukedag }} {{ a.dag|dato }}.</label>
+  <textarea id="notatpanel-tekst" name="tekst" rows="3" maxlength="{{ panel_maks }}" required></textarea>
+  <p class="notatgrense">Høyst {{ panel_maks }} tegn.</p>
+  <button type="submit">Lagre notatet</button>
+</form>
+{% endif %}
+{% elif panel_valget %}
+<form class="nytt-notat" method="post" action="/notat">
+  <input type="hidden" name="tilbake" value="{{ panel_tilbake }}">
+  <label for="notatpanel-aksje">Aksjen</label>
+  <select id="notatpanel-aksje" name="symbol" required>
+    {%- for symbol, navn in panel_valget %}
+    <option value="{{ symbol }}">{{ navn }}</option>
+    {%- endfor %}
+  </select>
+  <label for="notatpanel-tekst">Notatet får siste dag med kurs for aksjen du velger.</label>
+  <textarea id="notatpanel-tekst" name="tekst" rows="3" maxlength="{{ panel_maks }}" required></textarea>
+  <p class="notatgrense">Høyst {{ panel_maks }} tegn.</p>
+  <button type="submit">Lagre notatet</button>
+</form>
+{% elif panel_valget is not none %}
+<p class="uten">Ingen aksje i lista har kurser ennå, så et notat kan ikke skrives.</p>
+{% endif %}
+{% if panelnotater %}
+{#- Gjennomgangen (ECH1): som i Min liste, når siden viser en tidligere dag. #}
+{% if notatpanel.tidligere %}<p class="notatgrense">Et tenkt kjøp eller salg noteres med sjekkene for siste dag med kurser, så knappene står når siden viser siste børsdag.</p>{% endif %}
+<ol class="notatliste">
+  {% for n in panelnotater %}{{ notatet(n, panel_indeks, med_skjema=true, siste_dag=n.siste_dag, kan_handle=n.kan_handle, med_navn=true, tilbake=panel_tilbake) }}{% endfor %}
+</ol>
+{% else %}
+<p class="uten">Ingen notater ennå.</p>
+{% endif %}
+{% endif %}
