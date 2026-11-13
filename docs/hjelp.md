@@ -15,6 +15,10 @@ Spørsmål og svar til «Kom i gang» i [README-en](../README.md) og til [instal
 
 Etter «Pakk ut alle» på Windows ligger en `G74-lund-osen-main` inne i en annen med samme navn. Åpne den innerste, der README ligger. De fire filene står øverst der: `Start demoen` og `Start den ekte versjonen`, som `.cmd` for Windows og `.command` for Mac. Står du inne i ZIP-fila, se «ZIP-fila ser ut som en vanlig mappe.» under steg 2.
 
+### Vinduet spør om snarveien, og nettleseren åpnes ikke.
+
+Første gang på Windows spør vinduet om det skal lage snarveien på skrivebordet, og nettleseren åpner appen når du har svart, også etter et nei. Skriv `j` og trykk Enter for ja, eller bare Enter for nei. Svarer du ikke på 30 sekunder, lages ingen snarvei, nettleseren åpnes, og spørsmålet kommer igjen neste gang.
+
 ### Vinduet lukkes med en gang.
 
 Har du dobbeltklikket inne i ZIP-fila uten å pakke ut, finner ikke startfila skriptene i `start/`. Pakk ut først, og dobbeltklikk i den innerste `G74-lund-osen-main`.
@@ -280,6 +284,14 @@ Appen viser ikke børsmeldingene. De står på NewsWeb og ofte også på selskap
 ### Kan KI-teksten lages uten grafikkort?
 
 Ja, med din egen nøkkel til Gemini, Anthropic eller OpenAI. Sett `OSE_KI_TJENESTE=gemini`, `anthropic` eller `openai` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`, `OSE_KI_ANTHROPIC_NOKKEL=` eller `OSE_KI_OPENAI_NOKKEL=`. Da sendes grunnlaget for hver aksje til tjenesten du har valgt, og det kan koste hos dem. Del aldri nøkkelen, og bruk ikke en konto der du har sagt ja til at tjenesten trener på innholdet. Mangler nøkkelen, eller har den tegn som ikke kan sendes, skrives ingen rader, og utskriften sier hvilken variabel det gjelder: legg den inn og hent igjen samme kveld, før midnatt. Feiler tjenesten, for eksempel fordi nøkkelen er feil, blir det ingen KI-tekst for noen av aksjene den dagen, heller ikke om du retter det og henter igjen samme kveld. Hentingen går ikke over til en annen tjeneste. Mer står under «Egen nøkkel til Gemini, Anthropic eller OpenAI» i [installasjonen](installasjon.md).
+
+### Vinduet spør om KI-teksten første gang.
+
+Den ekte versjonen spør første gang, etter nøkkelen, hvem som skal skrive KI-teksten: 1 henter Gemma, en gratis språkmodell som kjører på maskinen, og installerer Ollama først; 2 bruker din egen API-nøkkel til Gemini, Anthropic eller OpenAI, og da sendes tallene teksten bygger på, til tjenesten, og det kan koste der; 3 er ikke nå, og vinduet spør ikke igjen. Appen virker også uten KI-tekst. Svarer du ikke på 30 sekunder, spør vinduet igjen neste gang. Mer står under «Den lokale modellen for KI-teksten» i [installasjonen](installasjon.md#ki-teksten).
+
+### Det står at KI-teksten lages når maskinen har en modell.
+
+Da finnes ingen KI-tekst for siste børsdag i basen, fordi ingen modell svarte da kursene ble hentet, eller KI-teksten var av. For en eldre dag står grunnen som før, fordi teksten bare kan lages for inneværende børsdag. Hentingen sa hvorfor i én linje. Lenken «Slik slår du den på» går til [installasjonen](installasjon.md#ki-teksten). En tekst som kontrollen stoppet, har en annen linje, som sier hvorfor.
 
 ## Når appen kjører, eller ikke
 
