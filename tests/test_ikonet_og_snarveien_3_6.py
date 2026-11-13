@@ -381,11 +381,17 @@ class TestStartskriptet:
         før appen svarte."""
         tekst = (ROT / "start" / "start.ps1").read_text(encoding="utf-8-sig")
         assert ". (Join-Path $PSScriptRoot 'snarvei.ps1')" in tekst
-        # Gjennomgangen (VG2, VG3, ECH2): med rota som argument, etter at
-        # nettleseren er åpnet, før ventingen på serveren, og bare mens den kjører.
-        kall = "if (-not $server.HasExited) { Tilby-Snarvei $Versjon (Split-Path -Parent $PSScriptRoot) }"
+        # Gjennomgangen (VG2, VG3, ECH2): med rota som argument, før ventingen
+        # på serveren, og bare mens den kjører. Rettet 2026-11-12 (story 3.7,
+        # svaret 11.11 kl. 22:07): her sto «etter at nettleseren er åpnet».
+        # Nå spør vinduet først, og nettleseren åpnes etter svaret
+        # (test_snarveien_foer_nettleseren_3_7.py).
+        kall = (
+            "Snarvei-Og-Nettleser $Versjon (Split-Path -Parent $PSScriptRoot) "
+            "{ -not $server.HasExited } { Start-Process $Adresse }"
+        )
         assert tekst.count(kall) == 1
-        assert tekst.index("{ Start-Process $Adresse }") < tekst.index(kall) < tekst.index("$server.WaitForExit()")
+        assert tekst.index(kall) < tekst.index("$server.WaitForExit()")
         assert (ROT / "start" / "snarvei.ps1").read_bytes().startswith(b"\xef\xbb\xbf")
 
 

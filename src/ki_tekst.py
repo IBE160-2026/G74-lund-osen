@@ -288,7 +288,8 @@ def _hva_naa(grunn: str) -> str:
         )
     if "ikke hentet" in grunn:
         return "Hent modellen, se «Den lokale modellen» i docs/installasjon.md"
-    return "Start Ollama, se «Den lokale modellen» i docs/installasjon.md"
+    # Story 3.7 (tillegg 1): paa en ny PC er Ollama kanskje ikke installert.
+    return "Start Ollama, eller installer den, se «Den lokale modellen» i docs/installasjon.md"
 
 
 def lag_ki_tekster(
@@ -366,7 +367,9 @@ def lag_ki_tekster(
             skriv(
                 f"Ingen KI-tekst for børsdagen {dato.isoformat()}: {grunn}. Ingen rader er skrevet i "
                 "KI-loggen, og teksten for den dagen kan ikke lages senere, fordi den ikke er "
-                "inneværende børsdag (AD-7). Kveldens henting lager tekstene for dagens børsdag."
+                "inneværende børsdag (AD-7). Kveldens henting lager tekstene for dagens børsdag. "
+                # Story 3.7 (tillegg 1): ogsaa her hvor det staar hvordan den slaas paa.
+                f"{_hva_naa(grunn)}."
             )
             return False
         if grunn:

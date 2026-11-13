@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 11-12-2026 20:23
+last_updated: 13-11-2026 19:56
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -120,6 +120,7 @@ development_status:
   3-5h-til-faglaerer: done
   3-5i-installasjonen-i-egen-fil: done
   3-6-ikonet-og-snarveien: done
+  3-7-snarveien-spoer-foer-nettleseren: done
   epic-3-retrospective: optional
 
   epic-4: in-progress
@@ -190,13 +191,15 @@ development_status:
   8-16-regelen-for-startdagen-og-periodene-i-kursgrafen: done
   8-17-periodevalget-i-oversikten-min-liste-og-børsometeret: done
   8-18-kommende-eksdato-i-kursgrafen: backlog
-  8-19-neste-henting-i-stripa-øverst: backlog
+  8-19-neste-henting-i-stripa-øverst: done
   8-20-ux-rettingene-etter-gjennomgangen-06-11: done
   8-21-egne-notater-paa-aksjesiden: done
   8-22-foelg-en-aksje-og-min-liste: done
   8-23-funnene-fra-brukertesten: done
   8-24-notatene-to-ting: done
   8-25-spill-av-omvisningen: done
+  8-26-vis-meg-rundt-spiller-av-siden: done
+  8-27-mine-notater-i-panel: done
   8-28-de-15-mest-omsatte: review
   epic-8-retrospective: optional
 
@@ -235,4 +238,5 @@ development_status:
   10-8-chatgpt-med-sign-in-with-chatgpt: backlog
   10-9-ki-teksten-forklarer-det-siden-viser: done
   10-10-rikere-ki-tekster: done
+  10-11-mest-av-bransjene-med-minst-to-aksjer: done
   epic-10-retrospective: optional

@@ -1,0 +1,36 @@
+{% extends "_ramme.html" %}
+{#- Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): siden knappen
+    «Åpne eodhd.com» i steg 1 i «Din egen liste» går til i demoen. Samme
+    oppsett som investorsidene i demoen (docs/bilder/investorsider/LESMEG.md):
+    lenken tilbake øverst, en tegning laget av KI med snakkeboble, «Illustrasjon
+    laget av KI» under, og teksten nederst. Humoren handler om nøkler og kall,
+    aldri om kurser eller kjøp og salg (NFR-06). Siden finnes bare i demoen. -#}
+{% block tittel %}eodhd.com i demoen — OSE Signal{% endblock %}
+{% block side %}side-demoselskap{% endblock %}
+
+{% block innhold %}
+  <a class="tilbake" href="/min-liste#din-egen-liste">Tilbake til Min liste</a>
+
+  <header class="selskap">
+    <div class="selskapsnavn">
+      <h1>eodhd.com i demoen</h1>
+      <p class="meta">Steg 1 i «Din egen liste» · Demo Børs</p>
+    </div>
+  </header>
+
+  <div class="tegningsfelt">
+    <figure class="tegningen">
+      <div class="flate">
+        <img src="/static/demo/eodhd.svg" width="560" height="400" alt="{{ side.beskrivelse }}">
+        <p class="boble" style="{{ side.boblestil }}">{{ side.boble }}</p>
+        <svg class="hale" viewBox="0 0 560 400" aria-hidden="true" focusable="false">
+          <polygon class="flate-hale" points="{{ side.flate }}"/>
+          <polyline class="strek-hale" points="{{ side.strek }}"/>
+        </svg>
+      </div>
+      <figcaption class="ki-merke">Illustrasjon laget av KI</figcaption>
+    </figure>
+  </div>
+
+  <p class="oppdiktet">Dette er demoen, med oppdiktede selskaper og tall, så ingen konto trengs. I den ekte versjonen åpner knappen registreringen hos EODHD i en ny fane.</p>
+{% endblock %}

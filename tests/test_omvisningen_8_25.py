@@ -67,14 +67,18 @@ def _dataene(side: str) -> tuple[str, list]:
 
 class TestKnappenOgRekkefoelgen:
     def test_knappen_staar_ved_vis_meg_rundt(self, klient):
-        """Del A: ville feilet hvis knappen manglet ved «Vis meg rundt», eller
-        lista fra 8.9 ble borte."""
+        """Del A: ville feilet hvis knappen manglet ved «Vis meg rundt».
+        Story 8.26 (svaret 11.11 kl. 16:58 og 17:06): begge står i raden
+        øverst, rett etter «Innstillinger», og lista fra 8.9 er borte."""
         for adresse in SIDENE.values():
             side = klient.get(adresse).data.decode("utf-8")
-            rundtur = side[side.index('<div class="rad rundtur-rad">') :]
-            rundtur = rundtur[: rundtur.index("</div>")]
-            assert '<button type="button" class="spill-av" hidden>Spill av omvisningen</button>' in rundtur, adresse
-            assert '<ol class="rundtur-steg">' in rundtur, adresse
+            raden = side[side.index('<nav class="rad sider"') : side.index("</nav>")]
+            etter = raden[raden.index("Innstillinger</a>") :]
+            assert re.search(r'<button type="button" class="sideknapp vis-meg-rundt" data-steg="[^"]*" hidden>', etter)
+            assert '<button type="button" class="sideknapp spill-av" hidden>' in etter, adresse
+            assert etter.index("vis-meg-rundt") < etter.index("spill-av"), adresse
+            assert "Spill av omvisningen</button>" in etter, adresse
+            assert '<ol class="rundtur-steg">' not in side and "rundtur-rad" not in side, adresse
 
     def test_sidene_i_fast_rekkefoelge(self, klient):
         """Del A: ville feilet hvis omvisningen gikk gjennom sidene i en annen
@@ -112,7 +116,15 @@ class TestStegene:
         """Del B: ville feilet hvis omvisningen hadde egne tekster, ikke de
         samme som «Vis meg rundt» i hjelpetekster.py."""
         sider = rundturer()
-        venta = [(side, s.anker, s.tittel, s.tekst) for side in OMVISNINGEN_SIDER for s in sider[side]]
+        # Story 8.26 (tillegg 20): uten stegene som gjentar en side før.
+        from hjelpetekster import GJENTATT_I_OMVISNINGEN
+
+        venta = [
+            (side, s.anker, s.tittel, s.tekst)
+            for side in OMVISNINGEN_SIDER
+            for s in sider[side]
+            if (side, s.anker) not in GJENTATT_I_OMVISNINGEN
+        ]
         assert [(s["side"], s["anker"], s["tittel"], s["tekst"]) for s in omvisningen()] == venta
 
     def test_skriptet_har_knappene_tastaturet_og_rollen(self):
@@ -136,7 +148,9 @@ class TestStegene:
         """Del B: ville feilet hvis knappen sto synlig uten skriptet, der den
         ikke gjør noe."""
         side = klient.get("/").data.decode("utf-8")
-        assert re.search(r'<button type="button" class="spill-av" hidden>', side)
+        assert re.search(r'<button type="button" class="sideknapp spill-av" hidden>', side)
+        # Story 8.26: «Vis meg rundt» er også skjult uten skriptet.
+        assert re.search(r'<button type="button" class="sideknapp vis-meg-rundt" data-steg="[^"]*" hidden>', side)
         assert '<div id="omvisning" hidden' in side
 
     def test_vis_hjelp_av_tar_bort_omvisningen(self, klient):
@@ -215,14 +229,19 @@ class TestRaadOgVersjonene:
         """Del D, NFR-06: ville feilet hvis et steg eller tilbudet ga råd eller
         sa noe om hva kursen vil gjøre."""
         skriptet = SKRIPTET.read_text(encoding="utf-8")
-        tilbudet = re.search(r'tekst\.textContent = "([^"]+)"', skriptet).group(1)
-        for tekst in [*(f"{s['tittel']} {s['tekst']}" for s in omvisningen()), tilbudet]:
+        # Story 8.26 (tillegg 21): tilbudet står i OMVISNING.TILBUDET, og
+        # linjene på det siste steget i «Vis meg rundt» på oversikten sjekkes også.
+        tilbudet = re.search(r'TILBUDET: "([^"]+)"', skriptet).group(1)
+        linjene = re.findall(r'linje: "([^"]+)"', skriptet)
+        assert len(linjene) == 2
+        for tekst in [*(f"{s['tittel']} {s['tekst']}" for s in omvisningen()), tilbudet, *linjene]:
             for ord_ in RAADSORD:
                 assert not re.search(ord_, tekst, re.IGNORECASE), (ord_, tekst)
 
     def test_lik_i_demoen_og_den_ekte_versjonen(self, klient, tmp_path, monkeypatch):
         """Del D: ville feilet hvis omvisningen var en annen i den ekte
-        versjonen enn i demoen."""
+        versjonen enn i demoen. Story 8.19 (tillegg 2, spørsmål 8): bare
+        steget om dagen på oversikten er ulikt, fordi demoen ikke henter."""
         import lagring_sqlite
         from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
 
@@ -232,7 +251,20 @@ class TestRaadOgVersjonene:
         monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
         monkeypatch.delenv(app_modul.I_DEMO, raising=False)
         _, ekte = _dataene(app_modul.app.test_client().get("/").data.decode("utf-8"))
-        assert ekte == demoen
+        # Story 8.27 (forslaget i spørsmål 13, godtatt 12.11 kl. 10:16): steget
+        # for «Mine notater» har linja om demoen i demoen. Story 8.19 (spørsmål 8):
+        # steget om dagen på oversikten er ulikt. Ellers likt.
+        import hjelpetekster as ht
+
+        for s in demoen:
+            if s["anker"] == ht.NOTATKNAPP:
+                assert s["tekst"] == ht.NOTATSTEGET_DEMO
+                s["tekst"] = ht.NOTATSTEGET
+        dagen = ("oversikt", "velg-dag")
+        assert [s for s in ekte if (s["side"], s["anker"]) != dagen] == [
+            s for s in demoen if (s["side"], s["anker"]) != dagen
+        ]
+        assert len(ekte) == len(demoen)
 
 
 class TestEtterBygget:
@@ -318,7 +350,9 @@ class TestOppfoerselenMedNode(TestLogikkenMedNode):
         skriptet = SKRIPTET.read_text(encoding="utf-8")
         for bit in (
             "OMVISNING.fortsett(lagret, her(), steg.length)",
-            "OMVISNING.knappene(steg, j, SIDE, finnes)",
+            # Story 8.26: boksen går gjennom de aktive stegene, hele
+            # omvisningen eller siden med «Vis meg rundt».
+            "OMVISNING.knappene(aktive, j, stedet, finnes)",
             "OMVISNING.skalLukke(e.key,",
             "OMVISNING.skalTilby(SIDE,",
             'document.addEventListener("keydown", tast)',
@@ -394,7 +428,7 @@ class TestFoelgEnAksje:
         for kode in koder:
             klient.post("/folg", data={"kode": kode})
             side = klient.get("/folg").data.decode("utf-8")
-            if "Lista er full. Fjern en aksje for å følge en annen." in side:
+            if "Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen." in side:
                 break
         else:
             pytest.fail("lista ble aldri full")

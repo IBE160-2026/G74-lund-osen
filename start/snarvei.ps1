@@ -1,6 +1,6 @@
 ﻿# Story 3.6 (del C, gruppens svar 10.11 kl. 14:07, og tillegget om demoen
 # kl. 15:57): snarveien «OSE Signal» på skrivebordet i Windows, med ikonet.
-# start.ps1 kaller Tilby-Snarvei når appen svarer. Første gang spør vinduet
+# start.ps1 kaller Snarvei-Og-Nettleser når appen svarer. Første gang spør vinduet
 # om snarveien skal lages. Et nei huskes i data\, og finnes snarveien,
 # spørres det ikke igjen. Starter den en annen kopi, spør vinduet én gang
 # om den skal starte denne i stedet (svaret 11.11 kl. 13:47). Snarveien starter versjonen som dobbeltklikket
@@ -9,6 +9,9 @@
 # OSE_SKRIVEBORD er skrivebordet (testene gir en midlertidig mappe),
 # OSE_START_SVAR_SNARVEI svarer på spørsmålet (j eller n, testene), og
 # OSE_START_SVAR_JA=1 (CI) gir verken spørsmål eller snarvei.
+
+# Story 3.7, tillegg 4: spørsmålet venter høyst 30 sekunder (frist.ps1).
+. (Join-Path $PSScriptRoot 'frist.ps1')
 
 function Snarvei-Navn([string]$Versjon) {
     if ($Versjon -eq 'demo') { return 'OSE Signal (demo)' }
@@ -58,12 +61,21 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
     } else {
         $spoersmaal = "Lage snarveien «$navn» på skrivebordet? Skriv j og trykk Enter for ja, eller bare Enter for nei"
     }
+    # Story 3.7 (svaret 11.11 kl. 22:07): nettleseren åpnes etter svaret, så
+    # spørsmålet ikke står i vinduet bak den. Linja står rett før spørsmålet.
+    if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Write-Host 'Nettleseren åpner appen når du har svart.' }
     if ($env:OSE_START_SVAR_SNARVEI) {
         # Testene: spørsmålet skrives, så teksten kan prøves (gjennomgangen, VG1).
         Write-Host $spoersmaal
         $svar = $env:OSE_START_SVAR_SNARVEI
     } else {
-        $svar = Read-Host $spoersmaal
+        $svar = Les-Med-Frist $spoersmaal
+    }
+    # Tillegg 4: uten svar innen fristen lages ingen snarvei, og ingenting
+    # huskes, så spørsmålet kommer igjen neste gang.
+    if ($null -eq $svar) {
+        Write-Host "Ingen svar på $(Svar-Frist) sekunder, så ingen endring av snarveien nå. Spørsmålet kommer igjen neste gang."
+        return
     }
     if ($svar -notmatch '^\s*(j|ja|y|yes)\s*$') {
         $foer = if ($annen) { 'Snarveien er som før.' } else { 'Ingen snarvei.' }
@@ -90,4 +102,19 @@ function Tilby-Snarvei([string]$Versjon, [string]$Rot) {
     } catch {
         Write-Host "Snarveien kunne ikke lages: $($_.Exception.Message) Appen kjører som før."
     }
+}
+
+# Story 3.7 (svaret 11.11 kl. 22:07): når appen svarer, spør vinduet om
+# snarveien først, og nettleseren åpnes etter svaret, også etter et nei og
+# når vinduet ikke spør. Har appen stoppet, spørres det ikke, og har den
+# stoppet mens vinduet spurte, åpnes ingen nettleser; beskjeden kommer fra
+# start.ps1 som før. $Kjoerer sier om appen kjører, og $Aapne åpner
+# nettleseren, så testene kan prøve rekkefølgen med en falsk nettleser.
+function Snarvei-Og-Nettleser([string]$Versjon, [string]$Rot, [scriptblock]$Kjoerer, [scriptblock]$Aapne) {
+    if (-not (& $Kjoerer)) { return }
+    # Gjennomgangen (ECH6, VG8): en feil i spørsmålet stopper ikke appen, og
+    # nettleseren åpnes likevel.
+    try { Tilby-Snarvei $Versjon $Rot } catch { Write-Host "Snarveien kunne ikke tilbys: $($_.Exception.Message) Appen kjører som før." }
+    if (-not (& $Kjoerer)) { return }
+    if ($env:OSE_START_UTEN_NETTLESER -ne '1') { & $Aapne }
 }

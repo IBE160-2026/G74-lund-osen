@@ -114,6 +114,12 @@ code { font-family: ui-monospace, Consolas, monospace; }
 
 /* Designregler §5: fokus i blekk på lys bakgrunn, oransje på blekk. */
 *:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+/* Story 8.26 (gruppens ønske 11.11 kl. 20:06, tillegg 10): alle lenker har
+   samme farge før og etter besøk, i samme stil som navnene i tabellene, så
+   ingen lenke viser nettleserens blå eller lilla. Regelen gjelder også en
+   besøkt lenke, fordi stilarket går foran nettleserens, og en lenke med egen
+   farge, som i demolinja og .knapp, står som før, fordi a er svakest. */
+a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
 header.stripe *:focus-visible { outline-color: var(--oransje); }
 
 /* Stripa øverst. */
@@ -135,17 +141,23 @@ header.stripe .demo { border-top: 1px solid var(--stripe-strek); }
 /* Story 3.3i (U51): lenken til den ekte versjonen i demolinja, i fargen til
    stripa og understreket, saa den synes paa den moerke stripa. */
 header.stripe .eksempeltall a { color: var(--hvit); text-decoration: underline; }
+/* Story 8.26 (tillegg 6): luft over periodevalget og filteret når siden
+   holder plassen med ankeret. */
+#perioden, #filteret, #visvalget, .valg[id$="-valget"] { scroll-margin-top: 16px; }
+/* Story 8.26 (ønsket kl. 17:53): «(åpnes i en ny fane)» ved «Den ekte
+   versjonen» er bare for skjermlesere, som ved investorsiden. */
+header.stripe .eksempeltall .skjult { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* Story 8.3: knapperaden med Markedsoversikt og Min liste. Knappen for
    siden man står på, er fylt (aria-current), og klikkflaten er 44 px høy.
    To knapper får plass på 390 px, og raden brytes heller enn å rulle. */
 header.stripe .sider { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }
-header.stripe a.sideknapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
+header.stripe .sideknapp { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
                             border: 1px solid var(--stripe-kant); border-radius: 999px; color: var(--stripe-tekst);
                             font-size: 15px; font-weight: 600; text-decoration: none; }
 /* Gruppens svar 04.11 kl. 22:23, 4: ikonene foran navnet, 16 px med strek 2
    i tekstfargen (currentColor), så de følger knappen som er valgt, og 8 px
    fra navnet (gap i regelen for a.sideknapp over). */
-header.stripe a.sideknapp .ikon { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
+header.stripe .sideknapp .ikon { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
                                   stroke-linecap: round; stroke-linejoin: round; }
 /* Story 8.23 (A6): siden man er på, er oransje i toppen, som står på blekk. */
 header.stripe a.sideknapp[aria-current="page"] { background: var(--oransje); border-color: var(--oransje); color: var(--blekk); }
@@ -197,6 +209,9 @@ header.stripe button.hjelpeknapp:focus-visible, .tabellboks thead button.hjelpek
   background: var(--kort); color: var(--tekst);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.30), 0 2px 6px rgba(0, 0, 0, 0.12);
 }
+.hjelpevindu .lukkes { color: var(--dempet); font-size: 13px; margin: 0.75rem 0 0; }
+/* Gjennomgangen av tillegg 12 (ECH4): kallene i vinduet som teksten over. */
+.hjelpevindu .kallene { margin: 0.25rem 0 0; padding-left: 1.2rem; font-size: 15px; }
 .hjelpevindu .hjelpetopp { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .hjelpevindu .hjelpemerke {
   display: inline-block; font-size: 12.5px; font-weight: 700; padding: 0.15rem 0.5rem;
@@ -350,6 +365,10 @@ p.fotnote { color: var(--dempet); font-size: 0.85rem; margin-top: 1.5rem; }
 /* Story 8.23 (tillegg 2): den blanke 0-brikken, hvit med kant som i tabellen
    (.brikke.null). */
 :where(.side-oversikt) .utslagsfelt .null { background: var(--hvit); color: var(--dempet-2); border: 1px solid var(--strek-2); }
+/* Story 8.26 (funnene fra demoprøven): de tre brikkene er høyere enn 36 px,
+   så feltet vokser med dem og har luft rundt, i stedet for at brikkene står
+   utenfor den grå ruta og inntil overskriften. */
+:where(.side-oversikt) .symbolfelt:has(> .utslagsfelt) { height: auto; padding: 6px 0; }
 :where(.side-oversikt) .symbolfelt .pil { font-size: 16px; font-weight: 700; line-height: 1; }
 :where(.side-oversikt) .symbolfelt svg { width: 22px; height: 22px; }
 
@@ -711,15 +730,17 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
 :where(.side-aksje) .ki-bryter { margin: 10px 0 0; }
 :where(.side-aksje) .ki .ki-bryter { margin: 0; }
 :where(.side-aksje) .ki-bryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
-                                        box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;
+                                        box-sizing: border-box; font: inherit; font-weight: 600;
                                         border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort);
                                         color: var(--blekk); cursor: pointer; }
 :where(.side-aksje) .ki-bryter .spor { position: relative; width: 36px; height: 20px; border-radius: 999px;
                                        background: var(--strek-2); flex: none; }
 :where(.side-aksje) .ki-bryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
                                               border-radius: 50%; background: var(--hvit); }
-:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: var(--blekk); }
-:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor::after { left: 18px; }
+/* Story 8.26 (gruppens svar 11.11 kl. 17:21): oransje med blekk-knott, som
+   bryterne i Innstillinger, så alle bryterne i appen ser like ut. */
+:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor { background: var(--oransje); }
+:where(.side-aksje) .ki-bryter [aria-checked="true"] .spor::after { left: 18px; background: var(--blekk); }
 :where(.side-aksje) .ki-bryter .verdi { color: var(--dempet); font-weight: 400; }
 /* Gjennomgangen av 8.2b (ECH9): med høy kontrast forsvinner bakgrunnen, så
    sporet og knotten får kant og systemfarger. */
@@ -1086,6 +1107,8 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
 :where(.side-oversikt) .fargefelt span { width: 9px; height: 9px; border-radius: 2px; }
 :where(.side-oversikt) .rammefelt .proeve { display: inline-block; box-sizing: border-box; width: 13px; height: 13px; border-width: 3px; border-radius: 2px;
                                             background: var(--trinn-noeytral); box-shadow: none; }
+/* Story 8.26 (tillegg 7): prøven uten ramme, for 0 og 1 av 3. */
+:where(.side-oversikt) .rammefelt .proeve.uten-ramme { border: 1px solid var(--strek-2); }
 :where(.side-oversikt) .stoerrelsefelt { align-items: flex-end; padding-bottom: 9px; box-sizing: border-box; }
 :where(.side-oversikt) .stoerrelsefelt span { background: var(--dempet); border-radius: 1px; width: 6px; height: 6px; }
 :where(.side-oversikt) .stoerrelsefelt span + span { width: 8px; height: 9px; }
@@ -1215,10 +1238,11 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Story 8.23 (A1): «Dine egne aksjer» som tabellen over, med bransjeikonet
    foran bransjen, og status og knappen i hver sin kolonne. */
 :where(.side-oversikt) .egnetabell { margin: 12px 0; }
-:where(.side-oversikt) .egnetabell td.bransje { white-space: nowrap; }
-:where(.side-oversikt) .egnetabell td.bransje svg { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
 :where(.side-oversikt) .egnetabell td.status { color: var(--dempet); font-size: 14px; }
-:where(.side-oversikt) .egnetabell td.status .statustekst { display: block; margin-top: 4px; }
+:where(.side-oversikt) .egnetabell td.status .statustekst { display: block; }
+/* Story 8.26 (svaret kl. 17:12): «Angre» og «Fjern» som en liten knapp til
+   høyre, og merkene små, som på oversikten. */
+:where(.side-oversikt) .egnetabell .knapp.liten { min-height: 32px; padding: 0 12px; font-size: 14px; }
 :where(.side-oversikt) .egnetabell td.valg { text-align: right; }
 :where(.side-oversikt) .egenmerke, :where(.side-oversikt) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px;
                                                                            font-size: 12.5px; font-weight: 600; }
@@ -1251,6 +1275,12 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .valgbrikke:has(input:checked)::before, :where(.side-oversikt) .valgbrikke.valgt::before {
   content: "✓" / ""; font-weight: 700; }
 :where(.side-oversikt) .valgbrikke input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
+/* Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): antallet på hver
+   bransje, og en bransje uten aksjer som kan følges, er grå og kan ikke velges. */
+:where(.side-oversikt) .valgbrikke .antall { font-weight: 400; color: var(--dempet); }
+:where(.side-oversikt) .valgbrikke.tom { color: var(--dempet); cursor: default; opacity: 0.55; }
+/* «Vis» skjules av skriptet (hidden), som ellers overstyres av display på .knapp. */
+.folgfilter button[hidden] { display: none; }
 :where(.side-oversikt) .valgbrikke:has(input:focus-visible), :where(.side-oversikt) a.valgbrikke:focus-visible {
   outline: 3px solid var(--blekk); outline-offset: 2px; }
 @media (forced-colors: active) {
@@ -1283,7 +1313,8 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
    hjørner som de andre kortene, og nummeret i en sirkel. */
 :where(.side-oversikt) .stegkort { list-style: none; padding: 0; margin: 12px 0 16px; display: grid; gap: 12px;
                                    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-:where(.side-oversikt) .kort-steg { padding: 16px 18px; border: 1px solid var(--strek); border-radius: 12px; background: var(--kort); }
+:where(.side-oversikt) .kort-steg { padding: 16px 18px; border: 1px solid var(--strek); border-radius: 12px; background: var(--kort);
+                                    display: flex; flex-direction: column; }
 :where(.side-oversikt) .kort-steg h4 { margin: 8px 0 6px; font-size: 16px; }
 :where(.side-oversikt) .kort-steg p { margin: 6px 0; }
 :where(.side-oversikt) .stegnummer { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px;
@@ -1295,22 +1326,65 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .kort-steg .noekkelstatus { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--strek-2);
                                                    border-radius: 10px; font-size: 14px; }
 :where(.side-oversikt) .kort-steg h5 { margin: 12px 0 4px; font-size: 14px; }
+/* Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): som tavla «Min
+   liste» 13.10: tittelen i Newsreader ved siden av tallet, like høye kort og
+   handlingen nederst, og statusen i steg 2 som én linje med ✓. */
+:where(.side-oversikt) .kort-steg .steg-topp { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+:where(.side-oversikt) .kort-steg .steg-topp h4 { margin: 0; font-family: "Newsreader", Georgia, serif; font-size: 20px; font-weight: 600; }
+:where(.side-oversikt) .kort-steg .stegnummer { flex: none; }
+:where(.side-oversikt) .kort-steg .handling { margin-top: auto; padding-top: 10px; }
+:where(.side-oversikt) .kort-steg .handling .noekkelstatus { display: block; margin: 0; }
+:where(.side-oversikt) .kort-steg .noekkelstatus.virker { border: none; padding: 0; }
+:where(.side-oversikt) .kort-steg .hake { color: var(--opp); font-weight: 700; }
 :where(.side-oversikt) .stegknapper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 :where(.side-oversikt) .folgskjema { display: grid; gap: 10px; margin: 16px 0; }
 :where(.side-oversikt) .folgskjema .knapper { display: flex; gap: 12px; justify-content: flex-end; }
 :where(.side-oversikt) .folgskjema select, :where(.side-oversikt) .sok input { min-height: 44px; font: inherit; padding: 0 10px; }
 :where(.side-oversikt) .sok { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-:where(.side-oversikt) .feil, :where(.side-oversikt) .full { color: var(--ned); font-weight: 600; }
+:where(.side-oversikt) .feil { color: var(--ned); font-weight: 600; }
+/* Story 8.26 (gruppens svar 11.11 kl. 17:12): at appen følger så mange
+   aksjer den kan, står ikke i rødt, fordi rødt betyr negativ, men som de
+   andre beskjedene, i en boks som meldingen om endringer som venter. */
+:where(.side-oversikt) .full { margin: 12px 0; padding: 10px 14px; border: 1px solid var(--strek-2);
+                               border-left: 4px solid var(--oransje); border-radius: 8px; background: var(--kort); color: var(--tekst); }
+:where(.side-oversikt) span.full { display: block; }
 :where(.side-oversikt) .bytt-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: 24px; }
+/* Story 8.26 (tillegg 14 og 15): «Følg flere aksjer» som rådet tegnet: tallet og
+   streken med plassene til høyre for overskriften (under på smal skjerm), og
+   aksjene i hvite kort per bransje, tre kolonner på bred skjerm og én ved 390 px. */
+:where(.side-oversikt) .flere-topp { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 24px; margin: 32px 0 8px; }
+:where(.side-oversikt) .flere-topp h3 { margin: 0; }
+:where(.side-oversikt) .plassene { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+:where(.side-oversikt) .plassene .antall-egne { color: var(--blekk); font-weight: 600; }
+:where(.side-oversikt) .plassstrek { display: inline-flex; gap: 3px; }
+:where(.side-oversikt) .plassstrek span { width: 10px; height: 10px; border-radius: 2px; background: var(--strek-2); }
+:where(.side-oversikt) .plassstrek span.brukt { background: var(--blekk); }
+:where(.side-oversikt) .flere-setning { margin: 0 0 16px; color: var(--dempet); }
+:where(.side-oversikt) .flere-handling { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 16px; }
+:where(.side-oversikt) .flere-handling .flere-setning { margin: 0; }
+:where(.side-oversikt) .bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+:where(.side-oversikt) .bransjekortet { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 14px 16px; }
+:where(.side-oversikt) .bransjekortet h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 16px; }
+:where(.side-oversikt) .bransjekortet h4 .antall { color: var(--dempet); font-weight: 400; }
+:where(.side-oversikt) .bransjekortet h4 .bransjesymbol { width: 18px; height: 18px; flex: none; }
+:where(.side-oversikt) .bransjekortet .bytt-lista { display: block; }
+:where(.side-oversikt) .bransjekortet .bytt-lista li { padding: 8px 0; border-top: 1px solid var(--strek); align-items: center; gap: 6px 8px; }
+:where(.side-oversikt) .bransjekortet .selskapet { display: flex; flex-direction: column; min-width: 0; }
+:where(.side-oversikt) .bransjekortet .selskapet .linje { color: var(--dempet); font-size: 12.5px; }
+:where(.side-oversikt) .bransjekortet .knapp.liten { margin-left: auto; min-height: 32px; padding: 0 10px; font-size: 13.5px; }
+@media (max-width: 900px) { :where(.side-oversikt) .bransjekort { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  :where(.side-oversikt) .bransjekort { grid-template-columns: 1fr; }
+  :where(.side-oversikt) .plassene { align-items: flex-start; }
+}
+@media (forced-colors: active) { :where(.side-oversikt) .plassstrek span { border: 1px solid CanvasText; } :where(.side-oversikt) .plassstrek span.brukt { background: CanvasText; } }
 :where(.side-oversikt) .bytt-lista .knapp { margin-left: auto; min-height: 36px; }
 /* Story 2.12 (gjennomgangen, VG2): «Utenfor målingen» på aksjesiden og i
    børsometeret, i grått. */
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }
 :where(.side-aksje) .utenformerke { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
                                     color: var(--dempet); border: 1px solid var(--strek-2); margin-right: 6px; }
-/* Story 8.11: filteret på signalet og de ferdige listene. */
-:where(.side-oversikt) .signalfilter { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
-:where(.side-oversikt) .filtertekst { margin: 4px 0 12px; }
+/* Story 8.11: de ferdige listene. Filteret på signalet er tatt bort i 8.26. */
 /* Tillegg 3 til 8.22: aksjene i en ferdig liste står på siden «Er du sikker?», ikke under en
    <details> i Min liste. */
 :where(.side-oversikt) ol.ferdig-liste { margin: 8px 0; padding-left: 24px; }
@@ -1332,7 +1406,7 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .innstillingsbryter .verdi { color: var(--dempet); font-weight: 400; }
 /* Story 10.6: bryteren «Vis KI-tekst» på oversikten, som på aksjesiden. */
 :where(.side-oversikt) .dagsbryter button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 8px;
-                                           box-sizing: border-box; font: inherit; font-size: 14px; font-weight: 600;
+                                           box-sizing: border-box; font: inherit; font-weight: 600;
                                            border: 1px solid var(--strek-2); border-radius: 999px; background: var(--kort);
                                            color: var(--blekk); cursor: pointer; }
 :where(.side-oversikt) .dagsbryter button:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
@@ -1340,8 +1414,10 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                           background: var(--strek-2); flex: none; }
 :where(.side-oversikt) .dagsbryter .spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
                                                  border-radius: 50%; background: var(--hvit); }
-:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: var(--blekk); }
-:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor::after { left: 18px; }
+/* Story 8.26 (svaret kl. 17:21, tillegg 18 og ønsket kl. 22:09): som bryterne i
+   Innstillinger, med samme skrift, størrelse, knott og «På» og «Av». */
+:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor { background: var(--oransje); }
+:where(.side-oversikt) .dagsbryter [aria-checked="true"] .spor::after { left: 18px; background: var(--blekk); }
 :where(.side-oversikt) .dagsbryter .verdi { color: var(--dempet); font-weight: 400; }
 @media (forced-colors: active) {
   :where(.side-oversikt) .dagsbryter .spor { border: 1px solid CanvasText; }
@@ -1417,22 +1493,24 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 /* Brikkene og «N av 3» på linje med teksten i «Etterpå» og ved kjøpet. */
 .etterpaa .sjekker, .tenkt .sjekker { display: inline-flex; vertical-align: middle; margin: 0 4px; }
 .etterpaa .pille, .tenkt .pille { display: inline-block; }
-/* Story 8.9 (FR-109): «Vis meg rundt», en knapp som åpner stegene. */
-.rundtur { margin: 0.5rem 0 0.25rem; max-width: 46rem; }
-.rundtur summary { display: inline-block; cursor: pointer; padding: 0.3rem 0.8rem; border: 1px solid currentColor; border-radius: 999px; font-size: 14px; font-weight: 600; }
-.rundtur-steg a { color: inherit; }
-.rundtur-steg { margin: 0.6rem 0 0; padding-left: 1.4rem; font-size: 14px; line-height: 1.5; }
-.rundtur-steg li { margin-bottom: 0.3rem; }
-/* Lukket: lista har ingen boks, så ingenting regnes som synlig tekst (test_hjelpefeltet). */
-.rundtur:not([open]) .rundtur-steg { display: none; }
-/* Story 8.25: «Spill av omvisningen». Boksen står fast nederst til høyre, og
-   delen den peker på, rulles øverst og merkes med en kraftig ramme. */
-.spill-av { font: inherit; font-size: 14px; font-weight: 600; padding: 0.3rem 0.8rem; margin: 0.5rem 0 0.25rem 0.5rem;
-            border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; cursor: pointer; }
-.rundtur-rad { display: flex; flex-wrap: wrap; align-items: flex-start; }
+/* Story 8.26 (svaret 11.11 kl. 17:06): «Vis meg rundt» og «Spill av
+   omvisningen» er knapper i raden øverst, i samme stil som sideknappene
+   (regelen for .sideknapp over), uten fyll. */
+header.stripe button.sideknapp { font-family: inherit; background: transparent; cursor: pointer; }
+header.stripe button.sideknapp[hidden] { display: none; }
+/* Story 8.25: boksen står fast nederst til høyre, og delen den peker på,
+   rulles øverst og merkes med en kraftig ramme. */
 .omvisning-merket { outline: 3px solid var(--oransje); outline-offset: 4px; border-radius: 6px; scroll-margin-top: 24px; }
-/* Gjennomgangen av 8.25 (BH15): en åpen liste står på egen linje, så den er like bred som før. */
-.rundtur-rad .rundtur[open] { flex-basis: 100%; }
+/* Story 8.26 (gruppens svar 11.11 kl. 22:13, tillegg 18): et steg om én kolonne
+   merker overskriften og de første radene med en ramme rundt kolonnen, og
+   boksen flyttes til venstre når den ellers ville dekket den. */
+.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje); scroll-margin-top: 24px; }
+td.omvisning-kolonne { background-color: color-mix(in srgb, var(--oransje) 14%, transparent); }
+th.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje), inset 0 3px 0 var(--oransje); }
+.omvisning-kolonne.omvisning-kolonne-siste { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 var(--oransje), inset 0 -3px 0 var(--oransje); }
+.omvisning.til-venstre { right: auto; left: 16px; }
+.omvisning.oeverst { bottom: auto; top: 16px; }
+@media (forced-colors: active) { .omvisning-kolonne { outline: 3px solid Highlight; outline-offset: -3px; } }
 .omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
              border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
@@ -1447,3 +1525,64 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 .omvisning-tilbud { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0; padding: 12px 16px;
                     background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; }
 .omvisning-tilbud p { margin: 0; }
+/* Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): «Mine notater» i et
+   panel fra knappen øverst. Med skriptet (hjelp.js, klassen
+   notatpanel-aapent på <html>) står panelet fra 1056 px fast i høyre kant,
+   400 px bredt som hjelpefeltet, og <body> gir like mye plass. panel-venstre
+   flytter det til venstre. Smalere, og uten skriptet, står det aldri. */
+.notatpanel { display: none; }
+@media (min-width: 1056px) {
+  .notatpanel-aapent { --notatpanel: 432px; }
+  .notatpanel-aapent .notatpanel:not([hidden]) {
+    display: flex; flex-direction: column; position: fixed; inset: 16px 16px 16px auto; z-index: 40;
+    width: 400px; box-sizing: border-box; padding: 16px 20px 18px 22px; overflow: auto;
+    background: var(--kort); color: var(--tekst); border: 1px solid var(--strek); border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+  .notatpanel-aapent body { padding-right: var(--notatpanel); }
+  .notatpanel-aapent.panel-venstre .notatpanel:not([hidden]) { inset: 16px auto 16px 16px; }
+  .notatpanel-aapent.panel-venstre body { padding-right: 0; padding-left: var(--notatpanel); }
+  /* Spørsmål 1: mens panelet er åpent, åpnes hjelpen over panelet, på samme
+     side, så siden gir plass til ett felt, ikke to. «Flytt» i hjelpen er
+     borte da; panelet har sin egen. */
+  .hjelpefelt.notatpanel-aapent .hjelpevindu { inset: 16px 16px 16px auto; }
+  .hjelpefelt.notatpanel-aapent.panel-venstre .hjelpevindu { inset: 16px auto 16px 16px; }
+  .hjelpefelt.notatpanel-aapent body:has(.hjelpevindu:popover-open) { padding-right: var(--notatpanel); padding-left: 0; }
+  .hjelpefelt.notatpanel-aapent.panel-venstre body:has(.hjelpevindu:popover-open) { padding-right: 0; padding-left: var(--notatpanel); }
+  .hjelpefelt.notatpanel-aapent .hjelpevindu button.flytt { display: none; }
+}
+.notatpanel:focus { outline: none; }
+.notatpanel:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.notatpanel-topp { display: flex; align-items: center; gap: 8px; }
+.notatpanel-topp h2 { font-family: "Newsreader", Georgia, serif; font-size: 23px; font-weight: 600; line-height: 1.2;
+                      color: var(--blekk); margin: 0 auto 0 0; }
+.notatpanel button, .notatpanel select {
+  font: inherit; font-size: 0.85rem; min-height: 36px; padding: 0 0.9rem; cursor: pointer;
+  border: 1px solid var(--strek-2); border-radius: 8px; background: var(--hvit); color: var(--blekk);
+}
+.notatpanel-topp button { min-height: 44px; }
+.notatpanel select { display: block; width: 100%; min-height: 44px; margin: 0 0 12px; }
+.notatpanel button:focus-visible, .notatpanel select:focus-visible,
+.notatpanel textarea:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.notatpanel .notatpanel-innhold { margin: 12px 0 0; }
+.notatpanel .uten, .notatpanel .notatgrense { color: var(--dempet); margin: 0 0 12px; }
+.notatpanel .notatgrense { font-size: 13.5px; margin: 4px 0 8px; }
+.notatpanel .notatpanel-demo { margin: 0 0 12px; }
+.notatpanel .notatliste { margin-top: 12px; }
+.notatpanel .etterpaa, .notatpanel .tenkt { font-size: 14px; }
+/* Tillegg 1 til 8.27 (svaret 11.11 kl. 21:36): «Vis alle (N)» under de to
+   nyeste notatene på aksjesiden, som en knapp. */
+.alle-notater summary { display: inline-block; cursor: pointer; margin: 8px 0 0; padding: 6px 14px; font-weight: 600;
+                        border: 1px solid var(--strek-2); border-radius: 999px; background: var(--hvit); color: var(--blekk); }
+.alle-notater summary:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
+.alle-notater[open] summary { margin-bottom: 4px; }
+/* Story 8.27, raden (gruppens svar 13.11 kl. 10:18): med «Mine notater» og
+   knappene fra 8.26 er det sju knapper i raden øverst. Fra 1056 px har de
+   mindre luft, 8 px på sidene og 6 px mellom, så de står på én rad ved 1280 px
+   når panelet er lukket (998 av 1008 px, målt i Edge). Klikkflaten er
+   fortsatt 44 px høy (min-height i regelen for .sideknapp), og med panelet
+   åpent brytes raden som før. */
+@media (min-width: 1056px) {
+  header.stripe .sider { column-gap: 6px; }
+  header.stripe .sideknapp { padding: 0 8px; }
+}

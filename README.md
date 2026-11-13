@@ -4,7 +4,7 @@
 
 Gruppe G74 (Ai Ai Ai) i IBE160 Programmering med KI, Høgskolen i Molde, høsten 2026.
 
-OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt. Tre enkle sjekker – trend, bevegelse og interesse (handelsvolum) – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI skal forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Den er under utvikling og ikke ferdig.
+OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversikt, og med «Følg en aksje» kan lista ha opptil 18. Tre enkle sjekker – trend, bevegelse og interesse (handelsvolum) – gir hver aksje en signalstyrke fra 0 til 3, så en vanlig sparer kan se hva som har endret seg, og hvorfor. Beregningene gjøres med vanlig programkode, og KI kan forklare signalet med ord. Appen gir ikke råd om å kjøpe eller selge. Versjon 1 er ferdig, og «Ekstra» under «Status» er det som er ferdig utover briefen.
 
 ![Toppen av oversikten i demoen, med overskriften, ingressen og «Slik leser du tabellen», med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-topp-demo.png)
 *Toppen av oversikten i demoen, med oppdiktede selskaper og kurser («Eksempeltall»).*
@@ -70,9 +70,15 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
 | Klar | Med en gang | Etter første henting, som kan startes når som helst. Før kl. 22 på en børsdag henter den forrige børsdag, og dagens kurser etter kl. 22 trenger da bonuskvote hos EODHD |
+| KI-tekst | Ferdige tekster for siste dag, laget én gang med Gemma | På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på |
+| Dagen | Fast: fredag 09.10.2026 | Den siste børsdagen som er hentet |
+| Endringer i lista | Tas ikke i bruk, fordi demoen ikke henter | Tas i bruk ved hentingen etter kl. 22 |
+| Notatene | Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start | Lagres i basen på maskinen |
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](docs/installasjon.md#med-docker-desktop) ([demoen](docs/installasjon.md#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
+  - Hovedflyten i demoen: aksjene som skilte seg ut, står øverst i tabellen på oversikten, under «Skilte seg ut». Klikk en av dem, og les «Hvorfor signalet ble …» og «Signalet forklart» på aksjesiden. «Vis meg rundt» viser siden du står på, og «Spill av omvisningen» alle sidene
+  - Brukertesten: målet i PRD-en er at en person utenfor gruppen forklarer hvorfor en aksje skiller seg ut, på under 5 minutter. 10.11 tok det over 5 minutter, og personen gikk seg vill på noen sider. Etter det har appen fått rikere KI-tekster og «Spill av omvisningen», og første gang tilbyr den «Vis meg rundt»: [brukertesten](docs/brukertest.md)
 - Testene: de automatiske, med to kommandoer etter at uv er installert: [Tester](#tester)
 - Dokumentene:
   - [Product Brief](_bmad-output/planning-artifacts/product-brief.md), arbeidskravet: versjon 8 etter [tilbakemeldingen 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md), låst i taggen `arbeidskrav-product-brief-v8`
@@ -96,13 +102,13 @@ Til faglærer:
 4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
 5. **Lukk vinduet** for å stoppe appen.
 
-**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
+**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen, før nettleseren åpner appen. Første gang tilbyr appen «Vis meg rundt» på oversikten. «Spill av omvisningen» øverst viser alle sidene, og «Vis meg rundt» viser siden du står på. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
 
-<a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
+<a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Første gang tilbyr den også å hente Gemma, en gratis språkmodell som skriver KI-teksten på maskinen (prøvd med 15,7 GB minne), eller å bruke din egen API-nøkkel. Appen virker også uten KI-tekst. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
 
 ## Status
 
-Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.
+Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra, ferdig» er det som er ferdig utover briefen, og prøven av README-en på en ren maskin står under «Neste i v1» til den er tatt.
 
 **Ferdig**
 
@@ -118,10 +124,11 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 **Ekstra, ferdig**
 
 - Målingen av omsetning for aksjene som ikke var målt
-- Egne notater på aksjesiden, med tenkte kjøp og salg
-- Ikonet i fanen og snarveien på skrivebordet i Windows, også for demoen
+- Egne notater på aksjesiden, med tenkte kjøp og salg, og alle notatene i et panel fra knappen øverst
+- Ikonet i fanen og snarveien i Windows, også for demoen, med spørsmålet før nettleseren og tilbudet om Gemma første gang
 - Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
-- «Spill av omvisningen» ved «Vis meg rundt»: seks av sidene, ett steg om gangen, og tilbudet første gang
+- «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
+- Bak «Oppdatert» øverst: når nye kurser tidligst kan hentes, i den ekte versjonen
 
 **Neste i v1**
 
@@ -129,7 +136,7 @@ Prosjektet er under utvikling. Listene under viser hva som er ferdig på main, o
 
 Det som står under «Ekstra», er ikke lovet i briefen og kommer bare med hvis det er ferdig og testet før README-prøven, senest én uke før innleveringen.
 
-«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter ikke, og viser et eksempel på meldingen om dem, merket «Eksempeltall». Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
+«Ferdig» betyr flettet til main. Rundt appen er dette også ferdig: brukertesten med én person, README-en med demoen først og installasjonen med bilder i en egen fil, ruff i CI og i testene, den oppdaterte kvalitetssikringen og et ryddigere repo uten kopien av BMAD-skillene. Hver side har «Vis meg rundt», testene for dokumentene kjøres med én kommando, og hentingen fyller hull i kursserien neste gang den henter. Fra 29.10 går hentingen av seg selv hver kveld på en PC i gruppen, og etterpå måler den omsetningen for andre aksjer på Oslo Børs med kallene som er igjen av dagen. Det som bygges etter demoen, skal vises i begge versjonene. Bare i den ekte versjonen tas endringer i lista i bruk ved hentingen etter kl. 22; demoen henter ikke, og sier at en endring ikke tas i bruk der. Børsmeldinger er ikke med i v1, fordi Euronext ikke ga tillatelse til automatisert henting (plan B). Detaljene står i [sprintstatusen](_bmad-output/implementation-artifacts/sprint-status.yaml) og i [planen](_bmad-output/planning-artifacts/epics.md).
 
 ## Tester
 
@@ -260,7 +267,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår
 - [`Dockerfile`](Dockerfile), [`compose.yaml`](compose.yaml) og [`.dockerignore`](.dockerignore) — imaget og tjenestene: webserveren, hentingen og demoen
-- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også snarveien på skrivebordet i Windows, jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
+- [`start/`](start/) og [`.gitattributes`](.gitattributes) — start med dobbeltklikk, uten Docker: skriptene bak de fire filene Start demoen og Start den ekte versjonen i rota, for Windows og Mac, og linjeskiftene de trenger. Der står også snarveien på skrivebordet i Windows, som spør før nettleseren åpnes, spørsmålet om KI-modellen første gang den ekte versjonen startes, jobben som henter hver kveld i Oppgaveplanlegging på Windows, og skriptene som legger den inn og tar den bort
 - [`_bmad/`](_bmad/) og [`.claude/skills/`](.claude/skills/) — BMAD-rammeverket, ikke skrevet av oss, og skillen sesjonslogg, som kommer fra faglærer
 - [`README.md`](README.md) — denne fila: hva appen er, hvordan den startes, status og testene
 - [`CLAUDE.md`](CLAUDE.md) — reglene for KI-øktene i repoet, som Claude Code leser når en økt starter

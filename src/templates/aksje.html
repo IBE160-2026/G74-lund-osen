@@ -43,9 +43,9 @@
   {% endif %}
   {#- Svar 18: børsen og datoen, «Demo Børs» i demoen. #}
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
-  {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sier hva
-      siden viser. #}
-  <p class="innledning">{% if detalj.sjekker %}Siden viser sjekkene for {{ detalj.aksje.navn }} med tallene bak, kursgrafen og det appen skrev om aksjen hver børsdag.{% else %}Siden viser kursgrafen for {{ detalj.aksje.navn }} og det appen skrev om aksjen hver børsdag.{% endif %}</p>
+  {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sa hva
+      siden viser. Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 1): den
+      er tatt bort, fordi overskriftene og «Vis meg rundt» sier det. #}
 
   {#- Gjennomgangen av 8.20a (BH11, ECH1): 2 av 3 merkes bare for siste
       børsdag (designregler §3), som overskriften over. #}
@@ -385,7 +385,7 @@
         <form class="ki-bryter" method="post" action="/ki">
           <input type="hidden" name="til" value="{{ ki_til }}">
           <input type="hidden" name="tilbake" value="{{ ki_tilbake }}">
-          <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
+          <button type="submit" role="switch" aria-checked="{{ 'true' if ki_er_paa else 'false' }}"><span class="spor" aria-hidden="true"></span><span class="navn">Vis KI-tekst</span> <span class="verdi" aria-hidden="true">{{ 'På' if ki_er_paa else 'Av' }}</span></button>
         </form>
       </div>
       {#- Gruppens svar 25.10 kl. 00:51 og 5.11 kl. 19:13 og 23:36: appen
@@ -403,50 +403,13 @@
             <p class="ki-tekst">{{ ki.tekst|ki_tekst }}</p>
             <p class="modell">Modell: {{ ki.modell }}</p>
           {% else %}
-            <p class="uten">{{ ki.grunn }}</p>
+            {#- Story 3.7 (tillegg 1): en dag uten modell lenker til installasjonen. #}
+            <p class="uten">{{ ki.grunn }}{% if ki.tilstand == "ingen_modell" %} <a href="{{ ki_teksten_url }}">Slik slår du den på</a>{% endif %}</p>
           {% endif %}
         </div>
       {% endif %}
       <p class="grunnlaget">Signalet bygger bare på kurs og volum i sjekkene over, ikke på KI-teksten, og sier ikke om du bør kjøpe eller selge. Børsmeldinger og kommende finansielle hendelser er ikke med i denne versjonen.</p>
     </section>
-  {% endif %}
-
-  {#- Story 8.21 (gruppens svar 10.11 kl. 14:32 og 14:44): «Mine notater»
-      under kursgrafen og «Signalet forklart», over «Signalet dag for dag».
-      Et notat får dagen siden viser (spørsmål 3), og under hvert står
-      «Etterpå» med bare fakta og det tenkte kjøpet (_notat.html). Bryteren
-      «Notater» i Innstillinger skjuler delen. #}
-  {% if vis_notater %}
-  <section class="notater" id="{{ notat_anker }}" aria-labelledby="notater-tittel">
-    <h2 id="notater-tittel">Mine notater</h2>
-    <p class="notatingress">Notatene lagres på denne maskinen. Under hvert notat står hva aksjen, hovedindeksen og signalet gjorde etterpå, og et tenkt kjøp eller salg får den neste sluttkursen appen henter.</p>
-    {% if notatene is none %}
-      <p class="uten">Notatene kan ikke leses fra basen nå.</p>
-    {% else %}
-      {#- Gjennomgangen (ECH1): en dag uten kurs for aksjen fra «Vis dagen»
-          får ikke skjemaet, fordi notatet trenger en kurs fra dagen. #}
-      {% if kan_skrive_notat and not notatdag_har_kurs %}
-        <p class="uten">Et notat får dagen siden viser, og {{ notatdag|ukedag }} {{ notatdag|dato }} har ingen kurs for {{ detalj.aksje.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
-      {% elif kan_skrive_notat %}
-        <form class="nytt-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat">
-          <input type="hidden" name="dag" value="{{ notatdag.isoformat() }}">
-          <input type="hidden" name="vis" value="{{ notat_visningen }}">
-          <label for="notattekst">Notatet får datoen {{ notatdag|ukedag }} {{ notatdag|dato }}.</label>
-          <textarea id="notattekst" name="tekst" rows="2" maxlength="{{ notat_maks }}" required></textarea>
-          <p class="notatgrense">Høyst {{ notat_maks }} tegn.</p>
-          <button type="submit">Lagre notatet</button>
-        </form>
-      {% endif %}
-      {% if notatene %}
-        {% if fjernes_i_kveld %}<p class="notatgrense">{{ detalj.aksje.navn }} fjernes fra lista ved hentingen i kveld og får ingen nye kurser, så et tenkt kjøp eller salg kan ikke noteres.</p>{% elif not kan_handle and kan_skrive_notat %}<p class="notatgrense">Et tenkt kjøp eller salg noteres fra siden for siste dag med kurser.</p>{% endif %}
-        <ol class="notatliste">
-          {% for n in notatene %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle) }}{% endfor %}
-        </ol>
-      {% else %}
-        <p class="uten">Ingen notater for {{ detalj.aksje.navn }} ennå.</p>
-      {% endif %}
-    {% endif %}
-  </section>
   {% endif %}
 
   {#- Story 2.7b (avgjørelsen 2026-10-21 under story 2.7): historikken, en
@@ -467,7 +430,11 @@
     {#- Story 8.23 (tillegg 2): hvor ofte aksjen fikk 3 av 3 det siste året, og
         sist. Er serien kortere enn et år, står «siden» og den første dagen.
         Bare antall og datoer (NFR-06). #}
-    {% if alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}.</p>{% endif %}
+    {#- Story 8.26 (tillegg 17): uten en eneste vurdering, som Varde
+        Systemer i demoen, står at signalet ikke er regnet ennå, og hvorfor,
+        som øverst på siden. #}
+    {% if alle_sjekkene and not alle_sjekkene.vurdert %}<p class="alle-sjekkene-aaret">Signalet er ikke regnet ennå: {% if detalj.for_kort_serie %}Trenger {{ detalj.noedvendige_dager }} dager for å regne signal, fikk {{ detalj.antall_dager }}.{% else %}{{ detalj.tekst }}.{% endif %}</p>
+    {% elif alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}.</p>{% endif %}
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>
@@ -518,10 +485,59 @@
       dag» (skissen aksjesiden-ki-paa.png). Den erstatter fotnoten fra 10.5. #}
   {{ investorboble(detalj.aksje.symbol, detalj.aksje.navn, eksempeltall, investorside) }}
 
+  {#- Story 8.21 (gruppens svar 10.11 kl. 14:32 og 14:44): «Mine notater».
+      Story 8.27 (tillegg 1, gruppens svar 11.11 kl. 21:36): nederst, etter
+      «Signalet dag for dag» og boblen til investorsiden, fordi siden ble
+      lang, med skjemaet, de to nyeste notatene og «Vis alle (N)», som viser
+      resten på samme side, også uten skript.
+      Et notat får dagen siden viser (spørsmål 3), og under hvert står
+      «Etterpå» med bare fakta og det tenkte kjøpet (_notat.html). Bryteren
+      «Notater» i Innstillinger skjuler delen. #}
+  {% if vis_notater %}
+  <section class="notater" id="{{ notat_anker }}" aria-labelledby="notater-tittel">
+    <h2 id="notater-tittel">Mine notater</h2>
+    <p class="notatingress">Notatene lagres på denne maskinen. Under hvert notat står hva aksjen, hovedindeksen og signalet gjorde etterpå, og et tenkt kjøp eller salg får den neste sluttkursen appen henter.</p>
+    {% if notatene is none %}
+      <p class="uten">Notatene kan ikke leses fra basen nå.</p>
+    {% else %}
+      {#- Gjennomgangen (ECH1): en dag uten kurs for aksjen fra «Vis dagen»
+          får ikke skjemaet, fordi notatet trenger en kurs fra dagen. #}
+      {% if kan_skrive_notat and not notatdag_har_kurs %}
+        <p class="uten">Et notat får dagen siden viser, og {{ notatdag|ukedag }} {{ notatdag|dato }} har ingen kurs for {{ detalj.aksje.navn }}. Velg en børsdag med kurs for å skrive et notat.</p>
+      {% elif kan_skrive_notat %}
+        <form class="nytt-notat" method="post" action="/aksje/{{ detalj.aksje.symbol }}/notat">
+          <input type="hidden" name="dag" value="{{ notatdag.isoformat() }}">
+          <input type="hidden" name="vis" value="{{ notat_visningen }}">
+          <label for="notattekst">Notatet får datoen {{ notatdag|ukedag }} {{ notatdag|dato }}.</label>
+          <textarea id="notattekst" name="tekst" rows="2" maxlength="{{ notat_maks }}" required></textarea>
+          <p class="notatgrense">Høyst {{ notat_maks }} tegn.</p>
+          <button type="submit">Lagre notatet</button>
+        </form>
+      {% endif %}
+      {% if notatene %}
+        {% if fjernes_i_kveld %}<p class="notatgrense">{{ detalj.aksje.navn }} fjernes fra lista ved hentingen i kveld og får ingen nye kurser, så et tenkt kjøp eller salg kan ikke noteres.</p>{% elif not kan_handle and kan_skrive_notat %}<p class="notatgrense">Et tenkt kjøp eller salg noteres fra siden for siste dag med kurser.</p>{% endif %}
+        <ol class="notatliste">
+          {% for n in notatene[:2] %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle) }}{% endfor %}
+        </ol>
+        {% if notatene|length > 2 %}
+        <details class="alle-notater"{% if request.args.get("alle") == "1" %} open{% endif %}>
+          <summary>Vis alle ({{ notatene|length }})</summary>
+          <ol class="notatliste" start="3">
+            {% for n in notatene[2:] %}{{ notatet(n, indeks_symbol, med_skjema=true, vis=notat_visningen, siste_dag=siste_i_serien, kan_handle=kan_handle, alle=true) }}{% endfor %}
+          </ol>
+        </details>
+        {% endif %}
+      {% else %}
+        <p class="uten">Ingen notater for {{ detalj.aksje.navn }} ennå.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+  {% endif %}
+
   {#- grafen bare med grafen og snittet, ga og maalt_mot bare med sjekkene
       (gjennomgangen av 8.0b): ellers forklarer hjelpen noe siden ikke viser.
       Story 8.0d, PR 3: «data hentet» står i vinduet ved «Oppdatert». #}
-  {% if hentet %}{{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje"])]) }}{% endif %}
+  {% if hentet %}{{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet_aksje", "neste_henting"])]) }}{% endif %}
   {#- U5 i docs/ux-logg.md (2.7b): hjelpen sier dagen siden viser. #}
   {#- Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): høyst 60 ord i hvert
       vindu på aksjesiden. Resten står i docs/hjelp.md. #}
@@ -530,7 +546,7 @@
   {% if vis_grafhjelp %}
     {{ hjelpevindu("hjelp-graf", "Kursgrafen", [("", grafhjelp)]) }}
   {% endif %}
-  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ikke_raad_kort"])]) }}
+  {{ hjelpevindu("hjelp-styrke", "Signalstyrke", [("", ["signalstyrke", "ringen", "ikke_raad_kort"])]) }}
   {{ hjelpevindu("hjelp-retning-aksje", "Retning", [
     ("", ["retning_aksje", "positiv_aksje", "negativ_aksje", "blandet_aksje", "ingen_aksje", "ukjent_aksje", "oftere_positiv"]),
   ]) }}

@@ -91,7 +91,8 @@ class TestSidene:
         listene, eller ikke hadde navnet og antallet."""
         self._maalt(monkeypatch)
         side = klient.get("/min-liste").data.decode("utf-8")
-        delen = side.split('<h3 id="ferdige-lister">Start fra en ferdig liste</h3>', 1)[1].split("</ul>", 1)[0]
+        # Story 8.26 (tillegg 12): brikkene står i steg 3, i lista med id="ferdige-lister".
+        delen = side.split('id="ferdige-lister"', 1)[1].split("</ul>", 1)[0]
         knappene = re.findall(r'<a class="knapp ferdigknapp" href="([^"]+)"', delen)
         assert knappene[0] == "/ferdig-liste?liste=mest-omsatte"
         assert (

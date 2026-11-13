@@ -342,7 +342,10 @@ class TestSidene:
         # grafen har en dag merket, som ved den første knappen.
         for adresse in SIDENE + ("/aksje/BRFE?periode=siste",):
             _side(klient, adresse)
-        assert bedt_om == set(hjelpetekster())
+        # Story 8.26 (tillegg 8): teksten om demoen står bare i demoen, som
+        # test_vis_meg_rundt_8_26.py viser.
+        # Story 8.26 (tillegg 5): også setningen om fredag 09.10 står bare i demoen.
+        assert bedt_om == set(hjelpetekster()) - {"uten_data_demo", "foerste_knapp_demo"}
 
     def test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer(self, klient, base):
         """Story 8.0c, den nye delen 2 (godkjent 13.10 kl. 15:36): «?» ved
@@ -374,7 +377,12 @@ class TestSidene:
         # Story 8.0d, PR 2: tidspunktet står bare i stripa, som «Oppdatert»,
         # med «?» ved siden av (BH2, svar 5).
         stripa = oversikt.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
-        assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        # Story 8.19: linja om neste henting kan staa inne i den samme <span>.
+        assert re.search(
+            r"Oppdatert [^<]+(?:<span class=\"neste-henting\" id=\"neste-henting\">[^<]*</span>)?</span>\s*"
+            + knapp.format("hjelp-hentet"),
+            stripa,
+        )
         assert "data hentet" not in oversikt
         detalj = _side(klient, "/aksje/BRFE")
         for tekst, vindu in (
@@ -394,7 +402,12 @@ class TestSidene:
         # og hvert vindu har én knapp. Rettet 04.11 (gruppens svar kl. 09:58):
         # vinduene for Ga og Målt mot har én knapp i hvert sjekkort, under.
         stripa = detalj.split('<header class="stripe">', 1)[1].split("</header>", 1)[0]
-        assert re.search(r"Oppdatert [^<]+</span>\s*" + knapp.format("hjelp-hentet"), stripa)
+        # Story 8.19: linja om neste henting kan staa inne i den samme <span>.
+        assert re.search(
+            r"Oppdatert [^<]+(?:<span class=\"neste-henting\" id=\"neste-henting\">[^<]*</span>)?</span>\s*"
+            + knapp.format("hjelp-hentet"),
+            stripa,
+        )
         # Story 8.20a (del E, gruppens svar 06.11 kl. 23:07): ett «?» per kort,
         # ved navnet, og ingen ved «Ga» eller «Målt mot». Rettet fra svaret
         # 04.11 kl. 09:58, der de sto i alle tre kortene. Ville feilet med et
@@ -414,6 +427,9 @@ class TestSidene:
         from markupsafe import escape
 
         def vindu(html, id_):
+            # Story 8.27: panelet (<template>) står etter hjelpevinduene, og
+            # avsnittene der er notatene, ikke hjelp.
+            html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
             del_ = (
                 html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1]
                 .split('<div id="hjelp-')[0]
@@ -432,16 +448,20 @@ class TestSidene:
                 # Story 2.9: delen over tabellen.
                 # Story 2.9b: søylene i samme vindu. Story 8.2b, a (U26):
                 # hvert sitt vindu.
-                "hjelp-hovedindeks": ["hovedindeksen"],
+                # Story 8.26 (svaret 11.11 kl. 17:06): navnet på indeksen først.
+                "hjelp-hovedindeks": ["hovedindeksnavnet", "hovedindeksen"],
                 "hjelp-soeylene": ["soeylene"],
                 "hjelp-selskap": ["selskap"],
                 "hjelp-sluttkurs": ["sluttkurs"],
                 "hjelp-endring": ["endring", "utbyttejustert"],
-                "hjelp-signalstyrke": ["signalstyrke", "uten_styrke", "ikke_raad"],
+                # Story 8.26 (tillegg 7): «Uten ring» etter signalstyrken.
+                "hjelp-signalstyrke": ["signalstyrke", "ringen", "uten_styrke", "ikke_raad"],
                 "hjelp-retning": ["retning", "positiv", "negativ", "blandet", "ingen", "ukjent"],
-                "hjelp-hentet": ["data_hentet", "uten_data"],
+                # Story 8.19: neste henting.
+                "hjelp-hentet": ["data_hentet", "neste_henting", "uten_data"],
                 # Story 8.17a: periodevalget over søylene og tabellen.
-                "hjelp-perioden": ["perioden_oversikten"],
+                # Story 8.26 (tillegg 5): den første knappen.
+                "hjelp-perioden": ["perioden_oversikten", "foerste_knapp"],
                 # Story 2.12: «Dine egne aksjer» under tabellen.
                 "hjelp-egne": ["dine_egne_aksjer"],
                 # Story 10.6: «Børsdagen kort fortalt» under tabellen.
@@ -450,7 +470,7 @@ class TestSidene:
             "/aksje/BRFE": {
                 # Story 8.0d, PR 3: «data hentet» står ved «Oppdatert» i stripa,
                 # og endringen er et eget nøkkeltall.
-                "hjelp-hentet": ["data_hentet_aksje"],
+                "hjelp-hentet": ["data_hentet_aksje", "neste_henting"],
                 # U5 (story 2.7b): sluttkursen for dagen siden viser.
                 # Story 8.20a (del E): høyst 60 ord i hvert vindu, med
                 # tekstene fra utkastet i spesifikasjonen for 8.20.
@@ -459,7 +479,7 @@ class TestSidene:
                 # Story 2.9c: den stiplede linja, når basen har indeksen.
                 # Story 8.16: periodene i samme vindu som grafen.
                 "hjelp-graf": ["grafen", "indekslinja", "perioden"],
-                "hjelp-styrke": ["signalstyrke", "ikke_raad_kort"],
+                "hjelp-styrke": ["signalstyrke", "ringen", "ikke_raad_kort"],
                 "hjelp-retning-aksje": [
                     "retning_aksje",
                     "positiv_aksje",
@@ -491,7 +511,8 @@ class TestSidene:
         om styrken. Det er fortsatt fem kolonner (FR-101)."""
         html = _side(klient, "/")
         assert re.search(
-            r'<th class="tall"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
+            # Story 8.26 (tillegg 18): kolonnen har id-en omvisningen merker.
+            r'<th class="tall" id="kolonne-signal"><a class="sorter" href="[^"]*">Signalstyrke<span class="skjult">[^<]*</span><svg[^>]*><path[^>]*/></svg></a> '
             r'<button type="button" class="hjelpeknapp" popovertarget="hjelp-signalstyrke"[^>]*>\?</button></th>',
             html,
         )
@@ -509,7 +530,10 @@ class TestSidene:
         for adresse in SIDENE:
             html = _side(klient, adresse)
             assert "<script" not in _uten_hjelpeskriptet(html).lower(), adresse
-            assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', html), adresse
+            # Story 8.26 (tillegg 12): bare registreringen hos EODHD, i en ny
+            # fane, i den ekte versjonen.
+            uten = html.replace(f'href="{app_modul.EODHD_REGISTRERING}" target="_blank"', "")
+            assert not re.search(r'(src|href)\s*=\s*"(https?:)?//', uten), adresse
             # Story 8.0d: skriften ligger i appen, saa url( er lov bare til
             # /static/ (designregler §1).
             adresser = re.findall(r"""url\(\s*["']?([^"')]+)""", html)
@@ -748,6 +772,10 @@ class TestHjelpefeltet:
             ".hjelpevindu p",
             ".hjelpevindu button.lukk",
             ".hjelpevindu button.flytt",
+            # Story 8.26: linja om hvordan vinduet lukkes, i dempet tekst.
+            ".hjelpevindu .lukkes",
+            # Story 8.26 (tillegg 12): kallene, regnet av lista, i vinduet.
+            ".hjelpevindu .kallene",
         }, uten_klassen
         assert all("display" not in k for v, k in reglene if v == ".hjelpevindu button.flytt")
         assert re.search(r"\.hjelpefelt body:has\(\.hjelpevindu:popover-open\)", stil)

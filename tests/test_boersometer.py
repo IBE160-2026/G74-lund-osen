@@ -459,6 +459,9 @@ class TestSiden:
         styrke for dagen (gruppens svar 23.10 kl. 09:24, a). Ville feilet uten
         gult den dagen, eller med styrke eller mørk ramme."""
         html = _side(klient, "/boersometer?dag=2026-09-18")
+        # Story 8.27: notatene i panelet (<template>) viser styrken som i Min
+        # liste. Testen gjelder rutene og tabellen, så panelet tas ut.
+        html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
         assert "fredag 18.09" in html
         ruter = _ruter(html)
         rammer = {symbol: re.search(r"ramme-(\w+)", klasser) for klasser, symbol in ruter}
@@ -514,11 +517,14 @@ class TestSiden:
         html = _side(klient)
         rute = re.search(
             # Story 8.23 (A4): ruta har en title med symbolet, endringen og styrken.
-            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: uten data">\s*<span class="ticker">MTFJ</span>.*?</a>',
+            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: ingen kurser ennå">\s*<span class="ticker">MTFJ</span>.*?</a>',
             html,
             re.S,
         )
-        assert rute and "Uten data" in rute.group(0)
+        # Story 8.26 (tillegg 2 og 8): «Ingen kurser ennå» i ruta, var «Uten data».
+        assert (
+            rute and f'<span class="endring">{UTEN_DATA}</span>' in rute.group(0) and UTEN_DATA == "Ingen kurser ennå"
+        )
 
     def test_hver_rute_lenker_til_aksjesiden(self, klient):
         """Hver rute lenker til aksjesiden, også MTFJ uten kurser, som svarer
@@ -551,6 +557,11 @@ class TestSiden:
         # Story 8.25: stegene i omvisningen står som data i rammen, og steget
         # for Innstillinger heter «KI-tekst». De er ikke tekst på siden.
         html = re.sub(r'<div id="omvisning" hidden[^>]*></div>', "", html)
+        # Story 8.27 (gruppens svar 11.11 kl. 21:09-21:20): panelet har alle
+        # notatene med knappene for et tenkt kjøp og salg, som Min liste
+        # (8.21). Det står i en <template> og er ikke tekst på siden før
+        # panelet åpnes. Spørsmål 14 i spesifikasjonen.
+        html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
         tekst = re.sub(r"<[^>]+>", " ", html.split("<main", 1)[1]).lower()
         assert not re.search(r"\b(kjøp|selg|anbefal)", tekst)
         assert 'class="ki' not in html and "KI-tekst" not in html
@@ -582,7 +593,8 @@ class TestSiden:
         )
         assert 'class="merke"' not in html
         for symbol, _navn, endring, _volum, styrke in rader:
-            assert endringer[symbol] == endring, symbol
+            # Story 8.26 (tillegg 2): ruta har den korte teksten, tabellen den lange.
+            assert {UTEN_DATA: "Ingen kurser ennå"}.get(endringer[symbol], endringer[symbol]) == endring, symbol
             if re.fullmatch(r"\d av 3", styrke):
                 assert styrker[symbol] == styrke, symbol
             else:
@@ -761,7 +773,7 @@ class TestDenEkteVersjonen:
         """Gjennomgangen 23.10 (VG8). Ville feilet med «Demo Børs» eller
         setningen om demoen i den ekte versjonen."""
         html = _side(ekte, "/aksje/MTFJ")
-        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in html
+        assert "ingen kursgraf og ingen sjekker for Matfjord Merkevarer." in html
         assert "Oslo Børs" in html and "Demo Børs" not in html and "I demoen" not in html
 
     def test_uten_base_viser_siden_hentekommandoen(self, monkeypatch):
@@ -821,8 +833,8 @@ class TestSvaretKl0924:
         html = svar.data.decode("utf-8")
         assert '<h1 class="overskrift">Matfjord Merkevarer</h1>' in html
         assert '<span class="merke">MTFJ</span>' in html and "Konsum</span>" in html
-        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in html
-        assert "I demoen mangler kursene med vilje." in html and "Eksempeltall" in html
+        assert "ingen kursgraf og ingen sjekker for Matfjord Merkevarer." in html
+        assert "I demoen er Matfjord Merkevarer med vilje uten kurser" in html and "Eksempeltall" in html  # Story 8.26
         assert '<svg class="graf"' not in html and "Kursutvikling" not in html
         assert "sjekkort" not in html and "Signalet dag for dag" not in html
 
@@ -830,7 +842,7 @@ class TestSvaretKl0924:
         """b) Lenken fra børsometeret en annen dag har ?dag=. Ville feilet med
         en feilside for den adressen."""
         assert 'href="/aksje/MTFJ?dag=2026-10-08"' in _side(klient, "/boersometer?dag=2026-10-08")
-        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in _side(klient, "/aksje/MTFJ?dag=2026-10-08")
+        assert "ingen kursgraf og ingen sjekker for Matfjord Merkevarer." in _side(klient, "/aksje/MTFJ?dag=2026-10-08")
 
     def test_et_ukjent_symbol_gir_fortsatt_404(self, klient):
         """b) 404 er fortsatt forbeholdt et symbol som ikke er i lista.
@@ -875,7 +887,7 @@ class TestSvaretKl0924:
         tekster = hjelpetekster(STANDARD)
         # Story 8.20b: teksten om rammen står i docs/hjelp.md.
         assert "også når du velger en annen dag" in _avsnittet()
-        assert "med lenke til aksjesiden" in tekster["uten_data"].tekst
+        assert "lenke til aksjesiden" in tekster["uten_data"].tekst
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "også en dag uten vurdering" in hjelp
         assert "For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå" in hjelp
@@ -1245,7 +1257,7 @@ class TestFargetrinnene:
             )
             assert len(ruter) == 15, adresse
             for trinn, symbol, endring in ruter:
-                ventet = "ingen" if endring in ("Uten data", "–") else fargetrinn(_tall(endring))
+                ventet = "ingen" if endring in (UTEN_DATA, "–") else fargetrinn(_tall(endring))
                 assert trinn == ventet, (adresse, symbol, endring)
                 sett.add(trinn)
         assert len(sett - {"ingen"}) >= 3, sett

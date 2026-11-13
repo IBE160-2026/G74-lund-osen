@@ -4,6 +4,7 @@ KI-radene skrives rett i testbasen med SQL, fordi testseriene ikke ligger paa
 inneveerende boersdag og KILogg.skriv avviser alle andre dager.
 """
 
+import re
 import sqlite3
 import subprocess
 import sys
@@ -191,7 +192,8 @@ class TestSiden:
         """Ville feilet hvis KI-teksten sto foer regelforklaringen (V1).
         Story 8.2b, c (U66): etter grafen og foer historikken."""
         skriv_kirad(kirad(aksje))
-        html = side(klient)
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg øverst.
+        html = re.sub(r' data-steg="[^"]*"', "", side(klient))
         assert html.index("Hvorfor signalet ble") < html.index("Kursutvikling") < html.index("Signalet forklart")
         assert html.index("Signalet forklart") < html.index("Signalet dag for dag")
         assert TEKST in html
@@ -214,8 +216,9 @@ class TestSiden:
         """Ville feilet med et tomt felt (V3)."""
         html = side(klient)
         assert (
-            '<p class="uten">Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk.</p>'
-            in html
+            # Story 3.7 (tillegg 1): i den ekte versjonen sier linja når
+            # teksten lages, med lenken til installasjonen.
+            f'<p class="uten">{MODELL}</p>' in html
         )
 
     @pytest.mark.parametrize(
@@ -240,7 +243,8 @@ class TestSiden:
         """FR-601: av og paa kan sammenlignes, og bryteren er synlig."""
         skriv_kirad(kirad(aksje))
         av = side(klient, "av")
-        assert "kort fortalt" not in av and TEKST not in av
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", av) and TEKST not in av
         # Story 8.2b, c (U33): en bryter med «KI-tekst» og «Av» eller «På».
         assert 'role="switch" aria-checked="false"' in av and '<span class="verdi" aria-hidden="true">Av</span>' in av
         paa = side(klient, "paa")
@@ -258,7 +262,11 @@ class TestSiden:
         skriv_serie("EQNR", rader, datetime.fromisoformat(HENTET), vurdert=False)
         skriv_vurdering("EQNR", rader[-1].dato, Grunn.KURS_IKKE_FRA_DAGEN)
         html = side(klient)
-        assert "kort fortalt" not in html and "ki-bryter" not in html.split("</head>", 1)[1]
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert (
+            "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html)
+            and "ki-bryter" not in html.split("</head>", 1)[1]
+        )
 
     def test_en_logg_som_ikke_kan_leses_gir_en_dag_uten_tekst(self, klient, aksje, monkeypatch):
         """NFR-04: for eksempel en base fra foer 0005."""
@@ -396,6 +404,13 @@ def test_webserveren_importerer_ingen_modell_heller_ikke_under_en_forespoersel(t
 
 DAGEN = "Ingen KI-tekst for denne dagen: KI var slått av, eller modellen svarte ikke da hentingen gikk."
 AKSJEN = "Ingen KI-tekst for denne aksjen: teksten ble ikke laget i hentingen."
+# Story 3.7 (tillegg 1, spoersmaal 8): en dag uten rad er i den ekte versjonen
+# en dag uten modell, med lenken til installasjonen. DAGEN gjelder demoen.
+MODELL = (
+    "Ingen KI-tekst for denne dagen. Den lages når kursene hentes, på en maskin med en språkmodell. "
+    '<a href="https://github.com/IBE160-2026/G74-lund-osen/blob/main/docs/installasjon.md#ki-teksten">'
+    "Slik slår du den på</a>"
+)
 
 
 class TestGrunnenPaaSiden:
@@ -410,23 +425,23 @@ class TestGrunnenPaaSiden:
         assert ki.tilstand == INGEN_FOR_AKSJEN and ki.grunn == AKSJEN
 
     def test_ingen_rader_for_dagen_paa_siden(self, klient, aksje):
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_rader_for_andre_aksjer_men_ikke_denne(self, klient, aksje):
         """Ville feilet hvis siden ga grunnen for dagen (B1)."""
         skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
         html = side(klient)
-        assert f'<p class="uten">{AKSJEN}</p>' in html and DAGEN not in html
+        assert f'<p class="uten">{AKSJEN}</p>' in html and DAGEN not in html and MODELL not in html
 
     def test_en_rad_for_en_annen_dag_teller_ikke(self, klient, aksje):
         """Bare rader for samme dag sier at hentingen laget tekster den dagen."""
         skriv_kirad(kirad(aksje - timedelta(days=1), emne=Emne.aksje("DNB", aksje - timedelta(days=1))))
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_dagsteksten_teller_ikke_som_en_aksje(self, klient, aksje):
         """En rad for dagen (10.6) er ikke en tekst for en aksje."""
         skriv_kirad(kirad(aksje, emne=Emne.dagen(aksje)))
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_rader_som_foer(self, klient, aksje):
         skriv_kirad(kirad(aksje))
@@ -437,7 +452,10 @@ class TestGrunnenPaaSiden:
     def test_bryteren_av_viser_ingen_grunn(self, klient, aksje):
         skriv_kirad(kirad(aksje, emne=Emne.aksje("DNB", aksje)))
         html = side(klient, "av")
-        assert DAGEN not in html and AKSJEN not in html and "kort fortalt" not in html
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert (
+            DAGEN not in html and AKSJEN not in html and "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html)
+        )
 
     def test_siden_leser_bare(self, klient, aksje):
         """AD-10: aksjesiden skriver ingenting i KI-loggen."""
@@ -458,7 +476,7 @@ class TestGrunnenPaaSiden:
     def test_en_melding_teller_ikke_som_en_aksje(self, klient, aksje):
         """VG1: bare rader for andre aksjer gir grunnen for aksjen."""
         skriv_kirad(kirad(aksje, emne=Emne.melding("x", aksje)))
-        assert f'<p class="uten">{DAGEN}</p>' in side(klient)
+        assert f'<p class="uten">{MODELL}</p>' in side(klient)
 
     def test_en_rad_som_ikke_kan_leses_endrer_ikke_svaret(self, klient, aksje, monkeypatch):
         """BH2, ECH, VG2: radene for andre aksjer og dager tolkes ikke."""
@@ -520,7 +538,9 @@ class TestStory816bDenValgteDagen:
         """Ville feilet hvis dagen uten KI-rad viste teksten for siste dag,
         eller ikke teksten appen har for en dag uten KI-tekst."""
         html = klient.get(f"/aksje/EQNR?dag={dag.isoformat()}").data.decode("utf-8")
-        assert f'<p class="uten">{DAGEN}</p>' in html
+        # Story 3.7 (gjennomgangen, ECH4): en eldre dag kan ikke få teksten
+        # senere (AD-7), så der står grunnen som før, uten linja om modellen.
+        assert f'<p class="uten">{DAGEN}</p>' in html and "på en maskin med en språkmodell" not in html
         assert TEKST not in html
 
     def test_ki_teksten_proeves_mot_vurderingen_for_dagen(self, klient, aksje):

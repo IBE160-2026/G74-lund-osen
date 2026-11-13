@@ -8,6 +8,7 @@ bruker en falsk modell (AD-8), og ingen test kaller Ollama eller EODHD.
 import hashlib
 import inspect
 import json
+import re
 from datetime import date, datetime, timedelta
 
 import pytest
@@ -19,7 +20,7 @@ from dagsgrunnlag import dagsgrunnlag
 from hjelpetekster import hjelpetekster
 from ki_dagen import DAGSPROMPTVERSJON, REGLER_DAGEN, kontroller_dagen, lag_dagsprompt, lag_dagsrad
 from ki_modell import ModellFeilet, Modellsvar
-from ki_visning import DAGEN_AV, DAGEN_UTEN, KAPSEL, PERIODEN_UTEN, bygg_dagsvisning
+from ki_visning import DAGEN_AV, DAGEN_UTEN, DAGEN_UTEN_MODELL, KAPSEL, PERIODEN_UTEN, bygg_dagsvisning
 from kilogg import Emne, KIRad
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import SqliteKILogg, aapne_base
@@ -314,6 +315,8 @@ AVTRYKK = {
     # Tillegget kl. 17:21: tre nye former, og versjonen staar som dag-2, fordi den ikke er
     # flettet. Var f0377e8f....
     "dag-2": "cf1e7f7577f9f3afa07d1b7ca0db65845d9daecf9ef6cbf4ab472a6a33340c7a",
+    # Story 10.11: formene med «mest» sier «av bransjene med minst to aksjer».
+    "dag-3": "fd1f011d0d433374d1f28c16cbcbf0f225f07ea331d3165af6381ecad166bc7f",
 }
 
 
@@ -530,6 +533,8 @@ class TestForsiden:
         assert "Børsdagen kort fortalt" in side and "Laget av KI" in side
         assert '<span class="tall">1</span> skilte seg ut' in side
         assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg øverst.
+        side = re.sub(r' data-steg="[^"]*"', "", side)
         assert side.index('class="tabell') < side.index("boersdagen-kort-fortalt")
 
     def test_grunnlaget_maa_stemme_med_siden(self, klient):
@@ -544,10 +549,29 @@ class TestForsiden:
         forsiden_med(TEKSTEN, besto=False)
         side = html(klient)
         assert TEKSTEN not in side and DAGEN_UTEN in side
+        # Story 3.7 (tillegg 1, spørsmål 8): en tekst kontrollen stoppet, har en
+        # rad, og er ikke en dag uten modell. Ville feilet hvis siden blandet dem.
+        assert DAGEN_UTEN_MODELL not in side and "Slik slår du den på" not in side
 
     def test_uten_rad(self, klient):
         forsiden_med(None)
-        assert DAGEN_UTEN in html(klient)
+        side = html(klient)
+        # Story 3.7 (tillegg 1): i den ekte versjonen sier linja når teksten
+        # lages, med lenken til installasjonen. Ville feilet uten linja eller lenken.
+        assert (
+            f'<p class="uten">{DAGEN_UTEN_MODELL} <a href="https://github.com/IBE160-2026/G74-lund-osen/blob/main/'
+            'docs/installasjon.md#ki-teksten">Slik slår du den på</a></p>'
+        ) in side
+
+    def test_uten_dagstekst_men_med_tekster_for_aksjene_staar_ikke_linja(self, klient):
+        """Story 3.7 (gjennomgangen, ECH5). Ville feilet hvis forsiden sa at
+        maskinen trenger en modell når aksjene har KI-tekst den dagen."""
+        from test_ki_visning import kirad
+
+        forsiden_med(None)
+        skriv_kirad(kirad(FREDAG))
+        side = html(klient)
+        assert DAGEN_UTEN in side and DAGEN_UTEN_MODELL not in side and "Slik slår du den på" not in side
 
     def test_bryteren_slaar_av_begge_ki_tekstene(self, klient):
         """FR-601: ville feilet hvis bryteren ikke slo av teksten om dagen,
@@ -571,7 +595,8 @@ class TestForsiden:
     def test_min_liste_har_ikke_delen(self, klient):
         """Spørsmål 9: FR-607 gjelder markedsoversikten."""
         forsiden_med(TEKSTEN)
-        assert "Børsdagen kort fortalt" not in html(klient, "/min-liste?vis=alle")
+        # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+        assert "Børsdagen kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html(klient, "/min-liste?vis=alle"))
 
     def test_linja_om_min_liste_under_teksten(self, klient):
         """Story 10.10, spørsmål 10 (gjennomgangen, VG1): ville feilet hvis
@@ -663,6 +688,7 @@ class TestHjelpen:
 
     def test_hjelpen_har_ordene_fra_utdraget_i_tre_setninger(self):
         tekst = hjelpetekster()["boersdagen_kort_fortalt"].tekst
+        # Story 8.26 (tillegg 18): høyst tre setninger og 50 ord; begynnelsen står som før.
         assert tekst.startswith("Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI).")
         assert "tall med prikket strek står i det modellen fikk, og den gir ikke råd." in tekst
 

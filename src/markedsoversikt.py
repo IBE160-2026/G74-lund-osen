@@ -442,7 +442,12 @@ def uten_kurser(poster: list[Oversiktspost]) -> list[Aksje]:
 # «–» i raden for en aksje uten en eneste kurs.
 # Gjennomgangen 24.10 (BH13): et annet navn enn UTEN_DATA i boersometer.py,
 # som har stor forbokstav.
-UTEN_DATA_TEKST = "uten data"
+# Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 2): sier hvorfor, som
+# «for kort historikk». Var «uten data».
+UTEN_DATA_TEKST = "ingen kurser ennå"
+# Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): en aksje som venter
+# på hentingen etter «Følg», står nederst i tabellen som radene uten kurser.
+VENTER_TEKST = "venter på henting"
 
 
 @dataclass(frozen=True)
@@ -470,11 +475,25 @@ class RadUtenData:
     ikke_vurdert: bool = False
     sjekker: tuple = ()
     retning: Retningsvisning = UKJENT_RETNING
+    # Story 8.26 (tillegg 3): aksjen venter på hentingen og har ingen
+    # aksjeside ennå, så navnet er ikke en lenke.
+    venter: bool = False
 
 
 def rader_uten_data(poster: list[Oversiktspost]) -> list[RadUtenData]:
     """En RadUtenData per aksje uten kurser, i rekkefølgen i lista."""
     return [RadUtenData(aksje) for aksje in uten_kurser(poster)]
+
+
+def rader_som_venter(oensker: list[tuple[str, str, str]], i_lista: set[str]) -> list[RadUtenData]:
+    """Story 8.26 (tillegg 3): en rad per aksje som venter på hentingen etter
+    «Følg», (symbol, navn, bransje) i rekkefølgen ønskene kom, uten dem som
+    alt står i lista."""
+    return [
+        RadUtenData(Aksje(symbol, symbol, navn, sektor), tekst=VENTER_TEKST, venter=True)
+        for symbol, navn, sektor in oensker
+        if symbol not in i_lista
+    ]
 
 
 def sidens_tidsstempel(rader: list[Rad]) -> datetime | None:
@@ -670,3 +689,38 @@ def oppdatert(tid: datetime, i_aar: int) -> str:
     Norge, og ukedagen sier fredag.
     """
     return f"{ukedag(tid.astimezone(NORSK_TID).date())} {norsk_tid(tid, i_aar)}"
+
+
+def grensen_som_tekst() -> str:
+    """TIDSGRENSE slik stripa og hjelpen viser den: «kl. 22», eller
+    «kl. 21.30» med minutter (gjennomgangen av 8.19, ECH7)."""
+    grense = boersdag.TIDSGRENSE
+    return f"kl. {grense.hour}" if not grense.minute else f"kl. {grense:%H.%M}"
+
+
+def neste_henting_tekst(kursdag: date, naa: datetime) -> str | None:
+    """Story 8.19 (U60): det som staar bak «Oppdatert …» i den ekte
+    versjonen, naar nye kurser tidligst kan hentes. kursdag er den siste
+    kursdagen i basen, den eldste blant aksjene i lista, som sidens_dato
+    (spoersmaal 10). «i kveld» og «i morgen» naar dagen er i dag eller i
+    morgen, ukedagen innen en uke, og ellers ukedagen og datoen. None naar
+    kalenderen ikke dekker dagen (NFR-08)."""
+    # Gjennomgangen (ECH4): noe annet enn en dato gir aldri en tekst.
+    if not isinstance(kursdag, date) or isinstance(kursdag, datetime):
+        return None
+    try:
+        dag = boersdag.neste_henting(kursdag, naa)
+    except UtenforKalenderen:
+        return None
+    if dag is None:
+        return "nye kurser kan hentes nå"
+    kl = grensen_som_tekst()
+    idag = boersdag.norsk_dato(naa)
+    dager = (dag - idag).days
+    if dager == 0:
+        return f"nye kurser fra {kl} i kveld"
+    if dager == 1:
+        return f"nye kurser fra {kl} i morgen"
+    if dager < 7:
+        return f"nye kurser fra {ukedag(dag)} {kl}"
+    return f"nye kurser fra {ukedag(dag)} {dato(dag, idag.year)} {kl}"
