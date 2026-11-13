@@ -1874,12 +1874,20 @@ class TestTabellenOmForskjellene:
 
     def test_ki_teksten(self):
         """Ville feilet hvis raden sa noe annet enn at demoen har ferdige
-        tekster, og at den ekte er av uten en lokal modell eller egen nøkkel,
-        eller hvis .env.example ikke lenger hadde KI av."""
+        tekster, og at den ekte står på med Gemma eller egen nøkkel, eller hvis
+        .env.example ikke lenger hadde KI på (lokal), startskriptet ikke tilbød
+        Gemma og egen nøkkel, eller aksjesiden ikke hadde lenken uten modell.
+        Rettet i story 3.7 (tillegg 1 og 5): .env.example har lokal, ikke av."""
         _, demoen, ekte = _tabellraden("KI-tekst")
         assert demoen == "Ferdige tekster for siste dag, laget én gang med Gemma"
-        assert ekte == "Av, til du velger en lokal modell eller en egen nøkkel til en KI-tjeneste"
-        assert "OSE_KI_TJENESTE=av" in (ROT / ".env.example").read_text(encoding="utf-8")
+        assert ekte == (
+            "På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel "
+            "til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på"
+        )
+        assert "OSE_KI_TJENESTE=lokal" in (ROT / ".env.example").read_text(encoding="utf-8")
+        tilbudet = (ROT / "start" / "ki-modell.ps1").read_text(encoding="utf-8")
+        assert "function Ki-HentGemma" in tilbudet and "function Ki-EgenNoekkel" in tilbudet
+        assert "Slik slår du den på" in (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
         assert "laget én gang med Gemma" in (ROT / "src" / "demo.py").read_text(encoding="utf-8")
         installasjonen = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
         assert "Ingen nøkkel følger med appen eller repoet." in installasjonen

@@ -292,6 +292,10 @@ if ($Versjon -eq 'demo') {
         Remove-Variable noekkel, nye
         Write-Host 'Nøkkelen er lagret i .env.'
     }
+    # Story 3.7 (tillegg 2 og 3): første gang tilbyr vinduet Gemma eller egen
+    # API-nøkkel, etter nøkkelen og før første henting. Bare den ekte versjonen.
+    . (Join-Path $PSScriptRoot 'ki-modell.ps1')
+    Tilby-KI (Split-Path -Parent $PSScriptRoot)
     Write-Host 'Henter kurser. Er alt hentet, brukes ingen kall.'
     uv run python src/fetch_prices.py
     if ($LASTEXITCODE -ne 0) {
@@ -321,11 +325,13 @@ if (-not $klar) { Stopp 'appen svarte ikke på 127.0.0.1:8000 etter 2 minutter. 
 Write-Host ''
 Write-Host "Appen kjører på $Adresse."
 Write-Host 'Lukk dette vinduet, eller trykk Ctrl+C, for å stoppe den.'
-if ($env:OSE_START_UTEN_NETTLESER -ne '1') { Start-Process $Adresse }
 # Story 3.6 (del C): snarveien på skrivebordet i Windows, første gang.
 . (Join-Path $PSScriptRoot 'snarvei.ps1')
-# Har appen alt stoppet, spørres det ikke (gjennomgangen, ECH2).
-if (-not $server.HasExited) { Tilby-Snarvei $Versjon (Split-Path -Parent $PSScriptRoot) }
+# Story 3.7 (svaret 11.11 kl. 22:07): spørsmålet om snarveien først, så
+# nettleseren, også etter et nei. Har appen alt stoppet, spørres det ikke
+# (gjennomgangen av 3.6, ECH2), og stopper den mens vinduet spør, åpnes
+# ingen nettleser. OSE_START_UTEN_NETTLESER=1 åpner ingen nettleser (CI).
+Snarvei-Og-Nettleser $Versjon (Split-Path -Parent $PSScriptRoot) { -not $server.HasExited } { Start-Process $Adresse }
 $server.WaitForExit()
 # Gjennomgangen (BH2, VG2): stopper appen av seg selv, står beskjeden.
 if ($server.ExitCode -ne 0) { Stopp "appen stoppet med kode $($server.ExitCode). Startet du demoen eller den ekte versjonen i et annet vindu, er det den som kjører nå, og dette vinduet kan lukkes. Ellers står grunnen i linjene over: lukk vinduet og dobbeltklikk på nytt." }

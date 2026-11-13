@@ -403,7 +403,8 @@
             <p class="ki-tekst">{{ ki.tekst|ki_tekst }}</p>
             <p class="modell">Modell: {{ ki.modell }}</p>
           {% else %}
-            <p class="uten">{{ ki.grunn }}</p>
+            {#- Story 3.7 (tillegg 1): en dag uten modell lenker til installasjonen. #}
+            <p class="uten">{{ ki.grunn }}{% if ki.tilstand == "ingen_modell" %} <a href="{{ ki_teksten_url }}">Slik slår du den på</a>{% endif %}</p>
           {% endif %}
         </div>
       {% endif %}
