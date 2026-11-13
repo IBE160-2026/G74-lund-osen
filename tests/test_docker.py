@@ -1341,7 +1341,8 @@ HOEYDE_PAA_BILDET = 1864
 # og bildene med knappen er tatt paa nytt.
 # Gjennomgangen av «Følg en aksje» i 8.25: _ramme.html. Bildene er byte for byte de samme.
 # Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_BILDET = "0147988653b616a29cca49498f3718287c41c71c1f8fd9105860bba0740fb200"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
@@ -1795,7 +1796,8 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
 # Story 8.25 og flettingen av main (8.22 og 3.6) inn i 8.25: avtrykkene er regnet ut paa nytt.
 # Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_AKSJESIDEN = "cafa3c116eb5f362bb1dd4bbf2bd322991cb09254c4be98addfebfa4214ddc4b"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
@@ -2042,7 +2044,8 @@ DE_NYE_BILDENE = {
 # notatene-brfe-390-demo.png er som paa main (8.22): utklippet ga et annet bilde ogsaa med koden paa
 # a93c668f, uten endringene i 3.7, saa avviket ligger i fremgangsmaaten, som i 10.10.
 # Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
     "docs/appen/folg-en-aksje-demo.png": "8352f20fb3fa1f46b5d3b261eaafadc78b343958ad7399b557fb869a645c5254",
     TOPPEN_AV_OVERSIKTEN: "0147988653b616a29cca49498f3718287c41c71c1f8fd9105860bba0740fb200",
