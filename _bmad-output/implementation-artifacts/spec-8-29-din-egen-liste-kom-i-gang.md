@@ -114,8 +114,28 @@ Diffen `46692396..94234186`, med tre lesere som ikke så hverandres funn. 21 fun
 | BH6 | lav | En tittel kunne strekkes av «?»-knappen | Avvist: `.steg-topp` har `align-items: center` (stil.css), og titlene måles som hele linjer |
 | ECH3 | lav | Kontrasten i plassstreken på beige | Utsatt: spørsmål 7 |
 
-## Mutanten
+## Gjennomgangen av tillegg 2 (13.11, Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `d905cb62..99d454b3`, med tre lesere som ikke så hverandres funn. 15 funn: 12 rettet (VG4 delvis), 2 avvist og 1 utsatt. Rettingene står i `6d3d46ea`.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| BH1 | middels | `signalet` leser `parametre.terskel` fra konteksten, og ingen test hentet sidene med notater | Rettet: Edge Case Hunter slo opp at `parametre` kommer fra context-prosessoren på alle sidene, og en test henter Min liste, aksjesiden og oversikten (panelet) med notater i den ekte versjonen |
+| VG1 | middels | Den ekte versjonen var ikke prøvd med 0–3 på en side | Rettet: basen fra `test_historikken.py` (EQNR med 3, 0, 2 og 1 av 3), og testen krever alle fire |
+| VG2, ECH3, BH3 | middels | Notatene på sidene kunne bestå uten et eneste notat | Rettet: ett notat hver av de fire dagene, og testen krever 0–3 på hver side |
+| BH2 | middels | Testen og malen kunne få terskelen fra to steder | Rettet: testen sjekker at malen får samme terskel |
+| BH4 | lav | Kortet kunne kuttes for tidlig i testen fra 8.20a | Rettet: testen krever styrken i kortet |
+| BH5, ECH1 | lav | Hjelpen sa «som i tabellen» og 2 av 3 uten terskelen, mens tabellen viser tekst for en valgt dag | Rettet: hjelpen og kommentaren sier regelen tabellen har for siste børsdag, og terskelen |
+| VG3 | lav | Testen av cellen feilet uforståelig hvis cellen ble flyttet | Rettet |
+| VG4 | lav | Stilen bare sjekket som tekst | Rettet for selektorene med omfang; en nettlesertest av stilen er utsatt |
+| VG5 | lav | Summen og kortet bare sjekket i demoen | Rettet: en tidligere dag med 2 av 3 i den ekte versjonen |
+| BH6 | lav | §3 i designreglene var ikke rettet i diffen | Avvist: linja står i `17bd178d`, utenfor diffen |
+| BH7 | lav | Stilen for notatene gjelder bare under `.etterpaa` | Avvist: begge kallene står inne i `.etterpaa` (Edge Case Hunter slo det opp) |
+| ECH2 | lav | Setningen for en valgt dag viser styrken som ren tekst | Utsatt: spørsmål 9 |
+
+## Mutantene
 
 | Mutant | Commit | Endringen | Utfall |
 |---|---|---|---|
 | M1 | `be35000a` | `min-height: 30px` til `20px` for brikkene i steg 3 i `stil.css` | Fanget av `test_brikkene_i_stilen` og `test_delen_i_nettleseren` ved 1280, 700 og 390 px i demoen; den ekte versjonen har ingen ferdige lister. `stil.css` var lik HEAD etterpå (`git hash-object`). |
+| M2 | arbeidskopien før `99d454b3` | `verdi >= terskel` til `verdi > terskel` i makroen `styrke` i `_brikker.html` (tillegg 2) | Fanget av 7 tester: `test_i_notatet` og `test_i_signalet_dag_for_dag` med 2 av 3 i begge versjonene, `test_paa_sidene` i begge og `test_styrken_merkes_som_i_tabellen_paa_oversikten`. `_brikker.html` var lik før etterpå (`git hash-object`). |
