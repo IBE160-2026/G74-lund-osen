@@ -751,8 +751,9 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         ),
         "ferdige_lister_kort": Hjelpetekst(
             "De ferdige listene:",
-            "velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de "
-            "mest omsatte aksjene i bransjen.",
+            # Story 8.28: setningen gjelder også «De 15 mest omsatte» på hele børsen.
+            "velger du en liste, ser du den før noe byttes, og ved neste henting byttes lista di ut med de "
+            "mest omsatte aksjene på børsen eller i bransjen.",
             ((FERDIGE_LISTER, "def lister("),),
         ),
         "dine_egne_aksjer": Hjelpetekst(

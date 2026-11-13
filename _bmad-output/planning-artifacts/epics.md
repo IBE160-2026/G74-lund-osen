@@ -5124,3 +5124,20 @@ Som **gruppe**, vil vi rette de lave funnene som står åpne fra fire storyer, s
 **Avhenger av:** 10.6, 8.8 og 8.11b. **Én økt:** ja.
 
 *Avgjort 2026-11-09 kl. 17:37 (gruppens svar):* forslagene i spørsmål 1 og 3–7 i spesifikasjonen er godtatt. På spørsmål 2 (ECH14 i 10.6) anbefalte rådet a, men gruppen valgte c: neste kveld lages teksten for forrige børsdag når den mangler og hovedindeksen nå er der. Det bygges senere, og ECH14 står åpent som lav. Rådet anbefalte resten. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`.
+
+### Story 8.28: «De 15 mest omsatte» som ferdig liste
+
+*Lagt til 2026-11-12, etter tillegg 2 til 9.11 (kl. 20:10) og gruppens svar 12.11 kl. 20:04 og 20:06:* spørsmål 15 i spesifikasjonen for 9.11. «De 15 mest omsatte» står i FR-412 og bygges som egen story. Rådet anbefalte 9.12, og gruppen valgte å bygge lista. 8.26 og 8.27 er tatt av åpne grener. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-28-de-15-mest-omsatte.md`, med spørsmålene og forslagene.
+
+Som **bruker**, vil jeg kunne starte fra de mest omsatte aksjene på hele børsen, ikke bare fra én bransje, så lista mi følger de mest likvide uten at jeg velger dem én og én.
+
+**Oppfyller:** FR-412 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 19
+
+**Kontroll — hva testen ser etter:**
+- «De 15 mest omsatte» står først under «Start fra en ferdig liste», med antallet, og går til «Er du sikker?», som sier hele børsen og bransjen ved hver aksje
+- Lista er de 15 med høyest median omsetning fra den samme målingen som bransjelistene, bare målte aksjer med en bransje, uten kravet om åtte bransjer
+- «Bruk denne lista» følger hver aksje med sin egen bransje
+- Likt i demoen og den ekte versjonen, og `docs/hjelp.md` sier det
+- **Ville feilet hvis:** lista hadde flere enn 15, en aksje uten måling eller bransje, en annen rekkefølge enn omsetningen, eller en aksje ble fulgt med en annen bransje enn sin egen (`tests/test_de_15_mest_omsatte_8_28.py`)
+
+**Avhenger av:** 8.11, 8.11b, 8.22. **Én økt:** ja.
