@@ -372,6 +372,8 @@ tverrgående (NFR-03, 05, 06 og 08).
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* fotnoten som raden for NFR-06 siterer, står nå i `src/templates/index.html:137`, ikke på linje 108. Den endres i 8.0c til «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.» Forbeholdet om kjøp og salg står fortsatt synlig.
 
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:44, story 8.26):* fotnoten under tabellen på oversikten og i Min liste er tatt bort. Det den sa om sluttkursen, endringen og signalstyrken, står bak «?» ved kolonnene, og at signalstyrken ikke sier om du bør kjøpe eller selge, står synlig i innledningen på oversikten og i Min liste (NFR-06). Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 1, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 ## Epic List
 
 **Rekkefølge.** Pilene er harde avhengigheter, ikke anbefalinger.
@@ -2733,6 +2735,28 @@ Spesifikasjonen er `spec-3-6-ikonet-og-snarveien.md`.
 
 *Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
 
+### Story 3.7: Snarveien spør før nettleseren, og KI-teksten på en ny PC
+
+*Lagt til 2026-11-12, etter instruksjonen «Ny liten story etter 3.6: snarveien spør før nettleseren åpnes» (limt inn 12.11 kl. 16:48) og tillegg 1–4, som føres i `docs/ai-prompts/2026-11-12.md` med flettingen.* 3.7 var neste ledige nummer i Epic 3.
+
+Som **bruker i Windows**, vil jeg se spørsmålet om snarveien før nettleseren dekker vinduet, og få KI-teksten på en ny PC uten å lese installasjonen først, så appen virker som lovet første gang.
+
+Spesifikasjonen er `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
+
+*Avgjort 2026-11-11 kl. 22:07 (gruppens svar):* snarveien spør før nettleseren åpnes, og får vinduet ikke svar innen 30 sekunder, lages ingen snarvei, og den tilbys igjen neste gang (rettelsen fra rådet 12.11, tillegg 4). Funnet fra demoprøven 11.11 kl. 22:06: snarveien kom ikke på skrivebordet, fordi spørsmålet sto i vinduet bak nettleseren. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:32 (gruppens svar, tillegg 1):* KI-teksten står på når den ekte versjonen installeres på en ny PC: `.env.example` har `OSE_KI_TJENESTE=lokal`, og uten modell sier hentingen det i én linje, og sidene sier at teksten lages når maskinen har en modell, med lenke til installasjonen. Det retter svar 5 under Epic 10. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:41 (gruppens svar, tillegg 2):* startskriptet tilbyr å hente Gemma første gang den ekte versjonen startes, som planen 05.10 sa (FR-608). Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:46 (gruppens svar, tillegg 3):* spørsmålet tilbyr også egen API-nøkkel til Gemini, Anthropic eller OpenAI. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag i spesifikasjonen godtas som bygget, også spørsmål 26: lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. Funnene som sto åpne til svaret (ECH3, ECH4, ECH5 og ECH13), er lukket. PR #148 flettes etter 8.27. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 6):* 3.7 flettes før 8.27, med main slik den er, med 8.26, så README-prøven på en ny PC kan starte tidligere. Rekkefølgen blir 3.7, 10.11, 8.27 og 8.19. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 3.7 er flettet med PR #148 i `b565ccd0` kl. 11:29, låst til head-en `816f0be0` (main med 8.26 flettet inn), etter instruksjonen 12.11 kl. 16:48 og tillegg 1–5 i `docs/ai-prompts/2026-11-12.md` og tillegg 6 i `docs/ai-prompts/2026-11-13.md`. Hele settet lokalt i åtte deler kl. 10:33–10:57 (`date`), hver del bare når ingen annen pytest kjørte: 5612 bestått, 24 hoppet over og 0 feilet, til sammen de 5636 som `pytest --collect-only` finner. CI var grønn på head-en (run 43407401615), med 5537 bestått og 99 hoppet over i jobben `pytest`, og steget «Snarveien og KI-spørsmålet på Windows (3.7)» kjørte 60 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `816f0be0`. Spørsmål 26 ble dekket av regelen for lenker fra 8.26, og alle 16 bildene i `docs/appen/` var like etter flettingen. Ingen funn på middels eller over sto åpne.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -2952,10 +2976,12 @@ på papir.
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger:
 1. Kveldshentingen går på PC-en den går på i dag (15,7 GB og RTX 4070), med Ollama i Docker som i `malinger.md` §19, alltid med grafikkort. Ingenting installeres på Windows.
+   *Presisert 2026-11-12 (story 3.7, spørsmål 20, gruppens svar 12.11 kl. 19:06):* svar 1 gjelder fortsatt kveldsjobben, som bruker Ollama i Docker. Startskriptet i 3.7 kan installere Ollama på brukerens egen maskin, bare etter et ja (tillegg 2). Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 2. Raden står når den finnes, også når modellen feilet (FR-604).
 3. Kjøres hentingen på nytt samme dag og vurderingen endrer seg, vises dagen uten KI-tekst (FR-602).
 4. Bryteren huskes i en informasjonskapsel nå. 8.10b flytter bryteren til innstillingene og bruker samme kapsel.
 5. «av» er et eget valg i `OSE_KI_TJENESTE`. `.env.example` har «av», og README-en sier hvordan KI slås på. Uten variabelen gjelder «lokal», som i FR-608. Ført også under FR-608 i PRD-en.
+   *Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):* `.env.example` har nå `lokal`, ikke `av`, så KI-teksten står på i en ny installasjon. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor. `av` er fortsatt et eget valg, og en `.env` som finnes fra før, endres ikke. Ført også under FR-608 i PRD-en og i story 3.7. Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 6. `0005` gir plass til dagsteksten i 10.6, med en dato som eneste emne.
 7. 3.4b kommer rett etter 10.3. Demotekstene lages med Gemma lokalt av de oppdiktede demodataene, i en egen avtalt kjøring.
 8. Adressen til Ollama er `OSE_KI_OLLAMA_URL`, med `http://127.0.0.1:11434` som standard og `http://ollama:11434` i compose. Porten publiseres bare på 127.0.0.1.
@@ -3315,6 +3341,8 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 
 *Rettet 2026-11-11 (story 10.10, gruppens svar 10.11 kl. 16:18 og 11.11 kl. 17:21 og 19:30):* grunnlaget for teksten om dagen har nå også navnene på dem som skilte seg ut (høyst fem, med styrke og retning), bransjen som steg og falt mest i snitt (bare navnet, ingen prosent), antallet mot snittet for de siste 20 børsdagene og retningen på hovedindeksen de siste fem børsdagene. Når bransjen som steg eller falt mest kan stå, står ikke formen med antallet som steg i én bransje. Rekkefølgen i teksten er fast. Uka er med som retning, ikke som antall. Se story 10.10.
 
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* bransjen som steg eller falt mest i snitt regnes bare av bransjene med minst to aksjer med en endring, og teksten sier det: «I snitt falt ‹bransje_mest_ned› mest av bransjene med minst to aksjer.» Se story 10.11.
+
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 
 *Lagt til 2026-10-05, gruppens beslutning 04.10.*
@@ -3422,6 +3450,32 @@ Som **bruker**, vil jeg at KI-tekstene sier hvilke aksjer og bransjer som skilte
 *Avgjort 2026-11-11 kl. 19:30 (gruppens svar):* formen med antallet i én bransje står bare uten «mest», rekkefølgen er fast, og storyen flettes i kveld. Rådet anbefalte det. Spørsmål 13 (BH2) står åpent til gruppen har svart.
 
 *Ferdig 2026-11-11:* PR #145 er squash-flettet i `e5268b30`, låst til head-en `497548e0`.
+
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* formene med «mest» er nå «I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.» og det samme med «falt», i promptversjon dag-3, og kontrollen godtar bare dem. Formene uten «av bransjene med minst to aksjer» i dag-2 gjelder ikke lenger. Se story 10.11.
+
+### Story 10.11: «mest av bransjene med minst to aksjer» i teksten om børsdagen
+
+*Lagt til 2026-11-12, etter instruksjonen kl. 17:03 12.11 (føres i dagsfila med flettingen) og gruppens svar 11.11 kl. 22:04 på funn 4 fra demoprøven.* 10.11 var neste ledige nummer i Epic 10. Spesifikasjonen står i [`spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md`](../implementation-artifacts/spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md), med spørsmålene og forslagene.
+
+Som **bruker**, vil jeg at teksten om børsdagen sier at bransjen som steg eller falt mest er regnet av bransjene med minst to aksjer, så den ikke ser feil ut når børsometeret viser en bransje med én aksje som falt mer.
+
+**Oppfyller:** FR-607, FR-603, svaret 11.11 kl. 22:04 · **Begrenses av:** FR-605, NFR-06, `AD-7`, `AD-10`, regel 19
+
+**Kontroll — hva testen ser etter:**
+- Formene med «mest» i prompten sier «av bransjene med minst to aksjer», og prompten har versjon dag-3
+- Kontrollen godtar bare de nye formene for «mest»
+- En bransje med én aksje med en endring blir aldri «mest»
+- Grunnlaget og tallene er de samme som i dag-2, og en tekst med dag-2 vises fortsatt
+- Hjelpen ved «Børsdagen kort fortalt» og `docs/hjelp.md` sier det samme
+- **Ville feilet hvis:** en form med «mest» uten «av bransjene med minst to aksjer» besto, eller en bransje med én aksje ble «mest»
+
+*Avgjort 2026-11-11 kl. 22:04 (gruppens svar):* formene med «mest» i teksten om børsdagen sier at bransjen er den som steg eller falt mest av bransjene med minst to aksjer (funn 4 fra demoprøven). Rådet anbefalte det. Svaret er gjengitt fra instruksjonen kl. 17:03 12.11, fordi det ikke står andre steder i repoet.
+
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar):* forslagene i alle seks spørsmålene i spesifikasjonen er godtatt som bygget, og PR #149 flettes i natt etter 3.7. Rådet anbefalte det. Svaret er gjengitt fra tillegg 4 til instruksjonen kl. 17:03.
+
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 8):* rekkefølgen er 3.7, 10.11, 8.27 og 8.19, fordi notatvinduet sto og ventet på et spørsmål i natt. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 10.11 er flettet med PR #149 i `0c223890` kl. 14:19, låst til head-en `1402fed3` (main med 3.7 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 i `docs/ai-prompts/2026-11-13.md`. Flettingen ble en vanlig merge-commit, ikke squash som de andre. Hjelpen ved «Børsdagen kort fortalt» er den korte teksten fra spørsmål 4, 50 ord. Hele settet lokalt i fire deler kl. 13:08–14:14 (`date`), hver del bare når ingen annen pytest kjørte: 5632 bestått, 24 hoppet over og 0 feilet, til sammen de 5656 som `pytest --collect-only` finner. CI var grønn på head-en (run 43431952221). Treet i `0c223890` er likt treet på `1402fed3`. Testene for dokumentene på main etter flettingen: 2847 bestått, 7 hoppet over.
 
 ---
 
@@ -4155,6 +4209,8 @@ del er før jeg leser tallene.
 
 *Rettet 2026-11-11 (gruppens svar 10.11 kl. 22:59):* svaret kl. 11:52 godtok spørsmål 1, at det ikke er noen omvisning som flytter seg fra del til del. Det gjelder ikke lenger: «Vis meg rundt» får også knappen «Spill av omvisningen», som går side for side gjennom appen, i story 8.25 (`spec-8-25-spill-av-omvisningen.md`). Den nummererte lista fra 8.9 står. Rådet anbefalte onsdag, men gruppen valgte i natt. Svaret er ført etter instruksjonen kl. 23:02 10.11, som lagres i `docs/ai-prompts/2026-11-10.md` etter gruppens ja.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 16:58, story 8.26):* svaret 10.11 kl. 11:52 og føringen etter svaret kl. 22:59 over sier at den nummererte lista fra 8.9 står. Det gjelder ikke lenger: «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og lista er tatt bort, fordi testpersonen 10.11 gikk seg vill når siden hoppet. Etter svaret kl. 17:06 står «Vis meg rundt» og «Spill av omvisningen» i raden øverst etter «Innstillinger» (`spec-8-26-vis-meg-rundt-spiller-av-siden.md`). Svaret føres etter instruksjonen kl. 18:01 11.11, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Ferdig 2026-11-10:* flettet i `eb3ba928`, PR #136.
 
 ### Story 8.10: Innstillinger øverst
@@ -4248,6 +4304,8 @@ NFR-01, NFR-06
 *Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt. Spørsmål 9, å bruke medianen av kursene også i merket «Utenfor målingen», blir et punkt i `issues.md` til senere. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-09 kl. 10:55 (gruppens svar):* 8.11 (PR #128) og 8.11b (PR #129) flettes «alt så tidlig som mulig», etter flettingen av #126 kl. 23:50, og 8.11 før 8.11b. Svaret er ført etter nattflettingen (kl. 12:00) i `docs/ai-prompts/2026-11-09.md`.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret på signalet fra denne storyen er tatt bort, fordi det ikke viste noe tabellen ikke alt viser under «Skilte seg ut». De ferdige listene står. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.11c: «Utenfor målingen» med medianen av kursene
 
@@ -4522,6 +4580,20 @@ NFR-08, `AD-10`
 
 **Avhenger av:** 8.0d for stripa. **Én økt:** avgjøres i planen.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 17:01, tillegg 1 til 10.11):* bare den ekte versjonen viser bak «Oppdatert …» når nye kurser tidligst kan hentes, for eksempel «nye kurser fra kl. 22 i kveld» eller «nye kurser fra mandag kl. 22», og linja sier aldri at en henting kommer. Demoen viser den ikke, fordi den ikke henter. `TIDSGRENSE` står nå i `boersdag.py`, ikke i `fetch_prices.py`, så webserveren slipper å importere hentingen (AD-10), og `fetch_prices.TIDSGRENSE` er den samme. Spesifikasjonen står i [`spec-8-19-neste-henting-i-stripa.md`](../implementation-artifacts/spec-8-19-neste-henting-i-stripa.md).
+
+*Avgjort 2026-11-12 kl. 17:01 (gruppens svar):* 8.19 bygges som egen story etter 10.11, med formen over. Rådet anbefalte det. Gjengitt fra tillegg 1 til instruksjonen kl. 17:03 12.11.
+
+*Avgjort 2026-11-12 kl. 17:31 og 17:44 (gruppens svar):* omvisningen forklarer linja, også i demoen (tillegg 2), og fire steg i omvisningen rettes (tillegg 3). Begge bygges etter at 8.26 er flettet. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 20:04 (gruppens svar):* spørsmål 1–9 i spesifikasjonen er godtatt, 1–7 som bygget og 8–9 som forslaget, som bygges etter 8.26, og 8.19 flettes i natt etter 10.11. Rådet anbefalte det. Spørsmål 10 (ECH1 og ECH2) står åpent til gruppen har svart. Svaret er gjengitt fra tillegg 5 til instruksjonen kl. 17:03.
+
+*Avgjort 2026-11-12 kl. 20:42 (gruppens svar):* spørsmål 10 er godtatt som forslaget: stripa leser den siste kursdagen i basen, den eldste blant aksjene i lista, og aksjesiden bruker den samme dagen som oversikten. ECH1 og ECH2 er lukket. Rådet anbefalte det. Svaret er gjengitt fra tillegg 6 til instruksjonen kl. 17:03.
+
+*Avgjort 2026-11-13 kl. 10:18 og 18:24 (gruppens svar):* 8.19 flettes etter 8.27 (tillegg 8 til 10.11), og i kveld kjøres hele settet i CI i stedet for lokalt, fordi kveldsjobben hoppes over. Rådet anbefalte begge.
+
+*Lagt til 2026-11-13:* 8.19 er squash-flettet med PR #151 i `4fa06fc0` kl. 19:43, låst til head-en `4f473586` (main med 8.27 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–3 og 5–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Hele settet i CI (run 43484368470), etter gruppens svar 13.11 kl. 18:24: 5730 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Commit-tittelen har med seg «(flettes ikke før gruppen svarer)» fra PR-tittelen, som ikke ble rettet før flettingen. Spesifikasjonen: [`spec-8-19-neste-henting-i-stripa.md`](../implementation-artifacts/spec-8-19-neste-henting-i-stripa.md).
+
 ---
 
 ### Story 8.20: UX-rettingene etter gjennomgangen 06.11
@@ -4573,6 +4645,8 @@ Som **bruker**, vil jeg skrive et kort notat på aksjesiden og senere se hvordan
 
 *Avgjort 2026-11-10 kl. 14:44 (gruppens svar):* notatet skrives under signalet og kursgrafen, alle notatene står samlet nederst i Min liste, og Innstillinger får bryteren «Notater», som rådet anbefalte. Tenkte kjøp og salg flyttes inn i v1 og bygges i samme story i natt; rådet anbefalte onsdag, men gruppen valgte i natt. Svaret kl. 14:32 om at nettsiden skriver notatene, gjelder også de tenkte kjøpene og salgene. Svaret er ført etter tillegget kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 21:36):* plassen i svaret kl. 14:44 gjelder ikke lenger. «Mine notater» står nederst på aksjesiden, etter «Signalet dag for dag» og knappen til investorsiden, fordi siden ble lang, med skjemaet, de to nyeste notatene og «Vis alle (N)». Det bygges i story 8.27, tillegg 1 (`spec-8-27-mine-notater-i-panel.md`). Rådet anbefalte det. Svaret kl. 14:32 om at nettsiden skriver notatene, og resten av svaret kl. 14:44 står.
+
 *Avgjort 2026-11-10 kl. 15:57 (gruppens svar):* gruppen blir vurdert på demoen, så alt nytt skal kunne ses der uten nøkkel, med oppdiktede eksempler merket «Eksempeltall». Rådet anbefalte det. Svaret er ført etter tillegg 2 kl. 16:52 i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-10:* 8.21 er flettet med PR #139 i `3919dd48` kl. 23:50, låst til head-en `a8b87de8`, etter instruksjonen kl. 16:08 i `docs/ai-prompts/2026-11-10.md`. CI var grønn på head-en (run 42907509591), og hele settet lokalt før flettingen: 5068 bestått og 24 hoppet over.
@@ -4607,6 +4681,8 @@ Spesifikasjonen er `spec-8-22-foelg-en-aksje-og-min-liste.md`, med spørsmålene
 
 *Avgjort 2026-11-11 kl. 14:29 (gruppens svar):* ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. Tiden for medianene måles, og testen for et kall som feiler legges til (spørsmål 12 og 14). Det valgte står i oransje med hakemerket (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet. Rådet anbefalte alt.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 20:28, story 8.26, tillegg 12):* svaret kl. 14:29 godtok forslaget i spørsmål 9, at adressen i steg 1 står som tekst fordi sidene ikke har adresser til nettet. Det gjelder ikke lenger: steg 1 har knappen «Åpne eodhd.com ↗», som i den ekte versjonen åpner registreringen hos EODHD i en ny fane, med samme adresse som startskriptet, og i demoen en egen side. Kontrollpunktet i `test_hjelpetekster.py` godtar akkurat den lenken. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 12, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43043943092). Tiden for én visning av hele lista var 0,046, 0,014 og 0,014 s, så medianene huskes ikke i minnet.
 
 ### Story 8.23: Funnene fra brukertesten 10.11 (del A)
@@ -4632,6 +4708,8 @@ Som **bruker fra brukertesten**, vil jeg at det som var uklart eller tungvint 10
 *Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* «ja» til del A og B. Rådet anbefalte det. Kl. 14:15 la gruppen til overskriften i Min liste, kl. 14:53 og 14:59 sju småfunn fra gjennomgangen, kl. 15:54 tabellen på Børsometeret åpen fra start, og kl. 15:57 at alt skal kunne ses i demoen. Rådet anbefalte alle. Svarene er ført etter instruksjonen om del A og tilleggene i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-11:* 8.23 er flettet med PR #142 i `7fb9b1fd` kl. 03:41, låst til head-en `3e9c84ae`. CI var grønn på head-en (run 42945863521), og hele settet lokalt før flettingen: 5137 bestått og 25 hoppet over.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* antallet på knappene i filteret og lenken til dem som fikk 2 av 3 (A8) er tatt bort med filteret. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.24: Notatene, to ting etter flettingen
 
@@ -4674,11 +4752,82 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 *Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* tilbudet første gang og et nei huskes i nettleseren, som bygget (spørsmål 3). Rådet anbefalte det.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 09:58, story 8.26, tillegg 21):* tilbudet første gang starter ikke lenger hele omvisningen, men «Vis meg rundt» for oversikten, med teksten «Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.» og knappene «Vis meg rundt» og «Nei takk». Hele omvisningen er 23 steg på seks sider, og målet «Brukerutfall» i §7 i PRD-en er at en person utenfor gruppen gjennomfører hovedflyten og forklarer hvorfor en aksje skiller seg ut, under 5 minutter, uten hjelp. Svaret huskes i nettleseren som før, og «Spill av omvisningen» står øverst som før. Rådet anbefalte det. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 21, som lagres i `docs/ai-prompts/2026-11-12.md` etter gruppens ja.
+
 *Avgjort 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B er flettet (spørsmål 7), og flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
 
 *Avgjort 2026-11-11 kl. 16:26 (gruppens svar):* lista «Ekstra, hvis tiden rekker» står borte fra README-en, og setningen under listene sier «Ekstra» igjen. Bildegrenene beholdes, så bildene i PR-ene står, og så gruppen kan vise endringene i refleksjonsloggen og rapporten. Rådet anbefalte det.
 
 *Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43054754599), og hele settet lokalt før flettingen: 5252 bestått og 37 hoppet over.
+
+### Story 8.26: «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven
+
+*Lagt til 2026-11-13, etter instruksjonen 11.11 kl. 18:01 i `docs/ai-prompts/2026-11-11.md`, med tilleggene 1–20 der og tilleggene 21–24 i `docs/ai-prompts/2026-11-12.md`.* 8.25 var brukt, så dette er 8.26. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md`, med spørsmålene, svarene, triagen av gjennomgangene og mutantene.
+
+Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» viser meg delene av siden der jeg står, uten at siden hopper, at knappene står sammen med sideknappene, og at funnene fra demoprøven er rettet, så sidene er roligere og sier det de viser.
+
+**Oppfyller:** FR-109, svarene 11.11 kl. 16:58–22:20 og 12.11 kl. 09:58–16:24 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 22
+
+**Kontroll — hva testen ser etter:**
+- «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og den nummererte lista fra 8.9 er borte
+- «Vis meg rundt» og «Spill av omvisningen» står i raden øverst etter «Innstillinger», med hvert sitt ikon
+- Tilbudet første gang starter «Vis meg rundt» for oversikten, og det siste steget der viser vei til navnene under «Skilte seg ut»
+- En aksje uten kurser har de samme ordene og den samme forklaringen på hvorfor overalt
+- En aksje som følges, får stjerne med en gang, og en aksje som venter på henting, står nederst med «venter på henting» (migrasjon 0013)
+- Filteret på signalet er borte, og «Følg flere aksjer» og «Din egen liste» er bygget som på tavla
+- README-en har hovedflyten og brukertesten under «Til faglærer» og forskjellene mellom demoen og den ekte versjonen
+- Alt er likt i demoen og den ekte versjonen, og ingen tekst gir råd
+- **Ville feilet hvis:** siden hoppet eller lista fra 8.9 sto, en knapp manglet i raden øverst, tilbudet startet hele omvisningen, ordene for en aksje uten kurser var ulike, stjernen manglet eller en aksje som venter, sto uten merket, eller en rad i tabellen i README-en ikke stemte med koden
+
+**Avhenger av:** 8.9, 8.25. **Én økt:** nei, delene ble bygget etter hverandre.
+
+*Avgjort 2026-11-11 kl. 16:58–17:53 (gruppens svar og ønsker, tilleggene 1–4):* «Vis meg rundt» spiller av siden, knappene står øverst (rådet anbefalte én knapp, gruppen valgte to), funnene fra demoprøven rettes, fotnoten og filteret tas bort, «uten data» sier hvorfor, en aksje som følges, får stjerne, og «Den ekte versjonen» åpnes i en ny fane.
+
+*Avgjort 2026-11-11 kl. 18:09–22:20 (gruppens svar og ønsker, tilleggene 5–20):* siden står i ro, de samme ordene overalt, lenkene har samme farge før og etter besøk, «Din egen liste» og «Følg flere aksjer» som på tavla, brikkene, hjelpetekstene, bryterne og stegene i omvisningen. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 09:58 (gruppens svar, tillegg 21):* tilbudet første gang starter «Vis meg rundt» for oversikten, etter målet «Brukerutfall» i §7 i PRD-en. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 22):* spørsmål 1–9 og 12–22 godtas som bygget, spørsmål 11 etter forslag 1, tillegg 11 kommer ikke (spørsmål 15), og forklaringen på en aksje uten kurser rettes (spørsmål 10). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt. Rådet anbefalte alt.
+
+*Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
+
+*Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
+
+### Story 8.27: «Mine notater» i et panel fra en knapp øverst
+
+*Lagt til 2026-11-11, etter instruksjonen kl. 21:25 og tillegg 1 kl. 21:40, som lagres i `docs/ai-prompts/2026-11-11.md` med flettingen.* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt. 8.26 er tatt av et annet vindu, så dette er 8.27. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-27-mine-notater-i-panel.md`.
+
+Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel ved siden av det jeg ser på, så jeg kan skrive og lese notater uten å gå fra siden.
+
+**Oppfyller:** svarene 11.11 kl. 21:09–21:20 og 21:36 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`
+
+**Kontroll — hva testen ser etter:**
+- Knappen «Mine notater» står øverst etter «Min liste», med eget ikon, og er borte når bryteren «Notater» er av
+- Fra 1056 px åpner knappen et panel fast i kanten, som siden gir plass til, og som kan flyttes til venstre eller høyre; om det er åpent, og hvilken side det står på, huskes i nettleseren
+- Panelet har alle notatene, de nyeste først, som i Min liste, og et skjema for et nytt notat: på aksjesiden for aksjen og dagen siden viser, ellers med et valg blant aksjene i lista; etter lagring kommer siden tilbake med panelet åpent
+- Smalere enn 1056 px går knappen til notatene i Min liste, og i demoen sier panelet at notatene står til demoen startes på nytt
+- På aksjesiden står «Mine notater» nederst, med skjemaet, de to nyeste notatene og «Vis alle (N)»
+- **Ville feilet hvis:** knappen sto med bryteren av, panelet manglet et notat, et notat fra panelet fikk en annen aksje eller dag, svaret gikk til en annen side, eller nettsiden skrev noe annet enn notatene
+
+**Avhenger av:** 8.0f, 8.21, 8.24. **Én økt:** ja.
+
+*Avgjort 2026-11-11 kl. 21:09–21:20 (gruppens svar):* «Mine notater» får en knapp øverst etter «Min liste», som fra 1056 px åpner et panel fast i kanten som hjelpen, og som kan flyttes til venstre eller høyre. Panelet har alle notatene og et skjema for et nytt notat. Smalere går knappen til notatene i Min liste. Rådet foreslo to snarveier først, og gruppen valgte panelet nå, uten mobil. Rådet anbefalte å starte i kveld.
+
+*Avgjort 2026-11-11 kl. 21:36 (gruppens svar):* på aksjesiden flyttes «Mine notater» nederst, etter «Signalet dag for dag» og knappen til investorsiden, med skjemaet, de to nyeste notatene og «Vis alle (N)». Rådet anbefalte det (Rettet-linje under 8.21).
+
+*Avgjort 2026-11-11 kl. 22:20 (gruppens svar):* knappen «Mine notater» får et steg i omvisningen og i «Vis meg rundt», helst i delen for Min liste, bare når bryteren «Notater» er på, med hva panelet er, at det kan flyttes, og at notatene lagres på maskinen, i demoen til den startes på nytt. Steget legges inn når 8.26 er flettet og main er flettet inn i grenen; ellers venter det. Rådet anbefalte det.
+
+*Avgjort 2026-11-11 mellom kl. 21:41 og 21:43 (gruppens svar i økta):* storyen står under «Ekstra, hvis tiden rekker» bare her, ikke i README-en, etter svaret kl. 16:26, og føres under «Ekstra, ferdig» der når den er flettet. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 3):* alle 14 spørsmålene i spesifikasjonen godtas som bygget, også innholdet i en `<template>` på hver side (spørsmål 11) og knappene for et tenkt kjøp og salg i panelet på alle sidene (spørsmål 14). PR #147 flettes etter 8.26, som flettes 12.11 kl. 23:50–23:58, med steget fra svaret kl. 22:20 bygget etter forslaget i spørsmål 13, uten at gruppen ser på den igjen. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar):* med 8.26 har raden øverst sju knapper. De står på én rad ved 1280 px med mindre luft i knappene, og to rader beholdes hvis det blir for trangt eller klikkflaten blir lavere (spørsmål 15 i spesifikasjonen). Rekkefølgen er endret: 3.7 og 10.11 flettes før 8.27, og PR #147 flettes når Utført-linja for 10.11 står på origin/main, med main flettet inn i grenen på nytt og hele settet før flettingen. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 (gruppens svar, kl. 18:07 i økta):* radene for 10.11 i `docs/kvalitetssikring.md` føres på main fra vinduet for 8.27, fordi main var rød i CI uten dem (`b92ebe0a`).
+
+*Avgjort 2026-11-13 kl. 18:24 og 18:26 (gruppens svar, felles tillegg for køen):* kveldshentingen hoppes over i kveld, hele settet kjøres i CI, og rekkefølgen er 8.27, 8.19, 8.28, 9.11, 8.29, bildene 3.3k og 9.12. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 8.27 er flettet med PR #147 i `2a363adb` kl. 18:50, låst til head-en `9244203f` (main med 3.7 og 10.11 flettet inn), etter instruksjonen 11.11 kl. 21:25 og tillegg 1–2 i `docs/ai-prompts/2026-11-11.md`, tillegg 3 i `docs/ai-prompts/2026-11-12.md` og svarene 13.11 i `docs/ai-prompts/2026-11-13.md`. De sju knappene står på én rad ved 1280 px (spørsmål 15). Hele settet lokalt i fire deler kl. 18:10–18:33 (`date`), hver del bare når ingen annen pytest kjørte: 5793, likt `--collect-only`, og hele settet i CI (run 43470073941), alle fire jobbene grønne. Testene for dokumentene besto på `9244203f`.
 
 ---
 
@@ -4975,6 +5124,65 @@ Som **gruppe**, vil vi rette de lave funnene som står åpne fra fire storyer, s
 **Avhenger av:** 10.6, 8.8 og 8.11b. **Én økt:** ja.
 
 *Avgjort 2026-11-09 kl. 17:37 (gruppens svar):* forslagene i spørsmål 1 og 3–7 i spesifikasjonen er godtatt. På spørsmål 2 (ECH14 i 10.6) anbefalte rådet a, men gruppen valgte c: neste kveld lages teksten for forrige børsdag når den mangler og hovedindeksen nå er der. Det bygges senere, og ECH14 står åpent som lav. Rådet anbefalte resten. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`.
+
+### Story 8.28: «De 15 mest omsatte» som ferdig liste
+
+*Lagt til 2026-11-12, etter tillegg 2 til 9.11 (kl. 20:10) og gruppens svar 12.11 kl. 20:04 og 20:06:* spørsmål 15 i spesifikasjonen for 9.11. «De 15 mest omsatte» står i FR-412 og bygges som egen story. Rådet anbefalte 9.12, og gruppen valgte å bygge lista. 8.26 og 8.27 er tatt av åpne grener. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-28-de-15-mest-omsatte.md`, med spørsmålene og forslagene.
+
+Som **bruker**, vil jeg kunne starte fra de mest omsatte aksjene på hele børsen, ikke bare fra én bransje, så lista mi følger de mest likvide uten at jeg velger dem én og én.
+
+**Oppfyller:** FR-412 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 19
+
+**Kontroll — hva testen ser etter:**
+- «De 15 mest omsatte» står først under «Start fra en ferdig liste», med antallet, og går til «Er du sikker?», som sier hele børsen og bransjen ved hver aksje
+- Lista er de 15 med høyest median omsetning fra den samme målingen som bransjelistene, bare målte aksjer med en bransje, uten kravet om åtte bransjer
+- «Bruk denne lista» følger hver aksje med sin egen bransje
+- Likt i demoen og den ekte versjonen, og `docs/hjelp.md` sier det
+- **Ville feilet hvis:** lista hadde flere enn 15, en aksje uten måling eller bransje, en annen rekkefølge enn omsetningen, eller en aksje ble fulgt med en annen bransje enn sin egen (`tests/test_de_15_mest_omsatte_8_28.py`)
+
+**Avhenger av:** 8.11, 8.11b, 8.22. **Én økt:** ja.
+
+*Lagt til 2026-11-13:* 8.28 er squash-flettet med PR #153 i `c8ad6f4c` kl. 21:51, låst til head-en `baaa5168` (main med 8.26, 8.27, 3.7, 10.11 og 8.19 flettet inn), etter tillegg 2 til 9.11 i `docs/ai-prompts/2026-11-12.md` og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. 8.26 hadde flyttet de ferdige listene til steg 3 i «Din egen liste», så «De 15 mest omsatte» står først blant brikkene der, og setningen bak «?» gjelder hele børsen. Hele settet i CI (run 43504332042), etter gruppens svar 13.11 kl. 18:24: 5739 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-8-28-de-15-mest-omsatte.md`](../implementation-artifacts/spec-8-28-de-15-mest-omsatte.md).
+
+### Story 9.11: PRD-en etter tilbakemeldingen fra faglærer 12.11
+
+*Lagt til 2026-11-12, etter instruksjonen kl. 18:03 og gruppens svar 12.11 kl. 18:00:* en ny versjon av `prd.md` med gjeldende tekst, slik briefen fikk versjon 8 i 9.6. Rådet anbefalte det. Tilbakemeldingen står i [`tilbakemelding-prd.md`](prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd.md) (`29cf2874`). Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md`, med spørsmålene og forslagene.
+
+Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som én gjeldende tekst med konsekvenser en test kan sjekke, så jeg ikke bygger etter en setning som ikke gjelder lenger.
+
+**Oppfyller:** 4.1–4.5 og §5 i tilbakemeldingen · **Begrenses av:** regel 5, 13, 16, 17 og 20 i `CLAUDE.md`, NFR-06
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `prd.md` før omskrivingen står urørt i taggen `prd-vurdert-2026-11-12`, på `10265324`
+- Hvert FR og NFR har én gjeldende tekst og «*Konsekvenser:*», med de samme ID-ene. Brukerreisen UJ-1, ordlista, tabellen «Kjerne, ekstra og senere», SM-1–SM-9 med krav, og plan A i vedlegg A
+- Alle «Rettet»- og «Lagt til»-linjene og kommentaren om status står ordrett i `prd-endringslogg.md`, ordnet etter krav og dato, med tabellen over tilbakemeldingen øverst. Resonnement som ikke er krav, står i §13 i `begrunnelser.md`
+- Kodenavnene og commitene som gikk ut av kravene, står i tabellen under, der de ikke sto i arkitekturen eller her fra før
+- **Ville feilet hvis:** et «Rettet» eller «Lagt til» sto igjen i `prd.md`, endringsloggen hadde et annet antall enn taggen, et krav manglet konsekvenser eller en ID fra taggen, et SM manglet ID eller krav, eller en lenke til et anker i `prd.md` ikke virket (`tests/test_prd_9_11.py`)
+
+**Avhenger av:** ingen. **Én økt:** ja.
+
+**Navn og commits som gikk ut av kravene.** Disse sto i kravene i taggen og ikke i arkitekturen eller `epics.md` fra før:
+
+| Navn eller commit | Krav i taggen | Hva det er |
+|---|---|---|
+| `/boersometer` | FR-106 | Siden for børsometeret, story 8.6 (`7f1c1f09`) og 8.6b (`7f6d9e4c`) |
+| `238ef186` | FR-109 | Hjelpefeltet, story 8.0f, PR #102 |
+| `24849dd9` | FR-104, FR-202 | Hovedindeksen som stiplet linje i kursgrafen, story 2.9c, PR #64 |
+| `2a84142d` | FR-408 | Første henting på dagtid og unntaket fra `AD-7`, story 2.3c, PR #87 |
+| `676fbc8b` | FR-413, NFR-01 | Målingen av omsetning i jobben, story 2.13 |
+| `bygg_soeyler`, `bygg_soeyler_perioden` | FR-105 | Søylene bare for aksjene med kurs for tabellens dag |
+| `eldre_enn_nyeste` | FR-104 | «hentet» under navnet, story 1.4c |
+| `med_perioden`, `egne_dager` | FR-104 | Raden med aksjens egen siste dag, også ved en periode, story 8.17b |
+| `sidens_dato`, `sidens_siste` | FR-104 | Den eldste dagen i overskriften, og den nyeste for indeksen og søylene |
+| `data/logg/kveldshenting-<dato>.log` | FR-401 | Loggen fra kveldsjobben, story 2.3d |
+| `spec-2-13-maalingen-av-omsetning.md` | FR-413 | Rekkefølgen i målingen av omsetning |
+| `src/migrasjoner/0002_vurdering.sql` | FR-408 | Tabellen `vurdering`, uten kolonnen for meldinger |
+| `src/tilstand.py` | FR-409 | Tilstandene, også «ikke i lista» |
+| `issuerSign`, `issuerName`, `category`, `publishedTime` | FR-501 | Feltene i NewsWeb-målingene, plan A (`malinger.md`) |
+
+*Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene i spesifikasjonen godtas som bygget, med tre avgjørelser. Min liste får sitt eget krav, FR-111, i 9.11 (spørsmål 14). «De 15 mest omsatte» står i FR-412 og bygges i natt som egen story i Epic 8 (spørsmål 15). Tabellen står med ja for FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag (spørsmål 16). PR #150 flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte. Svaret er ført etter tillegg 1 og 2 kl. 20:10 i `docs/ai-prompts/2026-11-12.md`.
+
+*Lagt til 2026-11-13:* 9.11 er squash-flettet med PR #150 i `ef802733` kl. 22:47, låst til head-en `7f2edbce` (main med 8.26, 8.27, 3.7, 10.11, 8.19 og 8.28 flettet inn). Det skjedde etter instruksjonen 12.11 kl. 18:03 og tillegg 1 og 3–6 i `docs/ai-prompts/2026-11-12.md`, og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Steg 2 førte flettingene inn i kravteksten, lest i koden 13.11. Hele settet ble kjørt i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24: 5751 bestått og 100 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-11-prd-etter-tilbakemeldingen.md`](../implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md).
 
 ### Story 9.12: Rådordene i alle malene, taggene i CI og technology.md
 

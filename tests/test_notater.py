@@ -637,7 +637,7 @@ class TestEtterGjennomgangen:
         side med notater eller 500, ikke siden som ber om en ny demobase."""
         c = sqlite3.connect(demobase)
         c.execute("DROP TABLE notat")
-        c.execute("DELETE FROM skjema_versjon WHERE versjon = 12")
+        c.execute("DELETE FROM skjema_versjon WHERE versjon >= 12")  # Story 8.26: og 0013
         c.commit()
         c.close()
         svar = klient.get(f"/aksje/{AKSJE}")
@@ -693,13 +693,22 @@ class TestEtterGjennomgangen:
 # --- Tillegget kl. 14:44 (del E-G) og tillegg 2 kl. 15:57 (del H) -------------
 
 
+def _uten_panelet(side: str) -> str:
+    """Siden uten innholdet i panelet fra 8.27 (<template>), som har de samme
+    notatene. Gjennomgangen av 8.27 (VG1): testene som leser hele siden, leser
+    da bare siden selv."""
+    return re.sub(r'<template id="notatpanel-mal">.*?</template>', "", side, flags=re.S)
+
+
 def _kjoepsknapp(side: str) -> dict:
     """Feltene i skjemaet «Noter et tenkt kjøp» for det første notatet som har det."""
+    side = _uten_panelet(side)
     treff = re.search(r'<form method="post" action="/aksje/[A-Z]+/notat/kjoep">(.*?)</form>', side, re.S)
     return dict(re.findall(r'name="(id|dag|vis)" value="([^"]*)"', treff.group(1))) if treff else {}
 
 
 def _salgsknapp(side: str) -> dict:
+    side = _uten_panelet(side)
     treff = re.search(r'<form method="post" action="/aksje/[A-Z]+/notat/salg">(.*?)</form>', side, re.S)
     return dict(re.findall(r'name="(id|dag|vis)" value="([^"]*)"', treff.group(1))) if treff else {}
 
@@ -758,11 +767,18 @@ class TestMinListe:
         assert 'class="nytt-notat"' not in delen and "/notat/slett" in delen
         assert "Etterpå" in _tekst(delen)
 
-    def test_menyen_faar_ingen_ny_knapp(self, klient, demobase):
-        """Del F: ville feilet hvis stripa øverst fikk en knapp for notatene."""
+    def test_menyen_faar_bare_knappen_fra_8_27(self, klient, demobase):
+        """Del F sa at stripa øverst ikke fikk en knapp for notatene. Story
+        8.27 (gruppens svar 11.11 kl. 21:09–21:20): stripa får én, «Mine
+        notater». Ville feilet hvis stripa fikk en knapp til for notatene
+        (tests/test_notatpanel_8_27.py tester knappen)."""
         side = klient.get("/min-liste").data.decode("utf-8")
         stripa = side[: side.index("</nav>")]
-        assert "otater" not in stripa
+        lenkene = re.findall(r"<a [^>]*>.*?</a>", stripa, re.S)
+        assert [lenke for lenke in lenkene if "otater" in lenke] == re.findall(
+            r'<a class="sideknapp notatknapp".*?</a>', stripa, re.S
+        )
+        assert stripa.count('class="sideknapp notatknapp"') == 1
 
 
 class TestTenkteKjoep:
@@ -823,7 +839,7 @@ class TestTenkteKjoep:
         notatet, eller knappen ikke sa at kjøpet slettes med."""
         felt = self._notat(klient)
         klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
-        assert "Slett notatet og det tenkte kjøpet" in klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
+        assert "Slett notatet og det tenkte kjøpet" in _uten_panelet(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
         klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": felt["id"]})
         assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
 
@@ -940,7 +956,7 @@ class TestDemoen:
             tekst = _tekst(_delen(demoklient.get(f"/aksje/{symbol}").data.decode("utf-8")))
             assert re.search(r"Aksjen fra .* til fredag 09\.10: [+-]?[0-9]+,[0-9]{2} %", tekst), symbol
             assert "Eksempeltall" in tekst
-        side = _tekst(demoklient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
+        side = _tekst(_uten_panelet(demoklient.get(f"/aksje/{AKSJE}").data.decode("utf-8")))
         assert re.search(r"Salgsdag .*\d+ børsdager etter\. Sjekkene på siden da salget ble notert: T", side)
         assert "Aksjen fra kjøpet til salget:" in side
 
@@ -954,7 +970,7 @@ class TestDemoen:
                 assert not re.search(rf"\b{ord_}\b", tekst, re.I), (ord_, rad[3])
 
     def test_notatene_samlet_i_min_liste_i_demoen(self, demoklient, demomal):
-        side = demoklient.get("/min-liste").data.decode("utf-8")
+        side = _uten_panelet(demoklient.get("/min-liste").data.decode("utf-8"))
         assert side.count('<li class="notat">') == len(_rader(demomal))
 
     def test_ingen_kronebeloep(self, demoklient):
@@ -1052,7 +1068,7 @@ class TestFjernesIKveld:
         tas ut før kursene hentes i kveld."""
         felt = TestTenkteKjoep()._notat(klient)
         assert klient.post("/fjern", data={"symbol": AKSJE, "tilbake": "oversikten"}).status_code == 303
-        side = klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
+        side = _uten_panelet(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
         assert not _kjoepsknapp(side) and "fjernes fra lista ved hentingen i kveld" in _tekst(side)
         assert klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt).status_code == 400
         assert _rader(demobase, "tenkt_kjoep") == []
@@ -1083,10 +1099,12 @@ class TestEtterGjennomgangenAvTilleggene:
         klient.post("/innstillinger", data={"navn": "vis_notater", "til": "av"})
         assert len(_rader(demobase, "tenkt_kjoep")) == 1
 
-    def test_delen_staar_under_grafen_og_over_historikken(self, klient, demobase):
-        """VG7, spørsmål 13: ville feilet hvis «Mine notater» sto et annet sted."""
+    def test_delen_staar_nederst_etter_historikken(self, klient, demobase):
+        """VG7, spørsmål 13: ville feilet hvis «Mine notater» sto et annet sted.
+        Story 8.27 (tillegg 1, gruppens svar 11.11 kl. 21:36): nederst, etter
+        «Signalet dag for dag» og boblen til investorsiden. Var under grafen."""
         side = klient.get(f"/aksje/{AKSJE}").data.decode("utf-8")
-        assert side.index('id="ki-tittel"') < side.index('id="mine-notater"') < side.index('id="signalet-dag-for-dag"')
+        assert side.index('id="signalet-dag-for-dag"') < side.index('id="mine-notater"')
 
     def test_base_uten_notatvalg(self, klient, demobase):
         """VG7: ville feilet hvis bryteren kunne trykkes, eller lagringen ga

@@ -339,7 +339,7 @@ class TestVelgDag:
         delene og 2 av 3. Ville feilet hvis samme dag ble merket på to måter."""
         _basen()
         html = klient.get("/?periode=velg&dag=2026-10-09").data.decode("utf-8")
-        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', html) == ["siste"]
+        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)#perioden" aria-current="true">', html) == ["siste"]
         assert _rad(html, "DNB")[0] == "utslag" and 'class="del ut"' in html
 
     def test_en_boersdag_foer_serien_begynner_og_sortering_paa_kurs(self, klient):
@@ -376,7 +376,7 @@ class TestVelgDag:
         for rad in rader:
             tekst = _synlig(rad).replace("3 av 3 siste børsdag", "")
             assert "av 3" not in tekst, tekst
-            assert "ikke vurdert" in tekst or "uten data" in tekst, tekst
+            assert "ikke vurdert" in tekst or "ingen kurser ennå" in tekst, tekst
         assert "Tabellen viser tirsdag 15.09" in _synlig(html)
         # Gjennomgangen (VG8): fotnoten om «ikke vurdert» står for dagen.
         assert fotnoten(html)
@@ -600,7 +600,7 @@ class TestAdressen:
         kursgrafen."""
         _basen()
         html = klient.get("/").data.decode("utf-8")
-        valgt = re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', html)
+        valgt = re.findall(r'<a href="/\?periode=([a-z0-9-]+)#perioden" aria-current="true">', html)
         assert valgt == ["siste"]
         assert 'aria-label="Periode for oversikten"' in html
 
@@ -612,7 +612,7 @@ class TestAdressen:
         # Story 8.23 (A2): lenkene i kolonneraden og «Standard rekkefølge» går til tabellen.
         assert 'href="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende#aksjene"' in uke
         sortert = klient.get("/?periode=1-uke&sorter=endring&orden=synkende").data.decode("utf-8")
-        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', sortert) == ["1-uke"]
+        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)#perioden" aria-current="true">', sortert) == ["1-uke"]
         assert "+37,50 %" in _rad(sortert, "EQNR")[1]
         assert 'href="/?periode=1-uke#aksjene">Standard rekkefølge</a>' in sortert
         assert 'name="tilbake" value="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende"' in sortert
@@ -718,64 +718,86 @@ class TestSmalSkjerm:
         assert r == {"rull": 390, "brede": []}, r
 
 
-PRD = (
+# Story 9.11 (gruppens svar 12.11 kl. 18:00): prd.md har den gjeldende teksten,
+# og de daterte linjene står ordrett i prd-endringslogg.md under kravet, med
+# overskriften det hadde i taggen prd-vurdert-2026-11-12.
+PRD_MAPPA = (
     Path(__file__).resolve().parent.parent
     / "_bmad-output"
     / "planning-artifacts"
     / "prds"
     / "prd-G74-lund-osen-2026-09-20"
-    / "prd.md"
 )
+PRD = PRD_MAPPA / "prd.md"
+ENDRINGSLOGGEN = PRD_MAPPA / "prd-endringslogg.md"
+
+
+def _kravet(tekst: str, overskrift: str) -> str:
+    """Delen under en overskrift, til neste overskrift på samme nivå."""
+    nivaa = overskrift.split(" ", 1)[0]
+    return tekst.split(overskrift + "\n", 1)[1].split(f"\n{nivaa} ", 1)[0]
 
 
 def test_fr_105_har_rettet_linja_om_en_dag_per_side():
     """Gruppens svar 30.10 kl. 12:21 (f): FR-105 får en Rettet-linje om at
     alle sidene følger samme regel, én dag per side, og at alt på siden,
-    også indeksen, gjelder den dagen. Ville feilet hvis linja manglet, sto
-    under et annet krav, eller ikke sa at indeksen følger tabellens dag."""
-    tekst = PRD.read_text(encoding="utf-8")
-    fr105 = tekst.split("#### FR-105 — Søylene under hovedindeksen", 1)[1].split("\n#### ", 1)[0]
+    også indeksen, gjelder den dagen. Story 9.11: linja står i
+    endringsloggen under FR-105, og regelen står i FR-105 i prd.md. Ville
+    feilet hvis linja manglet, sto under et annet krav, ikke sa at indeksen
+    følger tabellens dag, eller FR-105 i prd.md ikke hadde regelen."""
+    fr105 = _kravet(ENDRINGSLOGGEN.read_text(encoding="utf-8"), "### FR-105 — Søylene under hovedindeksen")
     linja = " ".join(fr105.split("*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*", 1)[1].split("\n\n", 1)[0].split())
     assert linja.startswith(
         "alle sidene følger samme regel, én dag per side, og alt på siden, også indeksen, gjelder den dagen."
     )
     assert "tabellens dag" in linja and "ikke indeksens dato" in linja
-    # Linja står etter kravet den retter, ikke før.
-    assert fr105.index("En aksje uten kurs for") < fr105.index("*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*")
+    gjeldende = " ".join(_kravet(PRD.read_text(encoding="utf-8"), "#### FR-105 — Søylene under hovedindeksen").split())
+    assert "En aksje uten kurs for tabellens dag får ingen søyle" in gjeldende
 
 
 def test_fr_104_har_rettet_linja_om_tabellens_dag():
     """Gjennomgangen 30.10 (BH4): verdien, endringen og «x av N» står i
-    FR-104, som sa indeksens siste børsdag. Ville feilet hvis FR-104 ikke
-    fikk en Rettet-linje om at de gjelder tabellens dag."""
-    tekst = PRD.read_text(encoding="utf-8")
-    fr104 = tekst.split("#### FR-104 — Hovedindeksen i markedsoversikten", 1)[1].split("\n#### ", 1)[0]
+    FR-104, som sa indeksens siste børsdag. Story 9.11: linja står i
+    endringsloggen under FR-104, og FR-104 i prd.md sier én dag per side.
+    Ville feilet hvis linja manglet, eller prd.md ikke sa at alt gjelder
+    tabellens dag."""
+    fr104 = _kravet(ENDRINGSLOGGEN.read_text(encoding="utf-8"), "### FR-104 — Hovedindeksen i markedsoversikten")
     merke = "*Rettet 2026-10-30, gruppens svar kl. 12:21 (e og f):*"
     linja = " ".join(fr104.split(merke, 1)[1].split("\n\n", 1)[0].split())
     assert "tabellens dag" in linja and "ikke indeksens siste børsdag" in linja, linja
-    assert fr104.index("indeksens siste børsdag") < fr104.index(merke)
+    gjeldende = " ".join(
+        _kravet(PRD.read_text(encoding="utf-8"), "#### FR-104 — Hovedindeksen i markedsoversikten").split()
+    )
+    assert "Alt gjelder dagen eller perioden tabellen viser: én dag per side." in gjeldende
 
 
 def test_fr_104_og_fr_105_har_unntaket_fra_en_dag_per_side():
     """Gruppens svar 02.11 kl. 17:40: tolkningen av f står, og avvikene
-    beholdes som et felles unntak, slik koden er. Ville feilet hvis linja
-    manglet under FR-104 eller FR-105, sto før Rettet-linja fra f, eller
-    ikke sa at raden og aksjesiden viser aksjens egen siste dag og at
-    indekslinja i kursgrafen slutter ved indeksens siste kurs."""
-    tekst = PRD.read_text(encoding="utf-8")
+    beholdes som et felles unntak, slik koden er. Story 9.11: linjene står i
+    endringsloggen, etter linja fra f fordi den er eldre, og unntaket står i
+    FR-104 i prd.md. Ville feilet hvis linja manglet under FR-104 eller
+    FR-105, sto før Rettet-linja fra f, ikke sa at raden og aksjesiden viser
+    aksjens egen siste dag og at indekslinja i kursgrafen slutter ved
+    indeksens siste kurs, eller unntaket manglet i prd.md."""
+    tekst = ENDRINGSLOGGEN.read_text(encoding="utf-8")
     merke = "*Lagt til 2026-11-03, gruppens svar 02.11 kl. 17:40:*"
     krav = (
-        ("#### FR-104 — Hovedindeksen i markedsoversikten", "*Rettet 2026-10-30, gruppens svar kl. 12:21 (e og f):*"),
-        ("#### FR-105 — Søylene under hovedindeksen", "*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*"),
+        ("### FR-104 — Hovedindeksen i markedsoversikten", "*Rettet 2026-10-30, gruppens svar kl. 12:21 (e og f):*"),
+        ("### FR-105 — Søylene under hovedindeksen", "*Rettet 2026-10-30, gruppens svar kl. 12:21 (f):*"),
     )
     for overskrift, f in krav:
-        avsnitt = tekst.split(overskrift, 1)[1].split("\n#### ", 1)[0]
+        avsnitt = _kravet(tekst, overskrift)
         assert merke in avsnitt, overskrift
         # Linja står etter regelen fra f, ikke før.
         assert avsnitt.index(f) < avsnitt.index(merke), overskrift
         linja = " ".join(avsnitt.split(merke, 1)[1].split("\n\n", 1)[0].split())
         assert "unntak" in linja and "egen siste dag" in linja, linja
         assert "indekslinja" in linja and "indeksens siste kurs" in linja, linja
-    fr104 = tekst.split(krav[0][0], 1)[1].split("\n#### ", 1)[0]
+    fr104 = _kravet(tekst, krav[0][0])
     linja = " ".join(fr104.split(merke, 1)[1].split("\n\n", 1)[0].split())
     assert "Min liste" in linja and "Aksjesiden" in linja and "Raden sier ikke hvilken dag" in linja, linja
+    gjeldende = " ".join(
+        _kravet(PRD.read_text(encoding="utf-8"), "#### FR-104 — Hovedindeksen i markedsoversikten").split()
+    )
+    assert "**Unntaket fra én dag per side.**" in gjeldende
+    assert "Indeksen går bare til" in gjeldende

@@ -5,6 +5,8 @@ under tmp_path (regel 22), og ingen test gjør nettkall (AD-8). Kursene er
 oppdiktet (regel 16).
 """
 
+import html as html_modul
+import json
 import re
 from dataclasses import replace
 from datetime import date, datetime, timezone
@@ -54,10 +56,13 @@ def klient(tmp_path, monkeypatch):
     return k
 
 
-def _rundturen(side: str) -> str:
-    treff = re.search(r'<details class="rundtur">.*?</details>', side, re.S)
+def _rundturen(side: str) -> list[dict]:
+    """Story 8.26 (svaret 11.11 kl. 16:58): stegene på knappen «Vis meg
+    rundt» i raden øverst, som skriptet viser i boksen. Lista fra 8.9 er
+    borte."""
+    treff = re.search(r'<button type="button" class="sideknapp vis-meg-rundt" data-steg="([^"]*)" hidden>', side)
     assert treff, "ingen «Vis meg rundt»"
-    return treff.group(0)
+    return json.loads(html_modul.unescape(treff.group(1)))
 
 
 class TestHverSide:
@@ -67,9 +72,10 @@ class TestHverSide:
         pekte på noe siden ikke har, som børsometeret før 8.6 var bygget."""
         html = klient.get(SIDENE[side]).data.decode("utf-8")
         rundtur = _rundturen(html)
-        assert "<summary>Vis meg rundt</summary>" in rundtur
-        ankrene = re.findall(r'<a href="#([^"]+)">', rundtur)
-        assert ankrene == [s.anker for s in ht.rundturer()[side]]
+        assert [(s["anker"], s["tittel"], s["tekst"]) for s in rundtur] == [
+            (s.anker, s.tittel, s.tekst) for s in ht.rundturer()[side]
+        ]
+        ankrene = [s["anker"] for s in rundtur]
         for anker in ankrene:
             # Gjennomgangen (BH3): en hel id, ikke data-id, og bare én.
             assert len(re.findall(rf'(?<![\w-])id="{re.escape(anker)}"', html)) == 1, (side, anker)
@@ -80,7 +86,7 @@ class TestHverSide:
         svar = klient.post("/innstillinger", data={"navn": "vis_hjelp", "til": "av"})
         assert svar.status_code in (302, 303)
         for adresse in SIDENE.values():
-            assert 'class="rundtur"' not in klient.get(adresse).data.decode("utf-8"), adresse
+            assert "vis-meg-rundt" not in klient.get(adresse).data.decode("utf-8"), adresse
 
     def test_ikke_der_stegene_ikke_passer(self, klient, monkeypatch):
         """Gjennomgangen (ECH1, ECH4, VG1): ville feilet hvis knappen sto på
@@ -89,12 +95,12 @@ class TestHverSide:
         merkede aksjer."""
         import valg
 
-        assert 'class="rundtur"' not in klient.get("/folg?bytt=EQNR").data.decode("utf-8")
+        assert "vis-meg-rundt" not in klient.get("/folg?bytt=EQNR").data.decode("utf-8")
         monkeypatch.setattr(valg, "TAK", 0)
         full = klient.get("/folg").data.decode("utf-8")
-        assert 'id="q"' not in full and 'class="rundtur"' not in full
+        assert 'id="q"' not in full and "vis-meg-rundt" not in full
         klient.post("/min-liste/merk", data={"symbol": "EQNR", "til": "fjern", "tilbake": "/"})
-        assert 'class="rundtur"' not in klient.get("/min-liste").data.decode("utf-8")
+        assert "vis-meg-rundt" not in klient.get("/min-liste").data.decode("utf-8")
 
     def test_alle_sidene_har_steg(self):
         """Ville feilet hvis en side i lista ikke hadde steg i hjelpetekster.py."""
@@ -106,7 +112,7 @@ class TestHverSide:
         noe siden ikke har."""
         html = klient.get("/aksje/EQNR?dag=2026-09-21").data.decode("utf-8")
         assert "Hvorfor signalet ble ukjent" in html
-        ankrene = re.findall(r'<a href="#([^"]+)">', _rundturen(html))
+        ankrene = [s["anker"] for s in _rundturen(html)]
         assert ankrene == [s.anker for s in ht.rundturer()["aksje_uten_sjekker"]]
         assert "sjekkene" not in ankrene
         for anker in ankrene:
@@ -143,8 +149,12 @@ class TestTekstene:
 
         forslaget = (Path(__file__).resolve().parent.parent / ht.ENDRINGSFORSLAGET_13_10).read_text(encoding="utf-8")
         alle = {s.tittel: s.tekst for steg in ht.rundturer().values() for s in steg}
-        assert alle["Signalstyrken"] == ht.TAVLA_STYRKEN and f"«{ht.TAVLA_STYRKEN}»" in forslaget
-        assert alle["Retningen"] == ht.TAVLA_RETNING and f"Retning: «{ht.TAVLA_RETNING} " in forslaget
+        assert f"«{ht.TAVLA_STYRKEN}»" in forslaget
+        # Story 8.19 (tillegg 3, gruppens svar 12.11 kl. 17:44): «Signalstyrken»
+        # nevner de tre sjekkene, og setningen om Blandet er flyttet til
+        # «Retningen», som begynner med teksten fra tavla.
+        assert alle["Signalstyrken"] == ht.STEGET_STYRKEN
+        assert alle["Retningen"].startswith(ht.TAVLA_RETNING) and f"Retning: «{ht.TAVLA_RETNING} " in forslaget
         # Uten den siste setningen, som 8.20a flyttet fra siden.
         assert alle["Sjekkene"] == ht.TAVLA_SJEKKENE and f"«{ht.TAVLA_SJEKKENE} Ingen vekting" in forslaget
 

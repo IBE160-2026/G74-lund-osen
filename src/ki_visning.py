@@ -58,6 +58,11 @@ STOPPET_AV_VAKTEN = "stoppet_av_vakten"
 # Story 8.2b, b (U6): demoen har KI-tekst bare for siste boersdag, saa grunnen
 # i INGEN_RAD stemmer ikke der.
 INGEN_I_DEMOEN = "ingen_i_demoen"
+# Story 3.7 (tillegg 1, spoersmaal 8 i spesifikasjonen): i den ekte versjonen
+# er en dag uten rad i KI-loggen en dag uten modell, slik siden kan se det
+# uten ny migrasjon. En tekst kontrollen stoppet, har en rad. Siden lenker
+# til installasjonen, og demoen er som foer.
+INGEN_MODELL = "ingen_modell"
 
 GRUNNER = {
     # Svar kl. 23:57 15.10: siden sier hvorfor med det loggen kan vise. Den
@@ -70,6 +75,7 @@ GRUNNER = {
     STEMMER_IKKE: "Ingen KI-tekst for denne dagen: vurderingen er skrevet på nytt etter at teksten ble laget.",
     STOPPET_AV_VAKTEN: "Ingen KI-tekst for denne dagen: teksten ble stoppet, fordi den kunne leses som et råd.",
     INGEN_I_DEMOEN: "Ingen KI-tekst for denne dagen: demoen har KI-tekst bare for siste børsdag.",
+    INGEN_MODELL: "Ingen KI-tekst for denne dagen. Den lages når kursene hentes, på en maskin med en språkmodell.",
 }
 
 
@@ -178,6 +184,8 @@ def ki_tekst(tekst: str) -> Markup:
 # Story 10.6 (FR-607, utdraget 08.11 §3): «Børsdagen kort fortalt» paa
 # forsiden. Tekstene uten KI-tekst staar ordrett fra utdraget.
 DAGEN_UTEN = "Dagen er uten KI-tekst."
+# Story 3.7 (tillegg 1): dagen har ingen rad i KI-loggen, i den ekte versjonen.
+DAGEN_UTEN_MODELL = "Dagen er uten KI-tekst. Den lages når kursene hentes, på en maskin med en språkmodell."
 PERIODEN_UTEN = "Perioden er uten KI-tekst. Teksten skrives for én børsdag om gangen."
 DAGEN_AV = "KI-teksten er slått av. Tabellen over viser bare det reglene har regnet ut."
 

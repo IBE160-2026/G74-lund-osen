@@ -522,9 +522,22 @@ def sorter(rader: list[Foelgbar], sortering: str) -> list[Foelgbar]:
 
 @dataclass(frozen=True)
 class Ferdigaksje:
+    """En aksje i en ferdig liste. Story 8.28: bransjen er aksjens egen, som
+    «De 15 mest omsatte» trenger, fordi den lista har flere bransjer."""
+
     symbol: str
     navn: str
     median: float
+    bransje: str = ""
+
+
+# Story 8.28 (gruppens svar 12.11 kl. 20:04, spørsmål 15 i 9.11, FR-412): de
+# mest omsatte på hele børsen, fra den samme målingen som bransjelistene, bare
+# målte aksjer og uten kravet om åtte bransjer. Navnet, antallet og nøkkelen
+# i adressen står her, ett sted.
+MEST_OMSATTE = "De 15 mest omsatte"
+MEST_OMSATTE_ANTALL = 15
+MEST_OMSATTE_NOEKKEL = "mest-omsatte"
 
 
 def _aksjene_i_lista(tilkobling: sqlite3.Connection) -> tuple[set[str], list[tuple[str, str, float, str]]]:
@@ -578,18 +591,48 @@ def lister(tilkobling: sqlite3.Connection | None) -> dict[str, list[Ferdigaksje]
     rekkefølgen bransjene har i BRANSJENE. En bransje uten målte aksjer har
     ingen liste. Bare lesing. Mangler tabellene, er det ingen lister.
     Story 8.11b: aksjene i lista er med, med medianen regnet av kursene."""
+    return begge(tilkobling)[0]
+
+
+def mest_omsatte(tilkobling: sqlite3.Connection | None) -> list[Ferdigaksje]:
+    """Story 8.28 (FR-412): de MEST_OMSATTE_ANTALL aksjene med høyest median
+    omsetning på hele børsen, med høyest først, fra de samme radene som
+    lister(). Bare aksjer med en bransje, så hver kan følges, og uten kravet
+    om åtte bransjer. Bare lesing. Mangler tabellene, er lista tom."""
+    return begge(tilkobling)[1]
+
+
+def begge(tilkobling: sqlite3.Connection | None) -> tuple[dict[str, list[Ferdigaksje]], list[Ferdigaksje]]:
+    """Story 8.28: (lister(), mest_omsatte()) av de samme radene, regnet én
+    gang, så siden regner dem én gang (gjennomgangen av 8.11c, BH4, ECH2)."""
     if tilkobling is None:
-        return {}
+        return {}, []
     try:
-        maalte = tilkobling.execute(
-            "SELECT o.symbol, b.navn, o.median_omsetning FROM omsetning o JOIN boersliste b ON b.kode = o.symbol "
-            "WHERE o.maalt = (SELECT max(maalt) FROM omsetning WHERE symbol = o.symbol) "
-            "AND o.median_omsetning IS NOT NULL"
-        ).fetchall()
-        regnet, i_lista = _aksjene_i_lista(tilkobling)
-        sektorer = dict(tilkobling.execute("SELECT symbol, sektor FROM aksje").fetchall())
+        rader = _radene(tilkobling)
     except sqlite3.Error:
-        return {}
+        return {}, []
+    mest = [Ferdigaksje(s, n, float(m), b) for s, n, m, b in rader if b in BRANSJENE][:MEST_OMSATTE_ANTALL]
+    etter_bransje: dict[str, list[Ferdigaksje]] = {}
+    for symbol, navn, median, bransje in rader:
+        if bransje not in BRANSJENE:
+            continue
+        liste = etter_bransje.setdefault(bransje, [])
+        if len(liste) < TAK:
+            liste.append(Ferdigaksje(symbol, navn, float(median)))
+    return {b: etter_bransje[b] for b in BRANSJENE if b in etter_bransje}, mest
+
+
+def _radene(tilkobling: sqlite3.Connection) -> list[tuple[str, str, float, str | None]]:
+    """[(symbol, navn, median, bransje)] for alle målte aksjer, med høyest
+    median først, som lister() og mest_omsatte() bygger på. Story 8.28:
+    flyttet hit fra lister() uten endring. Reiser sqlite3.Error."""
+    maalte = tilkobling.execute(
+        "SELECT o.symbol, b.navn, o.median_omsetning FROM omsetning o JOIN boersliste b ON b.kode = o.symbol "
+        "WHERE o.maalt = (SELECT max(maalt) FROM omsetning WHERE symbol = o.symbol) "
+        "AND o.median_omsetning IS NOT NULL"
+    ).fetchall()
+    regnet, i_lista = _aksjene_i_lista(tilkobling)
+    sektorer = dict(tilkobling.execute("SELECT symbol, sektor FROM aksje").fetchall())
     # Story 8.11b: for en aksje appen har kurser for, gjelder medianen regnet
     # av kursene, ogsaa om den har en eldre maaling i omsetning (spoersmaal 4).
     # Gjennomgangen (BH3, VG1): ogsaa naar den ikke fikk en median i vinduet.
@@ -598,15 +641,11 @@ def lister(tilkobling: sqlite3.Connection | None) -> dict[str, list[Ferdigaksje]
     # Story 8.22: den faste bransjen foerst, ogsaa for aksjene i lista (spoersmaal 3).
     rader = [(s, n, float(m), fast_bransje(s) or sektorer.get(s)) for s, n, m in maalte if s not in regnet]
     rader += [(s, n, float(m), fast_bransje(s) or b) for s, n, m, b in i_lista]
+    # Gjennomgangen av 8.28 (ECH1): MULTI og SCOIN (UTE) kan aldri følges, så de
+    # står ikke i noen ferdig liste, heller ikke med en bransje i aksje.
+    rader = [r for r in rader if r[0] not in UTE]
     rader.sort(key=lambda r: (-r[2], r[0]))
-    etter_bransje: dict[str, list[Ferdigaksje]] = {}
-    for symbol, navn, median, bransje in rader:
-        if bransje not in BRANSJENE:
-            continue
-        liste = etter_bransje.setdefault(bransje, [])
-        if len(liste) < TAK:
-            liste.append(Ferdigaksje(symbol, navn, float(median)))
-    return {b: etter_bransje[b] for b in BRANSJENE if b in etter_bransje}
+    return rader
 
 
 def medianene(tilkobling: sqlite3.Connection | None) -> dict[str, tuple[float | None, date | None]]:

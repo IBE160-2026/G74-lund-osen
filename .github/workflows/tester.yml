@@ -478,3 +478,16 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           uv run pytest -q -p no:cacheprovider -rs tests/test_ikonet_og_snarveien_3_6.py -k "Snarveien" | tee "$RUNNER_TEMP/snarvei.log"
           if grep -q "skipped" "$RUNNER_TEMP/snarvei.log"; then echo "En test for snarveien ble hoppet over"; exit 1; fi
+
+      # Story 3.7: rekkefølgen med snarveien og nettleseren, fristen og
+      # spørsmålet om KI-teksten, med falske winget og ollama og en falsk
+      # Ollama på 127.0.0.1 i testen. Ingenting lastes ned. Steget feiler
+      # hvis noen test hoppes over.
+      - name: Snarveien og KI-spørsmålet på Windows (3.7)
+        if: runner.os == 'Windows'
+        shell: bash
+        timeout-minutes: 10
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv run pytest -q -p no:cacheprovider -rs tests/test_snarveien_foer_nettleseren_3_7.py | tee "$RUNNER_TEMP/snarvei37.log"
+          if grep -q "skipped" "$RUNNER_TEMP/snarvei37.log"; then echo "En test i 3.7 ble hoppet over"; exit 1; fi
