@@ -2,7 +2,7 @@
 title: "Begrunnelser — hvorfor kravene i PRD-en ser slik ut"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-09T00:04
+updated: 2026-11-12T18:21
 ---
 
 # Begrunnelser — hvorfor kravene i PRD-en ser slik ut
@@ -628,3 +628,213 @@ Første versjon er på norsk, kjører lokalt, og prioriterer stabilitet fremfor 
 ### Hva briefen ikke bygger på
 
 Vi har ikke gjennomført en brukerundersøkelse, og briefen bygger derfor ikke på antakelser om et bredere marked.
+
+---
+
+## 13. Fra prd.md før omskrivingen 12.11
+
+Da `prd.md` ble skrevet om til én gjeldende tekst per krav 12.11 (story 9.11), ble
+resonnementet som ikke er krav, flyttet hit, ordrett fra taggen
+`prd-vurdert-2026-11-12`. Noe av det gjelder ikke lenger, og det står likevel,
+fordi det viser hvordan kravene ble til. De daterte linjene står i
+[`prd-endringslogg.md`](prd-endringslogg.md).
+
+### Fra FR-101 — Fem kolonner
+
+Begrunnelsen er NFR-03: manglende data for én aksje skal ikke stoppe
+hovedflyten. En rad som forsvinner, forteller brukeren at aksjen ikke finnes.
+En rad med tom styrke forteller at den finnes og at vi ikke kunne vurdere den.
+Bare det andre er sant.
+
+Begrunnelse: AD-15 lar ett symbol feile og beholde sin gamle serie. Viste siden
+det nyeste tidspunktet, ville en side med én fersk rad og fjorten foreldede sett
+fersk ut.
+
+Kravet stod ikke skrevet før 2026-09-21. De to skjermbildene var spesifisert
+hver for seg, og ingenting sa at det ene fører til det andre — de hang
+uforbundet i kravregisteret selv om hovedflyten forutsetter begge.
+
+Navnet er valgt som lenke framfor en egen kolonne med knapp, fordi femte
+kolonne allerede er brukt opp: FR-101 sier nøyaktig fem kolonner, og en sjette
+ville brutt kravet for å løse et navigasjonsproblem.
+
+### Fra FR-102 — Standard sortering
+
+Absolutt, ikke fortegn: et stort fall skal ikke havne bakerst fordi det er
+negativt.
+
+Merk at styrken bare har fire verdier fordelt på femten rader, så lik styrke er
+normalen og ikke unntaket. Målingen 2026-09-21 viste 13 av 15 aksjer på styrke
+2 eller høyere for 2026-09-18. **Sekundærkriteriet gjør derfor mesteparten av
+sorteringsarbeidet**, og det er verdt å vite når rekkefølgen skal forklares i
+en demonstrasjon.
+
+### Fra FR-103 — Retning vises i tre redundante kanaler
+
+Alle tre kanalene er obligatoriske. Farge alene utelukker fargeblinde brukere,
+og «blandet» lar seg ikke uttrykke lesbart i farge i det hele tatt. Teksten er
+den bærende kanalen; symbol og farge er forsterkninger. Symbolet står ved siden
+av teksten, ikke i stedet for den, og skjules for skjermlesere så pilen ikke
+leses opp i tillegg til ordet.
+
+### Fra FR-202 — MA50-linjen tegnes oppå kursen
+
+Begrunnelsen er at aksjedetaljen finnes for å forklare signalet. MA50 regnes på
+utbyttejustert kurs etter FR-701. Tegner grafen en annen serie enn den signalet
+bruker, forklarer skjermbildet noe annet enn det som faktisk skjedde — og
+avviket ville vært systematisk, ikke tilfeldig.
+
+**Målt i grafvinduet 2026-09-21**, som avstand mellom `close` og
+`adjusted_close`:
+
+| Symbol | Avstand |
+|---|---:|
+| FRO | 8,93 % |
+| DNB | 5,84 % |
+| GJF | 5,64 % |
+| **Median over de 15** | **3,72 %** |
+
+Avstanden er størst for aksjene som betaler mest utbytte. En kurslinje på
+`close` mot et snitt på `adjusted_close` ville altså ligget mest feil nettopp
+der utbyttet betyr mest.
+
+**Markedsoversikten og aksjedetaljen viser derfor bevisst ulike serier:**
+
+| Skjermbilde | Hva som vises | Hvorfor |
+|---|---|---|
+| Markedsoversikten (FR-101) | `close` | Det er kursen aksjen faktisk omsettes til |
+| Aksjedetaljen (FR-201) | `adjusted_close` | Det er serien signalet er regnet på |
+
+Det er en reell forskjell brukeren kan oppdage, og den skal forklares der den
+oppstår: **tegnforklaringen i grafen skal si at linjene viser utbyttejustert
+kurs.** Uten det vil en bruker som sammenligner de to skjermbildene, lese
+forskjellen som en feil.
+
+### Fra FR-204 — Aksjedetaljen for en aksje uten gyldig signal
+
+Begrunnelsen er den samme som FR-101 fikk: en 404 forteller brukeren at aksjen
+ikke finnes. En side med graf og en beskjed forteller at den finnes og at vi
+ikke kunne vurdere den. Bare det andre er sant, og NFR-03 sier at manglende
+data for én aksje ikke skal stoppe hovedflyten.
+
+### Fra FR-406 — To lagre for kursdata, med hvert sitt ansvar
+
+De to lagrene ligger nå i hvert sitt medium: beregningsgrunnlaget i databasen,
+rådata som filer. **Regelen var aldri fil mot base.** Den var at serien aldri
+skjøtes på, fordi EODHD regner `adjusted_close` om bakover ved hvert nytt
+utbytte. Den regelen holdes i databasen ved at hver henting erstatter symbolets
+rader i sin helhet. Se arkitekturspinen AD-5 og AD-6.
+
+Uten de 50 ekstra dagene finnes ikke det glidende snittet for den første delen
+av grafen, og MA50-linjen ville startet midt inne i bildet uten at noe feilet.
+Sjekk 1 ville da vært usynlig nettopp i den perioden brukeren ser først.
+
+**I praksis hentes et helt år.** Ett kall koster det samme uansett
+intervallengde — målt og ført i `malinger.md` §2 — så et kortere intervall ville
+kostet nøyaktig like mye og gitt mindre. Gratisnivået gir ett års historikk, og
+det er derfor taket, ikke et valg.
+
+### Fra FR-408 — Dagens vurdering lagres per aksje
+
+Uten lagringen kan spørsmålet «hva sa løsningen om EQNR for to uker siden?»
+ikke besvares.
+
+Dette er et tredje lager, med et annet formål enn de to i FR-406: de lagrer
+*data fra kilden*, dette lagrer *hva løsningen mente om dem*.
+
+Det er nettopp det dette kravet finnes for å hindre. Lageret skal vise hva
+løsningen mente den dagen — og en dag ingen kjørte kommandoen, mente løsningen
+ingenting. Da skal det stå at den ikke sa noe.
+
+### Fra FR-409 — De tre tilstandene skal være skillbare i lageret
+
+Uten skillet blir en dag vi ikke kjørte, umulig å skille fra en dag uten utslag.
+Det første er en mangel hos oss; det andre er et funn om markedet. De skal ikke
+kunne forveksles.
+
+**Bindingen gjelder videre.** Enhver visning, kommando eller spørring som senere
+leser denne historikken, **skal bevare skillet** — ikke gjengi «ingen rad» og
+«styrke 0» som samme tilstand. Står ikke dette her, er grunnen til at kravet
+finnes glemt den dagen visningen bygges.
+
+**Ikke dekket av FR-204.** Det kravet gjelder en aksje som ikke kan vurderes
+*nå* — for kort historikk eller hull i serien. FR-409 gjelder den lagrede raden
+for en dag som allerede har passert.
+
+### Fra FR-501 — Deduplisering av språkdubletter
+
+**Hvordan språket avgjøres.** Kravet sa opprinnelig bare «behold den norske»,
+og det er ikke implementerbart uten å vite hvilket språk en melding er på.
+NewsWeb-målingene dokumenterer feltene `issuerSign`, `issuerName`, `category`,
+`publishedTime` og `title` — ingen språkindikator. Regelen er derfor:
+
+Heuristikken er et kompromiss, ikke et ideal. Finnes språkkoden, erstatter den
+punkt 2 som hovedregel, og heuristikken blir liggende som reserve.
+
+### Fra FR-502 — Kategorifilter i tre bøtter
+
+**Kategorier som ikke står i tabellen** går i en egen bøtte. De vises for
+brukeren merket **«ukjent kategori»** og føres i loggen, men de sendes **ikke**
+til KI-laget: prompten er skrevet for samlekategorien og ville gitt en
+vurdering den ikke er kalibrert for. Et svar som ser like sikkert ut som de
+andre, men som kommer fra en modell utenfor sitt område, er verre enn ingen
+vurdering.
+
+Bøtta er en mellomstasjon, ikke en endestasjon. Etter en ukes drift vet vi
+hvilke kategorier som faktisk dukket opp, og plasserer dem bevisst — se åpent
+punkt 15.
+
+### Fra FR-602 — Visningen når KI-laget er av
+
+Begrunnelsen er den samme som i FR-602A: av og på skal kunne sammenlignes, og
+det eneste som skiller dem, er KI-teksten. Bidraget er **forståelighet, ikke
+informasjon**: KI-teksten sier det samme som regelforklaringen, i hele setninger.
+
+### Fra FR-605 — Promptversjon og modell lagres med hver KI-tekst
+
+Justeres prompten i oktober, må det være mulig å se hvilken versjon som ga
+hvilken tekst. Uten det blir eksempelsettet en blanding av flere systemer
+som ser ut som ett.
+
+### Fra FR-702 — Nøytralsone i trendsjekken
+
+Uten nøytralsonen kan signalstyrke 0 ikke forekomme: en aksje ligger alltid
+enten over eller under sitt eget snitt, så trendsjekken slår alltid ut. Målt
+over 2 985 aksjedager er andelen med styrke 0 da **0,0 %**, og 63,9 % havner på
+styrke 1. Oversikten kan dermed aldri si at det ikke skjer noe, og det bryter
+målet «Dager uten signal».
+
+### Fra FR-706 — Synlig begrunnelse i aksjedetaljen
+
+De tre tallene til høyre er grunnlaget. De to til venstre er utledet av dem.
+Ingen vekting og ingen skjult formel. Dette er kravet som gjør signalet
+forklarbart, og det er ikke valgfritt — og da kan heller ikke grunnlaget være
+det.
+
+### Fra 6. Datakilder
+
+To forbehold hører til PRD-en fordi de kan velte krav: **NewsWeb-vilkårene er
+ikke kontrollert**, og API-et er udokumentert backend for Oslo Børs' egen
+nettside.
+
+### Fra 7. Suksessmål
+
+Målet er omformulert og ikke strøket, fordi den andre halvdelen er ønsket og
+ikke måles noe annet sted. Men **den første halvdelen er oppgitt, ikke myknet
+opp** — det skal stå, ellers ser omformuleringen ut som at målet ble justert til
+å passe det vi bygde.
+
+**Hva som mest sannsynlig bryter terskelen:** at migrasjonene blir en egen
+kommando. Arkitekturspinen fører «Hvem kjører migrasjonene, og når» som utsatt —
+`AD-16` sier at de finnes, ikke hvem som anvender dem. Et svar som deler dem ut
+i `docker run … migrer` ville sett ut som ryddig ansvarsdeling og brutt målet.
+**Det skal leses når Dockerfilen skrives.**
+
+### Fra Motmål
+
+- **Relevanseksperimentet skal avgjøre påstanden, ikke bekrefte den.** Viser
+  målingen liten forskjell mellom symbolmatching og KI-klassifisering, er det
+  også et funn.
+
+- **KI-bidrag måles i hva laget faktisk klarte å skille**, ikke i hvor mange
+  meldinger det behandlet.
