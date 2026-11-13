@@ -851,6 +851,18 @@ KI_STEGET = (
 )
 
 
+# Story 8.27, tillegg 2 (gruppens svar 11.11 kl. 22:20, forslaget i spørsmål
+# 13, godtatt 12.11 kl. 10:16): ett steg for knappen «Mine notater» øverst, i
+# delen for Min liste, bare når bryteren «Notater» er på. NOTATKNAPP er id-en
+# til knappen i _ramme.html.
+NOTATKNAPP = "notatknapp"
+NOTATSTEGET = (
+    "Mine notater åpner et panel i kanten av siden med alle notatene dine, og et skjema for et nytt notat. "
+    "Panelet kan flyttes til venstre eller høyre. Notatene lagres på denne maskinen."
+)
+NOTATSTEGET_DEMO = NOTATSTEGET.removesuffix(".") + ", i demoen til den startes på nytt."
+
+
 @dataclass(frozen=True)
 class Steg:
     """Ett steg i «Vis meg rundt»: id-en på siden det peker på, et navn og
@@ -861,9 +873,10 @@ class Steg:
     tekst: str
 
 
-def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
+def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = False) -> dict[str, tuple[Steg, ...]]:
     """Stegene for hver side, med tallene fra p. Nøkkelen er siden, som
-    malene gir til makroen i _rundtur.html."""
+    malene gir til makroen i _rundtur.html. Story 8.27: notater er bryteren
+    «Notater», og demo gir steget for «Mine notater» linja om demoen."""
     ma = _vis(p.ma_vindu, "heltall")
     volatilitet = _vis(p.volatilitet_vindu, "heltall")
     volum = _vis(p.volum_vindu, "heltall")
@@ -905,6 +918,9 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
             ),
             styrke,
             retning,
+            # Story 8.27 (spørsmål 13): etter stegene for Min liste, og før
+            # «Følg en aksje» i omvisningen. Tas ut under når «Notater» er av.
+            Steg(NOTATKNAPP, "Mine notater", NOTATSTEGET_DEMO if demo else NOTATSTEGET),
         ),
         "boersometer": (
             Steg("velg-dag", "Dagen og perioden", "Knappene og datoen velger hvilken dag eller periode rutene viser."),
@@ -961,6 +977,10 @@ def rundturer(p: Parametre = STANDARD) -> dict[str, tuple[Steg, ...]]:
     # ikke vurdert): stegene om sjekkene forklarer noe siden ikke viser.
     # Story 8.26 (tillegg 20): uten sjekker er det heller ingen «Signalet forklart».
     sider["aksje_uten_sjekker"] = tuple(s for s in sider["aksje"] if s.anker not in ("sjekkene", KI_ANKER))
+    # Story 8.27: uten «Notater» er knappen borte, og steget med den, så
+    # telleren i boksen ikke teller et steg som ikke vises.
+    if not notater:
+        sider["min_liste"] = tuple(s for s in sider["min_liste"] if s.anker != NOTATKNAPP)
     for side, steg in sider.items():
         assert len(steg) <= MAKS_STEG, side
     return sider
@@ -981,12 +1001,12 @@ GJENTATT_I_OMVISNINGEN = frozenset(
 )
 
 
-def omvisningen(p: Parametre = STANDARD) -> list[dict[str, str]]:
+def omvisningen(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = False) -> list[dict[str, str]]:
     """Stegene i omvisningen, i rekkefølgen sidene står i OMVISNINGEN_SIDER,
     med de samme tekstene som «Vis meg rundt», uten stegene som gjentar en
     side før (GJENTATT_I_OMVISNINGEN). Skriptet i hjelp.js leser dem fra
     rammen."""
-    sider = rundturer(p)
+    sider = rundturer(p, notater=notater, demo=demo)
     return [
         {"side": side, "anker": s.anker, "tittel": s.tittel, "tekst": s.tekst}
         for side in OMVISNINGEN_SIDER

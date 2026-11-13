@@ -523,6 +523,10 @@ def test_hver_menyknapp_har_sitt_ikon(klient, sti, navn, del_):
     # Story 8.26: knappene «Vis meg rundt» og «Spill av omvisningen» står også
     # i raden, med sine ikoner (test_vis_meg_rundt_8_26.py), men er ikke sider.
     assert len(re.findall(r'<a class="sideknapp"[^>]*><svg class="ikon"', meny)) == 4
+    # Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): og notatarket for
+    # «Mine notater», som er en knapp for panelet, ikke en side, når
+    # bryteren «Notater» er på.
+    assert len(re.findall(r'<a class="sideknapp notatknapp"[^>]*><svg class="ikon"', meny)) == 1
 
 
 def test_ikonene_er_16_px_med_strek_2_i_tekstfargen():
