@@ -11,7 +11,7 @@ context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md'
 ---
 
-Skrevet 13.11 i instruksjonen kl. 11:26, etter gruppens svar 13.11 kl. 10:32–10:54, med tavla «Min liste» 13.10, og tillegg 1 kl. 11:26 (gruppens ønske og svar kl. 10:59–11:02). Tillegget ble først limt inn kl. 11:04, før instruksjonen, og stoppet da i steg 0. Et første innlimingsforsøk av instruksjonen var avkortet og ble ikke utført. 8.27 og 8.28 er tatt av andre vinduer, så dette er 8.29. Svarene står ikke i repoet ennå; det som står her om dem, er hentet fra instruksjonen og tillegget.
+Skrevet 13.11 i instruksjonen kl. 11:26, etter gruppens svar 13.11 kl. 10:32–10:54, med tavla «Min liste» 13.10, og tillegg 1 kl. 11:26 (gruppens ønske og svar kl. 10:59–11:02). Tillegget ble først limt inn kl. 11:04, før instruksjonen, og stoppet da i steg 0. Et første innlimingsforsøk av instruksjonen var avkortet og ble ikke utført. 8.27 og 8.28 er tatt av andre vinduer, så dette er 8.29. Tillegg 2 kl. 20:38 (gruppens ønske kl. 20:35) gjelder styrken for én dag. Svarene står ikke i repoet ennå; det som står her om dem, er hentet fra instruksjonen og tillegget.
 
 ## Storyen
 
@@ -27,6 +27,8 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Din egen liste: kom 
 
 *Ønske og svar 2026-11-13 kl. 10:59–11:02 (tillegg 1, rådet anbefalte begge og har prøvd dem):* delen får ingen ramme, ingen egen bakgrunn og ingen luft på sidene (dette erstatter punkt d om bakgrunnen var(--bakgrunn) med kanten), og bransjekortene i «Følg flere aksjer» stables i kolonner uten hull.
 
+*Ønske 2026-11-13 kl. 20:35 (tillegg 2, rådet anbefalte å ta det i 8.29):* styrken for én dag vises likt overalt, med regelen fra tabellen på oversikten: 3 av 3 som pille tre-av-tre, fra terskelen (2 av 3) som pille to-av-tre, og 1 og 0 av 3 som tekst uten pille. Det gjelder notatene (Min liste, aksjesiden og panelet) og «Signalet dag for dag», i begge versjonene. Summen under sjekkene og kortet «Signalstyrke» står som før. Punktet sto som lavt i `issues.md` fra 8.27.
+
 ## Spørsmål til gruppen
 
 Et spørsmål stopper ikke arbeidet; alt er bygget etter forslaget.
@@ -39,6 +41,9 @@ Et spørsmål stopper ikke arbeidet; alt er bygget etter forslaget.
 6. **Investorknappen** er 44 px innenfor kanten og 47 px med kanten på 1,5 px, med 11 px luft og 22 px linjehøyde, så teksten står midt i også når den brytes. *Forslag, som bygget.*
 
 7. **Plassstreken på beige.** Uten den hvite bakgrunnen har de ledige rutene i streken under «Appen følger N av 18» (`--strek-2`) omtrent 1,3:1 i kontrast mot sidens bakgrunn, mot omtrent 1,5:1 mot hvitt før (ECH3). Streken er skjult for skjermlesere, og tallet står som tekst. *Forslag, som bygget:* streken står som før; en mørkere farge for de ledige rutene kan tas i en egen runde.
+
+8. **2 av 3 en tidligere dag** (tillegg 2). `designregler.md` §3 (01.10) sier «2 av 3 merkes uten gult, og bare for siste børsdag», og to tester holdt det: `test_to_av_tre_har_ingen_ring_en_tidligere_dag` (8.20a, BH11 og ECH1) og `test_3_av_3_merkes_som_i_oversikten_og_2_av_3_ikke` i `test_historikken.py`. Tillegget og skissen 06.11 (`docs/skisser/2026-11-06/aksjesiden-ki-paa.png`, onsdag 04.11 med «2 av 3» i pille) har den hvite pillen også en tidligere dag. *Forslag, som bygget:* som tillegget og skissen. §3 har en linje om det, testen i 8.20a sjekker nå bare summen og kortet en tidligere dag, og testen i `test_historikken.py` heter `test_styrken_merkes_som_i_tabellen_paa_oversikten`.
+9. **Andre steder med styrken for én dag.** Setningen «Signal: 2 av 3, …» for en valgt dag på aksjesiden er tekst, som tabellen for en valgt dag («Velg dag»). Børsometeret har pille ved mørk og gul ramme og ellers tekst, som tabellen. Lista for skjermlesere under hovedindeksen nevner bare «3 av 3» i teksten. *Forslag, som tabellen:* de står som før.
 
 ## Delene
 
@@ -61,6 +66,10 @@ Delen har ingen ramme, bakgrunn eller luft på sidene, og står 136–1144 px ve
 ### 5) Investorknappen (steg 3)
 
 `p.investorboble a` har `min-height: 44px`, 11 px luft og 22 px linjehøyde, i begge versjonene. ↗ og ny fane står bare i den ekte versjonen.
+
+### 6) Styrken for én dag (tillegg 2)
+
+Makroen `styrke` i `_brikker.html` har regelen, og `_notat.html` og «Signalet dag for dag» i `aksje.html` bruker den med `parametre.terskel`. Tabellen har samme regel med `skiller_seg_ut`. `stil.css` har den hvite pillen og teksten uten pille under `.etterpaa` (også i panelet) og `.historikk`.
 
 ## Målt i nettleseren 13.11 kl. 11:31
 
