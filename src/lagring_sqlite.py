@@ -694,6 +694,10 @@ class SqliteMinlistelager:
     Webserveren er eneste skriver, og den skriver bare denne tabellen. Et
     symbol som ikke staar i aksje, avvises her foer noe skrives, og av
     triggeren i 0007 hvis noe annet proever.
+
+    Story 8.26 (tillegg 3, gjennomgangen VG7): «Følg» og «Angre» i valg.py
+    skriver ogsaa stjernen direkte, fra webserveren, og triggeren fra 0013
+    godtar en aksje som venter paa hentingen etter «Følg».
     """
 
     def __init__(self, tilkobling: sqlite3.Connection):
@@ -704,6 +708,18 @@ class SqliteMinlistelager:
         return frozenset(
             s
             for (s,) in self._tilkobling.execute("SELECT m.symbol FROM min_liste m JOIN aksje a ON a.symbol = m.symbol")
+        )
+
+    def merkede_som_venter(self) -> frozenset[str]:
+        """Story 8.26 (tillegg 3): de merkede aksjene som venter på hentingen
+        etter «Følg», og derfor ikke står i aksje ennå (0013)."""
+        return frozenset(
+            s
+            for (s,) in self._tilkobling.execute(
+                "SELECT m.symbol FROM min_liste m WHERE NOT EXISTS (SELECT 1 FROM aksje a WHERE a.symbol = m.symbol) "
+                "AND EXISTS (SELECT 1 FROM oenske o WHERE o.symbol = m.symbol AND o.handling = 'folg' "
+                "AND o.tatt_i_bruk IS NULL AND o.avvist IS NULL)"
+            )
         )
 
     def merk(self, symbol: str) -> None:
@@ -717,7 +733,15 @@ class SqliteMinlistelager:
 
     def _symboler(self) -> list[str]:
         # Story 2.11 (gjennomgangen, VG7): bare aksjer som ikke er tatt ut.
-        return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM aksje WHERE ut IS NULL")]
+        # Story 8.26 (tillegg 3): og aksjene som venter på hentingen etter
+        # «Følg», så stjernen kan tas bort og settes igjen (0013).
+        return [
+            s
+            for (s,) in self._tilkobling.execute(
+                "SELECT symbol FROM aksje WHERE ut IS NULL UNION SELECT symbol FROM oenske "
+                "WHERE handling = 'folg' AND tatt_i_bruk IS NULL AND avvist IS NULL"
+            )
+        ]
 
     def _merket_i_tabellen(self) -> list[str]:
         return [s for (s,) in self._tilkobling.execute("SELECT symbol FROM min_liste")]

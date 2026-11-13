@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-05T15:44
+updated: 2026-11-12T16:41
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -486,6 +486,11 @@ det en egen oppgave.
 løsningen på kjente data. Hjelpelæreren skriver at «en god demoversjon er mer
 enn tilstrekkelig for å vise hvordan løsningen fungerer» (svaret 05.10, under
 «Spørsmål sendt hjelpelærer 2026-10-04»).
+
+*Lagt til 2026-11-12 (gruppens svar kl. 16:23):* gruppen antar at det ikke blir
+noen presentasjon, og at faglærer leser README-en og prøver demoen selv. Det er
+en antakelse, ikke bekreftet av faglærer. Demomanuset er laget og holdes som
+reserve. Det ligger ikke i repoet (slått opp 12.11 i filene git sporer).
 
 ### E. Om PRD og arkitekturdokument er innleveringskrav i seg selv
 

@@ -5,7 +5,7 @@ created: 2026-09-20
 # updated settes fra klokka, aldri for hånd:
 #   date +%Y-%m-%dT%H:%M   (lokal tid, samme som memloggen)
 # Feltet sto på 2026-09-20 mens fem commits den 21.09 hadde endret dokumentet.
-updated: 2026-11-11T00:32
+updated: 2026-11-11T18:24
 #
 # Hvorfor status var draft, og hva som avsluttet den.
 #
@@ -610,6 +610,8 @@ heter ikke «topp», fordi styrken verken er et råd eller en sannsynlighet
 og bulk koster 100 kall (NFR-01). Ingen kall.
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R20):* ikke bygget per 3.11, story 8.11, ekstra fra 19.10.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret er tatt bort. Raden «Alle», «3 av 3 positiv» og «3 av 3 negativ» under «Alle | Min liste» viste ikke noe tabellen ikke alt viser under «Skilte seg ut», og med den gikk linja om filteret, lenken til dem som fikk 2 av 3 og adressene `?signal=`. At signalstyrken ikke er et råd om å kjøpe eller selge, står fortsatt synlig i innledningen på oversikten (NFR-06). Rådet var enig.
 
 #### FR-109 — Hjelpen på sidene
 

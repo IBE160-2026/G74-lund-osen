@@ -71,7 +71,9 @@ class TestValget:
         for kode, _ in BOERSEN[:3]:
             l.folg(kode, "Kraft")
         assert l.antall() == 18
-        with pytest.raises(ListaErFull, match="Lista er full. Fjern en aksje for å følge en annen."):
+        with pytest.raises(
+            ListaErFull, match="Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen."
+        ):
             l.folg("NYD", "Kraft")
 
     def test_et_bytte_gaar_ogsaa_med_full_liste(self, tmp_path):
@@ -224,7 +226,7 @@ class TestSidene:
     def test_dine_egne_aksjer_paa_oversikten(self, klient):
         """Utdraget §1: ville feilet hvis delen eller «x av 18» manglet."""
         side = klient.get("/").data.decode("utf-8")
-        assert "Dine egne aksjer" in side and "0 egne · 15 av 18 aksjer i lista" in side
+        assert "Dine egne aksjer" in side and "0 egne · appen følger 15 av 18" in side
         assert 'href="/folg"' in side
 
     def test_foelg_en_aksje_fra_siden(self, klient):
@@ -240,7 +242,7 @@ class TestSidene:
         svar = klient.post("/folg", data={"kode": "NYA", "sektor": "Kraft"})
         assert svar.status_code == 303
         side = klient.get("/").data.decode("utf-8")
-        assert "Venter på henting i kveld etter kl. 22." in side and "16 av 18 aksjer i lista" in side
+        assert "Venter på henting i kveld etter kl. 22." in side and "appen følger 16 av 18" in side
 
     def test_bransjen_er_fast(self, klient, stier):
         """Story 8.22 (svaret 10.11 kl. 13:38, som erstatter spørsmål 4): ville
@@ -264,9 +266,12 @@ class TestSidene:
         for kode, _ in BOERSEN[:3]:
             klient.post("/folg", data={"kode": kode, "sektor": "Kraft"})
         side = klient.get("/").data.decode("utf-8")
-        assert "Lista er full. Fjern en aksje for å følge en annen." in side and 'href="/folg"' not in side
+        assert (
+            "Appen følger allerede 18 aksjer, som er taket. Fjern en for å følge en annen." in side
+            and 'href="/folg"' not in side
+        )
         svar = klient.post("/folg", data={"kode": "NYD", "sektor": "Kraft"})
-        assert svar.status_code == 303 and "feil=Lista+er+full" in svar.headers["Location"]
+        assert svar.status_code == 303 and "feil=Appen+f%C3%B8lger+allerede+18+aksjer" in svar.headers["Location"]
 
     def test_din_egen_liste_i_min_liste(self, klient):
         """Utdraget §2: ville feilet hvis kallene ikke ble regnet av lista."""
@@ -317,7 +322,7 @@ def test_demoen_virker_likt(tmp_path, monkeypatch):
     assert "så den merkes «Utenfor målingen»" in klient.get("/folg?kode=NRDE").data.decode("utf-8")
     assert klient.post("/folg", data={"kode": "SKRH", "sektor": "Helse"}).status_code == 303
     side = klient.get("/").data.decode("utf-8")
-    assert "1 egne · 16 av 18 aksjer i lista" in side
+    assert "1 egne · appen følger 16 av 18" in side
     assert "Venter på henting i kveld etter kl. 22." in side and "Demoen henter ingenting" in side
 
 
@@ -429,7 +434,7 @@ class TestEtterGjennomgangen:
         """ECH11: ville feilet hvis siden viste «Følge …?» for en aksje i lista."""
         med_boersen(stier[1], [("DNB", "DnB ASA")])
         side = klient.get("/folg?kode=DNB").data.decode("utf-8")
-        assert "er alt i lista" in side and "Følg aksjen" not in side
+        assert "Appen følger alt" in side and "Følg aksjen" not in side
 
     def test_en_feil_beholder_byttet(self, klient):
         """BH9, ECH9: ville feilet hvis en avvist forespørsel mistet byttet."""
@@ -457,7 +462,7 @@ def test_en_egen_aksje_staar_i_tabellen_med_merket(stier, monkeypatch):
     app_modul.app.config["TESTING"] = True
     side = app_modul.app.test_client().get("/").data.decode("utf-8")
     assert '<a href="/aksje/NYA">Ny Aksje ASA</a> <span class="egenmerke">Egen</span>' in side
-    assert "Hentet. Står i tabellen over." in side and "1 egne · 16 av 18 aksjer i lista" in side
+    assert "Hentet. Står i tabellen over." in side and "1 egne · appen følger 16 av 18" in side
     # Story 8.11c (spørsmål 9 i 8.11b): etter hentingen regnes medianen av
     # kursene, som i de ferdige listene. Her sto «Omsetningen er ikke målt ennå.»
     assert (

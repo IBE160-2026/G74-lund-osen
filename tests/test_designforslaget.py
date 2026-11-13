@@ -432,7 +432,7 @@ def test_lenken_til_boersometeret_har_samme_periode(klient, oversikt, boersomete
 @pytest.mark.parametrize(
     ("oversikt", "ventet"),
     [
-        ("/?periode=1-mnd", 'href="/boersometer?periode=1-mnd" aria-current="true"'),
+        ("/?periode=1-mnd", 'href="/boersometer?periode=1-mnd#perioden" aria-current="true"'),
         ("/?periode=velg&dag=2026-10-05", "mandag 05.10"),
     ],
 )
@@ -465,7 +465,8 @@ def test_ki_delen_heter_navnet_kort_fortalt(klient):
     assert 'aria-labelledby="ki-tittel"' in ki.split(">", 1)[0]
     tittel = ki.split("<h2>", 1)[1].split("</h2>", 1)[0]
     assert tittel.startswith('<span id="ki-tittel">Signalet forklart</span> ')
-    assert "kort fortalt" not in html
+    # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg på alle sidene.
+    assert "kort fortalt" not in re.sub(r' data-steg="[^"]*"', "", html)
     assert 'popovertarget="hjelp-ki"' in tittel
     # Story 8.20a (del D): modellen står i en egen linje under teksten.
     assert '<p class="merke-ki">Laget av KI.' in ki
@@ -519,15 +520,20 @@ def test_hver_menyknapp_har_sitt_ikon(klient, sti, navn, del_):
     assert knapp, navn
     assert 'aria-hidden="true" focusable="false"' in knapp.group(1) and del_ in knapp.group(1)
     # Story 8.10: og tannhjulet for «Innstillinger», den fjerde knappen.
+    # Story 8.26: knappene «Vis meg rundt» og «Spill av omvisningen» står også
+    # i raden, med sine ikoner (test_vis_meg_rundt_8_26.py), men er ikke sider.
+    assert len(re.findall(r'<a class="sideknapp"[^>]*><svg class="ikon"', meny)) == 4
     # Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): og notatarket for
-    # «Mine notater», den femte, når bryteren «Notater» er på.
-    assert len(re.findall(r'<svg class="ikon"', meny)) == 5
+    # «Mine notater», som er en knapp for panelet, ikke en side, når
+    # bryteren «Notater» er på.
+    assert len(re.findall(r'<a class="sideknapp notatknapp"[^>]*><svg class="ikon"', meny)) == 1
 
 
 def test_ikonene_er_16_px_med_strek_2_i_tekstfargen():
     """Svar 4: 16 px med strek 2 i tekstfargen. Ville feilet med en annen
     størrelse, en annen strek eller en fast farge, som ikke følger knappen
     som er valgt."""
-    regel = _regel("header.stripe a.sideknapp .ikon")
+    # Story 8.26: regelen gjelder også knappene i raden, så den heter .sideknapp.
+    regel = _regel("header.stripe .sideknapp .ikon")
     for del_ in ("width: 16px", "height: 16px", "stroke: currentColor", "stroke-width: 2", "fill: none"):
         assert del_ in regel, del_

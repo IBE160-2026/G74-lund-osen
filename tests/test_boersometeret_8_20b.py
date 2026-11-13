@@ -245,7 +245,8 @@ def test_det_verste_kartet_faar_plass():
 
 def _vinduene(html: str) -> dict[str, str]:
     deler = re.findall(r'<div id="(hjelp-[a-z-]+)" class="hjelpevindu" popover>(.*?)\n</div>', html, flags=re.S)
-    return {id_: _synlig(innhold.split("</div>", 1)[1]) for id_, innhold in deler}
+    # Story 8.26: linja om hvordan vinduet lukkes, telles ikke.
+    return {id_: _synlig(innhold.split("</div>", 1)[1].split('<p class="lukkes">')[0]) for id_, innhold in deler}
 
 
 class TestHjelpevinduene:

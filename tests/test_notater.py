@@ -637,7 +637,7 @@ class TestEtterGjennomgangen:
         side med notater eller 500, ikke siden som ber om en ny demobase."""
         c = sqlite3.connect(demobase)
         c.execute("DROP TABLE notat")
-        c.execute("DELETE FROM skjema_versjon WHERE versjon = 12")
+        c.execute("DELETE FROM skjema_versjon WHERE versjon >= 12")  # Story 8.26: og 0013
         c.commit()
         c.close()
         svar = klient.get(f"/aksje/{AKSJE}")

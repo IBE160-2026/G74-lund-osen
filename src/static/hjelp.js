@@ -293,9 +293,71 @@ const OMVISNING = {
     return Boolean(steg[i]) && steg[i].side === side;
   },
 
+  // Story 8.26 (svaret 11.11 kl. 16:58): «Vis meg rundt» bruker den samme
+  // boksen, bare med stegene for siden man står på. De får sidenavnet SIDEN,
+  // så et steg uten delen hoppes over som i omvisningen, og ingen går til en
+  // annen side.
+  SIDEN: "siden",
+  sidensSteg(liste) {
+    if (!Array.isArray(liste)) return [];
+    return liste.map((s) => ({ side: OMVISNING.SIDEN, anker: s.anker, tittel: s.tittel, tekst: s.tekst }));
+  },
+
   // Tilbudet første gang: bare på oversikten, og bare før det er besvart.
   skalTilby(side, svar) {
     return side === "oversikt" && svar === null;
+  },
+
+  // Story 8.26 (tillegg 21, gruppens svar 12.11 kl. 09:58, «Brukerutfall» i
+  // §7 i PRD-en): tilbudet starter «Vis meg rundt» for oversikten, ikke hele
+  // omvisningen på 23 steg, så en ny bruker kommer fort til en aksje selv.
+  TILBUDET: "Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.",
+
+  // Linja på det siste steget i «Vis meg rundt» på oversikten, og hvor
+  // «Ferdig» går: til det første navnet under «Skilte seg ut», eller til
+  // tabellen når ingen aksje står der (en annen dag, en sortering, ingen med
+  // 2 av 3). null på de andre sidene og i hele omvisningen, som går videre
+  // til aksjesiden selv.
+  videre(side, bareSiden, harNavn) {
+    if (side !== "oversikt" || !bareSiden) return null;
+    if (harNavn) {
+      return { linje: "Klikk så et navn under «Skilte seg ut» for å se hvorfor aksjen skilte seg ut.", maal: "ut" };
+    }
+    return { linje: "Klikk så et navn i tabellen for å se sjekkene for aksjen.", maal: "tabellen" };
+  },
+};
+
+// Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): «Følg en aksje»
+// filtrerer og sorterer i nettleseren med en gang ved klikk på en brikke, en
+// omsetning eller en sortering, som ferdige_lister.filtrer og .sorter gjør på
+// serveren. Rene funksjoner, så testene kan kjøre dem med Node.
+const FOLGLISTA = {
+  // Om raden (dataset fra malen) passer med søket, bransjene og omsetningen.
+  passer(rad, tekst, bransjer, omsetning) {
+    const t = (tekst || "").trim().toLowerCase();
+    if (t && !rad.kode.includes(t) && !rad.navn.includes(t)) return false;
+    if (bransjer.length && !bransjer.includes(rad.bransje)) return false;
+    if (omsetning && rad.omsetning !== omsetning) return false;
+    return true;
+  },
+  // Sammenligningen for sorteringen: «omsatt» (høyest median først, ikke
+  // målt sist), «navn» (A–Å, med Æ, Ø og Å sist) og «bransje» (rangen, så
+  // navnet). Likt ordnes etter navnet og så tickeren.
+  // Gjennomgangen (ECH1): samme nøkkel som ferdige_lister._norsk, med æ, ø og
+  // å sist, ikke localeCompare, som i nb regner «aa» som å.
+  norsk(navn) {
+    return navn.toLowerCase().replace(/æ/g, "{0").replace(/ø/g, "{1").replace(/å/g, "{2");
+  },
+  sammenlign(a, b, sortering) {
+    const na = FOLGLISTA.norsk(a.navn);
+    const nb = FOLGLISTA.norsk(b.navn);
+    const navn = (na < nb ? -1 : na > nb ? 1 : 0) || (a.kode < b.kode ? -1 : a.kode > b.kode ? 1 : 0);
+    if (sortering === "navn") return navn;
+    if (sortering === "bransje") return Number(a.rang) - Number(b.rang) || navn;
+    const ma = a.median === "" ? null : Number(a.median);
+    const mb = b.median === "" ? null : Number(b.median);
+    if ((ma === null) !== (mb === null)) return ma === null ? 1 : -1;
+    return (mb || 0) - (ma || 0) || navn;
   },
 };
 
@@ -340,6 +402,7 @@ const NOTATPANEL = {
 
 if (typeof module === "object" && module.exports) {
   module.exports = OMVISNING;
+  module.exports.FOLGLISTA = FOLGLISTA;
   module.exports.NOTATPANEL = NOTATPANEL;
 }
 
@@ -355,6 +418,10 @@ if (typeof module === "object" && module.exports) {
   }
   if (!Array.isArray(steg) || steg.length === 0) return;
   const SIDE = data.dataset.side;
+  // Story 8.26: stegene boksen går gjennom, og siden de hører til. Hele
+  // omvisningen, eller bare siden med «Vis meg rundt».
+  let aktive = steg;
+  let stedet = SIDE;
   let boksen = null;
   let merket = null;
   let fokusFoer = null;
@@ -383,13 +450,36 @@ if (typeof module === "object" && module.exports) {
     return les(sessionStorage, OMVISNING.AKSJEN);
   }
 
+  // Story 8.26 (tillegg 18): et steg som peker på en kolonneoverskrift,
+  // merker overskriften og cellene i kolonnen i de første radene.
+  const RADENE_I_KOLONNEN = 3;
+  let kolonnen = [];
+  function merkKolonnen(th) {
+    const tabell = th.closest("table");
+    const antall = th.parentElement.cells.length;
+    const celler = [th];
+    // Gjennomgangen (ECH6): alle tbody-ene, ikke bare den første.
+    for (const rad of tabell.querySelectorAll("tbody tr")) {
+      if (celler.length > RADENE_I_KOLONNEN) break;
+      if (rad.cells.length === antall && rad.cells[th.cellIndex].tagName === "TD") celler.push(rad.cells[th.cellIndex]);
+    }
+    for (const c of celler) c.classList.add("omvisning-kolonne");
+    celler[celler.length - 1].classList.add("omvisning-kolonne-siste");
+    return celler;
+  }
   function fjernMerket() {
     if (merket) merket.classList.remove("omvisning-merket");
     merket = null;
+    for (const c of kolonnen) c.classList.remove("omvisning-kolonne", "omvisning-kolonne-siste");
+    kolonnen = [];
   }
 
   function avslutt() {
-    skriv(sessionStorage, OMVISNING.STEGET, null);
+    // «Vis meg rundt» lagrer ingen tilstand, så en omvisning som er i gang
+    // på en annen fane eller side, røres ikke.
+    if (aktive === steg) skriv(sessionStorage, OMVISNING.STEGET, null);
+    aktive = steg;
+    stedet = SIDE;
     fjernMerket();
     if (boksen) boksen.remove();
     boksen = null;
@@ -423,10 +513,10 @@ if (typeof module === "object" && module.exports) {
   }
 
   function gaaTil(i, retning) {
-    const j = OMVISNING.nesteSteg(steg, i, retning, SIDE, finnes);
+    const j = OMVISNING.nesteSteg(aktive, i, retning, stedet, finnes);
     if (j < 0) return avslutt();
-    const s = steg[j];
-    if (s.side !== SIDE) {
+    const s = aktive[j];
+    if (s.side !== stedet) {
       const adresse = OMVISNING.adresse(s.side, aksjen());
       if (!adresse) return gaaTil(j + retning, retning);
       skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, retning, adresse));
@@ -440,6 +530,31 @@ if (typeof module === "object" && module.exports) {
     return document.getElementById(anker) !== null;
   }
 
+  // Story 8.26 (tillegg 21): det første navnet under «Skilte seg ut» i
+  // tabellen på oversikten, eller null når delen ikke står der.
+  function foersteNavn() {
+    const del = document.querySelector("#aksjene tr.del.ut");
+    const tbody = del ? del.closest("tbody") : null;
+    return tbody ? tbody.querySelector('a[href^="/aksje/"]') : null;
+  }
+
+  // «Ferdig» på det siste steget: boksen lukkes, og fokus går til det første
+  // navnet under «Skilte seg ut», eller til tabellen.
+  function tilNavnene(maal) {
+    avslutt();
+    const navnet = maal === "ut" ? foersteNavn() : null;
+    if (navnet) {
+      navnet.closest("tbody").querySelector("tr.del.ut").scrollIntoView({ block: "start" });
+      navnet.focus({ preventScroll: true });
+      return;
+    }
+    const tabellen = document.getElementById("aksjene");
+    if (!tabellen) return;
+    if (!tabellen.hasAttribute("tabindex")) tabellen.tabIndex = -1;
+    tabellen.scrollIntoView({ block: "start" });
+    tabellen.focus({ preventScroll: true });
+  }
+
   // Noen anker fra 8.9 er et tomt merke rett foran delen, som
   // <span id="noekkeltallene">. Da merkes delen etter merket.
   function delen(anker) {
@@ -451,12 +566,16 @@ if (typeof module === "object" && module.exports) {
   }
 
   function vis(j) {
-    const s = steg[j];
+    const s = aktive[j];
     const del = delen(document.getElementById(s.anker));
-    skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));
+    if (aktive === steg) skriv(sessionStorage, OMVISNING.STEGET, OMVISNING.tilstand(j, 1, her()));
     fjernMerket();
-    merket = del;
-    del.classList.add("omvisning-merket");
+    if (del.tagName === "TH") {
+      kolonnen = merkKolonnen(del);
+    } else {
+      merket = del;
+      del.classList.add("omvisning-merket");
+    }
     // Gjennomgangen (BH7, ECH7): delen øverst, så boksen nederst dekker
     // mindre av den, også på smal skjerm.
     del.scrollIntoView({ block: "start" });
@@ -475,7 +594,7 @@ if (typeof module === "object" && module.exports) {
     boksen.replaceChildren();
     const teller = document.createElement("p");
     teller.className = "omvisning-teller";
-    teller.textContent = OMVISNING.teller(j, steg.length);
+    teller.textContent = OMVISNING.teller(j, aktive.length);
     const tittel = document.createElement("h2");
     tittel.id = "omvisning-tittel";
     tittel.textContent = s.tittel;
@@ -484,20 +603,70 @@ if (typeof module === "object" && module.exports) {
     tekst.textContent = s.tekst;
     const knappene = document.createElement("div");
     knappene.className = "omvisning-knapper";
-    const lov = OMVISNING.knappene(steg, j, SIDE, finnes);
+    const lov = OMVISNING.knappene(aktive, j, stedet, finnes);
     const tilbake = knapp("Tilbake", "omvisning-tilbake", () => gaaTil(j - 1, -1));
     tilbake.disabled = !lov.tilbake;
     const siste = lov.ferdig;
+    // Story 8.26 (tillegg 21): på det siste steget i «Vis meg rundt» på
+    // oversikten står én linje til, og «Ferdig» går til navnene.
+    const videre = siste ? OMVISNING.videre(SIDE, aktive !== steg, foersteNavn() !== null) : null;
+    const ferdig = videre ? () => tilNavnene(videre.maal) : avslutt;
     knappene.append(
       tilbake,
-      knapp(siste ? "Ferdig" : "Neste", "omvisning-neste", () => (siste ? avslutt() : gaaTil(j + 1, 1))),
+      knapp(siste ? "Ferdig" : "Neste", "omvisning-neste", () => (siste ? ferdig() : gaaTil(j + 1, 1))),
       knapp("Lukk", "omvisning-lukk", avslutt),
     );
-    boksen.append(teller, tittel, tekst, knappene);
+    boksen.append(teller, tittel, tekst);
+    if (videre) {
+      const linja = document.createElement("p");
+      linja.className = "omvisning-videre";
+      linja.textContent = videre.linje;
+      boksen.append(linja);
+    }
+    boksen.append(knappene);
+    // Story 8.26 (svaret kl. 16:58): siste steg med «Vis meg rundt» har
+    // «Ferdig» og lenken til hele omvisningen.
+    if (siste && aktive !== steg) {
+      const hele = document.createElement("p");
+      hele.className = "omvisning-hele";
+      const lenke = document.createElement("a");
+      lenke.href = "#";
+      lenke.textContent = "Spill av hele omvisningen";
+      lenke.addEventListener("click", (e) => {
+        e.preventDefault();
+        avslutt();
+        start();
+      });
+      hele.append(lenke);
+      boksen.append(hele);
+    }
     boksen.focus();
+    // Story 8.26 (tillegg 18): boksen står ikke over det som er merket. Dekker
+    // den det nederst til høyre, flyttes den til venstre.
+    // Dekker den også der, står boksen øverst når det merkede står i nedre
+    // halvdel av vinduet.
+    boksen.classList.remove("til-venstre", "oeverst");
+    const merkede = kolonnen.length ? kolonnen : [del];
+    function dekker() {
+      const b = boksen.getBoundingClientRect();
+      return merkede.some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
+      });
+    }
+    if (dekker()) boksen.classList.add("til-venstre");
+    if (dekker()) {
+      // Gjennomgangen (ECH7): prøv øverst, og behold det bare hvis det hjelper.
+      boksen.classList.remove("til-venstre");
+      boksen.classList.add("oeverst");
+      if (dekker()) boksen.classList.remove("oeverst");
+    }
   }
 
   function start() {
+    // Gjennomgangen av 8.26 (ECH1, BH4): er boksen fra «Vis meg rundt» åpen,
+    // lukkes den først, så hele omvisningen spilles og ikke bare siden.
+    if (aktive !== steg) avslutt();
     skriv(localStorage, OMVISNING.SVARET, "ja");
     // En aksje fra en tidligere omvisning gjelder ikke; den leses på nytt.
     skriv(sessionStorage, OMVISNING.AKSJEN, null);
@@ -512,16 +681,19 @@ if (typeof module === "object" && module.exports) {
 
   // Første gang appen åpnes: tilbudet øverst på oversikten, én gang. Et
   // svar, ja eller nei, huskes i nettleseren.
+  // Story 8.26 (tillegg 21): ja starter «Vis meg rundt» for oversikten, ikke
+  // hele omvisningen. «Spill av omvisningen» står øverst som før.
   function tilby() {
     const rad = document.createElement("div");
     rad.className = "omvisning-tilbud";
     rad.setAttribute("role", "region");
     rad.setAttribute("aria-label", "Omvisning");
     const tekst = document.createElement("p");
-    tekst.textContent = "Første gang her? Omvisningen viser sidene i appen, ett steg om gangen.";
-    const ja = knapp("Spill av omvisningen", "spill-av", () => {
+    tekst.textContent = OMVISNING.TILBUDET;
+    const ja = knapp("Vis meg rundt", "omvisning-ja", () => {
       rad.remove();
-      start();
+      skriv(localStorage, OMVISNING.SVARET, "ja");
+      visSiden(sidensListe);
     });
     const nei = knapp("Nei takk", "omvisning-nei", () => {
       skriv(localStorage, OMVISNING.SVARET, "nei");
@@ -535,6 +707,31 @@ if (typeof module === "object" && module.exports) {
   for (const b of document.querySelectorAll("button.spill-av[hidden]")) {
     b.hidden = false;
     b.addEventListener("click", start);
+  }
+  // Story 8.26: «Vis meg rundt» med stegene for siden, fra knappen.
+  function visSiden(liste) {
+    if (boksen) avslutt();
+    aktive = OMVISNING.sidensSteg(liste);
+    stedet = OMVISNING.SIDEN;
+    if (aktive.length === 0) {
+      aktive = steg;
+      stedet = SIDE;
+      return;
+    }
+    gaaTil(0, 1);
+  }
+  // Stegene for siden, som tilbudet første gang også bruker.
+  let sidensListe = null;
+  for (const b of document.querySelectorAll("button.vis-meg-rundt[hidden]")) {
+    let liste;
+    try {
+      liste = JSON.parse(b.dataset.steg);
+    } catch {
+      continue;
+    }
+    if (sidensListe === null) sidensListe = liste;
+    b.hidden = false;
+    b.addEventListener("click", () => visSiden(liste));
   }
   function oppstart() {
     const lagret = les(sessionStorage, OMVISNING.STEGET);
@@ -551,7 +748,17 @@ if (typeof module === "object" && module.exports) {
       boksen = null;
       document.removeEventListener("keydown", tast);
     }
-    if (OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET)) && !document.querySelector(".omvisning-tilbud")) {
+    // Gjennomgangen av 8.26 (ECH2): en side fra hurtigbufferen har ikke
+    // lenger boksen fra «Vis meg rundt», så hele omvisningen gjelder igjen.
+    aktive = steg;
+    stedet = SIDE;
+    // Tillegg 21: uten «Vis meg rundt» på siden (ingen aksjer å vise) kommer
+    // tilbudet ikke, og det huskes ikke som besvart.
+    if (
+      sidensListe &&
+      OMVISNING.skalTilby(SIDE, les(localStorage, OMVISNING.SVARET)) &&
+      !document.querySelector(".omvisning-tilbud")
+    ) {
       tilby();
     }
   }
@@ -565,47 +772,80 @@ if (typeof module === "object" && module.exports) {
 })();
 
 // Story 8.22 (spørsmål 8): søket i «Følg en aksje» mens man skriver. Alle
-// radene står i siden; skriptet skjuler dem som ikke har teksten i tickeren
-// eller navnet (hver for seg, som ferdige_lister.filtrer, gjennomgangen BH5),
-// og sier hvor mange som vises. Uten skriptet gjør knappen «Vis» det samme på
-// serveren. Et klikk på en bransje, en omsetning eller en sortering sender
-// skjemaet; med tastaturet krysser mellomrom av en bransje og flytter
-// piltastene valget uten å laste siden, og «Vis» sender
-// det (gjennomgangen, BH4, ECH2, WCAG 3.2.2). Står her fordi sidene bare har
-// ett skript (8.0f), og gjelder bare siden med lista. Tillegg 3: radene er
-// rader i en tabell, som på oversikten.
+// radene står i siden; skriptet skjuler dem som ikke passer (som
+// ferdige_lister.filtrer, gjennomgangen BH5) og sier hvor mange som vises.
+// Story 8.26 (tillegg 17): også bransjene, omsetningen og sorteringen virker
+// med en gang, med klikk og med tastaturet, uten å laste siden, og adressen
+// følger valget. «Vis» står bare uten skriptet. Står her fordi sidene bare
+// har ett skript (8.0f), og gjelder bare siden med lista.
 (function () {
   // Flettingen av 8.22 inn i 8.25: testene laster skriptet i Node, uten side.
   if (typeof document === "undefined") return;
   const felt = document.querySelector("input[data-folgsok]");
   const lista = document.getElementById("foelgbare");
   if (!felt || !lista) return;
+  const skjema = felt.form;
   const rader = Array.from(lista.querySelectorAll("tr[data-kode]"));
   const antall = document.getElementById("antall-vist");
+  const filtrert = document.getElementById("antall-filtrert");
   const ingen = document.getElementById("ingen-treff");
-  function filtrer() {
-    const tekst = felt.value.trim().toLowerCase();
+  const tittel = document.getElementById("alle-tittel");
+  const ordnet = document.getElementById("ordnet-etter");
+  const alle = skjema.querySelector("a.valgbrikke");
+  for (const knapp of skjema.querySelectorAll("button[type=submit]")) knapp.hidden = true;
+  function valgte() {
+    return Array.from(skjema.querySelectorAll("input[name=bransje]:checked")).map((i) => i.value);
+  }
+  function verdi(navn) {
+    const i = skjema.querySelector(`input[name=${navn}]:checked`);
+    return i ? i.value : "";
+  }
+  function oppdater() {
+    const bransjer = valgte();
+    const omsetning = verdi("omsetning");
+    const sortering = verdi("sorter") || "omsatt";
+    rader.sort((a, b) => FOLGLISTA.sammenlign(a.dataset, b.dataset, sortering));
+    lista.append(...rader);
     let vist = 0;
+    let iFilteret = 0;
     for (const rad of rader) {
-      const med = !tekst || rad.dataset.kode.includes(tekst) || rad.dataset.navn.includes(tekst);
+      const filter = FOLGLISTA.passer(rad.dataset, "", bransjer, omsetning);
+      const med = filter && FOLGLISTA.passer(rad.dataset, felt.value, bransjer, omsetning);
       rad.hidden = !med;
+      if (filter) iFilteret += 1;
       if (med) vist += 1;
     }
     if (antall) antall.textContent = String(vist);
+    if (filtrert) filtrert.textContent = String(iFilteret);
     if (ingen) ingen.hidden = vist > 0;
+    if (ordnet) ordnet.hidden = sortering !== "omsatt";
+    if (tittel) {
+      const liste = bransjer.length > 1 ? bransjer.slice(0, -1).join(", ") + " og " + bransjer[bransjer.length - 1] : bransjer[0];
+      tittel.textContent = "Alle som kan følges" + (liste ? " i " + liste : "");
+    }
+    if (alle) {
+      alle.classList.toggle("valgt", bransjer.length === 0);
+      if (bransjer.length === 0) alle.setAttribute("aria-current", "true");
+      else alle.removeAttribute("aria-current");
+    }
+    const ledd = new URLSearchParams(new FormData(skjema));
+    try {
+      window.history.replaceState(null, "", "/folg?" + ledd.toString() + "#filteret");
+    } catch {
+      // Uten historikken virker lista likevel.
+    }
   }
-  felt.addEventListener("input", filtrer);
-  let klikk = false;
-  for (const gruppe of felt.form.querySelectorAll("fieldset")) {
-    gruppe.addEventListener("pointerdown", () => {
-      klikk = true;
-    });
-    gruppe.addEventListener("keydown", () => {
-      klikk = false;
-    });
-    gruppe.addEventListener("change", () => {
-      if (klikk) felt.form.submit();
-      klikk = false;
+  felt.addEventListener("input", oppdater);
+  skjema.addEventListener("change", oppdater);
+  skjema.addEventListener("submit", (e) => {
+    e.preventDefault();
+    oppdater();
+  });
+  if (alle) {
+    alle.addEventListener("click", (e) => {
+      e.preventDefault();
+      for (const i of skjema.querySelectorAll("input[name=bransje]:checked")) i.checked = false;
+      oppdater();
     });
   }
 })();

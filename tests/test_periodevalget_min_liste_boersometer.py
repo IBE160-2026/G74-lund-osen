@@ -183,11 +183,11 @@ class TestAdressen:
         Ville feilet hvis et klikk mistet perioden eller «Alle»."""
         _basen()
         html = _side(klient, "/min-liste?vis=alle&periode=1-uke&sorter=kurs&orden=synkende")
-        assert '<a href="/min-liste?vis=alle&amp;periode=1-mnd">1 mnd</a>' in html
-        assert '<a href="/min-liste?vis=alle&amp;periode=1-uke" aria-current="true">1 uke</a>' in html
+        assert '<a href="/min-liste?vis=alle&amp;periode=1-mnd#perioden">1 mnd</a>' in html
+        assert '<a href="/min-liste?vis=alle&amp;periode=1-uke#perioden" aria-current="true">1 uke</a>' in html
         assert '<input type="hidden" name="vis" value="alle">' in html
-        assert 'href="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
-        assert 'href="/min-liste?periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
+        assert 'href="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende#visvalget"' in html
+        assert 'href="/min-liste?periode=1-uke&amp;sorter=kurs&amp;orden=synkende#visvalget"' in html
         assert 'name="tilbake" value="/min-liste?vis=alle&amp;periode=1-uke&amp;sorter=kurs&amp;orden=synkende"' in html
         assert "periode=1-uke&amp;sorter=endring" in html
         dag = _side(klient, "/min-liste?vis=alle&periode=velg&dag=2026-10-07")
@@ -209,7 +209,7 @@ class TestAdressen:
         dag» ikke ga dagen som før."""
         _basen()
         html = _side(klient, "/boersometer?periode=1-uke")
-        assert '<a href="/boersometer?periode=1-uke" aria-current="true">1 uke</a>' in html
+        assert '<a href="/boersometer?periode=1-uke#perioden" aria-current="true">1 uke</a>' in html
         assert 'aria-current="true">Fredag</a>' in _side(klient, "/boersometer")
         dag = _side(klient, "/boersometer?periode=velg&dag=2026-10-07")
         # Story 8.20a (del B): dagen står i feltet, og knappen heter «Vis dagen».
