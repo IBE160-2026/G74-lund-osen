@@ -125,7 +125,7 @@ Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra
 
 - Målingen av omsetning for aksjene som ikke var målt
 - Egne notater på aksjesiden, med tenkte kjøp og salg
-- Ikonet i fanen og snarveien på skrivebordet i Windows, også for demoen
+- Ikonet i fanen og snarveien i Windows, også for demoen, med spørsmålet før nettleseren og tilbudet om Gemma første gang
 - Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
 - «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
 
