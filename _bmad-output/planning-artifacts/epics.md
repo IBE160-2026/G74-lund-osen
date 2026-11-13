@@ -5165,3 +5165,43 @@ Som **bruker**, vil jeg kunne starte fra de mest omsatte aksjene på hele børse
 **Avhenger av:** 8.11, 8.11b, 8.22. **Én økt:** ja.
 
 *Lagt til 2026-11-13:* 8.28 er squash-flettet med PR #153 i `c8ad6f4c` kl. 21:51, låst til head-en `baaa5168` (main med 8.26, 8.27, 3.7, 10.11 og 8.19 flettet inn), etter tillegg 2 til 9.11 i `docs/ai-prompts/2026-11-12.md` og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. 8.26 hadde flyttet de ferdige listene til steg 3 i «Din egen liste», så «De 15 mest omsatte» står først blant brikkene der, og setningen bak «?» gjelder hele børsen. Hele settet i CI (run 43504332042), etter gruppens svar 13.11 kl. 18:24: 5739 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-8-28-de-15-mest-omsatte.md`](../implementation-artifacts/spec-8-28-de-15-mest-omsatte.md).
+
+### Story 9.11: PRD-en etter tilbakemeldingen fra faglærer 12.11
+
+*Lagt til 2026-11-12, etter instruksjonen kl. 18:03 og gruppens svar 12.11 kl. 18:00:* en ny versjon av `prd.md` med gjeldende tekst, slik briefen fikk versjon 8 i 9.6. Rådet anbefalte det. Tilbakemeldingen står i [`tilbakemelding-prd.md`](prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd.md) (`29cf2874`). Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md`, med spørsmålene og forslagene.
+
+Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som én gjeldende tekst med konsekvenser en test kan sjekke, så jeg ikke bygger etter en setning som ikke gjelder lenger.
+
+**Oppfyller:** 4.1–4.5 og §5 i tilbakemeldingen · **Begrenses av:** regel 5, 13, 16, 17 og 20 i `CLAUDE.md`, NFR-06
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `prd.md` før omskrivingen står urørt i taggen `prd-vurdert-2026-11-12`, på `10265324`
+- Hvert FR og NFR har én gjeldende tekst og «*Konsekvenser:*», med de samme ID-ene. Brukerreisen UJ-1, ordlista, tabellen «Kjerne, ekstra og senere», SM-1–SM-9 med krav, og plan A i vedlegg A
+- Alle «Rettet»- og «Lagt til»-linjene og kommentaren om status står ordrett i `prd-endringslogg.md`, ordnet etter krav og dato, med tabellen over tilbakemeldingen øverst. Resonnement som ikke er krav, står i §13 i `begrunnelser.md`
+- Kodenavnene og commitene som gikk ut av kravene, står i tabellen under, der de ikke sto i arkitekturen eller her fra før
+- **Ville feilet hvis:** et «Rettet» eller «Lagt til» sto igjen i `prd.md`, endringsloggen hadde et annet antall enn taggen, et krav manglet konsekvenser eller en ID fra taggen, et SM manglet ID eller krav, eller en lenke til et anker i `prd.md` ikke virket (`tests/test_prd_9_11.py`)
+
+**Avhenger av:** ingen. **Én økt:** ja.
+
+**Navn og commits som gikk ut av kravene.** Disse sto i kravene i taggen og ikke i arkitekturen eller `epics.md` fra før:
+
+| Navn eller commit | Krav i taggen | Hva det er |
+|---|---|---|
+| `/boersometer` | FR-106 | Siden for børsometeret, story 8.6 (`7f1c1f09`) og 8.6b (`7f6d9e4c`) |
+| `238ef186` | FR-109 | Hjelpefeltet, story 8.0f, PR #102 |
+| `24849dd9` | FR-104, FR-202 | Hovedindeksen som stiplet linje i kursgrafen, story 2.9c, PR #64 |
+| `2a84142d` | FR-408 | Første henting på dagtid og unntaket fra `AD-7`, story 2.3c, PR #87 |
+| `676fbc8b` | FR-413, NFR-01 | Målingen av omsetning i jobben, story 2.13 |
+| `bygg_soeyler`, `bygg_soeyler_perioden` | FR-105 | Søylene bare for aksjene med kurs for tabellens dag |
+| `eldre_enn_nyeste` | FR-104 | «hentet» under navnet, story 1.4c |
+| `med_perioden`, `egne_dager` | FR-104 | Raden med aksjens egen siste dag, også ved en periode, story 8.17b |
+| `sidens_dato`, `sidens_siste` | FR-104 | Den eldste dagen i overskriften, og den nyeste for indeksen og søylene |
+| `data/logg/kveldshenting-<dato>.log` | FR-401 | Loggen fra kveldsjobben, story 2.3d |
+| `spec-2-13-maalingen-av-omsetning.md` | FR-413 | Rekkefølgen i målingen av omsetning |
+| `src/migrasjoner/0002_vurdering.sql` | FR-408 | Tabellen `vurdering`, uten kolonnen for meldinger |
+| `src/tilstand.py` | FR-409 | Tilstandene, også «ikke i lista» |
+| `issuerSign`, `issuerName`, `category`, `publishedTime` | FR-501 | Feltene i NewsWeb-målingene, plan A (`malinger.md`) |
+
+*Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene i spesifikasjonen godtas som bygget, med tre avgjørelser. Min liste får sitt eget krav, FR-111, i 9.11 (spørsmål 14). «De 15 mest omsatte» står i FR-412 og bygges i natt som egen story i Epic 8 (spørsmål 15). Tabellen står med ja for FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag (spørsmål 16). PR #150 flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte. Svaret er ført etter tillegg 1 og 2 kl. 20:10 i `docs/ai-prompts/2026-11-12.md`.
+
+*Lagt til 2026-11-13:* 9.11 er squash-flettet med PR #150 i `ef802733` kl. 22:47, låst til head-en `7f2edbce` (main med 8.26, 8.27, 3.7, 10.11, 8.19 og 8.28 flettet inn). Det skjedde etter instruksjonen 12.11 kl. 18:03 og tillegg 1 og 3–6 i `docs/ai-prompts/2026-11-12.md`, og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Steg 2 førte flettingene inn i kravteksten, lest i koden 13.11. Hele settet ble kjørt i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24: 5751 bestått og 100 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-11-prd-etter-tilbakemeldingen.md`](../implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md).

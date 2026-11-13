@@ -112,6 +112,11 @@ et sitat som ikke fantes».
     *Lagt til 2026-11-08 (story 3.5i, gruppens svar kl. 11:24):*
     `docs/installasjon.md`, med installasjonen som er flyttet fra «Kom i
     gang», er levende som README-en og `docs/hjelp.md`.
+    *Lagt til 2026-11-12 (story 9.11, gruppens svar kl. 18:00):* `prd.md` er
+    levende som README-en. Teksten endres der den står, og historikken står i
+    `prd-endringslogg.md` i samme mappe og i taggen `prd-vurdert-2026-11-12`.
+    En ny endring i et krav føres som en datert linje nederst i endringsloggen,
+    under «Endringer etter 12.11», ikke i `prd.md`.
 20. **Felles arbeid står på begge.** Vi diskuterer og avgjør arbeidet sammen, og
     det meste skrives inn på én maskin. Hver commit får derfor den av oss som
     ikke committer, som medforfatter. Linjen står nederst i meldingen, i samme

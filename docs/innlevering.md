@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-12T16:41
+updated: 2026-11-12T18:25
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -506,6 +506,8 @@ og stilt på nytt i Teams 22.09.
 *Lagt til 2026-11-03:* PRD-en er rettet før fristen 5.11, 03.11, etter gruppens svar 02.11 kl. 22:15. I `prd.md`: §8 i `c075b54e` (5b og 9 lukket, tabellen «Utenfor v1», R34), R1–R7 i `a79bd455`, R8–R13 i `b0cfa6b2`, R14–R25 i `3c74eff1`, R28 med brukslogga i `7d36abef`, R26, R27 og R29–R33 i `b33c1ae5`, og R35 like under «Kort fortalt» i `d8524821` (svaret 03.11 kl. 16:25, fordi «Kort fortalt» har høyst 400 ord). 126 linjer er lagt til i `prd.md`, og de 11 som er fjernet, er de ti flyttede radene i §8 og `updated`. Utenfor `prd.md`: Alpha Vantage i `docs/kilder-og-rettigheter.md` i `8a006032`, «Status» i README-en i `7f67d336`, `sprint-status.yaml` i `fb6d1051` og `docs/brukertest.md` i `ef5f627a`. `status` i `prd.md` står som final. Gjennomgangen har linja med det samme.
 
 *Avgjort 2026-11-05 kl. 14:23 (gruppens svar):* PRD-en er låst i taggen `prd-ferdig-2026-11-03` på `045ddeb1`, den siste commiten som endret `prd.md`, slik den var ved fristen 5.11. Senere endringer i `prd.md` får en datert linje.
+
+*Lagt til 2026-11-12 (story 9.11, gruppens svar kl. 18:00):* faglærer ga tilbakemelding på PRD-en 12.11 i [`tilbakemelding-prd.md`](../_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd.md). Versjonen faglærer vurderte, står i taggen `prd-vurdert-2026-11-12` på `10265324`. `prd.md` er skrevet om til én gjeldende tekst per krav, og de daterte linjene står ordrett i [`prd-endringslogg.md`](../_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd-endringslogg.md). «Senere endringer i `prd.md` får en datert linje» over gjelder ikke lenger: den daterte linja føres i endringsloggen (regel 19 i `CLAUDE.md`).
 
 ### F. Formkrav til refleksjonsrapporten
 
