@@ -104,3 +104,9 @@ Diffen `46692396..94234186`, med tre lesere som ikke så hverandres funn. 21 fun
 | ECH6 | lav | Avrunding kunne gi 15 eller 17 px mellom kortene | Rettet: ±1 px |
 | BH6 | lav | En tittel kunne strekkes av «?»-knappen | Avvist: `.steg-topp` har `align-items: center` (stil.css), og titlene måles som hele linjer |
 | ECH3 | lav | Kontrasten i plassstreken på beige | Utsatt: spørsmål 7 |
+
+## Mutanten
+
+| Mutant | Commit | Endringen | Utfall |
+|---|---|---|---|
+| M1 | `be35000a` | `min-height: 30px` til `20px` for brikkene i steg 3 i `stil.css` | Fanget av `test_brikkene_i_stilen` og `test_delen_i_nettleseren` ved 1280, 700 og 390 px i demoen; den ekte versjonen har ingen ferdige lister. `stil.css` var lik HEAD etterpå (`git hash-object`). |
