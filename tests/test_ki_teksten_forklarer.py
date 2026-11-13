@@ -469,7 +469,8 @@ def test_hjelpen_ved_rammen_har_hoeyst_60_ord(klient):
             klient.set_cookie(KAPSEL, kapsel)
         html = klient.get("/aksje/BRFE").get_data(as_text=True)
         vinduet = html.split('<div id="hjelp-ki" class="hjelpevindu" popover>', 1)[1].split("</div>\n", 2)[1]
-        tekst = re.sub(r"<[^>]+>", " ", vinduet.split('<p class="vist">')[0])
+        # Story 8.26: linja om hvordan vinduet lukkes, telles ikke.
+        tekst = re.sub(r"<[^>]+>", " ", vinduet.split('<p class="vist">')[0].split('<p class="lukkes">')[0])
         assert len(re.findall(r"\w+", tekst)) <= 60, tekst
 
 

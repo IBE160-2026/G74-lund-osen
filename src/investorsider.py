@@ -140,3 +140,38 @@ def demoside(symbol: str) -> Demoside | None:
         flate=_punkter(boble["hale"]["flate"]),
         strek=_punkter(boble["hale"]["strek"]),
     )
+
+
+# Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): siden for «Åpne
+# eodhd.com» i demoen, med tegningen i static/demo/ og boblen etter det første
+# forslaget i spesifikasjonen. Plassen er piksler i tegningen, som i bobler.json.
+EODHD_BOBLE = "Nøkkelen? Den ligger under matta, sammen med de 20 kallene."
+EODHD_TEGNING = Path(__file__).resolve().parent / "static" / "demo" / "eodhd.svg"
+
+
+@dataclass(frozen=True)
+class EodhdDemoside:
+    boble: str
+    beskrivelse: str
+    venstre: float
+    topp: float
+    bredde: float
+    flate: str
+    strek: str
+
+    @property
+    def boblestil(self) -> str:
+        return f"--venstre: {self.venstre:.4f}%; --topp: {self.topp:.4f}%; --bredde: {self.bredde:.4f}%;"
+
+
+def eodhd_demoside() -> EodhdDemoside:
+    """Siden knappen i steg 1 går til i demoen."""
+    return EodhdDemoside(
+        boble=EODHD_BOBLE,
+        beskrivelse=_beskrivelse(EODHD_TEGNING),
+        venstre=100 * 284 / BREDDE,
+        topp=100 * 4 / HOYDE,
+        bredde=100 * 270 / BREDDE,
+        flate=_punkter([[378, 112], [396, 160], [414, 112]]),
+        strek=_punkter([[378, 116.3], [396, 160], [414, 116.3]]),
+    )

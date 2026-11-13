@@ -372,6 +372,8 @@ tverrgående (NFR-03, 05, 06 og 08).
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* fotnoten som raden for NFR-06 siterer, står nå i `src/templates/index.html:137`, ikke på linje 108. Den endres i 8.0c til «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.» Forbeholdet om kjøp og salg står fortsatt synlig.
 
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:44, story 8.26):* fotnoten under tabellen på oversikten og i Min liste er tatt bort. Det den sa om sluttkursen, endringen og signalstyrken, står bak «?» ved kolonnene, og at signalstyrken ikke sier om du bør kjøpe eller selge, står synlig i innledningen på oversikten og i Min liste (NFR-06). Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 1, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 ## Epic List
 
 **Rekkefølge.** Pilene er harde avhengigheter, ikke anbefalinger.
@@ -4175,6 +4177,8 @@ del er før jeg leser tallene.
 
 *Rettet 2026-11-11 (gruppens svar 10.11 kl. 22:59):* svaret kl. 11:52 godtok spørsmål 1, at det ikke er noen omvisning som flytter seg fra del til del. Det gjelder ikke lenger: «Vis meg rundt» får også knappen «Spill av omvisningen», som går side for side gjennom appen, i story 8.25 (`spec-8-25-spill-av-omvisningen.md`). Den nummererte lista fra 8.9 står. Rådet anbefalte onsdag, men gruppen valgte i natt. Svaret er ført etter instruksjonen kl. 23:02 10.11, som lagres i `docs/ai-prompts/2026-11-10.md` etter gruppens ja.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 16:58, story 8.26):* svaret 10.11 kl. 11:52 og føringen etter svaret kl. 22:59 over sier at den nummererte lista fra 8.9 står. Det gjelder ikke lenger: «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og lista er tatt bort, fordi testpersonen 10.11 gikk seg vill når siden hoppet. Etter svaret kl. 17:06 står «Vis meg rundt» og «Spill av omvisningen» i raden øverst etter «Innstillinger» (`spec-8-26-vis-meg-rundt-spiller-av-siden.md`). Svaret føres etter instruksjonen kl. 18:01 11.11, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Ferdig 2026-11-10:* flettet i `eb3ba928`, PR #136.
 
 ### Story 8.10: Innstillinger øverst
@@ -4268,6 +4272,8 @@ NFR-01, NFR-06
 *Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt. Spørsmål 9, å bruke medianen av kursene også i merket «Utenfor målingen», blir et punkt i `issues.md` til senere. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-09 kl. 10:55 (gruppens svar):* 8.11 (PR #128) og 8.11b (PR #129) flettes «alt så tidlig som mulig», etter flettingen av #126 kl. 23:50, og 8.11 før 8.11b. Svaret er ført etter nattflettingen (kl. 12:00) i `docs/ai-prompts/2026-11-09.md`.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret på signalet fra denne storyen er tatt bort, fordi det ikke viste noe tabellen ikke alt viser under «Skilte seg ut». De ferdige listene står. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.11c: «Utenfor målingen» med medianen av kursene
 
@@ -4627,6 +4633,8 @@ Spesifikasjonen er `spec-8-22-foelg-en-aksje-og-min-liste.md`, med spørsmålene
 
 *Avgjort 2026-11-11 kl. 14:29 (gruppens svar):* ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. Tiden for medianene måles, og testen for et kall som feiler legges til (spørsmål 12 og 14). Det valgte står i oransje med hakemerket (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet. Rådet anbefalte alt.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 20:28, story 8.26, tillegg 12):* svaret kl. 14:29 godtok forslaget i spørsmål 9, at adressen i steg 1 står som tekst fordi sidene ikke har adresser til nettet. Det gjelder ikke lenger: steg 1 har knappen «Åpne eodhd.com ↗», som i den ekte versjonen åpner registreringen hos EODHD i en ny fane, med samme adresse som startskriptet, og i demoen en egen side. Kontrollpunktet i `test_hjelpetekster.py` godtar akkurat den lenken. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 12, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43043943092). Tiden for én visning av hele lista var 0,046, 0,014 og 0,014 s, så medianene huskes ikke i minnet.
 
 ### Story 8.23: Funnene fra brukertesten 10.11 (del A)
@@ -4652,6 +4660,8 @@ Som **bruker fra brukertesten**, vil jeg at det som var uklart eller tungvint 10
 *Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* «ja» til del A og B. Rådet anbefalte det. Kl. 14:15 la gruppen til overskriften i Min liste, kl. 14:53 og 14:59 sju småfunn fra gjennomgangen, kl. 15:54 tabellen på Børsometeret åpen fra start, og kl. 15:57 at alt skal kunne ses i demoen. Rådet anbefalte alle. Svarene er ført etter instruksjonen om del A og tilleggene i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-11:* 8.23 er flettet med PR #142 i `7fb9b1fd` kl. 03:41, låst til head-en `3e9c84ae`. CI var grønn på head-en (run 42945863521), og hele settet lokalt før flettingen: 5137 bestått og 25 hoppet over.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* antallet på knappene i filteret og lenken til dem som fikk 2 av 3 (A8) er tatt bort med filteret. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.24: Notatene, to ting etter flettingen
 
@@ -4694,11 +4704,46 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 *Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* tilbudet første gang og et nei huskes i nettleseren, som bygget (spørsmål 3). Rådet anbefalte det.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 09:58, story 8.26, tillegg 21):* tilbudet første gang starter ikke lenger hele omvisningen, men «Vis meg rundt» for oversikten, med teksten «Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.» og knappene «Vis meg rundt» og «Nei takk». Hele omvisningen er 23 steg på seks sider, og målet «Brukerutfall» i §7 i PRD-en er at en person utenfor gruppen gjennomfører hovedflyten og forklarer hvorfor en aksje skiller seg ut, under 5 minutter, uten hjelp. Svaret huskes i nettleseren som før, og «Spill av omvisningen» står øverst som før. Rådet anbefalte det. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 21, som lagres i `docs/ai-prompts/2026-11-12.md` etter gruppens ja.
+
 *Avgjort 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B er flettet (spørsmål 7), og flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
 
 *Avgjort 2026-11-11 kl. 16:26 (gruppens svar):* lista «Ekstra, hvis tiden rekker» står borte fra README-en, og setningen under listene sier «Ekstra» igjen. Bildegrenene beholdes, så bildene i PR-ene står, og så gruppen kan vise endringene i refleksjonsloggen og rapporten. Rådet anbefalte det.
 
 *Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43054754599), og hele settet lokalt før flettingen: 5252 bestått og 37 hoppet over.
+
+### Story 8.26: «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven
+
+*Lagt til 2026-11-13, etter instruksjonen 11.11 kl. 18:01 i `docs/ai-prompts/2026-11-11.md`, med tilleggene 1–20 der og tilleggene 21–24 i `docs/ai-prompts/2026-11-12.md`.* 8.25 var brukt, så dette er 8.26. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md`, med spørsmålene, svarene, triagen av gjennomgangene og mutantene.
+
+Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» viser meg delene av siden der jeg står, uten at siden hopper, at knappene står sammen med sideknappene, og at funnene fra demoprøven er rettet, så sidene er roligere og sier det de viser.
+
+**Oppfyller:** FR-109, svarene 11.11 kl. 16:58–22:20 og 12.11 kl. 09:58–16:24 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 22
+
+**Kontroll — hva testen ser etter:**
+- «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og den nummererte lista fra 8.9 er borte
+- «Vis meg rundt» og «Spill av omvisningen» står i raden øverst etter «Innstillinger», med hvert sitt ikon
+- Tilbudet første gang starter «Vis meg rundt» for oversikten, og det siste steget der viser vei til navnene under «Skilte seg ut»
+- En aksje uten kurser har de samme ordene og den samme forklaringen på hvorfor overalt
+- En aksje som følges, får stjerne med en gang, og en aksje som venter på henting, står nederst med «venter på henting» (migrasjon 0013)
+- Filteret på signalet er borte, og «Følg flere aksjer» og «Din egen liste» er bygget som på tavla
+- README-en har hovedflyten og brukertesten under «Til faglærer» og forskjellene mellom demoen og den ekte versjonen
+- Alt er likt i demoen og den ekte versjonen, og ingen tekst gir råd
+- **Ville feilet hvis:** siden hoppet eller lista fra 8.9 sto, en knapp manglet i raden øverst, tilbudet startet hele omvisningen, ordene for en aksje uten kurser var ulike, stjernen manglet eller en aksje som venter, sto uten merket, eller en rad i tabellen i README-en ikke stemte med koden
+
+**Avhenger av:** 8.9, 8.25. **Én økt:** nei, delene ble bygget etter hverandre.
+
+*Avgjort 2026-11-11 kl. 16:58–17:53 (gruppens svar og ønsker, tilleggene 1–4):* «Vis meg rundt» spiller av siden, knappene står øverst (rådet anbefalte én knapp, gruppen valgte to), funnene fra demoprøven rettes, fotnoten og filteret tas bort, «uten data» sier hvorfor, en aksje som følges, får stjerne, og «Den ekte versjonen» åpnes i en ny fane.
+
+*Avgjort 2026-11-11 kl. 18:09–22:20 (gruppens svar og ønsker, tilleggene 5–20):* siden står i ro, de samme ordene overalt, lenkene har samme farge før og etter besøk, «Din egen liste» og «Følg flere aksjer» som på tavla, brikkene, hjelpetekstene, bryterne og stegene i omvisningen. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 09:58 (gruppens svar, tillegg 21):* tilbudet første gang starter «Vis meg rundt» for oversikten, etter målet «Brukerutfall» i §7 i PRD-en. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 22):* spørsmål 1–9 og 12–22 godtas som bygget, spørsmål 11 etter forslag 1, tillegg 11 kommer ikke (spørsmål 15), og forklaringen på en aksje uten kurser rettes (spørsmål 10). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt. Rådet anbefalte alt.
+
+*Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
+
+*Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
 
 ---
 

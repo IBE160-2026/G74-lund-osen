@@ -611,6 +611,8 @@ og bulk koster 100 kall (NFR-01). Ingen kall.
 
 *Lagt til 2026-11-03 (gjennomgangen 02.11, R20):* ikke bygget per 3.11, story 8.11, ekstra fra 19.10.
 
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret er tatt bort. Raden «Alle», «3 av 3 positiv» og «3 av 3 negativ» under «Alle | Min liste» viste ikke noe tabellen ikke alt viser under «Skilte seg ut», og med den gikk linja om filteret, lenken til dem som fikk 2 av 3 og adressene `?signal=`. At signalstyrken ikke er et råd om å kjøpe eller selge, står fortsatt synlig i innledningen på oversikten (NFR-06). Rådet var enig.
+
 #### FR-109 — Hjelpen på sidene
 
 *Lagt til 2026-10-08, Marians beslutning (story 8.0b, 8.9 og 8.13).*

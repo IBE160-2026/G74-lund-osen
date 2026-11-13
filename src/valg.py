@@ -31,6 +31,11 @@ from kursdata import Aksje
 from tallformat import tall
 
 TAK = 18
+# Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): der «lista» betydde
+# alle aksjene appen følger, sies det slik, og ikke i rødt. Var «Lista er
+# full. Fjern en aksje for å følge en annen.» og «… for å angre dette.».
+FULL = f"Appen følger allerede {TAK} aksjer, som er taket. Fjern en for å følge en annen."
+FULL_ANGRE = f"Appen følger allerede {TAK} aksjer, som er taket. Fjern en for å angre dette."
 # Dagskvoten hos EODHD (gratisnivået) og kallet til hovedindeksen.
 KVOTE = 20
 INDEKSKALL = 1
@@ -263,11 +268,16 @@ class Valglager:
             if bytt_ut is not None:
                 self._kan_fjernes(bytt_ut)
             elif self.antall() >= TAK:
-                raise ListaErFull("Lista er full. Fjern en aksje for å følge en annen.")
+                raise ListaErFull(FULL)
             folg_id = self._t.execute(
                 "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, ?, ?)",
                 (kode, aksje.navn, sektor, laget),
             ).lastrowid
+            # Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): aksjen får
+            # stjerne og står i Min liste med en gang, i samme transaksjon som
+            # ønsket. Triggeren i 0013 godtar et symbol som venter.
+            self._t.execute("INSERT INTO min_liste (symbol) VALUES (?) ON CONFLICT (symbol) DO NOTHING", (kode,))
+            self._rydd_stjernene()
             if bytt_ut is not None:
                 fjern_id = self._t.execute(
                     "INSERT INTO oenske (handling, symbol, laget, par) VALUES ('fjern', ?, ?, ?)",
@@ -287,6 +297,9 @@ class Valglager:
         laget = self._klokke().isoformat()
         with self._laas():
             self._t.execute("DELETE FROM oenske WHERE tatt_i_bruk IS NULL AND avvist IS NULL")
+            # Før de nye ønskene, så en gammel stjerne ikke følger med en aksje
+            # fra den ferdige lista (gjennomgangen, BH2, ECH5).
+            self._rydd_stjernene()
             lista = [a.symbol for a in self.i_lista()]
             maal = {k for k, _ in aksjer}
             for symbol in lista:
@@ -304,6 +317,16 @@ class Valglager:
                     "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES ('folg', ?, ?, ?, ?)",
                     (kode, aksje.navn, sektor, laget),
                 )
+
+    def _rydd_stjernene(self) -> None:
+        """Gjennomgangen av 8.26 (BH2, ECH5): en stjerne fra «Følg» på en aksje
+        som verken står i aksje eller venter (ønsket ble slettet eller avvist),
+        tas bort, så den ikke dukker opp hvis aksjen kommer inn senere.
+        Triggeren fra 0013 lar ingen andre stjerner stå uten aksjen."""
+        self._t.execute(
+            "DELETE FROM min_liste WHERE symbol NOT IN (SELECT symbol FROM aksje) AND symbol NOT IN "
+            "(SELECT symbol FROM oenske WHERE handling = 'folg' AND tatt_i_bruk IS NULL AND avvist IS NULL)"
+        )
 
     def _kan_fjernes(self, symbol: str) -> None:
         if symbol not in {a.symbol for a in self.i_lista()}:
@@ -333,11 +356,20 @@ class Valglager:
                 raise UgyldigValg("ønsket finnes ikke, eller er alt tatt i bruk")
             handling, par = rad
             if handling == FJERN and par is None and self.antall() + 1 > TAK:
-                raise ListaErFull("Lista er full. Fjern en aksje for å angre dette.")
+                raise ListaErFull(FULL_ANGRE)
+            # Story 8.26 (tillegg 3, forslaget i spørsmål 7): «Angre» tar også
+            # bort stjernen som «Følg» satte, så Min liste ikke har en aksje
+            # appen ikke følger.
+            self._t.execute(
+                "DELETE FROM min_liste WHERE symbol IN (SELECT symbol FROM oenske WHERE id IN (?, ?) "
+                "AND handling = 'folg' AND tatt_i_bruk IS NULL AND avvist IS NULL)",
+                (oenske_id, par if par is not None else oenske_id),
+            )
             self._t.execute(
                 "DELETE FROM oenske WHERE id IN (?, ?) AND tatt_i_bruk IS NULL AND avvist IS NULL",
                 (oenske_id, par if par is not None else oenske_id),
             )
+            self._rydd_stjernene()
 
 
 def egne_i_lista(tilkobling: sqlite3.Connection) -> frozenset[str]:

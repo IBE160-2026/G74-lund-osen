@@ -3385,6 +3385,15 @@ Kl. 16:26 avgjorde vi at bildegrenene beholdes, så bildene i PR-ene står og en
 
 Det vi lærte: arbeid som står i dagsfila og sesjonsloggen, overlever en omstart. En instruksjon må si hvilket vindu den er for. Minnet på maskinen setter grensen for hvor mange vinduer som kan jobbe samtidig. Og merkingen av KI-tekst må stemme også i demoen. Bildegrenene beholdes, så endringene kan vises (svaret kl. 16:26).
 
+*Lagt til 2026-11-13 (tillegg 24), om kvelden etter kl. 18, fra dagsfila 11.11 og sesjonsloggene for 8.26 og 10.10:* funnene fra demoprøven ble story 8.26, med instruksjonen kl. 18:01 og tilleggene 1–4. Utover kvelden kom tilleggene 6, 8, 10, 12, 17, 18, 19 og 20, etter ønskene og svarene våre kl. 18:09–22:20.
+- **KI-tekstene (10.10)** ble flettet kl. 20:28 i `e5268b30` og ført kl. 20:31, med tekstene i demoen fra Gemma, som svaret kl. 16:05 ba om (utfordring 4).
+- **Notatpanelet (8.27)** ble startet i eget vindu med instruksjonen kl. 21:25, etter svarene kl. 21:09–21:36.
+- **Svaret kl. 22:17** om å fortsette med nye funksjoner står i tillegg 24 i dagsfila 12.11, og ikke i noen annen fil.
+- **Tilleggene 5, 7, 9, 13, 14 og 16** var sendt, men kom ikke fram til vinduet før kl. 22:24–22:25. Tillegg 15 stoppet derfor i steg 0 kl. 20:46, fordi det bygger på tillegg 14. De ble bygget samme kveld (`301d92ca`), og bildene fra tillegg 16 ligger på bildegrenen.
+- **Tillegg 11** ble limt inn i vinduet for 10.10 kl. 20:21, og steg 0 stoppet det der. Det ble aldri bygget, og svaret 12.11 kl. 10:16 sa at det ikke kommer.
+
+Det vi lærte: steg 0 holder en instruksjon i feil vindu ute, og nummererte tillegg viser hvilke som mangler.
+
 ---
 
 # Joakims oppføringer

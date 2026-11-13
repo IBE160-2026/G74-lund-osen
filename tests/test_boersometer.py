@@ -514,11 +514,14 @@ class TestSiden:
         html = _side(klient)
         rute = re.search(
             # Story 8.23 (A4): ruta har en title med symbolet, endringen og styrken.
-            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: uten data">\s*<span class="ticker">MTFJ</span>.*?</a>',
+            r'<a class="rute [^"]*uten-data[^"]*" href="/aksje/MTFJ" title="MTFJ: ingen kurser ennå">\s*<span class="ticker">MTFJ</span>.*?</a>',
             html,
             re.S,
         )
-        assert rute and "Uten data" in rute.group(0)
+        # Story 8.26 (tillegg 2 og 8): «Ingen kurser ennå» i ruta, var «Uten data».
+        assert (
+            rute and f'<span class="endring">{UTEN_DATA}</span>' in rute.group(0) and UTEN_DATA == "Ingen kurser ennå"
+        )
 
     def test_hver_rute_lenker_til_aksjesiden(self, klient):
         """Hver rute lenker til aksjesiden, også MTFJ uten kurser, som svarer
@@ -582,7 +585,8 @@ class TestSiden:
         )
         assert 'class="merke"' not in html
         for symbol, _navn, endring, _volum, styrke in rader:
-            assert endringer[symbol] == endring, symbol
+            # Story 8.26 (tillegg 2): ruta har den korte teksten, tabellen den lange.
+            assert {UTEN_DATA: "Ingen kurser ennå"}.get(endringer[symbol], endringer[symbol]) == endring, symbol
             if re.fullmatch(r"\d av 3", styrke):
                 assert styrker[symbol] == styrke, symbol
             else:
@@ -761,7 +765,7 @@ class TestDenEkteVersjonen:
         """Gjennomgangen 23.10 (VG8). Ville feilet med «Demo Børs» eller
         setningen om demoen i den ekte versjonen."""
         html = _side(ekte, "/aksje/MTFJ")
-        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in html
+        assert "ingen kursgraf og ingen sjekker for Matfjord Merkevarer." in html
         assert "Oslo Børs" in html and "Demo Børs" not in html and "I demoen" not in html
 
     def test_uten_base_viser_siden_hentekommandoen(self, monkeypatch):
@@ -821,8 +825,8 @@ class TestSvaretKl0924:
         html = svar.data.decode("utf-8")
         assert '<h1 class="overskrift">Matfjord Merkevarer</h1>' in html
         assert '<span class="merke">MTFJ</span>' in html and "Konsum</span>" in html
-        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in html
-        assert "I demoen mangler kursene med vilje." in html and "Eksempeltall" in html
+        assert "ingen kursgraf og ingen sjekker for Matfjord Merkevarer." in html
+        assert "I demoen er Matfjord Merkevarer med vilje uten kurser" in html and "Eksempeltall" in html  # Story 8.26
         assert '<svg class="graf"' not in html and "Kursutvikling" not in html
         assert "sjekkort" not in html and "Signalet dag for dag" not in html
 
@@ -830,7 +834,7 @@ class TestSvaretKl0924:
         """b) Lenken fra børsometeret en annen dag har ?dag=. Ville feilet med
         en feilside for den adressen."""
         assert 'href="/aksje/MTFJ?dag=2026-10-08"' in _side(klient, "/boersometer?dag=2026-10-08")
-        assert "Det finnes ingen kurser for Matfjord Merkevarer ennå" in _side(klient, "/aksje/MTFJ?dag=2026-10-08")
+        assert "ingen kursgraf og ingen sjekker for Matfjord Merkevarer." in _side(klient, "/aksje/MTFJ?dag=2026-10-08")
 
     def test_et_ukjent_symbol_gir_fortsatt_404(self, klient):
         """b) 404 er fortsatt forbeholdt et symbol som ikke er i lista.
@@ -875,7 +879,7 @@ class TestSvaretKl0924:
         tekster = hjelpetekster(STANDARD)
         # Story 8.20b: teksten om rammen står i docs/hjelp.md.
         assert "også når du velger en annen dag" in _avsnittet()
-        assert "med lenke til aksjesiden" in tekster["uten_data"].tekst
+        assert "lenke til aksjesiden" in tekster["uten_data"].tekst
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
         assert "også en dag uten vurdering" in hjelp
         assert "For en aksje uten kurser sier aksjesiden at det ikke finnes kurser ennå" in hjelp
@@ -1245,7 +1249,7 @@ class TestFargetrinnene:
             )
             assert len(ruter) == 15, adresse
             for trinn, symbol, endring in ruter:
-                ventet = "ingen" if endring in ("Uten data", "–") else fargetrinn(_tall(endring))
+                ventet = "ingen" if endring in (UTEN_DATA, "–") else fargetrinn(_tall(endring))
                 assert trinn == ventet, (adresse, symbol, endring)
                 sett.add(trinn)
         assert len(sett - {"ingen"}) >= 3, sett
