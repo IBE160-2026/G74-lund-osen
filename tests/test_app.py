@@ -1681,7 +1681,10 @@ class TestStory80c:
         monter(monkeypatch, snapshot({"EQNR": serie([100.0] * 61)}))
         for sti in ("/", "/aksje/EQNR"):
             html = klient.get(sti).data.decode("utf-8")
-            assert '<p class="under-arbeid">Appen er under utvikling og ikke ferdig.</p>' in html, sti
+            # Story 3.3k (tillegg 1): linja sier at versjon 1 er ferdig, som README-en.
+            # Ville feilet hvis den fortsatt sa at appen er under utvikling.
+            assert '<p class="under-arbeid">Versjon 1 er ferdig.</p>' in html, sti
+            assert "under utvikling" not in html and "ikke ferdig" not in html, sti
             # Story 8.0d, PR 3: aksjesiden har sjekkort, ikke en tabell.
             # Gjennomgangen 15.10 (BH18): merket finnes, så testen feiler med
             # en melding og ikke ValueError hvis grafen mangler.

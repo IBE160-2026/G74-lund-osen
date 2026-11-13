@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-12T18:25
+updated: 2026-11-14T00:46
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -268,6 +268,10 @@ at vi kan følge progresjonen deres.» (hjelpelæreren, svaret 05.10, under
 *Lagt til 2026-10-13 (story 8.0c):* før innleveringen avgjøres linja
 «Appen er under utvikling og ikke ferdig.» nederst på sidene. Den styres av
 `UNDER_ARBEID` i `src/app.py`. Står den på `True`, vises linja.
+
+*Lagt til 2026-11-14 (story 3.3k, tillegg 1, gruppens svar 12.11 kl. 16:23):*
+linja sier nå «Versjon 1 er ferdig.», som README-en etter 8.26, i demoen og
+den ekte versjonen. `UNDER_ARBEID` står på `True`, og navnene er de samme.
 
 ---
 
