@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-11T00:32
+updated: 2026-11-13T00:38
 ---
 
 # Brukertesten
@@ -77,6 +77,20 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 | Klokkeslett da del B startet | Ikke notert |
 | «Hva sier siden om denne aksjen?», KI av, svaret ordrett | Ikke notert |
 | «Hva sier siden om denne aksjen?», KI på, svaret ordrett | Ikke ordrett: teksten hjalp ham å forstå helheten i forhold til enkeltaksjen |
+
+*Lagt til 2026-11-13 (tillegg 24, story 10.4):* KI-loggen fra kveldsjobben, telt 13.11 kl. 00:37 fra `ki_logg` i `data/db/ose.db`, lest med `mode=ro` og med samme sha256 før og etter (regel 22). Hver rad er en kveld, etter børsdagen tekstene gjelder. «Laget» er tekstene om aksjene, «besto» er de som besto kontrollen i FR-603, og «stoppet» er de kontrollen stoppet. Versjonen er versjonen av instruksjonen (`promptversjon`). Alle tekstene er laget med den lokale modellen. Ingen KI-tekst og ingen kurser står her.
+
+| Kveld | Versjon, aksjene | Laget | Besto | Stoppet | Teksten om dagen |
+|---|---|---:|---:|---:|---|
+| 19.10–23.10 (5 kvelder) | 2 | 15 hver kveld | 15 | 0 | – |
+| 26.10–30.10 (5 kvelder) | 3 | 15 hver kveld | 15 | 0 | – |
+| 02.11–06.11 (5 kvelder) | 3 | 15 hver kveld | 15 | 0 | – |
+| 09.11 | 5 | 15 | 15 | 0 | 1, besto (`dag-1`) |
+| 10.11 | 5 | 18 | 18 | 0 | 1, besto (`dag-1`) |
+| 11.11 | 5 | 18 | 15 | 3 | 1, besto (`dag-1`) |
+| 12.11 | 6 | 18 | 15 | 3 | 1, besto (`dag-2`) |
+
+Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksjene, der 288 besto og 6 ble stoppet, og 4 tekster om dagen, som alle besto. De 6 ble stoppet av punkt 1 i kontrollen (det teksten sa om signalet mot grunnlaget), og én av dem også av punkt 2 (et tall). Én ukes drift er logget, flere ganger over.
 
 ## Funnene
 

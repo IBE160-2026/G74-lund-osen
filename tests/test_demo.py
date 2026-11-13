@@ -894,7 +894,12 @@ class TestLenkenTilDenEkteVersjonen:
     """Story 3.3i (U51): demolinja øverst lenker til «Den ekte versjonen» i
     README-en på GitHub. Den ekte versjonen har ingen slik lenke."""
 
-    LENKEN = f'<a href="{app_modul.EKTE_VERSJONEN_URL}">Den ekte versjonen</a>'
+    # Story 8.26 (ønsket 11.11 kl. 17:53): i en ny fane, med pila og teksten
+    # for skjermlesere, som lenken til investorsiden.
+    LENKEN = (
+        f'<a href="{app_modul.EKTE_VERSJONEN_URL}" target="_blank" rel="noreferrer">Den ekte versjonen'
+        '<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>'
+    )
 
     def test_lenken_staar_i_demoen(self, klient, monkeypatch, demobase):
         """Ville feilet hvis lenken manglet på en av sidene i demoen, sto

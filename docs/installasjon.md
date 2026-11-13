@@ -188,8 +188,9 @@ Når vinduet er åpent:
 
 - Mangler [uv](https://docs.astral.sh/uv/), spør vinduet om det skal installeres. Skriv `j` og trykk Enter. Det er den offisielle installasjonen fra astral.sh, og den legger uv i brukermappa di.
 - Første gang tar det noen minutter, fordi uv henter Python og pakkene appen bruker.
-- Nettleseren åpner http://127.0.0.1:8000 når appen svarer.
-- På Windows spør vinduet første gang om det skal lage snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen, med ikonet under. Skriv `j` og trykk Enter for ja, eller bare Enter for nei. Ikonet er de tre søylene fra logoen, med den høyeste i oransje. Et nei huskes, og finnes snarveien, spørres det ikke igjen. Starter snarveien en annen kopi av appen, sier vinduet hvilken mappe den peker på, og spør én gang om den skal starte denne kopien i stedet. Snarveien starter appen som dobbeltklikket. Vil du bli spurt på nytt, sletter du fila i `data` som begynner med `snarvei-nei`.
+- Den ekte versjonen spør første gang, etter nøkkelen, om KI-teksten: hente Gemma, en gratis språkmodell som kjører på maskinen, bruke din egen API-nøkkel, eller ikke nå. Se [den lokale modellen](#ki-teksten).
+- På Windows spør vinduet første gang om det skal lage snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen, med ikonet under. Spørsmålet kommer før nettleseren åpnes. Skriv `j` og trykk Enter for ja, eller bare Enter for nei. Vinduet venter høyst 30 sekunder; uten svar lages ingen snarvei, og spørsmålet kommer igjen neste gang. Ikonet er de tre søylene fra logoen, med den høyeste i oransje. Et nei huskes, og finnes snarveien, spørres det ikke igjen. Starter snarveien en annen kopi av appen, sier vinduet hvilken mappe den peker på, og spør én gang om den skal starte denne kopien i stedet. Snarveien starter appen som dobbeltklikket. Vil du bli spurt på nytt, sletter du fila i `data` som begynner med `snarvei-nei`.
+- Nettleseren åpner http://127.0.0.1:8000 når appen svarer og spørsmålet om snarveien er besvart.
 - Appen svarer bare på denne maskinen (127.0.0.1), så den kan ikke åpnes fra en mobil. Mobil kommer i en senere versjon.
 - Stopp appen ved å lukke vinduet, eller med Ctrl+C.
 
@@ -290,7 +291,7 @@ Volumene står når du bytter, også basen med vurderingene.
 | Variabel | Hva den gjør | Standard | Når den trengs |
 |---|---|---|---|
 | `EODHD_API_KEY` | Nøkkelen til EODHD, som hentingen bruker til sluttkursene | Ingen | Til hentingen i den ekte versjonen. Webserveren og demoen trenger den ikke |
-| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst, og med hva: `av`, `lokal` (Gemma i Ollama), eller `gemini`, `anthropic` eller `openai` med egen nøkkel | `av` etter steg 6, fordi `.env.example` har `OSE_KI_TJENESTE=av`. Står variabelen ikke i `.env`, gjelder `lokal`, og en tom verdi gir ingen KI-tekst | Når du vil slå KI-teksten på |
+| `OSE_KI_TJENESTE` | Om hentingen lager KI-tekst, og med hva: `av`, `lokal` (Gemma i Ollama), eller `gemini`, `anthropic` eller `openai` med egen nøkkel | `lokal` etter steg 6, fordi `.env.example` har `OSE_KI_TJENESTE=lokal`. Står variabelen ikke i `.env`, gjelder `lokal` også da, og en tom verdi gir ingen KI-tekst. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor | Når du vil velge en annen tjeneste, eller slå KI-teksten av |
 | `OSE_KI_OLLAMA_URL` | Adressen til Ollama | `http://127.0.0.1:11434`, og `http://ollama:11434` i Docker | Bare med uv, når Ollama ikke svarer på standardadressen |
 | `OSE_KI_GEMINI_NOKKEL` | Din egen nøkkel til Gemini | Ingen | Bare med `OSE_KI_TJENESTE=gemini` |
 | `OSE_KI_ANTHROPIC_NOKKEL` | Din egen nøkkel til Anthropic API | Ingen | Bare med `OSE_KI_TJENESTE=anthropic` |
@@ -300,12 +301,14 @@ Volumene står når du bytter, også basen med vurderingene.
 
 </details>
 
+<a name="ki-teksten"></a>
+
 <details>
 <summary>Den lokale modellen for KI-teksten (valgfri)</summary>
 
-Den lokale modellen er valgfri og trengs verken for demoen eller for å vurdere appen, fordi demoen har ferdig KI-tekst og bare trenger Docker. Hentingen kan lage en KI-tekst for hver aksje, med en modell som kjører på maskinen: Gemma i Ollama, i Docker, med grafikkortet. Med adressen som står som standard, sendes ingenting ut. KI-teksten er av i `.env.example`, og hentingen går som før uten den.
+Den lokale modellen er valgfri og trengs verken for demoen eller for å vurdere appen, fordi demoen har ferdig KI-tekst og bare trenger Docker. Hentingen kan lage en KI-tekst for hver aksje, med en modell som kjører på maskinen: Gemma i Ollama, i Docker, med grafikkortet. Med adressen som står som standard, sendes ingenting ut. KI-teksten står på i `.env.example` (`lokal`). Svarer ikke Ollama, lages ingen KI-tekst, hentingen sier hvorfor i én linje, og kursene hentes som før. Sidene sier da for siste børsdag at teksten lages når kursene hentes, på en maskin med en språkmodell, med en lenke hit.
 
-Det trengs et grafikkort fra NVIDIA med driver, og at Docker Desktop kan bruke det. Uten det starter ikke Ollama, og KI-teksten bør stå av.
+Det trengs et grafikkort fra NVIDIA med driver, og at Docker Desktop kan bruke det. Uten det starter ikke Ollama i Docker. Uten Docker kjører Gemma også uten grafikkort, se under.
 
 Bare første gang: start Ollama, og hent modellen til volumet `ose-ki-ollama`.
 
@@ -337,6 +340,14 @@ Slå av KI-teksten: sett `OSE_KI_TJENESTE=av` i `.env`.
 
 Modellen ble prøvd på en maskin med 15,7 GB minne og et grafikkort med 8 GB, der Docker Desktop hadde 8,2 GB (`malinger.md` §19).
 
+**Den lokale modellen uten Docker.** Første gang den ekte versjonen startes med dobbeltklikk på Windows, spør vinduet om KI-teksten, etter nøkkelen og før første henting, når Ollama ikke svarer med modellen:
+
+- **1, hent Gemma:** Ollama installeres med `winget`, eller siden der den lastes ned, åpnes når `winget` mangler, og så hentes modellen, noen GB, med framdriften i vinduet.
+- **2, egen API-nøkkel:** se under.
+- **3, ikke nå, eller bare Enter:** huskes i `data\ki-nei-ekte`. Slett fila for å bli spurt igjen. Et annet svar huskes ikke.
+
+Vinduet venter høyst 30 sekunder på svaret, og uten svar er det «ikke nå» bare denne gangen. Feiler noe, for eksempel uten nett, sier vinduet hva som skjedde, og appen starter uten KI-tekst. Sa du nei, eller vil du gjøre det selv, er det to kommandoer i et terminalvindu på Windows: først `winget install --id Ollama.Ollama --exact --source winget`, og så `ollama pull gemma4:e4b`. På Mac installeres Ollama fra https://ollama.com/download, og modellen hentes med den samme `ollama pull`. Ollama starter når du logger inn. Med uv når hentingen den på http://127.0.0.1:11434. Gemma kjører også uten grafikkort, men tregere (`malinger.md` §19).
+
 </details>
 
 <details>
@@ -351,6 +362,8 @@ I stedet for den lokale modellen kan hentingen la en tjeneste du selv har valgt,
 | OpenAI API | `openai` | `OSE_KI_OPENAI_NOKKEL` | GPT-6 Luna (`gpt-6-luna`) |
 
 Slå den på: sett for eksempel `OSE_KI_TJENESTE=gemini` i `.env`, og lim inn nøkkelen etter `OSE_KI_GEMINI_NOKKEL=`. Så hentes det som vanlig.
+
+Startskriptet kan nå spørre: første gang den ekte versjonen startes med dobbeltklikk på Windows, er svar 2 i spørsmålet om KI-teksten egen API-nøkkel. Vinduet spør hvilken tjeneste, og så etter nøkkelen, som vises som stjerner. `OSE_KI_TJENESTE` og nøkkelen til den tjenesten skrives i `.env`, og ingenting annet der endres. En API-nøkkel er ikke det samme som et abonnement på ChatGPT eller Claude. Nøkkelen prøves ikke før første henting, og er den feil, sier hentingen det. Valget endres senere i `.env`: rett `OSE_KI_TJENESTE` og nøkkelen, eller sett `OSE_KI_TJENESTE=lokal` for den lokale modellen. Hentingen hver kveld med Oppgaveplanlegging velger selv: lokal når Ollama i Docker svarer, ellers av.
 
 Det du bør vite før du slår den på:
 

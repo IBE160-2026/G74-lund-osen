@@ -28,6 +28,7 @@ import re
 import sqlite3
 import sys
 import threading
+from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta, timezone
@@ -44,7 +45,9 @@ import valg
 from aksjedetalj import bygg_dagen, bygg_detalj, normaliser_symbol
 from boersdag import UtenforKalenderen, forrige_boersdag, innevaerende_boersdag, norsk_dato
 from boersometer import (
+    BRANSJER,
     GRENSE_STERK,
+    UTEN_DATA,
     annen_grunn_i_kartet,
     bygg_boersometer,
     bygg_rute,
@@ -61,6 +64,7 @@ from boersometer import (
 from dagene import foerste_dag_i_rekka, lag_dagsbilde, setning_om_dagene, setning_om_samme_dag, tell_dagene
 from dagsgrunnlag import dagsgrunnlag, min_liste_linje, vanlig_fra
 from demo import DEMOKOMMANDO, DEMOKOMMANDO_DOCKER, STARTDAG, gammel_demobase
+from demo import UTEN_KURSER as DEMO_UTEN_KURSER_SYMBOL
 from etterpaa import brikkene, bygg_etterpaa, bygg_handelen
 from graf import LAPPBREDDE, LAPPHOYDE, bygg_graf
 from historikk import (
@@ -73,15 +77,25 @@ from historikk import (
     maanedsnavn,
     perioden,
 )
-from hjelpetekster import ANTALL_SJEKKER, Hjelp, hjelpetekster, omvisningen, rundturer
+from hjelpetekster import (
+    ANTALL_SJEKKER,
+    DEMO_UTEN_KURSER,
+    UTEN_KURSER_HVORFOR,
+    Hjelp,
+    hjelpetekster,
+    omvisningen,
+    rundturer,
+)
 from hovedindeks import Hovedindeksvisning, bygg_hovedindeks, er_bedre, valgt_indeks
-from investorsider import demoside
+from investorsider import demoside, eodhd_demoside
 from justeringsdager import justeringsdager
 from ki_visning import (
     AV,
     DAGEN_AV,
     DAGEN_UTEN,
+    DAGEN_UTEN_MODELL,
     INGEN_I_DEMOEN,
+    INGEN_MODELL,
     INGEN_RAD,
     KAPSEL,
     PAA,
@@ -112,6 +126,7 @@ from lagring_sqlite import (
     les_merket,
 )
 from markedsoversikt import (
+    UTEN_DATA_TEKST,
     Sortering,
     antall_vurdert,
     bygg_oversikt,
@@ -126,6 +141,7 @@ from markedsoversikt import (
     norsk_tid,
     oppdatert,
     periodeendring,
+    rader_som_venter,
     rader_uten_data,
     sidens_dato,
     sidens_tidsstempel,
@@ -252,6 +268,19 @@ def soeylestyrke(endring: float) -> str:
 
 app.jinja_env.filters["soeylestyrke"] = soeylestyrke
 app.jinja_env.globals["soeylegrense"] = tall(GRENSE_STERK, "grense")
+# Story 8.26 (tillegg 8): ordene og forklaringen for en aksje uten kurser,
+# likt på alle sidene.
+app.jinja_env.globals["uten_data_tekst"] = UTEN_DATA_TEKST
+app.jinja_env.globals["uten_data_kort"] = UTEN_DATA
+app.jinja_env.globals["uten_kurser_hvorfor"] = UTEN_KURSER_HVORFOR
+app.jinja_env.globals["demo_uten_kurser"] = DEMO_UTEN_KURSER
+# Gjennomgangen (BH4): setningen bare på siden for den aksjen.
+app.jinja_env.globals["demo_uten_kurser_symbol"] = DEMO_UTEN_KURSER_SYMBOL
+# Story 8.26 (tillegg 3): beskjeden når appen følger så mange aksjer den kan.
+app.jinja_env.globals["full_tekst"] = valg.FULL
+# Story 8.26 (tillegg 3): ønsket om å følge. Eget navn, fordi oversikten har
+# en parameter som heter valg.
+ONSKE_FOLG = valg.FOLG
 # Story 8.0d: «Oppdatert tirsdag 13.10 kl. 22.15» i stripa, i norsk tid.
 app.jinja_env.filters["oppdatert"] = lambda tid: oppdatert(tid, idag().year)
 
@@ -298,6 +327,8 @@ _RUTER_MED_BASE = {
     "merk",
     "boersometer",
     "demoselskap",
+    # Story 8.26 (tillegg 12): siden for «Åpne eodhd.com» i demoen.
+    "eodhd_demo",
     # Story 2.12: siden «Følg en aksje» og skjemaene for ønsket.
     "folg_side",
     # Tillegg 3 til 8.22: siden «Er du sikker?» før en ferdig liste.
@@ -324,6 +355,8 @@ _RUTER_MED_BASE = {
 # skriving, og bare tabellen min_liste skrives (AD-3, AD-10).
 _SKRIVER = "merk"
 # Story 2.12: rutene som skriver ønsket i oenske, og bare den tabellen (AD-3).
+# Story 8.26 (tillegg 3, gjennomgangen VG7): «Følg» og «Angre» skriver også
+# stjernen i min_liste, i samme transaksjon som ønsket (valg.py, 0013).
 _SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_liste", "lagre_innstilling", "ki_bryter"))
 # Story 8.21 (gruppens svar 10.11 kl. 14:32): rutene som skriver notatene, og
 # bare tabellen notat (AD-3).
@@ -409,6 +442,10 @@ EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fr
 # Story 3.3i (U51): demolinja lenker til stegene for den ekte versjonen i
 # README-en paa GitHub. Den staar bare i demoen, i samme blokk som merket.
 EKTE_VERSJONEN_URL = "https://github.com/IBE160-2026/G74-lund-osen#den-ekte-versjonen"
+# Story 3.7 (tillegg 1, spoersmaal 9): en dag uten KI-tekst i den ekte
+# versjonen lenker til delen i installasjonen som sier hvordan den slaas paa.
+# Appen viser ikke filene i docs/, saa lenken gaar til GitHub, som over.
+KI_TEKSTEN_URL = "https://github.com/IBE160-2026/G74-lund-osen/blob/main/docs/installasjon.md#ki-teksten"
 
 # Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
 # innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
@@ -488,6 +525,7 @@ def _eksempeltall():
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
         "demo_startdag": demo_startdag(),
         "ekte_versjonen_url": EKTE_VERSJONEN_URL,
+        "ki_teksten_url": KI_TEKSTEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
     }
 
@@ -592,6 +630,26 @@ def hent_oversiktsleser() -> Oversiktsleser | None:
     if tilkobling is None:
         return None
     return SqliteOversiktsleser(tilkobling)
+
+
+@app.context_processor
+def _oppdatert_overalt():
+    """Story 8.26 (tillegg 17): tidspunktet i linja «Oppdatert …» for sidene
+    som ikke har sitt eget, som «Følg en aksje», «Er du sikker?»,
+    Innstillinger og sidene i demoen: det eldste tidspunktet en aksje med
+    kurser sist ble hentet, som på oversikten (FR-101). Bare lesing."""
+    if request.endpoint not in _RUTER_MED_BASE or g.get("basefeil"):
+        return {"hentet_felles": None}
+    try:
+        leser = hent_oversiktsleser()
+        if leser is None:
+            return {"hentet_felles": None}
+        tider = [post.hentet for post in leser.oversikt(idag()) if post.nyeste is not None and post.hentet]
+        return {"hentet_felles": min(tider) if tider else None}
+    except Exception:  # noqa: BLE001
+        # Gjennomgangen (ECH5): linja er pynt; en feil her skal ikke gi 500 på
+        # «Følg en aksje» eller Innstillinger, som før ikke leste oversikten.
+        return {"hentet_felles": None}
 
 
 class _BasenFeilet(Exception):
@@ -752,7 +810,8 @@ def boersometer():
     børsdagen med kurs før den. Story 8.6b, b: hovedindeksen står som et tall
     i linja «Mål mot børsen», for dagen som vises, og søylene står bare på
     oversikten."""
-    felles = {"aktiv": BOERSOMETER}
+    # Story 8.26 (tillegg 2): teksten i en rute uten kurser, fra boersometer.py.
+    felles = {"aktiv": BOERSOMETER, "uten_kurs_kort": UTEN_DATA}
     if g.get("basefeil"):
         return _basen_kan_ikke_aapnes()
     if g.get("demo_mangler"):
@@ -1039,11 +1098,31 @@ def _tabellsiden(aktiv: str):
         vist = med_perioden(rader, serier, periodestart)
     annen_dag = not i_lista and valg is not None and valg.periode == VELG
     skilte_seg_ut, oevrige = del_i_to(rader if annen_dag else vist)
+    # Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): med «Vis dagen»
+    # sier overskriften og linja om 3 av 3 dagen tabellen viser, ikke siste
+    # børsdag. Radene for en annen dag merker ikke 2 av 3 (8.17a), så de som
+    # skilte seg ut den dagen, regnes av styrken mot terskelen.
+    dagens_rader = vist if annen_dag else rader
+    if annen_dag:
+        skilte_seg_ut = [rad for rad in vist if rad.styrke is not None and rad.styrke >= STANDARD.terskel]
     # Story 8.3: merkingen leses fra sin egen port, bare lesing her.
-    merkede = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling)).merkede()
+    minlista = _leser_eller_basefeil(lambda: SqliteMinlistelager(g.tilkobling))
+    # Story 8.26 (tillegg 3): også stjernen på en aksje som venter.
+    merkede = minlista.merkede() | minlista.merkede_som_venter()
     # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst, ikke
-    # bare navnet i en fotnote.
-    alle_uten_data = rader_uten_data(poster)
+    # bare navnet i en fotnote. Story 8.26 (gruppens svar 11.11 kl. 17:47,
+    # tillegg 3): aksjene som venter på hentingen etter «Følg», står under
+    # dem med «venter på henting», så de også synes under «Min liste». I
+    # demoen står de der alltid, fordi demoen ikke henter.
+    valglager = _valglager()
+    venter = rader_som_venter(
+        [(o.symbol, o.navn, o.sektor) for o in valglager.ventende() if o.handling == ONSKE_FOLG] if valglager else [],
+        {post.aksje.symbol for post in poster},
+    )
+    # Gjennomgangen (ECH7): ikke med «Velg dag», som er en dag appen ikke
+    # fulgte dem.
+    annen_dag_valgt = not i_lista and valg is not None and valg.periode == VELG
+    alle_uten_data = [*rader_uten_data(poster), *([] if annen_dag_valgt else venter)]
     mangler = alle_uten_data
     # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
@@ -1069,24 +1148,11 @@ def _tabellsiden(aktiv: str):
         mangler = [rad for rad in mangler if rad.aksje.symbol in merkede]
         if sortert is not None:
             sortert = [rad for rad in sortert if rad.aksje.symbol in merkede]
-    # Story 8.11 (FR-412, tillegget): filteret på signalet, bare innenfor
-    # lista som vises, og etter at radene er delt eller sortert, så
-    # rekkefølgen fortsatt er FR-102. Bare 3 av 3 i retningen som er valgt.
-    signalfilter = _signalfilteret()
-    # Gjennomgangen (ECH1, ECH2, ECH3): overskriften, innledningen og om
-    # tabellen vises, regnes av lista før filteret, så filteret bare skjuler
-    # rader og aldri endrer det siden sier.
+    # Story 8.26 (gruppens ønske 11.11 kl. 17:48, tillegg 4): filteret på
+    # signalet fra 8.11 og 8.23 er tatt bort, fordi det ikke viste noe
+    # tabellen ikke alt viser under «Skilte seg ut».
     overskrift_ut = alle_som_skilte_seg_ut if bare_min else skilte_seg_ut
-    foer_filter = bool(skilte_seg_ut or oevrige or mangler or sortert)
-    # Story 8.23 (A8): radene i lista som vises, før filteret, til antallet
-    # på knappene og 2 av 3 ved et tomt filter.
-    rader_foer = sortert if sortert is not None else [*skilte_seg_ut, *oevrige]
-    if signalfilter is not None:
-        skilte_seg_ut = [rad for rad in skilte_seg_ut if _passer(rad, signalfilter)]
-        oevrige = [rad for rad in oevrige if _passer(rad, signalfilter)]
-        mangler = []
-        if sortert is not None:
-            sortert = [rad for rad in sortert if _passer(rad, signalfilter)]
+    har_rader = bool(skilte_seg_ut or oevrige or mangler or sortert)
     hovedindeks, indeks_feilet = (
         (None, False)
         if i_lista
@@ -1112,7 +1178,7 @@ def _tabellsiden(aktiv: str):
         rader=rader,
         hovedindeks=hovedindeks,
         indeks_feilet=indeks_feilet,
-        dato=sidens_dato(rader),
+        dato=valg.dag if annen_dag else sidens_dato(rader),
         hentet=sidens_tidsstempel(rader),
         eget=eldre_enn_nyeste(rader),
         # Gruppens svar 03.11 kl. 14:28: en rad med eldre dag viser datoen sin.
@@ -1123,18 +1189,21 @@ def _tabellsiden(aktiv: str):
         # er også antallet rader i tabellen, fordi hver aksje uten kurser nå
         # har en rad, så «7 av 15» stemmer med tabellen. Summen er lik
         # len(poster), og definisjonen fra 14.10 står (gjennomgangen, BH5).
-        antall_aksjer=len(rader) + len(alle_uten_data),
+        # Story 8.26 (tillegg 3, gjennomgangen ECH3): aksjene som venter, er
+        # med, som radene, «Min liste N» og «appen følger 16 av 18».
+        # Gjennomgangen av tillegg 17 (ECH2): med «Vis dagen» er M radene den dagen.
+        antall_aksjer=(len(vist) if annen_dag else len(rader)) + len(alle_uten_data),
         ikke_vurdert=bool(ikke_vurdert),
         **_fotnoten(ikke_vurdert, i_dag),
         # Gjennomgangen (BH7, ECH1): «Alle» i Min liste er samme tabell som
         # oversikten, ogsaa naar ingen skilte seg ut.
-        ingen_skilte_seg_ut=ingen_skilte_seg_ut(rader) and not bare_merkede,
-        antall_vurdert=antall_vurdert(rader),
+        ingen_skilte_seg_ut=ingen_skilte_seg_ut(dagens_rader) and not bare_merkede,
+        antall_vurdert=antall_vurdert(dagens_rader),
         skilte_seg_ut=skilte_seg_ut,
         oevrige=oevrige,
         sortert=sortert,
         sortering=sortering,
-        tre_av_tre=[rad.aksje.navn for rad in rader if rad.styrke == ANTALL_SJEKKER],
+        tre_av_tre=[rad.aksje.navn for rad in dagens_rader if rad.styrke == ANTALL_SJEKKER],
         hentekommando=hentekommando(),
         merkede=merkede,
         antall_merket=antall_merket,
@@ -1153,78 +1222,16 @@ def _tabellsiden(aktiv: str):
         # Story 2.12: «Dine egne aksjer» på oversikten og «Din egen liste» i
         # Min liste, og merket «Egen» i tabellen.
         egne=_egne(),
-        # Story 8.11: filteret på signalet, og lenkene til det.
-        signalfilter=signalfilter,
-        filterlenker=_filterlenkene(signalfilter, rader_foer),
-        nest_beste=_nest_beste(signalfilter, rader_foer),
-        filter_retning_og_styrke=_filterets_retning_og_styrke(signalfilter) if signalfilter else None,
         # Story 8.23 (tillegg 1): overskriften i Min liste med «Alle».
         antall_ut=len(overskrift_ut),
         overskrift_ut=overskrift_ut,
-        foer_filter=foer_filter,
-        filter_tomt=signalfilter is not None and not (skilte_seg_ut or oevrige or sortert),
+        har_rader=har_rader,
         # Story 10.6: «Børsdagen kort fortalt», bare paa oversikten.
         boersdagen=None
         if i_lista
         else _boersdagen(poster, serier, valg, sidens_siste(rader), oversiktsleser, ledd, sortering),
         **felles,
     )
-
-
-# Story 8.11: filteret på signalet (FR-412, tillegget).
-SIGNALFILTER = {"positiv": "Positiv", "negativ": "Negativ"}
-# Story 8.23 (A8): dem som fikk én sjekk mindre i samme retning, som lenken
-# ved et tomt filter viser. Ingen knapp har dem.
-NEST_BESTE = {"positiv-2": "positiv", "negativ-2": "negativ"}
-
-
-def _signalfilteret() -> str | None:
-    """Verdien i ?signal=, eller None. En verdi som ikke er kjent, gir ingen
-    filtrering."""
-    verdi = request.args.get("signal")
-    return verdi if verdi in SIGNALFILTER or verdi in NEST_BESTE else None
-
-
-def _filterets_retning_og_styrke(signalfilter: str) -> tuple[str, int]:
-    """(retningen som ord, styrken) for en verdi i ?signal= - story 8.23."""
-    if signalfilter in NEST_BESTE:
-        return NEST_BESTE[signalfilter], ANTALL_SJEKKER - 1
-    return signalfilter, ANTALL_SJEKKER
-
-
-def _passer(rad, signalfilter: str) -> bool:
-    vurdering = rad.vurdering
-    retning, styrke = _filterets_retning_og_styrke(signalfilter)
-    return vurdering is not None and vurdering.styrke == styrke and vurdering.retning == SIGNALFILTER[retning]
-
-
-def _filteradresse(verdi: str | None) -> str:
-    """Adressen med ?signal=verdi og resten av adressen som den er, til
-    tabellen (story 8.23, A2)."""
-    ledd = [(k, v) for k, v in request.args.items(multi=True) if k != "signal"]
-    deler = ledd + ([("signal", verdi)] if verdi else [])
-    return request.path + ("?" + urlencode(deler) if deler else "") + "#aksjene"
-
-
-def _filterlenkene(signalfilter: str | None, rader_foer: list) -> list[tuple[str, str, bool]]:
-    """(teksten, adressen, aktiv) for «Alle», «3 av 3 positiv» og «3 av 3
-    negativ», med resten av adressen som den er. Story 8.23 (A8): med
-    antallet i lista som vises, før filteret, i parentes."""
-    lenker = [("Alle", _filteradresse(None), signalfilter is None)]
-    for verdi in ("positiv", "negativ"):
-        antall = sum(1 for rad in rader_foer if _passer(rad, verdi))
-        tekst = f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} {verdi} ({antall})"
-        lenker.append((tekst, _filteradresse(verdi), verdi == signalfilter))
-    return lenker
-
-
-def _nest_beste(signalfilter: str | None, rader_foer: list) -> tuple[int, str] | None:
-    """Story 8.23 (A8): når «3 av 3» i en retning gir 0, (hvor mange som fikk
-    2 av 3 i samme retning, adressen som viser dem). None ellers."""
-    if signalfilter not in SIGNALFILTER or any(_passer(rad, signalfilter) for rad in rader_foer):
-        return None
-    verdi = f"{signalfilter}-2"
-    return sum(1 for rad in rader_foer if _passer(rad, verdi)), _filteradresse(verdi)
 
 
 def sidens_siste(rader: list) -> date | None:
@@ -1812,6 +1819,24 @@ def _gyldig_dato(verdi: str) -> bool:
     return True
 
 
+# Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): registreringen hos
+# EODHD, samme adresse som startskriptet åpner (start.ps1 og start.sh).
+EODHD_REGISTRERING = "https://eodhd.com/register"
+app.jinja_env.globals["eodhd_registrering"] = EODHD_REGISTRERING
+
+
+@app.route("/eodhd-demo")
+def eodhd_demo():
+    """Story 8.26 (tillegg 12): siden «Åpne eodhd.com» i steg 1 går til i
+    demoen, i samme oppsett som investorsidene. Bare i demoen: den ekte
+    versjonen lenker til registreringen hos EODHD, og ruta svarer 404."""
+    if g.get("basefeil"):
+        return _basen_kan_ikke_aapnes()
+    if g.get("demo_mangler") or not g.get("eksempeltall"):
+        abort(404)
+    return render_template("eodhd_demo.html", side=eodhd_demoside(), aktiv="min_liste")
+
+
 @app.route("/investorside/<symbol>")
 def demoselskap(symbol: str):
     """Story 3.4h: siden for et av de 15 oppdiktede selskapene, med logoen,
@@ -1943,6 +1968,12 @@ def _ki_visning(post, detalj, siste: date) -> KIVisning:
     # demobase uten KI-tekstene ikke sier det om siste dag.
     if visning.tilstand == INGEN_RAD and g.get("eksempeltall") and detalj.dato < siste:
         return KIVisning(INGEN_I_DEMOEN)
+    # Story 3.7 (tillegg 1, spoersmaal 8): i den ekte versjonen er siste dag
+    # uten rad en dag uten modell, og siden lenker til installasjonen. En
+    # eldre dag kan ikke faa teksten senere (AD-7), saa der staar grunnen som
+    # foer (gjennomgangen, ECH4, BH1).
+    if visning.tilstand == INGEN_RAD and not g.get("eksempeltall") and detalj.dato == siste:
+        return KIVisning(INGEN_MODELL)
     return visning
 
 
@@ -1982,7 +2013,13 @@ def _boersdagen(
     try:
         rad = SqliteKILogg(g.tilkobling, naa).les(Emne.dagen(dag))
         if rad is None:
-            return {**bryter, "uten": DAGEN_UTEN}
+            # Story 3.7 (tillegg 1, spoersmaal 8): uten rad i den ekte
+            # versjonen sier linja naar teksten lages, med lenken, men bare
+            # for siste dag (AD-7) og bare naar ingen aksje har en rad den
+            # dagen, saa en maskin med modellen ikke faar linja (ECH4, ECH5).
+            if g.get("eksempeltall") or dag != siste or andre_aksjer_har_ki_rad(g.tilkobling, dag, ""):
+                return {**bryter, "uten": DAGEN_UTEN}
+            return {**bryter, "uten": DAGEN_UTEN_MODELL, "lenke": True}
         lager = SqliteIndekslager(g.tilkobling)
         symboler = lager.symboler()
         indeksserie = lager.serie(valgt_indeks(symboler)) if symboler else None
@@ -2028,6 +2065,15 @@ BOERSDAGEN_ANKER = "boersdagen-kort-fortalt"
 # Periodeknappene og «Velg dag» gaar til kursgrafen, og bryteren til
 # KI-teksten.
 GRAFANKER = "kursgrafen"
+# Story 8.26 (gruppens ønske 11.11 kl. 19:36, tillegg 6): periodevalget på
+# oversikten, i Min liste og på børsometeret holder plassen på samme måte.
+PERIODEANKER = "perioden"
+INNSTILLINGSANKER = {
+    innstillinger.VIS_HJELP: "hjelp-valget",
+    innstillinger.VIS_KI_TEKST: "ki-valget",
+    innstillinger.VIS_NOTATER: "notater-valget",
+}
+app.jinja_env.globals["periodeanker"] = PERIODEANKER
 KI_ANKER = "ki-teksten"
 
 
@@ -2276,7 +2322,16 @@ def _egne_regnet() -> dict | None:
         egne_i_lista = len(egne)
         # Story 8.11: de ferdige listene, med merket for omsetningen.
         ferdige = ferdige_lister.lister(g.tilkobling)
+        # Story 8.26 (tillegg 14): aksjene appen følger, samlet etter bransje i
+        # rekkefølgen på børsometeret; en ukjent bransje sist.
+        rang = {b: i for i, b in enumerate(BRANSJER)}
+        grupper: dict[str, list] = {}
+        for aksje in lista:
+            bransje = ferdige_lister.fast_bransje(aksje.symbol) or aksje.sektor or "Uten bransje"
+            grupper.setdefault(bransje, []).append(aksje)
         return {
+            "grupper": sorted(grupper.items(), key=lambda par: (rang.get(par[0], len(rang)), par[0])),
+            "egne_symboler": frozenset(egne),
             "ferdige": ferdige,
             "ferdige_utenfor": frozenset(
                 a.symbol for liste in ferdige.values() for a in liste if valg.utenfor_maalingen(a.median)
@@ -2384,14 +2439,17 @@ def folg_side():
     valgt_sortering = request.args.get("sorter") or ""
     if valgt_sortering not in {v for v, _ in ferdige_lister.SORTERINGER}:
         valgt_sortering = ferdige_lister.OMSATT
-    alle, rader, treff = [], [], set()
+    alle, rader, treff, filtrert, per_bransje = [], [], set(), set(), Counter()
     if valgt is None:
         opptatt = set(i_lista) | {o.symbol for o in lager.ventende() if o.handling == valg.FOLG}
         alle = ferdige_lister.foelgbare(g.tilkobling, opptatt, medianene)
-        rader = ferdige_lister.sorter(
-            ferdige_lister.filtrer(alle, "", valgte_bransjer, valgt_omsetning), valgt_sortering
-        )
-        treff = {a.kode for a in ferdige_lister.filtrer(rader, sok, (), "")}
+        # Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): alle radene
+        # står i siden, så skriptet kan filtrere og sortere med en gang;
+        # filtrert og treff sier hvilke som vises uten skriptet.
+        rader = ferdige_lister.sorter(alle, valgt_sortering)
+        filtrert = {a.kode for a in ferdige_lister.filtrer(alle, "", valgte_bransjer, valgt_omsetning)}
+        treff = {a.kode for a in ferdige_lister.filtrer(alle, sok, valgte_bransjer, valgt_omsetning)}
+        per_bransje = Counter(a.bransje for a in alle)
     # Gjennomgangen (ECH11): en aksje som alt er i lista, eller venter, kan
     # ikke følges, og siden sier det før skjemaet sendes.
     alt_fulgt = valgt is not None and (
@@ -2411,6 +2469,9 @@ def folg_side():
         alle=alle,
         rader=rader,
         treff=treff,
+        filtrert=filtrert,
+        per_bransje=per_bransje,
+        rang={b: i for i, b in enumerate(valg.BRANSJENE)},
         valgte_bransjer=valgte_bransjer,
         alle_bransjer="/folg" + (f"?{uten_bransjer}" if uten_bransjer else ""),
         valgt_sortering=valgt_sortering,
@@ -2649,8 +2710,12 @@ def lagre_innstilling():
     # Story 8.21: «Notater» står i notatvalg, som en base fra før 0012 mangler.
     if not innstillinger.har_tabellen(tilkobling, innstillinger.TABELL[navn]):
         abort(404)
+    # Story 8.26 (tillegg 6): tilbake til bryteren, så siden står i ro.
+    # Gjennomgangen (ECH3): ankeret slås opp før noe skrives, med tittelen
+    # for et valg uten anker.
+    anker = INNSTILLINGSANKER.get(navn, "innstillinger-tittel")
     innstillinger.sett(tilkobling, navn, til == PAA)
-    svar = redirect("/innstillinger", code=303)
+    svar = redirect("/innstillinger#" + anker, code=303)
     if navn == innstillinger.VIS_KI_TEKST:
         # Story 8.10b: kapselen også, som bryteren ved teksten.
         svar.set_cookie(KAPSEL, til, max_age=365 * 24 * 3600, samesite="Lax", httponly=True, secure=request.is_secure)

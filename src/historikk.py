@@ -260,6 +260,10 @@ class AlleSjekkene:
     antall: int
     sist: date | None
     fra: date | None
+    # Story 8.26 (gruppens svar 11.11 kl. 22:04, tillegg 17): om aksjen har
+    # minst én vurdering. Uten en eneste sier siden at signalet ikke er
+    # regnet ennå, ikke «3 av 3 aldri».
+    vurdert: bool = True
 
 
 def alle_sjekkene_det_siste_aaret(
@@ -276,4 +280,9 @@ def alle_sjekkene_det_siste_aaret(
         return None
     alle = [d for d in dagene if isinstance(vurderingene[d], Vurdering) and vurderingene[d].styrke == antall_sjekker]
     foerste = min(vurderingene)
-    return AlleSjekkene(antall=len(alle), sist=alle[-1] if alle else None, fra=foerste if foerste > start else None)
+    return AlleSjekkene(
+        antall=len(alle),
+        sist=alle[-1] if alle else None,
+        fra=foerste if foerste > start else None,
+        vurdert=any(isinstance(v, Vurdering) for v in vurderingene.values()),
+    )

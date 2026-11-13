@@ -80,63 +80,14 @@ class TestSorteringenBlirVedTabellen:
         assert len(lenker) == 5
         assert all(lenke.endswith("#aksjene") for lenke in lenker), lenker
 
-    def test_standard_rekkefoelge_og_filteret_gaar_til_tabellen(self, klient):
-        """Ville feilet hvis «Standard rekkefølge» eller knappene i filteret
-        sendte til toppen."""
+    def test_standard_rekkefoelge_gaar_til_tabellen(self, klient):
+        """Ville feilet hvis «Standard rekkefølge» sendte til toppen. Filteret
+        er tatt bort i 8.26."""
         html = _html(klient, "/min-liste?sorter=kurs&orden=synkende")
         assert '<a href="/min-liste#aksjene">Standard rekkefølge</a>' in html
-        nav = html.split('<nav class="signalfilter"', 1)[1].split("</nav>", 1)[0]
-        assert all(h.endswith("#aksjene") for h in re.findall(r'href="([^"]+)"', nav))
 
 
-class TestFilteretMedAntallet:
-    """A8: antallet står på knappene, og ved 0 står hvor mange som fikk 2 av 3
-    i samme retning, med en lenke."""
-
-    @pytest.mark.parametrize("sti", ["/", "/min-liste"])
-    @pytest.mark.parametrize("retning", ["positiv", "negativ"])
-    def test_antallet_paa_knappen_er_radene_filteret_gir(self, klient, sti, retning):
-        """Ville feilet hvis antallet på knappen var et annet enn radene man
-        får ved å trykke på den, eller talte aksjer utenfor lista som vises."""
-        html = _html(klient, sti)
-        nav = html.split('<nav class="signalfilter"', 1)[1].split("</nav>", 1)[0]
-        antall = int(re.search(rf"3 av 3 {retning} \((\d+)\)", nav).group(1))
-        filtrert = _html(klient, f"{sti}?signal={retning}")
-        assert len(_radene(filtrert)) == antall
-
-    def test_ved_0_staar_2_av_3_med_lenke(self, klient):
-        """Ville feilet hvis et tomt filter bare sa «Ingen», eller lenken viste
-        andre enn dem som fikk 2 av 3 i samme retning."""
-        # I Min liste i demoen fikk bare BRFE 3 av 3 negativ, og NLYS 2 av 3
-        # negativ (gjennomgangen, BH7, VG5: ingen tidlig retur).
-        _merk(klient, "BRFE", "fjern", "/min-liste")
-        html = _html(klient, "/min-liste?signal=negativ&sorter=kurs&orden=synkende")
-        tekst = html.split('<p class="filtertekst">', 1)[1].split("</p>", 1)[0]
-        assert "Ingen av aksjene her fikk det." in tekst
-        treff = re.search(r'(\d+) fikk 2 av 3 negativ: <a href="([^"]+)">se (?:den|dem)</a>', tekst)
-        assert treff, tekst
-        antall, adresse = int(treff.group(1)), treff.group(2).replace("&amp;", "&")
-        assert (
-            "signal=negativ-2" in adresse and "sorter=kurs&orden=synkende" in adresse and adresse.endswith("#aksjene")
-        )
-        neste = _html(klient, adresse.removesuffix("#aksjene"))
-        assert _radene(neste) == ["NLYS"] and antall == 1
-        assert "Bare aksjene som fikk 2 av 3 med retning negativ." in neste
-
-    def test_antallet_med_min_liste_paa_oversikten(self, klient):
-        """Gjennomgangen (VG5): ville feilet hvis antallet på oversikten med
-        «Min liste» talte alle aksjene, ikke de som vises."""
-        html = _html(klient, "/?vis=min")
-        nav = html.split('<nav class="signalfilter"', 1)[1].split("</nav>", 1)[0]
-        for retning in ("positiv", "negativ"):
-            antall = int(re.search(rf"3 av 3 {retning} \((\d+)\)", nav).group(1))
-            assert len(_radene(_html(klient, f"/?vis=min&signal={retning}"))) == antall
-
-    def test_ingen_tekst_om_2_av_3_naar_filteret_gir_noe(self, klient):
-        """Ville feilet hvis lenken til 2 av 3 sto også når 3 av 3 ga rader."""
-        html = _html(klient, "/?signal=positiv")
-        assert _radene(html)
-        assert "fikk 2 av 3" not in html.split('<p class="filtertekst">', 1)[1].split("</p>", 1)[0]
+# Story 8.26 (ønsket 11.11 kl. 17:48): filteret med antallet (A8) er tatt bort.
 
 
 class TestOverskriftenIMinListe:
@@ -220,7 +171,10 @@ class TestDineEgneAksjer:
         egne = html.split('id="dine-egne-aksjer"', 1)[1].split("</section>", 1)[0]
         assert '<div class="tabellboks egnetabell"' in egne and "<thead>" in egne
         rad = egne.split('<tr class="egen-rad">', 1)[1].split("</tr>", 1)[0]
-        assert '<td class="bransje"><svg class="bransjesymbol"' in rad and "Energi" in rad
+        # Story 8.26 (gruppens svar 11.11 kl. 17:12): bransjen med ikonet står
+        # under navnet, som på oversikten, ikke i en egen kolonne.
+        assert '<span class="linje">XTEST · <svg class="bransjesymbol"' in rad and "Energi</span>" in rad
+        assert '<td class="bransje">' not in rad
         assert "Venter på henting i kveld etter kl. 22." in rad and "Angre" in rad
 
 
@@ -233,7 +187,7 @@ class TestBoersometeret:
         html = _html(klient, "/boersometer")
         ruter = re.findall(r'<a class="rute [^"]*" href="[^"]+" title="([^"]+)">', html)
         assert len(ruter) == 15
-        assert all(re.fullmatch(r"[A-Z]+: ([+-]?[\d,]+\xa0%|uten data|–)(, .+)?", r) for r in ruter), ruter
+        assert all(re.fullmatch(r"[A-Z]+: ([+-]?[\d,]+\xa0%|ingen kurser ennå|–)(, .+)?", r) for r in ruter), ruter
         assert any(re.search(r", \d av 3$", r) for r in ruter)
 
     def test_smaa_ruter_viser_endringen_og_styrken(self):
@@ -307,11 +261,14 @@ class TestOransje:
         """Ville feilet hvis en bryter i Innstillinger som er på, var svart som før."""
         assert "background: var(--oransje)" in _regel(velger)
 
-    def test_bryteren_ved_ki_teksten_er_i_blekk(self):
-        """Hele settet, del 3: ville feilet hvis bryterne ved KI-teksten og ved
-        «Børsdagen kort fortalt» ble oransje, mot spørsmål 5 i 8.2b (blekk)."""
+    def test_bryteren_ved_ki_teksten_er_oransje(self):
+        """Story 8.26 (gruppens svar 11.11 kl. 17:21) endrer spørsmål 5 i 8.2b:
+        bryterne ved KI-teksten og ved «Børsdagen kort fortalt» er oransje med
+        blekk-knott, som i Innstillinger. Ville feilet hvis en av dem var i
+        blekk som før."""
         for velger in ('.dagsbryter [aria-checked="true"] .spor', '.ki-bryter [aria-checked="true"] .spor'):
-            assert "background: var(--blekk)" in _regel(velger), velger
+            assert "background: var(--oransje)" in _regel(velger), velger
+            assert "background: var(--blekk)" in _regel(velger + "::after"), velger
 
     def test_siden_man_er_paa(self):
         """Ville feilet hvis knappen for siden man er på, var hvit som før."""
@@ -327,8 +284,11 @@ class TestKalleneRegnesAvLista:
         monkeypatch.setattr(valg, "KVOTE", 25)
         monkeypatch.setattr(valg, "TAK", 20)
         html = _html(klient, "/min-liste")
-        avsnitt = html.split("<h3>Følg flere aksjer</h3>", 1)[1].split("</p>", 1)[0]
-        assert "Lista kan ha opptil 20 aksjer" in avsnitt and "av de 25 kallene" in avsnitt
+        # Story 8.26 (tillegg 14): teksten står bak «?» ved «Følg flere aksjer».
+        avsnitt = html.split('<div id="hjelp-flere" class="hjelpevindu"', 1)[1].split("</p>", 1)[0]
+        # Story 8.26: «Appen kan følge», ikke «Lista kan ha». Gjennomgangen
+        # (BH1): påstanden om kallene sto i en kommentar.
+        assert "Appen kan følge opptil 20 aksjer" in avsnitt and "av de 25 kallene" in avsnitt
         assert "med 20 aksjer er 4 igjen" in avsnitt
         treff = re.search(r"Med (\d+) aksjer etter neste henting er (\d+) kall igjen", avsnitt)
         antall, igjen = int(treff.group(1)), int(treff.group(2))
@@ -380,11 +340,14 @@ class TestSignaletForklart:
 class TestEndringerSomVenter:
     """Tillegg 2 og tillegget om demoen: meldingen øverst."""
 
-    def test_i_demoen_et_eksempel_merket_eksempeltall(self, klient):
-        """Ville feilet hvis meldingen ikke kunne ses i demoen."""
+    def test_i_demoen_ingen_eksempelboks(self, klient):
+        """Story 8.26 (gruppens svar 11.11 kl. 22:17, tillegg 19): eksempelet
+        som sto når ingen endring ventet, er tatt bort. Ville feilet hvis
+        eksempelboksen fortsatt sto i demoen uten en endring som venter."""
         for sti in ("/", "/min-liste"):
             html = _html(klient, sti)
-            assert '<p class="venter-melding demo">Eksempeltall:' in html, sti
+            assert "venter-melding" not in html.split("</head>", 1)[1], sti
+            assert "når en endring i lista venter" not in html, sti
 
     def test_med_en_endring_som_venter(self, klient):
         """Ville feilet hvis en endring som venter, ikke ga meldingen øverst."""
@@ -424,8 +387,9 @@ class TestTreAvTreDetSisteAaret:
         assert alle_sjekkene_det_siste_aaret(None, date(2026, 10, 9), 3) is None
         assert alle_sjekkene_det_siste_aaret({}, date(2026, 10, 9), 3) is None
         bare_grunn = {date(2026, 10, 8): Grunn.SIGNAL_IKKE_REGNET}
+        # Story 8.26 (tillegg 17): bare grunner er ikke vurdert.
         assert alle_sjekkene_det_siste_aaret(bare_grunn, date(2026, 10, 9), 3) == AlleSjekkene(
-            0, None, date(2026, 10, 8)
+            0, None, date(2026, 10, 8), vurdert=False
         )
 
     def test_aaret_og_grensen(self, monkeypatch):
@@ -516,7 +480,13 @@ class TestEtterGjennomgangen:
                 "INSERT INTO oenske (handling, symbol, navn, sektor, laget) VALUES "
                 "('folg', 'XTEST', 'Eksempelselskap', 'Energi', '2026-10-13T12:00:00+00:00')"
             )
-        assert 'Eksempelselskap<span class="skjult">, </span><span class="egen-dag">XTEST</span>' in _html(klient, "/")
+        # Story 8.26: navnet og merkene, så et skilletegn for skjermleseren
+        # og linja med symbolet.
+        assert re.search(
+            r'Eksempelselskap <span class="egenmerke">Egen</span>( <span class="utenformerke">[^<]*</span>)?'
+            r'<span class="skjult">, </span><span class="linje">XTEST · ',
+            _html(klient, "/"),
+        )
 
     def test_en_aksje_i_lista(self):
         """ECH11: ville feilet med «1 av de 1 aksjene»."""

@@ -372,6 +372,8 @@ tverrgående (NFR-03, 05, 06 og 08).
 
 *Lagt til 2026-10-13, endringsforslaget 13.10 (punkt 4.4), godkjent av Marian kl. 12:46:* fotnoten som raden for NFR-06 siterer, står nå i `src/templates/index.html:137`, ikke på linje 108. Den endres i 8.0c til «Signalstyrken sier hvor mange av de 3 sjekkene som slo ut, ikke om du bør kjøpe eller selge.» Forbeholdet om kjøp og salg står fortsatt synlig.
 
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:44, story 8.26):* fotnoten under tabellen på oversikten og i Min liste er tatt bort. Det den sa om sluttkursen, endringen og signalstyrken, står bak «?» ved kolonnene, og at signalstyrken ikke sier om du bør kjøpe eller selge, står synlig i innledningen på oversikten og i Min liste (NFR-06). Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 1, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 ## Epic List
 
 **Rekkefølge.** Pilene er harde avhengigheter, ikke anbefalinger.
@@ -2733,6 +2735,28 @@ Spesifikasjonen er `spec-3-6-ikonet-og-snarveien.md`.
 
 *Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
 
+### Story 3.7: Snarveien spør før nettleseren, og KI-teksten på en ny PC
+
+*Lagt til 2026-11-12, etter instruksjonen «Ny liten story etter 3.6: snarveien spør før nettleseren åpnes» (limt inn 12.11 kl. 16:48) og tillegg 1–4, som føres i `docs/ai-prompts/2026-11-12.md` med flettingen.* 3.7 var neste ledige nummer i Epic 3.
+
+Som **bruker i Windows**, vil jeg se spørsmålet om snarveien før nettleseren dekker vinduet, og få KI-teksten på en ny PC uten å lese installasjonen først, så appen virker som lovet første gang.
+
+Spesifikasjonen er `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
+
+*Avgjort 2026-11-11 kl. 22:07 (gruppens svar):* snarveien spør før nettleseren åpnes, og får vinduet ikke svar innen 30 sekunder, lages ingen snarvei, og den tilbys igjen neste gang (rettelsen fra rådet 12.11, tillegg 4). Funnet fra demoprøven 11.11 kl. 22:06: snarveien kom ikke på skrivebordet, fordi spørsmålet sto i vinduet bak nettleseren. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:32 (gruppens svar, tillegg 1):* KI-teksten står på når den ekte versjonen installeres på en ny PC: `.env.example` har `OSE_KI_TJENESTE=lokal`, og uten modell sier hentingen det i én linje, og sidene sier at teksten lages når maskinen har en modell, med lenke til installasjonen. Det retter svar 5 under Epic 10. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:41 (gruppens svar, tillegg 2):* startskriptet tilbyr å hente Gemma første gang den ekte versjonen startes, som planen 05.10 sa (FR-608). Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:46 (gruppens svar, tillegg 3):* spørsmålet tilbyr også egen API-nøkkel til Gemini, Anthropic eller OpenAI. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag i spesifikasjonen godtas som bygget, også spørsmål 26: lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. Funnene som sto åpne til svaret (ECH3, ECH4, ECH5 og ECH13), er lukket. PR #148 flettes etter 8.27. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 6):* 3.7 flettes før 8.27, med main slik den er, med 8.26, så README-prøven på en ny PC kan starte tidligere. Rekkefølgen blir 3.7, 10.11, 8.27 og 8.19. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 3.7 er flettet med PR #148 i `b565ccd0` kl. 11:29, låst til head-en `816f0be0` (main med 8.26 flettet inn), etter instruksjonen 12.11 kl. 16:48 og tillegg 1–5 i `docs/ai-prompts/2026-11-12.md` og tillegg 6 i `docs/ai-prompts/2026-11-13.md`. Hele settet lokalt i åtte deler kl. 10:33–10:57 (`date`), hver del bare når ingen annen pytest kjørte: 5612 bestått, 24 hoppet over og 0 feilet, til sammen de 5636 som `pytest --collect-only` finner. CI var grønn på head-en (run 43407401615), med 5537 bestått og 99 hoppet over i jobben `pytest`, og steget «Snarveien og KI-spørsmålet på Windows (3.7)» kjørte 60 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `816f0be0`. Spørsmål 26 ble dekket av regelen for lenker fra 8.26, og alle 16 bildene i `docs/appen/` var like etter flettingen. Ingen funn på middels eller over sto åpne.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -2952,10 +2976,12 @@ på papir.
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger:
 1. Kveldshentingen går på PC-en den går på i dag (15,7 GB og RTX 4070), med Ollama i Docker som i `malinger.md` §19, alltid med grafikkort. Ingenting installeres på Windows.
+   *Presisert 2026-11-12 (story 3.7, spørsmål 20, gruppens svar 12.11 kl. 19:06):* svar 1 gjelder fortsatt kveldsjobben, som bruker Ollama i Docker. Startskriptet i 3.7 kan installere Ollama på brukerens egen maskin, bare etter et ja (tillegg 2). Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 2. Raden står når den finnes, også når modellen feilet (FR-604).
 3. Kjøres hentingen på nytt samme dag og vurderingen endrer seg, vises dagen uten KI-tekst (FR-602).
 4. Bryteren huskes i en informasjonskapsel nå. 8.10b flytter bryteren til innstillingene og bruker samme kapsel.
 5. «av» er et eget valg i `OSE_KI_TJENESTE`. `.env.example` har «av», og README-en sier hvordan KI slås på. Uten variabelen gjelder «lokal», som i FR-608. Ført også under FR-608 i PRD-en.
+   *Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):* `.env.example` har nå `lokal`, ikke `av`, så KI-teksten står på i en ny installasjon. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor. `av` er fortsatt et eget valg, og en `.env` som finnes fra før, endres ikke. Ført også under FR-608 i PRD-en og i story 3.7. Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 6. `0005` gir plass til dagsteksten i 10.6, med en dato som eneste emne.
 7. 3.4b kommer rett etter 10.3. Demotekstene lages med Gemma lokalt av de oppdiktede demodataene, i en egen avtalt kjøring.
 8. Adressen til Ollama er `OSE_KI_OLLAMA_URL`, med `http://127.0.0.1:11434` som standard og `http://ollama:11434` i compose. Porten publiseres bare på 127.0.0.1.
@@ -4179,6 +4205,8 @@ del er før jeg leser tallene.
 
 *Rettet 2026-11-11 (gruppens svar 10.11 kl. 22:59):* svaret kl. 11:52 godtok spørsmål 1, at det ikke er noen omvisning som flytter seg fra del til del. Det gjelder ikke lenger: «Vis meg rundt» får også knappen «Spill av omvisningen», som går side for side gjennom appen, i story 8.25 (`spec-8-25-spill-av-omvisningen.md`). Den nummererte lista fra 8.9 står. Rådet anbefalte onsdag, men gruppen valgte i natt. Svaret er ført etter instruksjonen kl. 23:02 10.11, som lagres i `docs/ai-prompts/2026-11-10.md` etter gruppens ja.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 16:58, story 8.26):* svaret 10.11 kl. 11:52 og føringen etter svaret kl. 22:59 over sier at den nummererte lista fra 8.9 står. Det gjelder ikke lenger: «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og lista er tatt bort, fordi testpersonen 10.11 gikk seg vill når siden hoppet. Etter svaret kl. 17:06 står «Vis meg rundt» og «Spill av omvisningen» i raden øverst etter «Innstillinger» (`spec-8-26-vis-meg-rundt-spiller-av-siden.md`). Svaret føres etter instruksjonen kl. 18:01 11.11, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Ferdig 2026-11-10:* flettet i `eb3ba928`, PR #136.
 
 ### Story 8.10: Innstillinger øverst
@@ -4272,6 +4300,8 @@ NFR-01, NFR-06
 *Avgjort 2026-11-09 kl. 10:23 (gruppens svar):* forslagene i spørsmål 1–10 i spesifikasjonen 8.11b (`spec-8-11b-de-15-i-bransjelistene.md`) er godtatt. Spørsmål 9, å bruke medianen av kursene også i merket «Utenfor målingen», blir et punkt i `issues.md` til senere. Svaret er ført etter instruksjonen kl. 10:28 i `docs/ai-prompts/2026-11-09.md`.
 
 *Avgjort 2026-11-09 kl. 10:55 (gruppens svar):* 8.11 (PR #128) og 8.11b (PR #129) flettes «alt så tidlig som mulig», etter flettingen av #126 kl. 23:50, og 8.11 før 8.11b. Svaret er ført etter nattflettingen (kl. 12:00) i `docs/ai-prompts/2026-11-09.md`.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret på signalet fra denne storyen er tatt bort, fordi det ikke viste noe tabellen ikke alt viser under «Skilte seg ut». De ferdige listene står. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.11c: «Utenfor målingen» med medianen av kursene
 
@@ -4631,6 +4661,8 @@ Spesifikasjonen er `spec-8-22-foelg-en-aksje-og-min-liste.md`, med spørsmålene
 
 *Avgjort 2026-11-11 kl. 14:29 (gruppens svar):* ja til forslagene i spørsmål 1–4, 6, 8–11, 13 og 16–18 som bygget. Tiden for medianene måles, og testen for et kall som feiler legges til (spørsmål 12 og 14). Det valgte står i oransje med hakemerket (spørsmål 15). Del B flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C er flettet. Rådet anbefalte alt.
 
+*Rettet 2026-11-11 (gruppens svar 11.11 kl. 20:28, story 8.26, tillegg 12):* svaret kl. 14:29 godtok forslaget i spørsmål 9, at adressen i steg 1 står som tekst fordi sidene ikke har adresser til nettet. Det gjelder ikke lenger: steg 1 har knappen «Åpne eodhd.com ↗», som i den ekte versjonen åpner registreringen hos EODHD i en ny fane, med samme adresse som startskriptet, og i demoen en egen side. Kontrollpunktet i `test_hjelpetekster.py` godtar akkurat den lenken. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 12, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
+
 *Lagt til 2026-11-11:* 8.22 er flettet med PR #138 i `dcb0bc6f` kl. 16:04, låst til head-en `6b5b97b6` (main med 3.6 flettet inn), etter instruksjonen kl. 14:31 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43043943092). Tiden for én visning av hele lista var 0,046, 0,014 og 0,014 s, så medianene huskes ikke i minnet.
 
 ### Story 8.23: Funnene fra brukertesten 10.11 (del A)
@@ -4656,6 +4688,8 @@ Som **bruker fra brukertesten**, vil jeg at det som var uklart eller tungvint 10
 *Avgjort 2026-11-10 kl. 13:54 (gruppens svar):* «ja» til del A og B. Rådet anbefalte det. Kl. 14:15 la gruppen til overskriften i Min liste, kl. 14:53 og 14:59 sju småfunn fra gjennomgangen, kl. 15:54 tabellen på Børsometeret åpen fra start, og kl. 15:57 at alt skal kunne ses i demoen. Rådet anbefalte alle. Svarene er ført etter instruksjonen om del A og tilleggene i `docs/ai-prompts/2026-11-10.md`.
 
 *Lagt til 2026-11-11:* 8.23 er flettet med PR #142 i `7fb9b1fd` kl. 03:41, låst til head-en `3e9c84ae`. CI var grønn på head-en (run 42945863521), og hele settet lokalt før flettingen: 5137 bestått og 25 hoppet over.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* antallet på knappene i filteret og lenken til dem som fikk 2 av 3 (A8) er tatt bort med filteret. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 4, som lagres i `docs/ai-prompts/2026-11-11.md` etter gruppens ja.
 
 ### Story 8.24: Notatene, to ting etter flettingen
 
@@ -4698,11 +4732,46 @@ Som **ny bruker**, vil jeg kunne spille av en omvisning som går side for side g
 
 *Avgjort 2026-11-11 kl. 13:49 (gruppens svar):* tilbudet første gang og et nei huskes i nettleseren, som bygget (spørsmål 3). Rådet anbefalte det.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 09:58, story 8.26, tillegg 21):* tilbudet første gang starter ikke lenger hele omvisningen, men «Vis meg rundt» for oversikten, med teksten «Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.» og knappene «Vis meg rundt» og «Nei takk». Hele omvisningen er 23 steg på seks sider, og målet «Brukerutfall» i §7 i PRD-en er at en person utenfor gruppen gjennomfører hovedflyten og forklarer hvorfor en aksje skiller seg ut, under 5 minutter, uten hjelp. Svaret huskes i nettleseren som før, og «Spill av omvisningen» står øverst som før. Rådet anbefalte det. Svaret føres etter instruksjonen kl. 18:01 11.11 og tillegg 21, som lagres i `docs/ai-prompts/2026-11-12.md` etter gruppens ja.
+
 *Avgjort 2026-11-11 kl. 14:33 (gruppens svar):* ja til forslagene i spørsmål 1, 2, 4, 5, 6 og 8 og til starten fra oversikten med alle aksjene (spørsmål 9), som bygget. Omvisningen får stegene fra «Følg en aksje» etter Min liste når del B er flettet (spørsmål 7), og flettes når svarene er bygget, gjennomgått og CI er grønn, etter at del C og del B er flettet, uten at gruppen ser på den igjen. Rådet anbefalte alt.
 
 *Avgjort 2026-11-11 kl. 16:26 (gruppens svar):* lista «Ekstra, hvis tiden rekker» står borte fra README-en, og setningen under listene sier «Ekstra» igjen. Bildegrenene beholdes, så bildene i PR-ene står, og så gruppen kan vise endringene i refleksjonsloggen og rapporten. Rådet anbefalte det.
 
 *Lagt til 2026-11-11:* 8.25 er flettet med PR #143 i `c53df5b1` kl. 17:10, låst til head-en `97003ae8`, etter instruksjonen kl. 16:07 i `docs/ai-prompts/2026-11-11.md`. CI var grønn på head-en (run 43054754599), og hele settet lokalt før flettingen: 5252 bestått og 37 hoppet over.
+
+### Story 8.26: «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven
+
+*Lagt til 2026-11-13, etter instruksjonen 11.11 kl. 18:01 i `docs/ai-prompts/2026-11-11.md`, med tilleggene 1–20 der og tilleggene 21–24 i `docs/ai-prompts/2026-11-12.md`.* 8.25 var brukt, så dette er 8.26. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md`, med spørsmålene, svarene, triagen av gjennomgangene og mutantene.
+
+Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» viser meg delene av siden der jeg står, uten at siden hopper, at knappene står sammen med sideknappene, og at funnene fra demoprøven er rettet, så sidene er roligere og sier det de viser.
+
+**Oppfyller:** FR-109, svarene 11.11 kl. 16:58–22:20 og 12.11 kl. 09:58–16:24 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 22
+
+**Kontroll — hva testen ser etter:**
+- «Vis meg rundt» starter den samme boksen som omvisningen, bare med stegene for siden man står på, og den nummererte lista fra 8.9 er borte
+- «Vis meg rundt» og «Spill av omvisningen» står i raden øverst etter «Innstillinger», med hvert sitt ikon
+- Tilbudet første gang starter «Vis meg rundt» for oversikten, og det siste steget der viser vei til navnene under «Skilte seg ut»
+- En aksje uten kurser har de samme ordene og den samme forklaringen på hvorfor overalt
+- En aksje som følges, får stjerne med en gang, og en aksje som venter på henting, står nederst med «venter på henting» (migrasjon 0013)
+- Filteret på signalet er borte, og «Følg flere aksjer» og «Din egen liste» er bygget som på tavla
+- README-en har hovedflyten og brukertesten under «Til faglærer» og forskjellene mellom demoen og den ekte versjonen
+- Alt er likt i demoen og den ekte versjonen, og ingen tekst gir råd
+- **Ville feilet hvis:** siden hoppet eller lista fra 8.9 sto, en knapp manglet i raden øverst, tilbudet startet hele omvisningen, ordene for en aksje uten kurser var ulike, stjernen manglet eller en aksje som venter, sto uten merket, eller en rad i tabellen i README-en ikke stemte med koden
+
+**Avhenger av:** 8.9, 8.25. **Én økt:** nei, delene ble bygget etter hverandre.
+
+*Avgjort 2026-11-11 kl. 16:58–17:53 (gruppens svar og ønsker, tilleggene 1–4):* «Vis meg rundt» spiller av siden, knappene står øverst (rådet anbefalte én knapp, gruppen valgte to), funnene fra demoprøven rettes, fotnoten og filteret tas bort, «uten data» sier hvorfor, en aksje som følges, får stjerne, og «Den ekte versjonen» åpnes i en ny fane.
+
+*Avgjort 2026-11-11 kl. 18:09–22:20 (gruppens svar og ønsker, tilleggene 5–20):* siden står i ro, de samme ordene overalt, lenkene har samme farge før og etter besøk, «Din egen liste» og «Følg flere aksjer» som på tavla, brikkene, hjelpetekstene, bryterne og stegene i omvisningen. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 09:58 (gruppens svar, tillegg 21):* tilbudet første gang starter «Vis meg rundt» for oversikten, etter målet «Brukerutfall» i §7 i PRD-en. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 22):* spørsmål 1–9 og 12–22 godtas som bygget, spørsmål 11 etter forslag 1, tillegg 11 kommer ikke (spørsmål 15), og forklaringen på en aksje uten kurser rettes (spørsmål 10). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt. Rådet anbefalte alt.
+
+*Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
+
+*Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
 
 ---
 

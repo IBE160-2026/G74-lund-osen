@@ -204,7 +204,10 @@ class TestLagringen:
     def test_bare_0007_lager_tabellen(self):
         """AD-16: tabellen lages av en nummerert migrasjon, ikke i koden."""
         filer = sorted(p.name for p in MIGRASJONEN.parent.glob("*.sql") if "min_liste" in p.read_text(encoding="utf-8"))
-        assert filer == ["0007_min_liste.sql"]
+        # Story 8.26 (tillegg 3): 0013 lager ikke tabellen, men endrer
+        # triggerne, så en aksje som venter, kan få stjerne.
+        assert filer == ["0007_min_liste.sql", "0013_stjerne_ved_folg.sql"]
+        assert "CREATE TABLE" not in (MIGRASJONEN.parent / "0013_stjerne_ved_folg.sql").read_text(encoding="utf-8")
         assert "CREATE TABLE" not in (ROT / "src" / "lagring_sqlite.py").read_text(encoding="utf-8")
 
     def test_demoen_merker_fem_fra_begge_delene(self, demo):
@@ -420,7 +423,7 @@ class TestSidene:
             assert '<span class="under">★ = Min liste</span></th>' in thead.split("</th>", 1)[0] + "</th>"
             rader = [r for r in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S) if '<td class="selskap">' in r]
             # Story 8.2a, b: _rekkefoelge teller ikke radene uten data.
-            assert len(rader) == len(_rekkefoelge(html)) + sum(">uten data<" in r for r in rader) > 0
+            assert len(rader) == len(_rekkefoelge(html)) + sum(">ingen kurser ennå<" in r for r in rader) > 0
             for rad in rader:
                 assert rad.count("<td") == 5
 
@@ -589,9 +592,12 @@ class TestGjennomgangen:
         assert tilbake == {"/min-liste?vis=alle&amp;sorter=kurs&amp;orden=synkende"}
         # Story 8.23 (A2): lenken går til tabellen.
         assert '<a href="/min-liste?vis=alle#aksjene">Standard rekkefølge</a>' in html
-        assert re.search(r'class="visknapp" href="/min-liste\?sorter=kurs&amp;orden=synkende">Min liste', html)
         assert re.search(
-            r'class="visknapp" href="/min-liste\?vis=alle&amp;sorter=kurs&amp;orden=synkende" aria-current', html
+            r'class="visknapp" href="/min-liste\?sorter=kurs&amp;orden=synkende#visvalget">Min liste', html
+        )
+        assert re.search(
+            r'class="visknapp" href="/min-liste\?vis=alle&amp;sorter=kurs&amp;orden=synkende#visvalget" aria-current',
+            html,
         )
         sorterlenker = re.findall(r'<a class="sorter[^"]*" href="([^"]*)"', html)
         assert len(sorterlenker) == 5
@@ -642,7 +648,11 @@ class TestGjennomgangen:
             tekst = fil.read_text(encoding="utf-8")
             if "SqliteMinlistelager(" in tekst or re.search(r"(INSERT INTO|DELETE FROM|UPDATE) min_liste", tekst):
                 brukere.add(fil.name)
-        assert brukere == {"app.py", "demo.py", "lagring_sqlite.py"}
+        # Story 8.26 (gruppens svar 11.11 kl. 17:47, tillegg 3): «Følg» og
+        # «Angre» i valg.py skriver stjernen med ønsket. folg() og angre()
+        # kalles bare av webserveren (POST /folg og /angre i app.py); hentingen
+        # bruker andre deler av valg.py og skriver ikke min_liste.
+        assert brukere == {"app.py", "demo.py", "lagring_sqlite.py", "valg.py"}
 
     def test_den_fylte_knappen_er_fylt_i_stilen_og_raden_brytes(self):
         """VG5, VG2. Ville feilet hvis regelen som fyller knappen for siden

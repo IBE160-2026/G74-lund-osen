@@ -128,7 +128,7 @@ def test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote(klient):
     celler = re.findall(r"<td[^>]*>(.*?)</td>", siste, re.S)
     assert len(celler) == 5
     assert [_synlig(celle) for celle in celler[1:3]] == ["–", "–"]
-    assert _synlig(celler[3]) == "– uten data"
+    assert _synlig(celler[3]) == "– ingen kurser ennå"
     assert _synlig(celler[4]).startswith("–")
     assert sum("Matfjord Merkevarer" in rad for rad in radene) == 1
 
@@ -356,7 +356,7 @@ def test_min_liste_med_bare_aksjen_uten_kurser_har_tabellen(klient):
         assert 'Min liste <span class="antall">1</span>' in html and "<table" in html
         radene = _radene(html)
         assert len(radene) == 1 and '<a href="/aksje/MTFJ">Matfjord Merkevarer</a>' in radene[0]
-        assert ">uten data<" in radene[0]
+        assert ">ingen kurser ennå<" in radene[0]
 
 
 def test_en_serie_som_ikke_kan_leses_gir_grunnen_uten_tall(klient, monkeypatch):

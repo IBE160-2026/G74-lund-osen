@@ -477,7 +477,8 @@ class TestForhaandssjekken:
     @pytest.mark.parametrize(
         "grunn, hva",
         [
-            ("Ollama svarer ikke (kjører den?)", "Start Ollama"),
+            # Story 3.7 (tillegg 1): ogsaa installer.
+            ("Ollama svarer ikke (kjører den?)", "Start Ollama, eller installer den"),
             ("modellen gemma4:e4b er ikke hentet (ollama pull gemma4:e4b)", "Hent modellen"),
         ],
     )
