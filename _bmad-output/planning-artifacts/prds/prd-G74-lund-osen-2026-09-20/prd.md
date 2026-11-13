@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-13T19:36
+updated: 2026-11-13T19:43
 ---
 
 # PRD — OSE Signal
@@ -97,8 +97,8 @@ sorterer, og KI forklarer. Grensen er synlig i grensesnittet, ikke bare i koden.
 ### Brukerreisen UJ-1
 
 **UJ-1. Kari** følger 12 aksjer ved siden av studiene. Hun åpner appen om
-kvelden, etter at hentingen er gjort. Første gang tilbyr appen omvisningen
-(«Spill av omvisningen»), og hun kan si «Nei takk». Oversikten viser at to
+kvelden, etter at hentingen er gjort. Første gang tilbyr oversikten «Vis meg
+rundt», og hun kan si «Nei takk». Oversikten viser at to
 aksjer har 3 av 3. De står øverst under «Skilte seg ut». Hun åpner den ene og
 leser de tre sjekkene under «Hvorfor signalet ble 3». Hver sjekk har verdien den
 ga og målingen bak. I kursgrafen ser hun volumsøylene og 50-dagerssnittet. Med KI
@@ -154,7 +154,7 @@ lest i koden 12.11.
 
 | FR | Krav | Kjerne / ekstra / senere | Bygget? |
 |---|---|---|---|
-| FR-101 | Fem kolonner, raden uten signal og raden uten data | kjerne | ja |
+| FR-101 | Fem kolonner, raden uten signal og raden uten kurser | kjerne | ja |
 | FR-101 | Periodevalget i oversikten | ekstra | ja |
 | FR-101 | Oversikten viser lista som er aktiv | ekstra | ja |
 | FR-101 | Endringen i kroner under prosenten | senere | nei |
@@ -164,7 +164,7 @@ lest i koden 12.11.
 | FR-105 | Søylene under hovedindeksen | kjerne | ja |
 | FR-106 | Børsometeret | ekstra | ja |
 | FR-107 | Merket for endret signalstyrke | senere | nei |
-| FR-108 | Filter på signalet | ekstra | ja |
+| FR-108 | Filter på signalet, tatt bort 11.11 | ekstra | nei |
 | FR-109 | Hjelpen bak «?» | kjerne | ja |
 | FR-109 | «Vis meg rundt» og «Spill av omvisningen» | ekstra | ja |
 | FR-109 | «Lær noe nytt» | senere | nei |
@@ -343,14 +343,15 @@ derfor ingen signalverdi. Raden vises da slik:
 de ikke kunne regnes. Begrunnelse: en rad som forsvinner, sier at aksjen ikke
 finnes, og det er ikke sant (NFR-03).
 
-Uten data: en aksje uten en eneste kursrad har en rad nederst i tabellen, med
-navnet som lenke, «–» i hver kolonne og «uten data». Tallet i overskriften
-stemmer med radene.
+Uten kurser: en aksje uten en eneste kursrad har en rad nederst i tabellen, med
+navnet som lenke, «–» i hver kolonne og «ingen kurser ennå». En aksje som venter
+på den første hentingen, har «venter på henting» og navnet uten lenke. Tallet i
+overskriften stemmer med radene.
 
 *Konsekvenser:*
-- Tabellen har fem kolonner for hver periode og hvert filter.
+- Tabellen har fem kolonner for hver periode, også i Min liste.
 - En aksje uten vurdering for dagen har «–» og grunnen i Signalstyrke og «Ukjent» i Retning, aldri 0 og aldri «Ingen».
-- En aksje uten kurser står nederst med «uten data».
+- En aksje uten kurser står nederst med «ingen kurser ennå».
 - Når endringen i kroner bygges, har den samme fortegn som prosenten.
 - Antallet rader er antallet aksjer i lista.
 - Ingen side gjør et API-kall.
@@ -384,8 +385,8 @@ lenken, fordi en egen kolonne med knapp ville brutt de fem kolonnene.
 Standarden er **signalstyrke fallende**. Ved lik styrke sorteres det på
 **absolutt kursendring**, innenfor hver av de to delene av tabellen. Absolutt, og
 ikke med fortegn, slik at et stort fall ikke havner bakerst bare fordi det er
-negativt. **Aksjer uten gyldig signal sorteres sist**, og «uten data» aller
-sist. Tidspunktet dataene ble hentet, påvirker ikke sorteringen.
+negativt. **Aksjer uten gyldig signal sorteres sist**, og aksjene uten kurser
+aller sist. Tidspunktet dataene ble hentet, påvirker ikke sorteringen.
 
 Et klikk på en kolonne i kolonneraden sorterer på den, og et nytt klikk snur
 rekkefølgen. Første klikk sorterer Sluttkurs, Endring og Signalstyrke synkende,
@@ -493,7 +494,7 @@ med de samme tallene. Den gjør ingen nye kall, og ingenting nytt lagres.
 
 *Konsekvenser:*
 - Snittet for en bransje er snittet av endringene i FR-101 for aksjene i bransjen.
-- Antallet ruter er antallet aksjer i lista, og en aksje uten kurs for dagen har «Uten data».
+- Antallet ruter er antallet aksjer i lista. En aksje uten kurser har «Ingen kurser ennå», og en uten kurs den dagen har «Ingen kurs».
 - Tabellen og rutene viser samme endring.
 
 #### FR-107 — Endret signalstyrke siden forrige børsdag
@@ -513,20 +514,17 @@ ikke noe merke. Merket skjules når en sammenligning med en annen dag er valgt.
 
 #### FR-108 — Filter på signalet
 
-Over tabellen velges «Alle», «3 av 3 positiv» eller «3 av 3 negativ». De to
-filtrene viser antallet. Filteret viser aksjene med styrke 3 og den retningen,
-innenfor lista som vises, også i Min liste. Rekkefølgen er fortsatt FR-102.
-Teksten ved filteret sier at det viser hva sjekkene ga, og at det ikke er et
-råd. Filteret heter ikke «topp» (NFR-06, FR-703). Gir filteret ingen aksjer, står
-det hvor mange som fikk 2 av 3 i samme retning, med en lenke til dem. Hele børsen
-er ikke med, fordi det ville krevd kurser for alle aksjene hver dag (NFR-01).
+Filteret er tatt bort 11.11, etter gruppens ønske. Raden «Alle», «3 av 3
+positiv» og «3 av 3 negativ» viste ikke noe tabellen ikke alt viser under
+«Skilte seg ut». Med raden gikk også linja om filteret og lenken til dem som
+fikk 2 av 3. Over tabellen står nå bare «Alle» og «Min liste» (FR-111). At
+signalstyrken ikke er et råd om å kjøpe eller selge, står fortsatt i
+innledningen på oversikten (NFR-06).
 
 *Konsekvenser:*
-- Med filteret på vises bare aksjer med styrke 3 og retning Positiv eller Negativ etter valget.
-- Styrke 3 med Blandet vises ikke.
-- Uten filter vises hele lista.
-- Antallet ved knappen er antallet rader.
-- Filteret gjør ingen API-kall.
+- Oversikten og Min liste har ikke noe valg for signalet, og adressen leser ikke `?signal=`.
+- Over tabellen står bare «Alle» og «Min liste», med antallet.
+- Innledningen på oversikten sier at signalstyrken ikke er et råd.
 
 #### FR-109 — Hjelpen på sidene
 
@@ -539,8 +537,15 @@ bruker. Da kan ikke hjelpen si én ting mens koden gjør en annen.
 - **«Vis meg rundt».** Hver side har en liste med stegene på siden. «Spill av
   omvisningen» går gjennom oversikten, en aksjeside, børsometeret, Min liste,
   «Følg en aksje» og Innstillinger. Den går ett steg om gangen, med «Tilbake»,
-  «Neste» og «Lukk». Første gang appen åpnes, tilbys omvisningen én gang, og et
-  nei huskes i nettleseren.
+  «Neste» og «Lukk».
+- **Knappene øverst.** «Vis meg rundt» og «Spill av omvisningen» står i raden
+  øverst på sidene når «Vis hjelp» er på. Et trykk starter omvisningen med en
+  gang, uten spørsmål. «Vis meg rundt» viser stegene på siden, og «Spill av
+  omvisningen» hele omvisningen.
+- **Tilbudet.** Første gang oversikten åpnes, tilbyr den «Vis meg rundt» øverst
+  på siden, med knappene «Vis meg rundt» og «Nei takk». Et ja starter «Vis meg
+  rundt» for oversikten. Et nei gjelder bare tilbudet: det kommer ikke igjen,
+  og knappene øverst står som før. Svaret huskes i nettleseren.
 - **«Lær noe nytt».** Ikke i v1, men kan komme senere. Planen er en liten boks i
   oversikten med ett tips per dag, fra en fast liste. KI kan skrive utkast, men
   hvert tips kontrolleres og rettes av en av oss før det tas inn. Tipset er
@@ -554,13 +559,16 @@ leses som et råd (NFR-06).
 - Hvert tall i hjelpen er lik parameteren i beregningen.
 - Hvert steg i omvisningen peker på noe som finnes på siden.
 - Ingen hjelpetekst har et ord fra rådlista.
-- Et nei til omvisningen gir ikke tilbudet igjen.
+- Et nei til tilbudet gir ikke tilbudet igjen, og knappene øverst står fortsatt.
+- Et trykk på «Vis meg rundt» eller «Spill av omvisningen» starter omvisningen uten spørsmål.
+- Med «Vis hjelp» av står verken knappene eller tilbudet på siden.
 
 #### FR-110 — Innstillinger
 
 Knappen «Innstillinger» står i stripa på alle sider. Siden har bryterne «Vis
-hjelp», «Vis KI-tekst» og «Vis notater». Valgene gjelder alle sidene, lagres i
-basen og overlever en omstart. Det er ingen innlogging, så valgene gjelder
+hjelp», «Vis KI-tekst» og «Vis notater», under overskriftene «Hjelp»,
+«KI-tekst» og «Notater». Hver bryter viser «På» eller «Av». Valgene gjelder alle
+sidene, lagres i basen og overlever en omstart. Det er ingen innlogging, så valgene gjelder
 maskinen. Bryteren ved hver KI-tekst (FR-601) styrer det samme valget som «Vis
 KI-tekst», så de to viser aldri hver sin verdi.
 
@@ -580,8 +588,10 @@ siden hvordan man merker.
 
 Merket lagres i basen, gjelder maskinen og overlever en omstart. Webserveren
 skriver bare merket og henter aldri (NFR-02). Min liste har periodevalget med
-«Sammenlign siste børsdag med» og filteret (FR-108). Notatene står samlet
-nederst når «Vis notater» er på (FR-110). Min liste er et utvalg av lista
+«Sammenlign siste børsdag med». Notatene står samlet nederst under «Mine
+notater» når «Vis notater» er på (FR-110). Da står også knappen «Mine notater» i
+raden øverst på alle sidene. På en bred skjerm åpner den notatene i et panel ved
+siden av siden, og ellers går den til notatene i Min liste. Min liste er et utvalg av lista
 (FR-412), ikke en egen henting og ikke en portefølje.
 
 *Konsekvenser:*
@@ -983,10 +993,10 @@ kommando lager demobasen.
   demobasen selv. Mangler demobasen, viser siden kommandoen som lager den.
 - Demobasen ligger aldri i imaget eller i repoet.
 - Alt brukeren ser i v1, kan vises i demoen, også KI av og på, med ferdige
-  KI-tekster. Kan demoen ikke gjøre det samme fordi den ikke henter, forklarer en
-  boks hvordan det er i den ekte versjonen. Boksen kan ha et bilde laget fra
-  testdata, aldri med ekte kurser. Lista i demoen kan byttes, men det hentes
-  aldri.
+  KI-tekster. Kan demoen ikke gjøre det samme fordi den ikke henter, sier en kort
+  tekst hvordan det er i den ekte versjonen, for eksempel at et valg står som
+  «Venter på henting». Demoen viser ikke et eksempel når ingen endring venter.
+  Lista i demoen kan byttes, men det hentes aldri.
 
 *Konsekvenser:*
 - Demokommandoen kjørt to ganger gir byte for byte samme kurser.
@@ -998,7 +1008,8 @@ kommando lager demobasen.
 
 Lista har opptil 18 aksjer, valgt fritt. De 15 i §3 er lista appen starter med.
 Aksjer kan legges til og tas ut, og lista kan byttes med en ferdig liste. Siden
-viser plassene som er brukt, for eksempel «16 av 18 aksjer i lista». En nittende
+viser plassene som er brukt, for eksempel «Appen følger 16 av 18, 2 plasser
+ledige.». En nittende
 avvises med en forklaring. En aksje brukeren har valgt selv, merkes «Egen».
 
 - En endring tas i bruk ved neste henting, på en børsdag. Webserveren skriver bare
@@ -1102,8 +1113,12 @@ ikke et utviklerflagg, fordi bidraget skal kunne vises fram mens noen ser på.
 
 Med KI på sier siden hvorfor en tekst mangler:
 
-- Har dagen ingen tekster i loggen, sier den at KI var av, eller at modellen ikke
-  svarte da hentingen gikk.
+- Har den siste børsdagen ingen tekster i loggen i den ekte versjonen, sier den
+  at teksten lages når kursene hentes, på en maskin med en språkmodell, med
+  lenken «Slik slår du den på».
+- Har en tidligere dag ingen tekster i loggen, sier den at KI var av, eller at
+  modellen ikke svarte da hentingen gikk.
+- Svarte ikke modellen da hentingen gikk, sier den det.
 - Har andre aksjer tekster for dagen, sier den at teksten for denne ikke ble
   laget.
 - Ellers sier den om teksten ikke besto kontrollen, eller ikke stemmer med
@@ -1112,7 +1127,8 @@ Med KI på sier siden hvorfor en tekst mangler:
 *Konsekvenser:*
 - Med KI av har aksjesiden og forsiden ingen KI-tekst og ingen melding om KI.
 - Et klikk på bryteren ved teksten endrer valget i Innstillinger.
-- En dag uten rader i loggen gir meldingen om at KI var av, eller at modellen ikke svarte.
+- En tidligere dag uten rader i loggen gir meldingen om at KI var av, eller at modellen ikke svarte.
+- Den siste børsdagen uten rader i loggen gir lenken «Slik slår du den på».
 
 #### FR-602 — Visningen når KI-laget er av
 
@@ -1231,7 +1247,8 @@ Under tabellen i markedsoversikten står noen setninger om hele børsdagen,
 - hvor mange som gikk bedre enn indeksen, og hvor mange som hadde kurs
 - hvor mange som skilte seg ut per retning, og navnene på høyst fem av dem med
   styrke og retning
-- antall som steg per bransje, og bransjene som steg og falt mest
+- antall som steg per bransje, og bransjene som steg og falt mest, regnet bare
+  for bransjene med minst to aksjer med endring den dagen
 - om flere eller færre enn vanlig skilte seg ut
 
 Grunnlaget har ingen prosenter. Teksten lages én gang i hentekommandoen, med ett
@@ -1243,13 +1260,22 @@ grunnlaget stemmer med det siden viser. Den gir ikke råd og spår ikke (NFR-06)
 - Teksten om dagen har én rad i loggen per børsdag.
 - Et tall i teksten som ikke står i grunnlaget, stopper den.
 - Med KI av vises den ikke.
+- En setning om bransjen som steg eller falt mest, slutter med «mest av bransjene med minst to aksjer», ellers stopper kontrollen den.
 
 #### FR-608 — Valg av tjeneste
 
 Tjenesten velges i `.env` med `OSE_KI_TJENESTE`: `lokal`, `gemini`, `anthropic`,
 `openai` eller `av`. Uten variabelen gjelder `lokal`. Malen `.env.example` har
-`av`, så KI er av for en ny bruker til README-en sier hvordan den slås på. Den
-lokale modellen trenger verken nøkkel eller konto.
+`lokal`, så KI-teksten står på i en ny installasjon. Den lokale modellen trenger
+verken nøkkel eller konto.
+
+Første gang den ekte versjonen startes med dobbeltklikk på Windows, og den lokale
+modellen ikke svarer, spør startskriptet om tre valg: hente Gemma, bruke egen
+API-nøkkel eller «Ikke nå». Svarer ingen på 30 sekunder, blir det ingen KI-tekst
+denne gangen, og spørsmålet kommer igjen neste gang. «Ikke nå» huskes, så
+vinduet spør ikke igjen. En `.env` som finnes fra før, endres ikke uten et valg.
+Svarer ikke modellen ved hentingen, lages ingen KI-tekst, og hentingen sier
+hvorfor. Kursene hentes som før (NFR-04). Demoen spør aldri.
 
 Det er én tjeneste per kjøring, uten stille overgang til en annen. Feiler
 tjenesten, blir det ingen tekst og en rad i loggen (FR-604, NFR-04). Nøklene
@@ -1265,6 +1291,8 @@ Et Claude-abonnement kan ikke brukes.
 - En tjeneste som feiler, gir ingen tekst fra en annen tjeneste.
 - Med `av` gjøres ingen kall til en modell.
 - Ingen nøkkel står i repoet.
+- `.env.example` har `OSE_KI_TJENESTE=lokal`.
+- Uten svar på 30 sekunder starter appen uten KI-tekst, og ingenting lagres.
 
 ---
 
