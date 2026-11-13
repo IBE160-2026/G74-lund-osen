@@ -2,7 +2,7 @@
 title: 'Story 8.29: «Din egen liste: kom i gang» som tavla, og investorknappen 44 px'
 type: 'feature'
 created: '2026-11-13'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '46692396'
 context:
@@ -139,3 +139,7 @@ Diffen `d905cb62..99d454b3`, med tre lesere som ikke så hverandres funn. 15 fun
 |---|---|---|---|
 | M1 | `be35000a` | `min-height: 30px` til `20px` for brikkene i steg 3 i `stil.css` | Fanget av `test_brikkene_i_stilen` og `test_delen_i_nettleseren` ved 1280, 700 og 390 px i demoen; den ekte versjonen har ingen ferdige lister. `stil.css` var lik HEAD etterpå (`git hash-object`). |
 | M2 | arbeidskopien før `99d454b3` | `verdi >= terskel` til `verdi > terskel` i makroen `styrke` i `_brikker.html` (tillegg 2) | Fanget av 7 tester: `test_i_notatet` og `test_i_signalet_dag_for_dag` med 2 av 3 i begge versjonene, `test_paa_sidene` i begge og `test_styrken_merkes_som_i_tabellen_paa_oversikten`. `_brikker.html` var lik før etterpå (`git hash-object`). |
+
+## Flettet
+
+8.29 er squash-flettet med PR #154 i `f98d979e` 14.11 kl. 00:15, låst til head-en `808044a0` (main med 8.27, 10.11, 8.19, 8.28 og 9.11 flettet inn), etter instruksjonen kl. 11:26, tillegg 1 og 2 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. «De 15 mest omsatte» fra 8.28 står først blant brikkene i steg 3, med samme klasse og stil, så det ble ikke et spørsmål. Hele settet i CI (run 43524921914), alle fire jobbene grønne, også Windows, etter gruppens svar 13.11 kl. 18:24; lokalt hele settet i deler før flettingen av 8.27 (5634 bestått og 24 hoppet over, 5658 som `--collect-only`), og etter det testfilene grenen endrer og `--dokumentene`.
