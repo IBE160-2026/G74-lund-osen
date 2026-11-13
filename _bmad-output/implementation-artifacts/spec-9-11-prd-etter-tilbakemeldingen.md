@@ -367,3 +367,48 @@ Etter runden er ingen setninger i løpende tekst over 30 ord.
 - BH10 (lav): `lang="no"` står igjen i parentes i NFR-05.
 
 Ingen funn på middels eller over står åpne (regel 25).
+
+## Steg 2: PRD-en følger flettingene (tillegg 1, 4, 6 og 8)
+
+Main ble flettet inn i grenen to ganger 13.11:
+- `296a609a`: med 8.26, 8.27, 3.7 og 10.11.
+- `687484ab`: med 8.19 og 8.28.
+
+De to daterte linjene fra 8.26 (FR-108) og 3.7 (§4.6) kom inn i den gamle
+plassen i `prd.md`. De er flyttet ordrett til «Endringer etter 12.11» i
+endringsloggen, så testen mot taggen holder. Kravteksten ble så skrevet etter det
+appen viser, lest i koden 13.11:
+
+| Krav | Det som er endret |
+|---|---|
+| FR-108 og §2 | Filteret er tatt bort 11.11, med grunnen. Raden i §2 har «nei» |
+| FR-101 og FR-106 | «ingen kurser ennå» og «venter på henting» i stedet for «uten data» |
+| FR-101, «Hvor gamle dataene er» | Linja om når nye kurser tidligst kan hentes, bare i den ekte versjonen (8.19) |
+| FR-109 og UJ-1 | Tilbudet om «Vis meg rundt» første gang på oversikten. Et nei gjelder bare tilbudet. Knappene «Vis meg rundt» og «Spill av omvisningen» står øverst når «Vis hjelp» er på, og starter uten spørsmål (tillegg 4) |
+| FR-110 | Bryterne «Vis hjelp», «Vis KI-tekst» og «Vis notater», under overskriftene «Hjelp», «KI-tekst» og «Notater» (tillegg 8) |
+| FR-111 | Filteret er ute, og «Mine notater» står i et panel fra knappen øverst (8.27) |
+| FR-411 | Uten eksempelboksen. En kort tekst sier hvordan det er i den ekte versjonen |
+| FR-412 | Teksten om plassene slik appen viser den. «De 15 mest omsatte» står først og er bygget, og raden i §2 har «ja» (8.28) |
+| FR-601 | Teksten når KI-teksten mangler, med «Slik slår du den på» for siste børsdag (3.7) |
+| FR-607 | «mest av bransjene med minst to aksjer» (10.11) |
+| FR-608 | `.env.example` har `lokal`. Første start spør om Gemma, egen nøkkel eller «Ikke nå», med 30 sekunders frist (3.7) |
+
+Hver endring står som datert linje under «Endringer etter 12.11».
+
+**Setningen om `close`.** Språkrunden hadde tatt bort «Sluttkursen vises som
+`close`», som `src/hjelpetekster.py` siterer siden 8.26. Dokumenttestene fant det,
+og setningen står igjen under feltene i ordlista (`5beebf77`).
+
+**Testen** for ekstra-radene godtar FR-108 bare med «tatt bort» og «nei». Den
+krever «ja» for «De 15 mest omsatte». Begge mutantene ble fanget:
+- FR-108 med «ja».
+- FR-412 med «nei».
+
+Fila var lik før og etter, målt med sha256.
+
+**Lengden**, målt med `wc -l -w -c` etter steg 2: 1 870 linjer, 15 171 ord og
+94 198 byte.
+
+**Testene** følger det felles tillegget 13.11, etter gruppens svar kl. 18:24.
+Lokalt ble testfilene som leser `prd.md`, og `uv run pytest --dokumentene` kjørt.
+Hele settet ble kjørt i CI.
