@@ -1509,13 +1509,10 @@ class TestFoelgFlereAksjer:
 
     def test_stilen_tre_kolonner_og_en_ved_390(self):
         """Ville feilet hvis kortene ikke sto i tre kolonner på bred skjerm og
-        én ved 390 px, eller streken ikke var skjult for skjermlesere."""
+        én ved 390 px. Tillegg 1 til 8.29: kolonnene er CSS columns på minst
+        260 px, så det blir én kolonne ved 390 px uten egen regel."""
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
-        assert ".bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));" in stil
-        assert re.search(
-            r"@media \(max-width: 600px\) \{\s*:where\(\.side-oversikt\) \.bransjekort \{ grid-template-columns: 1fr; \}",
-            stil,
-        )
+        assert ":where(.side-oversikt) .bransjekort { columns: 3 260px; column-gap: 16px; }" in stil
 
     def test_den_ekte_versjonen(self, ekte):
         """Ville feilet hvis utformingen bare var i demoen, eller boksen om

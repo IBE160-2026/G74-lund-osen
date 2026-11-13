@@ -50,9 +50,9 @@
 </section>
 {% else %}
 <section class="egne" id="din-egen-liste" aria-labelledby="egen-liste-tittel">
-  <h2 id="egen-liste-tittel">Din egen liste</h2>
-  <p>Vil du følge helt andre aksjer, lager du din egen liste. Hver bruker har sin egen gratis nøkkel fra EODHD, som legges inn én gang.</p>
-  <h3>Din egen liste: kom i gang</h3>
+  {#- Story 8.29 (gruppens svar 13.11 kl. 10:32-10:54, tavla «Min liste»
+      13.10): én overskrift for delen, med id-en delen viser til. #}
+  <h2 id="egen-liste-tittel">Din egen liste: kom i gang</h2>
   <p>Appen kjører på din egen maskin, så det finnes ingen innlogging hos oss. Du trenger bare din egen gratiskonto hos EODHD. Da velger du selv hvilke aksjer du følger.</p>
   {#- Story 8.22 (utdraget §2): de tre stegene som kort. Steg 2 er en
       forklaring, ikke et felt: webserveren rører aldri nøkkelen (AD-10, svaret
@@ -75,7 +75,7 @@
     </li>
     <li class="kort-steg">
       <div class="steg-topp"><span class="stegnummer" aria-hidden="true">2</span><h4>Lim inn nøkkelen din</h4> {{ hjelpeknapp("hjelp-noekkel", "Hjelp: slik bytter du nøkkel") }}</div>
-      <p>Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen.</p>
+      <p>Nøkkelen står på kontosiden hos EODHD. Startskriptet til den ekte versjonen spør etter den første gang, og den lagres bare på denne maskinen.</p>
       {#- Tillegg 4 til 8.22: statusen regnet av siste henting, uten kall og
           uten å lese .env. Story 8.26: én linje med ✓, i samme stil i demoen. #}
       <p class="handling">

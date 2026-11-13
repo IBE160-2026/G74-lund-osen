@@ -1142,7 +1142,9 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
    versjonene (skissen investorsiden-i-demoen.png). Teksten brytes i stedet
    for å gå ut av siden på smal skjerm. */
 p.investorboble { margin: 2rem 0 0; }
-p.investorboble a { display: inline-block; max-width: 100%; box-sizing: border-box; padding: 10px 20px;
+/* Story 8.29 (gruppens svar 13.11): minst 44 px høy, som skissen 06.11, også
+   når teksten brytes: 11 px luft over og under og 22 px linjehøyde. */
+p.investorboble a { display: inline-block; max-width: 100%; box-sizing: border-box; min-height: 44px; padding: 11px 20px; line-height: 22px;
                     border: 1.5px solid var(--blekk); border-radius: 22px; background: var(--hvit); color: var(--blekk);
                     font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
 p.investorboble a:hover { text-decoration: underline; }
@@ -1362,8 +1364,13 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .flere-setning { margin: 0 0 16px; color: var(--dempet); }
 :where(.side-oversikt) .flere-handling { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 16px; }
 :where(.side-oversikt) .flere-handling .flere-setning { margin: 0; }
-:where(.side-oversikt) .bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
-:where(.side-oversikt) .bransjekortet { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 14px 16px; }
+/* Tillegg 1 til 8.29 (svarene 13.11 kl. 10:59-11:02): kortene stables i
+   kolonner, så hvert kort starter rett under det over, uten hullene radene
+   ga. Tre kolonner på minst 260 px, to eller én når det ikke er plass, og
+   ingen kort deles. Rekkefølgen i HTML-en er som før og leses nedover. */
+:where(.side-oversikt) .bransjekort { columns: 3 260px; column-gap: 16px; }
+:where(.side-oversikt) .bransjekortet { background: var(--kort); border: 1px solid var(--strek); border-radius: 16px; padding: 14px 16px;
+                                        break-inside: avoid; margin: 0 0 16px; }
 :where(.side-oversikt) .bransjekortet h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 16px; }
 :where(.side-oversikt) .bransjekortet h4 .antall { color: var(--dempet); font-weight: 400; }
 :where(.side-oversikt) .bransjekortet h4 .bransjesymbol { width: 18px; height: 18px; flex: none; }
@@ -1372,13 +1379,29 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .bransjekortet .selskapet { display: flex; flex-direction: column; min-width: 0; }
 :where(.side-oversikt) .bransjekortet .selskapet .linje { color: var(--dempet); font-size: 12.5px; }
 :where(.side-oversikt) .bransjekortet .knapp.liten { margin-left: auto; min-height: 32px; padding: 0 10px; font-size: 13.5px; }
-@media (max-width: 900px) { :where(.side-oversikt) .bransjekort { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
-  :where(.side-oversikt) .bransjekort { grid-template-columns: 1fr; }
   :where(.side-oversikt) .plassene { align-items: flex-start; }
 }
 @media (forced-colors: active) { :where(.side-oversikt) .plassstrek span { border: 1px solid CanvasText; } :where(.side-oversikt) .plassstrek span.brukt { background: CanvasText; } }
 :where(.side-oversikt) .bytt-lista .knapp { margin-left: auto; min-height: 36px; }
+/* Story 8.29 (gruppens svar 13.11 kl. 10:32-10:54, tavla «Min liste» 13.10,
+   og tillegg 1, svarene kl. 10:59-11:02): «Din egen liste: kom i gang» uten
+   ramme, egen bakgrunn eller luft på sidene, så overskriften og kortene står
+   på sidens bakgrunn i linje med tabellen over og «Mine notater» under. Luften
+   over og under er som før (20 px og kanten på 1 px). Id-en gjør at
+   «Dine egne aksjer» på oversikten står som før. */
+:where(.side-oversikt) #din-egen-liste { padding: 21px 0; background: none; border: none; border-radius: 0; }
+:where(.side-oversikt) #din-egen-liste > h2 { margin: 0; font-size: 32px; font-weight: 500; }
+:where(.side-oversikt) #din-egen-liste .stegkort { gap: 14px; }
+:where(.side-oversikt) #din-egen-liste .kort-steg { padding: 18px 18px 20px; border-radius: 14px; }
+:where(.side-oversikt) #din-egen-liste .kort-steg .steg-topp h4 { font-size: 21px; line-height: 1.2; }
+:where(.side-oversikt) #din-egen-liste .kort-steg p { font-size: 16px; line-height: 1.5; }
+/* Brikkene i steg 3: 30 px høye (WCAG 2.5.8 krever 24), 12 px luft på
+   sidene, 13 px tekst med vekt 600, 6 px mellom og ikonet 13 px. */
+:where(.side-oversikt) #din-egen-liste .ferdige-knapper { gap: 6px; }
+:where(.side-oversikt) #din-egen-liste .ferdigknapp { min-height: 30px; height: 30px; box-sizing: border-box; padding: 0 12px;
+                                                      font-size: 13px; font-weight: 600; gap: 6px; }
+:where(.side-oversikt) #din-egen-liste .ferdigknapp .bransjesymbol { width: 13px; height: 13px; }
 /* Story 2.12 (gjennomgangen, VG2): «Utenfor målingen» på aksjesiden og i
    børsometeret, i grått. */
 :where(.side-aksje) .utenfor-linje { color: var(--dempet); font-size: 14px; margin: 4px 0 12px; }

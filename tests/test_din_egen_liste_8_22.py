@@ -60,7 +60,11 @@ def test_noekkelen_har_ikke_noe_felt(klient):  # noqa: F811
         "Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye."
         in html.split('id="hjelp-noekkel"', 1)[1]
     )
-    assert "Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen." in andre
+    # Story 8.29 (gruppens svar 13.11): setningen sier at startskriptet spør etter nøkkelen.
+    assert (
+        "Nøkkelen står på kontosiden hos EODHD. Startskriptet til den ekte versjonen spør etter den første gang,"
+        " og den lagres bare på denne maskinen." in andre
+    )
 
 
 def test_kallene_og_knappene_i_steg_3(klient):  # noqa: F811
