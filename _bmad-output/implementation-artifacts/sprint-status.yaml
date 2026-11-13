@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 13-11-2026 18:51
+last_updated: 13-11-2026 21:52
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -191,7 +191,7 @@ development_status:
   8-16-regelen-for-startdagen-og-periodene-i-kursgrafen: done
   8-17-periodevalget-i-oversikten-min-liste-og-børsometeret: done
   8-18-kommende-eksdato-i-kursgrafen: backlog
-  8-19-neste-henting-i-stripa-øverst: backlog
+  8-19-neste-henting-i-stripa-øverst: done
   8-20-ux-rettingene-etter-gjennomgangen-06-11: done
   8-21-egne-notater-paa-aksjesiden: done
   8-22-foelg-en-aksje-og-min-liste: done
@@ -200,6 +200,7 @@ development_status:
   8-25-spill-av-omvisningen: done
   8-26-vis-meg-rundt-spiller-av-siden: done
   8-27-mine-notater-i-panel: done
+  8-28-de-15-mest-omsatte: done
   epic-8-retrospective: optional
 
   epic-9: in-progress

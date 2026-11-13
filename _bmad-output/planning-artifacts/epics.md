@@ -4580,6 +4580,20 @@ NFR-08, `AD-10`
 
 **Avhenger av:** 8.0d for stripa. **Én økt:** avgjøres i planen.
 
+*Rettet 2026-11-12 (gruppens svar 12.11 kl. 17:01, tillegg 1 til 10.11):* bare den ekte versjonen viser bak «Oppdatert …» når nye kurser tidligst kan hentes, for eksempel «nye kurser fra kl. 22 i kveld» eller «nye kurser fra mandag kl. 22», og linja sier aldri at en henting kommer. Demoen viser den ikke, fordi den ikke henter. `TIDSGRENSE` står nå i `boersdag.py`, ikke i `fetch_prices.py`, så webserveren slipper å importere hentingen (AD-10), og `fetch_prices.TIDSGRENSE` er den samme. Spesifikasjonen står i [`spec-8-19-neste-henting-i-stripa.md`](../implementation-artifacts/spec-8-19-neste-henting-i-stripa.md).
+
+*Avgjort 2026-11-12 kl. 17:01 (gruppens svar):* 8.19 bygges som egen story etter 10.11, med formen over. Rådet anbefalte det. Gjengitt fra tillegg 1 til instruksjonen kl. 17:03 12.11.
+
+*Avgjort 2026-11-12 kl. 17:31 og 17:44 (gruppens svar):* omvisningen forklarer linja, også i demoen (tillegg 2), og fire steg i omvisningen rettes (tillegg 3). Begge bygges etter at 8.26 er flettet. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 20:04 (gruppens svar):* spørsmål 1–9 i spesifikasjonen er godtatt, 1–7 som bygget og 8–9 som forslaget, som bygges etter 8.26, og 8.19 flettes i natt etter 10.11. Rådet anbefalte det. Spørsmål 10 (ECH1 og ECH2) står åpent til gruppen har svart. Svaret er gjengitt fra tillegg 5 til instruksjonen kl. 17:03.
+
+*Avgjort 2026-11-12 kl. 20:42 (gruppens svar):* spørsmål 10 er godtatt som forslaget: stripa leser den siste kursdagen i basen, den eldste blant aksjene i lista, og aksjesiden bruker den samme dagen som oversikten. ECH1 og ECH2 er lukket. Rådet anbefalte det. Svaret er gjengitt fra tillegg 6 til instruksjonen kl. 17:03.
+
+*Avgjort 2026-11-13 kl. 10:18 og 18:24 (gruppens svar):* 8.19 flettes etter 8.27 (tillegg 8 til 10.11), og i kveld kjøres hele settet i CI i stedet for lokalt, fordi kveldsjobben hoppes over. Rådet anbefalte begge.
+
+*Lagt til 2026-11-13:* 8.19 er squash-flettet med PR #151 i `4fa06fc0` kl. 19:43, låst til head-en `4f473586` (main med 8.27 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–3 og 5–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Hele settet i CI (run 43484368470), etter gruppens svar 13.11 kl. 18:24: 5730 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Commit-tittelen har med seg «(flettes ikke før gruppen svarer)» fra PR-tittelen, som ikke ble rettet før flettingen. Spesifikasjonen: [`spec-8-19-neste-henting-i-stripa.md`](../implementation-artifacts/spec-8-19-neste-henting-i-stripa.md).
+
 ---
 
 ### Story 8.20: UX-rettingene etter gjennomgangen 06.11
@@ -5110,6 +5124,25 @@ Som **gruppe**, vil vi rette de lave funnene som står åpne fra fire storyer, s
 **Avhenger av:** 10.6, 8.8 og 8.11b. **Én økt:** ja.
 
 *Avgjort 2026-11-09 kl. 17:37 (gruppens svar):* forslagene i spørsmål 1 og 3–7 i spesifikasjonen er godtatt. På spørsmål 2 (ECH14 i 10.6) anbefalte rådet a, men gruppen valgte c: neste kveld lages teksten for forrige børsdag når den mangler og hovedindeksen nå er der. Det bygges senere, og ECH14 står åpent som lav. Rådet anbefalte resten. Svaret er ført etter instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-09.md`.
+
+### Story 8.28: «De 15 mest omsatte» som ferdig liste
+
+*Lagt til 2026-11-12, etter tillegg 2 til 9.11 (kl. 20:10) og gruppens svar 12.11 kl. 20:04 og 20:06:* spørsmål 15 i spesifikasjonen for 9.11. «De 15 mest omsatte» står i FR-412 og bygges som egen story. Rådet anbefalte 9.12, og gruppen valgte å bygge lista. 8.26 og 8.27 er tatt av åpne grener. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-28-de-15-mest-omsatte.md`, med spørsmålene og forslagene.
+
+Som **bruker**, vil jeg kunne starte fra de mest omsatte aksjene på hele børsen, ikke bare fra én bransje, så lista mi følger de mest likvide uten at jeg velger dem én og én.
+
+**Oppfyller:** FR-412 · **Begrenses av:** NFR-06, `AD-3`, `AD-10`, regel 19
+
+**Kontroll — hva testen ser etter:**
+- «De 15 mest omsatte» står først under «Start fra en ferdig liste», med antallet, og går til «Er du sikker?», som sier hele børsen og bransjen ved hver aksje
+- Lista er de 15 med høyest median omsetning fra den samme målingen som bransjelistene, bare målte aksjer med en bransje, uten kravet om åtte bransjer
+- «Bruk denne lista» følger hver aksje med sin egen bransje
+- Likt i demoen og den ekte versjonen, og `docs/hjelp.md` sier det
+- **Ville feilet hvis:** lista hadde flere enn 15, en aksje uten måling eller bransje, en annen rekkefølge enn omsetningen, eller en aksje ble fulgt med en annen bransje enn sin egen (`tests/test_de_15_mest_omsatte_8_28.py`)
+
+**Avhenger av:** 8.11, 8.11b, 8.22. **Én økt:** ja.
+
+*Lagt til 2026-11-13:* 8.28 er squash-flettet med PR #153 i `c8ad6f4c` kl. 21:51, låst til head-en `baaa5168` (main med 8.26, 8.27, 3.7, 10.11 og 8.19 flettet inn), etter tillegg 2 til 9.11 i `docs/ai-prompts/2026-11-12.md` og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. 8.26 hadde flyttet de ferdige listene til steg 3 i «Din egen liste», så «De 15 mest omsatte» står først blant brikkene der, og setningen bak «?» gjelder hele børsen. Hele settet i CI (run 43504332042), etter gruppens svar 13.11 kl. 18:24: 5739 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-8-28-de-15-mest-omsatte.md`](../implementation-artifacts/spec-8-28-de-15-mest-omsatte.md).
 
 ### Story 9.11: PRD-en etter tilbakemeldingen fra faglærer 12.11
 

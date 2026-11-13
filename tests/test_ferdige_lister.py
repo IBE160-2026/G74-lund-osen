@@ -159,8 +159,9 @@ class TestErDuSikker:
         delen = side.split('id="ferdige-lister"', 1)[1].split("</ul>", 1)[0]
         vindu = side.split('id="hjelp-kallene"', 1)[1].split('<p class="lukkes">', 1)[0]
         assert (
-            "velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest "
-            "omsatte aksjene i bransjen." in vindu
+            # Story 8.28: setningen gjelder også «De 15 mest omsatte» på hele børsen.
+            "velger du en liste, ser du den før noe byttes, og ved neste henting byttes lista di ut med de mest "
+            "omsatte aksjene på børsen eller i bransjen." in vindu
         )
         assert re.search(
             r'<a class="knapp ferdigknapp" href="/ferdig-liste\?bransje=Kraft"><svg class="bransjesymbol".*?</svg>'

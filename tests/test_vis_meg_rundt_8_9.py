@@ -149,8 +149,12 @@ class TestTekstene:
 
         forslaget = (Path(__file__).resolve().parent.parent / ht.ENDRINGSFORSLAGET_13_10).read_text(encoding="utf-8")
         alle = {s.tittel: s.tekst for steg in ht.rundturer().values() for s in steg}
-        assert alle["Signalstyrken"] == ht.TAVLA_STYRKEN and f"«{ht.TAVLA_STYRKEN}»" in forslaget
-        assert alle["Retningen"] == ht.TAVLA_RETNING and f"Retning: «{ht.TAVLA_RETNING} " in forslaget
+        assert f"«{ht.TAVLA_STYRKEN}»" in forslaget
+        # Story 8.19 (tillegg 3, gruppens svar 12.11 kl. 17:44): «Signalstyrken»
+        # nevner de tre sjekkene, og setningen om Blandet er flyttet til
+        # «Retningen», som begynner med teksten fra tavla.
+        assert alle["Signalstyrken"] == ht.STEGET_STYRKEN
+        assert alle["Retningen"].startswith(ht.TAVLA_RETNING) and f"Retning: «{ht.TAVLA_RETNING} " in forslaget
         # Uten den siste setningen, som 8.20a flyttet fra siden.
         assert alle["Sjekkene"] == ht.TAVLA_SJEKKENE and f"«{ht.TAVLA_SJEKKENE} Ingen vekting" in forslaget
 

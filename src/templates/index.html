@@ -459,7 +459,7 @@
     {% if hentet %}
       {#- Svar 5: vinduet heter «Oppdatert», som i ordlista (§4). #}
       {#- Story 8.26 (tillegg 8): i demoen også hvilken aksje som med vilje er uten kurser. #}
-      {{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet", "uten_data"] + (["uten_data_demo"] if eksempeltall else []))]) }}
+      {{ hjelpevindu("hjelp-hentet", "Oppdatert", [("", ["data_hentet", "neste_henting", "uten_data"] + (["uten_data_demo"] if eksempeltall else []))]) }}
     {% endif %}
   {% endif %}
 {% endblock %}
