@@ -5141,3 +5141,5 @@ Som **bruker**, vil jeg kunne starte fra de mest omsatte aksjene på hele børse
 - **Ville feilet hvis:** lista hadde flere enn 15, en aksje uten måling eller bransje, en annen rekkefølge enn omsetningen, eller en aksje ble fulgt med en annen bransje enn sin egen (`tests/test_de_15_mest_omsatte_8_28.py`)
 
 **Avhenger av:** 8.11, 8.11b, 8.22. **Én økt:** ja.
+
+*Lagt til 2026-11-13:* 8.28 er squash-flettet med PR #153 i `c8ad6f4c` kl. 21:51, låst til head-en `baaa5168` (main med 8.26, 8.27, 3.7, 10.11 og 8.19 flettet inn), etter tillegg 2 til 9.11 i `docs/ai-prompts/2026-11-12.md` og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. 8.26 hadde flyttet de ferdige listene til steg 3 i «Din egen liste», så «De 15 mest omsatte» står først blant brikkene der, og setningen bak «?» gjelder hele børsen. Hele settet i CI (run 43504332042), etter gruppens svar 13.11 kl. 18:24: 5739 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-8-28-de-15-mest-omsatte.md`](../implementation-artifacts/spec-8-28-de-15-mest-omsatte.md).

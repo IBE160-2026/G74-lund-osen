@@ -2,7 +2,7 @@
 title: 'Story 8.28: «De 15 mest omsatte» som ferdig liste'
 type: 'feature'
 created: '2026-11-12'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a93c668f'
 context:
@@ -107,3 +107,22 @@ Ingen funn på middels eller over.
 Testen som feilet, var `test_hver_lenke_gaar_til_en_side_som_finnes`, som ikke
 kjente adressen til den nye lista. Den er utvidet, og del 3 ga etterpå 1 317
 bestått. Summen er 5 412, lik `--collect-only`. Ruff er grønn.
+
+## Flettet 13.11
+
+Utført-linja for 8.19 kom på origin/main kl. 21:10. Main med 8.26, 8.27, 3.7, 10.11
+og 8.19 ble flettet inn i grenen (`baaa5168`). 8.26 hadde flyttet de ferdige
+listene til steg 3 i «Din egen liste», som brikker, med setningen bak «?».
+- «De 15 mest omsatte» står først blant brikkene i steg 3. Setningen i steg 3 sier
+  «eller en ferdig liste», og hjelpeteksten bak «?» sier «på børsen eller i
+  bransjen».
+- `docs/hjelp.md` har teksten fra main, med 8.28 lagt inn.
+- Tre tester søkte etter markupen og setningen fra før 8.26 og er rettet.
+- Avtrykkene er regnet ut på nytt, og alle bildene er tatt på nytt. «Din egen
+  liste» er 1763 px høy, mot 1709 på main, og «Mine notater» i Min liste er ny.
+
+Testfilene grenen endrer og `uv run pytest --dokumentene` ble kjørt lokalt. Den
+siste i tre deler, 2 890 til sammen, lik `--collect-only`. Hele settet ble kjørt i
+CI (run 43504332042): 5 739 bestått og 99 hoppet over i jobben `pytest`, og alle
+jobbene grønne, etter gruppens svar 13.11 kl. 18:24. PR #153 ble squash-flettet i
+`c8ad6f4c` kl. 21:51, låst til `baaa5168`.
