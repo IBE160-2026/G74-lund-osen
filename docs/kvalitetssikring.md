@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-13T23:33
+updated: 2026-11-14T00:17
 ---
 
 # Kvalitetssikring
@@ -431,7 +431,7 @@ sist i dokumentet.
 | 8.19 Neste henting i stripa øverst, med omvisningen: svarene 12.11 kl. 17:01, 17:31, 17:44, 20:04 og 20:42 og 13.11 kl. 10:18; hele settet i CI (run 43484368470), etter gruppens svar 13.11 kl. 18:24 | `4fa06fc` (#151) | 1 (2: grenen før kl. 22 i `neste_henting` og den eldste kursdagen i `kursdag_felles`) | ingen overlevde | `S/spec-8-19-neste-henting-i-stripa.md` |
 | 8.28 «De 15 mest omsatte» som ferdig liste: svarene 12.11 kl. 20:04 og 20:06; hele settet lokalt før flettingen av main og i CI (run 43504332042), etter gruppens svar 13.11 kl. 18:24 | `c8ad6f4` (#153) | 1 (1: lista fikk 16 aksjer, `MEST_OMSATTE_ANTALL + 1`) | ingen overlevde | `S/spec-8-28-de-15-mest-omsatte.md` |
 | 9.11 PRD-en etter tilbakemeldingen fra faglærer: svarene 12.11 kl. 18:00, 20:04, 20:06, 20:09, 20:10, 20:21 og 20:40, og rettelsen fra rådet 13.11 (tillegg 8); hele settet i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24 | `ef80273` (#150) | 1 (3: «*Konsekvenser:*» fjernet fra FR-108, FR-108 med «ja» og FR-412 med «nei» i tabellen i §2) | ingen overlevde | `S/spec-9-11-prd-etter-tilbakemeldingen.md` |
-| 8.29 «Din egen liste: kom i gang» som tavla, og investorknappen 44 px: svarene 13.11 kl. 10:32–10:54 og 10:59–11:02 | PR-en for 8.29; flettecommiten står under story 8.29 i `epics.md` | 1 (2, M1 og M2) | ingen overlevde | `S/spec-8-29-din-egen-liste-kom-i-gang.md` |
+| 8.29 «Din egen liste: kom i gang» som tavla, og investorknappen 44 px: svarene 13.11 kl. 10:32–10:54 og 10:59–11:02 og ønsket kl. 20:35 (tillegg 2); hele settet lokalt før flettingen av 8.27 og i CI (run 43524921914), etter gruppens svar 13.11 kl. 18:24 | `f98d979` (#154) | 1 (2, M1 og M2) | ingen overlevde | `S/spec-8-29-din-egen-liste-kom-i-gang.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
