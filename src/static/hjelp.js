@@ -361,9 +361,49 @@ const FOLGLISTA = {
   },
 };
 
+// Story 8.27: avgjørelsene i panelet «Mine notater», uten en side, så
+// testene kan kjøre dem med Node (gjennomgangen, VG2 og VG3). Skriptet for
+// panelet nederst bruker dem.
+const NOTATPANEL = {
+  AAPENT: "ose-notatpanel", // localStorage: "ja" når panelet er åpent
+  SIDEN: "ose-notatpanel-side", // localStorage: "venstre" eller "hoeyre"
+  ANKER: "#notatpanel", // appen sender tilbake hit etter lagring
+
+  // Panelet står bare fra 1056 px, og bare når det er åpent.
+  synlig(aapen, bred) {
+    return Boolean(aapen) && Boolean(bred);
+  },
+  // Åpent ved start når det er husket som åpent, eller siden kom fra et
+  // skjema i panelet.
+  aapentVedStart(lagret, anker) {
+    return lagret === "ja" || anker === NOTATPANEL.ANKER;
+  },
+  // Det som lagres når knappen trykkes: åpent når panelet var skjult.
+  etterKnappen(skjult) {
+    return skjult ? "ja" : null;
+  },
+  venstre(lagret) {
+    return lagret === "venstre";
+  },
+  // Det som lagres når «Flytt» trykkes, og teksten på knappen etterpå.
+  flytt(venstreNaa) {
+    return venstreNaa ? "hoeyre" : "venstre";
+  },
+  flyttTekst(venstre) {
+    return venstre ? "Flytt til høyre" : "Flytt til venstre";
+  },
+  // Esc lukker panelet bare når fokus er i det, og ingen annen boks er åpen
+  // (hjelpen eller omvisningen), og ingen annen kontroll har brukt tasten.
+  // Gjennomgangen (ECH4): da lukker ett trykk bare den øverste.
+  escLukker(tast, brukt, skjult, fokusIPanelet, annenAapen) {
+    return tast === "Escape" && !brukt && !skjult && fokusIPanelet && !annenAapen;
+  },
+};
+
 if (typeof module === "object" && module.exports) {
   module.exports = OMVISNING;
   module.exports.FOLGLISTA = FOLGLISTA;
+  module.exports.NOTATPANEL = NOTATPANEL;
 }
 
 (function () {
@@ -820,4 +860,158 @@ if (typeof module === "object" && module.exports) {
       oppdater();
     });
   }
+})();
+
+
+// Story 8.27 (gruppens svar 11.11 kl. 21:09–21:20): «Mine notater» i et
+// panel fra knappen øverst. Fra 1056 px åpner knappen panelet fast i kanten,
+// som hjelpefeltet (8.0f), og siden gir plass. Smalere, og uten skriptet, er
+// knappen en lenke til notatene i Min liste. Om panelet er åpent, og hvilken
+// side det står på, står i localStorage, så det huskes fra side til side og
+// fra gang til gang. Avgjørelsene står i NOTATPANEL over.
+(function () {
+  if (typeof document === "undefined") return;
+  const panel = document.getElementById("notatpanel");
+  const knapp = document.querySelector("a.notatknapp");
+  if (!panel || !knapp) return;
+  const P = NOTATPANEL;
+  const BRED = window.matchMedia("(min-width: 1056px)");
+  const rot = document.documentElement;
+  const innhold = panel.querySelector(".notatpanel-innhold");
+  const flytt = panel.querySelector("button.panelflytt");
+  const mal = document.getElementById("notatpanel-mal");
+  let hentet = false;
+
+  // Er lagringen slått av, kaster localStorage, og panelet virker likevel.
+  // Gjennomgangen (BH11): valgene står også her, så panelet holder seg
+  // når lagringen er slått av og bredden endres.
+  const minne = {};
+  function les(noekkel) {
+    try {
+      return localStorage.getItem(noekkel);
+    } catch {
+      return noekkel in minne ? minne[noekkel] : null;
+    }
+  }
+  function skriv(noekkel, verdi) {
+    minne[noekkel] = verdi;
+    try {
+      if (verdi === null) localStorage.removeItem(noekkel);
+      else localStorage.setItem(noekkel, verdi);
+    } catch {
+      // Lagringen er slått av.
+    }
+  }
+
+  // Innholdet står i en <template> fra appen, så skriptet henter ingenting.
+  // Det settes inn første gang panelet åpnes på siden.
+  function hent() {
+    if (hentet || !mal) return;
+    hentet = true;
+    innhold.replaceChildren(mal.content.cloneNode(true));
+  }
+
+  // Panelet står bare fra 1056 px. Smalere er knappen en lenke igjen.
+  function vis(aapen, fokus) {
+    const synlig = P.synlig(aapen, BRED.matches);
+    // Gjennomgangen (ECH9): fokus i panelet som skjules, går til knappen.
+    const fokusInne = panel.contains(document.activeElement);
+    panel.hidden = !synlig;
+    rot.classList.toggle("notatpanel-aapent", synlig);
+    if (BRED.matches) {
+      knapp.setAttribute("aria-controls", panel.id);
+      knapp.setAttribute("aria-expanded", synlig ? "true" : "false");
+      knapp.setAttribute("role", "button");
+    } else {
+      knapp.removeAttribute("aria-controls");
+      knapp.removeAttribute("aria-expanded");
+      knapp.removeAttribute("role");
+    }
+    if (synlig) {
+      hent();
+      if (fokus) panel.focus({ preventScroll: true });
+    } else if (fokusInne) {
+      knapp.focus({ preventScroll: true });
+    }
+  }
+
+  function side(venstre) {
+    rot.classList.toggle("panel-venstre", venstre);
+    flytt.textContent = P.flyttTekst(venstre);
+  }
+
+  knapp.addEventListener("click", (e) => {
+    if (!BRED.matches) return;
+    e.preventDefault();
+    const verdi = P.etterKnappen(panel.hidden);
+    skriv(P.AAPENT, verdi);
+    vis(verdi === "ja", verdi === "ja");
+  });
+  // Mellomrom åpner også, som en knapp, når lenken er en knapp.
+  // Gjennomgangen (BH9): ikke på nytt mens tasten holdes inne.
+  knapp.addEventListener("keydown", (e) => {
+    if (e.key === " " && BRED.matches && !e.repeat) {
+      e.preventDefault();
+      knapp.click();
+    }
+  });
+
+  function lukk() {
+    skriv(P.AAPENT, null);
+    vis(false);
+    knapp.focus();
+  }
+  panel.querySelector("button.panellukk").addEventListener("click", lukk);
+
+  flytt.addEventListener("click", () => {
+    const verdi = P.flytt(rot.classList.contains("panel-venstre"));
+    side(P.venstre(verdi));
+    skriv(P.SIDEN, verdi);
+  });
+
+  // Gjennomgangen (BH8): uten popover i nettleseren kaster velgeren.
+  function annenAapen() {
+    if (document.querySelector(".omvisning")) return true;
+    try {
+      return Boolean(document.querySelector(".hjelpevindu:popover-open"));
+    } catch {
+      return false;
+    }
+  }
+  // Gjennomgangen (ECH4): på vei ned, før hjelpen og omvisningen lukker seg
+  // på Esc, så ett trykk bare lukker den øverste.
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if (P.escLukker(e.key, e.defaultPrevented, panel.hidden, panel.contains(document.activeElement), annenAapen())) {
+        lukk();
+      }
+    },
+    true,
+  );
+
+  BRED.addEventListener("change", () => vis(les(P.AAPENT) === "ja", false));
+
+  function start() {
+    side(P.venstre(les(P.SIDEN)));
+    // Etter lagring sender appen tilbake med #notatpanel, så panelet står
+    // åpent også når lagringen er slått av.
+    const fraSkjema = location.hash === P.ANKER;
+    if (fraSkjema) {
+      skriv(P.AAPENT, "ja");
+      // Gjennomgangen (BH1): ankeret tas bort, så «Lukk» varer også når
+      // siden lastes på nytt.
+      history.replaceState(history.state, "", location.pathname + location.search);
+    }
+    vis(P.aapentVedStart(les(P.AAPENT), fraSkjema ? P.ANKER : ""), fraSkjema);
+  }
+  start();
+  // Gjennomgangen (ECH5): en side fra hurtigbufferen ved «Tilbake» har
+  // gamle notater og kanskje en tekst som alt er lagret, så den lastes på
+  // nytt når panelet var satt inn.
+  window.addEventListener("pageshow", (e) => {
+    if (!e.persisted) return;
+    if (hentet) location.reload();
+    else start();
+  });
 })();

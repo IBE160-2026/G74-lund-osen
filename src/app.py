@@ -28,13 +28,14 @@ import re
 import sqlite3
 import sys
 import threading
+import unicodedata
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta, timezone
 from functools import partial
 from pathlib import Path
-from urllib.parse import parse_qs, urlencode, urlsplit
+from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
 from flask import Flask, abort, g, redirect, render_template, request
 
@@ -93,7 +94,9 @@ from ki_visning import (
     AV,
     DAGEN_AV,
     DAGEN_UTEN,
+    DAGEN_UTEN_MODELL,
     INGEN_I_DEMOEN,
+    INGEN_MODELL,
     INGEN_RAD,
     KAPSEL,
     PAA,
@@ -362,6 +365,8 @@ _RUTER_MED_BASE = {
     # Tillegget kl. 14:44: tenkte kjøp og salg.
     "noter_tenkt_kjoep",
     "noter_tenkt_salg",
+    # Story 8.27: et notat med aksjen valgt i panelet.
+    "skriv_notat_valgt",
 }
 
 # Story 8.3: ruta som skriver merkingen. Bare den aapner en demobase for
@@ -374,6 +379,8 @@ _SKRIVERE = frozenset((_SKRIVER, "folg", "fjern_egen", "angre", "bruk_ferdig_lis
 # Story 8.21 (gruppens svar 10.11 kl. 14:32): rutene som skriver notatene, og
 # bare tabellen notat (AD-3).
 _SKRIVERE |= {"skriv_notat", "slett_notat", "noter_tenkt_kjoep", "noter_tenkt_salg"}
+# Story 8.27 (del C): et notat fra panelet, med aksjen valgt der.
+_SKRIVERE |= {"skriv_notat_valgt"}
 
 
 def _basefeil(feil: BaseException) -> str:
@@ -455,6 +462,10 @@ EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fr
 # Story 3.3i (U51): demolinja lenker til stegene for den ekte versjonen i
 # README-en paa GitHub. Den staar bare i demoen, i samme blokk som merket.
 EKTE_VERSJONEN_URL = "https://github.com/IBE160-2026/G74-lund-osen#den-ekte-versjonen"
+# Story 3.7 (tillegg 1, spoersmaal 9): en dag uten KI-tekst i den ekte
+# versjonen lenker til delen i installasjonen som sier hvordan den slaas paa.
+# Appen viser ikke filene i docs/, saa lenken gaar til GitHub, som over.
+KI_TEKSTEN_URL = "https://github.com/IBE160-2026/G74-lund-osen/blob/main/docs/installasjon.md#ki-teksten"
 
 # Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
 # innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
@@ -534,6 +545,7 @@ def _eksempeltall():
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
         "demo_startdag": demo_startdag(),
         "ekte_versjonen_url": EKTE_VERSJONEN_URL,
+        "ki_teksten_url": KI_TEKSTEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
     }
 
@@ -561,10 +573,17 @@ def _omvisningen():
     """Story 8.25: stegene i «Spill av omvisningen», på hver side, som
     «Vis meg rundt»: borte når «Vis hjelp» er av i Innstillinger. Bare
     lesing, og lik i demoen og i den ekte versjonen."""
-    if not innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_HJELP]:
+    valgene = innstillinger.les(g.get("tilkobling"))
+    if not valgene[innstillinger.VIS_HJELP]:
         return {"omvisning": None}
     # Story 8.19 (spørsmål 8): steget om dagen er ulikt i demoen.
-    return {"omvisning": omvisningen(STANDARD, bool(g.get("eksempeltall")))}
+    # Story 8.27 (spørsmål 13): steget for «Mine notater» bare med «Notater»
+    # på, og med linja om demoen i demoen.
+    return {
+        "omvisning": omvisningen(
+            STANDARD, notater=valgene[innstillinger.VIS_NOTATER], demo=bool(g.get("eksempeltall", False))
+        )
+    }
 
 
 @app.context_processor
@@ -587,8 +606,13 @@ def _hjelp():
     antall_sjekker er «3» i «N av 3» (story 8.0c), fra samme sted som hjelpen."""
     return {
         "hjelp": Hjelp(hjelpetekster(STANDARD)),
-        # Story 8.9: stegene i «Vis meg rundt», fra samme fil.
-        "rundturer": rundturer(STANDARD, bool(g.get("eksempeltall"))),
+        # Story 8.9: stegene i «Vis meg rundt», fra samme fil. Story 8.27:
+        # med steget for «Mine notater» bare når «Notater» er på.
+        "rundturer": rundturer(
+            STANDARD,
+            notater=innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_NOTATER],
+            demo=bool(g.get("eksempeltall", False)),
+        ),
         "parametre": STANDARD,
         "antall_sjekker": ANTALL_SJEKKER,
         "blandet": BLANDET,
@@ -1358,6 +1382,9 @@ def aksjedetalj(symbol: str):
         # saa ?dag= og ?periode= leses ikke (gjennomgangen 23.10, BH6,
         # ECH3). En base uten en eneste kurs gir 404 over, foer foerste
         # henting.
+        # Story 8.27, gjennomgangen (ECH3): panelet sier at aksjen ikke har
+        # kurser, i stedet for å by fram valget.
+        g.notatpanel_aksje = {"symbol": post.aksje.symbol, "navn": post.aksje.navn, "uten_kurser": True}
         # Story 3.4h (spørsmål 5): boblen nederst også her.
         return render_template(
             "aksje_uten_kurser.html",
@@ -1435,6 +1462,17 @@ def aksjedetalj(symbol: str):
         # Story 8.7: baandet for sjekk 2 og volumet for sjekk 3.
         volumfaktor=STANDARD.volumfaktor,
     )
+    # Story 8.27 (del C): skjemaet i panelet skriver for aksjen og dagen
+    # siden viser, med samme visning som skjemaet nederst.
+    g.notatpanel_tidligere = slutt != rader[-1].dato
+    g.notatpanel_aksje = {
+        "symbol": post.aksje.symbol,
+        "navn": post.aksje.navn,
+        "dag": slutt,
+        "har_kurs": any(rad.dato == slutt for rad in rader),
+        "tatt_ut": post.ut is not None,
+        "vis": _visningen(valg, slutt, periode),
+    }
     svar = app.make_response(
         render_template(
             "aksje.html",
@@ -1524,6 +1562,118 @@ _VISNINGEN = re.compile(r"dag=([0-9]{4}-[0-9]{2}-[0-9]{2})|periode=([a-z0-9-]+)"
 # Story 8.24 (gruppens svar 10.11 kl. 22:59): fra «Mine notater» i Min liste,
 # med eller uten «Alle». Bare disse to, så adressen aldri kommer fra skjemaet.
 MIN_LISTE_TILBAKE = {"min-liste": "/min-liste", "min-liste-alle": "/min-liste?vis=alle"}
+
+# --- Story 8.27: «Mine notater» i et panel fra en knapp øverst ---------------
+
+# Gruppens svar 11.11 kl. 21:09–21:20: panelet har id-en notatpanel, og et
+# skjema i panelet sender tilbake hit på siden man sto på.
+NOTATPANEL = "notatpanel"
+# Siden man sto på: en sti i appen med eller uten spørsmål, aldri en annen
+# vert («//», «/\»), mellomrom, linjeskift eller «#». Høyst 2048 tegn
+# (gjennomgangen, ECH6: en lang adresse med filter og sortering).
+_PANELSIDEN = re.compile(r"/(?![/\\])[^\s#\\]{0,2047}")
+
+
+def _panelsiden(verdi: str | None) -> str | None:
+    """Siden et skjema i panelet kom fra, eller None når verdien ikke er en
+    sti i appen. Svaret går aldri til en annen vert."""
+    if verdi and _PANELSIDEN.fullmatch(verdi):
+        return verdi
+    return None
+
+
+def _her() -> str:
+    """Siden som vises nå, med spørsmålet, som skjemaene i panelet sender
+    tilbake til. Gjennomgangen (BH4): stien kodes igjen, som spørsmålet er,
+    så en sti med mellomrom eller andre tegn kommer tilbake som den var."""
+    sporring = request.query_string.decode("utf-8", "replace")
+    return quote(request.path, safe="/-._~!$&'()*+,;=:@") + (f"?{sporring}" if sporring else "")
+
+
+def _navnenoekkel(navn: str) -> str:
+    """Navnet sortert som i norsk: æ, ø og å etter z, i den rekkefølgen, og
+    andre bokstaver med aksent som bokstaven uten (gjennomgangen, BH12), så
+    «Élkem» står ved E."""
+    navn = navn.casefold().translate(str.maketrans({"æ": "{", "ø": "|", "å": "}"}))
+    return "".join(t for t in unicodedata.normalize("NFD", navn) if not unicodedata.combining(t))
+
+
+def _aksjevalget() -> list[tuple[str, str]] | None:
+    """Aksjene i valget i panelet (spørsmål 4): de i lista som ikke er tatt
+    ut og har kurser, etter navnet. None når basen ikke kan leses."""
+    try:
+        postene = SqliteOversiktsleser(g.tilkobling).oversikt()
+    except BASEFEIL as feil:
+        app.logger.warning("Aksjene kunne ikke leses: %s", type(feil).__name__)
+        return None
+    valget = [(p.aksje.symbol, p.aksje.navn) for p in postene if p.ut is None and p.nyeste is not None]
+    return sorted(valget, key=lambda a: (_navnenoekkel(a[1]), a[0]))
+
+
+@app.context_processor
+def _notatpanelet():
+    """Story 8.27 (del B og C): innholdet i panelet, på hver side som leser
+    basen: alle notatene, de nyeste først, som i Min liste, og skjemaet for
+    et nytt notat. På aksjesiden skriver skjemaet for aksjen og dagen siden
+    viser (g.notatpanel_aksje), ellers velges aksjen. Innholdet står i en
+    <template> i rammen, som skriptet viser når panelet åpnes, så skriptet
+    henter ingenting. None når bryteren «Notater» er av, eller siden ikke
+    leser basen. Bare lesing (AD-3, AD-10)."""
+    if request.endpoint not in _RUTER_MED_BASE or request.method != "GET" or g.get("tilkobling") is None:
+        return {"notatpanel": None}
+    try:
+        if not innstillinger.les(g.tilkobling)[innstillinger.VIS_NOTATER]:
+            return {"notatpanel": None}
+    except BASEFEIL:
+        return {"notatpanel": None}
+    if "notatpanel" not in g:
+        aksjen = g.get("notatpanel_aksje")
+        # Gjennomgangen (BH2): en basefeil her gir panelet uten notater, ikke
+        # 500, så siden og feilsiden vises som før.
+        # Gjennomgangen (ECH1): viser siden en tidligere dag, står ingen
+        # knapper for kjøp og salg i panelet, som på aksjesiden og i Min liste.
+        # Aksjesiden sier selv om den viser siste dag med kurser.
+        tidligere = g.get("notatpanel_tidligere", request.args.get("dag") is not None)
+        try:
+            notatene, indeks = _alle_notatene(tidligere), _indeksen_for_grafen()[0]
+        except BASEFEIL as feil:
+            app.logger.warning("Panelet kunne ikke leses: %s", type(feil).__name__)
+            notatene, indeks = None, None
+        g.notatpanel = {
+            "notatene": notatene,
+            "indeks": indeks,
+            "aksjen": aksjen,
+            "valget": None if aksjen or notatene is None else _aksjevalget(),
+            "tilbake": _her(),
+            "maks": MAKS_TEGN,
+            "tidligere": tidligere,
+        }
+    return {"notatpanel": g.notatpanel}
+
+
+@app.post("/notat")
+def skriv_notat_valgt():
+    """Et nytt notat fra panelet utenfor aksjesiden (del C, spørsmål 3): for
+    aksjen som er valgt, med siste dag med kurs for den. Webserveren skriver
+    bare tabellen notat (AD-3), og henter aldri noe (AD-10)."""
+    symbol = request.form.get("symbol", "")
+    if not symbol:
+        abort(400)
+    post, kursdager, feilside = _notatsiden(symbol)
+    if feilside is not None:
+        return feilside
+    # Som skjemaet på aksjesiden: ikke for en aksje som er tatt ut, og bare
+    # med en dag aksjen har kurs.
+    if post.ut is not None or not kursdager:
+        abort(400)
+    try:
+        SqliteNotatlager(g.tilkobling).skriv(post.aksje.symbol, kursdager[-1], request.form.get("tekst", ""), naa())
+    except UgyldigNotat:
+        abort(400)
+    except BASEFEIL as feil:
+        g.basefeil = _basefeil(feil)
+        return _basen_kan_ikke_aapnes()
+    return redirect(_tilbake_til_notatene(post.aksje.symbol, None), code=303)
 
 
 def _notatene(
@@ -1667,16 +1817,26 @@ def _visningen(valg: Valg, slutt: date, periode: str | None) -> str:
 def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
     """Samme side, med samme periode eller dag, ved «Mine notater» (del B).
     En visning siden ikke kjenner, gir standardvisningen."""
+    # Story 8.27 (del C): skjemaene i panelet sender tilbake til siden man
+    # sto på, med panelet åpent. Bare en sti i appen godtas.
+    tilbake = _panelsiden(request.form.get("tilbake"))
+    if tilbake is not None:
+        return tilbake + f"#{NOTATPANEL}"
     # Story 8.24: skjemaene i Min liste sender tilbake dit, til «Mine notater».
     if visningen in MIN_LISTE_TILBAKE:
         return MIN_LISTE_TILBAKE[visningen] + f"#{NOTATANKER}"
     adresse_ = f"/aksje/{symbol}"
     treff = _VISNINGEN.fullmatch(visningen or "")
+    sporsmaal = []
     if treff and treff.group(1) and _gyldig_dato(treff.group(1)):
-        adresse_ += f"?dag={treff.group(1)}"
+        sporsmaal.append(f"dag={treff.group(1)}")
     elif treff and treff.group(2) in PERIODENE and treff.group(2) != VELG:
-        adresse_ += f"?periode={treff.group(2)}"
-    return adresse_ + f"#{NOTATANKER}"
+        sporsmaal.append(f"periode={treff.group(2)}")
+    # Story 8.27, gjennomgangen (BH5): fra et notat under «Vis alle» kommer
+    # siden tilbake med lista åpen.
+    if request.form.get("alle") == "1":
+        sporsmaal.append("alle=1")
+    return adresse_ + ("?" + "&".join(sporsmaal) if sporsmaal else "") + f"#{NOTATANKER}"
 
 
 def _notatsiden(symbol: str):
@@ -1987,6 +2147,12 @@ def _ki_visning(post, detalj, siste: date) -> KIVisning:
     # demobase uten KI-tekstene ikke sier det om siste dag.
     if visning.tilstand == INGEN_RAD and g.get("eksempeltall") and detalj.dato < siste:
         return KIVisning(INGEN_I_DEMOEN)
+    # Story 3.7 (tillegg 1, spoersmaal 8): i den ekte versjonen er siste dag
+    # uten rad en dag uten modell, og siden lenker til installasjonen. En
+    # eldre dag kan ikke faa teksten senere (AD-7), saa der staar grunnen som
+    # foer (gjennomgangen, ECH4, BH1).
+    if visning.tilstand == INGEN_RAD and not g.get("eksempeltall") and detalj.dato == siste:
+        return KIVisning(INGEN_MODELL)
     return visning
 
 
@@ -2026,7 +2192,13 @@ def _boersdagen(
     try:
         rad = SqliteKILogg(g.tilkobling, naa).les(Emne.dagen(dag))
         if rad is None:
-            return {**bryter, "uten": DAGEN_UTEN}
+            # Story 3.7 (tillegg 1, spoersmaal 8): uten rad i den ekte
+            # versjonen sier linja naar teksten lages, med lenken, men bare
+            # for siste dag (AD-7) og bare naar ingen aksje har en rad den
+            # dagen, saa en maskin med modellen ikke faar linja (ECH4, ECH5).
+            if g.get("eksempeltall") or dag != siste or andre_aksjer_har_ki_rad(g.tilkobling, dag, ""):
+                return {**bryter, "uten": DAGEN_UTEN}
+            return {**bryter, "uten": DAGEN_UTEN_MODELL, "lenke": True}
         lager = SqliteIndekslager(g.tilkobling)
         symboler = lager.symboler()
         indeksserie = lager.serie(valgt_indeks(symboler)) if symboler else None

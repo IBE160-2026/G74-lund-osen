@@ -38,12 +38,20 @@ ved navnet, og bransjene ved feltet sitt. Et navn som ikke staar i
 grunnlaget, blir staaende igjen naar formene er tatt ut, og stoppes som
 resten. Ord som «bør», «verdt å følge», «følg med» og «vil» stoppes under
 punkt 3 og 4 (NFR-06, lista i ki_kontroll.py).
+
+Story 10.11, promptversjon dag-3 (gruppens svar 11.11 kl. 22:04, funn 4 fra
+demoproeven): formene med «mest» sier «av bransjene med minst to aksjer»
+(AV_BRANSJENE), fordi snittet bare regnes for bransjer med minst
+MINST_I_BRANSJEN aksjer med en endring, og leseren ellers ser en bransje med
+én aksje som falt mer paa Boersometeret. Kontrollen godtar bare de nye
+formene for «mest». Grunnlaget og tallene er de samme som i dag-2.
 """
 
 import json
 import re
 from collections.abc import Mapping
 
+from dagene import MINST_I_BRANSJEN
 from dagsgrunnlag import ANDRE, MEST_NED, MEST_OPP, MOT_VANLIG, NAVNENE, UKA, VANLIG
 from ki_kontroll import (
     _EGET_MOENSTER,
@@ -59,7 +67,12 @@ from ki_kontroll import (
 from ki_modell import Modell, ModellFeilet, Modellsvar, _grunn
 from kilogg import DAG, Emne, KIRad, UgyldigKIRad
 
-DAGSPROMPTVERSJON = "dag-2"
+DAGSPROMPTVERSJON = "dag-3"
+
+# Story 10.11: det formene med «mest» slutter med, regnet av grensen for
+# bransjene, saa formen foelger MINST_I_BRANSJEN (spoersmaal 1).
+_SOM_ORD = {2: "to", 3: "tre", 4: "fire", 5: "fem"}
+AV_BRANSJENE = f"av bransjene med minst {_SOM_ORD[MINST_I_BRANSJEN]} aksjer"
 
 REGLER_DAGEN = """Du skriver noen korte setninger på norsk om hele børsdagen på Oslo Børs, for en som ikke kjenner reglene i appen.
 Appen gir hver aksje et regelbasert signal. En aksje skilte seg ut når minst to av de tre sjekkene i signalet ga utslag.
@@ -73,7 +86,7 @@ Opplysningene under er regnet ut av appen for én børsdag og for aksjene i list
 - skilte_seg_ut_navn: navnene på aksjene som skilte seg ut, høyst fem, med styrken (3 eller 2 av 3) og retningen for hver. De med 3 av 3 står først. Feltet kan mangle.
 - skilte_seg_ut_andre: hvor mange flere som skilte seg ut, utenom navnene. Feltet kan mangle.
 - bransjer: for hver bransje, steg er hvor mange aksjer som steg, og med_endring hvor mange som hadde en endring den dagen. Feltet kan mangle.
-- bransje_mest_opp og bransje_mest_ned: bransjen der aksjene i snitt steg mest, og bransjen der de i snitt falt mest, regnet ut av appen. Feltene kan mangle.
+- bransje_mest_opp og bransje_mest_ned: {av_bransjene}, bransjen der aksjene i snitt steg mest, og bransjen der de i snitt falt mest, regnet ut av appen. Feltene kan mangle.
 - skilte_seg_ut_vanlig og skilte_seg_ut_mot_vanlig: snittet av hvor mange som skilte seg ut de siste 20 børsdagene, som et helt tall, og om det var flere, færre eller like mange denne dagen. Feltene kan mangle.
 - hovedindeksen_uka: om hovedindeksen steg, falt eller var uendret de siste fem børsdagene. Feltet kan mangle.
 
@@ -85,7 +98,7 @@ Regler for teksten:
   - «‹skilte_seg_ut› skilte seg ut: ‹skilte_seg_ut_positiv› med positiv retning, ‹skilte_seg_ut_negativ› negativ og ‹skilte_seg_ut_blandet› blandet.» Ta bare med retningene som har minst én aksje. Er skilte_seg_ut 0, skriver du «Ingen aksjer skilte seg ut.»
   - «Det var flere enn vanlig: snittet de siste 20 børsdagene er ‹skilte_seg_ut_vanlig›.», med «flere enn», «færre enn» eller «like mange som» etter feltet skilte_seg_ut_mot_vanlig.
   - Om navnene skriver du formen for navnene denne dagen, som står under opplysningene, ordrett og som én setning, når den står der. Den har formen «Blant dem var ‹navn› (‹styrke› av 3, ‹retning›), ‹navn› (‹styrke› av 3, ‹retning›) og ‹skilte_seg_ut_andre› andre.»
-  - «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.», med navnet på bransjen med små bokstaver.
+  - «I snitt steg ‹bransje_mest_opp› mest {av_bransjene}.» og «I snitt falt ‹bransje_mest_ned› mest {av_bransjene}.», med navnet på bransjen med små bokstaver.
 {bransjeformen}- Mangler et felt, skriver du ikke setningen for det.
 - Skriv tallene som i opplysningene. Ikke nevn andre tall, prosenter, kurser eller beløp.
 - Ikke si noe om hovedindeksen, bransjene, retningene eller hvor mange som steg eller falt utenom formene.
@@ -95,6 +108,9 @@ Regler for teksten:
 - Ikke finn mønstre selv, og ikke sammenlign aksjene eller bransjene med hverandre utover formene.
 - Skriv aldri navnet på et felt eller tegnene ‹ › i teksten.
 """
+# Gjennomgangen av 10.11 (BH2, ECH1, VG2): prompten faar AV_BRANSJENE herfra,
+# saa prompten, kontrollen og eksempelskriveren sier det samme om grensen.
+REGLER_DAGEN = REGLER_DAGEN.replace("{av_bransjene}", AV_BRANSJENE)
 
 
 # Story 10.10: Gemma satte punktum foer «og 2 andre» (11.11), saa appen gir
@@ -225,8 +241,11 @@ _VERBET = {"steg": "steg", "falt": "falt", "var uendret": "uendret"}
 _I_PARENTES = r"\s*\(\s*(\d{1,4})\s+av\s+3\s*,\s*(positiv|negativ|blandet)\s*\)"
 _F_BLANT = re.compile(r"(?<![\w-])blant\s+dem\s+var(?![\w-])", re.IGNORECASE)
 _F_ANDRE = re.compile(r"(?<![\w-])" + _N + r"\s+andre(?![\w-])", re.IGNORECASE)
+# Story 10.11: formen slutter med AV_BRANSJENE. Uten den leses formen
+# likevel, saa kontrollen kan si hvorfor den stoppes (spoersmaal 2).
 _F_MEST = re.compile(
-    r"(?<![\w-])i\s+snitt\s+(steg|falt)\s+([a-zæøå]+(?:[\s-]+(?:og\s+)?[a-zæøå]+)?)\s+mest(?![\w-])",
+    r"(?<![\w-])i\s+snitt\s+(steg|falt)\s+([a-zæøå]+(?:[\s-]+(?:og\s+)?[a-zæøå]+)?)\s+mest"
+    r"(\s+" + r"\s+".join(AV_BRANSJENE.split()) + r")?(?![\w-])",
     re.IGNORECASE,
 )
 _MEST_FELT = {"steg": MEST_OPP, "falt": MEST_NED}
@@ -382,6 +401,8 @@ def kontroller_dagen(tekst: str, grunnlag: Mapping[str, object]) -> Kontrollsvar
             grunner.append(f"1: «{treff.group(0)}», men {felt} mangler i grunnlaget")
         elif navn != str(grunnlag[felt]).lower():
             grunner.append(f"1: «{treff.group(0)}», grunnlaget sier {grunnlag[felt]}")
+        if treff.group(3) is None:
+            grunner.append(f"1: «{treff.group(0)}» sier ikke «{AV_BRANSJENE}»")
         tekst = _ta_ut(tekst, treff)
     for treff in list(_F_BEDRE.finditer(tekst)):
         ved_feltet(treff.group(1), "bedre_enn_indeksen", treff.group(0))

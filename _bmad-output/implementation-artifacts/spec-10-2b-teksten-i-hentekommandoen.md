@@ -39,6 +39,7 @@ Planen for KI-laget ble vist i chatten 15.10 kl. 15:43 og er ført kort i Utfør
 - Svar 1: kveldshentingen går på PC-en med RTX 4070, med Ollama i Docker, alltid med grafikkort. Compose reserverer grafikkortet for Ollama.
 - Svar 2: raden står når den finnes, også når modellen feilet. Modellen kalles ikke for en aksje som har raden.
 - Svar 5: `av` er et eget valg i `OSE_KI_TJENESTE`. `.env.example` har `av`, og README-en sier hvordan KI slås på. Uten variabelen gjelder `lokal`.
+  *Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):* `.env.example` har nå `lokal`, ikke `av`, så KI-teksten står på i en ny installasjon. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor. `av` er fortsatt et eget valg, og en `.env` som finnes fra før, endres ikke. Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 - Svar 8: `OSE_KI_OLLAMA_URL`, med `http://127.0.0.1:11434` som standard og `http://ollama:11434` i compose. Porten publiseres bare på 127.0.0.1.
 
 **Fra `deferred-work.md`, tatt her:**

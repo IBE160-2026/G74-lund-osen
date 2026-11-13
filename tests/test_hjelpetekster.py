@@ -427,6 +427,9 @@ class TestSidene:
         from markupsafe import escape
 
         def vindu(html, id_):
+            # Story 8.27: panelet (<template>) står etter hjelpevinduene, og
+            # avsnittene der er notatene, ikke hjelp.
+            html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
             del_ = (
                 html.split(f'<div id="{id_}" class="hjelpevindu" popover>', 1)[1]
                 .split('<div id="hjelp-')[0]
