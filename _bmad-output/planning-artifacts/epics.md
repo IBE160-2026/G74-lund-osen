@@ -4725,6 +4725,28 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» vise
 
 *Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
 
+### Story 8.29: «Din egen liste: kom i gang» som tavla, og investorknappen 44 px
+
+*Lagt til 2026-11-13, etter instruksjonen kl. 11:26 og tillegg 1 kl. 11:26, som lagres i `docs/ai-prompts/2026-11-13.md` med flettingen.* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Den bygges på egen gren og flettes ferdig og grønt. 8.27 og 8.28 er tatt av andre vinduer, så dette er 8.29. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-29-din-egen-liste-kom-i-gang.md`.
+
+Som **bruker i demoen og den ekte versjonen**, vil jeg at «Din egen liste: kom i gang» i Min liste ser ut som på tavla, med én overskrift, titler som ikke skrives oppå seg selv og kort som står tett, og at knappen til investorsiden er stor nok å trykke på.
+
+**Oppfyller:** svarene 13.11 kl. 10:32–10:54 og 10:59–11:02 · **Begrenses av:** NFR-06, `AD-10`, regel 22
+
+**Kontroll — hva testen ser etter:**
+- Delen har én overskrift, «Din egen liste: kom i gang» (h2, 32 px), og ingen «Din egen liste» alene
+- Titlene i kortene har linjehøyde 1,2 og teksten 1,5, og brikkene i steg 3 er 30 px høye
+- Steg 2 sier at startskriptet spør etter nøkkelen, uten felt eller knapp (AD-10)
+- Delen har ingen ramme, bakgrunn eller luft på sidene, og bransjekortene står i opptil tre kolonner uten hull
+- Knappen til investorsiden er minst 44 px høy, også når teksten brytes
+- **Ville feilet hvis:** delen hadde to overskrifter, en tittel ble skrevet oppå seg selv, en brikke var lavere enn 24 px, kortene sto i rader med hull, eller knappen var lavere enn 44 px
+
+**Avhenger av:** 8.22, 8.26. **Én økt:** ja.
+
+*Avgjort 2026-11-13 kl. 10:32–10:54 (gruppens svar, med tavla «Min liste» 13.10):* «Din egen liste: kom i gang» bygges med tallene fra tavla, likt i demoen og den ekte versjonen, og investorknappen blir minst 44 px høy, som skissen 06.11. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 kl. 10:59–11:02 (gruppens ønske og svar, tillegg 1):* delen får ingen ramme, bakgrunn eller luft på sidene, og bransjekortene stables i kolonner uten hull. Rådet anbefalte begge og har prøvd dem.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
