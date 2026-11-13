@@ -1422,7 +1422,7 @@ class TestFerdigeListerBareISteg3:
         aksjer», eller ankeret #ferdige-lister ikke var i steg 3."""
         side = _side(klient, "/min-liste")
         assert side.count('id="ferdige-lister"') == 1
-        steg3 = side.split("Velg aksjene dine</h4>", 1)[1].split("</li>\n  </ol>", 1)[0]
+        steg3 = side.split("Velg aksjene dine</h3>", 1)[1].split("</li>\n  </ol>", 1)[0]
         assert 'id="ferdige-lister"' in steg3
         flere = side.split('id="folg-flere"', 1)[1]
         assert "ferdig-liste?bransje=" not in flere.split("</section>", 1)[0]

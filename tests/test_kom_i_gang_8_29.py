@@ -139,22 +139,25 @@ MAAL_DELEN = r"""
 const s = document.querySelector('#din-egen-liste');
 const r = (e) => e.getBoundingClientRect();
 const cs = getComputedStyle(s), h2 = s.querySelector('h2'), h2s = getComputedStyle(h2);
-const naboen = document.querySelector('main table') || document.querySelector('#mine-notater');
+const naboen = document.querySelector('#mine-notater') || document.querySelector('main table');
 const titler = [...s.querySelectorAll('.steg-topp h3')].map((h) => [parseFloat(getComputedStyle(h).lineHeight), r(h).height]);
 const brikker = [...s.querySelectorAll('.ferdigknapp')].map((b) => [r(b).height, b.scrollHeight <= b.clientHeight + 1]);
 const kort = [...s.querySelectorAll('.bransjekortet')].map((k) => [Math.round(r(k).left), r(k).top, r(k).bottom]);
 const hvite = [...s.querySelectorAll('.kort-steg, .bransjekortet')].every((k) => getComputedStyle(k).backgroundColor === 'rgb(255, 255, 255)');
 const rekkefoelgen = [...s.querySelectorAll('.bransjekortet h4')].map((h) => h.textContent.trim());
+const kolonne = s.querySelector('.bransjekort');
+// Målt før fokus, som ruller siden.
+const under = kolonne ? Math.round(r(kolonne).bottom - Math.max(...kort.map((k) => k[2]))) : null;
+const delen = [Math.round(r(s).left), Math.round(r(s).right)];
 let fokus = null;
 const knapp = s.querySelector('.ferdigknapp') || s.querySelector('.handling .knapp');
 if (knapp) { knapp.focus(); const f = getComputedStyle(knapp); fokus = [knapp.matches(':focus-visible'), f.outlineStyle, f.outlineWidth]; }
-const kolonne = s.querySelector('.bransjekort');
 ferdig({h2: s.querySelectorAll('h2').length, h2stil: [h2s.fontSize, h2s.fontWeight, h2s.fontFamily.split(',')[0]],
         bakgrunn: cs.backgroundColor, kant: cs.borderTopWidth,
-        delen: [Math.round(r(s).left), Math.round(r(s).right)],
+        delen,
         naboen: naboen ? [Math.round(r(naboen).left), Math.round(r(naboen).right)] : null,
         titler, brikker, kort, hvite, rekkefoelgen, fokus,
-        under: kolonne ? Math.round(r(kolonne).bottom - Math.max(...kort.map((k) => k[2]))) : null,
+        under,
         rulling: document.documentElement.scrollWidth > document.documentElement.clientWidth});
 """
 
@@ -175,7 +178,8 @@ def test_delen_i_nettleseren(request, tmp_path, hvilken, bredde, kolonner):
     bransjekort og den ekte versjonen like mange, nok til tre kolonner."""
     k, side = _versjonen(request, hvilken)
     rekkefoelgen = [
-        re.sub(r"<[^>]+>|\s+\d+\s*$", "", h).strip() for h in re.findall(r'<h4 id="flere-\d+">(.*?)</h4>', side, re.S)
+        re.sub(r"\s+\d+$", "", re.sub(r"<[^>]+>", "", h).strip())
+        for h in re.findall(r'<h4 id="flere-\d+">(.*?)</h4>', side, re.S)
     ]
     r = _kjoer(side, tmp_path, bredde, MAAL_DELEN)
     assert r["h2"] == 1 and r["h2stil"] == ["32px", "500", "Newsreader"], r["h2stil"]
