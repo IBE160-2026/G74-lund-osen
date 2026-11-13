@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-13T23:07
+updated: 2026-11-13T23:34
 ---
 
 # PRD — OSE Signal
@@ -1036,7 +1036,7 @@ avvises med en forklaring. En aksje brukeren har valgt selv, merkes «Egen».
 
 **Ferdige lister:** de 15 i §3, «De 15 mest omsatte» på hele børsen, og én liste
 per bransje med de opptil 18 med høyest målt omsetning. «De 15 mest omsatte» står
-først blant de ferdige listene i «Din egen liste», og hver aksje følges med sin
+først blant de ferdige listene i «Din egen liste», og hver aksje står med sin
 egen bransje. «De 15 mest omsatte»
 regnes av den samme målingen som bransjelistene, bare med målte aksjer. Den har
 ikke kravet om minst åtte bransjer i §3. En liste vi ikke har målt, står ikke

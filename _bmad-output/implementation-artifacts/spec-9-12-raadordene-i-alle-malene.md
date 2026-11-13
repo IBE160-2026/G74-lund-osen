@@ -84,3 +84,14 @@ så sha256 ble sammenlignet etter samme linjeskift. Den var lik `git show HEAD:`
 **Hele settet** i tre deler, aldri samtidig med en annen pytest: 2 013 bestått
 og 23 hoppet over, 2 132 bestått og 1 hoppet over, og 1 238 bestått. Summen er
 5 407, lik `--collect-only`. Ruff er grønn.
+
+## Flettingen av main 13.11 og det testen fant
+
+Main med 8.19, 8.28 og 9.11 ble flettet inn i grenen 13.11 (`912a2b43`). Punkt 26
+i §8 er lukket, og NFR-06 sier at testen finnes (tillegg 7, `16ccf117`). CI (run
+43519071873) var rød på `test_ingen_raad_i_det_appen_viser`. 8.28 hadde lagt til
+«og hver følges med sin egen bransje» på siden «Er du sikker?» for «De 15 mest
+omsatte», og «følg… med» står i rådlista. Det er ikke et ekte råd, men setningen
+kunne leses som «følg med». Den første omskrivingen, «beholder», traff også
+rådlista. Setningen er nå «og hver aksje står med sin egen bransje» i malen, i
+`docs/hjelp.md` og i FR-412, og testen er grønn uten nye unntak.
