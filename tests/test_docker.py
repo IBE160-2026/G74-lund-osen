@@ -3959,6 +3959,8 @@ EKSTRA_FERDIG = (
     ("faste bransjer", "«følg en aksje»"),
     # Story 8.25 (svaret 11.11 kl. 13:49): omvisningen er flettet.
     ("«spill av omvisningen»", "«vis meg rundt»"),
+    # Story 8.19 (tillegg 5 til 10.11, svaret 12.11 kl. 20:04): linja bak «Oppdatert» er flettet.
+    ("«oppdatert»", "nye kurser tidligst"),
 )
 
 
