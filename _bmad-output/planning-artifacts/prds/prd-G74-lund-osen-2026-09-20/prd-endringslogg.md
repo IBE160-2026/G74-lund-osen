@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-13T22:13
+updated: 2026-11-13T23:07
 ---
 
 # Endringslogg for PRD-en
@@ -1628,3 +1628,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Rettet 2026-11-13 (tillegg 4, 6 og 8 til 9.11, etter flettingen av 8.26, 8.27, 3.7 og 10.11):* kravene sier det appen viser, lest i koden 13.11. FR-108 sier at filteret er tatt bort, og hvorfor, og raden i §2 har «nei». FR-101 og FR-106 har «ingen kurser ennå» i stedet for «uten data». FR-109 og UJ-1 har tilbudet om «Vis meg rundt» på oversikten første gang, et nei som bare gjelder tilbudet, og knappene øverst når «Vis hjelp» er på, som starter uten spørsmål. FR-110 har bryterne «Vis hjelp», «Vis KI-tekst» og «Vis notater» under overskriftene. FR-111 har «Mine notater» i et panel. FR-411 er uten eksempelboksen. FR-412 har teksten om plassene slik appen viser den. FR-601 har teksten når KI-teksten mangler, FR-607 «mest av bransjene med minst to aksjer», og FR-608 `lokal` i `.env.example` og spørsmålet ved første start med 30 sekunders frist.
 
 *Rettet 2026-11-13 (tillegg 1 og 6 til 9.11, etter flettingen av 8.19 og 8.28):* «Hvor gamle dataene er» under FR-101 sier at den ekte versjonen viser når nye kurser tidligst kan hentes, bak tidspunktet i stripa (8.19). «De 15 mest omsatte» i FR-412 er bygget og står først blant de ferdige listene (8.28), og raden i §2 har «ja».
+
+*Rettet 2026-11-13 (tillegg 7 til 9.11, story 9.12):* punkt 26 i §8 er lukket. En test går gjennom alle malene, hjelpetekstene og omvisningen etter ordene i rådlista i FR-603 (`tests/test_raadordene_9_12.py`), og NFR-06 sier det. Punktet sto slik: «| 26 | **En test som går gjennom alle malene etter rådord** (NFR-06). I dag har hjelpen, omvisningen og enkelte sider hver sin test | Gruppen | Avgjøres av gruppen |».
