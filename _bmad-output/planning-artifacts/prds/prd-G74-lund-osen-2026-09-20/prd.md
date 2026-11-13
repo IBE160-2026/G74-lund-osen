@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-13T19:55
+updated: 2026-11-13T22:13
 ---
 
 # PRD — OSE Signal
@@ -193,7 +193,7 @@ lest i koden 12.11.
 | FR-410 | Hovedindeksen hentes i samme kjøring | kjerne | ja |
 | FR-411 | Demoversjonen | kjerne | ja |
 | FR-412 | Lista over aksjer, ferdige lister og egne aksjer | ekstra | ja |
-| FR-412 | «De 15 mest omsatte» | ekstra | nei |
+| FR-412 | «De 15 mest omsatte» | ekstra | ja |
 | FR-413 | Måling av omsetning | ekstra | ja |
 | FR-414 | Eks.datoer ført for hånd | senere | nei |
 | FR-501–FR-503 | Meldingsfilteret (vedlegg A) | senere | nei |
@@ -368,8 +368,15 @@ Ukedagen i overskriften og datoen under den er den eldste dagen blant radene.
 Hovedindeksen, søylene og linja over tabellen gjelder den nyeste dagen (FR-104).
 Tidsstempler vises i norsk tid.
 
+I den ekte versjonen står det bak tidspunktet når nye kurser tidligst kan
+hentes, for eksempel «nye kurser fra kl. 22 i kveld». Dagen regnes av den siste
+kursdagen i basen og børskalenderen. Linja sier ikke om kursene blir hentet,
+fordi det avhenger av at appen eller kveldsjobben kjører. Demoen henter ikke og
+viser ikke linja.
+
 *Konsekvenser:*
 - Med én aksje hentet tidligere enn de andre viser stripa den eldste tiden, og raden har sin egen.
+- I den ekte versjonen står «nye kurser fra kl. 22 i kveld» bak tidspunktet når neste børsdag er i dag, og demoen har ingen slik linje.
 - Med én aksje med en eldre dag har overskriften den eldre ukedagen.
 
 ##### Navigasjon til aksjedetaljen
@@ -1028,7 +1035,9 @@ avvises med en forklaring. En aksje brukeren har valgt selv, merkes «Egen».
 - Ingen forslag fra KI om hvilke aksjer man bør følge (NFR-06).
 
 **Ferdige lister:** de 15 i §3, «De 15 mest omsatte» på hele børsen, og én liste
-per bransje med de opptil 18 med høyest målt omsetning. «De 15 mest omsatte»
+per bransje med de opptil 18 med høyest målt omsetning. «De 15 mest omsatte» står
+først blant de ferdige listene i «Din egen liste», og hver aksje følges med sin
+egen bransje. «De 15 mest omsatte»
 regnes av den samme målingen som bransjelistene, bare med målte aksjer. Den har
 ikke kravet om minst åtte bransjer i §3. En liste vi ikke har målt, står ikke
 som ferdig liste.

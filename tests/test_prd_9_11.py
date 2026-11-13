@@ -412,9 +412,9 @@ def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
     sto som ekstra eller kjerne i tabellen i §2, manglet i tabellen eller i
     lista under «v1.1» i §8, eller kravteksten ikke sa at den ikke er i v1.
     Ekstra er det som er bygget utover briefen, så det feiler også hvis en
-    annen ekstra-rad enn «De 15 mest omsatte» og filteret i FR-108 sto uten
-    «ja». Filteret ble tatt bort 11.11 (8.26), så raden skal si det og ha
-    «nei» (tillegg 6)."""
+    annen ekstra-rad enn filteret i FR-108 sto uten «ja», også «De 15 mest
+    omsatte», som er flettet med 8.28. Filteret ble tatt bort 11.11 (8.26), så
+    raden skal si det og ha «nei» (tillegg 6)."""
     tekst = _prd()
     del2 = tekst.split("### Kjerne, ekstra og senere\n", 1)[1].split("\n### ", 1)[0]
     status = {}
@@ -429,10 +429,7 @@ def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
         assert f"({fr})" in v11, fr
         assert "ikke i v1" in " ".join(kravene[fr].split()).lower(), fr
     ekstra_uten_bygg = [
-        k
-        for k, s in status.items()
-        if s == "ekstra"
-        and k not in (("FR-412", "«De 15 mest omsatte»"), ("FR-108", "Filter på signalet, tatt bort 11.11"))
+        k for k, s in status.items() if s == "ekstra" and k != ("FR-108", "Filter på signalet, tatt bort 11.11")
     ]
     del2_rader = {
         (r.split("|")[1].strip(), r.split("|")[2].strip()): r.split("|")[4].strip()
