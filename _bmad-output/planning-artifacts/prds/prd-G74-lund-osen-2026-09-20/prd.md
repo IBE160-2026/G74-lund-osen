@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-13T19:43
+updated: 2026-11-13T19:55
 ---
 
 # PRD — OSE Signal
@@ -136,6 +136,8 @@ Kolonnene i oversikten bygger på disse feltene fra kilden:
 |---|---|
 | Sluttkurs | `close` for siste børsdag |
 | Endring | Endring i prosent, regnet på `adjusted_close` |
+
+Sluttkursen vises som `close`, mens endringen regnes på `adjusted_close` (FR-407).
 
 ---
 
