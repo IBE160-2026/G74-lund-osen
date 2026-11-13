@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pytest
 
+from test_historikken import base  # noqa: F401  (fiksturen, gjennomgangen VG1)
 from test_hjelpefeltet import NETTLESER, _kjoer
 from test_vis_meg_rundt_8_26 import ekte, klient, mal  # noqa: F401  (fiksturene)
 
@@ -253,12 +254,16 @@ def test_knappen_44_px_ogsaa_naar_teksten_brytes(request, tmp_path, hvilken, bre
 STYRKEN = re.compile(r'<span class="([^"]*)">(\d) av 3</span>')
 
 
-def _ventet(styrke: int) -> str:
+def _terskel() -> int:
     from signalberegning import STANDARD
 
+    return STANDARD.terskel
+
+
+def _ventet(styrke: int) -> str:
     if styrke == 3:
         return "pille tre-av-tre"
-    return "pille to-av-tre" if styrke >= STANDARD.terskel else "styrketall"
+    return "pille to-av-tre" if styrke >= _terskel() else "styrketall"
 
 
 def _dagen(styrke: int):
@@ -285,6 +290,8 @@ class TestStyrkenSomTabellen:
             html = render_template_string(
                 '{% from "_notat.html" import signalet with context %}{{ signalet(dag) }}', dag=_dagen(styrke)
             )
+            # Gjennomgangen (BH2): malene får samme terskel som _ventet.
+            assert render_template_string("{{ parametre.terskel }}") == str(_terskel())
         assert STYRKEN.findall(html) == [(_ventet(styrke), str(styrke))], html
 
     @VERSJONENE
@@ -298,7 +305,9 @@ class TestStyrkenSomTabellen:
 
         _versjonen(request, hvilken)
         aksjemal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
-        cellen = re.search(r"\{% if dag\.vurdering %\}(.*?)\{% elif not dag\.tom %\}", aksjemal, flags=re.S).group(1)
+        treff = re.search(r"\{% if dag\.vurdering %\}(.*?)\{% elif not dag\.tom %\}", aksjemal, flags=re.S)
+        assert treff, "cellen i «Signalet dag for dag» er flyttet (gjennomgangen, VG3)"
+        cellen = treff.group(1)
         with app_modul.app.test_request_context("/"):
             html = render_template_string(
                 '{% from "_brikker.html" import brikker, retningspille, styrke %}' + cellen, dag=_dagen(styrke)
@@ -309,7 +318,8 @@ class TestStyrkenSomTabellen:
     def test_paa_sidene(self, request, hvilken):
         """Ville feilet hvis en dag i «Signalet dag for dag» eller et notat på
         sidene viste styrken på en annen måte enn tabellen. I demoen skal
-        historikken ha alle fire, så regelen er prøvd for hver."""
+        historikken ha alle fire, så regelen er prøvd for hver. Den ekte
+        versjonen med 0-3 og notater står i TestStyrkenIDenEkteVersjonen."""
         k, side = _versjonen(request, hvilken)
         symbolene = sorted(set(re.findall(r'href="/aksje/([A-Z]+)"', _side(k, "/"))))
         sett = set()
@@ -321,9 +331,8 @@ class TestStyrkenSomTabellen:
             for klasse, tall in STYRKEN.findall(historikken):
                 assert klasse == _ventet(int(tall)), (symbol, klasse, tall)
                 sett.add(int(tall))
-        for etterpaa in re.findall(r'<div class="etterpaa".*?</div>', side, flags=re.S):
-            for klasse, tall in STYRKEN.findall(etterpaa):
-                assert klasse == _ventet(int(tall)), (klasse, tall)
+        for klasse, tall in _i_notatene(side):
+            assert klasse == _ventet(int(tall)), (klasse, tall)
         assert sett, "ingen dager i historikken"
         if hvilken == "klient":
             assert sett == {0, 1, 2, 3}, sett
@@ -339,9 +348,78 @@ class TestStyrkenSomTabellen:
         """Ville feilet hvis den hvite pillen eller teksten uten pille manglet
         stil i notatene eller i «Signalet dag for dag»."""
         for del_ in (
-            ".etterpaa .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit);",
-            ".etterpaa .styrketall { font-weight: 700;",
-            ".historikk .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit);",
-            ".historikk .styrketall { font-weight: 700;",
+            "\n.etterpaa .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit);",
+            "\n.etterpaa .styrketall { font-weight: 700;",
+            "\n:where(.side-aksje) .historikk .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit);",
+            "\n:where(.side-aksje) .historikk .styrketall { font-weight: 700;",
         ):
-            assert del_ in STIL, del_
+            # Gjennomgangen (VG4): hele selektoren fra linjestart, så et annet
+            # omfang ikke teller. Notatene er uten omfang, fordi panelet står
+            # på alle sidene.
+            assert del_ in STIL.replace("\r\n", "\n"), del_
+
+
+def _i_notatene(side: str) -> list[tuple[str, str]]:
+    """Styrkene under «Etterpå» i notatene på en side (gjennomgangen, BH3)."""
+    treff = []
+    for blokk in side.split('<div class="etterpaa">')[1:]:
+        treff += STYRKEN.findall(blokk.split("</div>", 1)[0])
+    return treff
+
+
+@pytest.fixture
+def ekte_med_notater(base, monkeypatch):  # noqa: F811
+    """Den ekte versjonen med basen fra test_historikken: EQNR med 3 av 3
+    01.10, 0 av 3 02.10, 2 av 3 06.10 og 1 av 3 08.10 (siste dag 09.10 har
+    2 av 3), og ett notat hver av de fire dagene (gjennomgangen, VG1 og VG2)."""
+    from datetime import date, datetime, timezone
+
+    import app as app_modul
+    import lagring_sqlite
+    import test_historikken as h
+
+    monkeypatch.setattr(app_modul, "naa", lambda: h.NAA)
+    monkeypatch.delenv(app_modul.I_DEMO, raising=False)
+    monkeypatch.delenv(app_modul.I_DOCKER, raising=False)
+    tilkobling = lagring_sqlite.aapne_base(lagring_sqlite.BASE_STI)
+    try:
+        lager = lagring_sqlite.SqliteNotatlager(tilkobling)
+        for dag in (date(2026, 10, 1), date(2026, 10, 2), date(2026, 10, 6), date(2026, 10, 8)):
+            lager.skriv(h.SYMBOL, dag, f"Notat {dag:%d.%m}", datetime(2026, 10, 9, 18, tzinfo=timezone.utc))
+    finally:
+        tilkobling.close()
+    app_modul.app.config["TESTING"] = True
+    return app_modul.app.test_client()
+
+
+class TestStyrkenIDenEkteVersjonen:
+    def test_signalet_dag_for_dag_med_0_til_3(self, ekte_med_notater):
+        """Ville feilet hvis en dag med 0, 1, 2 eller 3 av 3 i «Signalet dag for
+        dag» i den ekte versjonen viste styrken på en annen måte enn tabellen
+        (gjennomgangen, VG1)."""
+        side = _side(ekte_med_notater, "/aksje/EQNR")
+        assert "Eksempeltall" not in side
+        historikken = side.split('<section class="historikk"', 1)[1].split("</section>", 1)[0]
+        funnet = STYRKEN.findall(historikken)
+        assert {int(t) for _, t in funnet} == {0, 1, 2, 3}, funnet
+        assert all(klasse == _ventet(int(tall)) for klasse, tall in funnet), funnet
+
+    @pytest.mark.parametrize("adresse", ("/min-liste", "/aksje/EQNR", "/"))
+    def test_notatene_med_0_til_3(self, ekte_med_notater, adresse):
+        """Ville feilet hvis et notat i Min liste, på aksjesiden eller i panelet
+        (malen står på alle sidene, også oversikten) viste 0, 1, 2 eller 3 av
+        3 på en annen måte enn tabellen, eller siden ikke kunne vises med
+        notatene (gjennomgangen, BH1, VG2 og ECH3)."""
+        funnet = _i_notatene(_side(ekte_med_notater, adresse))
+        assert {int(t) for _, t in funnet} == {0, 1, 2, 3}, (adresse, funnet)
+        assert all(klasse == _ventet(int(tall)) for klasse, tall in funnet), (adresse, funnet)
+
+    def test_summen_og_kortet_en_tidligere_dag(self, ekte_med_notater):
+        """Ville feilet hvis summen eller kortet «Signalstyrke» en tidligere dag
+        med 2 av 3 fikk den hvite pillen fra «Signalet dag for dag» i den ekte
+        versjonen (gjennomgangen, VG5)."""
+        side = _side(ekte_med_notater, "/aksje/EQNR?dag=2026-10-06")
+        summen = side.split('<p class="sumrad">', 1)[1].split("</p>", 1)[0]
+        kortet = side.split('<span class="etikett">Signalstyrke', 1)[1].split("</div>", 1)[0]
+        assert '<span class="pille">2 av 3</span>' in summen and "2 <span" in kortet
+        assert "to-av-tre" not in summen + kortet

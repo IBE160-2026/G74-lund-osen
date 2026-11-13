@@ -120,6 +120,7 @@ class TestToppenOgSummen:
                         continue
                     summen = html.split('<p class="sumrad">', 1)[1].split("</p>", 1)[0]
                     kortet = html.split('<span class="etikett">Signalstyrke', 1)[1].split("</div>", 1)[0]
+                    assert "2 <span" in kortet, "kortet er kuttet for tidlig (gjennomgangen, BH4)"
                     assert '<span class="pille">2 av 3</span>' in summen and "to-av-tre" not in summen + kortet
                     return
         pytest.fail("ingen tidligere dag med 2 av 3 i demoen")
