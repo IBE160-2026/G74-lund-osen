@@ -2,7 +2,7 @@
 title: 'Story 3.7: snarveien spør før nettleseren, og KI-teksten på en ny PC'
 type: 'feature'
 created: '2026-11-12'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a93c668f'
 context:
@@ -148,3 +148,5 @@ Tatt etter tillegg 1 med en testbase uten demomerket og uten rader i KI-loggen (
 26. **Fargen på lenken** (fra bildene, lav). Lenken «Slik slår du den på» står i nettleserens blå med understrek, mens resten av rammen er i blekk. *Forslag:* lenken får fargen til teksten rundt, med understrek, i `stil.css`. Det endrer avtrykkene bak alle bildene i `docs/appen/`, så det bygges etter gruppens svar, med bildene tatt på nytt.
     *Svar 12.11 kl. 19:06:* ja. Det bygges når main med 8.27 er flettet inn i grenen.
     *Bygget 13.11 (tillegg 6):* main med 8.26 ble flettet inn i grenen i stedet. 8.26 la til regelen `a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }` i `stil.css` (tillegg 10 i 8.26), så lenken har fargen til teksten rundt, med understrek, som de andre lenkene, uten en egen regel. En egen regel for `.uten a` ble prøvd og forkastet, fordi den ga en tynnere understrek enn de andre lenkene. `TestLenkefargen` i testfila for 3.7 sjekker regelen og at ingen regel for lenken gir den en egen farge. Bildene før og etter flettingen (blå, så i fargen til teksten) ligger utenfor repoet. Alle 16 bildene i `docs/appen/` ble tatt på nytt etter flettingen og er byte for byte de samme, så bare avtrykkene er nye.
+
+*Ferdig 2026-11-13:* PR #148 er squash-flettet i `b565ccd0`, låst til head-en `816f0be0`, etter gruppens svar 12.11 kl. 19:06 og 13.11 kl. 10:18 (tillegg 5 og 6). Ingen funn på middels eller over står åpne.

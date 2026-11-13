@@ -2753,6 +2753,10 @@ Spesifikasjonen er `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 
 *Avgjort 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag i spesifikasjonen godtas som bygget, også spørsmål 26: lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. Funnene som sto åpne til svaret (ECH3, ECH4, ECH5 og ECH13), er lukket. PR #148 flettes etter 8.27. Rådet anbefalte det.
 
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 6):* 3.7 flettes før 8.27, med main slik den er, med 8.26, så README-prøven på en ny PC kan starte tidligere. Rekkefølgen blir 3.7, 10.11, 8.27 og 8.19. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 3.7 er flettet med PR #148 i `b565ccd0` kl. 11:29, låst til head-en `816f0be0` (main med 8.26 flettet inn), etter instruksjonen 12.11 kl. 16:48 og tillegg 1–5 i `docs/ai-prompts/2026-11-12.md` og tillegg 6 i `docs/ai-prompts/2026-11-13.md`. Hele settet lokalt i åtte deler kl. 10:33–10:57 (`date`), hver del bare når ingen annen pytest kjørte: 5612 bestått, 24 hoppet over og 0 feilet, til sammen de 5636 som `pytest --collect-only` finner. CI var grønn på head-en (run 43407401615), med 5537 bestått og 99 hoppet over i jobben `pytest`, og steget «Snarveien og KI-spørsmålet på Windows (3.7)» kjørte 60 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `816f0be0`. Spørsmål 26 ble dekket av regelen for lenker fra 8.26, og alle 16 bildene i `docs/appen/` var like etter flettingen. Ingen funn på middels eller over sto åpne.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
