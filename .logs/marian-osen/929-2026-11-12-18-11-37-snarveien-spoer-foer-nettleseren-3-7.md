@@ -35,3 +35,26 @@ Instruksjonen «Ny liten story etter 3.6: snarveien spør før nettleseren åpne
 - Raden «KI-tekst» i tabellen «Demoen og den ekte versjonen» i README-en kommer med 8.26 og må følge 3.7 når main med 8.26 er flettet inn (tillegg 1, steg 3).
 - De to kommandoene uten Docker (`winget install --id Ollama.Ollama …` og `ollama pull gemma4:e4b`) og framdriften i et ekte vindu er ikke prøvd. De prøves i neste README-prøve på en PC uten Ollama (spørsmål 23, BH9).
 - Fargen på lenken «Slik slår du den på» (spørsmål 26): den bygges etter svaret, med bildene tatt på nytt.
+
+## 2026-11-13 kl. 12:51 — Marian Osen
+
+### Oppgave
+Tillegg 5 (limt inn 12.11 kl. 19:50, gruppens svar kl. 19:06: alle 26 spørsmål som bygget, flettingen etter 8.27) og tillegg 6 (13.11 kl. 10:22, gruppens svar kl. 10:18: 3.7 flettes nå, før 8.27). Svarene føres, main med 8.26 flettes inn i grenen, spørsmål 26 bygges, og PR #148 flettes og føres.
+
+### Plan
+- Tillegg 5 og 6 og spørsmålene underveis er kopiert ordrett til scratchpad med klokkeslettet fra `date`. Kvotesjekken 12.11 kl. 19:50: 0 kall brukt i dag (GMT), 20 igjen. Ingen andre API-kall.
+- Steg 1 i tillegg 5 først, så ventingen på 8.27 i bakgrunnen, så steg 2 og 3 etter tillegg 6.
+
+### Resultat
+- `3dc6e1d7` (grenen): svarene i spesifikasjonen og `epics.md`, ECH3, ECH4, ECH5 og ECH13 lukket, og den daterte linja under svar 1 for KI-laget (spørsmål 20). CI grønn (run 43286681192).
+- Ventingen på 8.27: stoppet av Claude Code for lite minne kl. 22:15 og startet igjen uten å spørre, som tillegg 5 sier. Den første kopien gikk likevel og ble stoppet kl. 23:07. Tillegg 6 stoppet ventingen kl. 10:22.
+- `c420ccdd`: main (8.26) flettet inn i grenen. Konfliktene i README-en, `issues.md`, `prd.md` og `test_docker.py` er løst med begge endringene. Raden «KI-tekst» i tabellen «Demoen og den ekte versjonen» følger 3.7, med testen fra 8.26 rettet.
+- Spørsmål 26: regelen `a { color: inherit; … }` fra 8.26 gir lenken fargen til teksten rundt, med understrek. En egen regel ga tynnere understrek og ble forkastet. `TestLenkefargen` i `fb7369a4`. Mutanten (regelen med blå farge) ble fanget, og `stil.css` var lik HEAD etterpå. Bildene før og etter ligger i scratchpad (`bilder-q26`).
+- `816f0be0`: alle 16 bildene i `docs/appen/` tatt på nytt etter flettingen, byte for byte de samme. Bare avtrykkene er nye.
+- Hele settet i åtte deler kl. 10:33–10:57: 5612 bestått, 24 hoppet over og 0 feilet, til sammen 5636 som `--collect-only`. ruff ren. Testene for dokumentene: 2827 bestått, 7 hoppet over. CI grønn på `816f0be0` (run 43407401615).
+- PR #148 squash-flettet i `b565ccd0` kl. 11:29, låst til `816f0be0`. Treet på main er likt treet på head-en. Testene for dokumentene på main: 2827 bestått, 7 hoppet over.
+- Føringen på main: `dd724ca9` (done, epics.md og spesifikasjonen), `9ffadc4a` (README-en, «Ekstra, ferdig»), `5aa51e7a` (kvalitetssikringen) og `1b50530b` (dagsfilene 12.11 og 13.11).
+- Fire punkter i `issues.md` er lukket.
+
+### Åpne punkter
+- De to kommandoene uten Docker og framdriften i et ekte vindu prøves i README-prøven på en PC uten Ollama (spørsmål 23, BH9). Står fra før i `issues.md`.
