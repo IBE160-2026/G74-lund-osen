@@ -257,6 +257,39 @@ class TestPanelet:
         assert ".notatpanel { display: none; }" in stilen
 
 
+class TestRaden:
+    """Gruppens svar 13.11 kl. 10:18: de sju knappene står på én rad ved
+    1280 px med mindre luft, og klikkflaten blir ikke lavere. Bredden er målt
+    i Edge (998 av 1008 px); her prøves regelen."""
+
+    def test_mindre_luft_fra_1056_px_og_samme_hoeyde(self):
+        """Ville feilet hvis knappene hadde mindre luft også på smal skjerm,
+        mer luft enn det som ble målt, mindre luft mellom radene når raden
+        brytes, en lavere klikkflate, eller en senere regel tok luften
+        tilbake."""
+        stilen = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
+        start = stilen.index("/* Story 8.27, raden")
+        blokk = stilen[start:]
+        blokk = blokk[: blokk.index("\n}") + 2]
+        media = blokk[blokk.index("@media (min-width: 1056px) {") :]
+        assert "header.stripe .sider { column-gap: 6px; }" in media
+        assert "header.stripe .sideknapp { padding: 0 8px; }" in media
+        assert "min-height" not in media and "row-gap" not in media
+        assert "header.stripe .sider { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }" in stilen
+        assert "min-height: 44px; padding: 0 16px;" in stilen
+        etter = stilen[start + len(blokk) :]
+        assert not re.search(r"\.sideknapp\s*\{[^}]*padding|\.sider\s*\{[^}]*gap", etter)
+
+    def test_raden_har_sju_knapper(self, klient, versjon):
+        """Ville feilet hvis raden hadde en annen knapp enn de sju som ble
+        målt, i demoen eller i den ekte versjonen."""
+        for adresse in SIDENE:
+            side = _side(klient, adresse)
+            raden = side[side.index('aria-label="Sidene"') :]
+            raden = raden[: raden.index("</nav>")]
+            assert len(re.findall(r'class="sideknapp\b', raden)) == 7, adresse
+
+
 # --- C) Skjemaet i panelet ----------------------------------------------------
 
 

@@ -1576,3 +1576,13 @@ th.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 
                         border: 1px solid var(--strek-2); border-radius: 999px; background: var(--hvit); color: var(--blekk); }
 .alle-notater summary:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 .alle-notater[open] summary { margin-bottom: 4px; }
+/* Story 8.27, raden (gruppens svar 13.11 kl. 10:18): med «Mine notater» og
+   knappene fra 8.26 er det sju knapper i raden øverst. Fra 1056 px har de
+   mindre luft, 8 px på sidene og 6 px mellom, så de står på én rad ved 1280 px
+   når panelet er lukket (998 av 1008 px, målt i Edge). Klikkflaten er
+   fortsatt 44 px høy (min-height i regelen for .sideknapp), og med panelet
+   åpent brytes raden som før. */
+@media (min-width: 1056px) {
+  header.stripe .sider { column-gap: 6px; }
+  header.stripe .sideknapp { padding: 0 8px; }
+}
