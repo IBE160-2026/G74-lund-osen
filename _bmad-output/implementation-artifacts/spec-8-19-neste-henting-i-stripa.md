@@ -71,6 +71,15 @@ Slått opp i grenen for 8.26 (`origin/8-26-vis-meg-rundt-spiller-av-siden`): `MA
    - **«Hovedindeksen» og «Dag for dag»:** får småtingene.
    - **Boksen «Slik leser du tabellen» og hjelpen:** følger der de sier det samme (regel 19).
 
+## Bygget etter 8.26 (spørsmål 8–10, tillegg 7)
+
+Main med 8.26 ble flettet inn i grenen 13.11 kl. 00:37 (`d04118b9`), da Utført-linja for 8.26 sto på origin/main. Konfliktene i `hjelpetekster.py`, `index.html`, `sprint-status.yaml` og `test_docker.py` er løst med begge sider.
+
+- **Spørsmål 10 (ECH1, ECH2, ECH6):** `_oppdatert_overalt` i `src/app.py` gir også `kursdag_felles`, den siste kursdagen i basen, den eldste blant aksjene i lista med kurser, som `sidens_dato` på oversikten. `_ramme.html` regner linja av den på alle sidene, også aksjesiden. `boersdag.neste_henting` og `neste_henting_tekst` tar kursdagen, ikke tidspunktet, og `boersdagen_hentet` er borte. Noe annet enn en dato gir ingen linje (ECH4).
+- **Spørsmål 8 (tillegg 2):** `rundturer` og `omvisningen` tar `demo`. I den ekte versjonen får «Dagen og perioden» på oversikten setningen «Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes.» og merker også linja (`Steg.ogsaa`, `id="neste-henting"`), og `hjelp.js` ruller til den øverste av de to delene, så begge vises. I demoen står «Den ekte versjonen viser bak «Oppdatert» øverst når nye kurser tidligst kan hentes; demoen henter ikke.», uten merke i stripa. Aksjesiden har ikke noe steg om dagen etter 8.26, så setningen står bare på oversikten. Hjelpen ved «Oppdatert» er den samme i begge versjonene.
+- **Spørsmål 9 (tillegg 3):** «Signalstyrken» nevner trend, bevegelse og interesse (T, B og I) og «fra 0 av 3 til 3 av 3», som boksen «Slik leser du tabellen». «Retningen» har setningen om Blandet og «Det er ikke et råd.» Forslaget «… om å kjøpe eller selge» står ikke, fordi ingen tekst i omvisningen kan ha ordene i `RAADSORD` (`test_ingen_tekst_gir_raad` fra 8.25); boksen sier det alt. «Signalet forklart» har sin egen tekst, og «Hovedindeksen» og «Dag for dag» har småtingene. Boksen «Slik leser du tabellen» sa det samme fra før, og `docs/hjelp.md` er rettet under «Hva er «Vis meg rundt»?» og «Når kan jeg hente?» (regel 19).
+- **Testene som er endret:** `test_tekstene_fra_tavla` (8.9) sjekker fortsatt sjekkene ordrett fra tavla, men styrken og retningen er de nye tekstene. `test_lik_i_demoen_og_den_ekte_versjonen` (8.25) unntar steget om dagen på oversikten.
+
 ## Gjennomgangen 12.11 (Edge Case Hunter)
 
 | Funn | Grad | Hva | Triage |
@@ -91,8 +100,9 @@ Slått opp i grenen for 8.26 (`origin/8-26-vis-meg-rundt-spiller-av-siden`): `MA
 | Fil | Mutanten | Fanget av |
 |---|---|---|
 | `src/boersdag.py` | grenen «før kl. 22 en børsdag gir i dag» tatt bort i `neste_henting` | `test_teksten` (tre tilfeller), `test_klokkeslettet_kommer_fra_tidsgrensen` og `test_den_ekte_versjonen_viser_linja` |
+| `src/app.py` (spørsmål 10, 13.11 kl. 01:11) | `kursdag_felles` tar den nyeste kursdagen (`max`) i stedet for den eldste | `test_ech2_en_aksje_mangler_dagen` |
 
-Kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad): fanget, og fila var lik HEAD etterpå.
+Kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad): fanget, og fila var lik HEAD etterpå. Det gjelder begge mutantene; den for spørsmål 10 kjørte på `af79c3b1`.
 
 ## Bildene
 
@@ -100,7 +110,8 @@ Kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad): fange
   - `stripa-foer.png`: main.
   - `stripa-etter-i-kveld.png`: «nye kurser fra kl. 22 i kveld».
   - `stripa-etter-naa.png`: «nye kurser kan hentes nå».
-- **Bildene i `docs/appen/`** er tatt på nytt og er byte for byte de samme, fordi demoen ikke viser linja. Avtrykkene i `tests/test_docker.py` er regnet ut på nytt.
+- **Omvisningen (spørsmål 8 og 9):** `bilder-8-19/omvisningen/` på bildegrenen (`0b06b67c`) har stegene «Dagen og perioden», «Hovedindeksen», «Signalstyrken», «Retningen», «Signalet forklart» og «Dag for dag» før (`d04118b9`) og etter (`7f50a7f2`), i demoen og den ekte versjonen. Den ekte versjonen er en testbase med oppdiktede kurser uten vurdering, så «Signalet forklart» står bare i demoen.
+- **Bildene i `docs/appen/`** er tatt på nytt og er byte for byte de samme, fordi demoen ikke viser linja, og omvisningen bare vises når den startes. Det gjelder også etter spørsmål 8–10. Avtrykkene i `tests/test_docker.py` er regnet ut på nytt.
 
 ## Hele settet
 
