@@ -42,8 +42,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-390-demo.png)
 *«Mine notater» på aksjesiden for BRFE i demoen ved 390 px, som på en mobil, bare delen med notatene, med oppdiktede selskaper («Eksempeltall»).*
 
-![«Din egen liste» i Min liste i demoen: de tre stegene som kort, med kallene lista bruker, «Bytt ut» ved hver aksje og én knapp per bransje for de ferdige listene, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
-*«Din egen liste» i Min liste i demoen, med de tre stegene som kort, kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én knapp per bransje og siden «Er du sikker?» før lista byttes. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
+![«Din egen liste: kom i gang» i Min liste i demoen: de tre stegene som kort, med kallene lista bruker, «Bytt ut» ved hver aksje og én knapp per bransje for de ferdige listene, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
+*«Din egen liste: kom i gang» i Min liste i demoen, med de tre stegene som kort, kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én knapp per bransje og siden «Er du sikker?» før lista byttes. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
 
 ![«Følg en aksje» i demoen med bransjen Kraft valgt: antallet, søket, filteret på bransje og målt omsetning, sorteringen og alle som kan følges i en tabell, med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/folg-en-aksje-demo.png)
 *«Følg en aksje» i demoen med Kraft valgt og «Mest omsatt først», ordnet etter omsetningen og ikke etter kursen eller signalet, med det valgte i oransje og «ikke målt ennå» der omsetningen ikke er målt, med oppdiktede selskaper («Eksempeltall»).*
@@ -126,7 +126,7 @@ Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra
 - Målingen av omsetning for aksjene som ikke var målt
 - Egne notater på aksjesiden, med tenkte kjøp og salg, og alle notatene i et panel fra knappen øverst
 - Ikonet i fanen og snarveien i Windows, også for demoen, med spørsmålet før nettleseren og tilbudet om Gemma første gang
-- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste: kom i gang» i tre steg
 - «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
 - Bak «Oppdatert» øverst: når nye kurser tidligst kan hentes, i den ekte versjonen
 - «De 15 mest omsatte» på hele børsen som ferdig liste, ved siden av bransjelistene

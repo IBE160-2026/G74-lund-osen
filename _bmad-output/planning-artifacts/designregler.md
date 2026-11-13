@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-10T22:04
+updated: 2026-11-13T20:43
 ---
 
 # Designregler
@@ -78,6 +78,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 *Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31):* fargene er som i originalen, med oransje som grunnfarge. 3 av 3 har strek på 4 px til venstre i raden og ring rundt pillen i sterk oransje `#F2B53A`. 2 av 3 har strek på 4 px i lys oransje `#F8DE9C`, og fet «2 av 3» som før. 1 av 3 og 0 av 3 har ingen strek og ingen farge. **Hvorfor:** gruppen vil ha utseendet fra originalen. Teksten sier alltid det samme (FR-103), og pillen har svart fyll siden 8.0e, så ringen og strekene trenger ikke 3:1 mot hvitt.
 
 *Lagt til 2026-10-17 (story 2.9b, spesifikasjonen `spec-2-9b-soeylene-under-hovedindeksen.md`):* bransjesymbolet over søylen under hovedindeksen er gult ved 3 av 3 i `#a67c00`, ikke i sterk oransje `#F2B53A`. Symbolet står på det hvite kortet, der `#F2B53A` har 1,83:1 og `#a67c00` 3,82:1, og grafikk som bærer mening skal ha minst 3:1 (WCAG 1.4.11). «3 av 3» står også i teksten for skjermleser.
+
+*Lagt til 2026-11-13 (tillegg 2 til story 8.29, gruppens ønske kl. 20:35, rådet anbefalte det):* styrken for én dag i notatene og i «Signalet dag for dag» på aksjesiden vises som i tabellen på oversikten, også en tidligere dag: 3 av 3 i pillen med oransje ring, 2 av 3 i den hvite pillen og 1 og 0 av 3 som tekst uten pille, som skissen 06.11. Linja over om 2 av 3 bare for siste børsdag gjelder fortsatt summen under sjekkene og kortet «Signalstyrke».
 
 ## 4. Ordliste – samme ord på alle sidene (01.10)
 

@@ -806,7 +806,7 @@ class TestDinEgenListeSomTavla:
         assert len(kortene) == 3
         for nummer, kort in enumerate(kortene, 1):
             assert re.search(
-                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h4>', kort
+                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h3>', kort
             ), nummer
             assert kort.rstrip().endswith("</p>") and '<p class="handling">' in kort, nummer
         assert "kort-steg .handling { margin-top: auto;" in STIL
@@ -1426,7 +1426,7 @@ class TestFerdigeListerBareISteg3:
         aksjer», eller ankeret #ferdige-lister ikke var i steg 3."""
         side = _side(klient, "/min-liste")
         assert side.count('id="ferdige-lister"') == 1
-        steg3 = side.split("Velg aksjene dine</h4>", 1)[1].split("</li>\n  </ol>", 1)[0]
+        steg3 = side.split("Velg aksjene dine</h3>", 1)[1].split("</li>\n  </ol>", 1)[0]
         assert 'id="ferdige-lister"' in steg3
         flere = side.split('id="folg-flere"', 1)[1]
         assert "ferdig-liste?bransje=" not in flere.split("</section>", 1)[0]
@@ -1513,13 +1513,10 @@ class TestFoelgFlereAksjer:
 
     def test_stilen_tre_kolonner_og_en_ved_390(self):
         """Ville feilet hvis kortene ikke sto i tre kolonner på bred skjerm og
-        én ved 390 px, eller streken ikke var skjult for skjermlesere."""
+        én ved 390 px. Tillegg 1 til 8.29: kolonnene er CSS columns på minst
+        260 px, så det blir én kolonne ved 390 px uten egen regel."""
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
-        assert ".bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));" in stil
-        assert re.search(
-            r"@media \(max-width: 600px\) \{\s*:where\(\.side-oversikt\) \.bransjekort \{ grid-template-columns: 1fr; \}",
-            stil,
-        )
+        assert ":where(.side-oversikt) .bransjekort { columns: 3 260px; column-gap: 16px; }" in stil
 
     def test_den_ekte_versjonen(self, ekte):
         """Ville feilet hvis utformingen bare var i demoen, eller boksen om

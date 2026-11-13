@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-13T22:47
+updated: 2026-11-13T23:33
 ---
 
 # Kvalitetssikring
@@ -431,6 +431,7 @@ sist i dokumentet.
 | 8.19 Neste henting i stripa øverst, med omvisningen: svarene 12.11 kl. 17:01, 17:31, 17:44, 20:04 og 20:42 og 13.11 kl. 10:18; hele settet i CI (run 43484368470), etter gruppens svar 13.11 kl. 18:24 | `4fa06fc` (#151) | 1 (2: grenen før kl. 22 i `neste_henting` og den eldste kursdagen i `kursdag_felles`) | ingen overlevde | `S/spec-8-19-neste-henting-i-stripa.md` |
 | 8.28 «De 15 mest omsatte» som ferdig liste: svarene 12.11 kl. 20:04 og 20:06; hele settet lokalt før flettingen av main og i CI (run 43504332042), etter gruppens svar 13.11 kl. 18:24 | `c8ad6f4` (#153) | 1 (1: lista fikk 16 aksjer, `MEST_OMSATTE_ANTALL + 1`) | ingen overlevde | `S/spec-8-28-de-15-mest-omsatte.md` |
 | 9.11 PRD-en etter tilbakemeldingen fra faglærer: svarene 12.11 kl. 18:00, 20:04, 20:06, 20:09, 20:10, 20:21 og 20:40, og rettelsen fra rådet 13.11 (tillegg 8); hele settet i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24 | `ef80273` (#150) | 1 (3: «*Konsekvenser:*» fjernet fra FR-108, FR-108 med «ja» og FR-412 med «nei» i tabellen i §2) | ingen overlevde | `S/spec-9-11-prd-etter-tilbakemeldingen.md` |
+| 8.29 «Din egen liste: kom i gang» som tavla, og investorknappen 44 px: svarene 13.11 kl. 10:32–10:54 og 10:59–11:02 | PR-en for 8.29; flettecommiten står under story 8.29 i `epics.md` | 1 (2, M1 og M2) | ingen overlevde | `S/spec-8-29-din-egen-liste-kom-i-gang.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -722,6 +723,7 @@ funn. Antall rader i loggen:
 | 8.19, gjennomgangen 12.11 (Edge Case Hunter, 8 funn; ECH1 og ECH2 bygget med spørsmål 10 og lukket med svaret kl. 20:42, og de lave som står, talt som utsatt) | 8 | 4 | 0 | 4 |
 | 8.28, gjennomgangen 12.11 (Edge Case Hunter, 3 funn; ECH1 rettet, ECH2 og ECH3 lave som står, talt som utsatt) | 3 | 1 | 0 | 2 |
 | 9.11, gjennomgangene 12.11 (27, 8, 13 og 12 funn fra Blind Hunter, Edge Case Hunter og Verification Gap i to deler, og 10 fra Blind Hunter i språkrunden, telt per funn; BH7 i språkrunden uten endring, talt som avvist; spørsmålene lukket med svarene kl. 20:04 og 20:06 og de lave som står, talt som utsatt) | 70 | 58 | 1 | 11 |
+| 8.29, gjennomgangene 13.11 (21 og 15 funn, telt per funn; VG8 og VG4 delvis rettet, talt som rettet; ECH3 utsatt, spørsmål 7, og ECH2 i tillegg 2 utsatt, spørsmål 9) | 36 | 31 | 3 | 2 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1585,6 +1587,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 8.19, svarene 12.11 kl. 17:01–20:42 | 2: grenen «før kl. 22 en børsdag gir i dag» tatt bort i `src/boersdag.py`, og `kursdag_felles` med den nyeste kursdagen (`max`) i `src/app.py` (spørsmål 10) | fanget, den første av `test_teksten`, `test_klokkeslettet_kommer_fra_tidsgrensen` og `test_den_ekte_versjonen_viser_linja`, den andre av `test_ech2_en_aksje_mangler_dagen`, alle i `tests/test_neste_henting.py`. Hver fil var lik HEAD etterpå | `S/spec-8-19-neste-henting-i-stripa.md` |
 | 8.28, svarene 12.11 kl. 20:04 og 20:06 | 1: lista fikk 16 aksjer i stedet for 15 (`MEST_OMSATTE_ANTALL + 1`) i `src/ferdige_lister.py` | fanget av to tester i `tests/test_de_15_mest_omsatte_8_28.py`. Fila var lik HEAD etterpå | `S/spec-8-28-de-15-mest-omsatte.md` |
 | 9.11, svarene 12.11 kl. 18:00–20:40 og tillegg 6 | 3: «*Konsekvenser:*» fjernet fra FR-108 på `d38e1101`, og FR-108 med «ja» og FR-412 med «nei» i tabellen i §2 13.11 | fanget av `test_hvert_krav_har_konsekvenser` og `test_de_aatte_som_ikke_er_i_v1_staar_som_senere` i `tests/test_prd_9_11.py`. Fila var lik før og etter, målt med sha256 | `S/spec-9-11-prd-etter-tilbakemeldingen.md` |
+| 8.29, svarene 13.11 kl. 10:32–10:54 og 10:59–11:02, og ønsket kl. 20:35 | 2: M1 på `be35000a`, `min-height: 30px` til `20px` for brikkene i steg 3 i `stil.css`; M2 for tillegg 2, `verdi >= terskel` til `verdi > terskel` i makroen `styrke` i `_brikker.html`, fanget av 7 tester i `tests/test_kom_i_gang_8_29.py` og `tests/test_historikken.py` | fanget av `test_brikkene_i_stilen` og `test_delen_i_nettleseren` ved 1280, 700 og 390 px i demoen (den ekte versjonen har ingen ferdige lister). `stil.css` var lik HEAD etterpå | `S/spec-8-29-din-egen-liste-kom-i-gang.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |

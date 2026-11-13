@@ -190,9 +190,11 @@ class TestTilstandene:
         assert oktober["06.10"][1] == "tirsdag 06.10 ↔ Blandet T +1 B -1 I 0 2 av 3"
         assert oktober["08.10"][1] == "torsdag 08.10 ↓ Negativ T 0 B 0 I -1 1 av 3"
 
-    def test_3_av_3_merkes_som_i_oversikten_og_2_av_3_ikke(self, klient, base):
+    def test_styrken_merkes_som_i_tabellen_paa_oversikten(self, klient, base):
         """Ville feilet hvis 3 av 3 ikke fikk pillen og streken fra
-        designregler.md §3, eller 2 av 3 ble merket i historikken."""
+        designregler.md §3, 2 av 3 ikke fikk den hvite pillen, eller 1 av 3
+        sto i en pille. Tillegg 2 til 8.29 (gruppens ønske 13.11 kl. 20:35):
+        som tabellen på oversikten. Før var 2 av 3 en pille uten klasse."""
         oktober = _dagene(_side(klient, f"/aksje/{SYMBOL}"))
         klasser, _, inni = oktober["01.10"]
         assert "alle" in klasser
@@ -200,7 +202,9 @@ class TestTilstandene:
         for dag in ("06.10", "09.10"):
             klasser, _, inni = oktober[dag]
             assert "alle" not in klasser and "tre-av-tre" not in inni, dag
-            assert '<span class="pille">2 av 3</span>' in inni, dag
+            assert '<span class="pille to-av-tre">2 av 3</span>' in inni, dag
+        klasser, _, inni = oktober["08.10"]
+        assert '<span class="styrketall">1 av 3</span>' in inni and 'class="pille' not in inni
 
 
 class TestTallene:

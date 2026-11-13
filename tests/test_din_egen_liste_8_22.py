@@ -25,7 +25,8 @@ def test_tre_stegkort_i_rekkefoelgen_fra_utdraget(klient):  # noqa: F811
     """Ville feilet hvis stegene ikke var tre kort, i rekkefølgen konto,
     nøkkel og aksjer, med nummeret i kortet."""
     kortene = _kortene(klient.get("/min-liste").data.decode("utf-8"))
-    assert [re.search(r"<h4>(.*?)</h4>", k).group(1) for k in kortene] == [
+    # Story 8.29 (gjennomgangen, BH1): titlene er h3.
+    assert [re.search(r"<h3>(.*?)</h3>", k).group(1) for k in kortene] == [
         "Lag en gratis konto hos EODHD",
         "Lim inn nøkkelen din",
         "Velg aksjene dine",
@@ -60,7 +61,11 @@ def test_noekkelen_har_ikke_noe_felt(klient):  # noqa: F811
         "Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye."
         in html.split('id="hjelp-noekkel"', 1)[1]
     )
-    assert "Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen." in andre
+    # Story 8.29 (gruppens svar 13.11): setningen sier at startskriptet spør etter nøkkelen.
+    assert (
+        "Nøkkelen står på kontosiden hos EODHD. Startskriptet til den ekte versjonen spør etter den første gang,"
+        " og den lagres bare på denne maskinen." in andre
+    )
 
 
 def test_kallene_og_knappene_i_steg_3(klient):  # noqa: F811
