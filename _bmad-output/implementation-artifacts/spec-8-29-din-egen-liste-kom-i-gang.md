@@ -38,6 +38,8 @@ Et spørsmål stopper ikke arbeidet; alt er bygget etter forslaget.
 5. **Rekkefølgen i «Følg flere aksjer»** leses nå nedover hver kolonne, ikke bortover hver rad, som tillegget sier. `docs/hjelp.md` sier det. *Forslag, som bygget.*
 6. **Investorknappen** er 44 px innenfor kanten og 47 px med kanten på 1,5 px, med 11 px luft og 22 px linjehøyde, så teksten står midt i også når den brytes. *Forslag, som bygget.*
 
+7. **Plassstreken på beige.** Uten den hvite bakgrunnen har de ledige rutene i streken under «Appen følger N av 18» (`--strek-2`) omtrent 1,3:1 i kontrast mot sidens bakgrunn, mot omtrent 1,5:1 mot hvitt før (ECH3). Streken er skjult for skjermlesere, og tallet står som tekst. *Forslag, som bygget:* streken står som før; en mørkere farge for de ledige rutene kan tas i en egen runde.
+
 ## Delene
 
 ### 1) Én overskrift (a)
@@ -79,3 +81,26 @@ Fokusringen er den samme som for de andre knappene (`*:focus-visible`, 3 px i bl
 ## Bildene
 
 `min-liste-demo.png`, `din-egen-liste-demo.png` (1709 → 1339 px) og `notatene-min-liste-demo.png` er tatt på nytt; de andre bildene er byte for byte de samme. Ingen av bildene viser investorknappen. Avtrykkene i `test_docker.py` er regnet ut på nytt.
+
+## Gjennomgangen 13.11 (Blind Hunter, Edge Case Hunter og Verification Gap)
+
+Diffen `46692396..94234186`, med tre lesere som ikke så hverandres funn. 21 funn: 19 rettet (VG8 delvis), 1 avvist og 1 utsatt. Rettingene står i commiten etter `94234186`.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | høy | Testene ba om både `klient` og `ekte`; `ekte` tok bort `OSE_DEMO`, så demoen ble aldri prøvd | Rettet: én fikstur per test med `request.getfixturevalue`, og testen sjekker at det er riktig versjon |
+| BH1 | middels | Overskriftene hoppet fra h2 til h4 | Rettet: titlene i stegkortene er h3 |
+| BH2, ECH2, VG9 | middels | Fast høyde på brikkene, så teksten kunne gå ut av dem | Rettet: bare `min-height: 30px`, og testen ser at teksten er inne |
+| VG2 | middels | Linja mot tabellen ble ikke sjekket uten tabell, og ikke mot «Mine notater» eller 136–1144 | Rettet |
+| VG3 | middels | Fokusringen var ikke prøvd | Rettet: en brikke (eller knappen i steg 1) og investorknappen får fokus, og ringen er 3 px |
+| BH3, ECH4, VG1 | lav | Luft under det siste kortet | Rettet: målt, ved 1280 px kuttes margen i kolonnebruddet, men ved 390 px ga den 16 px; `:last-child` har ingen marg, og testen måler 0 |
+| ECH5 | lav | Linjehøyden 1,5 traff også avsnittet med knappen | Rettet: `p:not(.handling)` |
+| BH4 | lav | Kommentaren ga 44 px uten kanten | Rettet: 44 px innenfor kanten, 47 px med |
+| BH5, VG5 | lav | Tre kolonner hviler på testdataene, og to kolonner var ikke prøvd | Rettet: 700 px gir to, og docstringen sier testdataene |
+| VG4 | lav | At kortene er hvite, var ikke prøvd | Rettet |
+| VG6 | lav | Nettlesertesten bare i demoen | Rettet: begge versjonene |
+| VG7 | lav | Ny fane bare sjekket med ↗ | Rettet: også `target` og «(åpnes i en ny fane)» |
+| VG8 | lav | Overskriften bare sjekket som tekst i stilen | Rettet for h2 (32 px, 500, Newsreader i nettleseren); luften og hjørnene i stegkortene er fortsatt bare sjekket i stilen, utsatt |
+| ECH6 | lav | Avrunding kunne gi 15 eller 17 px mellom kortene | Rettet: ±1 px |
+| BH6 | lav | En tittel kunne strekkes av «?»-knappen | Avvist: `.steg-topp` har `align-items: center` (stil.css), og titlene måles som hele linjer |
+| ECH3 | lav | Kontrasten i plassstreken på beige | Utsatt: spørsmål 7 |
