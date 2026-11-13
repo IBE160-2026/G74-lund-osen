@@ -14,7 +14,15 @@ import pytest
 
 import demo_ki
 from dagsgrunnlag import ANDRE, MEST_NED, MEST_OPP, NAVNENE, dagsgrunnlag, for_promptversjon, mest_opp_og_ned
-from ki_dagen import DAGSPROMPTVERSJON, REGLER_DAGEN, dagsregel, kontroller_dagen, lag_dagsprompt, lag_dagsrad
+from ki_dagen import (
+    AV_BRANSJENE,
+    DAGSPROMPTVERSJON,
+    REGLER_DAGEN,
+    dagsregel,
+    kontroller_dagen,
+    lag_dagsprompt,
+    lag_dagsrad,
+)
 from ki_eksempel import MODELLNAVN, EksempelModell, tekst_om_aksjen, tekst_om_dagen
 from ki_kontroll import kontroller
 from ki_modell import lag_ki_rad
@@ -218,10 +226,11 @@ class TestPromptenForDagen:
     def test_versjon_dag_2_med_formene(self):
         """Ville feilet hvis prompten manglet formene for navnene og
         bransjene, eller versjonen ikke var ny (FR-605)."""
-        assert DAGSPROMPTVERSJON == "dag-2"
+        # Story 10.11: dag-3, med «mest av bransjene med minst to aksjer».
+        assert DAGSPROMPTVERSJON == "dag-3"
         assert "«Blant dem var ‹navn› (‹styrke› av 3, ‹retning›)" in REGLER_DAGEN
-        assert "«I snitt steg ‹bransje_mest_opp› mest.»" in REGLER_DAGEN
-        assert "«I snitt falt ‹bransje_mest_ned› mest.»" in REGLER_DAGEN
+        assert f"«I snitt steg ‹bransje_mest_opp› mest {AV_BRANSJENE}.»" in REGLER_DAGEN
+        assert f"«I snitt falt ‹bransje_mest_ned› mest {AV_BRANSJENE}.»" in REGLER_DAGEN
         assert "«bør», «verdt å følge» eller «følg med»" in REGLER_DAGEN
 
     def test_navnene_kommer_med_i_prompten(self):
@@ -240,7 +249,9 @@ class TestKontrollenForDagen:
         navn med hardt mellomrom skrevet med vanlig mellomrom."""
         tekst = self.tekst()
         assert "Blant dem var Echo (3 av 3, negativ), Foxtrot (3 av 3, positiv)" in tekst
-        assert tekst.endswith("og 2 andre. I snitt steg energi mest. I snitt falt finans mest.")
+        assert tekst.endswith(
+            f"og 2 andre. I snitt steg energi mest {AV_BRANSJENE}. I snitt falt finans mest {AV_BRANSJENE}."
+        )
         assert kontroller_dagen(tekst, grunnlaget()).besto, kontroller_dagen(tekst, grunnlaget()).grunner
         g = {n: v for n, v in grunnlaget().items() if n != ANDRE}
         g[NAVNENE] = [{"navn": "Delta Hav" + HARDT + "ASA", "styrke": 2, "retning": "positiv"}]
@@ -288,8 +299,16 @@ class TestKontrollenForDagen:
             # BH7: et navn utenfor setningen etter «Blant dem var».
             ("Blant dem var Echo (3 av 3, negativ), ", "Echo (3 av 3, negativ). Blant dem var ", "setningen etter"),
             # ECH4: «Blant dem var» og bransjen to ganger.
-            ("I snitt falt finans mest.", "I snitt falt finans mest. Blant dem var.", "én gang foran navnene"),
-            ("I snitt falt finans mest.", "I snitt falt finans mest. I snitt steg energi mest.", "mer enn én gang"),
+            (
+                f"falt finans mest {AV_BRANSJENE}.",
+                f"falt finans mest {AV_BRANSJENE}. Blant dem var.",
+                "én gang foran navnene",
+            ),
+            (
+                f"falt finans mest {AV_BRANSJENE}.",
+                f"falt finans mest {AV_BRANSJENE}. I snitt steg energi mest {AV_BRANSJENE}.",
+                "mer enn én gang",
+            ),
             # «og N andre» mangler når feltet er der.
             (" og 2 andre", "", "andre» skal stå én gang"),
             # VG6: navnet med andre store og små bokstaver.
@@ -350,11 +369,11 @@ class TestKontrollenForDagen:
             ("og 2 andre", "og 3 andre"),
             ("I snitt steg energi mest", "I snitt steg sjømat mest"),
             ("I snitt falt finans mest", "I snitt falt energi mest"),
-            ("I snitt steg energi mest.", "I snitt steg energi mest, og den bør følges."),
-            ("I snitt steg energi mest.", "I snitt steg energi mest, og den er verdt å følge."),
-            ("I snitt steg energi mest.", "I snitt steg energi mest. Følg med på den."),
-            ("I snitt steg energi mest.", "I snitt steg energi mest, og den vil stige."),
-            ("I snitt steg energi mest.", "I snitt steg energi mest, fordi oljeprisen steg."),
+            (f"{AV_BRANSJENE}. I snitt falt", f"{AV_BRANSJENE}, og den bør følges. I snitt falt"),
+            (f"{AV_BRANSJENE}. I snitt falt", f"{AV_BRANSJENE}, og den er verdt å følge. I snitt falt"),
+            (f"{AV_BRANSJENE}. I snitt falt", f"{AV_BRANSJENE}. Følg med på den. I snitt falt"),
+            (f"{AV_BRANSJENE}. I snitt falt", f"{AV_BRANSJENE}, og den vil stige. I snitt falt"),
+            (f"{AV_BRANSJENE}. I snitt falt", f"{AV_BRANSJENE}, fordi oljeprisen steg. I snitt falt"),
         ],
     )
     def test_feil_stoppes(self, fra, til):
@@ -370,7 +389,11 @@ class TestKontrollenForDagen:
         """Ville feilet hvis «Blant dem var», «andre» eller «I snitt»
         besto uten feltet i grunnlaget."""
         g = {n: v for n, v in grunnlaget().items() if n not in (NAVNENE, ANDRE, MEST_OPP, MEST_NED)}
-        for tekst in ("Blant dem var Echo (3 av 3, negativ).", "I snitt steg energi mest.", "Og 2 andre."):
+        for tekst in (
+            "Blant dem var Echo (3 av 3, negativ).",
+            f"I snitt steg energi mest {AV_BRANSJENE}.",
+            "Og 2 andre.",
+        ):
             assert not kontroller_dagen(tekst, g).besto, tekst
 
 
@@ -466,7 +489,7 @@ class TestDemoen:
         assert radene and all(r.modell == MODELL and r.besto for r in radene)
         assert all(" 0 " not in r.tekst and " 0." not in r.tekst and " 0," not in r.tekst for r in radene)
         dagen = demo_ki.les_dagsraden(prompt=demo_ki.dagens_promptavtrykk())
-        assert dagen.promptversjon == "dag-2" and dagen.modell == MODELL and dagen.besto
+        assert dagen.promptversjon == "dag-3" and dagen.modell == MODELL and dagen.besto
         assert "Blant dem var " in dagen.tekst and "I snitt steg " in dagen.tekst
 
     def test_grunnlaget_er_det_samme_som_den_falske_modellen_faar(self, tmp_path):

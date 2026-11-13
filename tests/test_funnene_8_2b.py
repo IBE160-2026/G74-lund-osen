@@ -241,7 +241,8 @@ def test_ingressen_i_historikken_er_kort(klient):
     # Ingressen var 60 ord før 8.2b, med navnet for BRFE.
     assert len(ingress.split()) <= 25, ingress
     vinduet = _vindu(html, "hjelp-historikk")
-    assert "lest fra basen og aldri regnet på nytt" in vinduet and "signalstyrke 2 eller mer" in vinduet
+    # Story 8.26 (tillegg 18): «lest fra basen» er tatt ut; at det aldri regnes på nytt, står.
+    assert "aldri regnet på nytt" in vinduet and "signalstyrke 2 eller mer" in vinduet
 
 
 def test_endringen_har_alltid_ukedagen_og_datoen(klient):
@@ -332,15 +333,23 @@ def test_bryteren_staar_i_rammen_som_en_bryter(klient):
     topp = ki.split('<div class="ki-topp">', 1)[1].split("</form>", 1)[0]
     # Story 10.9, del C: rammen heter «Signalet forklart».
     assert "Signalet forklart</span>" in topp and 'role="switch" aria-checked="true"' in topp
-    assert '<span class="navn">KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
+    # Story 8.26 (tillegg 18): «Vis KI-tekst», som bryterne i Innstillinger.
+    assert (
+        '<span class="navn">Vis KI-tekst</span>' in topp and '<span class="verdi" aria-hidden="true">På</span>' in topp
+    )
     assert html.count('class="ki-bryter"') == 1
     # Gjennomgangen (VG1): gult heter også oransje og baand-ut i stilen.
-    regler = re.findall(r"\.ki-bryter[^{]*\{([^}]*)\}", STIL)
+    # Story 8.26 (gruppens svar 11.11 kl. 17:21): bryteren som er på, er
+    # oransje som i Innstillinger; ellers ingen gul farge i bryteren.
+    paa = '.ki-bryter [aria-checked="true"] .spor'
+    regler = re.findall(r"(\.ki-bryter[^{]*)\{([^}]*)\}", STIL)
     assert len(regler) >= 5
-    for regel in regler:
+    for velger, regel in regler:
         for farge in ("gul", "oransje", "baand-ut", "hjelp-bakgrunn"):
+            if farge == "oransje" and velger.strip().endswith(paa):
+                continue
             assert farge not in regel, (farge, regel)
-    assert "var(--blekk)" in _regel('.ki-bryter [aria-checked="true"] .spor')
+    assert "var(--oransje)" in _regel(paa)
     assert "border-radius: 16px" in _regel(".ki") and "font-size: 17px" in _regel(".ki p.ki-tekst")
 
 
@@ -377,13 +386,13 @@ def test_tallene_i_ki_teksten_har_prikket_strek():
     assert "underline dotted currentColor" in _regel(".ki .tall")
 
 
-def test_innledningen_under_tittelen(klient):
-    """U62. Ville feilet uten innledning, med den et annet sted, eller med
-    en som sa sjekkene på en side uten sjekker."""
-    html = _html(klient, "/aksje/BRFE")
-    assert '<p class="innledning">Siden viser sjekkene for Brattfjell Energi med tallene bak' in html
-    assert html.index('<p class="meta">') < html.index('<p class="innledning">') < html.index('class="sammendrag"')
-    assert '<p class="innledning">Siden viser kursgrafen for Varde Systemer' in _html(klient, "/aksje/VRDS")
+def test_innledningen_under_tittelen_er_borte(klient):
+    """U62 ga en innledning under tittelen. Story 8.26 (gruppens ønske 11.11
+    kl. 17:44, tillegg 1): den er tatt bort, fordi overskriftene og «Vis meg
+    rundt» sier hva siden viser. Ville feilet hvis den sto igjen."""
+    for adresse in ("/aksje/BRFE", "/aksje/VRDS"):
+        html = _html(klient, adresse)
+        assert '<p class="innledning">' not in html and "Siden viser sjekkene for" not in html, adresse
 
 
 def test_kortet_retning_sier_hva_sjekkene_ga(klient):
@@ -507,6 +516,9 @@ def test_demogrunnen_ikke_for_siste_dag(klient, monkeypatch):
     html = _html(klient, "/aksje/BRFE")
     assert "demoen har KI-tekst bare" not in html
     assert "Ingen KI-tekst for denne dagen" in html
+    # Story 3.7 (gjennomgangen, VG4): linja om modellen og lenken står bare i
+    # den ekte versjonen. Ville feilet hvis demoen fikk dem.
+    assert "på en maskin med en språkmodell" not in html and app_modul.KI_TEKSTEN_URL not in html
 
 
 def test_tittelen_i_min_liste_bare_med_en_vurdert_merket(klient):
@@ -633,7 +645,7 @@ def test_styrken_staar_i_rutene_som_i_tabellen(klient):
         elif styrke:
             assert styrke.group(1) == "styrke" and styrke.group(2) in "01", symbol
         else:
-            assert 'class="tekst"' in rute or "Uten data" in rute, symbol
+            assert 'class="tekst"' in rute or "Ingen kurser ennå" in rute, symbol
         sett.add(styrke.group(2) if styrke else None)
     assert {"3", "2"} <= sett and sett & {"1", "0"}, sett
     assert 'class="merke"' not in "".join(ruter.values())
@@ -679,7 +691,7 @@ def test_skriften_og_rammen_i_boersometeret():
 def test_spoersmaalstegnet_for_periodene_staar_foerst(klient, sti, vindu):
     """Svaret kl. 10:04. Ville feilet med «?» etter knappene, som før, eller
     uten «?» i raden."""
-    rad = _html(klient, sti).split('<div class="periodehode">', 1)[1].split("</nav>", 1)[0]
+    rad = re.split(r'<div class="periodehode"[^>]*>', _html(klient, sti), maxsplit=1)[1].split("</nav>", 1)[0]
     assert rad.lstrip().startswith(f'<button type="button" class="hjelpeknapp" popovertarget="{vindu}"'), rad[:120]
     assert rad.index(f'popovertarget="{vindu}"') < rad.index("<nav")
 
@@ -986,7 +998,7 @@ def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
         rute = re.sub(r' title="[^"]*"', "", rute)
         if "uten-data" in re.search(r'<a class="rute ([^"]*)"', rute).group(1).split():
             assert "ikke vurdert" not in rute and "styrke" not in rute, (adresse, symbol)
-            assert '<span class="endring">Uten data</span>' in rute
+            assert '<span class="endring">Ingen kurser ennå</span>' in rute
             continue
         if re.search(r'<span class="styrke[^"]*">\d av 3</span>', rute):
             assert "ikke vurdert" not in rute, (adresse, symbol)

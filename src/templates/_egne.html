@@ -9,7 +9,7 @@
 <section class="egne" id="dine-egne-aksjer" aria-labelledby="egne-tittel">
   <div class="egne-topp">
     <h2><span id="egne-tittel">Dine egne aksjer</span> {{ hjelpeknapp("hjelp-egne", "Hjelp: dine egne aksjer") }}</h2>
-    <p class="antall-egne">{{ egne.antall_egne }} egne · {{ egne.antall }} av {{ egne.tak }} aksjer i lista</p>
+    <p class="antall-egne">{{ egne.antall_egne }} egne · appen følger {{ egne.antall }} av {{ egne.tak }}</p>
   </div>
   {% if egne.rader %}
   {#- Story 8.23 (A1, brukertesten 10.11): radene har samme utseende som
@@ -18,20 +18,22 @@
   <div class="tabellboks egnetabell" role="region" aria-label="Dine egne aksjer" tabindex="0">
   <table>
     <thead>
-      <tr><th>Selskap</th><th>Bransje</th><th>Status</th><th><span class="skjult">Valg</span></th></tr>
+      {#- Story 8.26 (gruppens svar 11.11 kl. 17:12): samme stil som
+          oversikten og «Følg en aksje»: navnet med ticker og bransjeikon
+          under, uten egen bransjekolonne, små merker og en liten knapp. #}
+      <tr><th>Selskap</th><th>Status</th><th><span class="skjult">Valg</span></th></tr>
     </thead>
     <tbody>
     {% for rad in egne.rader %}
       <tr class="egen-rad">
-        <td class="selskap">{{ rad.navn }}<span class="skjult">, </span><span class="egen-dag">{{ rad.symbol }}</span></td>
-        <td class="bransje">{{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</td>
-        <td class="status"><span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}
+        <td class="selskap">{{ rad.navn }} <span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}<span class="skjult">, </span><span class="linje">{{ rad.symbol }} · {{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</span></td>
+        <td class="status">
         {%- if rad.status == "hentet" %} <span class="statustekst">Hentet. Står i tabellen over.</span>
         {%- elif rad.status == "venter" %} <span class="statustekst">Venter på henting i kveld etter kl. 22.</span>
         {%- else %} <span class="statustekst">Fjernes ved hentingen i kveld etter kl. 22.</span>{% endif %}</td>
         <td class="valg">
-        {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Fjern</button></form>
-        {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp">Angre</button></form>{% endif -%}
+        {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Fjern</button></form>
+        {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Angre</button></form>{% endif -%}
         </td>
       </tr>
     {% endfor %}
@@ -40,7 +42,7 @@
   </div>
   {% endif %}
   {% if egne.full %}
-    <p class="full">Lista er full. Fjern en aksje for å følge en annen.</p>
+    <p class="full">{{ full_tekst }}</p>
   {% else %}
     <p><a class="knapp hoved" href="/folg">+ Følg en aksje</a></p>
   {% endif %}
@@ -52,84 +54,98 @@
   <p>Vil du følge helt andre aksjer, lager du din egen liste. Hver bruker har sin egen gratis nøkkel fra EODHD, som legges inn én gang.</p>
   <h3>Din egen liste: kom i gang</h3>
   <p>Appen kjører på din egen maskin, så det finnes ingen innlogging hos oss. Du trenger bare din egen gratiskonto hos EODHD. Da velger du selv hvilke aksjer du følger.</p>
-  {#- Story 8.22 (utdraget §2): de tre stegene som kort, i samme stil som
-      resten av siden. Steg 1 har adressen som tekst, fordi sidene ikke har
-      adresser til nettet (spørsmål 9). Steg 2 er en forklaring, ikke et
-      felt: webserveren rører aldri nøkkelen (AD-10, svaret 08.11 kl.
-      12:39). Steg 3 har kallene regnet av lista (spørsmål 10). #}
+  {#- Story 8.22 (utdraget §2): de tre stegene som kort. Steg 2 er en
+      forklaring, ikke et felt: webserveren rører aldri nøkkelen (AD-10, svaret
+      08.11 kl. 12:39).
+      Story 8.26 (gruppens svar 11.11 kl. 20:28, tillegg 12): som tavla «Min
+      liste» 13.10 (utdraget §2): tittelen ved siden av tallet i den svarte
+      boblen, kort tekst og én handling nederst i like høye kort. Steg 1 lenker
+      til registreringen hos EODHD i en ny fane, og i demoen til en egen side.
+      Svaret 11.11 kl. 14:29 (spørsmål 9 i 8.22) om adressen som tekst er
+      rettet. Kallene, bransjelistene og byttet av nøkkel står bak «?». #}
   <ol class="stegkort">
     <li class="kort-steg">
-      <span class="stegnummer" aria-hidden="true">1</span>
-      <h4>Lag en gratis konto hos EODHD</h4>
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">1</span><h4>Lag en gratis konto hos EODHD</h4></div>
       <p>Registreringen skjer hos EODHD, ikke hos oss. Gratiskontoen gir {{ egne.kall.kvote }} kall i døgnet og sluttkurser 1 år tilbake.</p>
       <p>Kontoen er din egen. Den kan ikke deles med andre, heller ikke i en gruppe.</p>
-      <p class="adresse">Adressen er eodhd.com.</p>
+      <p class="handling">
+      {%- if eksempeltall %}<a class="knapp" href="/eodhd-demo">Åpne eodhd.com</a>
+      {%- else %}<a class="knapp" href="{{ eodhd_registrering }}" target="_blank" rel="noreferrer">Åpne eodhd.com<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>{% endif -%}
+      </p>
     </li>
     <li class="kort-steg">
-      <span class="stegnummer" aria-hidden="true">2</span>
-      <h4>Lim inn nøkkelen din</h4>
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">2</span><h4>Lim inn nøkkelen din</h4> {{ hjelpeknapp("hjelp-noekkel", "Hjelp: slik bytter du nøkkel") }}</div>
       <p>Nøkkelen står på kontosiden hos EODHD. Den lagres bare på denne maskinen.</p>
-      {#- Tillegg 4 (svaret 10.11 kl. 22:50): kortet er det samme i demoen og
-          i den ekte versjonen. Der tavla har feltet og «Sjekk nøkkelen», står
-          statusen regnet av siste henting (valg.siste_henting), uten kall og
-          uten å lese .env (AD-10, svaret 08.11 kl. 12:39). Demoen viser at den
-          ikke trenger nøkkel på samme plass (tillegget kl. 17:16).
-          Gjennomgangen: «virket» og «minst», fordi siden bare vet hva siste
-          henting lagret (BH1, BH2, ECH3). Byttet står også for Docker og uten
-          startskriptet (ECH1), og teksten uten henting peker på byttet (ECH2). #}
-      {% if eksempeltall %}
-        <p class="noekkelstatus">Demoen trenger ingen nøkkel. Den viser oppdiktede selskaper og henter aldri.</p>
-      {% elif egne.henting %}
-        <p class="noekkelstatus virker">Nøkkelen virket ved siste henting {{ egne.henting.dag|dato }}, som brukte minst {{ egne.henting.serier }} av {{ egne.kall.kvote }} kall.</p>
-      {% else %}
-        <p class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel».</p>
-      {% endif %}
-      <h5>Slik bytter du nøkkel</h5>
-      <p>Slett det som står etter <code>EODHD_API_KEY=</code> i fila <code>.env</code> i mappa til appen. Neste gang den ekte versjonen startes med startskriptet, spør det etter nøkkelen og lagrer den nye. Med Docker, eller uten startskriptet, skriver du den nye nøkkelen etter <code>EODHD_API_KEY=</code> selv og starter appen på nytt. Siden her har ikke noe felt for nøkkelen.</p>
+      {#- Tillegg 4 til 8.22: statusen regnet av siste henting, uten kall og
+          uten å lese .env. Story 8.26: én linje med ✓, i samme stil i demoen. #}
+      <p class="handling">
+      {%- if eksempeltall %}<span class="noekkelstatus virker"><span class="hake" aria-hidden="true">✓</span> Demoen trenger ingen nøkkel.</span>
+      {%- elif egne.henting %}<span class="noekkelstatus virker"><span class="hake" aria-hidden="true">✓</span> Nøkkelen virket ved siste henting {{ egne.henting.dag|dato }}, som brukte minst {{ egne.henting.serier }} av {{ egne.kall.kvote }} kall.</span>
+      {%- else %}<span class="noekkelstatus">Ingen henting har lagret kurser ennå. Startes den ekte versjonen med startskriptet, spør det etter nøkkelen første gang, og hentingen går med en gang. Har den feilet, kan nøkkelen være feil: se «Slik bytter du nøkkel»{% if vis_hjelp is not defined or vis_hjelp %} bak «?»{% endif %}.</span>{% endif -%}
+      </p>
+      {#- Gjennomgangen av tillegg 12 (ECH1, BH2): med «Vis hjelp» av står det
+          som ellers står bak «?», i kortet. #}
+      {% if vis_hjelp is defined and not vis_hjelp %}<p class="uten-hjelp"><strong>Slik bytter du nøkkel:</strong> {{ hjelp.tekst("bytt_noekkel").tekst }} {{ hjelp.tekst("bytt_noekkel_docker").tekst }}</p>{% endif %}
     </li>
     <li class="kort-steg">
-      <span class="stegnummer" aria-hidden="true">3</span>
-      <h4>Velg aksjene dine</h4>
-      <p>Start fra en ferdig liste, eller følg aksjene én og én, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}. I «Følg en aksje» står alle aksjene på Oslo Børs som kan følges, med bransjen og den målte omsetningen.</p>
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">3</span><h4>Velg aksjene dine</h4> {{ hjelpeknapp("hjelp-kallene", "Hjelp: kallene og de ferdige listene") }}</div>
+      {#- Gjennomgangen (BH3, ECH2): tallet regnes av lista, og den ferdige
+          lista nevnes bare når det finnes en. #}
+      <p>Start med dagens {{ egne.antall }}{% if egne.ferdige %} eller en ferdig liste for én bransje{% endif %}, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}.</p>
+      {#- Story 8.11 og tillegg 3 til 8.22: de ferdige listene som brikker med
+          ikonet og antallet, til siden «Er du sikker?» (/ferdig-liste). #}
+      {% if egne.ferdige %}
+      <ul class="ferdige-knapper" id="ferdige-lister" aria-label="Start fra en ferdig liste">
+      {% for bransje, aksjene in egne.ferdige.items() %}
+        <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+      {% if vis_hjelp is defined and not vis_hjelp %}<p class="uten-hjelp">{{ hjelp.tekst("kallene_lista").tittel }} {{ hjelp.tekst("kallene_lista").tekst }}</p>
       <ul class="kallene">
         <li>{{ egne.kall.faste }} kall: de {{ egne.kall.faste }} aksjene</li>
         <li>{{ egne.kall.indeks }} kall: hovedindeksen</li>
         {% if egne.kall.egne %}<li>{{ egne.kall.egne }} kall: {{ "din egen aksje" if egne.kall.egne == 1 else "dine egne aksjer" }}</li>{% endif %}
         <li>{{ egne.kall.margin }} kall: margin</li>
-      </ul>
-      <p class="stegknapper">
-        {#- Tillegg 3: knappen har samme navn som delen den går til. #}
-        {% if egne.ferdige %}<a class="knapp" href="#ferdige-lister">Start fra en ferdig liste</a>{% endif %}
-        {% if egne.full %}<span class="full">Lista er full. Fjern en aksje for å følge en annen.</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
+      </ul>{% endif %}
+      <p class="handling">
+        {% if egne.full %}<span class="full">{{ full_tekst }}</span>{% else %}<a class="knapp hoved" href="/folg">+ Følg en aksje</a>{% endif %}
       </p>
     </li>
   </ol>
-  <h3>Følg flere aksjer</h3>
-  {#- Story 8.23 (A7, brukertesten 10.11): tallene regnes av kvoten, taket og
-    lista (valg.py), ikke skrevet for hånd. #}
-  <p>Lista kan ha opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Med {{ egne.antall }} aksjer etter neste henting er {{ egne.kall.igjen }} kall igjen til et nytt forsøk hvis noe feiler, og med {{ egne.tak }} aksjer er {{ egne.kall.igjen_med_taket }} igjen. Vil du følge andre, bytter du dem inn for noen i lista.</p>
-  <p>Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre.</p>
-  <p class="antall-egne">{{ egne.antall }} av {{ egne.tak }} aksjer i lista</p>
-  <ul class="bytt-lista">
-    {% for aksje in egne.lista %}
-      <li><span class="navn">{{ aksje.navn }}</span> <span class="linje">{{ aksje.symbol }}</span>
-        {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp" href="/folg?bytt={{ aksje.symbol }}">Bytt ut</a>{% endif %}</li>
-    {% endfor %}
-  </ul>
-  {#- Story 8.11 (FR-108): de ferdige listene, én per bransje. Tillegg 3
-      (svarene 10.11 kl. 22:44): én knapp per bransje med ikonet og antallet,
-      og én kort setning. Aksjene, det som fjernes, og knappen som bytter,
-      står på siden «Er du sikker?» (/ferdig-liste), og ingenting byttes før
-      den. #}
-  {% if egne.ferdige %}
-  <h3 id="ferdige-lister">Start fra en ferdig liste</h3>
-  <p>Velger du en bransje, ser du lista før noe byttes, og ved neste henting byttes lista di ut med de mest omsatte aksjene i bransjen.</p>
-  <ul class="ferdige-knapper">
-  {% for bransje, aksjene in egne.ferdige.items() %}
-    <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
-  {% endfor %}
-  </ul>
+  {#- Story 8.26 (gruppens svar 11.11 kl. 20:39 og tillegg 15, kl. 20:44):
+      «Følg flere aksjer» som rådet tegnet. Tallene og rutene regnes av lista
+      og taket; teksten om kallene og gratiskontoen står bak «?» (index.html,
+      hjelp-flere). Aksjene samles etter bransje i kort, i rekkefølgen på
+      børsometeret (egne.grupper). #}
+  <div class="flere-topp">
+    <h3 id="folg-flere">Følg flere aksjer {{ hjelpeknapp("hjelp-flere", "Hjelp: følg flere aksjer") }}</h3>
+    <div class="plassene">
+      <p class="antall-egne">Appen følger {{ egne.antall }} av {{ egne.tak }}{% if egne.full %}, som er taket.{% else %}, {{ egne.tak - egne.antall }} {{ "plass" if egne.tak - egne.antall == 1 else "plasser" }} ledige.{% endif %}</p>
+      <span class="plassstrek" aria-hidden="true">{% for i in range(egne.tak) %}<span class="{{ 'brukt' if i < egne.antall else 'ledig' }}"></span>{% endfor %}</span>
+    </div>
+  </div>
+  {#- Gjennomgangen (ECH3): med «Vis hjelp» av står teksten om kallene her. #}
+  {% if vis_hjelp is defined and not vis_hjelp %}<p class="uten-hjelp">Appen kan følge opptil {{ egne.tak }} aksjer. Hver aksje bruker {{ egne.kall.per_aksje }} av de {{ egne.kall.kvote }} kallene i døgnet, og hovedindeksen {{ egne.kall.indeks }}. Hver bruker har sin egen gratiskonto hos EODHD, så lista di påvirker ingen andre.</p>{% endif %}
+  {% if egne.full %}
+  <p class="flere-setning">Bytt ut en aksje for å følge en annen. Byttet skjer ved neste henting.</p>
+  {% else %}
+  <div class="flere-handling"><p class="flere-setning">Følg en aksje til, eller bytt ut en. Endringen skjer ved neste henting.</p> <a class="knapp hoved" href="/folg">+ Følg en aksje</a></div>
   {% endif %}
+  <div class="bransjekort">
+    {% for bransje, aksjene in egne.grupper %}
+    <section class="bransjekortet" aria-labelledby="flere-{{ loop.index }}">
+      <h4 id="flere-{{ loop.index }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span></h4>
+      <ul class="bytt-lista">
+        {% for aksje in aksjene %}
+        <li><span class="selskapet"><a class="navn" href="/aksje/{{ aksje.symbol }}">{{ aksje.navn }}</a><span class="linje">{{ aksje.symbol }}</span></span>
+          {% if aksje.symbol in egne.egne_symboler %}<span class="egenmerke">Egen</span>{% endif %}{% if aksje.symbol in egne.utenfor %}<span class="utenformerke">Utenfor målingen</span>{% endif %}
+          {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter kl. 22.</span>{% else %}<a class="knapp liten" href="/folg?bytt={{ aksje.symbol }}" aria-label="Bytt ut {{ aksje.navn }}">Bytt ut</a>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+  </div>
   {% if eksempeltall %}<p class="demoboks">Demoen henter ingenting, så et valg står som «Venter på henting». I den ekte versjonen hentes aksjen ved neste henting etter kl. 22.</p>{% endif %}
 </section>
 {% endif %}

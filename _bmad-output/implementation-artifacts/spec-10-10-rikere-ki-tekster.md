@@ -13,6 +13,8 @@ context:
   - '{project-root}/docs/brukertest.md'
 ---
 
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* formene «I snitt steg ‹bransje_mest_opp› mest.» og «I snitt falt ‹bransje_mest_ned› mest.» under del A og i svaret kl. 19:30 gjelder ikke lenger. I promptversjon dag-3 er de «I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.» og det samme med «falt», og kontrollen godtar bare dem. Demotekstene under er gjengitt som de var. Se `spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md`.
+
 *Svar 2026-11-11 kl. 16:05 (gruppens svar):* forslagene i spørsmål 1–5 og 7–9 er godtatt som bygget. Demoen skal vise tekster fra Gemma i de nye formene (spørsmål 6), og gruppen ser demotekstene før flettingen. Rådet anbefalte alt.
 
 *Svar 2026-11-11 kl. 17:21 (gruppens svar):* teksten om børsdagen skal si mer, med tre nye deler: hvilke av aksjene i Min liste som skilte seg ut, om flere eller færre enn vanlig skilte seg ut, og hovedindeksen siste uke. Rådet anbefalte de to første, og gruppen valgte også den tredje. Delene står under «Tillegget kl. 17:21», med spørsmål 10–12.

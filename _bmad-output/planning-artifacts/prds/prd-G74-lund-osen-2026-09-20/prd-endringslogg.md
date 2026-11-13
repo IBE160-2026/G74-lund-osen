@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-12T21:03
+updated: 2026-11-13T19:36
 ---
 
 # Endringslogg for PRD-en
@@ -1612,6 +1612,12 @@ mer enn antall aksjer. 15 aksjer gir 16 kall og margin 4.
 av skjermen. Om oversikten er for tett, er et spørsmål til brukertesten (story 8.1).
 
 ## Endringer etter 12.11
+
+Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står her ordrett. Kravteksten i `prd.md` sier det samme.
+
+*Rettet 2026-11-11 (gruppens ønske 11.11 kl. 17:48, story 8.26):* filteret er tatt bort. Raden «Alle», «3 av 3 positiv» og «3 av 3 negativ» under «Alle | Min liste» viste ikke noe tabellen ikke alt viser under «Skilte seg ut», og med den gikk linja om filteret, lenken til dem som fikk 2 av 3 og adressene `?signal=`. At signalstyrken ikke er et råd om å kjøpe eller selge, står fortsatt synlig i innledningen på oversikten (NFR-06). Rådet var enig.
+
+*Lagt til 2026-11-12 (gruppens svar 12.11 kl. 16:32, story 3.7):* `.env.example` har nå `lokal`, så KI-teksten står på i en ny installasjon, som standarden over sier. Svarer ikke Ollama, lages ingen KI-tekst, hentingen sier hvorfor, og kursene hentes som før (NFR-04). Første gang den ekte versjonen startes med dobbeltklikk på Windows, tilbyr startskriptet å hente Gemma eller å bruke egen nøkkel (svarene kl. 16:41 og 16:46). En `.env` som finnes fra før, endres ikke.
 
 *Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar på spørsmål 14 og 15 i spesifikasjonen for 9.11):* FR-111, Min liste, er et nytt krav med konsekvenser, i kjernen og bygget. «De 15 mest omsatte» står i FR-412 som ferdig liste, ekstra, og bygges i natt som egen story. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte.
 

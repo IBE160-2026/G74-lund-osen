@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-12T21:03
+updated: 2026-11-13T19:36
 ---
 
 # PRD — OSE Signal

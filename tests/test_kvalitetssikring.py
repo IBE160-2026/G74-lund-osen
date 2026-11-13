@@ -50,6 +50,10 @@ OMDOEPT: dict[str, str] = {
     "tests/test_fetch_prices.py::TestVintertid::test_kl_20_59_i_oslo_i_november_nekter": "tests/test_fetch_prices.py::TestVintertid::test_kl_21_59_i_oslo_i_november_nekter",
 }
 
+# Story 8.26 (gruppens ønske 11.11 kl. 17:48, tillegg 4): testene som ble
+# tatt bort med filteret på signalet, og som vedlegget nevner fra 8.23.
+TATT_BORT = {"test_ved_0_staar_2_av_3_med_lenke"}
+
 # Antall spesifikasjoner med status done da testen ble skrevet, 17.10: 41 før
 # spesifikasjonen for 9.1 selv. Gulvet fanger en lesing av status som slutter
 # å virke.
@@ -236,7 +240,7 @@ def test_testene_i_vedlegget_fra_17_10_finnes():
     del_ = tekst.split("\n### Fra 2.2 til 10.3, én linje per spesifikasjon\n", 1)[1]
     gamle = set(re.findall(r"før 17\.10: `(?:\w+::)?(test_\w+)`", del_))
     omdoept = {gammel.rsplit("::", 1)[-1] for gammel in OMDOEPT}
-    nevnt = set(re.findall(r"`(?:\w+::)*(test_\w+)", del_)) - gamle - omdoept
+    nevnt = set(re.findall(r"`(?:\w+::)*(test_\w+)", del_)) - gamle - omdoept - TATT_BORT
     assert nevnt
     borte = sorted(nevnt - _alle_testnavn())
     assert not borte, borte

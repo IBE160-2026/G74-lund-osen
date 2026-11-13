@@ -487,6 +487,11 @@ løsningen på kjente data. Hjelpelæreren skriver at «en god demoversjon er me
 enn tilstrekkelig for å vise hvordan løsningen fungerer» (svaret 05.10, under
 «Spørsmål sendt hjelpelærer 2026-10-04»).
 
+*Lagt til 2026-11-12 (gruppens svar kl. 16:23):* gruppen antar at det ikke blir
+noen presentasjon, og at faglærer leser README-en og prøver demoen selv. Det er
+en antakelse, ikke bekreftet av faglærer. Demomanuset er laget og holdes som
+reserve. Det ligger ikke i repoet (slått opp 12.11 i filene git sporer).
+
 ### E. Om PRD og arkitekturdokument er innleveringskrav i seg selv
 
 **Besvart 23.09:** ikke et krav, men de sentrale dokumentene «bør derfor ...

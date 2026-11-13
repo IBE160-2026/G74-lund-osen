@@ -339,7 +339,7 @@ class TestVelgDag:
         delene og 2 av 3. Ville feilet hvis samme dag ble merket på to måter."""
         _basen()
         html = klient.get("/?periode=velg&dag=2026-10-09").data.decode("utf-8")
-        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', html) == ["siste"]
+        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)#perioden" aria-current="true">', html) == ["siste"]
         assert _rad(html, "DNB")[0] == "utslag" and 'class="del ut"' in html
 
     def test_en_boersdag_foer_serien_begynner_og_sortering_paa_kurs(self, klient):
@@ -376,7 +376,7 @@ class TestVelgDag:
         for rad in rader:
             tekst = _synlig(rad).replace("3 av 3 siste børsdag", "")
             assert "av 3" not in tekst, tekst
-            assert "ikke vurdert" in tekst or "uten data" in tekst, tekst
+            assert "ikke vurdert" in tekst or "ingen kurser ennå" in tekst, tekst
         assert "Tabellen viser tirsdag 15.09" in _synlig(html)
         # Gjennomgangen (VG8): fotnoten om «ikke vurdert» står for dagen.
         assert fotnoten(html)
@@ -600,7 +600,7 @@ class TestAdressen:
         kursgrafen."""
         _basen()
         html = klient.get("/").data.decode("utf-8")
-        valgt = re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', html)
+        valgt = re.findall(r'<a href="/\?periode=([a-z0-9-]+)#perioden" aria-current="true">', html)
         assert valgt == ["siste"]
         assert 'aria-label="Periode for oversikten"' in html
 
@@ -612,7 +612,7 @@ class TestAdressen:
         # Story 8.23 (A2): lenkene i kolonneraden og «Standard rekkefølge» går til tabellen.
         assert 'href="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende#aksjene"' in uke
         sortert = klient.get("/?periode=1-uke&sorter=endring&orden=synkende").data.decode("utf-8")
-        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)" aria-current="true">', sortert) == ["1-uke"]
+        assert re.findall(r'<a href="/\?periode=([a-z0-9-]+)#perioden" aria-current="true">', sortert) == ["1-uke"]
         assert "+37,50 %" in _rad(sortert, "EQNR")[1]
         assert 'href="/?periode=1-uke#aksjene">Standard rekkefølge</a>' in sortert
         assert 'name="tilbake" value="/?periode=1-uke&amp;sorter=endring&amp;orden=synkende"' in sortert

@@ -305,6 +305,10 @@ class TestRammen:
                 # README-en paa GitHub, bare i demoen, og laster ingenting.
                 if verdi == app_modul.EKTE_VERSJONEN_URL and verdi in lenker and 'class="eksempeltall"' in html:
                     continue
+                # Story 3.7 (tillegg 1): en dag uten modell lenker til installasjonen
+                # paa GitHub, bare i den ekte versjonen, og laster ingenting.
+                if verdi == app_modul.KI_TEKSTEN_URL and verdi in lenker and 'class="eksempeltall"' not in html:
+                    continue
                 assert not re.match(r"(https?:)?//", verdi), (navn, verdi)
             # Story 2.7a: skriftene står i stilarket, ikke i siden.
             for adresse in re.findall(r"""url\(\s*["']?([^"')]+)""", html + _stil(html)):
@@ -328,6 +332,12 @@ class TestRammen:
                 if href.endswith("#aksjene") and href != "#aksjene":
                     assert re.search(r'(?<![\w-])id="aksjene"', html), (navn, href)
                     href = href.removesuffix("#aksjene")
+                # Story 8.26 (tillegg 6): periodevalget og filteret holder plassen
+                # med et anker, som må finnes på siden.
+                for anker in ("perioden", "filteret", "visvalget"):
+                    if href.endswith("#" + anker) and href != "#" + anker:
+                        assert re.search(rf'(?<![\w-])id="{anker}"', html), (navn, href)
+                        href = href.removesuffix("#" + anker)
                 href = href.replace("?vis=min&amp;", "?").replace("?vis=min", "") or "/"
                 # Story 8.15: sorteringen er en parameter på /.
                 assert (
@@ -335,8 +345,6 @@ class TestRammen:
                     # Story 8.6: børsometeret, fra knappen i stripa. Story 8.10:
                     # «Innstillinger», fra knappen i stripa.
                     or href in ("/boersometer", "/innstillinger")
-                    # Story 8.11: filteret på signalet, med resten av adressen.
-                    or re.fullmatch(r"/(min-liste)?\?([a-z]+=[A-Za-z0-9-]+&amp;)*signal=(positiv|negativ)", href)
                     # Story 2.12: «Følg en aksje» og «Bytt ut».
                     or re.fullmatch(r"/folg(\?bytt=[A-Z0-9-]+)?", href)
                     # Story 8.22: steg 3 i «Din egen liste» går til bransjelistene
@@ -349,12 +357,19 @@ class TestRammen:
                     # «Avbryt» tilbake til de ferdige listene.
                     or re.fullmatch(r"/folg\?([a-z]+=[A-Za-z0-9%+-]*)(&amp;[a-z]+=[A-Za-z0-9%+-]*)*", href)
                     or href in ("/min-liste#ferdige-lister", "/#dine-egne-aksjer")
+                    # Story 8.26 (tillegg 12): «Åpne eodhd.com» i demoen, og
+                    # tilbake til Min liste fra den siden.
+                    or href in ("/eodhd-demo", "/min-liste#din-egen-liste")
+                    # Story 8.27: «Mine notater» i stripa går til notatene i Min liste.
+                    or href == "/min-liste#mine-notater"
                     # Story 10.5: lenken til investorsiden for aksjen.
                     or href in INVESTORSIDER.values()
                     # Story 3.4h: boblen i demoen går til siden for selskapet.
                     or (re.fullmatch(r"/investorside/[A-Z0-9]+", href) and 'class="eksempeltall"' in html)
                     # Story 3.3i (U51): den ekte versjonen i README-en, bare i demoen.
                     or (href == app_modul.EKTE_VERSJONEN_URL and 'class="eksempeltall"' in html)
+                    # Story 3.7 (tillegg 1): installasjonen paa GitHub, bare i den ekte versjonen.
+                    or (href == app_modul.KI_TEKSTEN_URL and 'class="eksempeltall"' not in html)
                     # Story 8.9: stegene i «Vis meg rundt» peker på en id på samme side.
                     or (href.startswith("#") and re.search(rf'(?<![\w-])id="{re.escape(href[1:])}"', html))
                     # Story 3.6: ikonet i fanen, som finnes i src/static.
@@ -730,11 +745,11 @@ class TestOversikten:
         )
         # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
         # Story 8.2a, b (gjennomgangen 24.10, BH4): «og N uten data» for seg.
-        uten_data = html.count('<span class="merke mangler">uten data</span>')
+        uten_data = html.count('<span class="merke mangler">ingen kurser ennå</span>')
         uten = html.count('<span class="merke mangler">') - uten_data
         assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (
             f" og {uten} uten signal" if uten else ""
-        ) + (f" og {uten_data} uten data" if uten_data else "")
+        ) + (f" og {uten_data} uten kurser" if uten_data else "")
         stil = _stil(html)
         assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
         skjult = _regel(stil, ".merke.skjult")
@@ -854,8 +869,10 @@ class TestBrikkene:
     def test_to_av_tre_er_en_hvit_pille_og_en_av_tre_er_tekst(self, sidene):
         """Gruppen 14.10 kl. 19:59: hvit pille med kant i blekk ved 2 av 3,
         uten ring. 1 og 0 av 3 står uten pille. Ville feilet hvis «2 av 3»
-        mistet pillen."""
-        html = sidene["oversikten i demoen"]
+        mistet pillen. Gjelder tabellen, så innholdet i notatpanelet fra 8.27
+        (<template>), der notatene viser styrken som i Min liste (8.21), tas
+        ut først."""
+        html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", sidene["oversikten i demoen"], flags=re.S)
         assert '<span class="pille to-av-tre">2 av 3</span>' in html
         assert not re.search(r'<span class="pille[^"]*">[01] av 3</span>', html)
         assert re.search(r'<span class="styrketall">[01] av 3</span>', html)
@@ -994,8 +1011,9 @@ class TestStilarket:
         # 8.10: «Innstillinger» (innstillinger.html) den åttende. Story 8.21:
         # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
         # Tillegg 3 til 8.22: «Er du sikker?» før en ferdig liste
-        # (ferdig_liste.html) er den tiende.
-        assert sider == 10
+        # (ferdig_liste.html) er den tiende. Story 8.26 (tillegg 12): siden for
+        # «Åpne eodhd.com» i demoen (eodhd_demo.html) er den ellevte.
+        assert sider == 11
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,

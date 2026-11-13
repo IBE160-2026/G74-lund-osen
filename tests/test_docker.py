@@ -1340,7 +1340,19 @@ HOEYDE_PAA_BILDET = 1864
 # Flettingen av main (8.22, del B, og 3.6, del C) inn i 8.25 11.11: avtrykkene er regnet ut paa nytt,
 # og bildene med knappen er tatt paa nytt.
 # Gjennomgangen av «Følg en aksje» i 8.25: _ramme.html. Bildene er byte for byte de samme.
-AVTRYKK_BAK_BILDET = "889a0848bcabd34ef0db2e755fc14df84fc6bc02f118bc980906d284a7c4191b"
+# Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Story 10.11: «mest av bransjene med minst to aksjer» (ki_dagen.py, hjelpetekster.py og
+# demo_ki_dagen.json fra Gemma). Avtrykkene er regnet ut paa nytt, fordi hjelpetekster.py er med bak alle
+# bildene, og alle bildene er tatt paa nytt. Bare oversikten ved 390 px er ny, med samme hoeyde; de andre er
+# byte for byte de samme (gjennomgangen, BH7).
+# Flettingen av main (3.7) inn i 10.11 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt
+# paa nytt. Bare oversikten ved 390 px er ny (teksten om dagen i demoen).
+# Story 8.27 med flettingen av main (8.26, 3.7 og 10.11) 13.11: «Mine notater» i raden øverst og panelet
+# (_ramme.html, _notatpanel.html, app.py, hjelp.js, hjelpetekster.py og stil.css), og sju knapper på én rad
+# fra 1056 px (gruppens svar 13.11 kl. 10:18). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+AVTRYKK_BAK_BILDET = "110cf1ba9fec7d7543bceab766964b6b91acce45c529b0e7234522496bd268dd"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1792,7 +1804,15 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # bildene er tatt paa nytt.
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
 # Story 8.25 og flettingen av main (8.22 og 3.6) inn i 8.25: avtrykkene er regnet ut paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "817655aedd52d2bfb73119afcd2fcc7ae7117fb3aaf2da8b4f3a5d47a42ab88b"
+# Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Flettingen av main (3.7) inn i 10.11 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt
+# paa nytt. Bare oversikten ved 390 px er ny (teksten om dagen i demoen).
+# Story 8.27 med flettingen av main (8.26, 3.7 og 10.11) 13.11: «Mine notater» i raden øverst og panelet
+# (_ramme.html, _notatpanel.html, app.py, hjelp.js, hjelpetekster.py og stil.css), og sju knapper på én rad
+# fra 1056 px (gruppens svar 13.11 kl. 10:18). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "810d3024a55ddf409f18d9c0cd82e0246e3d5369bf4029f117ac5b80295b4784"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1838,11 +1858,13 @@ DE_NYE_BILDENE = {
     # Gruppens ønske 09.11 kl. 22:01 (tillegg 5 til ekstravinduet): investorsiden
     # står rett under aksjesiden i knappen, fordi man kommer dit fra aksjesiden.
     # Rekkefølgen her er rekkefølgen i knappen.
-    "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 948, FILENE_BAK_INVESTORSIDEN),
+    # Story 8.26 (tilleggene 5–20): 948 -> 986, med linja «Oppdatert …» (tillegg 17).
+    "docs/appen/investorsiden-brfe-demo.png": ("/investorside/BRFE", 1280, 986, FILENE_BAK_INVESTORSIDEN),
     # Story 8.20b: 1682, med kortene «Mål mot børsen» og «Slik leser du
     # børsometeret» øverst og to linjer i bransjeoverskriftene. Var 1329.
     # Story 8.23 (tillegg 3): 3136, med tabellen åpen fra start. Var 1682.
-    "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 3136, FILENE_BAK_BOERSOMETERET),
+    # Story 8.26: 3136 -> 3095 (knappene i raden øverst, uten raden under demolinja).
+    "docs/appen/boersometeret-demo.png": ("/boersometer", 1280, 3095, FILENE_BAK_BOERSOMETERET),
     "docs/appen/min-liste-demo.png": ("/min-liste", 1280, 1155, FILENE_BAK_MIN_LISTE),
     # Story 8.20a: 3509, med datoen og pilene på egen linje ved 390 px. Var 3524.
     # Story 2.12: 3797, med «Dine egne aksjer» under tabellen.
@@ -1855,18 +1877,27 @@ DE_NYE_BILDENE = {
     # og «Vis meg rundt» fra 8.9. Var 4240.
     # Story 10.10: 4602, med navnene og bransjene i «Børsdagen kort fortalt». Var 4444.
     # Story 10.10, tillegget kl. 17:21: 4810, med Gemma-teksten og de tre nye delene.
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 4810, MALENE_BAK_BILDET),
+    # Story 8.26: 4534, med knappene i raden øverst, uten fotnoten og filteret (målt etter flettingen av 10.10).
+    # Story 8.26 (tilleggene 5–20): 4534 -> 4424, uten eksempelboksen (tillegg 19).
+    # Story 8.27: 4424 -> 4477, med «Mine notater» i raden øverst (en linje til ved 390 px).
+    "docs/appen/oversikten-390-demo.png": ("/", 390, 4477, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     # Story 8.23 (tillegg 3): 5021, med tabellen åpen fra start. Var 3327.
-    "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 5021, FILENE_BAK_BOERSOMETERET),
+    # Story 8.26: 5021 -> 5083 (knappene i raden øverst, på flere linjer ved 390 px).
+    # Story 8.26 (tilleggene 5–20): 5083 -> 5103, med «Uten ramme» i forklaringen (tillegg 7).
+    "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 5103, FILENE_BAK_BOERSOMETERET),
     # Gruppens ønske 09.11 kl. 22:01: investorsiden for BRFE ved 390 px, sist
     # blant bildene ved 390 px, hele siden (1117 px).
-    "docs/appen/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1117, FILENE_BAK_INVESTORSIDEN),
+    # Story 8.26 (tilleggene 5–20): 1117 -> 1155, med linja «Oppdatert …» (tillegg 17).
+    # Story 8.27: 1155 -> 1207, med «Mine notater» i raden øverst (en linje til ved 390 px).
+    "docs/appen/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1207, FILENE_BAK_INVESTORSIDEN),
     # Tillegg 5 til 8.22 (svaret 10.11 kl. 22:55): «Følg en aksje» med Kraft valgt ved 390 px, hele
     # siden, og «Mine notater» på aksjesiden for BRFE ved 390 px, bare delen (id-en mine-notater),
     # klippet ut med 16 px over og under, fordi hele aksjesiden er for høy. Etter de andre ved 390 px.
-    "docs/appen/folg-en-aksje-390-demo.png": ("/folg?bransje=Kraft", 390, 1573, FILENE_BAK_FOLG),
+    # Story 8.26: 1573 -> 1636 (knappene i raden øverst, på flere linjer ved 390 px).
+    # Story 8.26 (tilleggene 5–20): 1636 -> 1722, med «Oppdatert …» og antallet på brikkene (tillegg 17).
+    "docs/appen/folg-en-aksje-390-demo.png": ("/folg?bransje=Kraft", 390, 1722, FILENE_BAK_FOLG),
     "docs/appen/notatene-brfe-390-demo.png": ("/aksje/BRFE", 390, 1354, FILENE_BAK_AKSJESIDEN),
     # Story 2.12: «Din egen liste» i Min liste, bare delen (id-en
     # din-egen-liste), klippet ut med 16 px over og under.
@@ -1878,12 +1909,17 @@ DE_NYE_BILDENE = {
     # Tillegg 4 (svaret 10.11 kl. 22:50): 1634, med statusen og «Slik bytter du nøkkel» i steg 2.
     # Gjennomgangen av tillegg 4: 1714, med teksten for Docker i «Slik bytter du nøkkel».
     # Tillegg 3 (svarene 10.11 kl. 22:44): 1454, med én knapp per bransje i stedet for lister. Var 1714.
-    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1454, FILENE_BAK_MIN_LISTE),
+    # Story 8.26: 1454 -> 1474 (tabellen «Dine egne aksjer» med navnet og bransjen på to linjer).
+    # Story 8.26 (tillegg 12): 1474 -> 1389, stegkortene som på tavla, med kallene bak «?».
+    # Story 8.26 (tilleggene 5–20): 1389 -> 1709, «Følg flere aksjer» med kortene per bransje (tillegg 14 og 15).
+    "docs/appen/din-egen-liste-demo.png": ("/min-liste", 1280, 1709, FILENE_BAK_MIN_LISTE),
     # Story 8.22: «Følg en aksje» i demoen med Kraft valgt, hele siden (1326 px), sist i knappen.
     # Flettingen av main (8.9, «Vis meg rundt») inn i 8.22: 1368. Bekreftelsen sier «Demo Børs» i
     # demoen (folg.html); bildet er byte for byte det samme.
     # Tillegg 3: 1252, med sorteringen og tabellen i stedet for forslagskortet. Var 1368.
-    "docs/appen/folg-en-aksje-demo.png": ("/folg?bransje=Kraft", 1280, 1252, FILENE_BAK_FOLG),
+    # Story 8.26: 1252 -> 1211 (knappene i raden øverst, uten raden under demolinja).
+    # Story 8.26 (tilleggene 5–20): 1211 -> 1251, med «Oppdatert …» og antallet på brikkene (tillegg 17).
+    "docs/appen/folg-en-aksje-demo.png": ("/folg?bransje=Kraft", 1280, 1251, FILENE_BAK_FOLG),
     # Story 8.21 (tillegg 2, gruppens svar 10.11 kl. 15:57): «Mine notater» på
     # aksjesiden for BRFE og samlet i Min liste, bare delen (id-en
     # mine-notater), klippet ut med 16 px over og under, og Innstillinger med
@@ -1893,7 +1929,9 @@ DE_NYE_BILDENE = {
     "docs/appen/notatene-min-liste-demo.png": ("/min-liste", 1280, 1346, FILENE_BAK_MIN_LISTE),
     # Flettingen av main (8.9) inn i 8.21: 1062, med «Vis meg rundt» øverst. Var 1021.
     # Story 8.24: 1060, uten «?» ved Notater. Var 1062.
-    "docs/appen/innstillinger-demo.png": ("/innstillinger", 1280, 1060, FILENE_BAK_INNSTILLINGER),
+    # Story 8.26: 1060 -> 1019 (knappene i raden øverst, uten raden under demolinja).
+    # Story 8.26 (tilleggene 5–20): 1019 -> 1057, med linja «Oppdatert …» (tillegg 17).
+    "docs/appen/innstillinger-demo.png": ("/innstillinger", 1280, 1057, FILENE_BAK_INNSTILLINGER),
 }
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
@@ -2017,21 +2055,36 @@ DE_NYE_BILDENE = {
 # tilbudet om omvisningen besvart, som i 8.25. Aksjesiden og oversikten ved 390 px (4810 px) har Gemma-teksten.
 # Story 10.10, svaret kl. 19:30: ki_dagen.py, ki_eksempel.py og teksten om dagen. Bildene er tatt paa nytt;
 # bare oversikten ved 390 px er ny, med samme hoeyde.
+# Story 3.7: linja om en dag uten modell i app.py, ki_visning.py, aksje.html og index.html, bare i den
+# ekte versjonen. Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# notatene-brfe-390-demo.png er som paa main (8.22): utklippet ga et annet bilde ogsaa med koden paa
+# a93c668f, uten endringene i 3.7, saa avviket ligger i fremgangsmaaten, som i 10.10.
+# Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Story 10.11: avtrykkene er regnet ut paa nytt (hjelpetekster.py og demo_ki_dagen.json). Alle bildene er
+# tatt paa nytt, og bare oversikten ved 390 px er ny. notatene-brfe-390-demo.png er som paa main, fordi
+# den klippes ut med en fremgangsmaate dette vinduet ikke har, som i 10.10; den viser ikke teksten om dagen.
+# Flettingen av main (3.7) inn i 10.11 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt
+# paa nytt. Bare oversikten ved 390 px er ny (teksten om dagen i demoen).
+# Story 8.27 med flettingen av main (8.26, 3.7 og 10.11) 13.11: «Mine notater» i raden øverst og panelet
+# (_ramme.html, _notatpanel.html, app.py, hjelp.js, hjelpetekster.py og stil.css), og sju knapper på én rad
+# fra 1056 px (gruppens svar 13.11 kl. 10:18). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "80b1213be0ae1827efbabeb9e412ae7f59f5d8d65ea6741073181599d1a74f8e",
-    TOPPEN_AV_OVERSIKTEN: "889a0848bcabd34ef0db2e755fc14df84fc6bc02f118bc980906d284a7c4191b",
-    "docs/appen/boersometeret-demo.png": "0664ecefb343472cb64ffa5a30a6b81045258c7d7921517ba41358b60111818b",
-    "docs/appen/min-liste-demo.png": "8ac714beb386a13d3700db12ffe82c0d6a86067320273a163569c73bebe0ce60",
-    "docs/appen/oversikten-390-demo.png": "889a0848bcabd34ef0db2e755fc14df84fc6bc02f118bc980906d284a7c4191b",
-    "docs/appen/boersometeret-390-demo.png": "0664ecefb343472cb64ffa5a30a6b81045258c7d7921517ba41358b60111818b",
-    "docs/appen/din-egen-liste-demo.png": "8ac714beb386a13d3700db12ffe82c0d6a86067320273a163569c73bebe0ce60",
-    "docs/appen/investorsiden-brfe-demo.png": "0c4a3f573717363a36f289bb8d6939bd688c1b86a143cc4f898e146fe056bec8",
-    "docs/appen/investorsiden-brfe-390-demo.png": "0c4a3f573717363a36f289bb8d6939bd688c1b86a143cc4f898e146fe056bec8",
-    "docs/appen/folg-en-aksje-390-demo.png": "80b1213be0ae1827efbabeb9e412ae7f59f5d8d65ea6741073181599d1a74f8e",
-    "docs/appen/notatene-brfe-390-demo.png": "817655aedd52d2bfb73119afcd2fcc7ae7117fb3aaf2da8b4f3a5d47a42ab88b",
-    "docs/appen/notatene-brfe-demo.png": "817655aedd52d2bfb73119afcd2fcc7ae7117fb3aaf2da8b4f3a5d47a42ab88b",
-    "docs/appen/notatene-min-liste-demo.png": "8ac714beb386a13d3700db12ffe82c0d6a86067320273a163569c73bebe0ce60",
-    "docs/appen/innstillinger-demo.png": "2ea97e51cfbfd752f9994897749856175761b699999830021c7b2b99c327a397",
+    "docs/appen/folg-en-aksje-demo.png": "32c78f2bab426f467923d747e5d9e138e2894fa909a2e33c95a01d08179c7327",
+    TOPPEN_AV_OVERSIKTEN: "110cf1ba9fec7d7543bceab766964b6b91acce45c529b0e7234522496bd268dd",
+    "docs/appen/boersometeret-demo.png": "5e8d5290e38277186c7a91e37d4c175a43cf2478ca8239f8a19f12ff47ad84f1",
+    "docs/appen/min-liste-demo.png": "5e68d7173c68563fc6761a6555fda7d293bad3ee01c3d0e80ae0bf3ebdb2015b",
+    "docs/appen/oversikten-390-demo.png": "110cf1ba9fec7d7543bceab766964b6b91acce45c529b0e7234522496bd268dd",
+    "docs/appen/boersometeret-390-demo.png": "5e8d5290e38277186c7a91e37d4c175a43cf2478ca8239f8a19f12ff47ad84f1",
+    "docs/appen/din-egen-liste-demo.png": "5e68d7173c68563fc6761a6555fda7d293bad3ee01c3d0e80ae0bf3ebdb2015b",
+    "docs/appen/investorsiden-brfe-demo.png": "d202452c7aaf7cb147ffc37d4a2b3918c333144d8783162aa643562019c3661c",
+    "docs/appen/investorsiden-brfe-390-demo.png": "d202452c7aaf7cb147ffc37d4a2b3918c333144d8783162aa643562019c3661c",
+    "docs/appen/folg-en-aksje-390-demo.png": "32c78f2bab426f467923d747e5d9e138e2894fa909a2e33c95a01d08179c7327",
+    "docs/appen/notatene-brfe-390-demo.png": "810d3024a55ddf409f18d9c0cd82e0246e3d5369bf4029f117ac5b80295b4784",
+    "docs/appen/notatene-brfe-demo.png": "810d3024a55ddf409f18d9c0cd82e0246e3d5369bf4029f117ac5b80295b4784",
+    "docs/appen/notatene-min-liste-demo.png": "5e68d7173c68563fc6761a6555fda7d293bad3ee01c3d0e80ae0bf3ebdb2015b",
+    "docs/appen/innstillinger-demo.png": "1d2ab9cb9f3ea0224e2117bebb0e8c52b0db0dca216efed902b4d633d8f05b33",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2368,6 +2421,7 @@ TIL_FAGLAERER_LENKENE = (
     "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md#kort-fortalt",
     "_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md",
     "_bmad-output/planning-artifacts/epics.md",
+    "docs/brukertest.md",
     "docs/innlevering.md",
     "docs/vurderingsmatrise.md",
     "docs/kvalitetssikring.md",
@@ -3010,7 +3064,9 @@ class TestReadmeForNybegynnere:
         # etter merket, i samme avsnitt.
         assert re.findall(r'<p class="eksempeltall">(.+?)</p>', ramme) == [
             "Demoversjon. {{ eksempeltall_merke }} Ekte kurser trenger en gratis nøkkel fra EODHD: se "
-            '<a href="{{ ekte_versjonen_url }}">Den ekte versjonen</a>.'
+            # Story 8.26: i en ny fane.
+            '<a href="{{ ekte_versjonen_url }}" target="_blank" rel="noreferrer">Den ekte versjonen'
+            '<span class="pil" aria-hidden="true"> ↗</span><span class="skjult"> (åpnes i en ny fane)</span></a>.'
         ]
         for mal in ("index.html", "aksje.html", "basefeil.html"):
             tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
@@ -3144,11 +3200,12 @@ class TestReadmeForNybegynnere:
         """Gjennomgangen av 3.3e (BH2, BH3, VG5): standardene i tabellen er
         de koden, .env.example, compose.yaml og Dockerfile bruker. Ville
         feilet hvis standardadressen til Ollama, adressen i compose,
-        OSE_KI_TJENESTE=av i .env.example eller lokal uten variabelen ble
+        OSE_KI_TJENESTE=lokal i .env.example (av til story 3.7, tillegg 1)
+        eller lokal uten variabelen ble
         endret uten at tabellen fulgte, eller OSE_DEMO og OSE_I_DOCKER ikke
         ble satt der tabellen sier."""
         from ki_lokal import STANDARD_URL
-        from ki_tekst import AV, LOKAL
+        from ki_tekst import LOKAL
 
         knapp = _detaljer(_seksjon("Mer for den som vil"))["Variablene i .env"]
         rader = {re.match(r"\| `([A-Z0-9_]+)` \|", l).group(1): l for l in knapp.splitlines() if l.startswith("| `")}
@@ -3157,8 +3214,10 @@ class TestReadmeForNybegynnere:
         assert "OSE_KI_OLLAMA_URL: http://ollama:11434" in ollama_i_compose, ollama_i_compose
         assert "`http://ollama:11434` i Docker" in rader["OSE_KI_OLLAMA_URL"]
         eksempel = (ROT / ".env.example").read_text(encoding="utf-8")
-        assert re.search(rf"^OSE_KI_TJENESTE={AV}$", eksempel, re.MULTILINE)
-        assert f"`{AV}` etter steg 6" in rader["OSE_KI_TJENESTE"]
+        # Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):
+        # her sto av. KI-teksten står på i en ny installasjon.
+        assert re.search(rf"^OSE_KI_TJENESTE={LOKAL}$", eksempel, re.MULTILINE)
+        assert f"`{LOKAL}` etter steg 6" in rader["OSE_KI_TJENESTE"]
         assert f"gjelder `{LOKAL}`" in rader["OSE_KI_TJENESTE"]
         assert 'OSE_DEMO: "1"' in COMPOSE.read_text(encoding="utf-8")
         assert "OSE_I_DOCKER=1" in (ROT / "Dockerfile").read_text(encoding="utf-8")
@@ -3379,9 +3438,15 @@ class TestReadmeForNybegynnere:
         assert "```" not in status and "~~~" not in status and "`" not in status
         assert not re.search(r"docker[ -]compose|uv run", status, re.IGNORECASE)
         # Story 3.3g: «Status» begynner med at prosjektet er under utvikling.
+        # Story 8.26 (tillegg 23, gruppens svar 12.11 kl. 16:23): «Status»
+        # begynner med at versjon 1 er ferdig, sier hva «Ekstra, ferdig» er,
+        # og at README-prøven står under «Neste i v1» til den er tatt. Ville
+        # feilet hvis README-en fortsatt sa at prosjektet er under utvikling.
         assert status.startswith(
-            "\nProsjektet er under utvikling. Listene under viser hva som er ferdig på main, og hva som gjenstår.\n"
-        ), status[:200]
+            "\nVersjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra, ferdig» er det som er "
+            "ferdig utover briefen, og prøven av README-en på en ren maskin står under «Neste i v1» til den er tatt.\n"
+        ), status[:300]
+        assert "under utvikling" not in status
         for innhold in (
             "hentingen",
             "Docker",
@@ -3615,7 +3680,18 @@ class TestReadmeForNybegynnere:
         # 12.10 kl. 11:12: at appen er under utvikling, staar ogsaa oeverst,
         # ikke bare i «Status» etter hele «Kom i gang».
         # Rett etter setningen om raad, som instruksjonen kl. 11:15 sier (VG 12.10).
-        assert "selge. Den er under utvikling og ikke ferdig." in beskrivelse
+        # Story 8.26 (tillegg 23, gruppens svar 12.11 kl. 16:23): setningen
+        # sier at versjon 1 er ferdig, og hva «Ekstra» er. Ville feilet hvis
+        # beskrivelsen fortsatt sa at appen er under utvikling og ikke ferdig.
+        assert (
+            "selge. Versjon 1 er ferdig, og «Ekstra» under «Status» er det som er ferdig utover briefen." in beskrivelse
+        )
+        assert "under utvikling" not in beskrivelse and "ikke ferdig" not in beskrivelse
+        # Tillegg 23: taket fra «Følg en aksje» står også. Ville feilet hvis
+        # TAK i valg.py endret seg uten at beskrivelsen fulgte.
+        import valg
+
+        assert f"med «Følg en aksje» kan lista ha opptil {valg.TAK}." in beskrivelse
 
     def test_hvorfor_bare_15_aksjer(self):
         """12.10 kl. 10:22: spoersmaalet staar i docs/hjelp.md under
@@ -3775,6 +3851,10 @@ class TestReadmeForNybegynnere:
             # Story 3.3e (gjennomgangen, VG7): uv installeres foerst.
             ("med to kommandoer etter at uv er installert", "Tester", f"#{_anker('Tester')}"),
         ]
+        # Story 8.26 (tillegg 23, gruppens svar 12.11 kl. 16:23): hovedflyten
+        # og brukertesten står som underpunkter til «Prøv appen», så de to
+        # første er punktene på øverste nivå.
+        lista = [linje for linje in lista if linje.startswith("- ")]
         assert lista[0].startswith("- Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel"), lista[0]
         assert lista[1].startswith("- Testene: "), lista[1]
         to_foerste = "\n".join(lista[:2])
@@ -4209,7 +4289,9 @@ AVTRYKK_I_PILENE = {
     # Story 3.6 (gjennomgangen, ECH12): snarveien under start/. Var e4171fa9....
     # Tillegg 5 til 8.22 (regel 19): «Følg en aksje» og notatene for BRFE ved 390 px. Var e4171fa9....
     # Flettingen av main (3.6) inn i 8.22: begge endringene. Var 55c0a57b... og 3ea3433e....
-    "Mappestruktur": "66d9867584978b5ded9cd972fd40cb7e2941599a2756fd7fe722bc22b54f613e",
+    # Story 3.7 (regel 19): under start/ står at snarveien spør før nettleseren, og
+    # spørsmålet om KI-modellen. Var 66d98675....
+    "Mappestruktur": "59b2a3feec164adc7e737416c7e1ec35762f7860964ca0544c1b887fd8f4ec43",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
@@ -4246,7 +4328,9 @@ AVTRYKK_I_KOM_I_GANG = {
     # til en annen kopi. Var d8dccde4....
     # Gjennomgangen av spørsmål 8 (ECH1): fila for neiet heter «snarvei-nei…».
     # Var 3a938e6a....
-    "Slik virker dobbeltklikket": "1f7571e7722d7518d56a3c977562e85bbead28d8385327f10656ac5ced0de3f6",
+    # Story 3.7 (regel 19): spørsmålet om KI-teksten i den ekte versjonen, og at
+    # snarveien spør før nettleseren og venter høyst 30 sekunder. Var 1f7571e7....
+    "Slik virker dobbeltklikket": "f9b7a68dfb5c413f38e062e43357f3c17c07e6b46df88f5ebe46e83a728bbdf5",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 
@@ -4636,11 +4720,16 @@ def _ord(tekst: str) -> int:
 
 LINUX_LINJA = "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under."
 # Story 3.5i (spesifikasjonen, med svaret 08.11 kl. 11:24): linja om den
-# ekte versjonen i README-en, med ankeret lenken i demoen gaar til.
+# ekte versjonen i README-en, med ankeret lenken i demoen gaar til. Story 3.7
+# (tillegg 2, gruppens svar 12.11 kl. 16:41): to setninger om den lokale
+# modellen, gratis standard som hentes første gang, minnet den er prøvd med
+# (malinger.md §19), egen nøkkel, og at appen virker uten KI-tekst.
 EKTE_LINJA = (
     '<a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for '
     "«Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra "
-    "ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: "
+    "ZIP-fila, ikke i en klon. Første gang tilbyr den også å hente Gemma, en gratis språkmodell som skriver "
+    "KI-teksten på maskinen (prøvd med 15,7 GB minne), eller å bruke din egen API-nøkkel. Appen virker også "
+    "uten KI-tekst. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: "
     "[Installasjonen](docs/installasjon.md)."
 )
 
@@ -4752,7 +4841,19 @@ class TestHovedveien:
         tekst = README.read_text(encoding="utf-8")
         tabellen = _tabellen()
         rader = [l.split(" | ", 1)[0] for l in tabellen.splitlines() if l.startswith("| ")]
-        assert rader == ["|", "| Kurser", "| Trenger", "| Klar"], rader
+        # Story 8.26 (tillegg 23, ønsket 12.11 kl. 16:24): fire rader til for
+        # forskjellene. Ville feilet hvis en av dem manglet eller sto i en
+        # annen rekkefølge.
+        assert rader == [
+            "|",
+            "| Kurser",
+            "| Trenger",
+            "| Klar",
+            "| KI-tekst",
+            "| Dagen",
+            "| Endringer i lista",
+            "| Notatene",
+        ], rader
         assert tabellen.splitlines()[0] == "| | Demoen | Den ekte versjonen |"
         # Gjennomgangen etter cc7f587 (ECH2): uten skillelinja, eller med feil
         # antall kolonner, viser GitHub ikke tabellen som tabell.
