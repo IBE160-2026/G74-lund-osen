@@ -2,7 +2,7 @@
 title: 'Story 9.11: PRD-en etter tilbakemeldingen fra faglærer 12.11'
 type: 'docs'
 created: '2026-11-12'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a93c668f'
 context:
@@ -412,3 +412,11 @@ Fila var lik før og etter, målt med sha256.
 **Testene** følger det felles tillegget 13.11, etter gruppens svar kl. 18:24.
 Lokalt ble testfilene som leser `prd.md`, og `uv run pytest --dokumentene` kjørt.
 Hele settet ble kjørt i CI.
+
+## Flettet 13.11
+
+CI var grønn på head-en `7f2edbce` (run 43512687583): 5751 bestått og 100 hoppet over i jobben
+`pytest`, og alle jobbene grønne. Dokumenttestene ble kjørt lokalt i tre deler, til
+sammen 2 903, lik `--collect-only`. Den første kjøringen av del 1 hadde én feil, og
+navnet på testen ble ikke skrevet ut. Kjøringen på nytt hadde ingen feil. PR #150 ble
+squash-flettet i `ef802733` kl. 22:47, låst til `7f2edbce`.
