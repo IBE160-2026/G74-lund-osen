@@ -25,6 +25,8 @@ Skrevet 12.11 etter instruksjonen «Ny liten story etter 3.6: snarveien spør f�
 
 *Tillegg 4 (limt inn 12.11 kl. 17:02), en rettelse fra rådet:* svaret 11.11 kl. 22:07 hadde én del til, som instruksjonen ikke tok med: får vinduet ikke svar på spørsmålet om snarveien innen 30 sekunder, lages ingen snarvei, og den tilbys igjen neste gang.
 
+*Tillegg 6 (gruppens svar 2026-11-13 kl. 10:18):* 3.7 flettes før 8.27, med main slik den er, med 8.26, så README-prøven på en ny PC kan starte tidligere. Rekkefølgen blir 3.7, 10.11, 8.27 og 8.19. Rådet anbefalte det.
+
 *Svar 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag godtas som bygget, også spørsmål 26, så lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. PR-en flettes i natt etter 8.27. Rådet anbefalte det.
 
 ## Spørsmål til gruppen
@@ -89,6 +91,7 @@ Forslaget er det som bygges (regel 3).
 - **Del C:** `TestKIValget` (Windows) i samme fil, med falske `winget` og `ollama` og en falsk Ollama på 127.0.0.1 i testen.
 - **Tillegg 4:** `TestFristen` (Windows) i samme fil, med standard inn åpen uten svar og fristen satt til 2 sekunder.
 - **Den ekte versjonen og demoen på sidene:** `test_ki_visning.py`, `test_ki_dagen.py` (ingen rad gir linja og lenken, en tekst kontrollen stoppet gir den ikke) og `TestDemoen`.
+- **Spørsmål 26:** `TestLenkefargen` i samme fil. Mutanten (regelen for `a` med blå farge) ble fanget, og `stil.css` var lik HEAD etterpå.
 - **CI:** steget «Snarveien og KI-spørsmålet på Windows (3.7)» kjører fila og feiler hvis noen test hoppes over.
 
 ## Gjennomgangen 12.11 kl. 17:14 og triagen
@@ -144,3 +147,4 @@ Tatt etter tillegg 1 med en testbase uten demomerket og uten rader i KI-loggen (
 
 26. **Fargen på lenken** (fra bildene, lav). Lenken «Slik slår du den på» står i nettleserens blå med understrek, mens resten av rammen er i blekk. *Forslag:* lenken får fargen til teksten rundt, med understrek, i `stil.css`. Det endrer avtrykkene bak alle bildene i `docs/appen/`, så det bygges etter gruppens svar, med bildene tatt på nytt.
     *Svar 12.11 kl. 19:06:* ja. Det bygges når main med 8.27 er flettet inn i grenen.
+    *Bygget 13.11 (tillegg 6):* main med 8.26 ble flettet inn i grenen i stedet. 8.26 la til regelen `a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }` i `stil.css` (tillegg 10 i 8.26), så lenken har fargen til teksten rundt, med understrek, som de andre lenkene, uten en egen regel. En egen regel for `.uten a` ble prøvd og forkastet, fordi den ga en tynnere understrek enn de andre lenkene. `TestLenkefargen` i testfila for 3.7 sjekker regelen og at ingen regel for lenken gir den en egen farge. Bildene før og etter flettingen (blå, så i fargen til teksten) ligger utenfor repoet. Alle 16 bildene i `docs/appen/` ble tatt på nytt etter flettingen og er byte for byte de samme, så bare avtrykkene er nye.

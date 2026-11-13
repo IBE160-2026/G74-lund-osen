@@ -848,3 +848,37 @@ class TestKIValgetEtterGjennomgangen:
         klasse, url = ollama
         ut, _, kall = self._tilby(tmp_path, url, "1", winget=True, winget_kode="1")
         assert kall[-1] == "ollama pull gemma4:e4b" and "Gemma er hentet." in ut.stdout, ut.stdout
+
+
+def _reglene(css: str) -> list[tuple[str, str]]:
+    """(velgerne, innholdet) for hver regel i stilarket, uten kommentarene og
+    uten @-blokkene rundt."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    return [(v.strip(), i) for v, i in re.findall(r"([^{}@]+)\{([^{}]*)\}", css)]
+
+
+class TestLenkefargen:
+    """Spørsmål 26 (gruppens svar 12.11 kl. 19:06, tillegg 5 og 6): lenken
+    «Slik slår du den på» har fargen til teksten rundt, med understrek, som de
+    andre lenkene i appen. Regelen `a { color: inherit; … }` fra 8.26 gjør det
+    etter flettingen av main 13.11, så stil.css trenger ingen egen regel."""
+
+    def test_lenken_arver_fargen_og_er_understreket(self):
+        """Ville feilet hvis den felles regelen for a ikke lenger arvet fargen,
+        eller hvis en regel for lenken i .uten ga den en egen farge eller tok
+        bort understreken, så den ble blå eller skilte seg fra de andre."""
+        reglene = _reglene((ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8"))
+        felles = [i for v, i in reglene if v == "a"]
+        assert len(felles) == 1 and re.search(r"(^|;)\s*color:\s*inherit\s*(;|$)", felles[0]), felles
+        assert "text-decoration:" not in felles[0].replace("text-decoration-", ""), felles
+        for velgerne, innholdet in reglene:
+            for velger in velgerne.split(","):
+                if re.search(r"\.(uten|ki|boersdagen)\b[^,]*\ba\b", velger):
+                    assert "color" not in innholdet and "text-decoration: none" not in innholdet, velger
+
+    def test_malene_gir_lenken_ingen_egen_klasse(self):
+        """Ville feilet hvis lenken fikk en klasse eller stil i malene, som en
+        regel kunne farge annerledes enn teksten rundt."""
+        for mal in ("aksje.html", "index.html"):
+            tekst = (ROT / "src" / "templates" / mal).read_text(encoding="utf-8")
+            assert tekst.count('<a href="{{ ki_teksten_url }}">Slik slår du den på</a>') == 1, mal
