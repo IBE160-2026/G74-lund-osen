@@ -1,7 +1,7 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
-{% from "_brikker.html" import brikker, retningspille -%}
+{% from "_brikker.html" import brikker, retningspille, styrke -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% from "_rundtur.html" import rundtur with context -%}
 {% from "_investorboble.html" import investorboble -%}
@@ -461,7 +461,8 @@
                   {% if dag.vurdering %}
                     {{ retningspille(dag.retning) }}
                     {{ brikker(dag.brikker) }}
-                    <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>
+                    {#- Tillegg 2 til 8.29: som tabellen på oversikten (_brikker.html). #}
+                    {{ styrke(dag.vurdering.styrke, antall_sjekker, parametre.terskel) }}
                   {% elif not dag.tom %}
                     <span class="tilstand">– {{ dag.tekst }}</span>
                   {% endif %}

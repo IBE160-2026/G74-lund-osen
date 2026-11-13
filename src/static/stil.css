@@ -845,6 +845,9 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
 :where(.side-aksje) .historikk .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; font-weight: 700;
                                         border: 1.5px solid var(--strek-2); }
 :where(.side-aksje) .historikk .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+/* Tillegg 2 til 8.29: som tabellen på oversikten. */
+:where(.side-aksje) .historikk .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
+:where(.side-aksje) .historikk .styrketall { font-weight: 700; color: var(--tekst); white-space: nowrap; }
 :where(.side-aksje) .maanedssum { margin: 12px 0 0; }
 /* Story 8.2b, c (U64): summen under sjekkene. */
 :where(.side-aksje) p.sumrad { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0 0; padding: 14px 22px;
@@ -1503,6 +1506,10 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 .etterpaa .pille { white-space: nowrap; padding: 0.05rem 0.45rem; border-radius: 999px; font-weight: 700;
                                        border: 1.5px solid var(--strek-2); }
 .etterpaa .pille.tre-av-tre { border: 2px solid var(--oransje); background: var(--fyll); color: var(--hvit); }
+/* Tillegg 2 til 8.29 (gruppens ønske 13.11 kl. 20:35): som tabellen på oversikten,
+   hvit pille fra terskelen og tekst uten pille under. */
+.etterpaa .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit); color: var(--blekk); }
+.etterpaa .styrketall { font-weight: 700; color: var(--tekst); white-space: nowrap; }
 .slett-notat { margin: 8px 0 0; }
 /* Tillegget kl. 14:44: det tenkte kjøpet under «Etterpå», knappene ved
    notatet, merket «Eksempeltall» i demoen og siden som spør før «Fjern». */

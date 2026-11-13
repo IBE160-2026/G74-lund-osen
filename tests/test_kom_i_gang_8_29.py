@@ -242,3 +242,106 @@ def test_knappen_44_px_ogsaa_naar_teksten_brytes(request, tmp_path, hvilken, bre
     assert r["hoeyde"] >= 44 and not r["rulling"], r
     assert (r["linjer"] > 1) == brytes, r
     assert r["fokus"] == [True, "3px"], r["fokus"]
+
+
+# Tillegg 2 (gruppens ønske 13.11 kl. 20:35): styrken for én dag vises likt
+# overalt, med regelen fra tabellen på oversikten (index.html og skiller_seg_ut
+# i markedsoversikt.py): 3 av 3 som pille tre-av-tre, fra terskelen som pille
+# to-av-tre, og under terskelen som tekst uten pille. Gjelder notatene
+# (_notat.html: Min liste, aksjesiden og panelet) og «Signalet dag for dag».
+
+STYRKEN = re.compile(r'<span class="([^"]*)">(\d) av 3</span>')
+
+
+def _ventet(styrke: int) -> str:
+    from signalberegning import STANDARD
+
+    if styrke == 3:
+        return "pille tre-av-tre"
+    return "pille to-av-tre" if styrke >= STANDARD.terskel else "styrketall"
+
+
+def _dagen(styrke: int):
+    from types import SimpleNamespace
+
+    retning = SimpleNamespace(klasse="blandet", symbol="↔", tekst="Blandet")
+    return SimpleNamespace(
+        vurdering=SimpleNamespace(styrke=styrke), retning=retning, brikker=[("T", "Trend", "+1")], tekst=""
+    )
+
+
+class TestStyrkenSomTabellen:
+    @VERSJONENE
+    @pytest.mark.parametrize("styrke", (0, 1, 2, 3))
+    def test_i_notatet(self, request, hvilken, styrke):
+        """Ville feilet hvis et notat viste 0 eller 1 av 3 i en pille, 2 av 3
+        uten den hvite pillen eller 3 av 3 uten den oransje, i en av versjonene."""
+        from flask import render_template_string
+
+        import app as app_modul
+
+        _versjonen(request, hvilken)
+        with app_modul.app.test_request_context("/min-liste"):
+            html = render_template_string(
+                '{% from "_notat.html" import signalet with context %}{{ signalet(dag) }}', dag=_dagen(styrke)
+            )
+        assert STYRKEN.findall(html) == [(_ventet(styrke), str(styrke))], html
+
+    @VERSJONENE
+    @pytest.mark.parametrize("styrke", (0, 1, 2, 3))
+    def test_i_signalet_dag_for_dag(self, request, hvilken, styrke):
+        """Ville feilet hvis en dag i «Signalet dag for dag» viste styrken på
+        en annen måte enn tabellen, i en av versjonene."""
+        from flask import render_template_string
+
+        import app as app_modul
+
+        _versjonen(request, hvilken)
+        aksjemal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
+        cellen = re.search(r"\{% if dag\.vurdering %\}(.*?)\{% elif not dag\.tom %\}", aksjemal, flags=re.S).group(1)
+        with app_modul.app.test_request_context("/"):
+            html = render_template_string(
+                '{% from "_brikker.html" import brikker, retningspille, styrke %}' + cellen, dag=_dagen(styrke)
+            )
+        assert STYRKEN.findall(html) == [(_ventet(styrke), str(styrke))], html
+
+    @VERSJONENE
+    def test_paa_sidene(self, request, hvilken):
+        """Ville feilet hvis en dag i «Signalet dag for dag» eller et notat på
+        sidene viste styrken på en annen måte enn tabellen. I demoen skal
+        historikken ha alle fire, så regelen er prøvd for hver."""
+        k, side = _versjonen(request, hvilken)
+        symbolene = sorted(set(re.findall(r'href="/aksje/([A-Z]+)"', _side(k, "/"))))
+        sett = set()
+        for symbol in symbolene:
+            aksjeside = _side(k, f"/aksje/{symbol}")
+            if '<section class="historikk"' not in aksjeside:
+                continue
+            historikken = aksjeside.split('<section class="historikk"', 1)[1].split("</section>", 1)[0]
+            for klasse, tall in STYRKEN.findall(historikken):
+                assert klasse == _ventet(int(tall)), (symbol, klasse, tall)
+                sett.add(int(tall))
+        for etterpaa in re.findall(r'<div class="etterpaa".*?</div>', side, flags=re.S):
+            for klasse, tall in STYRKEN.findall(etterpaa):
+                assert klasse == _ventet(int(tall)), (klasse, tall)
+        assert sett, "ingen dager i historikken"
+        if hvilken == "klient":
+            assert sett == {0, 1, 2, 3}, sett
+
+    def test_summen_og_kortet_staar_som_foer(self):
+        """Ville feilet hvis summen under sjekkene eller kortet «Signalstyrke»
+        fikk regelen for én dag i stedet for ringen fra siste børsdag."""
+        aksjemal = (ROT / "src" / "templates" / "aksje.html").read_text(encoding="utf-8")
+        assert '<span class="pille{% if ringen %} {{ ringen }}{% endif %}">{{ detalj.styrke }}' in aksjemal
+        assert '<span class="styrken{% if ringen %} pille {{ ringen }}{% endif %}">' in aksjemal
+
+    def test_stilen_for_notatene_og_historikken(self):
+        """Ville feilet hvis den hvite pillen eller teksten uten pille manglet
+        stil i notatene eller i «Signalet dag for dag»."""
+        for del_ in (
+            ".etterpaa .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit);",
+            ".etterpaa .styrketall { font-weight: 700;",
+            ".historikk .pille.to-av-tre { border: 1.5px solid var(--blekk); background: var(--hvit);",
+            ".historikk .styrketall { font-weight: 700;",
+        ):
+            assert del_ in STIL, del_

@@ -8,3 +8,14 @@
 {% macro retningspille(retning) -%}
 {% if retning.klasse == "ukjent" %}<span class="retningstekst ukjent"><span class="symbol" aria-hidden="true">{{ retning.symbol }}</span> {{ retning.tekst }}</span>{% else %}<span class="retningspille {{ retning.klasse }}"><span class="symbol" aria-hidden="true">{{ retning.symbol }}</span>{{ retning.tekst }}</span>{% endif %}
 {%- endmacro %}
+
+{#- Tillegg 2 til 8.29 (gruppens ønske 13.11 kl. 20:35): styrken for én dag
+    vises likt overalt, med regelen fra tabellen på oversikten: 3 av 3 som
+    pille tre-av-tre, fra terskelen som pille to-av-tre, og under terskelen
+    som tekst uten pille. Brukt i notatene og «Signalet dag for dag»; tabellen
+    har samme regel med skiller_seg_ut (markedsoversikt.py). -#}
+{% macro styrke(verdi, antall, terskel) -%}
+{% if verdi == antall %}<span class="pille tre-av-tre">{{ verdi }} av {{ antall }}</span>
+{%- elif verdi >= terskel %}<span class="pille to-av-tre">{{ verdi }} av {{ antall }}</span>
+{%- else %}<span class="styrketall">{{ verdi }} av {{ antall }}</span>{% endif %}
+{%- endmacro %}

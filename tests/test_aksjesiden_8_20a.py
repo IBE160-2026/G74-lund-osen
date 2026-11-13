@@ -108,16 +108,19 @@ class TestToppenOgSummen:
     def test_to_av_tre_har_ingen_ring_en_tidligere_dag(self, klient):
         """Gjennomgangen av 8.20a (BH11, ECH1): designregler.md §3 merker 2 av 3
         bare for siste børsdag. Ville feilet hvis en tidligere dag med 2 av 3
-        fikk svart ring."""
+        fikk svart ring i summen eller kortet. Tillegg 2 til 8.29: «Signalet dag
+        for dag» har den hvite pillen ved 2 av 3 som tabellen, så siden som
+        helhet sjekkes ikke lenger, bare summen og kortet «Signalstyrke»."""
         for symbol in sorted(set(re.findall(r'href="/aksje/([A-Z]+)"', _side(klient, "/")))):
             historikken = _side(klient, f"/aksje/{symbol}").split('<section class="historikk"', 1)[1]
             for dag, celle in re.findall(r'href="/aksje/[A-Z]+\?dag=([\d-]+)">(.*?)</li>', historikken, flags=re.S):
-                if '<span class="pille">2 av 3</span>' in celle:
+                if ">2 av 3</span>" in celle:
                     html = _side(klient, f"/aksje/{symbol}?dag={dag}")
                     if 'class="tidligere-dag"' not in html:
                         continue
                     summen = html.split('<p class="sumrad">', 1)[1].split("</p>", 1)[0]
-                    assert '<span class="pille">2 av 3</span>' in summen and "to-av-tre" not in html
+                    kortet = html.split('<span class="etikett">Signalstyrke', 1)[1].split("</div>", 1)[0]
+                    assert '<span class="pille">2 av 3</span>' in summen and "to-av-tre" not in summen + kortet
                     return
         pytest.fail("ingen tidligere dag med 2 av 3 i demoen")
 

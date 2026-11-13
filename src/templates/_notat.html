@@ -3,10 +3,10 @@
     Bare fakta: ingen ord om at noe var riktig eller galt, ingen kronebeløp og
     ingen råd (NFR-06). med_skjema er aksjesiden, med knappene; i Min liste
     står navnet på aksjen med lenke i stedet. -#}
-{% from "_brikker.html" import brikker, retningspille -%}
+{% from "_brikker.html" import brikker, retningspille, styrke -%}
 
 {% macro signalet(dag) -%}
-{% if dag is none %}<span class="tilstand">– signalet kunne ikke leses</span>{% elif dag.vurdering %}{{ retningspille(dag.retning) }} {{ brikker(dag.brikker) }} <span class="pille{% if dag.vurdering.styrke == antall_sjekker %} tre-av-tre{% endif %}">{{ dag.vurdering.styrke }} av {{ antall_sjekker }}</span>{% else %}<span class="tilstand">–{% if dag.tekst %} {{ dag.tekst }}{% endif %}</span>{% endif %}
+{% if dag is none %}<span class="tilstand">– signalet kunne ikke leses</span>{% elif dag.vurdering %}{{ retningspille(dag.retning) }} {{ brikker(dag.brikker) }} {{ styrke(dag.vurdering.styrke, antall_sjekker, parametre.terskel) }}{% else %}<span class="tilstand">–{% if dag.tekst %} {{ dag.tekst }}{% endif %}</span>{% endif %}
 {%- endmacro %}
 
 {% macro sjekkene(sjekker) -%}
