@@ -2,7 +2,7 @@
 title: 'Story 10.11: «mest av bransjene med minst to aksjer» i teksten om børsdagen'
 type: 'feature'
 created: '2026-11-12'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a93c668f'
 context:
@@ -115,3 +115,5 @@ Ingen funn står åpent på middels eller over.
 ## Hele settet
 
 I fire deler etter filnavn, én om gangen og bare når ingen annen pytest kjørte, kl. 18:11–18:34 på `eec91492`: 1653 (1630 bestått og 23 hoppet over) + 1784 (1783 og 1) + 1186 + 800 = 5423, likt `--collect-only`. ruff og testene for dokumentene besto.
+
+*Ferdig 2026-11-13:* PR #149 er flettet med en merge-commit i `0c223890`, låst til head-en `1402fed3` (main med 3.7 flettet inn), etter gruppens svar 12.11 kl. 19:06 og 13.11 kl. 10:18 (tillegg 4 og 8). Hjelpen ved «Børsdagen kort fortalt» er den korte teksten fra spørsmål 4. Ingen funn på middels eller over står åpne.

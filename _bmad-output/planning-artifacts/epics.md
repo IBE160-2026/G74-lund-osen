@@ -3473,6 +3473,10 @@ Som **bruker**, vil jeg at teksten om børsdagen sier at bransjen som steg eller
 
 *Avgjort 2026-11-12 kl. 19:06 (gruppens svar):* forslagene i alle seks spørsmålene i spesifikasjonen er godtatt som bygget, og PR #149 flettes i natt etter 3.7. Rådet anbefalte det. Svaret er gjengitt fra tillegg 4 til instruksjonen kl. 17:03.
 
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 8):* rekkefølgen er 3.7, 10.11, 8.27 og 8.19, fordi notatvinduet sto og ventet på et spørsmål i natt. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 10.11 er flettet med PR #149 i `0c223890` kl. 14:19, låst til head-en `1402fed3` (main med 3.7 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 i `docs/ai-prompts/2026-11-13.md`. Flettingen ble en vanlig merge-commit, ikke squash som de andre. Hjelpen ved «Børsdagen kort fortalt» er den korte teksten fra spørsmål 4, 50 ord. Hele settet lokalt i fire deler kl. 13:08–14:14 (`date`), hver del bare når ingen annen pytest kjørte: 5632 bestått, 24 hoppet over og 0 feilet, til sammen de 5656 som `pytest --collect-only` finner. CI var grønn på head-en (run 43431952221). Treet i `0c223890` er likt treet på `1402fed3`. Testene for dokumentene på main etter flettingen: 2847 bestått, 7 hoppet over.
+
 ---
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
