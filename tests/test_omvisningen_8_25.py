@@ -240,7 +240,8 @@ class TestRaadOgVersjonene:
 
     def test_lik_i_demoen_og_den_ekte_versjonen(self, klient, tmp_path, monkeypatch):
         """Del D: ville feilet hvis omvisningen var en annen i den ekte
-        versjonen enn i demoen."""
+        versjonen enn i demoen. Story 8.19 (tillegg 2, spørsmål 8): bare
+        steget om dagen på oversikten er ulikt, fordi demoen ikke henter."""
         import lagring_sqlite
         from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
 
@@ -251,14 +252,19 @@ class TestRaadOgVersjonene:
         monkeypatch.delenv(app_modul.I_DEMO, raising=False)
         _, ekte = _dataene(app_modul.app.test_client().get("/").data.decode("utf-8"))
         # Story 8.27 (forslaget i spørsmål 13, godtatt 12.11 kl. 10:16): steget
-        # for «Mine notater» har linja om demoen i demoen. Ellers likt.
+        # for «Mine notater» har linja om demoen i demoen. Story 8.19 (spørsmål 8):
+        # steget om dagen på oversikten er ulikt. Ellers likt.
         import hjelpetekster as ht
 
         for s in demoen:
             if s["anker"] == ht.NOTATKNAPP:
                 assert s["tekst"] == ht.NOTATSTEGET_DEMO
                 s["tekst"] = ht.NOTATSTEGET
-        assert ekte == demoen
+        dagen = ("oversikt", "velg-dag")
+        assert [s for s in ekte if (s["side"], s["anker"]) != dagen] == [
+            s for s in demoen if (s["side"], s["anker"]) != dagen
+        ]
+        assert len(ekte) == len(demoen)
 
 
 class TestEtterBygget:

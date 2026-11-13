@@ -75,7 +75,10 @@
     {% if hentet %}
     <div class="rad oppdatert">
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>
-      <span>Oppdatert {{ hentet|oppdatert }}</span>
+      <span>Oppdatert {{ hentet|oppdatert }}
+        {#- Story 8.19 (U60): når nye kurser tidligst kan hentes, bare i den ekte versjonen, fordi demoen ikke henter.
+            Spørsmål 10: regnet av den siste kursdagen i basen (kursdag_felles), ikke av tidspunktet. #}
+        {%- if not eksempeltall and kursdag_felles %}{% set neste = kursdag_felles|neste_henting %}{% if neste %}<span class="neste-henting" id="neste-henting"> · {{ neste }}</span>{% endif %}{% endif %}</span>
       {#- PR 2: «?» ved tidspunktet, på sidene som har vinduet. #}
       {% block oppdatert_hjelp %}{% endblock %}
     </div>

@@ -455,6 +455,8 @@ class TestSteget:
             "anker": "notatknapp",
             "tittel": "Mine notater",
             "tekst": NOTATSTEGET_DEMO if versjon == "demo" else NOTATSTEGET,
+            # Story 8.19 (spørsmål 8): hvert steg har en del til som merkes, tom her.
+            "ogsaa": "",
         }
         assert [s["anker"] for s in stegene].count("notatknapp") == 1
         # Ankeret er knappen øverst, så skriptet finner den.
