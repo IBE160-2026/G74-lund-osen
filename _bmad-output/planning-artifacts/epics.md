@@ -4755,6 +4755,8 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 
 *Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 3):* alle 14 spørsmålene i spesifikasjonen godtas som bygget, også innholdet i en `<template>` på hver side (spørsmål 11) og knappene for et tenkt kjøp og salg i panelet på alle sidene (spørsmål 14). PR #147 flettes etter 8.26, som flettes 12.11 kl. 23:50–23:58, med steget fra svaret kl. 22:20 bygget etter forslaget i spørsmål 13, uten at gruppen ser på den igjen. Rådet anbefalte det.
 
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar):* med 8.26 har raden øverst sju knapper. De står på én rad ved 1280 px med mindre luft i knappene, og to rader beholdes hvis det blir for trangt eller klikkflaten blir lavere (spørsmål 15 i spesifikasjonen). Rekkefølgen er endret: 3.7 og 10.11 flettes før 8.27, og PR #147 flettes når Utført-linja for 10.11 står på origin/main, med main flettet inn i grenen på nytt og hele settet før flettingen. Rådet anbefalte det.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
