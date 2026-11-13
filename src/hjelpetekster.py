@@ -777,11 +777,12 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "",
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
             # Setningen fra «Modellen fikk» til «nyheter.» står ordrett i docs/hjelp.md (test_ki_dagen).
+            # Story 10.11 (spørsmål 4): «bransjene med minst to aksjer», og fortsatt 50 ord.
             "Et kort sammendrag av børsdagen, skrevet av en språkmodell (KI). "
-            "Modellen fikk bare det appen regnet ut: hovedindeksen, aksjene som skilte seg ut og bransjene, "
+            "Modellen fikk bare det appen regnet ut: hovedindeksen, aksjene som skilte seg ut og bransjene "
             # Ordene fra utdraget 08.11 §3; linja om Min liste sier selv «Skrevet av appen».
-            "ingen kurser eller nyheter. Teksten sjekkes før den vises: tall med prikket strek står i det "
-            "modellen fikk, og den gir ikke råd.",
+            "med minst to aksjer, ingen kurser eller nyheter. Teksten sjekkes først: tall med prikket strek "
+            "står i det modellen fikk, og den gir ikke råd.",
             (
                 (DAGSGRUNNLAG, "def dagsgrunnlag("),
                 (DAGSGRUNNLAG, "Ingen kurs, prosent, volum eller forholdstall"),
