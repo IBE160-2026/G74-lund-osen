@@ -7,9 +7,11 @@ bakgrunn og luft på sidene, bransjekortene stablet i kolonner, og knappen til
 investorsiden minst 44 px høy. Spesifikasjonen er
 spec-8-29-din-egen-liste-kom-i-gang.md. Demoen og den ekte versjonen bygges
 under tmp_path (regel 22), og ingen test gjør nettkall (AD-8).
+
+Gjennomgangen (ECH1): klient setter OSE_DEMO og ekte tar den bort, så en test
+ber om bare én av dem, med request.getfixturevalue.
 """
 
-import json
 import os
 import re
 from pathlib import Path
@@ -26,6 +28,7 @@ SETNINGEN = (
     "Nøkkelen står på kontosiden hos EODHD. Startskriptet til den ekte versjonen spør etter den første gang,"
     " og den lagres bare på denne maskinen."
 )
+VERSJONENE = pytest.mark.parametrize("hvilken", ("klient", "ekte"))
 
 
 def _side(k, adresse: str) -> str:
@@ -38,17 +41,21 @@ def _delen(side: str) -> str:
     return side.split('<section class="egne" id="din-egen-liste"', 1)[1].split("</ol>", 1)[0]
 
 
-@pytest.fixture(params=("demo", "ekte"))
-def versjon(request, klient, ekte):  # noqa: F811
-    return klient if request.param == "demo" else ekte
+def _versjonen(request, hvilken: str):
+    """Klienten for demoen eller den ekte versjonen, og bare den (ECH1)."""
+    k = request.getfixturevalue(hvilken)
+    side = _side(k, "/min-liste")
+    assert ("Eksempeltall" in side) == (hvilken == "klient"), "feil versjon"
+    return k, side
 
 
 class TestOverskriften:
-    def test_en_h2_med_id_en_delen_viser_til(self, versjon):
+    @VERSJONENE
+    def test_en_h2_med_id_en_delen_viser_til(self, request, hvilken):
         """Ville feilet hvis delen hadde mer enn én h2, overskriften ikke var
         «Din egen liste: kom i gang» med id-en i aria-labelledby, eller
         overskriften «Din egen liste» og setningen under sto igjen."""
-        side = _side(versjon, "/min-liste")
+        _, side = _versjonen(request, hvilken)
         delen = _delen(side)
         assert 'aria-labelledby="egen-liste-tittel"' in side
         assert re.findall(r"<h2[^>]*>(.*?)</h2>", delen) == ["Din egen liste: kom i gang"]
@@ -58,6 +65,13 @@ class TestOverskriften:
         assert "Vil du følge helt andre aksjer" not in side
         assert "Appen kjører på din egen maskin, så det finnes ingen innlogging hos oss." in delen
 
+    @VERSJONENE
+    def test_overskriftene_gaar_h2_h3_h4(self, request, hvilken):
+        """Gjennomgangen (BH1). Ville feilet hvis titlene i stegkortene hoppet
+        fra h2 til h4."""
+        _, side = _versjonen(request, hvilken)
+        assert re.findall(r'<span class="stegnummer" aria-hidden="true">\d</span><(h\d)>', _delen(side)) == ["h3"] * 3
+
     def test_overskriften_i_stilen(self):
         """Ville feilet hvis overskriften ikke var 32 px med vekt 500 (Newsreader
         kommer fra h2 i hele appen)."""
@@ -66,39 +80,36 @@ class TestOverskriften:
 
 
 class TestKortene:
-    def test_setningen_i_steg_2_og_ingen_felt(self, versjon):
+    @VERSJONENE
+    def test_setningen_i_steg_2_og_ingen_felt(self, request, hvilken):
         """Ville feilet hvis steg 2 ikke sa at startskriptet spør etter
         nøkkelen, sa den gamle setningen, eller fikk et felt (AD-10)."""
-        delen = _delen(_side(versjon, "/min-liste"))
+        _, side = _versjonen(request, hvilken)
+        delen = _delen(side)
         assert SETNINGEN in delen
         assert "EODHD. Den lagres bare på denne maskinen." not in delen
         assert "<input" not in delen and "<form" not in delen
 
     def test_titlene_teksten_og_kortene_i_stilen(self):
         """Ville feilet hvis titlene ikke var 21 px med linjehøyde 1,2, teksten
-        16 px med 1,5, eller stegkortene ikke hadde luften, hjørnene og
-        avstanden fra tavla."""
+        16 px med 1,5 (ikke avsnittet med knappen, ECH5), eller stegkortene ikke
+        hadde luften, hjørnene og avstanden fra tavla."""
         for regel in (
-            "#din-egen-liste .kort-steg .steg-topp h4 { font-size: 21px; line-height: 1.2; }",
-            "#din-egen-liste .kort-steg p { font-size: 16px; line-height: 1.5; }",
+            "#din-egen-liste .kort-steg .steg-topp h3 { font-size: 21px; line-height: 1.2; }",
+            "#din-egen-liste .kort-steg p:not(.handling) { font-size: 16px; line-height: 1.5; }",
             "#din-egen-liste .stegkort { gap: 14px; }",
             "#din-egen-liste .kort-steg { padding: 18px 18px 20px; border-radius: 14px; }",
         ):
             assert f":where(.side-oversikt) {regel}" in STIL, regel
 
     def test_brikkene_i_stilen(self):
-        """Ville feilet hvis brikkene i steg 3 ikke var 30 px høye, med 12 px
-        luft, 13 px tekst med vekt 600, 6 px mellom og ikonet 13 px."""
+        """Ville feilet hvis brikkene i steg 3 ikke var minst 30 px høye, med
+        12 px luft, 13 px tekst med vekt 600, 6 px mellom og ikonet 13 px, eller
+        hadde en fast høyde teksten kunne gå ut av (BH2, ECH2)."""
         brikken = re.search(r":where\(\.side-oversikt\) #din-egen-liste \.ferdigknapp \{([^}]*)\}", STIL).group(1)
-        for del_ in (
-            "min-height: 30px",
-            "height: 30px",
-            "padding: 0 12px",
-            "font-size: 13px",
-            "font-weight: 600",
-            "gap: 6px",
-        ):
+        for del_ in ("min-height: 30px", "padding: 0 12px", "font-size: 13px", "font-weight: 600", "gap: 6px"):
             assert del_ in brikken, del_
+        assert not re.search(r"(?<!min-)height:", brikken)
         assert ":where(.side-oversikt) #din-egen-liste .ferdige-knapper { gap: 6px; }" in STIL
         assert (
             ":where(.side-oversikt) #din-egen-liste .ferdigknapp .bransjesymbol { width: 13px; height: 13px; }" in STIL
@@ -119,6 +130,7 @@ class TestKortene:
         assert ":where(.side-oversikt) .bransjekort { columns: 3 260px; column-gap: 16px; }" in STIL
         kortet = re.search(r":where\(\.side-oversikt\) \.bransjekortet \{([^}]*)\}", STIL).group(1)
         assert "break-inside: avoid" in kortet and "margin: 0 0 16px" in kortet
+        assert ":where(.side-oversikt) .bransjekortet:last-child { margin-bottom: 0; }" in STIL
         assert "grid-template-columns: repeat(3" not in STIL.split(".bransjekort {", 1)[1].split("}", 1)[0]
 
 
@@ -126,49 +138,74 @@ class TestKortene:
 MAAL_DELEN = r"""
 const s = document.querySelector('#din-egen-liste');
 const r = (e) => e.getBoundingClientRect();
-const cs = getComputedStyle(s);
-const tabell = document.querySelector('main table');
-const titler = [...s.querySelectorAll('.steg-topp h4')].map((h) => [parseFloat(getComputedStyle(h).lineHeight), r(h).height]);
-const brikker = [...s.querySelectorAll('.ferdigknapp')].map((b) => r(b).height);
-const kort = [...s.querySelectorAll('.bransjekortet')].map((k) => [Math.round(r(k).left), Math.round(r(k).top), Math.round(r(k).bottom)]);
-ferdig({h2: s.querySelectorAll('h2').length, bakgrunn: cs.backgroundColor, kant: cs.borderTopWidth,
-        venstre: [Math.round(r(s).left), tabell ? Math.round(r(tabell).left) : null],
-        hoeyre: [Math.round(r(s).right), tabell ? Math.round(r(tabell).right) : null],
-        titler, brikker, kort,
+const cs = getComputedStyle(s), h2 = s.querySelector('h2'), h2s = getComputedStyle(h2);
+const naboen = document.querySelector('main table') || document.querySelector('#mine-notater');
+const titler = [...s.querySelectorAll('.steg-topp h3')].map((h) => [parseFloat(getComputedStyle(h).lineHeight), r(h).height]);
+const brikker = [...s.querySelectorAll('.ferdigknapp')].map((b) => [r(b).height, b.scrollHeight <= b.clientHeight + 1]);
+const kort = [...s.querySelectorAll('.bransjekortet')].map((k) => [Math.round(r(k).left), r(k).top, r(k).bottom]);
+const hvite = [...s.querySelectorAll('.kort-steg, .bransjekortet')].every((k) => getComputedStyle(k).backgroundColor === 'rgb(255, 255, 255)');
+const rekkefoelgen = [...s.querySelectorAll('.bransjekortet h4')].map((h) => h.textContent.trim());
+let fokus = null;
+const knapp = s.querySelector('.ferdigknapp') || s.querySelector('.handling .knapp');
+if (knapp) { knapp.focus(); const f = getComputedStyle(knapp); fokus = [knapp.matches(':focus-visible'), f.outlineStyle, f.outlineWidth]; }
+const kolonne = s.querySelector('.bransjekort');
+ferdig({h2: s.querySelectorAll('h2').length, h2stil: [h2s.fontSize, h2s.fontWeight, h2s.fontFamily.split(',')[0]],
+        bakgrunn: cs.backgroundColor, kant: cs.borderTopWidth,
+        delen: [Math.round(r(s).left), Math.round(r(s).right)],
+        naboen: naboen ? [Math.round(r(naboen).left), Math.round(r(naboen).right)] : null,
+        titler, brikker, kort, hvite, rekkefoelgen, fokus,
+        under: kolonne ? Math.round(r(kolonne).bottom - Math.max(...kort.map((k) => k[2]))) : null,
         rulling: document.documentElement.scrollWidth > document.documentElement.clientWidth});
 """
 
 
 @I_NETTLESER
-@pytest.mark.parametrize("bredde,kolonner", ((1280, 3), (390, 1)))
-def test_delen_i_nettleseren(klient, tmp_path, bredde, kolonner):  # noqa: F811
-    """Ville feilet hvis delen hadde mer enn én h2, en ramme eller egen
-    bakgrunn, ikke sto i linje med tabellen, en tittel som brytes ble skrevet
-    oppå seg selv (linjehøyde 1,2), en brikke var lavere enn 24 px (WCAG
-    2.5.8), bransjekortene ikke sto i tre kolonner ved 1280 px og én ved 390,
-    eller et kort ikke startet 16 px under kortet over i samme kolonne."""
-    r = _kjoer(_side(klient, "/min-liste"), tmp_path, bredde, MAAL_DELEN)
-    assert r["h2"] == 1 and r["kant"] == "0px" and r["bakgrunn"] == "rgba(0, 0, 0, 0)", r
+@VERSJONENE
+@pytest.mark.parametrize("bredde,kolonner", ((1280, 3), (700, 2), (390, 1)))
+def test_delen_i_nettleseren(request, tmp_path, hvilken, bredde, kolonner):
+    """Ville feilet hvis delen hadde mer enn én h2 eller ikke var 32 px med
+    vekt 500 i Newsreader, hadde en ramme eller egen bakgrunn, ikke sto i
+    linje med tabellen eller «Mine notater» (136-1144 px ved 1280 px), kortene
+    ikke var hvite, en tittel som brytes ble skrevet oppå seg selv (linjehøyde
+    1,2), en brikke var lavere enn 24 px eller teksten gikk ut av den (WCAG
+    2.5.8), fokusringen manglet, bransjekortene ikke sto i tre kolonner ved
+    1280 px, to ved 700 og én ved 390, et kort ikke startet 16 px under kortet
+    over i samme kolonne, det var luft under det siste kortet, eller
+    rekkefølgen i HTML-en var en annen. Med testdataene (BH5): demoen har åtte
+    bransjekort og den ekte versjonen like mange, nok til tre kolonner."""
+    k, side = _versjonen(request, hvilken)
+    rekkefoelgen = [
+        re.sub(r"<[^>]+>|\s+\d+\s*$", "", h).strip() for h in re.findall(r'<h4 id="flere-\d+">(.*?)</h4>', side, re.S)
+    ]
+    r = _kjoer(side, tmp_path, bredde, MAAL_DELEN)
+    assert r["h2"] == 1 and r["h2stil"] == ["32px", "500", "Newsreader"], r["h2stil"]
+    assert r["kant"] == "0px" and r["bakgrunn"] == "rgba(0, 0, 0, 0)" and r["hvite"], r
     assert not r["rulling"]
-    if r["venstre"][1] is not None:
-        assert abs(r["venstre"][0] - r["venstre"][1]) <= 1 and abs(r["hoeyre"][0] - r["hoeyre"][1]) <= 1, r
+    assert r["naboen"] and abs(r["delen"][0] - r["naboen"][0]) <= 1 and abs(r["delen"][1] - r["naboen"][1]) <= 1, r
+    if bredde == 1280:
+        assert r["delen"] == [136, 1144], r["delen"]
     for linje, hoeyde in r["titler"]:
         assert linje == pytest.approx(25.2, abs=0.1)
-        assert hoeyde >= linje - 0.5 and round(hoeyde / linje, 1) == round(hoeyde / linje)  # hele linjer
-    assert r["brikker"] and all(h == pytest.approx(30, abs=0.5) for h in r["brikker"]), r["brikker"]
+        assert hoeyde == pytest.approx(linje * round(hoeyde / linje), abs=1)  # hele linjer
+    assert all(h >= 24 and h == pytest.approx(30, abs=0.5) and inne for h, inne in r["brikker"]), r["brikker"]
+    assert hvilken == "ekte" or r["brikker"]
+    assert r["fokus"] and r["fokus"][0] and r["fokus"][1] == "solid" and r["fokus"][2] == "3px", r["fokus"]
     venstre = sorted({k[0] for k in r["kort"]})
     assert len(venstre) == kolonner, r["kort"]
     for kol in venstre:
-        i_kol = sorted(k for k in r["kort"] if k[0] == kol)
-        i_kol.sort(key=lambda k: k[1])
+        i_kol = sorted((k for k in r["kort"] if k[0] == kol), key=lambda k: k[1])
         for over, under in zip(i_kol, i_kol[1:]):
-            assert under[1] - over[2] == 16, (over, under)
+            assert under[1] - over[2] == pytest.approx(16, abs=1), (over, under)
+    assert r["under"] == 0, r["under"]
+    assert rekkefoelgen and [re.sub(r"\s+\d+$", "", t) for t in r["rekkefoelgen"]] == rekkefoelgen
 
 
 MAAL_KNAPPEN = r"""
 const a = document.querySelector('p.investorboble a');
 const b = a.getBoundingClientRect();
-ferdig({hoeyde: b.height, linjer: Math.round((b.height - 25) / 22),
+a.focus();
+const f = getComputedStyle(a);
+ferdig({hoeyde: b.height, linjer: Math.round((b.height - 25) / 22), fokus: [a.matches(':focus-visible'), f.outlineWidth],
         rulling: document.documentElement.scrollWidth > document.documentElement.clientWidth});
 """
 
@@ -180,20 +217,24 @@ def test_knappen_i_stilen():
 
 
 @I_NETTLESER
-@pytest.mark.parametrize("hvilken", ("demo", "ekte"))
+@VERSJONENE
 @pytest.mark.parametrize("bredde,brytes", ((1280, False), (320, True)))
-def test_knappen_44_px_ogsaa_naar_teksten_brytes(klient, ekte, tmp_path, hvilken, bredde, brytes):  # noqa: F811
+def test_knappen_44_px_ogsaa_naar_teksten_brytes(request, tmp_path, hvilken, bredde, brytes):
     """Ville feilet hvis knappen til investorsiden var lavere enn 44 px, på én
     linje eller når et langt navn brytes på smal skjerm, i en av versjonene,
-    eller pila og den nye fanen sto i demoen."""
-    k = klient if hvilken == "demo" else ekte
-    side = _side(k, "/min-liste")
+    fokusringen manglet, eller pila og den nye fanen sto i demoen og ikke i den
+    ekte versjonen (VG7)."""
+    k, side = _versjonen(request, hvilken)
     symbol = re.search(r'href="/aksje/([A-Z0-9.]+)"', side).group(1)
     html = _side(k, f"/aksje/{symbol}")
-    navn = re.search(r'<p class="investorboble"><a [^>]*>Investorsiden til ([^<]+)<', html).group(1)
-    assert ("↗" in html.split('class="investorboble"', 1)[1].split("</p>", 1)[0]) == (hvilken == "ekte")
+    boblen = html.split('<p class="investorboble">', 1)[1].split("</p>", 1)[0]
+    ekte_ = hvilken == "ekte"
+    assert ("↗" in boblen) == ekte_ and ('target="_blank"' in boblen) == ekte_
+    assert ("(åpnes i en ny fane)" in boblen) == ekte_
+    navn = re.search(r">Investorsiden til ([^<]+)<", boblen).group(1)
     if brytes:
         html = html.replace(f"Investorsiden til {navn}<", f"Investorsiden til {navn} Holding og Kraftselskap ASA<", 1)
     r = _kjoer(html, tmp_path, bredde, MAAL_KNAPPEN)
     assert r["hoeyde"] >= 44 and not r["rulling"], r
-    assert (r["linjer"] > 1) == brytes, json.dumps(r)
+    assert (r["linjer"] > 1) == brytes, r
+    assert r["fokus"] == [True, "3px"], r["fokus"]

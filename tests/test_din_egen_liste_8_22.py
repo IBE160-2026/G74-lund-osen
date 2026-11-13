@@ -25,7 +25,8 @@ def test_tre_stegkort_i_rekkefoelgen_fra_utdraget(klient):  # noqa: F811
     """Ville feilet hvis stegene ikke var tre kort, i rekkefølgen konto,
     nøkkel og aksjer, med nummeret i kortet."""
     kortene = _kortene(klient.get("/min-liste").data.decode("utf-8"))
-    assert [re.search(r"<h4>(.*?)</h4>", k).group(1) for k in kortene] == [
+    # Story 8.29 (gjennomgangen, BH1): titlene er h3.
+    assert [re.search(r"<h3>(.*?)</h3>", k).group(1) for k in kortene] == [
         "Lag en gratis konto hos EODHD",
         "Lim inn nøkkelen din",
         "Velg aksjene dine",

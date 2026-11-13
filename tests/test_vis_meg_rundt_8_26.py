@@ -806,7 +806,7 @@ class TestDinEgenListeSomTavla:
         assert len(kortene) == 3
         for nummer, kort in enumerate(kortene, 1):
             assert re.search(
-                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h4>', kort
+                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h3>', kort
             ), nummer
             assert kort.rstrip().endswith("</p>") and '<p class="handling">' in kort, nummer
         assert "kort-steg .handling { margin-top: auto;" in STIL
