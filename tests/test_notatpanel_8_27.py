@@ -378,6 +378,90 @@ class TestDemoen:
         assert (linja in _tekst(_panelet(klient))) == (versjon == "demo")
 
 
+# --- F) Steget i omvisningen (tillegg 2) -------------------------------------
+
+
+def _vis_meg_rundt(side: str) -> list[dict] | None:
+    """Stegene i «Vis meg rundt» på siden (_rundtur.html), eller None."""
+    import html
+    import json
+
+    treff = re.search(r'class="sideknapp vis-meg-rundt" data-steg="([^"]*)"', side)
+    return json.loads(html.unescape(treff.group(1))) if treff else None
+
+
+def _omvisningen(side: str) -> list[dict]:
+    """Stegene i den hele omvisningen, fra rammen (8.25)."""
+    import html
+    import json
+
+    treff = re.search(r'<div id="omvisning" hidden data-side="[^"]*" data-steg="([^"]*)"', side)
+    assert treff, "omvisningen mangler"
+    return json.loads(html.unescape(treff.group(1)))
+
+
+NOTATSTEGET = (
+    "Mine notater åpner et panel i kanten av siden med alle notatene dine, og et skjema for et nytt notat. "
+    "Panelet kan flyttes til venstre eller høyre. Notatene lagres på denne maskinen."
+)
+NOTATSTEGET_DEMO = NOTATSTEGET[:-1] + ", i demoen til den startes på nytt."
+
+
+class TestSteget:
+    """Tillegg 2 (gruppens svar 11.11 kl. 22:20), etter forslaget i spørsmål
+    13, godtatt 12.11 kl. 10:16."""
+
+    def test_sist_i_vis_meg_rundt_for_min_liste(self, klient, versjon):
+        """Ville feilet hvis steget manglet i «Vis meg rundt» for Min liste,
+        ikke sto sist der, pekte på noe annet enn knappen øverst, eller hadde
+        feil tekst i demoen eller i den ekte versjonen."""
+        side = _side(klient, "/min-liste")
+        stegene = _vis_meg_rundt(side)
+        assert stegene is not None
+        assert stegene[-1] == {
+            "anker": "notatknapp",
+            "tittel": "Mine notater",
+            "tekst": NOTATSTEGET_DEMO if versjon == "demo" else NOTATSTEGET,
+        }
+        assert [s["anker"] for s in stegene].count("notatknapp") == 1
+        # Ankeret er knappen øverst, så skriptet finner den.
+        assert 'id="notatknapp"' in _knappen(side)
+
+    def test_i_omvisningen_etter_min_liste_og_foer_foelg_en_aksje(self, klient, versjon):
+        """Ville feilet hvis steget manglet i den hele omvisningen, sto på en
+        annen side enn Min liste, eller ikke sto rett før «Følg en aksje»."""
+        stegene = _omvisningen(_side(klient, "/"))
+        sidene = [s["side"] for s in stegene]
+        i = [s["anker"] for s in stegene].index("notatknapp")
+        assert stegene[i]["side"] == "min_liste"
+        assert sidene[i + 1] == "folg" and sidene[i - 1] == "min_liste"
+        assert stegene[i]["tekst"] == (NOTATSTEGET_DEMO if versjon == "demo" else NOTATSTEGET)
+        assert [s["anker"] for s in stegene].count("notatknapp") == 1
+
+    @pytest.mark.parametrize("adresse", ["/", "/boersometer", f"/aksje/{AKSJE}", "/innstillinger", "/folg"])
+    def test_ikke_paa_de_andre_sidene(self, klient, adresse):
+        """Ville feilet hvis steget sto i «Vis meg rundt» på en annen side enn
+        Min liste, så lista der ble lengre."""
+        stegene = _vis_meg_rundt(_side(klient, adresse))
+        assert stegene is not None, adresse
+        assert "notatknapp" not in [s["anker"] for s in stegene]
+
+    def test_borte_naar_bryteren_er_av(self, klient):
+        """Ville feilet hvis steget sto i «Vis meg rundt» eller i omvisningen
+        med «Notater» av, der knappen er borte og telleren ville telt et steg
+        som ikke vises."""
+        _bryteren_av(klient)
+        side = _side(klient, "/min-liste")
+        assert "notatknapp" not in [s["anker"] for s in _vis_meg_rundt(side) or []]
+        assert "notatknapp" not in [s["anker"] for s in _omvisningen(side)]
+        assert "notatknapp" not in [s["anker"] for s in _omvisningen(_side(klient, "/"))]
+
+    def test_ingen_raad_i_teksten(self):
+        """NFR-06: ville feilet hvis steget sa kjøp, selg eller anbefal."""
+        for tekst in (NOTATSTEGET, NOTATSTEGET_DEMO):
+            assert not re.search(r"(kjøp|selg|anbefal)", tekst.lower())
+
+
 # --- E) Plassen på aksjesiden (tillegg 1) -------------------------------------
 
 

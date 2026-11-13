@@ -250,6 +250,14 @@ class TestRaadOgVersjonene:
         monkeypatch.setattr(lagring_sqlite, "BASE_STI", base)
         monkeypatch.delenv(app_modul.I_DEMO, raising=False)
         _, ekte = _dataene(app_modul.app.test_client().get("/").data.decode("utf-8"))
+        # Story 8.27 (forslaget i spørsmål 13, godtatt 12.11 kl. 10:16): steget
+        # for «Mine notater» har linja om demoen i demoen. Ellers likt.
+        import hjelpetekster as ht
+
+        for s in demoen:
+            if s["anker"] == ht.NOTATKNAPP:
+                assert s["tekst"] == ht.NOTATSTEGET_DEMO
+                s["tekst"] = ht.NOTATSTEGET
         assert ekte == demoen
 
 

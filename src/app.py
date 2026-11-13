@@ -551,9 +551,16 @@ def _omvisningen():
     """Story 8.25: stegene i «Spill av omvisningen», på hver side, som
     «Vis meg rundt»: borte når «Vis hjelp» er av i Innstillinger. Bare
     lesing, og lik i demoen og i den ekte versjonen."""
-    if not innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_HJELP]:
+    valgene = innstillinger.les(g.get("tilkobling"))
+    if not valgene[innstillinger.VIS_HJELP]:
         return {"omvisning": None}
-    return {"omvisning": omvisningen(STANDARD)}
+    # Story 8.27 (spørsmål 13): steget for «Mine notater» bare med «Notater»
+    # på, og med linja om demoen i demoen.
+    return {
+        "omvisning": omvisningen(
+            STANDARD, notater=valgene[innstillinger.VIS_NOTATER], demo=bool(g.get("eksempeltall", False))
+        )
+    }
 
 
 @app.context_processor
@@ -576,8 +583,13 @@ def _hjelp():
     antall_sjekker er «3» i «N av 3» (story 8.0c), fra samme sted som hjelpen."""
     return {
         "hjelp": Hjelp(hjelpetekster(STANDARD)),
-        # Story 8.9: stegene i «Vis meg rundt», fra samme fil.
-        "rundturer": rundturer(STANDARD),
+        # Story 8.9: stegene i «Vis meg rundt», fra samme fil. Story 8.27:
+        # med steget for «Mine notater» bare når «Notater» er på.
+        "rundturer": rundturer(
+            STANDARD,
+            notater=innstillinger.les(g.get("tilkobling"))[innstillinger.VIS_NOTATER],
+            demo=bool(g.get("eksempeltall", False)),
+        ),
         "parametre": STANDARD,
         "antall_sjekker": ANTALL_SJEKKER,
         "blandet": BLANDET,

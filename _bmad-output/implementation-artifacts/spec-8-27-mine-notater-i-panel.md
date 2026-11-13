@@ -101,7 +101,7 @@ Panelet sier i demoen at notatene står til demoen startes på nytt.
 
 ### F) Steget i omvisningen (tillegg 2)
 
-*Venter:* 8.26 bygger om omvisningen og «Vis meg rundt», og var ikke flettet 11.11 kl. 22:21 (main sto på `db89c5ba`). Steget legges inn når 8.26 er flettet og main er flettet inn i grenen, etter forslaget i spørsmål 13. Er 8.26 ikke flettet når resten av 8.27 er grønn, venter steget, og PR-en sier det.
+*Bygget 13.11* etter tillegg 3 (gruppens svar 12.11 kl. 10:16), da 8.26 var flettet (`719e5f07`) og main var flettet inn i grenen. `src/hjelpetekster.py`: steget `Steg(NOTATKNAPP, "Mine notater", …)` står sist i `rundturer()["min_liste"]`, med `NOTATSTEGET` eller `NOTATSTEGET_DEMO`. Med «Notater» av tas det ut der (`notater=False`), så telleren i boksen ikke teller det. `src/app.py` gir bryteren og demoflagget til `rundturer()` og `omvisningen()`, og knappen i `_ramme.html` har id-en `notatknapp`. I den hele omvisningen står steget etter Min liste og før «Følg en aksje», fordi stegene om styrken og retningen i Min liste hoppes over der (8.26). Testen fra 8.25 om lik omvisning i demoen og den ekte versjonen godtar linja om demoen i dette steget, og ingen annen forskjell.
 
 **Ville feilet hvis:** steget manglet i den hele omvisningen eller i «Vis meg rundt» for Min liste, sto med «Notater» av, eller manglet linja om demoen i demoen.
 
