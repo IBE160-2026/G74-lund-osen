@@ -92,11 +92,16 @@
       <div class="steg-topp"><span class="stegnummer" aria-hidden="true">3</span><h3>Velg aksjene dine</h3> {{ hjelpeknapp("hjelp-kallene", "Hjelp: kallene og de ferdige listene") }}</div>
       {#- Gjennomgangen (BH3, ECH2): tallet regnes av lista, og den ferdige
           lista nevnes bare når det finnes en. #}
-      <p>Start med dagens {{ egne.antall }}{% if egne.ferdige %} eller en ferdig liste for én bransje{% endif %}, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}.</p>
+      <p>Start med dagens {{ egne.antall }}{% if egne.mest_omsatte %} eller en ferdig liste{% elif egne.ferdige %} eller en ferdig liste for én bransje{% endif %}, og bytt ut dem du vil. Du kan ha opptil {{ egne.tak }}.</p>
       {#- Story 8.11 og tillegg 3 til 8.22: de ferdige listene som brikker med
           ikonet og antallet, til siden «Er du sikker?» (/ferdig-liste). #}
-      {% if egne.ferdige %}
+      {#- Story 8.28 (FR-412): «De 15 mest omsatte» på hele børsen står først,
+          med antallet, og går til den samme siden «Er du sikker?». #}
+      {% if egne.ferdige or egne.mest_omsatte %}
       <ul class="ferdige-knapper" id="ferdige-lister" aria-label="Start fra en ferdig liste">
+      {% if egne.mest_omsatte %}
+        <li><a class="knapp ferdigknapp" href="/ferdig-liste?liste={{ egne.mest_omsatte_noekkel }}">{{ egne.mest_omsatte_navn }} <span class="antall">{{ egne.mest_omsatte|length }}</span><span class="skjult"> {{ "aksje" if egne.mest_omsatte|length == 1 else "aksjer" }}</span></a></li>
+      {% endif %}
       {% for bransje, aksjene in egne.ferdige.items() %}
         <li><a class="knapp ferdigknapp" href="/ferdig-liste?bransje={{ bransje|urlencode }}">{{ bransjesymbol(bransje) }}{{ bransje }} <span class="antall">{{ aksjene|length }}</span><span class="skjult"> {{ "aksje" if aksjene|length == 1 else "aksjer" }}</span></a></li>
       {% endfor %}

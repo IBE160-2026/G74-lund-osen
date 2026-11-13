@@ -129,6 +129,7 @@ Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra
 - Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste: kom i gang» i tre steg
 - «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
 - Bak «Oppdatert» øverst: når nye kurser tidligst kan hentes, i den ekte versjonen
+- «De 15 mest omsatte» på hele børsen som ferdig liste, ved siden av bransjelistene
 
 **Neste i v1**
 

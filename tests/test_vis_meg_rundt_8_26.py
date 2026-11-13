@@ -842,7 +842,10 @@ class TestDinEgenListeSomTavla:
         assert 'popovertarget="hjelp-noekkel"' in kortene[1] and "Slik bytter du nøkkel" not in kortene[1]
         assert 'popovertarget="hjelp-kallene"' in kortene[2] and "kall: margin" not in kortene[2]
         vindu = side.split('id="hjelp-kallene"', 1)[1].split('<p class="lukkes">', 1)[0]
-        assert re.search(r"<li>\d+ kall: margin</li>", vindu) and "mest omsatte aksjene i bransjen" in vindu
+        assert (
+            re.search(r"<li>\d+ kall: margin</li>", vindu)
+            and "mest omsatte aksjene på børsen eller i bransjen" in vindu
+        )  # 8.28
         assert 'id="ferdige-lister"' in kortene[2] and 'class="knapp ferdigknapp"' in kortene[2]
 
     def test_siden_i_demoen(self, klient):
@@ -882,7 +885,8 @@ class TestEtterGjennomgangenAvTillegg12:
         """BH3, ECH2: ville feilet hvis steg 3 sa «dagens 15» fast, i stedet
         for antallet appen følger."""
         mal = (ROT / "src" / "templates" / "_egne.html").read_text(encoding="utf-8")
-        assert "Start med dagens {{ egne.antall }}{% if egne.ferdige %}" in mal
+        # Story 8.28: setningen nevner «De 15 mest omsatte» først, og bransjene ellers.
+        assert "Start med dagens {{ egne.antall }}{% if egne.mest_omsatte %}" in mal
 
 
 # Tillegg 17 (gruppens svar 11.11 kl. 22:04): brikkene i «Følg en aksje»,
