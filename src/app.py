@@ -94,7 +94,9 @@ from ki_visning import (
     AV,
     DAGEN_AV,
     DAGEN_UTEN,
+    DAGEN_UTEN_MODELL,
     INGEN_I_DEMOEN,
+    INGEN_MODELL,
     INGEN_RAD,
     KAPSEL,
     PAA,
@@ -445,6 +447,10 @@ EKSEMPELTALL_MERKE = "Eksempeltall: oppdiktede selskaper og kurser, ikke data fr
 # Story 3.3i (U51): demolinja lenker til stegene for den ekte versjonen i
 # README-en paa GitHub. Den staar bare i demoen, i samme blokk som merket.
 EKTE_VERSJONEN_URL = "https://github.com/IBE160-2026/G74-lund-osen#den-ekte-versjonen"
+# Story 3.7 (tillegg 1, spoersmaal 9): en dag uten KI-tekst i den ekte
+# versjonen lenker til delen i installasjonen som sier hvordan den slaas paa.
+# Appen viser ikke filene i docs/, saa lenken gaar til GitHub, som over.
+KI_TEKSTEN_URL = "https://github.com/IBE160-2026/G74-lund-osen/blob/main/docs/installasjon.md#ki-teksten"
 
 # Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
 # innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
@@ -524,6 +530,7 @@ def _eksempeltall():
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
         "demo_startdag": demo_startdag(),
         "ekte_versjonen_url": EKTE_VERSJONEN_URL,
+        "ki_teksten_url": KI_TEKSTEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
     }
 
@@ -2114,6 +2121,12 @@ def _ki_visning(post, detalj, siste: date) -> KIVisning:
     # demobase uten KI-tekstene ikke sier det om siste dag.
     if visning.tilstand == INGEN_RAD and g.get("eksempeltall") and detalj.dato < siste:
         return KIVisning(INGEN_I_DEMOEN)
+    # Story 3.7 (tillegg 1, spoersmaal 8): i den ekte versjonen er siste dag
+    # uten rad en dag uten modell, og siden lenker til installasjonen. En
+    # eldre dag kan ikke faa teksten senere (AD-7), saa der staar grunnen som
+    # foer (gjennomgangen, ECH4, BH1).
+    if visning.tilstand == INGEN_RAD and not g.get("eksempeltall") and detalj.dato == siste:
+        return KIVisning(INGEN_MODELL)
     return visning
 
 
@@ -2153,7 +2166,13 @@ def _boersdagen(
     try:
         rad = SqliteKILogg(g.tilkobling, naa).les(Emne.dagen(dag))
         if rad is None:
-            return {**bryter, "uten": DAGEN_UTEN}
+            # Story 3.7 (tillegg 1, spoersmaal 8): uten rad i den ekte
+            # versjonen sier linja naar teksten lages, med lenken, men bare
+            # for siste dag (AD-7) og bare naar ingen aksje har en rad den
+            # dagen, saa en maskin med modellen ikke faar linja (ECH4, ECH5).
+            if g.get("eksempeltall") or dag != siste or andre_aksjer_har_ki_rad(g.tilkobling, dag, ""):
+                return {**bryter, "uten": DAGEN_UTEN}
+            return {**bryter, "uten": DAGEN_UTEN_MODELL, "lenke": True}
         lager = SqliteIndekslager(g.tilkobling)
         symboler = lager.symboler()
         indeksserie = lager.serie(valgt_indeks(symboler)) if symboler else None

@@ -2735,6 +2735,28 @@ Spesifikasjonen er `spec-3-6-ikonet-og-snarveien.md`.
 
 *Lagt til 2026-11-11:* 3.6 er flettet med PR #144 i `078c7c28` kl. 15:21, låst til head-en `11998215` (main flettet inn), etter instruksjonen kl. 14:26 i `docs/ai-prompts/2026-11-11.md` og gruppens svar 11.11 kl. 13:47 og 13:49. Hele settet lokalt i åtte deler før pushen kl. 15:15 (`date`), hver del bare når ingen annen pytest kjørte: 5166 bestått, 25 hoppet over og 0 feilet, til sammen de 5191 som `pytest --collect-only` finner. CI var grønn på head-en (run 43036831538), med 5143 bestått og 48 hoppet over i jobben `pytest`, og steget «Snarveien på Windows» kjørte 29 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `11998215`. Ingen funn på middels eller over sto åpne.
 
+### Story 3.7: Snarveien spør før nettleseren, og KI-teksten på en ny PC
+
+*Lagt til 2026-11-12, etter instruksjonen «Ny liten story etter 3.6: snarveien spør før nettleseren åpnes» (limt inn 12.11 kl. 16:48) og tillegg 1–4, som føres i `docs/ai-prompts/2026-11-12.md` med flettingen.* 3.7 var neste ledige nummer i Epic 3.
+
+Som **bruker i Windows**, vil jeg se spørsmålet om snarveien før nettleseren dekker vinduet, og få KI-teksten på en ny PC uten å lese installasjonen først, så appen virker som lovet første gang.
+
+Spesifikasjonen er `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
+
+*Avgjort 2026-11-11 kl. 22:07 (gruppens svar):* snarveien spør før nettleseren åpnes, og får vinduet ikke svar innen 30 sekunder, lages ingen snarvei, og den tilbys igjen neste gang (rettelsen fra rådet 12.11, tillegg 4). Funnet fra demoprøven 11.11 kl. 22:06: snarveien kom ikke på skrivebordet, fordi spørsmålet sto i vinduet bak nettleseren. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:32 (gruppens svar, tillegg 1):* KI-teksten står på når den ekte versjonen installeres på en ny PC: `.env.example` har `OSE_KI_TJENESTE=lokal`, og uten modell sier hentingen det i én linje, og sidene sier at teksten lages når maskinen har en modell, med lenke til installasjonen. Det retter svar 5 under Epic 10. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:41 (gruppens svar, tillegg 2):* startskriptet tilbyr å hente Gemma første gang den ekte versjonen startes, som planen 05.10 sa (FR-608). Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 16:46 (gruppens svar, tillegg 3):* spørsmålet tilbyr også egen API-nøkkel til Gemini, Anthropic eller OpenAI. Rådet anbefalte det.
+
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar på spørsmålene i PR #148, tillegg 5):* alle 26 forslag i spesifikasjonen godtas som bygget, også spørsmål 26: lenken «Slik slår du den på» får fargen til teksten rundt, med understrek, som de andre lenkene i appen. Funnene som sto åpne til svaret (ECH3, ECH4, ECH5 og ECH13), er lukket. PR #148 flettes etter 8.27. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 6):* 3.7 flettes før 8.27, med main slik den er, med 8.26, så README-prøven på en ny PC kan starte tidligere. Rekkefølgen blir 3.7, 10.11, 8.27 og 8.19. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 3.7 er flettet med PR #148 i `b565ccd0` kl. 11:29, låst til head-en `816f0be0` (main med 8.26 flettet inn), etter instruksjonen 12.11 kl. 16:48 og tillegg 1–5 i `docs/ai-prompts/2026-11-12.md` og tillegg 6 i `docs/ai-prompts/2026-11-13.md`. Hele settet lokalt i åtte deler kl. 10:33–10:57 (`date`), hver del bare når ingen annen pytest kjørte: 5612 bestått, 24 hoppet over og 0 feilet, til sammen de 5636 som `pytest --collect-only` finner. CI var grønn på head-en (run 43407401615), med 5537 bestått og 99 hoppet over i jobben `pytest`, og steget «Snarveien og KI-spørsmålet på Windows (3.7)» kjørte 60 tester uten at noen ble hoppet over. Treet på main etter `git pull --ff-only` er likt treet på `816f0be0`. Spørsmål 26 ble dekket av regelen for lenker fra 8.26, og alle 16 bildene i `docs/appen/` var like etter flettingen. Ingen funn på middels eller over sto åpne.
+
 ---
 
 ## Epic 4: KI kan tas i bruk uten å bryte godkjenningen
@@ -2954,10 +2976,12 @@ på papir.
 
 *Lagt til 2026-10-15 (gruppens svar på de ti spørsmålene i planen for KI-laget, instruksjonen kl. 15:53):* svarene er beslutninger:
 1. Kveldshentingen går på PC-en den går på i dag (15,7 GB og RTX 4070), med Ollama i Docker som i `malinger.md` §19, alltid med grafikkort. Ingenting installeres på Windows.
+   *Presisert 2026-11-12 (story 3.7, spørsmål 20, gruppens svar 12.11 kl. 19:06):* svar 1 gjelder fortsatt kveldsjobben, som bruker Ollama i Docker. Startskriptet i 3.7 kan installere Ollama på brukerens egen maskin, bare etter et ja (tillegg 2). Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 2. Raden står når den finnes, også når modellen feilet (FR-604).
 3. Kjøres hentingen på nytt samme dag og vurderingen endrer seg, vises dagen uten KI-tekst (FR-602).
 4. Bryteren huskes i en informasjonskapsel nå. 8.10b flytter bryteren til innstillingene og bruker samme kapsel.
 5. «av» er et eget valg i `OSE_KI_TJENESTE`. `.env.example` har «av», og README-en sier hvordan KI slås på. Uten variabelen gjelder «lokal», som i FR-608. Ført også under FR-608 i PRD-en.
+   *Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):* `.env.example` har nå `lokal`, ikke `av`, så KI-teksten står på i en ny installasjon. Svarer ikke Ollama, lages ingen KI-tekst, og hentingen sier hvorfor. `av` er fortsatt et eget valg, og en `.env` som finnes fra før, endres ikke. Ført også under FR-608 i PRD-en og i story 3.7. Se `spec-3-7-snarveien-spoer-foer-nettleseren.md`.
 6. `0005` gir plass til dagsteksten i 10.6, med en dato som eneste emne.
 7. 3.4b kommer rett etter 10.3. Demotekstene lages med Gemma lokalt av de oppdiktede demodataene, i en egen avtalt kjøring.
 8. Adressen til Ollama er `OSE_KI_OLLAMA_URL`, med `http://127.0.0.1:11434` som standard og `http://ollama:11434` i compose. Porten publiseres bare på 127.0.0.1.
@@ -3317,6 +3341,8 @@ storyen bygges. Spørsmålet til EODHD er avgjort 04.10: vi spør ikke.
 
 *Rettet 2026-11-11 (story 10.10, gruppens svar 10.11 kl. 16:18 og 11.11 kl. 17:21 og 19:30):* grunnlaget for teksten om dagen har nå også navnene på dem som skilte seg ut (høyst fem, med styrke og retning), bransjen som steg og falt mest i snitt (bare navnet, ingen prosent), antallet mot snittet for de siste 20 børsdagene og retningen på hovedindeksen de siste fem børsdagene. Når bransjen som steg eller falt mest kan stå, står ikke formen med antallet som steg i én bransje. Rekkefølgen i teksten er fast. Uka er med som retning, ikke som antall. Se story 10.10.
 
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* bransjen som steg eller falt mest i snitt regnes bare av bransjene med minst to aksjer med en endring, og teksten sier det: «I snitt falt ‹bransje_mest_ned› mest av bransjene med minst to aksjer.» Se story 10.11.
+
 ### Story 10.7: Egen nøkkel til Gemini, Anthropic og OpenAI
 
 *Lagt til 2026-10-05, gruppens beslutning 04.10.*
@@ -3424,6 +3450,32 @@ Som **bruker**, vil jeg at KI-tekstene sier hvilke aksjer og bransjer som skilte
 *Avgjort 2026-11-11 kl. 19:30 (gruppens svar):* formen med antallet i én bransje står bare uten «mest», rekkefølgen er fast, og storyen flettes i kveld. Rådet anbefalte det. Spørsmål 13 (BH2) står åpent til gruppen har svart.
 
 *Ferdig 2026-11-11:* PR #145 er squash-flettet i `e5268b30`, låst til head-en `497548e0`.
+
+*Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* formene med «mest» er nå «I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.» og det samme med «falt», i promptversjon dag-3, og kontrollen godtar bare dem. Formene uten «av bransjene med minst to aksjer» i dag-2 gjelder ikke lenger. Se story 10.11.
+
+### Story 10.11: «mest av bransjene med minst to aksjer» i teksten om børsdagen
+
+*Lagt til 2026-11-12, etter instruksjonen kl. 17:03 12.11 (føres i dagsfila med flettingen) og gruppens svar 11.11 kl. 22:04 på funn 4 fra demoprøven.* 10.11 var neste ledige nummer i Epic 10. Spesifikasjonen står i [`spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md`](../implementation-artifacts/spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md), med spørsmålene og forslagene.
+
+Som **bruker**, vil jeg at teksten om børsdagen sier at bransjen som steg eller falt mest er regnet av bransjene med minst to aksjer, så den ikke ser feil ut når børsometeret viser en bransje med én aksje som falt mer.
+
+**Oppfyller:** FR-607, FR-603, svaret 11.11 kl. 22:04 · **Begrenses av:** FR-605, NFR-06, `AD-7`, `AD-10`, regel 19
+
+**Kontroll — hva testen ser etter:**
+- Formene med «mest» i prompten sier «av bransjene med minst to aksjer», og prompten har versjon dag-3
+- Kontrollen godtar bare de nye formene for «mest»
+- En bransje med én aksje med en endring blir aldri «mest»
+- Grunnlaget og tallene er de samme som i dag-2, og en tekst med dag-2 vises fortsatt
+- Hjelpen ved «Børsdagen kort fortalt» og `docs/hjelp.md` sier det samme
+- **Ville feilet hvis:** en form med «mest» uten «av bransjene med minst to aksjer» besto, eller en bransje med én aksje ble «mest»
+
+*Avgjort 2026-11-11 kl. 22:04 (gruppens svar):* formene med «mest» i teksten om børsdagen sier at bransjen er den som steg eller falt mest av bransjene med minst to aksjer (funn 4 fra demoprøven). Rådet anbefalte det. Svaret er gjengitt fra instruksjonen kl. 17:03 12.11, fordi det ikke står andre steder i repoet.
+
+*Avgjort 2026-11-12 kl. 19:06 (gruppens svar):* forslagene i alle seks spørsmålene i spesifikasjonen er godtatt som bygget, og PR #149 flettes i natt etter 3.7. Rådet anbefalte det. Svaret er gjengitt fra tillegg 4 til instruksjonen kl. 17:03.
+
+*Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 8):* rekkefølgen er 3.7, 10.11, 8.27 og 8.19, fordi notatvinduet sto og ventet på et spørsmål i natt. Rådet anbefalte det.
+
+*Lagt til 2026-11-13:* 10.11 er flettet med PR #149 i `0c223890` kl. 14:19, låst til head-en `1402fed3` (main med 3.7 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 i `docs/ai-prompts/2026-11-13.md`. Flettingen ble en vanlig merge-commit, ikke squash som de andre. Hjelpen ved «Børsdagen kort fortalt» er den korte teksten fra spørsmål 4, 50 ord. Hele settet lokalt i fire deler kl. 13:08–14:14 (`date`), hver del bare når ingen annen pytest kjørte: 5632 bestått, 24 hoppet over og 0 feilet, til sammen de 5656 som `pytest --collect-only` finner. CI var grønn på head-en (run 43431952221). Treet i `0c223890` er likt treet på `1402fed3`. Testene for dokumentene på main etter flettingen: 2847 bestått, 7 hoppet over.
 
 ---
 

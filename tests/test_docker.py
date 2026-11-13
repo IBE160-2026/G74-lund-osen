@@ -1341,7 +1341,15 @@ HOEYDE_PAA_BILDET = 1864
 # og bildene med knappen er tatt paa nytt.
 # Gjennomgangen av «Følg en aksje» i 8.25: _ramme.html. Bildene er byte for byte de samme.
 # Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-AVTRYKK_BAK_BILDET = "78ff888db5baae34be7bf0df4ae35ae1e5119c437424957b165a8469d3c58303"
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Story 10.11: «mest av bransjene med minst to aksjer» (ki_dagen.py, hjelpetekster.py og
+# demo_ki_dagen.json fra Gemma). Avtrykkene er regnet ut paa nytt, fordi hjelpetekster.py er med bak alle
+# bildene, og alle bildene er tatt paa nytt. Bare oversikten ved 390 px er ny, med samme hoeyde; de andre er
+# byte for byte de samme (gjennomgangen, BH7).
+# Flettingen av main (3.7) inn i 10.11 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt
+# paa nytt. Bare oversikten ved 390 px er ny (teksten om dagen i demoen).
+AVTRYKK_BAK_BILDET = "676a08abbd82524b61b3b08b5cb2fd77465ff1a588b91a0d997dac79aef023e5"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1794,7 +1802,11 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Flettingen av main (3.6, del C) inn i 8.22 11.11: avtrykkene er regnet ut paa nytt.
 # Story 8.25 og flettingen av main (8.22 og 3.6) inn i 8.25: avtrykkene er regnet ut paa nytt.
 # Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
-AVTRYKK_BAK_AKSJESIDEN = "249747923876797e4f0d382d14c38e599e0eb157d02f8fc36d5eb9c957835d37"
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Flettingen av main (3.7) inn i 10.11 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt
+# paa nytt. Bare oversikten ved 390 px er ny (teksten om dagen i demoen).
+AVTRYKK_BAK_AKSJESIDEN = "b5b385a1232670ffe55c14b33ebf5bb904d6a85e04962f8167db3c295ef6697e"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2035,22 +2047,33 @@ DE_NYE_BILDENE = {
 # tilbudet om omvisningen besvart, som i 8.25. Aksjesiden og oversikten ved 390 px (4810 px) har Gemma-teksten.
 # Story 10.10, svaret kl. 19:30: ki_dagen.py, ki_eksempel.py og teksten om dagen. Bildene er tatt paa nytt;
 # bare oversikten ved 390 px er ny, med samme hoeyde.
+# Story 3.7: linja om en dag uten modell i app.py, ki_visning.py, aksje.html og index.html, bare i den
+# ekte versjonen. Alle bildene ble tatt paa nytt med DevTools-protokollen og er byte for byte de samme.
+# notatene-brfe-390-demo.png er som paa main (8.22): utklippet ga et annet bilde ogsaa med koden paa
+# a93c668f, uten endringene i 3.7, saa avviket ligger i fremgangsmaaten, som i 10.10.
 # Story 8.26, tilleggene 5–20: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Flettingen av main (8.26) inn i 3.7 13.11: avtrykkene er regnet ut paa nytt. Bildene ble tatt
+# paa nytt og er byte for byte de samme.
+# Story 10.11: avtrykkene er regnet ut paa nytt (hjelpetekster.py og demo_ki_dagen.json). Alle bildene er
+# tatt paa nytt, og bare oversikten ved 390 px er ny. notatene-brfe-390-demo.png er som paa main, fordi
+# den klippes ut med en fremgangsmaate dette vinduet ikke har, som i 10.10; den viser ikke teksten om dagen.
+# Flettingen av main (3.7) inn i 10.11 13.11: avtrykkene er regnet ut paa nytt, og bildene er tatt
+# paa nytt. Bare oversikten ved 390 px er ny (teksten om dagen i demoen).
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "611134de51bee018fc4fa75dd4c3668bca42a062325df29bd99fd83650b339ee",
-    TOPPEN_AV_OVERSIKTEN: "78ff888db5baae34be7bf0df4ae35ae1e5119c437424957b165a8469d3c58303",
-    "docs/appen/boersometeret-demo.png": "431a58f504b7c7c684470dac00a9b0f4ea9fb2e4cd2ac6b209ee48ab7935b99d",
-    "docs/appen/min-liste-demo.png": "29821fdc76295b47a23a7c426c6f9f405c900034c01bacbd00d7ced4890bfc9a",
-    "docs/appen/oversikten-390-demo.png": "78ff888db5baae34be7bf0df4ae35ae1e5119c437424957b165a8469d3c58303",
-    "docs/appen/boersometeret-390-demo.png": "431a58f504b7c7c684470dac00a9b0f4ea9fb2e4cd2ac6b209ee48ab7935b99d",
-    "docs/appen/din-egen-liste-demo.png": "29821fdc76295b47a23a7c426c6f9f405c900034c01bacbd00d7ced4890bfc9a",
-    "docs/appen/investorsiden-brfe-demo.png": "84f9e804a350bf280536bdb48298c1db88c2a63918c50ea9f3d0e683899468d8",
-    "docs/appen/investorsiden-brfe-390-demo.png": "84f9e804a350bf280536bdb48298c1db88c2a63918c50ea9f3d0e683899468d8",
-    "docs/appen/folg-en-aksje-390-demo.png": "611134de51bee018fc4fa75dd4c3668bca42a062325df29bd99fd83650b339ee",
-    "docs/appen/notatene-brfe-390-demo.png": "249747923876797e4f0d382d14c38e599e0eb157d02f8fc36d5eb9c957835d37",
-    "docs/appen/notatene-brfe-demo.png": "249747923876797e4f0d382d14c38e599e0eb157d02f8fc36d5eb9c957835d37",
-    "docs/appen/notatene-min-liste-demo.png": "29821fdc76295b47a23a7c426c6f9f405c900034c01bacbd00d7ced4890bfc9a",
-    "docs/appen/innstillinger-demo.png": "223ce272602e93a9db22463c046cb2ebdfd36622ea2a906ff6995cd7c1dd7a00",
+    "docs/appen/folg-en-aksje-demo.png": "41ca2352fb2ae7fcd4ea04ae3f2797cdee6507439c516fe25a6a1a51d97a5df4",
+    TOPPEN_AV_OVERSIKTEN: "676a08abbd82524b61b3b08b5cb2fd77465ff1a588b91a0d997dac79aef023e5",
+    "docs/appen/boersometeret-demo.png": "7c2d9d04b6fe98b221f2409db9361f7ea337b34dcb145379027084f1af7f50c2",
+    "docs/appen/min-liste-demo.png": "21a848fdc50165ba1b905c68627c8c9397ba5b19a3bd16bdedceb07e895f2d08",
+    "docs/appen/oversikten-390-demo.png": "676a08abbd82524b61b3b08b5cb2fd77465ff1a588b91a0d997dac79aef023e5",
+    "docs/appen/boersometeret-390-demo.png": "7c2d9d04b6fe98b221f2409db9361f7ea337b34dcb145379027084f1af7f50c2",
+    "docs/appen/din-egen-liste-demo.png": "21a848fdc50165ba1b905c68627c8c9397ba5b19a3bd16bdedceb07e895f2d08",
+    "docs/appen/investorsiden-brfe-demo.png": "6c9a45b63a7120f80c31a3404fa154ed01f9ebcebec67e5125706d328740a503",
+    "docs/appen/investorsiden-brfe-390-demo.png": "6c9a45b63a7120f80c31a3404fa154ed01f9ebcebec67e5125706d328740a503",
+    "docs/appen/folg-en-aksje-390-demo.png": "41ca2352fb2ae7fcd4ea04ae3f2797cdee6507439c516fe25a6a1a51d97a5df4",
+    "docs/appen/notatene-brfe-390-demo.png": "b5b385a1232670ffe55c14b33ebf5bb904d6a85e04962f8167db3c295ef6697e",
+    "docs/appen/notatene-brfe-demo.png": "b5b385a1232670ffe55c14b33ebf5bb904d6a85e04962f8167db3c295ef6697e",
+    "docs/appen/notatene-min-liste-demo.png": "21a848fdc50165ba1b905c68627c8c9397ba5b19a3bd16bdedceb07e895f2d08",
+    "docs/appen/innstillinger-demo.png": "e67610465821867bb4db91b9a244b6d5358de466b3e8436fcf97992ef62975da",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3166,11 +3189,12 @@ class TestReadmeForNybegynnere:
         """Gjennomgangen av 3.3e (BH2, BH3, VG5): standardene i tabellen er
         de koden, .env.example, compose.yaml og Dockerfile bruker. Ville
         feilet hvis standardadressen til Ollama, adressen i compose,
-        OSE_KI_TJENESTE=av i .env.example eller lokal uten variabelen ble
+        OSE_KI_TJENESTE=lokal i .env.example (av til story 3.7, tillegg 1)
+        eller lokal uten variabelen ble
         endret uten at tabellen fulgte, eller OSE_DEMO og OSE_I_DOCKER ikke
         ble satt der tabellen sier."""
         from ki_lokal import STANDARD_URL
-        from ki_tekst import AV, LOKAL
+        from ki_tekst import LOKAL
 
         knapp = _detaljer(_seksjon("Mer for den som vil"))["Variablene i .env"]
         rader = {re.match(r"\| `([A-Z0-9_]+)` \|", l).group(1): l for l in knapp.splitlines() if l.startswith("| `")}
@@ -3179,8 +3203,10 @@ class TestReadmeForNybegynnere:
         assert "OSE_KI_OLLAMA_URL: http://ollama:11434" in ollama_i_compose, ollama_i_compose
         assert "`http://ollama:11434` i Docker" in rader["OSE_KI_OLLAMA_URL"]
         eksempel = (ROT / ".env.example").read_text(encoding="utf-8")
-        assert re.search(rf"^OSE_KI_TJENESTE={AV}$", eksempel, re.MULTILINE)
-        assert f"`{AV}` etter steg 6" in rader["OSE_KI_TJENESTE"]
+        # Rettet 2026-11-12 (story 3.7, tillegg 1, gruppens svar 12.11 kl. 16:32):
+        # her sto av. KI-teksten står på i en ny installasjon.
+        assert re.search(rf"^OSE_KI_TJENESTE={LOKAL}$", eksempel, re.MULTILINE)
+        assert f"`{LOKAL}` etter steg 6" in rader["OSE_KI_TJENESTE"]
         assert f"gjelder `{LOKAL}`" in rader["OSE_KI_TJENESTE"]
         assert 'OSE_DEMO: "1"' in COMPOSE.read_text(encoding="utf-8")
         assert "OSE_I_DOCKER=1" in (ROT / "Dockerfile").read_text(encoding="utf-8")
@@ -4250,7 +4276,9 @@ AVTRYKK_I_PILENE = {
     # Story 3.6 (gjennomgangen, ECH12): snarveien under start/. Var e4171fa9....
     # Tillegg 5 til 8.22 (regel 19): «Følg en aksje» og notatene for BRFE ved 390 px. Var e4171fa9....
     # Flettingen av main (3.6) inn i 8.22: begge endringene. Var 55c0a57b... og 3ea3433e....
-    "Mappestruktur": "66d9867584978b5ded9cd972fd40cb7e2941599a2756fd7fe722bc22b54f613e",
+    # Story 3.7 (regel 19): under start/ står at snarveien spør før nettleseren, og
+    # spørsmålet om KI-modellen. Var 66d98675....
+    "Mappestruktur": "59b2a3feec164adc7e737416c7e1ec35762f7860964ca0544c1b887fd8f4ec43",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
@@ -4287,7 +4315,9 @@ AVTRYKK_I_KOM_I_GANG = {
     # til en annen kopi. Var d8dccde4....
     # Gjennomgangen av spørsmål 8 (ECH1): fila for neiet heter «snarvei-nei…».
     # Var 3a938e6a....
-    "Slik virker dobbeltklikket": "1f7571e7722d7518d56a3c977562e85bbead28d8385327f10656ac5ced0de3f6",
+    # Story 3.7 (regel 19): spørsmålet om KI-teksten i den ekte versjonen, og at
+    # snarveien spør før nettleseren og venter høyst 30 sekunder. Var 1f7571e7....
+    "Slik virker dobbeltklikket": "f9b7a68dfb5c413f38e062e43357f3c17c07e6b46df88f5ebe46e83a728bbdf5",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 
@@ -4677,11 +4707,16 @@ def _ord(tekst: str) -> int:
 
 LINUX_LINJA = "**Linux:** bruk [Docker](#med-docker-desktop) eller [uv](#uten-docker-med-uv), under."
 # Story 3.5i (spesifikasjonen, med svaret 08.11 kl. 11:24): linja om den
-# ekte versjonen i README-en, med ankeret lenken i demoen gaar til.
+# ekte versjonen i README-en, med ankeret lenken i demoen gaar til. Story 3.7
+# (tillegg 2, gruppens svar 12.11 kl. 16:41): to setninger om den lokale
+# modellen, gratis standard som hentes første gang, minnet den er prøvd med
+# (malinger.md §19), egen nøkkel, og at appen virker uten KI-tekst.
 EKTE_LINJA = (
     '<a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for '
     "«Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra "
-    "ZIP-fila, ikke i en klon. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: "
+    "ZIP-fila, ikke i en klon. Første gang tilbyr den også å hente Gemma, en gratis språkmodell som skriver "
+    "KI-teksten på maskinen (prøvd med 15,7 GB minne), eller å bruke din egen API-nøkkel. Appen virker også "
+    "uten KI-tekst. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: "
     "[Installasjonen](docs/installasjon.md)."
 )
 
