@@ -4590,6 +4590,10 @@ NFR-08, `AD-10`
 
 *Avgjort 2026-11-12 kl. 20:42 (gruppens svar):* spørsmål 10 er godtatt som forslaget: stripa leser den siste kursdagen i basen, den eldste blant aksjene i lista, og aksjesiden bruker den samme dagen som oversikten. ECH1 og ECH2 er lukket. Rådet anbefalte det. Svaret er gjengitt fra tillegg 6 til instruksjonen kl. 17:03.
 
+*Avgjort 2026-11-13 kl. 10:18 og 18:24 (gruppens svar):* 8.19 flettes etter 8.27 (tillegg 8 til 10.11), og i kveld kjøres hele settet i CI i stedet for lokalt, fordi kveldsjobben hoppes over. Rådet anbefalte begge.
+
+*Lagt til 2026-11-13:* 8.19 er squash-flettet med PR #151 i `4fa06fc0` kl. 19:43, låst til head-en `4f473586` (main med 8.27 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–3 og 5–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Hele settet i CI (run 43484368470), etter gruppens svar 13.11 kl. 18:24: 5730 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Commit-tittelen har med seg «(flettes ikke før gruppen svarer)» fra PR-tittelen, som ikke ble rettet før flettingen. Spesifikasjonen: [`spec-8-19-neste-henting-i-stripa.md`](../implementation-artifacts/spec-8-19-neste-henting-i-stripa.md).
+
 ---
 
 ### Story 8.20: UX-rettingene etter gjennomgangen 06.11

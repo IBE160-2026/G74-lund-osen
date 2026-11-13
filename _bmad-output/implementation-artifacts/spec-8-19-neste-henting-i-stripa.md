@@ -2,7 +2,7 @@
 title: 'Story 8.19: Neste henting i stripa øverst'
 type: 'feature'
 created: '2026-11-12'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a93c668f'
 context:
@@ -116,3 +116,5 @@ Kopi av fila før og sha256 mot HEAD etter (skriptet ligger i scratchpad): fange
 ## Hele settet
 
 I fire deler etter filnavn, én om gangen og bare når ingen annen pytest kjørte, kl. 19:21–19:43 på `66fdfefd`: 1653 + 1784 + 1188 + 800 = 5425, likt `--collect-only`. To tester i `test_docker.py` feilet, fordi avsnittet om stripa sto først under «Når kan jeg hente?», og svaret skal begynne med «Hent etter kl. 22». Avsnittet står nå etter det første, og `test_docker.py`, `test_neste_henting.py` og `test_readme.py` besto (181).
+
+*Ferdig 2026-11-13:* PR #151 er squash-flettet i `4fa06fc0` kl. 19:43, låst til head-en `4f473586` (main med 8.27, 3.7 og 10.11 flettet inn i `172c0705`), etter gruppens svar 12.11 kl. 17:01, 17:31, 17:44, 20:04 og 20:42 og 13.11 kl. 10:18 og 18:24. Etter flettingen ble avtrykkene regnet ut på nytt (`e8f42a05`; bildene var like), og to tester fikk med forskjellene fra 8.27 (`4f473586`). Hele settet i CI (run 43484368470), etter gruppens svar 13.11 kl. 18:24: 5730 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne, også Windows. Lokalt testfilene flettingen berørte og testene for dokumentene (2883 bestått, 7 hoppet over). Ingen funn på middels eller over står åpne.
