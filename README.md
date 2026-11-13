@@ -128,6 +128,7 @@ Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra
 - Ikonet i fanen og snarveien i Windows, også for demoen, med spørsmålet før nettleseren og tilbudet om Gemma første gang
 - Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste: kom i gang» i tre steg
 - «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
+- Bak «Oppdatert» øverst: når nye kurser tidligst kan hentes, i den ekte versjonen
 
 **Neste i v1**
 

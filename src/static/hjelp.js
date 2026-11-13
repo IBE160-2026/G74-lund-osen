@@ -300,7 +300,7 @@ const OMVISNING = {
   SIDEN: "siden",
   sidensSteg(liste) {
     if (!Array.isArray(liste)) return [];
-    return liste.map((s) => ({ side: OMVISNING.SIDEN, anker: s.anker, tittel: s.tittel, tekst: s.tekst }));
+    return liste.map((s) => ({ side: OMVISNING.SIDEN, anker: s.anker, tittel: s.tittel, tekst: s.tekst, ogsaa: s.ogsaa }));
   },
 
   // Tilbudet første gang: bare på oversikten, og bare før det er besvart.
@@ -424,6 +424,9 @@ if (typeof module === "object" && module.exports) {
   let stedet = SIDE;
   let boksen = null;
   let merket = null;
+  // Story 8.19 (spørsmål 8): en del til som merkes med steget, som linja
+  // bak «Oppdatert» i den ekte versjonen.
+  let ogsaaMerket = null;
   let fokusFoer = null;
 
   function les(lager, noekkel) {
@@ -470,6 +473,8 @@ if (typeof module === "object" && module.exports) {
   function fjernMerket() {
     if (merket) merket.classList.remove("omvisning-merket");
     merket = null;
+    if (ogsaaMerket) ogsaaMerket.classList.remove("omvisning-merket");
+    ogsaaMerket = null;
     for (const c of kolonnen) c.classList.remove("omvisning-kolonne", "omvisning-kolonne-siste");
     kolonnen = [];
   }
@@ -576,9 +581,16 @@ if (typeof module === "object" && module.exports) {
       merket = del;
       del.classList.add("omvisning-merket");
     }
+    const ogsaa = s.ogsaa ? document.getElementById(s.ogsaa) : null;
+    if (ogsaa) {
+      ogsaaMerket = ogsaa;
+      ogsaa.classList.add("omvisning-merket");
+    }
     // Gjennomgangen (BH7, ECH7): delen øverst, så boksen nederst dekker
-    // mindre av den, også på smal skjerm.
-    del.scrollIntoView({ block: "start" });
+    // mindre av den, også på smal skjerm. Story 8.19 (spørsmål 8): står den
+    // andre delen over, som linja bak «Oppdatert», rulles det dit, så begge vises.
+    const oeverst = ogsaa && ogsaa.compareDocumentPosition(del) & Node.DOCUMENT_POSITION_FOLLOWING ? ogsaa : del;
+    oeverst.scrollIntoView({ block: "start" });
     if (!boksen) {
       fokusFoer = document.activeElement;
       boksen = document.createElement("div");

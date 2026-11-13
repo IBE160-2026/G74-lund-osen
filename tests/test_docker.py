@@ -1352,12 +1352,16 @@ HOEYDE_PAA_BILDET = 1864
 # Story 8.27 med flettingen av main (8.26, 3.7 og 10.11) 13.11: «Mine notater» i raden øverst og panelet
 # (_ramme.html, _notatpanel.html, app.py, hjelp.js, hjelpetekster.py og stil.css), og sju knapper på én rad
 # fra 1056 px (gruppens svar 13.11 kl. 10:18). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Story 8.19, spoersmaal 8–10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt og er byte for byte de samme.
+# Flettingen av main (8.27, 3.7 og 10.11) inn i 8.19 13.11: avtrykkene er regnet ut paa nytt. Bildene ble
+# tatt paa nytt og er byte for byte de samme.
 # Story 8.29: _egne.html, eodhd_demo.html og stil.css, med flettingen av main (8.27 og 10.11) 13.11.
 # Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt: min-liste-demo.png og notatene-brfe-demo.png
 # (investorknappen står over «Mine notater») er nye, de andre byte for byte de samme.
 # Tillegg 2 til 8.29 (styrken for én dag som tabellen): _brikker.html, _notat.html, aksje.html og stil.css.
 # Avtrykkene er regnet ut paa nytt, og de tre bildene med notatene er nye.
-AVTRYKK_BAK_BILDET = "973f3dbf80341c64df5863a83f81091bf6c0a264df1409e06ce3abc7d7593723"
+# Flettingen av main (8.19) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_BILDET = "518edce6ed3623f5c91c06a4342fd09ec96e833bac2994d1d46235ac0a40a4f7"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1817,12 +1821,16 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 8.27 med flettingen av main (8.26, 3.7 og 10.11) 13.11: «Mine notater» i raden øverst og panelet
 # (_ramme.html, _notatpanel.html, app.py, hjelp.js, hjelpetekster.py og stil.css), og sju knapper på én rad
 # fra 1056 px (gruppens svar 13.11 kl. 10:18). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Story 8.19, spoersmaal 8–10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt og er byte for byte de samme.
+# Flettingen av main (8.27, 3.7 og 10.11) inn i 8.19 13.11: avtrykkene er regnet ut paa nytt. Bildene ble
+# tatt paa nytt og er byte for byte de samme.
 # Story 8.29: _egne.html, eodhd_demo.html og stil.css, med flettingen av main (8.27 og 10.11) 13.11.
 # Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt: min-liste-demo.png og notatene-brfe-demo.png
 # (investorknappen står over «Mine notater») er nye, de andre byte for byte de samme.
 # Tillegg 2 til 8.29 (styrken for én dag som tabellen): _brikker.html, _notat.html, aksje.html og stil.css.
 # Avtrykkene er regnet ut paa nytt, og de tre bildene med notatene er nye.
-AVTRYKK_BAK_AKSJESIDEN = "9410482d37705e1cdc4f0013db20b9a149fe1657368d8d73d78cd009a91ef867"
+# Flettingen av main (8.19) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt.
+AVTRYKK_BAK_AKSJESIDEN = "0a29857acf808b4b0bbbb466a6284efded6233535abf05db06ae51f5afbfd9a3"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2083,26 +2091,34 @@ DE_NYE_BILDENE = {
 # Story 8.27 med flettingen av main (8.26, 3.7 og 10.11) 13.11: «Mine notater» i raden øverst og panelet
 # (_ramme.html, _notatpanel.html, app.py, hjelp.js, hjelpetekster.py og stil.css), og sju knapper på én rad
 # fra 1056 px (gruppens svar 13.11 kl. 10:18). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt.
+# Story 8.19: neste henting i stripa (_ramme.html, app.py, boersdag.py, markedsoversikt.py, hjelpetekster.py,
+# index.html og aksje.html). Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt og er byte for byte
+# de samme, fordi demoen ikke viser linja. notatene-brfe-390-demo.png er som paa main, som i 10.10.
+# Gjennomgangen av 8.19 (ECH4, ECH7): markedsoversikt.py og hjelpetekster.py. Bildene er byte for byte de samme.
+# Story 8.19, spoersmaal 8–10: avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt og er byte for byte de samme.
+# Flettingen av main (8.27, 3.7 og 10.11) inn i 8.19 13.11: avtrykkene er regnet ut paa nytt. Bildene ble
+# tatt paa nytt og er byte for byte de samme.
 # Story 8.29: _egne.html, eodhd_demo.html og stil.css, med flettingen av main (8.27 og 10.11) 13.11.
 # Avtrykkene er regnet ut paa nytt, og bildene er tatt paa nytt: min-liste-demo.png og notatene-brfe-demo.png
 # (investorknappen står over «Mine notater») er nye, de andre byte for byte de samme.
 # Tillegg 2 til 8.29 (styrken for én dag som tabellen): _brikker.html, _notat.html, aksje.html og stil.css.
 # Avtrykkene er regnet ut paa nytt, og de tre bildene med notatene er nye.
+# Flettingen av main (8.19) inn i 8.29 13.11: avtrykkene er regnet ut paa nytt.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "1b04e84e9bd599e7f37176280e9fb2b70e5c864dda87059df1a985c6108bac8e",
-    TOPPEN_AV_OVERSIKTEN: "973f3dbf80341c64df5863a83f81091bf6c0a264df1409e06ce3abc7d7593723",
-    "docs/appen/boersometeret-demo.png": "c915508ef5a6569743ca02dd6464a19c29b7791683a04327ac567c3db2e5434d",
-    "docs/appen/min-liste-demo.png": "edb7fdbf99c9542f6b1d312cb8e92208b381d7ba129b12b6f6d53bc1de3b856a",
-    "docs/appen/oversikten-390-demo.png": "973f3dbf80341c64df5863a83f81091bf6c0a264df1409e06ce3abc7d7593723",
-    "docs/appen/boersometeret-390-demo.png": "c915508ef5a6569743ca02dd6464a19c29b7791683a04327ac567c3db2e5434d",
-    "docs/appen/din-egen-liste-demo.png": "edb7fdbf99c9542f6b1d312cb8e92208b381d7ba129b12b6f6d53bc1de3b856a",
-    "docs/appen/investorsiden-brfe-demo.png": "9228a7cc780184361355d4f52aacc1ce00931b0702b10d4219de2e1a8eaac650",
-    "docs/appen/investorsiden-brfe-390-demo.png": "9228a7cc780184361355d4f52aacc1ce00931b0702b10d4219de2e1a8eaac650",
-    "docs/appen/folg-en-aksje-390-demo.png": "1b04e84e9bd599e7f37176280e9fb2b70e5c864dda87059df1a985c6108bac8e",
-    "docs/appen/notatene-brfe-390-demo.png": "9410482d37705e1cdc4f0013db20b9a149fe1657368d8d73d78cd009a91ef867",
-    "docs/appen/notatene-brfe-demo.png": "9410482d37705e1cdc4f0013db20b9a149fe1657368d8d73d78cd009a91ef867",
-    "docs/appen/notatene-min-liste-demo.png": "edb7fdbf99c9542f6b1d312cb8e92208b381d7ba129b12b6f6d53bc1de3b856a",
-    "docs/appen/innstillinger-demo.png": "49b1d5abf7f4581b98f2c083f886490fd384c28746e53163147133b361f03707",
+    "docs/appen/folg-en-aksje-demo.png": "4a559116824158fedd1a7bdc9dbb6e7892f14e656a5ac1f4069a22dfef7c92b7",
+    TOPPEN_AV_OVERSIKTEN: "518edce6ed3623f5c91c06a4342fd09ec96e833bac2994d1d46235ac0a40a4f7",
+    "docs/appen/boersometeret-demo.png": "a316df0e0453032cd8a86dbe5d13023485a6c83f97f89fd4e3e8fdad840e52e4",
+    "docs/appen/min-liste-demo.png": "9196dab87d27f7b703cff69e1a4a191d253fe395cd727dbb5057156e0511121d",
+    "docs/appen/oversikten-390-demo.png": "518edce6ed3623f5c91c06a4342fd09ec96e833bac2994d1d46235ac0a40a4f7",
+    "docs/appen/boersometeret-390-demo.png": "a316df0e0453032cd8a86dbe5d13023485a6c83f97f89fd4e3e8fdad840e52e4",
+    "docs/appen/din-egen-liste-demo.png": "9196dab87d27f7b703cff69e1a4a191d253fe395cd727dbb5057156e0511121d",
+    "docs/appen/investorsiden-brfe-demo.png": "658796cd72375754ed26d0ca07fa0c82ad4fc9f929db9710d7d00caa78ad15b3",
+    "docs/appen/investorsiden-brfe-390-demo.png": "658796cd72375754ed26d0ca07fa0c82ad4fc9f929db9710d7d00caa78ad15b3",
+    "docs/appen/folg-en-aksje-390-demo.png": "4a559116824158fedd1a7bdc9dbb6e7892f14e656a5ac1f4069a22dfef7c92b7",
+    "docs/appen/notatene-brfe-390-demo.png": "0a29857acf808b4b0bbbb466a6284efded6233535abf05db06ae51f5afbfd9a3",
+    "docs/appen/notatene-brfe-demo.png": "0a29857acf808b4b0bbbb466a6284efded6233535abf05db06ae51f5afbfd9a3",
+    "docs/appen/notatene-min-liste-demo.png": "9196dab87d27f7b703cff69e1a4a191d253fe395cd727dbb5057156e0511121d",
+    "docs/appen/innstillinger-demo.png": "3df2a8cf88b86ca110773bfd2f2974b6bb50d062d2015f3315c9712da091773b",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -3964,6 +3980,8 @@ EKSTRA_FERDIG = (
     ("faste bransjer", "«følg en aksje»"),
     # Story 8.25 (svaret 11.11 kl. 13:49): omvisningen er flettet.
     ("«spill av omvisningen»", "«vis meg rundt»"),
+    # Story 8.19 (tillegg 5 til 10.11, svaret 12.11 kl. 20:04): linja bak «Oppdatert» er flettet.
+    ("«oppdatert»", "nye kurser tidligst"),
 )
 
 

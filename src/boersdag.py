@@ -19,11 +19,18 @@ stedet for en liste foert for haand per aar. Listene fra Euronext for 2026 og
 stemme med.
 """
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from functools import cache
 from zoneinfo import ZoneInfo
 
 OSLO = ZoneInfo("Europe/Oslo")
+
+# Story 8.19: grensen for hentingen staar her, saa webserveren kan si naar
+# nye kurser tidligst kan hentes uten aa importere fetch_prices, som laster
+# KI-laget (AD-10). fetch_prices importerer den herfra, og navnet
+# fetch_prices.TIDSGRENSE gjelder som foer. Kl. 22:00 fra 20.10 (story 2.3,
+# gruppens svar 19.10 kl. 22:19).
+TIDSGRENSE = time(22, 0)
 
 # Foerste aar kalenderen dekker, og den dekker hvert aar etter. 2025 er ikke
 # med (gruppens svar 30.10 kl. 10:45 under 8.17: «Børskalenderen får ikke
@@ -164,3 +171,32 @@ def norsk_dato(oeyeblikk: datetime) -> date:
     if oeyeblikk.tzinfo is None or oeyeblikk.utcoffset() is None:
         raise ValueError(f"oeyeblikk maa ha tidssone (AD-20), fikk {oeyeblikk!r}")
     return oeyeblikk.astimezone(OSLO).date()
+
+
+# --- Story 8.19: neste henting i stripa ---------------------------------------
+
+
+def neste_boersdag(dag: date) -> date:
+    """Foerste boersdag etter dag. Reiser UtenforKalenderen naar kalenderen
+    ikke dekker aaret den maa slaa opp (NFR-08: ingen gjetning)."""
+    _sjekk_dag(dag)
+    neste = dag + timedelta(days=1)
+    while not er_boersdag(neste):
+        neste += timedelta(days=1)
+    return neste
+
+
+def neste_henting(kursdag: date, naa: datetime) -> date | None:
+    """Dagen nye kurser tidligst kan hentes, fra TIDSGRENSE, eller None naar
+    de kan hentes naa. kursdag er den siste kursdagen i basen, den eldste
+    blant aksjene i lista (spoersmaal 10, svaret 12.11 kl. 20:42), ikke
+    tidspunktet for hentingen. Den sier aldri at en henting kommer, bare naar
+    hentingen i fetch_prices tidligst ville faatt nye kurser: paa en
+    boersdag foer TIDSGRENSE henter den ingenting, og ellers henter den
+    inneverende boersdag naar den er nyere enn kursdag."""
+    idag = norsk_dato(naa)
+    if er_boersdag(idag) and naa.astimezone(OSLO).time() < TIDSGRENSE:
+        return idag
+    if innevaerende_boersdag(idag) > kursdag:
+        return None
+    return neste_boersdag(idag)
