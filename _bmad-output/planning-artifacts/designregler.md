@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-13T20:43
+updated: 2026-11-14T06:45
 ---
 
 # Designregler
@@ -186,6 +186,8 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 *Lagt til 2026-10-19 (story 2.7a, gruppens svar kl. 12:06):* all stilen står i én fil, `src/static/stil.css`, lenket fra `_ramme.html` med et avtrykk av fila i adressen. Fargene står som navn i `:root` der og ingen andre steder. Reglene for én side er avgrenset med klassen på `<body>` (`side-oversikt`, `side-aksje` og `side-feil`), og ingen mal har `<style>`.
 
 **Kontrast.** Tekst har minst 4,5:1 mot bakgrunnen den står på. Streker, felt og fokus som må ses for å forstå siden, har minst 3:1 (WCAG 1.4.11). En test regner det ut fra fargene i stilen. Retningsfargene er nesten like lyse, så retningen står alltid med ord og symbol (§4).
+
+*Lagt til 2026-11-14 (story 8.30, gruppens svar kl. 05:10–05:13):* de ledige rutene i streken under «Appen følger N av 18» har `--dempet-2`, med 4,14:1 mot bakgrunnen og 3,83:1 mot de brukte rutene i `--blekk`. `--strek-2` ga 1,34:1 på beige. `tests/test_plassstreken_8_30.py` regner det ut fra fargene i stilen.
 
 **Skriften** følger §1. Newsreader brukes til logoen (27 px, 600), overskriftene (oversikten 52 px og aksjesiden 56 px, 500), delene på aksjesiden (36 px), navnet på en sjekk (30 px, 600) og tittelen i hjelpen (23 px, 600). Resten er IBM Plex Sans, med størrelsene i utdraget §3. Alle tall har tabelltall. Det viktigste i en overskrift har fet skrift, ikke gul understrek (§4, rettet 13.10).
 

@@ -1363,7 +1363,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-oversikt) .plassene { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
 :where(.side-oversikt) .plassene .antall-egne { color: var(--blekk); font-weight: 600; }
 :where(.side-oversikt) .plassstrek { display: inline-flex; gap: 3px; }
-:where(.side-oversikt) .plassstrek span { width: 10px; height: 10px; border-radius: 2px; background: var(--strek-2); }
+/* Story 8.30 (gruppens svar 14.11 kl. 05:10–05:13): de ledige rutene i --dempet-2, minst 3:1 mot bakgrunnen og mot
+   de brukte (WCAG 1.4.11, designregler §3). --strek-2 ga 1,34:1 på beige (ECH3 i 8.29). */
+:where(.side-oversikt) .plassstrek span { width: 10px; height: 10px; border-radius: 2px; background: var(--dempet-2); }
 :where(.side-oversikt) .plassstrek span.brukt { background: var(--blekk); }
 :where(.side-oversikt) .flere-setning { margin: 0 0 16px; color: var(--dempet); }
 :where(.side-oversikt) .flere-handling { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 16px; }
