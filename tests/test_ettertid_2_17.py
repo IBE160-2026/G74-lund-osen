@@ -24,6 +24,7 @@ from lagring_sqlite import (
     MIGRASJONSKATALOG,
     SqliteEttertidslager,
     SqliteKurslager,
+    SqliteNotatlager,
     SqliteVurderingslager,
     aapne_base,
 )
@@ -145,8 +146,8 @@ class TestRegelen:
         assert date(2026, 9, 21) not in radene and dagens not in radene
 
     def test_ingen_dag_foer_boerskalenderen(self):
-        """Spørsmål 4: ville feilet hvis en dag i 2025 fikk en rad, eller
-        regelen reiste UtenforKalenderen for den."""
+        """Ville feilet hvis en dag i 2025 fikk en rad, eller regelen reiste
+        UtenforKalenderen for den (spørsmål 4)."""
         dager = [d for d in (date(2025, 9, 1) + timedelta(days=i) for i in range(160)) if d.weekday() < 5]
         radene = dict(regn_i_ettertid(_serie(dager), set(), date(2026, 3, 2)))
         assert radene and min(radene).year == 2026
@@ -218,7 +219,8 @@ class TestLageret:
         assert lager.antall() == antall and _kveldsradene(t) == foer
 
     def test_basen_avviser_at_en_kveldsrad_blir_en_rad_i_ettertid(self):
-        """Ville feilet uten triggeren i 0014, eller med en rad i ettertid med grunn."""
+        """Ville feilet hvis triggeren i 0014 manglet, eller en rad i ettertid
+        kunne ha en grunn."""
         t, _ = self._med_kveldsrader()
         with pytest.raises(sqlite3.IntegrityError, match="kveldsrad"):
             t.execute("UPDATE vurdering SET regnet = 'ettertid' WHERE symbol = 'EQNR' AND dato = '2026-09-21'")
@@ -477,6 +479,8 @@ VERSJONENE = pytest.mark.parametrize(
     "hvilken, symbol, dag, maaned",
     [("ekte", "EQNR", "2026-09-21", "2026-09"), ("demoen", "KVST", "2026-09-18", "2026-09")],
 )
+# Den første dagen med kveldsrad i hver versjon. Fra den står ingen dag med merket.
+KVELDSDAGEN = {"ekte": TIRSDAG, "demoen": demo.STARTDAG}
 
 
 class TestVisningen:
@@ -485,25 +489,38 @@ class TestVisningen:
     @VERSJONENE
     def test_signalet_dag_for_dag_merker_dagen_og_teller_dem(self, request, hvilken, symbol, dag, maaned):
         """Ville feilet hvis en dag i ettertid manglet stiplet kant eller
-        teksten «i ettertid», en kveldsdag fikk merket, eller uka og måneden
-        ikke sa hvor mange som er i ettertid."""
+        teksten «i ettertid», en kveldsdag fikk merket, eller tallet i uka og
+        måneden ikke var antallet dager med merket (gjennomgangen, VG4, VG11)."""
         klient = request.getfixturevalue(hvilken)
         html = _side(klient, f"/aksje/{symbol}?maaned={maaned}")
         historikken = html.split('id="signalet-dag-for-dag"', 1)[1].split("</section>", 1)[0]
-        dagene = re.findall(r'<li class="dag([^"]*)">(.*?)</li>', historikken, flags=re.DOTALL)
-        merket = [(k, innhold) for k, innhold in dagene if "ettertid" in k]
-        assert merket
-        for klasser, innhold in dagene:
-            har_merket = '<span class="ettertid-merke">i ettertid</span>' in innhold
-            assert ("ettertid" in klasser.split()) == har_merket, innhold
-        assert re.search(r"\d+ av \d+ dag(er)? skilte seg ut, \d+ i ettertid", _synlig(historikken))
-        assert re.search(r"skilte seg ut \d+ av \d+ børsdager, \d+ i ettertid\.", _synlig(historikken))
+        ukene = historikken.split('<li class="uke">')[1:]
+        assert ukene
+        i_alt = 0
+        for uke in ukene:
+            dagene = re.findall(r'<li class="dag([^"]*)">(.*?)</li>', uke, flags=re.DOTALL)
+            merket = 0
+            for klasser, innhold in dagene:
+                har_merket = '<span class="ettertid-merke">i ettertid</span>' in innhold
+                assert ("ettertid" in klasser.split()) == har_merket, innhold
+                dato = re.search(r"(\d{2})\.(\d{2})", innhold)
+                if dato and date(2026, int(dato.group(2)), int(dato.group(1))) >= KVELDSDAGEN[hvilken]:
+                    assert not har_merket, innhold
+                merket += har_merket
+            summen = re.search(r'<p class="ukesum">(.*?)</p>', uke, flags=re.DOTALL)
+            if summen and merket:
+                assert f", {merket} i ettertid" in summen.group(1), summen.group(1)
+            elif summen:
+                assert "i ettertid" not in summen.group(1)
+            i_alt += merket
+        assert i_alt > 0
+        assert f", {i_alt} i ettertid." in _synlig(historikken.split('class="maanedssum"', 1)[1])
 
     @VERSJONENE
     def test_aksjesiden_for_dagen_sier_det_under_datoen_og_om_ki_teksten(self, request, hvilken, symbol, dag, maaned):
         """Ville feilet hvis siden for en dag i ettertid ikke sa det under
         datoen, «Signalet forklart» ikke sa at KI-teksten bare lages samme
-        kveld, eller setningen om dagene sto."""
+        kveld, eller setningen om dagene eller om samme dag sto."""
         klient = request.getfixturevalue(hvilken)
         html = _side(klient, f"/aksje/{symbol}?dag={dag}")
         assert '<p class="ettertid-linje" role="note">' in html
@@ -511,23 +528,77 @@ class TestVisningen:
         assert meta.index("ettertid-linje") < meta.index("noekkeltallene")
         ki = html.split('id="ki-tittel"', 1)[1].split("</section>", 1)[0]
         assert "KI-teksten lages bare samme kveld som kursene hentes" in _synlig(ki)
-        assert '<p class="dagene">' not in ki and '<p class="ki-tekst">' not in ki
+        for klasse in ("dagene", "samme-dag", "ki-tekst"):
+            assert f'<p class="{klasse}">' not in ki, klasse
 
     @VERSJONENE
     def test_grafen_boersometeret_og_oversikten_merker_dagen(self, request, hvilken, symbol, dag, maaned):
         """Ville feilet hvis grafen, børsometeret eller oversikten for en
-        tidligere dag med signalet regnet i ettertid viste signalet uten merket."""
+        tidligere dag med signalet regnet i ettertid viste signalet uten merket
+        (gjennomgangen, VG2 og VG5)."""
         klient = request.getfixturevalue(hvilken)
         html = _side(klient, f"/aksje/{symbol}?dag={dag}")
         figuren = html.split("<figure>", 1)[1].split("</figure>", 1)[0]
-        if 'class="signaldag' in figuren:
-            assert re.search(r'class="signaldag [a-z]+( alle)? ettertid"', figuren)
-            assert "i ettertid" in _synlig(figuren)
+        assert re.search(r'class="signaldag [a-z]+( alle)? ettertid"', figuren)
+        assert "En prikk med hvit midte og stiplet kant er regnet i ettertid." in _synlig(figuren)
+        # Lista over dagene for skjermleseren står bare med 31 dager eller færre.
+        n = len(re.findall(r'class="signaldag ', figuren))
+        assert n > 31 or re.search(r"\(\w+, \d av 3, i ettertid\)", _synlig(figuren))
+        assert re.search(r"\d+ dager i grafen, \d+ i ettertid", _synlig(figuren))
         oversikten = _side(klient, f"/?periode=velg&dag={dag}")
         assert '<span class="ettertid-merke">i ettertid</span>' in oversikten
         boersometeret = _side(klient, f"/boersometer?periode=velg&dag={dag}")
         assert re.search(r'class="rute [^"]*ettertid', boersometeret)
+        assert '<span class="tekst">i ettertid</span>' in boersometeret
         tabellen = boersometeret.split("<table", 1)[1]
+        assert '<span class="ettertid-merke">i ettertid</span>' in tabellen
+
+    @VERSJONENE
+    def test_min_liste_sammenlignet_med_en_dag_i_ettertid(self, request, hvilken, symbol, dag, maaned):
+        """Gjennomgangen (VG6): ville feilet hvis linja under i Min liste for en
+        dag i ettertid viste signalet uten merket, i en av versjonene."""
+        klient = request.getfixturevalue(hvilken)
+        if hvilken == "ekte":
+            svar = klient.post("/min-liste/merk", data={"symbol": symbol, "til": "merk", "tilbake": "/"})
+            assert svar.status_code in (302, 303)
+        html = _side(klient, f"/min-liste?periode=velg&dag={dag}")
+        linjene = re.findall(r'<tr class="sammenligning">(.*?)</tr>', html, re.S)
+        assert linjene
+        for linja in linjene:
+            assert "av 3" not in _synlig(linja) or '<span class="ettertid-merke">i ettertid</span>' in linja, linja
+
+    def test_etterpaa_under_notatet_merker_dagen(self, ekte, stier):
+        """Gjennomgangen (VG6): ville feilet hvis «Etterpå» under et notat fra
+        en dag i ettertid viste signalet uten merket."""
+        _, base = stier
+        t = aapne_base(base)
+        try:
+            SqliteNotatlager(t).skriv("EQNR", date(2026, 9, 21), "Et notat.", datetime(2026, 9, 21, 23, 0, tzinfo=OSLO))
+        finally:
+            t.close()
+        html = _side(ekte, "/aksje/EQNR")
+        notatet = html.split('id="mine-notater"', 1)[1].split("</section>", 1)[0]
+        signalet = notatet.split("Signalet mandag 21.09", 1)[1].split("</p>", 1)[0]
+        assert '<span class="ettertid-merke">i ettertid</span>' in signalet
+        siste = notatet.split("Signalet tirsdag 22.09", 1)[1].split("</p>", 1)[0]
+        assert "ettertid-merke" not in siste
+
+    def test_linja_for_siste_dag_naar_den_er_regnet_i_ettertid(self, ekte, stier):
+        """Gjennomgangen (VG6): siste dag med kurser uten kveldsrad, som etter
+        --les-inn, får signalet i ettertid ved neste henting. Ville feilet hvis
+        linja «Signal: …» ved grafen eller raden på oversikten sto uten merket."""
+        _, base = stier
+        t = aapne_base(base)
+        try:
+            t.execute("DELETE FROM vurdering WHERE symbol = 'EQNR' AND dato = '2026-09-22'")
+            t.commit()
+        finally:
+            t.close()
+        assert fp.regn_signalet_i_ettertid(base, _klokke(ONSDAG), lambda _: None) == 1
+        html = _side(ekte, "/aksje/EQNR?periode=siste")
+        linja = html.split('<p class="dagen">', 1)[1].split("</p>", 1)[0]
+        assert '<span class="ettertid-merke">i ettertid</span>' in linja
+        tabellen = _side(ekte, "/").split("<tbody", 1)[1].split("</tbody>", 1)[0]
         assert '<span class="ettertid-merke">i ettertid</span>' in tabellen
 
     def test_en_kveldsdag_har_ikke_merket(self, ekte):
@@ -537,13 +608,22 @@ class TestVisningen:
         assert "ettertid-merke" not in _side(ekte, "/").split("<tbody", 1)[1].split("</tbody>", 1)[0]
 
     def test_stilen_kanten_kontrasten_og_hoey_kontrast(self):
-        """Ville feilet hvis kanten var under 3:1 mot bakgrunnen, regelen for
-        forced-colors manglet, eller merket bare var en kant uten tekst."""
+        """Ville feilet hvis kanten var under 3:1 mot bakgrunnen og kartet,
+        ruta i børsometeret hadde kanten inne i ruta (gjennomgangen, VG1),
+        en regel for forced-colors manglet, eller merket bare var en kant uten
+        tekst."""
         stil = (app_modul.STILARK).read_text(encoding="utf-8")
         assert re.search(r"\.ettertid-merke \{[^}]*border: 1\.5px dashed var\(--dempet-2\)", stil)
         assert re.search(r"li\.dag\.ettertid \{ border: 1\.5px dashed var\(--dempet-2\)", stil)
-        tvunget = re.findall(r"@media \(forced-colors: active\) \{(.*?)\n\}", stil, flags=re.DOTALL)
-        assert any(".ettertid-merke { border-color: CanvasText; }" in d for d in tvunget)
+        assert re.search(r"\.rute\.ettertid \{ outline: 2px dashed var\(--dempet-2\); outline-offset: 0; \}", stil)
+        tvunget = "".join(re.findall(r"@media \(forced-colors: active\) \{(.*?)\n\}", stil, flags=re.DOTALL))
+        for regel in (
+            ".ettertid-merke { border-color: CanvasText; }",
+            "li.dag.ettertid { border-color: CanvasText; }",
+            ".signaldag.ettertid { fill: Canvas; stroke: CanvasText; }",
+            ".rute.ettertid { outline-color: CanvasText; }",
+        ):
+            assert regel in tvunget, regel
 
         def lyshet(h):
             c = [int(h[i : i + 2], 16) / 255 for i in (1, 3, 5)]
@@ -551,9 +631,11 @@ class TestVisningen:
             return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
 
         farge = re.search(r"--dempet-2:\s*(#[0-9A-Fa-f]{6})", stil).group(1)
-        bakgrunn = re.search(r"--bakgrunn:\s*(#[0-9A-Fa-f]{6})", stil).group(1)
-        a, b = sorted((lyshet(farge), lyshet(bakgrunn)), reverse=True)
-        assert (a + 0.05) / (b + 0.05) >= 3
+        for navn in ("--bakgrunn", "--kort"):
+            bak = re.search(rf"{navn}:\s*(#[0-9A-Fa-f]{{6}})", stil).group(1)
+            a, b = sorted((lyshet(farge), lyshet(bak)), reverse=True)
+            assert (a + 0.05) / (b + 0.05) >= 3, navn
+        assert re.search(r"\.kart \{[^}]*background: var\(--kort\)", stil)
         brikker = app_modul.app.root_path + "/templates/_brikker.html"
         assert '<span class="ettertid-merke">i ettertid</span>' in open(brikker, encoding="utf-8").read()
 
@@ -578,3 +660,159 @@ class TestDemoen:
         assert foerste and siste < demo.STARTDAG.isoformat() and kveld_foer == 0
         assert ki == [(demo.SLUTTDATO.isoformat(),)]
         assert not demo.gammel_demobase(sqlite3.connect(sti))
+
+
+class TestEtterGjennomgangen:
+    """Gjennomgangen 14.11 (Blind Hunter, Edge Case Hunter og Verification Gap)."""
+
+    def test_regnet_paa_nytt_med_kursene_som_staar_og_utenfor_lista_staar(self, stier, monkeypatch):
+        """VG3 og BH2: ville feilet hvis --regn-ettertid-paa-nytt ikke regnet
+        radene med kursene som står nå, eller slettet radene for en aksje som
+        er tatt ut av lista, som ingen henting regner igjen."""
+        raa, base = stier
+        _kjoer(raa, base, TIRSDAG_KL_22, _hent(TIRSDAG))
+        t = aapne_base(base)
+        try:
+            dag = t.execute("SELECT max(dato) FROM vurdering WHERE symbol = 'EQNR' AND regnet = 'ettertid'").fetchone()[
+                0
+            ]
+            t.execute(
+                "UPDATE kurs SET justert_slutt = justert_slutt * 3, slutt = slutt * 3 WHERE symbol = 'EQNR' AND dato = ?",
+                (dag,),
+            )
+            t.execute("UPDATE aksje SET ut = '2026-09-23' WHERE symbol = 'DNB'")
+            t.commit()
+            dnb_foer = t.execute(
+                "SELECT * FROM vurdering WHERE symbol = 'DNB' AND regnet = 'ettertid' ORDER BY dato"
+            ).fetchall()
+            foer = SqliteVurderingslager(t, _klokke(ONSDAG)).les("EQNR", date.fromisoformat(dag), med_ettertid=True)
+        finally:
+            t.close()
+        assert dnb_foer
+        assert fp.regn_signalet_i_ettertid(base, _klokke(ONSDAG), lambda _: None, paa_nytt=True) is not None
+        t = aapne_base(base)
+        try:
+            serie = SqliteKurslager(t).serie("EQNR")
+            etter = SqliteVurderingslager(t, _klokke(ONSDAG)).les("EQNR", date.fromisoformat(dag), med_ettertid=True)
+            dnb_etter = t.execute(
+                "SELECT * FROM vurdering WHERE symbol = 'DNB' AND regnet = 'ettertid' ORDER BY dato"
+            ).fetchall()
+        finally:
+            t.close()
+        ventet = dict(regn_i_ettertid(serie, set(), ONSDAG))[date.fromisoformat(dag)]
+        assert etter == ventet and etter != foer
+        assert dnb_etter == dnb_foer
+
+    def test_kveldens_rad_skriver_over_en_rad_i_ettertid_samme_dag(self):
+        """VG8 og spørsmål 11: ville feilet hvis kveldens rad, med en klokke
+        som har gått bakover, ble stående merket «ettertid», eller ikke ble
+        skrevet."""
+        t = _ny_base()
+        dager = _boersdager(date(2026, 6, 1), TIRSDAG)
+        serie = _serie(dager)
+        SqliteKurslager(t).erstatt_serie("EQNR", serie, datetime(2026, 9, 22, 20, 15, tzinfo=timezone.utc))
+        fyll_i_ettertid(SqliteKurslager(t), SqliteEttertidslager(t, _klokke(ONSDAG)), AKSJEUNIVERS, ONSDAG)
+        port = SqliteVurderingslager(t, _klokke(TIRSDAG))
+        assert port.les("EQNR", TIRSDAG, med_ettertid=True).ettertid
+        assert port.skriv("EQNR", TIRSDAG, vurder(serie, TIRSDAG))
+        assert t.execute(
+            "SELECT regnet FROM vurdering WHERE symbol = 'EQNR' AND dato = ?", (TIRSDAG.isoformat(),)
+        ).fetchone() == ("kveld",)
+        assert port.les("EQNR", TIRSDAG) == vurder(serie, TIRSDAG)
+
+    def test_gammel_demobase_uten_kolonnen_eller_uten_radene_i_ettertid(self, tmp_path):
+        """VG9 og spørsmål 10: ville feilet hvis en demobase uten rader i
+        ettertid, eller uten kolonnen regnet, ble regnet som ny."""
+        sti = tmp_path / "demo.db"
+        demo.lag_demobase(sti, skriv=lambda _: None, med_ki=False)
+        t = sqlite3.connect(sti)
+        try:
+            assert not demo.gammel_demobase(t)
+            t.execute("DELETE FROM vurdering WHERE regnet = 'ettertid'")
+            assert demo.gammel_demobase(t)
+        finally:
+            t.close()
+        uten = sqlite3.connect(":memory:")
+        uten.execute("CREATE TABLE vurdering (symbol TEXT, dato TEXT)")
+        assert demo.gammel_demobase(uten)
+
+    def test_paa_dagtid_regnes_dagene_og_koden_staar(self, stier):
+        """VG10 og spørsmål 12: ville feilet hvis en henting som tidskontrollen
+        stopper, ikke regnet dagene i ettertid i en base på siste versjon,
+        eller fikk en annen kode eller gjorde et kall."""
+        raa, base = stier
+        _kjoer(raa, base, TIRSDAG_KL_22, _hent(TIRSDAG))
+        t = aapne_base(base)
+        try:
+            t.execute("DELETE FROM vurdering WHERE regnet = 'ettertid'")
+            t.commit()
+        finally:
+            t.close()
+
+        def ingen_kall(*_):
+            pytest.fail("ingen kall")
+
+        kode, kall, ut = _kjoer(raa, base, datetime(2026, 9, 23, 10, 0, tzinfo=timezone.utc), ingen_kall)
+        assert kode == 0 and kall == [] and "er børsdag, og klokka er ikke" in ut
+        assert "Signalet er regnet i ettertid for" in ut
+        t = aapne_base(base)
+        try:
+            assert t.execute("SELECT count(*) FROM vurdering WHERE regnet = 'ettertid'").fetchone()[0] > 0
+            assert t.execute("SELECT count(*) FROM vurdering WHERE dato = ?", (ONSDAG.isoformat(),)).fetchone()[0] == 0
+        finally:
+            t.close()
+
+    def test_en_rad_som_ikke_kan_regnes_paa_nytt_staar(self, stier):
+        """ECH1: ville feilet hvis --regn-ettertid-paa-nytt slettet en rad i
+        ettertid for en dag kursene i basen ikke lenger dekker, fordi vinduet
+        har flyttet seg."""
+        raa, base = stier
+        _kjoer(raa, base, TIRSDAG_KL_22, _hent(TIRSDAG))
+        t = aapne_base(base)
+        try:
+            foer = t.execute(
+                "SELECT * FROM vurdering WHERE symbol = 'EQNR' AND regnet = 'ettertid' ORDER BY dato"
+            ).fetchall()
+            serie = SqliteKurslager(t).serie("EQNR")
+            SqliteKurslager(t).erstatt_serie("EQNR", serie[20:], datetime(2026, 9, 22, 20, 15, tzinfo=timezone.utc))
+        finally:
+            t.close()
+        assert fp.regn_signalet_i_ettertid(base, _klokke(ONSDAG), lambda _: None, paa_nytt=True) is not None
+        t = aapne_base(base)
+        try:
+            etter = t.execute(
+                "SELECT * FROM vurdering WHERE symbol = 'EQNR' AND regnet = 'ettertid' ORDER BY dato"
+            ).fetchall()
+        finally:
+            t.close()
+        assert foer and [r[:2] for r in etter] == [r[:2] for r in foer]
+
+    def test_en_feil_for_en_aksje_stopper_ikke_de_andre(self, stier, monkeypatch):
+        """ECH2: ville feilet hvis en feil for én aksje stoppet utfyllingen for
+        aksjene etter den, eller utskriften ikke sa hvilken aksje det var."""
+        raa, base = stier
+        ekte_serie = SqliteKurslager.serie
+
+        def serie(self, symbol):
+            if symbol == AKSJEUNIVERS[0].symbol:
+                raise sqlite3.OperationalError("disk I/O error")
+            return ekte_serie(self, symbol)
+
+        monkeypatch.setattr(SqliteKurslager, "serie", serie)
+        linjer = []
+        _kjoer(raa, base, TIRSDAG_KL_22, _hent(TIRSDAG))
+        t = aapne_base(base)
+        try:
+            t.execute("DELETE FROM vurdering WHERE regnet = 'ettertid'")
+            t.commit()
+        finally:
+            t.close()
+        assert fp.regn_signalet_i_ettertid(base, _klokke(ONSDAG), linjer.append)
+        ut = "\n".join(linjer)
+        assert f"kunne ikke regnes for {AKSJEUNIVERS[0].symbol} (OperationalError)" in ut
+        t = aapne_base(base)
+        try:
+            symbolene = {s for (s,) in t.execute("SELECT DISTINCT symbol FROM vurdering WHERE regnet = 'ettertid'")}
+        finally:
+            t.close()
+        assert AKSJEUNIVERS[0].symbol not in symbolene and AKSJEUNIVERS[-1].symbol in symbolene

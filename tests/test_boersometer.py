@@ -908,10 +908,13 @@ class TestSvaretKl0924:
         (regel 19). Ville feilet uten kvelder uten henting, eller uten
         børsometeret blant sidene med fotnoten."""
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her sto at
+        # signalet «regnes aldri ut bakover». Hjelpen sier nå det fotnoten sier.
         assert (
-            "I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut "
-            "bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene "
-            "er lest inn med `--les-inn`."
+            "I den ekte versjonen lagres signalet den kvelden kursene hentes, og for en tidligere børsdag "
+            "uten vurdering regner neste henting det i ettertid, når aksjen er i lista og har minst 51 "
+            "kursdager i basen til og med dagen. Det gjelder dagene før første henting, kvelder uten "
+            "henting, og dager der kursene er lest inn med `--les-inn`."
         ) in hjelp
         assert "Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor" in hjelp
 
@@ -943,8 +946,8 @@ class TestFotnoten:
     )
     EKTE_TEKST = (
         "«Ikke vurdert»: appen har ingen vurdering for dagen. Signalet lagres den kvelden kursene hentes, og for "
-        "en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen har minst 51 "
-        "kursdager til og med dagen."
+        "en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen er i lista og "
+        "har minst 51 kursdager i basen til og med dagen."
     )
 
     def test_demoen_foer_startdagen_har_fotnoten(self, klient):

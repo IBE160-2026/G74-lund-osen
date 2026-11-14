@@ -136,7 +136,7 @@ from lagring_sqlite import (
     aapne_base,
     les_lista,
 )
-from migrering import MigrasjonsFeil
+from migrering import MigrasjonsFeil, siste_versjon, versjon
 from signalberegning import vurder
 from vurderingsdata import Grunn
 
@@ -986,6 +986,7 @@ def regn_signalet_i_ettertid(
     skriv: Callable[[str], None] = print,
     *,
     paa_nytt: bool = False,
+    bare_migrert: bool = False,
 ) -> int | None:
     """Signalet i ettertid for aksjene i lista - story 2.17, ettertid.py.
 
@@ -993,19 +994,33 @@ def regn_signalet_i_ettertid(
     klokka. Gir antallet rader som ble skrevet, eller None naar noe feilet.
     En feil stopper aldri kvelden: den fanges her, og utskriften har bare
     typen, ingen kurser og ingen maalinger (regel 16). En base som ikke
-    finnes, lages ikke. Med paa_nytt slettes radene i ettertid foerst, og
-    regnes saa paa nytt med kursene som staar; kveldsradene roeres ikke.
+    finnes, lages ikke. Med paa_nytt regnes radene i ettertid for aksjene i
+    lista paa nytt med kursene som staar, og byttes ut i en transaksjon per
+    aksje; kveldsradene, radene for en aksje som er tatt ut (gjennomgangen,
+    BH2) og en rad som ikke kan regnes paa nytt (ECH1), roeres ikke.
+
+    Gjennomgangen (BH1): med bare_migrert, som hentingen gir, migrerer steget
+    aldri basen selv. Staar basen ikke paa siste versjon, for eksempel naar
+    tidskontrollen sa nei foer hentingen roerte basen, venter steget til
+    hentingen eller webserveren har migrert den.
     """
     if not Path(base_sti).is_file():
         return None
     try:
+        if bare_migrert:
+            sjekk = _aapne_for_sjekken(base_sti)
+            try:
+                migrert = versjon(sjekk) == siste_versjon(lagring_sqlite.MIGRASJONSKATALOG)
+            finally:
+                sjekk.close()
+            if not migrert:
+                return None
         tilkobling = aapne_base(base_sti)
         try:
             dagens = innevaerende_boersdag(norsk_dato(klokke()))
             lista = les_lista(tilkobling, dagens)
             lager = SqliteEttertidslager(tilkobling, klokke, lista)
-            slettet = lager.slett() if paa_nytt else 0
-            fylt = fyll_i_ettertid(SqliteKurslager(tilkobling, lista), lager, lista, dagens)
+            fylt = fyll_i_ettertid(SqliteKurslager(tilkobling, lista), lager, lista, dagens, paa_nytt=paa_nytt)
         finally:
             tilkobling.close()
     except Exception as feil:
@@ -1014,9 +1029,19 @@ def regn_signalet_i_ettertid(
             "og radene fra kvelden står (story 2.17)."
         )
         return None
+    if fylt.feilet:
+        # Gjennomgangen (ECH2): symbolene og typen, ingen kurser (regel 16).
+        skriv(
+            "Signalet i ettertid kunne ikke regnes for "
+            + ", ".join(f"{symbol} ({slag})" for symbol, slag in fylt.feilet)
+            + ". De andre aksjene er regnet, og kvelden er ikke stoppet (story 2.17)."
+        )
     if paa_nytt:
-        skriv(f"Slettet {slettet} rader regnet i ettertid. Kveldsradene er ikke rørt (story 2.17).")
-    if fylt.antall or paa_nytt:
+        skriv(
+            f"Regnet {fylt.antall} rader i ettertid på nytt med kursene som står. Kveldsradene er ikke rørt, "
+            "og en rad som ikke kan regnes med kursene som står, er beholdt (story 2.17)."
+        )
+    elif fylt.antall:
         skriv(
             f"Signalet er regnet i ettertid for {fylt.antall} børsdager uten rad i vurdering, for "
             f"{len(fylt.dager)} aksjer, med kursene til og med hver dag. Dagene er merket «i ettertid» "
@@ -1063,7 +1088,9 @@ def kjoer(
         )
     finally:
         if oeyeblikk.tzinfo is not None:
-            regn_signalet_i_ettertid(base_sti, klokke if klokke is not None else (lambda: oeyeblikk), skriv)
+            regn_signalet_i_ettertid(
+                base_sti, klokke if klokke is not None else (lambda: oeyeblikk), skriv, bare_migrert=True
+            )
 
 
 def _henting(
@@ -1972,7 +1999,7 @@ def ettertid_kommando(
         return 1
     skriv(
         f"Slettet {slettet} rader regnet i ettertid. Kveldsradene er ikke rørt. Neste henting regner "
-        "dem på nytt (story 2.17). 0 kall brukt."
+        "dem på nytt for aksjene i lista (story 2.17). 0 kall brukt."
     )
     return 0
 

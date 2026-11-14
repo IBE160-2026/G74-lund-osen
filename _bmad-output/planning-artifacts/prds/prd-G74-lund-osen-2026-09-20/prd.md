@@ -971,7 +971,7 @@ Lageret skiller tilstandene for en aksje og en dag **entydig**:
 | Rad med vurdering fra kvelden, også styrke 0 | **Et gyldig svar.** Med 0 ga sjekkene ingen utslag |
 | Rad med vurdering regnet i ettertid | **Et gyldig svar, merket «i ettertid».** Kvelden skrev ingen vurdering, og signalet er regnet senere av kursene til og med dagen. Ingen KI-tekst |
 | Rad med grunn | Kjøringen kunne ikke vurdere aksjen, og grunnen står |
-| Ingen rad, og dagen var en børsdag | **Kommandoen ble ikke kjørt,** og signalet er ikke regnet i ettertid, fordi aksjen hadde for få kurser eller dagen er inneværende børsdag. Et hull i vår egen drift |
+| Ingen rad, og dagen var en børsdag | **Kommandoen ble ikke kjørt,** og signalet er ikke regnet i ettertid, for eksempel fordi aksjen hadde for få kurser, dagen er inneværende børsdag eller før børskalenderen, eller steget i ettertid feilet. Et hull i vår egen drift |
 | Ingen rad, og dagen var ikke en børsdag | Dagen finnes ikke, og telles ikke |
 | Ingen rad etter at aksjen ble tatt ut av lista | «Ikke i lista», ikke et hull |
 

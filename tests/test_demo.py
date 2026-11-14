@@ -1084,8 +1084,8 @@ class TestFotnotenIDemoen:
     # at signalet «regnes aldri ut bakover».
     EKTE_TEKST = (
         "«Ikke vurdert»: appen har ingen vurdering for dagen. Signalet lagres den kvelden kursene hentes, "
-        "og for en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen har "
-        "minst 51 kursdager til og med dagen."
+        "og for en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen er i "
+        "lista og har minst 51 kursdager i basen til og med dagen."
     )
 
     @staticmethod

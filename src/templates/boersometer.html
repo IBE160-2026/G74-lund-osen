@@ -109,9 +109,10 @@
                 uten styrke, sier «ikke vurdert» der styrken ellers står, og
                 grunnen står under, uten «ikke vurdert» en gang til. #}
             {% if rute.styrke is not none %}<span class="skjult">, </span><span class="styrke{% if dagen == siste and rute.ramme == 'gul' %} pille tre-av-tre{% elif rute.ramme == 'moerk' %} pille to-av-tre{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% elif rute.uten_styrke %}<span class="skjult">, </span><span class="styrke ikke-vurdert">{{ rute.uten_styrke }}</span>{% endif %}
-            {#- Story 2.17: en dag med signalet regnet i ettertid har stiplet kant
-                og «i ettertid» der merket står. #}
-            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% if rute.ettertid %}<span class="skjult">, i ettertid</span>{% endif %}{% elif rute.ettertid %}<span class="merke"><span class="skjult">, </span>i ettertid</span>{% endif %}
+            {#- Story 2.17 (gjennomgangen, VG2): en dag med signalet regnet i
+                ettertid har stiplet kant, og «i ettertid» står der grunnen
+                ellers står (Rute.grunn), så kartet regner plassen som før. #}
+            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
             {% if rute.grunn %}<span class="skjult">, </span><span class="tekst">{{ rute.grunn }}</span>{% endif %}
             {#- Gruppens svar 04.11 kl. 22:23, 1: navnet står for øyet i store ruter,
                 nivå 4. Skjermleseren leser det i linja under, og stilen setter det under symbolet, så det står bare én gang. #}

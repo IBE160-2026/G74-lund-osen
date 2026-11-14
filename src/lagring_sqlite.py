@@ -512,8 +512,22 @@ class SqliteEttertidslager:
             for (dato,) in self._tilkobling.execute("SELECT dato FROM vurdering WHERE symbol = ?", (symbol,))
         }
 
-    def skriv(self, symbol: str, radene: list[tuple[date, Vurdering]]) -> int:
-        """Skriver radene for dager uten rad. Returnerer hvor mange som ble skrevet."""
+    def datoer_med_kveldsrad(self, symbol: str) -> set[date]:
+        """Datoene med en kveldsrad for symbolet (gjennomgangen, ECH1)."""
+        return {
+            date.fromisoformat(dato)
+            for (dato,) in self._tilkobling.execute(
+                "SELECT dato FROM vurdering WHERE symbol = ? AND regnet = 'kveld'", (symbol,)
+            )
+        }
+
+    def skriv(self, symbol: str, radene: list[tuple[date, Vurdering]], *, erstatt: bool = False) -> int:
+        """Skriver radene for dager uten rad. Returnerer hvor mange som ble skrevet.
+
+        Gjennomgangen (ECH1, BH9): med erstatt byttes en rad i ettertid for
+        samme dag ut, i samme transaksjon, saa en rad som ikke kan regnes paa
+        nytt (kursene for dagen er ute av vinduet), staar, og en feil midt i
+        aldri etterlater et hull. En kveldsrad roeres aldri."""
         dagens = innevaerende_boersdag(norsk_dato(self._klokke()))
         verdier = []
         for dato, vurdering in radene:
@@ -528,14 +542,23 @@ class SqliteEttertidslager:
             verdier.append((symbol, dato.isoformat(), *(getattr(vurdering, k) for k in VURDERINGSKOLONNER)))
         if not verdier:
             return 0
-        return self._i_transaksjon(
-            lambda: self._tilkobling.executemany(
+
+        def endring() -> int:
+            if erstatt:
+                self._tilkobling.executemany(
+                    "DELETE FROM vurdering WHERE symbol = ? AND dato = ? AND regnet = 'ettertid'",
+                    [rad[:2] for rad in verdier],
+                )
+            foer = self._tilkobling.total_changes
+            self._tilkobling.executemany(
                 "INSERT INTO vurdering (symbol, dato, " + ", ".join(VURDERINGSKOLONNER) + ", grunn, regnet) "
                 "VALUES (" + ", ".join("?" * (len(VURDERINGSKOLONNER) + 2)) + ", NULL, 'ettertid') "
                 "ON CONFLICT (symbol, dato) DO NOTHING",
                 verdier,
             )
-        )
+            return self._tilkobling.total_changes - foer
+
+        return self._i_transaksjon(endring, telt=True)
 
     def slett(self, symbol: str | None = None) -> int:
         """Sletter radene i ettertid, for symbolet eller alle. Aldri en kveldsrad."""
@@ -547,8 +570,9 @@ class SqliteEttertidslager:
             argumenter = (symbol,)
         return self._i_transaksjon(lambda: self._tilkobling.execute(sql, argumenter))
 
-    def _i_transaksjon(self, endring) -> int:
-        """Endringen i en transaksjon. Gir antallet rader den endret."""
+    def _i_transaksjon(self, endring, *, telt: bool = False) -> int:
+        """Endringen i en transaksjon. Gir antallet rader den endret, eller
+        med telt det endringen selv gir."""
         if self._tilkobling.in_transaction:
             raise RuntimeError(
                 "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
@@ -556,13 +580,13 @@ class SqliteEttertidslager:
         foer = self._tilkobling.total_changes
         try:
             self._tilkobling.execute("BEGIN")
-            endring()
+            resultat = endring()
             self._tilkobling.execute("COMMIT")
         except BaseException:
             if self._tilkobling.in_transaction:
                 self._tilkobling.execute("ROLLBACK")
             raise
-        return self._tilkobling.total_changes - foer
+        return resultat if telt else self._tilkobling.total_changes - foer
 
     def antall(self) -> int:
         """Hvor mange rader i ettertid basen har."""

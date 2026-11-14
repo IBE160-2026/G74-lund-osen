@@ -16,8 +16,8 @@
         kursdager til og med dagen.
         {%- else %}«Ikke vurdert»: appen har ingen vurdering for dagen. Signalet
         lagres den kvelden kursene hentes, og for en tidligere børsdag uten
-        vurdering regner neste henting det i ettertid når aksjen har minst
-        {{ signal_trenger }} kursdager til og med dagen.
+        vurdering regner neste henting det i ettertid når aksjen er i lista og
+        har minst {{ signal_trenger }} kursdager i basen til og med dagen.
         {%- if fotnote_kan_lagres %} Signalet for denne dagen kan fortsatt lagres hvis
         hentingen kjøres ferdig før neste børsdag.{% endif %}{% endif %}
       </p>

@@ -45,7 +45,7 @@
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
   {#- Story 2.17 (gruppens svar 14.11 kl. 05:41-05:49): en dag med signalet
       regnet i ettertid sier det under datoen. #}
-  {% if detalj.ettertid %}<p class="ettertid-linje" role="note">{{ ettertid(true) }} Signalet for {{ detalj.dato|ukedag }} {{ detalj.dato|dato }} er regnet i ettertid av kursene til og med dagen, fordi hentingen ikke skrev en vurdering den kvelden.</p>{% endif %}
+  {% if detalj.ettertid %}<p class="ettertid-linje" role="note">{{ ettertid(true) }} Signalet for {{ detalj.dato|ukedag }} {{ detalj.dato|dato }} er regnet i ettertid av kursene til og med dagen, fordi dagen ikke har en vurdering fra kvelden.</p>{% endif %}
   {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sa hva
       siden viser. Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 1): den
       er tatt bort, fordi overskriftene og «Vis meg rundt» sier det. #}

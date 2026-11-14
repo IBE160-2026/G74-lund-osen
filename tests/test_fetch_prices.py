@@ -3288,27 +3288,7 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
         finally:
             tilkobling.close()
 
-        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her
-        # sto sha av hele fila. Til slutt i hentingen migreres basen og faar
-        # signalet regnet i ettertid, saa testen ser paa kursene og
-        # kveldsradene, som ikke roeres.
-        def innholdet() -> tuple:
-            t = sqlite3.connect(base)
-            try:
-                kolonner = [r[1] for r in t.execute("PRAGMA table_info(vurdering)") if r[1] != "regnet"]
-                hvor = (
-                    " WHERE regnet = 'kveld'"
-                    if len(kolonner) < len(list(t.execute("PRAGMA table_info(vurdering)")))
-                    else ""
-                )
-                return (
-                    t.execute("SELECT * FROM kurs ORDER BY symbol, dato").fetchall(),
-                    t.execute(f"SELECT {', '.join(kolonner)} FROM vurdering{hvor} ORDER BY symbol, dato").fetchall(),
-                )
-            finally:
-                t.close()
-
-        foer = innholdet()
+        foer = sha(base)
 
         fil, kall, ut = kjoer_23(
             raa, base, OEYEBLIKK_22_09 + timedelta(minutes=30), ingen_kall, ingen_noekkel, ingen_kall
@@ -3316,7 +3296,7 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
         assert fil is None and kall == []
         assert "Basen har alt kursene for børsdagen 2026-09-22" in ut
         assert "kunne ikke leses" not in ut
-        assert innholdet() == foer
+        assert sha(base) == foer
 
     def test_to_versjoner_bak_avvises_som_foer(self, tmp_path, stier):
         """En base som staar lenger bak, kan ha et skjema lesingen ikke

@@ -68,31 +68,45 @@ class _Kursleser(Protocol):
 class _Ettertidslager(Protocol):
     def datoer_med_rad(self, symbol: str) -> set[date]: ...
 
-    def skriv(self, symbol: str, radene: list[tuple[date, Vurdering]]) -> int: ...
+    def datoer_med_kveldsrad(self, symbol: str) -> set[date]: ...
+
+    def skriv(self, symbol: str, radene: list[tuple[date, Vurdering]], *, erstatt: bool = False) -> int: ...
 
 
 @dataclass(frozen=True)
 class Fylt:
-    """Hva fyll_i_ettertid skrev: dager per aksje, bare aksjene med minst en."""
+    """Hva fyll_i_ettertid skrev: dager per aksje, bare aksjene med minst en.
+    feilet er (symbol, typen til feilen) for aksjene som feilet (gjennomgangen,
+    ECH2): symbolene og typen, aldri en kurs (regel 16)."""
 
     dager: dict[str, int]
+    feilet: tuple[tuple[str, str], ...] = ()
 
     @property
     def antall(self) -> int:
         return sum(self.dager.values())
 
 
-def fyll_i_ettertid(kurser: _Kursleser, lager: _Ettertidslager, lista: Iterable[Aksje], dagens: date) -> Fylt:
+def fyll_i_ettertid(
+    kurser: _Kursleser, lager: _Ettertidslager, lista: Iterable[Aksje], dagens: date, *, paa_nytt: bool = False
+) -> Fylt:
     """Radene i ettertid for hver aksje i lista, skrevet gjennom lageret.
 
-    Aksjer utenfor lista roeres ikke. Hver aksje skrives for seg, saa en feil
-    for en aksje stopper de neste, men radene som alt er skrevet, staar. Det
-    er kallerens jobb aa fange feilen (hentingen stopper aldri for den)."""
+    Aksjer utenfor lista roeres ikke. Hver aksje skrives for seg, i en
+    transaksjon. Gjennomgangen (ECH2): en feil for en aksje stopper ikke de
+    neste, og Fylt sier hvilke som feilet. Med paa_nytt regnes ogsaa dagene
+    som har en rad i ettertid, og raden byttes ut (ECH1); en kveldsrad
+    roeres aldri, og en rad som ikke kan regnes med kursene som staar, staar."""
     dager: dict[str, int] = {}
+    feilet: list[tuple[str, str]] = []
     for aksje in lista:
-        radene = regn_i_ettertid(kurser.serie(aksje.symbol), lager.datoer_med_rad(aksje.symbol), dagens)
-        if radene:
-            skrevet = lager.skriv(aksje.symbol, radene)
-            if skrevet:
-                dager[aksje.symbol] = skrevet
-    return Fylt(dager)
+        try:
+            har_rad = lager.datoer_med_kveldsrad(aksje.symbol) if paa_nytt else lager.datoer_med_rad(aksje.symbol)
+            radene = regn_i_ettertid(kurser.serie(aksje.symbol), har_rad, dagens)
+            if radene:
+                skrevet = lager.skriv(aksje.symbol, radene, erstatt=paa_nytt)
+                if skrevet:
+                    dager[aksje.symbol] = skrevet
+        except Exception as feil:
+            feilet.append((aksje.symbol, type(feil).__name__))
+    return Fylt(dager, tuple(feilet))

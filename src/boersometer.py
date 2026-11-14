@@ -76,6 +76,8 @@ GUL, MOERK = "gul", "moerk"
 # hvorfor. Tillegg 8 (ønsket kl. 19:51): de samme ordene som raden på
 # oversikten, også i ruta og i begge kolonnene i tabellen.
 UTEN_DATA = UTEN_DATA_TEKST[0].upper() + UTEN_DATA_TEKST[1:]
+# Story 2.17: teksten i ruta for en dag med signalet regnet i ettertid, som merket.
+I_ETTERTID = "i ettertid"
 
 # Story 8.6b, c: fem fargetrinn etter endringen slik den vises, med grensene i
 # prosent. Navnene er klassene i malen og fargene i :root i stil.css.
@@ -144,9 +146,14 @@ class Rute:
     @property
     def grunn(self) -> str | None:
         """Teksten under linja for styrken. Svar 2: «ikke vurdert» står bare
-        én gang i ruta, så teksten står ikke når den er det samme."""
+        én gang i ruta, så teksten står ikke når den er det samme. Story 2.17
+        (gjennomgangen, VG2 og BH6): «i ettertid» for en dag med signalet
+        regnet i ettertid, så teksten bærer merket der ruta har plass, også
+        med gul ramme."""
         if self.uten_data or self.ikke_vurdert:
             return None
+        if self.ettertid:
+            return I_ETTERTID
         return self.tekst
 
     @property

@@ -1239,7 +1239,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) p.ettertid-linje { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 12px;
                                        color: var(--tekst); font-size: 0.9rem; }
 :where(.side-aksje) li.dag.ettertid { border: 1.5px dashed var(--dempet-2); }
-:where(.side-oversikt) .rute.ettertid { outline: 2px dashed var(--dempet-2); outline-offset: -5px; }
+/* Gjennomgangen (VG1): kanten står utenfor ruta, mot bakgrunnen, fordi
+   fyllfargene og rammene i ruta gir for lite kontrast mot --dempet-2. */
+:where(.side-oversikt) .rute.ettertid { outline: 2px dashed var(--dempet-2); outline-offset: 0; }
 @media (forced-colors: active) {
   .ettertid-merke { border-color: CanvasText; }
   :where(.side-aksje) li.dag.ettertid { border-color: CanvasText; }
