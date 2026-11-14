@@ -936,6 +936,12 @@ class TestReadme:
         punkt = next(l for l in mappestruktur.splitlines() if l.startswith("- [`docs/appen/`](docs/appen/)"))
         for sti in (SKJERMBILDET, AKSJESIDEBILDET):
             assert f"[`{sti.rsplit('/', 1)[1]}`]({sti})" in punkt, sti
+        # Story 3.3k (spørsmål 6): alle bildene, i rekkefølgen fra README-en, og bildene
+        # ved 390 px under docs/appen/mobil/. Ville feilet hvis et bilde manglet, som
+        # folg-en-aksje-demo.png før, eller sto med den gamle stien.
+        rekkefoelgen = [TOPPEN_AV_OVERSIKTEN, *BILDENE_I_KNAPPEN, MOBILMAPPA, *BILDENE_PAA_MOBIL]
+        lenker = re.findall(r"\[`[^`]+`\]\(([^)]+)\)", punkt)
+        assert lenker == ["docs/appen/", *rekkefoelgen], lenker
 
 
 BILDEFILER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
@@ -1902,26 +1908,26 @@ DE_NYE_BILDENE = {
     # Story 8.26: 4534, med knappene i raden øverst, uten fotnoten og filteret (målt etter flettingen av 10.10).
     # Story 8.26 (tilleggene 5–20): 4534 -> 4424, uten eksempelboksen (tillegg 19).
     # Story 8.27: 4424 -> 4477, med «Mine notater» i raden øverst (en linje til ved 390 px).
-    "docs/appen/oversikten-390-demo.png": ("/", 390, 4477, MALENE_BAK_BILDET),
+    "docs/appen/mobil/oversikten-390-demo.png": ("/", 390, 4477, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     # Story 8.23 (tillegg 3): 5021, med tabellen åpen fra start. Var 3327.
     # Story 8.26: 5021 -> 5083 (knappene i raden øverst, på flere linjer ved 390 px).
     # Story 8.26 (tilleggene 5–20): 5083 -> 5103, med «Uten ramme» i forklaringen (tillegg 7).
-    "docs/appen/boersometeret-390-demo.png": ("/boersometer", 390, 5103, FILENE_BAK_BOERSOMETERET),
+    "docs/appen/mobil/boersometeret-390-demo.png": ("/boersometer", 390, 5103, FILENE_BAK_BOERSOMETERET),
     # Gruppens ønske 09.11 kl. 22:01: investorsiden for BRFE ved 390 px, sist
     # blant bildene ved 390 px, hele siden (1117 px).
     # Story 8.26 (tilleggene 5–20): 1117 -> 1155, med linja «Oppdatert …» (tillegg 17).
     # Story 8.27: 1155 -> 1207, med «Mine notater» i raden øverst (en linje til ved 390 px).
-    "docs/appen/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1207, FILENE_BAK_INVESTORSIDEN),
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": ("/investorside/BRFE", 390, 1207, FILENE_BAK_INVESTORSIDEN),
     # Tillegg 5 til 8.22 (svaret 10.11 kl. 22:55): «Følg en aksje» med Kraft valgt ved 390 px, hele
     # siden, og «Mine notater» på aksjesiden for BRFE ved 390 px, bare delen (id-en mine-notater),
     # klippet ut med 16 px over og under, fordi hele aksjesiden er for høy. Etter de andre ved 390 px.
     # Story 8.26: 1573 -> 1636 (knappene i raden øverst, på flere linjer ved 390 px).
     # Story 8.26 (tilleggene 5–20): 1636 -> 1722, med «Oppdatert …» og antallet på brikkene (tillegg 17).
-    "docs/appen/folg-en-aksje-390-demo.png": ("/folg?bransje=Kraft", 390, 1722, FILENE_BAK_FOLG),
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": ("/folg?bransje=Kraft", 390, 1722, FILENE_BAK_FOLG),
     # Tillegg 2 til 8.29: 1354 -> 1353, styrken 1 og 0 av 3 som tekst uten pille i notatene.
-    "docs/appen/notatene-brfe-390-demo.png": ("/aksje/BRFE", 390, 1353, FILENE_BAK_AKSJESIDEN),
+    "docs/appen/mobil/notatene-brfe-390-demo.png": ("/aksje/BRFE", 390, 1353, FILENE_BAK_AKSJESIDEN),
     # Story 2.12: «Din egen liste» i Min liste, bare delen (id-en
     # din-egen-liste), klippet ut med 16 px over og under.
     # Story 8.11: 1216, med «Start fra en ferdig liste» nederst.
@@ -1959,7 +1965,45 @@ DE_NYE_BILDENE = {
     # Story 8.26: 1060 -> 1019 (knappene i raden øverst, uten raden under demolinja).
     # Story 8.26 (tilleggene 5–20): 1019 -> 1057, med linja «Oppdatert …» (tillegg 17).
     "docs/appen/innstillinger-demo.png": ("/innstillinger", 1280, 1057, FILENE_BAK_INNSTILLINGER),
+    # Story 3.3k (svaret 12.11 kl. 17:09, spørsmål 4): panelet «Mine notater» åpent på
+    # oversikten, de første 1000 px, og første steg i «Vis meg rundt» på oversikten,
+    # 1000 px slik vinduet står når steget vises (siden ruller til steget).
+    "docs/appen/notatpanelet-demo.png": ("/", 1280, 1000, FILENE_BAK_MIN_LISTE),
+    "docs/appen/vis-meg-rundt-demo.png": ("/", 1280, 1000, MALENE_BAK_BILDET),
 }
+# Story 3.3k (svaret 12.11 kl. 17:09): bildene i knappen «Bilder av appen (demoen)» i
+# rekkefølgen fra knapperaden øverst, med sidene man kommer til rett etter: Markedsoversikt
+# (oversikten, aksjesiden, notatene på aksjesiden, investorsiden), Børsometer, Min liste
+# (Min liste, «Din egen liste: kom i gang», «Følg en aksje», notatene i Min liste), Mine
+# notater, Innstillinger og «Vis meg rundt». Toppen av oversikten står over knappen.
+BILDENE_I_KNAPPEN = (
+    SKJERMBILDET,
+    AKSJESIDEBILDET,
+    "docs/appen/notatene-brfe-demo.png",
+    "docs/appen/investorsiden-brfe-demo.png",
+    "docs/appen/boersometeret-demo.png",
+    "docs/appen/min-liste-demo.png",
+    "docs/appen/din-egen-liste-demo.png",
+    "docs/appen/folg-en-aksje-demo.png",
+    "docs/appen/notatene-min-liste-demo.png",
+    "docs/appen/notatpanelet-demo.png",
+    "docs/appen/innstillinger-demo.png",
+    "docs/appen/vis-meg-rundt-demo.png",
+)
+# Story 3.3k: bildene ved 390 px i docs/appen/mobil/, i en egen knapp etter den første, i
+# samme rekkefølge, med setningen om mobil først (spørsmål 2 og 3).
+MOBILMAPPA = "docs/appen/mobil/"
+MOBILKNAPPEN = "Bilder av appen på mobil (demoen)"
+MOBILSETNINGEN = (
+    "Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (127.0.0.1), så mobil kommer senere."
+)
+BILDENE_PAA_MOBIL = (
+    "docs/appen/mobil/oversikten-390-demo.png",
+    "docs/appen/mobil/notatene-brfe-390-demo.png",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png",
+    "docs/appen/mobil/boersometeret-390-demo.png",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png",
+)
 # Gjennomgangen av svarene 05.11 kl. 14:29: stil.css, hjelpetekster.py og
 # boersometer.py (STORSYMBOL_EM). Bildene ble tatt paa nytt og er byte for byte de samme.
 # Story 10.2i: demotekstene med promptversjon 4, i demo_ki_tekster.json. Bildene ble tatt
@@ -2124,16 +2168,19 @@ AVTRYKK_BAK_DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
     "docs/appen/boersometeret-demo.png": "5feb3d86d45c814deb29991f6903a92711592034739776c70a0367d2952cff3b",
     "docs/appen/min-liste-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
-    "docs/appen/oversikten-390-demo.png": "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
-    "docs/appen/boersometeret-390-demo.png": "5feb3d86d45c814deb29991f6903a92711592034739776c70a0367d2952cff3b",
+    "docs/appen/mobil/oversikten-390-demo.png": "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
+    "docs/appen/mobil/boersometeret-390-demo.png": "5feb3d86d45c814deb29991f6903a92711592034739776c70a0367d2952cff3b",
     "docs/appen/din-egen-liste-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
     "docs/appen/investorsiden-brfe-demo.png": "7958e9e02210890fb1c1a75b6dd7ea2b930447c599c59e91fca9f08925f848d6",
-    "docs/appen/investorsiden-brfe-390-demo.png": "7958e9e02210890fb1c1a75b6dd7ea2b930447c599c59e91fca9f08925f848d6",
-    "docs/appen/folg-en-aksje-390-demo.png": "93b6b99592389708b13482c221cb8dd828507c7549d3e9db3aa605661bf7f38d",
-    "docs/appen/notatene-brfe-390-demo.png": "0897d2fb1101977df68a3a4fca397ad1a3bf1ed0c934323d485c80b5d769a6a7",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "7958e9e02210890fb1c1a75b6dd7ea2b930447c599c59e91fca9f08925f848d6",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "93b6b99592389708b13482c221cb8dd828507c7549d3e9db3aa605661bf7f38d",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "0897d2fb1101977df68a3a4fca397ad1a3bf1ed0c934323d485c80b5d769a6a7",
     "docs/appen/notatene-brfe-demo.png": "0897d2fb1101977df68a3a4fca397ad1a3bf1ed0c934323d485c80b5d769a6a7",
     "docs/appen/notatene-min-liste-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
     "docs/appen/innstillinger-demo.png": "b1ec40c753247018c7e7af93c139ca3cd05db88f1d4d44b23fcf338b624eb0f4",
+    # Story 3.3k: de to nye bildene.
+    "docs/appen/notatpanelet-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
+    "docs/appen/vis-meg-rundt-demo.png": "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2282,6 +2329,19 @@ def _knappen_med_bildene() -> str:
     return deler[1].split("</details>", 1)[0]
 
 
+def _mobilknappen() -> str:
+    """Story 3.3k: innholdet i knappen «Bilder av appen på mobil (demoen)»."""
+    tekst = README.read_text(encoding="utf-8")
+    deler = tekst.split(f"<summary>{MOBILKNAPPEN}</summary>\n", 1)
+    assert len(deler) == 2, f"knappen «{MOBILKNAPPEN}» mangler"
+    return deler[1].split("</details>", 1)[0]
+
+
+def _bildene(del_: str) -> list[tuple[str, str, str]]:
+    """(alt-teksten, stien, teksten under) for hvert bilde i del_."""
+    return re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", del_, re.MULTILINE)
+
+
 class TestBildeneAvAppen:
     """Story 3.3f (gruppens svar 18.10 kl. 23:03): bildene av appen står bak
     en knapp rett under beskrivelsen, i docs/appen/, bare av demoen."""
@@ -2301,6 +2361,10 @@ class TestBildeneAvAppen:
         assert "i demoen" in alt and "«Eksempeltall»" in alt and "ikke data fra Oslo Børs" in alt, alt
         assert under.startswith("*Toppen av oversikten i demoen") and "«Eksempeltall»" in under, under
         assert etter.startswith("<details>\n<summary>Bilder av appen (demoen)</summary>\n\n"), etter[:80]
+        # Story 3.3k: knappen med bildene ved 390 px står rett etter, og så «Innhold».
+        # Ville feilet hvis den sto et annet sted, eller «Innhold» kom mellom dem.
+        etter = etter.split("</details>\n\n", 1)[1]
+        assert etter.startswith(f"<details>\n<summary>{MOBILKNAPPEN}</summary>\n\n"), etter[:80]
         assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
         # Lukket som de andre knappene: ingen <details> i README-en er åpen.
         # Story 3.5i: heller ikke i docs/installasjon.md, der pilene står.
@@ -2312,13 +2376,21 @@ class TestBildeneAvAppen:
         alt-tekst eller teksten under, eller ikke sa at det er demoen med
         oppdiktede tall."""
         knappen = _knappen_med_bildene()
-        bilder = re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", knappen, re.MULTILINE)
+        bilder = _bildene(knappen)
         # Gruppens svar 05.11 kl. 12:14 og 12:20: alle de hele bildene, også de
         # nye av børsometeret og Min liste og ved 390 px. Toppen står over.
-        hele = [sti for sti in DE_NYE_BILDENE if sti != TOPPEN_AV_OVERSIKTEN]
-        assert [sti for _, sti, _ in bilder] == [SKJERMBILDET, AKSJESIDEBILDET, *hele]
+        # Story 3.3k (svaret 12.11 kl. 17:09): i rekkefølgen fra knapperaden, og bildene
+        # ved 390 px i sin egen knapp. Ville feilet med et bilde i en annen rekkefølge,
+        # et bilde for mye eller for lite, eller et bilde ved 390 px her.
+        assert [sti for _, sti, _ in bilder] == list(BILDENE_I_KNAPPEN)
+        assert set(BILDENE_I_KNAPPEN) | set(BILDENE_PAA_MOBIL) == {
+            SKJERMBILDET,
+            AKSJESIDEBILDET,
+            *(sti for sti in DE_NYE_BILDENE if sti != TOPPEN_AV_OVERSIKTEN),
+        }
         for alt, sti, under in bilder:
-            assert sti.startswith("docs/appen/") and (ROT / sti).is_file(), sti
+            assert sti.startswith("docs/appen/") and not sti.startswith(MOBILMAPPA), sti
+            assert (ROT / sti).is_file(), sti
             assert "i demoen" in alt and "«Eksempeltall»" in alt and "ikke data fra Oslo Børs" in alt, alt
             assert under.startswith("*") and under.endswith("*"), under
             assert "i demoen" in under and "oppdiktede" in under and "«Eksempeltall»" in under, under
@@ -2332,7 +2404,8 @@ class TestBildeneAvAppen:
         tekst = README.read_text(encoding="utf-8")
         # Gruppens svar 05.11 kl. 12:14: toppen av oversikten står over knappen.
         tekst = tekst.replace(f"]({TOPPEN_AV_OVERSIKTEN})", "", 1)
-        uten_knappen = tekst.replace(_knappen_med_bildene(), "")
+        # Story 3.3k: og knappen med bildene ved 390 px.
+        uten_knappen = tekst.replace(_knappen_med_bildene(), "").replace(_mobilknappen(), "")
         assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
         assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
         # Story 3.5i: heller ikke i docs/installasjon.md.
@@ -2343,11 +2416,62 @@ class TestBildeneAvAppen:
         fil i docs/appen/, en undermappe, eller et bilde i mappa som ikke står
         i knappen."""
         mappe = ROT / "docs" / "appen"
-        filer = [p for p in mappe.rglob("*") if p.name not in SYSTEMFILER]
-        assert all(p.is_file() and p.parent == mappe for p in filer), filer
+        # Story 3.3k (svaret 12.11 kl. 17:09): bildene ved 390 px i undermappa mobil/,
+        # og ingen andre undermapper. Ville feilet med et bilde ved 390 px utenfor
+        # mobil/, et annet bilde i mobil/ eller en mappe til.
+        mobil = ROT / MOBILMAPPA
+        filer = [p for p in mappe.rglob("*") if p.name not in SYSTEMFILER and p != mobil]
+        assert mobil.is_dir()
+        assert all(p.is_file() and p.parent in (mappe, mobil) for p in filer), filer
         assert all(p.suffix.lower() in (BILDEFILER | VIDEOFILER) - {".svg"} for p in filer), filer
         bildene = sorted(p.relative_to(ROT).as_posix() for p in filer if p.suffix.lower() in BILDEFILER)
         assert bildene == sorted([SKJERMBILDET, AKSJESIDEBILDET, *DE_NYE_BILDENE]), bildene
+        paa_mobil = sorted(p.relative_to(ROT).as_posix() for p in filer if p.parent == mobil)
+        assert paa_mobil == sorted(BILDENE_PAA_MOBIL), paa_mobil
+        assert all(DE_NYE_BILDENE[sti][1] == 390 for sti in BILDENE_PAA_MOBIL)
+        assert all(v[1] == 1280 for sti, v in DE_NYE_BILDENE.items() if sti not in BILDENE_PAA_MOBIL)
+
+    def test_mobilknappen_har_setningen_og_bildene_ved_390_px_i_samme_rekkefoelge(self):
+        """Story 3.3k (svaret 12.11 kl. 17:09, spørsmål 2 og 3): bildene ved 390 px står
+        i en egen knapp, med setningen om mobil først og bildene i samme rekkefølge som i
+        den første knappen. Ville feilet uten setningen, med et bilde i en annen
+        rekkefølge enn sidene i den første knappen, uten alt-tekst eller teksten under,
+        eller med andre ord enn setningen og bildene."""
+        knappen = _mobilknappen()
+        assert knappen.startswith("\n" + MOBILSETNINGEN + "\n\n"), knappen[:200]
+        bilder = _bildene(knappen)
+        assert [sti for _, sti, _ in bilder] == list(BILDENE_PAA_MOBIL)
+        # Samme rekkefølge som i den første knappen: hvert bilde ved 390 px har et
+        # tilsvarende bilde ved 1280 px med samme navn uten «-390».
+        tilsvarende = [f"docs/appen/{sti.rsplit('/', 1)[1].replace('-390', '')}" for sti in BILDENE_PAA_MOBIL]
+        tilsvarende = [s if s in BILDENE_I_KNAPPEN else SKJERMBILDET for s in tilsvarende]
+        plass = [BILDENE_I_KNAPPEN.index(s) for s in tilsvarende]
+        assert plass == sorted(plass), plass
+        for alt, sti, under in bilder:
+            assert sti.startswith(MOBILMAPPA) and (ROT / sti).is_file(), sti
+            assert "i demoen på en mobil, 390 px bred" in alt and "ikke data fra Oslo Børs" in alt, alt
+            assert under.startswith("*") and under.endswith("*") and "ved 390 px" in under, under
+            assert "oppdiktede" in under and "«Eksempeltall»" in under, under
+        rest = re.sub(r"^!\[[^\]]*\]\([^)]+\)\n\*[^\n]*\*$", "", knappen, flags=re.MULTILINE)
+        assert rest.replace(MOBILSETNINGEN, "").strip() == "", rest
+        # Det samme som docs/installasjon.md sier under «Mer for den som vil».
+        assert "Appen svarer bare på denne maskinen (127.0.0.1)" in _installasjonen()
+
+    def test_hver_bildelenke_peker_paa_en_fil_som_finnes(self):
+        """Story 3.3k: hver lenke til docs/appen/ i README-en, i knappene og i
+        «Mappestruktur», peker på en fil eller mappe som finnes, og hvert bilde i mappene
+        står i README-en. Ville feilet med en lenke til den gamle plassen for bildene ved
+        390 px, eller et bilde i mappa som ingen lenke viser."""
+        tekst = README.read_text(encoding="utf-8")
+        lenker = re.findall(r"\]\((docs/appen/[^)]*)\)", tekst)
+        assert lenker, "ingen lenker til docs/appen/"
+        for sti in lenker:
+            assert (ROT / sti).exists(), sti
+        for sti in DE_NYE_BILDENE:
+            assert f"]({sti})" in tekst, sti
+        for ny in BILDENE_PAA_MOBIL:
+            gammel = "docs/appen/" + ny.rsplit("/", 1)[1]
+            assert gammel not in tekst, gammel
 
     def test_de_nye_bildene_tas_paa_nytt_naar_siden_endres(self):
         """Gruppens svar 05.11 kl. 12:14 og 12:20. Ville feilet hvis en fil bak
@@ -3470,11 +3594,12 @@ class TestReadmeForNybegynnere:
         # Story 3.3d, punkt f: «Innhold» står rett under beskrivelsen, og fra
         # 3.3f rett under knappen.
         assert avsnitt[-5].startswith("**Innhold:** "), avsnitt[-5]
-        assert avsnitt[-6] == "<details>", avsnitt[-6]
+        # Story 3.3k: knappen med bildene ved 390 px rett etter den første.
+        assert avsnitt[-6] == avsnitt[-7] == "<details>", avsnitt[-7:-5]
         # Gruppens svar 05.11 kl. 12:14: toppen av oversikten mellom
         # beskrivelsen og knappen.
-        assert avsnitt[-7].startswith("![Toppen av oversikten i demoen"), avsnitt[-7]
-        assert avsnitt[-8].startswith("OSE Signal viser"), avsnitt[-8]
+        assert avsnitt[-8].startswith("![Toppen av oversikten i demoen"), avsnitt[-8]
+        assert avsnitt[-9].startswith("OSE Signal viser"), avsnitt[-9]
         assert "\n## " not in topp
 
     def test_status_uten_storynumre_og_uten_kommando(self):
@@ -3839,7 +3964,8 @@ class TestReadmeForNybegynnere:
         # Flettingen av de fem storyene 10.11: «Din egen liste» og investorsiden ved 1280 px (regel 19).
         # Story 8.21 (tillegg 2): 46, med de tre nye bildene i docs/appen/.
         # Tillegg 5 til 8.22: 48, med de to nye bildene ved 390 px.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 48, lenker
+        # Story 3.3k: 52, med folg-en-aksje-demo.png, de to nye bildene og docs/appen/mobil/.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 52, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -4350,7 +4476,9 @@ AVTRYKK_I_PILENE = {
     # Flettingen av main (3.6) inn i 8.22: begge endringene. Var 55c0a57b... og 3ea3433e....
     # Story 3.7 (regel 19): under start/ står at snarveien spør før nettleseren, og
     # spørsmålet om KI-modellen. Var 66d98675....
-    "Mappestruktur": "59b2a3feec164adc7e737416c7e1ec35762f7860964ca0544c1b887fd8f4ec43",
+    # Story 3.3k (regel 19): punktet for docs/appen/ med bildene i rekkefølgen fra
+    # README-en, de to nye og docs/appen/mobil/. Var 59b2a3fe....
+    "Mappestruktur": "6c588c0322c7ec2d24e9c445591cb5d23b28e26034bbe58d3fc694b6ba73d081",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
