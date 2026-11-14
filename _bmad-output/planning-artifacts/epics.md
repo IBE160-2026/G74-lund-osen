@@ -2184,6 +2184,32 @@ så appen kan vise dem uten en kilde vi ikke har.
 
 ---
 
+### Story 2.17: Signalet regnet i ettertid
+
+*Lagt til 2026-11-14, etter instruksjonen kl. 16:57 og tillegg 1 kl. 16:58 i `docs/ai-prompts/2026-11-14.md`.* v1.1, etter gruppens svar 14.11 kl. 05:41–05:49; rådet anbefalte det. Spesifikasjonen er [`spec-2-17-signalet-regnet-i-ettertid.md`](../implementation-artifacts/spec-2-17-signalet-regnet-i-ettertid.md), med svarene, spørsmålene med forslag og kontrollisten.
+
+Som **bruker** vil jeg se signalet også for en børsdag appen ikke vurderte samme
+kveld, merket «i ettertid», så historikken ikke har hull der kursene finnes.
+
+**Oppfyller:** FR-408, FR-409 · **Begrenses av:** `AD-7` (merknaden 2026-11-14),
+`AD-3`, `AD-16`, `AD-17`, NFR-04, regel 16 og 22
+
+**Kontroll — hva testen ser etter:**
+- Til slutt i hver henting regnes signalet for hver børsdag med kurser og uten
+  rad, for aksjene i lista, med nok kurser, bare med kursene til og med dagen
+- Aldri inneværende børsdag, og en kveldsrad, også med grunn, overskrives aldri
+- Radene har eget merke i basen, og en kommando regner dem på nytt eller sletter
+  dem uten å røre en kveldsrad
+- Ingen KI-tekst for dem, og KI-grunnlaget leser bare kveldsradene
+- En feil stopper aldri kvelden, og utskriften har ingen kurser
+- «i ettertid» med stiplet kant overalt der en tidligere dag vises med signal
+- **Ville feilet hvis:** en kveldsrad ble endret, en dag fikk et signal regnet med
+  kurser etter dagen, eller en rad i ettertid så ut som en kveldsrad
+
+**Avhenger av:** 2.4, 2.5, 2.7b, 2.16. **Én økt:** nei.
+
+---
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
