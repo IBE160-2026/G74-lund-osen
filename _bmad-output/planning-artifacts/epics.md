@@ -4881,6 +4881,8 @@ Som **bruker i demoen og den ekte versjonen** vil jeg se de ledige plassene i st
 
 **Avhenger av:** 8.29. **Én økt:** ja.
 
+*Lagt til 2026-11-14:* 8.30 er squash-flettet med PR #156 i `c1e8a1f0` kl. 07:19, låst til head-en `191a682e`, etter tillegg 9 til 9.11 i `docs/ai-prompts/2026-11-14.md`. De ledige rutene har `--dempet-2`: 4,14:1 mot bakgrunnen og 3,83:1 mot de brukte. Spørsmål 1–3 er bygget etter forslaget. Hele settet ble kjørt i CI (run 43565183283), etter gruppens svar 13.11 kl. 18:24: 5817 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-8-30-plassstreken-kontrast.md`](../implementation-artifacts/spec-8-30-plassstreken-kontrast.md).
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

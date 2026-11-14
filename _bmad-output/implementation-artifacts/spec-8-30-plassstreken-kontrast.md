@@ -2,7 +2,7 @@
 title: 'Story 8.30: de ledige rutene i plassstreken med nok kontrast'
 type: 'fix'
 created: '2026-11-14'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '8944bf67'
 context:
@@ -125,3 +125,10 @@ står i `af986b9b`.
 | ECH1 | lav | `_bakgrunn` leser første regel, så en senere `@media` med en annen bakgrunn sees bare av nettlesertesten | Rettet: `test_ingen_annen_regel_gir_rutene_en_bakgrunn`, og en tydelig feil i stedet for `None`. En `@media` for 390 px med `--strek-2` ble fanget av den og nettlesertesten |
 | ECH2 | lav | En full eller tom liste gir `null` i skriptet i nettleseren og en uklar feil | Rettet: skriptet melder hva som mangler, og testen sier det |
 | ECH3 | lav | `_hex` tar bare `rgb()`, og `bak()` godtar en halvgjennomsiktig farge og ser bort fra bakgrunnsbilder | Rettet: `rgba` bare helt dekkende, og en forelder med bilde gir en feil |
+
+## Flettet 14.11
+
+Dokumenttestene ble kjørt lokalt i tre deler, til sammen 2 964, lik
+`--collect-only`. CI var grønn på head-en `191a682e` (run 43565183283): 5817 bestått og
+99 hoppet over i jobben `pytest`, og alle jobbene grønne. PR #156 ble
+squash-flettet i `c1e8a1f0` kl. 07:19, låst til `191a682e`.
