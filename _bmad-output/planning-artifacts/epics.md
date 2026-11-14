@@ -2420,6 +2420,14 @@ tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
 
 *Avgjort 2026-11-08 kl. 11:24 (gruppens svar):* forslagene i spørsmål 1–3 i spesifikasjonen 3.5i (`spec-3-5i-installasjonen-i-egen-fil.md`) er godtatt, og rådet anbefalte alle tre. Overskriften «Enklest: dobbeltklikk (anbefalt)» med ankeret står over de fem stegene i README-en, og setningen om demoen flyttes først i `docs/installasjon.md`. Setningen «Velg versjon», som flyttes, sier «øverst i README-en». `docs/installasjon.md` er levende som README-en og `docs/hjelp.md`, med en ny linje om det i regel 19 i `CLAUDE.md`. Svaret er ført etter instruksjonen kl. 11:27 i `docs/ai-prompts/2026-11-08.md`.
 
+*Lagt til 2026-11-14, etter instruksjonen 12.11 kl. 17:11 og tilleggene 1–6, som føres i `docs/ai-prompts/2026-11-12.md` og `docs/ai-prompts/2026-11-13.md` med flettingen.* Story 3.3k: bildene av appen i README-en i rekkefølgen fra knapperaden, med sidene man kommer til rett etter, og bildene ved 390 px i `docs/appen/mobil/` i en egen pil, med en setning om at mobil kommer senere. Linja nederst på sidene sier at versjon 1 er ferdig (tillegg 1), og tabellen «Demoen og den ekte versjonen» får radene for forskjellene etter natten (tillegg 5). 3.3b–3.3j var brukt, så dette er 3.3k. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-3-3k-bildene-av-appen-i-readme.md`.
+
+*Avgjort 2026-11-12 kl. 17:09 (gruppens svar):* bildene står i rekkefølgen fra knapperaden. Rådet anbefalte rekkefølgen og to nye bilder, panelet «Mine notater» åpent og første steg i «Vis meg rundt»; gruppen valgte en egen mappe for mobil, fordi den viser at sidene alt virker i smal bredde, og at mobil kan komme senere.
+
+*Avgjort 2026-11-12 kl. 20:44 (gruppens svar, tillegg 3):* PR-en flettes uten nytt stopp, etter 9.11, og forslagene i spesifikasjonen godtas som bygget. Rådet anbefalte det.
+
+*Lagt til 2026-11-14:* 3.3k er squash-flettet med PR #155 i `e8e226ff` 14.11 kl. 05:41, låst til head-en `5a33c9bd`, etter instruksjonen 12.11 kl. 17:11, tilleggene 1–7 og det felles tillegget i `docs/ai-prompts/2026-11-12.md`, `2026-11-13.md` og `2026-11-14.md`. Grenen ble laget fra origin/main `21876255`, etter Utført-linjene for de sju storyene den ventet på, så main måtte ikke flettes inn. Hele settet i CI (run 43557292773), alle fire jobbene grønne, også Windows, etter gruppens svar 13.11 kl. 18:24; lokalt testfilene grenen endrer eller som leser filene den endrer, og `--dokumentene`.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
@@ -4791,6 +4799,8 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» vise
 
 *Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
 
+*Lagt til 2026-11-14 (story 3.3k, tillegg 1, gruppens svar 12.11 kl. 16:23):* bunnteksten sier nå «Versjon 1 er ferdig.», som README-en, i begge versjonene (spørsmål 1 i `spec-3-3k-bildene-av-appen-i-readme.md`). Punktet over er lukket.
+
 *Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
 
 ### Story 8.27: «Mine notater» i et panel fra en knapp øverst
@@ -4828,6 +4838,30 @@ Som **bruker**, vil jeg nå notatene mine fra hvilken som helst side, i et panel
 *Avgjort 2026-11-13 kl. 18:24 og 18:26 (gruppens svar, felles tillegg for køen):* kveldshentingen hoppes over i kveld, hele settet kjøres i CI, og rekkefølgen er 8.27, 8.19, 8.28, 9.11, 8.29, bildene 3.3k og 9.12. Rådet anbefalte det.
 
 *Lagt til 2026-11-13:* 8.27 er flettet med PR #147 i `2a363adb` kl. 18:50, låst til head-en `9244203f` (main med 3.7 og 10.11 flettet inn), etter instruksjonen 11.11 kl. 21:25 og tillegg 1–2 i `docs/ai-prompts/2026-11-11.md`, tillegg 3 i `docs/ai-prompts/2026-11-12.md` og svarene 13.11 i `docs/ai-prompts/2026-11-13.md`. De sju knappene står på én rad ved 1280 px (spørsmål 15). Hele settet lokalt i fire deler kl. 18:10–18:33 (`date`), hver del bare når ingen annen pytest kjørte: 5793, likt `--collect-only`, og hele settet i CI (run 43470073941), alle fire jobbene grønne. Testene for dokumentene besto på `9244203f`.
+
+### Story 8.29: «Din egen liste: kom i gang» som tavla, og investorknappen 44 px
+
+*Lagt til 2026-11-13, etter instruksjonen kl. 11:26 og tillegg 1 kl. 11:26, som lagres i `docs/ai-prompts/2026-11-13.md` med flettingen.* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Den bygges på egen gren og flettes ferdig og grønt. 8.27 og 8.28 er tatt av andre vinduer, så dette er 8.29. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-29-din-egen-liste-kom-i-gang.md`.
+
+Som **bruker i demoen og den ekte versjonen**, vil jeg at «Din egen liste: kom i gang» i Min liste ser ut som på tavla, med én overskrift, titler som ikke skrives oppå seg selv og kort som står tett, og at knappen til investorsiden er stor nok å trykke på.
+
+**Oppfyller:** svarene 13.11 kl. 10:32–10:54 og 10:59–11:02 · **Begrenses av:** NFR-06, `AD-10`, regel 22
+
+**Kontroll — hva testen ser etter:**
+- Delen har én overskrift, «Din egen liste: kom i gang» (h2, 32 px), og ingen «Din egen liste» alene
+- Titlene i kortene har linjehøyde 1,2 og teksten 1,5, og brikkene i steg 3 er 30 px høye
+- Steg 2 sier at startskriptet spør etter nøkkelen, uten felt eller knapp (AD-10)
+- Delen har ingen ramme, bakgrunn eller luft på sidene, og bransjekortene står i opptil tre kolonner uten hull
+- Knappen til investorsiden er minst 44 px høy, også når teksten brytes
+- **Ville feilet hvis:** delen hadde to overskrifter, en tittel ble skrevet oppå seg selv, en brikke var lavere enn 24 px, kortene sto i rader med hull, eller knappen var lavere enn 44 px
+
+**Avhenger av:** 8.22, 8.26. **Én økt:** ja.
+
+*Avgjort 2026-11-13 kl. 10:32–10:54 (gruppens svar, med tavla «Min liste» 13.10):* «Din egen liste: kom i gang» bygges med tallene fra tavla, likt i demoen og den ekte versjonen, og investorknappen blir minst 44 px høy, som skissen 06.11. Rådet anbefalte det.
+
+*Avgjort 2026-11-13 kl. 10:59–11:02 (gruppens ønske og svar, tillegg 1):* delen får ingen ramme, bakgrunn eller luft på sidene, og bransjekortene stables i kolonner uten hull. Rådet anbefalte begge og har prøvd dem.
+
+*Lagt til 2026-11-14:* 8.29 er squash-flettet med PR #154 i `f98d979e` 14.11 kl. 00:15, låst til head-en `808044a0` (main med 8.27, 10.11, 8.19, 8.28 og 9.11 flettet inn), etter instruksjonen kl. 11:26, tillegg 1 og 2 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. «De 15 mest omsatte» fra 8.28 står først blant brikkene i steg 3, med samme klasse og stil, så det ble ikke et spørsmål. Hele settet i CI (run 43524921914), alle fire jobbene grønne, også Windows, etter gruppens svar 13.11 kl. 18:24; lokalt hele settet i deler før flettingen av 8.27 (5634 bestått og 24 hoppet over, 5658 som `--collect-only`), og etter det testfilene grenen endrer og `--dokumentene`.
 
 ---
 

@@ -18,6 +18,9 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Aksjesiden for Brattfjell Energi (BRFE) i demoen, med kursgrafen og rammen «Signalet forklart»: setningen om hvor lenge signalet har vært slik, setningen om hva hovedindeksen, bransjen og aksjene i lista gjorde samme dag, og KI-teksten, med oppdiktede tall («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/aksjesiden-brfe-demo.png)
 *Aksjesiden for BRFE i demoen, med grafen og rammen «Signalet forklart», med setningene om dagene og om samme dag først og KI-teksten under, med oppdiktede tall («Eksempeltall»).*
 
+![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-demo.png)
+*«Mine notater» på aksjesiden for BRFE i demoen, med «Etterpå» under hvert notat og et tenkt kjøp og salg, bare i prosent, med oppdiktede selskaper («Eksempeltall»).*
+
 ![Investorsiden for Brattfjell Energi (BRFE) i demoen, den man kommer til fra aksjesiden, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-demo.png)
 *Investorsiden for BRFE i demoen, fra boblen nederst på aksjesiden, med «Illustrasjon laget av KI» under tegningen, med oppdiktede selskaper («Eksempeltall»).*
 
@@ -27,35 +30,45 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![Min liste i demoen, med de fem aksjene som har stjerne, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/min-liste-demo.png)
 *Min liste i demoen, med aksjene som har stjerne, med oppdiktede tall («Eksempeltall»).*
 
-![Oversikten i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/oversikten-390-demo.png)
-*Oversikten i demoen ved 390 px, som på en mobil, med «Dine egne aksjer» under tabellen og «Børsdagen kort fortalt» nederst, KI-teksten om hele børsdagen, med oppdiktede tall («Eksempeltall»).*
-
-![Børsometeret i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/boersometeret-390-demo.png)
-*Børsometeret i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
-
-![Investorsiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-390-demo.png)
-*Investorsiden for BRFE i demoen ved 390 px, som på en mobil, med oppdiktede selskaper («Eksempeltall»).*
-
-![«Følg en aksje» i demoen på en mobil, 390 px bred, med bransjen Kraft valgt, brikkene for filteret og sorteringen og tabellen med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/folg-en-aksje-390-demo.png)
-*«Følg en aksje» i demoen ved 390 px, som på en mobil, med Kraft valgt og «Mest omsatt først», med oppdiktede selskaper («Eksempeltall»).*
-
-![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-390-demo.png)
-*«Mine notater» på aksjesiden for BRFE i demoen ved 390 px, som på en mobil, bare delen med notatene, med oppdiktede selskaper («Eksempeltall»).*
-
-![«Din egen liste» i Min liste i demoen: de tre stegene som kort, med kallene lista bruker, «Bytt ut» ved hver aksje og én knapp per bransje for de ferdige listene, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
-*«Din egen liste» i Min liste i demoen, med de tre stegene som kort, kallene lista bruker, «Bytt ut» ved hver aksje og «Start fra en ferdig liste» nederst, med én knapp per bransje og siden «Er du sikker?» før lista byttes. På oversikten står «Dine egne aksjer» med «+ Følg en aksje», og lista kan ha opptil 18 aksjer, med oppdiktede selskaper («Eksempeltall»).*
+![«Din egen liste: kom i gang» i Min liste i demoen: de tre stegene som kort, med «De 15 mest omsatte» og én knapp per bransje i steg 3, og «Følg flere aksjer» med aksjene etter bransje og «Bytt ut» ved hver, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/din-egen-liste-demo.png)
+*«Din egen liste: kom i gang» i Min liste i demoen, med de tre stegene som kort og «De 15 mest omsatte» først i steg 3, og under «Følg flere aksjer» hvor mange av de 18 plassene lista bruker, og «Bytt ut» ved hver aksje, med oppdiktede selskaper («Eksempeltall»).*
 
 ![«Følg en aksje» i demoen med bransjen Kraft valgt: antallet, søket, filteret på bransje og målt omsetning, sorteringen og alle som kan følges i en tabell, med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/folg-en-aksje-demo.png)
 *«Følg en aksje» i demoen med Kraft valgt og «Mest omsatt først», ordnet etter omsetningen og ikke etter kursen eller signalet, med det valgte i oransje og «ikke målt ennå» der omsetningen ikke er målt, med oppdiktede selskaper («Eksempeltall»).*
 
-![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-demo.png)
-*«Mine notater» på aksjesiden for BRFE i demoen, med «Etterpå» under hvert notat og et tenkt kjøp og salg, bare i prosent, med oppdiktede selskaper («Eksempeltall»).*
-
 ![Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen, knappene ved hvert notat og ett åpent tenkt kjøp, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-min-liste-demo.png)
 *Notatene samlet nederst i Min liste i demoen, det nyeste først, med lenke til aksjen og de samme knappene som på aksjesiden, med oppdiktede selskaper («Eksempeltall»).*
 
+![Panelet «Mine notater» åpent til høyre for oversikten i demoen, med valget av aksje, skjemaet for et nytt notat og notatene, det nyeste først, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatpanelet-demo.png)
+*Panelet «Mine notater» i demoen, åpnet med knappen øverst, til høyre for oversikten, med «Flytt til venstre» og «Lukk», et skjema for et nytt notat og alle notatene, med oppdiktede selskaper («Eksempeltall»).*
+
 ![Innstillinger i demoen med de tre bryterne «Vis hjelp», «Vis KI-tekst» og «Vis notater», med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/innstillinger-demo.png)
-*Innstillinger i demoen, med bryteren «Notater» og forklaringen under den, med oppdiktede selskaper («Eksempeltall»).*
+*Innstillinger i demoen, med bryterne «Vis hjelp», «Vis KI-tekst» og «Vis notater» og forklaringen under hver, med oppdiktede selskaper («Eksempeltall»).*
+
+![Første steg i «Vis meg rundt» på oversikten i demoen, «Dagen og perioden», med datoen merket og boksen med «Neste» og «Lukk», med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/vis-meg-rundt-demo.png)
+*«Vis meg rundt» på oversikten i demoen, steg 1 av 7, «Dagen og perioden», med datoen merket og boksen nede til høyre, med oppdiktede tall («Eksempeltall»).*
+
+</details>
+
+<details>
+<summary>Bilder av appen på mobil (demoen)</summary>
+
+Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (127.0.0.1), så mobil kommer senere.
+
+![Oversikten i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/oversikten-390-demo.png)
+*Oversikten i demoen ved 390 px, som på en mobil, med «Dine egne aksjer» under tabellen og «Børsdagen kort fortalt» nederst, KI-teksten om hele børsdagen, med oppdiktede tall («Eksempeltall»).*
+
+![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/notatene-brfe-390-demo.png)
+*«Mine notater» på aksjesiden for BRFE i demoen ved 390 px, som på en mobil, bare delen med notatene, med oppdiktede selskaper («Eksempeltall»).*
+
+![Investorsiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/investorsiden-brfe-390-demo.png)
+*Investorsiden for BRFE i demoen ved 390 px, som på en mobil, med oppdiktede selskaper («Eksempeltall»).*
+
+![Børsometeret i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/boersometeret-390-demo.png)
+*Børsometeret i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
+
+![«Følg en aksje» i demoen på en mobil, 390 px bred, med bransjen Kraft valgt, brikkene for filteret og sorteringen og tabellen med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/folg-en-aksje-390-demo.png)
+*«Følg en aksje» i demoen ved 390 px, som på en mobil, med Kraft valgt og «Mest omsatt først», med oppdiktede selskaper («Eksempeltall»).*
 
 </details>
 
@@ -74,6 +87,9 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 | Dagen | Fast: fredag 09.10.2026 | Den siste børsdagen som er hentet |
 | Endringer i lista | Tas ikke i bruk, fordi demoen ikke henter | Tas i bruk ved hentingen etter kl. 22 |
 | Notatene | Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start | Lagres i basen på maskinen |
+| Neste henting | Står ikke, fordi demoen ikke henter. Omvisningen sier at den ekte versjonen viser den | Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes |
+| Investorsiden | En oppdiktet side i appen, i samme fane | Selskapets egen side, i en ny fane, når appen har adressen |
+| «Åpne eodhd.com» | En side i appen med en tegning laget av KI, fordi demoen ikke trenger nøkkel | Registreringen hos EODHD, i en ny fane |
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](docs/installasjon.md#med-docker-desktop) ([demoen](docs/installasjon.md#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
@@ -126,10 +142,11 @@ Versjon 1 er ferdig, og listene under viser det som er ferdig på main. «Ekstra
 - Målingen av omsetning for aksjene som ikke var målt
 - Egne notater på aksjesiden, med tenkte kjøp og salg, og alle notatene i et panel fra knappen øverst
 - Ikonet i fanen og snarveien i Windows, også for demoen, med spørsmålet før nettleseren og tilbudet om Gemma første gang
-- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste» i tre steg
+- Faste bransjer, «Følg en aksje» med hele lista og «Din egen liste: kom i gang» i tre steg
 - «Vis meg rundt» for siden du står på, første gang på oversikten, og «Spill av omvisningen» gjennom seks av sidene
 - Bak «Oppdatert» øverst: når nye kurser tidligst kan hentes, i den ekte versjonen
 - «De 15 mest omsatte» på hele børsen som ferdig liste, ved siden av bransjelistene
+- «Din egen liste: kom i gang» som tavla, og styrken for én dag likt overalt
 
 **Neste i v1**
 
@@ -264,7 +281,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [`docs/bilder/readme/`](docs/bilder/readme/) — de tre skjermbildene i [`docs/installasjon.md`](docs/installasjon.md): [`engine-running.png`](docs/bilder/readme/engine-running.png), [`github-download-zip.png`](docs/bilder/readme/github-download-zip.png) og [`powershell-mappa.png`](docs/bilder/readme/powershell-mappa.png)
 - [`docs/bilder/investorsider/`](docs/bilder/investorsider/) — de 15 tegningene laget av KI til investorsidene i demoen, godkjent 24.10: SVG-ene, forhåndsvisningene, [`LESMEG.md`](docs/bilder/investorsider/LESMEG.md) og [`bobler.json`](docs/bilder/investorsider/bobler.json)
 - [`docs/skisser/2026-11-06/`](docs/skisser/2026-11-06/) — skissene av aksjesiden og børsometeret laget av KI i chatten 06.11, etter gruppens gjennomgang, med oppdiktede selskaper og tall: fem PNG-er og [`docs/skisser/2026-11-06/LESMEG.md`](docs/skisser/2026-11-06/LESMEG.md) med svarene de bygger på. Bygget 07.11 i 8.20a, 8.20b og 3.4h
-- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`investorsiden-brfe-demo.png`](docs/appen/investorsiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`din-egen-liste-demo.png`](docs/appen/din-egen-liste-demo.png), [`oversikten-390-demo.png`](docs/appen/oversikten-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/boersometeret-390-demo.png), [`investorsiden-brfe-390-demo.png`](docs/appen/investorsiden-brfe-390-demo.png), [`folg-en-aksje-390-demo.png`](docs/appen/folg-en-aksje-390-demo.png), [`notatene-brfe-390-demo.png`](docs/appen/notatene-brfe-390-demo.png), [`notatene-brfe-demo.png`](docs/appen/notatene-brfe-demo.png), [`notatene-min-liste-demo.png`](docs/appen/notatene-min-liste-demo.png) og [`innstillinger-demo.png`](docs/appen/innstillinger-demo.png)
+- [`docs/appen/`](docs/appen/) — bilder og senere video av appen, bare av demoen, i rekkefølgen i README-en: [`oversikten-topp-demo.png`](docs/appen/oversikten-topp-demo.png), [`oversikten-demo.png`](docs/appen/oversikten-demo.png), [`aksjesiden-brfe-demo.png`](docs/appen/aksjesiden-brfe-demo.png), [`notatene-brfe-demo.png`](docs/appen/notatene-brfe-demo.png), [`investorsiden-brfe-demo.png`](docs/appen/investorsiden-brfe-demo.png), [`boersometeret-demo.png`](docs/appen/boersometeret-demo.png), [`min-liste-demo.png`](docs/appen/min-liste-demo.png), [`din-egen-liste-demo.png`](docs/appen/din-egen-liste-demo.png), [`folg-en-aksje-demo.png`](docs/appen/folg-en-aksje-demo.png), [`notatene-min-liste-demo.png`](docs/appen/notatene-min-liste-demo.png), [`notatpanelet-demo.png`](docs/appen/notatpanelet-demo.png), [`innstillinger-demo.png`](docs/appen/innstillinger-demo.png) og [`vis-meg-rundt-demo.png`](docs/appen/vis-meg-rundt-demo.png). Bildene ved 390 px ligger i [`docs/appen/mobil/`](docs/appen/mobil/): [`oversikten-390-demo.png`](docs/appen/mobil/oversikten-390-demo.png), [`notatene-brfe-390-demo.png`](docs/appen/mobil/notatene-brfe-390-demo.png), [`investorsiden-brfe-390-demo.png`](docs/appen/mobil/investorsiden-brfe-390-demo.png), [`boersometeret-390-demo.png`](docs/appen/mobil/boersometeret-390-demo.png) og [`folg-en-aksje-390-demo.png`](docs/appen/mobil/folg-en-aksje-390-demo.png)
 - [`_bmad-output/`](_bmad-output/) — Product Brief, plan, krav og sprintstatus
 - [`.github/`](.github/) — testkjøringen og morgensjekken
 - [`.logs/`](.logs/) — loggene fra øktene med Claude Code, én mappe per bruker, og issues.md i hver mappe med det som gjenstår

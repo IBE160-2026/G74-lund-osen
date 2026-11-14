@@ -806,7 +806,7 @@ class TestDinEgenListeSomTavla:
         assert len(kortene) == 3
         for nummer, kort in enumerate(kortene, 1):
             assert re.search(
-                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h4>', kort
+                rf'<div class="steg-topp"><span class="stegnummer" aria-hidden="true">{nummer}</span><h3>', kort
             ), nummer
             assert kort.rstrip().endswith("</p>") and '<p class="handling">' in kort, nummer
         assert "kort-steg .handling { margin-top: auto;" in STIL
@@ -1426,7 +1426,7 @@ class TestFerdigeListerBareISteg3:
         aksjer», eller ankeret #ferdige-lister ikke var i steg 3."""
         side = _side(klient, "/min-liste")
         assert side.count('id="ferdige-lister"') == 1
-        steg3 = side.split("Velg aksjene dine</h4>", 1)[1].split("</li>\n  </ol>", 1)[0]
+        steg3 = side.split("Velg aksjene dine</h3>", 1)[1].split("</li>\n  </ol>", 1)[0]
         assert 'id="ferdige-lister"' in steg3
         flere = side.split('id="folg-flere"', 1)[1]
         assert "ferdig-liste?bransje=" not in flere.split("</section>", 1)[0]
@@ -1513,13 +1513,10 @@ class TestFoelgFlereAksjer:
 
     def test_stilen_tre_kolonner_og_en_ved_390(self):
         """Ville feilet hvis kortene ikke sto i tre kolonner på bred skjerm og
-        én ved 390 px, eller streken ikke var skjult for skjermlesere."""
+        én ved 390 px. Tillegg 1 til 8.29: kolonnene er CSS columns på minst
+        260 px, så det blir én kolonne ved 390 px uten egen regel."""
         stil = (ROT / "src" / "static" / "stil.css").read_text(encoding="utf-8")
-        assert ".bransjekort { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));" in stil
-        assert re.search(
-            r"@media \(max-width: 600px\) \{\s*:where\(\.side-oversikt\) \.bransjekort \{ grid-template-columns: 1fr; \}",
-            stil,
-        )
+        assert ":where(.side-oversikt) .bransjekort { columns: 3 260px; column-gap: 16px; }" in stil
 
     def test_den_ekte_versjonen(self, ekte):
         """Ville feilet hvis utformingen bare var i demoen, eller boksen om
@@ -1918,6 +1915,47 @@ class TestTabellenOmForskjellene:
         assert "uv run python src/demo.py" in (ROT / "start" / "start.ps1").read_text(encoding="utf-8")
         assert "uv run python src/demo.py ||" in (ROT / "start" / "start.sh").read_text(encoding="utf-8")
         assert 'entrypoint: ["python", "src/demo.py"]' in (ROT / "compose.yaml").read_text(encoding="utf-8")
+
+    # Story 3.3k (tillegg 5, ønsket 12.11 kl. 21:15): radene for forskjellene etter natten,
+    # sjekket mot koden.
+
+    def test_neste_henting(self):
+        """Ville feilet hvis demoen viste linja om neste henting i stripa, den ekte
+        versjonen ikke gjorde det, eller omvisningen i demoen ikke sa at den ekte
+        versjonen viser den (8.19)."""
+        _, demoen, ekte = _tabellraden("Neste henting")
+        assert demoen == "Står ikke, fordi demoen ikke henter. Omvisningen sier at den ekte versjonen viser den"
+        assert ekte == "Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes"
+        ramme = (ROT / "src" / "templates" / "_ramme.html").read_text(encoding="utf-8")
+        assert "{%- if not eksempeltall and kursdag_felles %}{% set neste = kursdag_felles|neste_henting %}" in ramme
+        assert ht.NESTE_HENTING_STEGET_DEMO.startswith("Den ekte versjonen viser bak «Oppdatert»")
+        assert ht.NESTE_HENTING_STEGET.startswith("Bak «Oppdatert» øverst står når nye kurser tidligst")
+
+    def test_investorsiden(self):
+        """Ville feilet hvis boblen i demoen ikke gikk til siden i appen i samme fane,
+        eller boblen i den ekte versjonen ikke åpnet selskapets side i en ny fane."""
+        _, demoen, ekte = _tabellraden("Investorsiden")
+        assert demoen == "En oppdiktet side i appen, i samme fane"
+        # Gjennomgangen (ECH3): uten adresse står ingen boble.
+        assert ekte == "Selskapets egen side, i en ny fane, når appen har adressen"
+        boble = (ROT / "src" / "templates" / "_investorboble.html").read_text(encoding="utf-8")
+        demo_del, ekte_del = boble.split("{% elif adresse %}", 1)
+        assert '<a href="/investorside/{{ symbol }}">' in demo_del and "_blank" not in demo_del
+        assert '<a href="{{ adresse }}" target="_blank"' in ekte_del
+        assert ekte_del.split("{% endif %}", 1)[1].strip() == "{%- endmacro %}"
+
+    def test_aapne_eodhd(self):
+        """Ville feilet hvis «Åpne eodhd.com» i demoen ikke gikk til siden i appen, eller
+        den ekte versjonen ikke åpnet registreringen hos EODHD i en ny fane."""
+        _, demoen, ekte = _tabellraden("«Åpne eodhd.com»")
+        assert demoen == "En side i appen med en tegning laget av KI, fordi demoen ikke trenger nøkkel"
+        assert ekte == "Registreringen hos EODHD, i en ny fane"
+        egne = (ROT / "src" / "templates" / "_egne.html").read_text(encoding="utf-8")
+        assert '{%- if eksempeltall %}<a class="knapp" href="/eodhd-demo">Åpne eodhd.com</a>' in egne
+        assert '<a class="knapp" href="{{ eodhd_registrering }}" target="_blank"' in egne
+        assert app_modul.EODHD_REGISTRERING == "https://eodhd.com/register"
+        siden = (ROT / "src" / "templates" / "eodhd_demo.html").read_text(encoding="utf-8")
+        assert "Illustrasjon laget av KI" in siden
 
     def test_anbefalingen_som_foer(self):
         """Ville feilet hvis «Prøv appen» ikke lenger anbefalte demoen først og
