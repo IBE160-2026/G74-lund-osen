@@ -259,3 +259,4 @@
 - [ ] 2026-11-14 [signalet-regnet-i-ettertid-2-17](922-2026-11-14-20-54-38-signalet-regnet-i-ettertid-2-17.md) — morgenkontrollen etter første kveldskjøring med 2.17 (punkt 2 under «Kontroll etter flettingen»); kopien av basen før det er gruppens
 - [x] 2026-11-14 [signalet-regnet-i-ettertid-2-17](922-2026-11-14-20-54-38-signalet-regnet-i-ettertid-2-17.md) — docs/kvalitetssikring.md får radene for 2.17 ved føringen etter flettingen (løst 2026-11-14: 68f6c4b4 og 73db9ae7)
 - [ ] 2026-11-14 [signalet-regnet-i-ettertid-2-17](922-2026-11-14-20-54-38-signalet-regnet-i-ettertid-2-17.md) — bildegrenen pr-2-17-bilder på GitHub kan slettes når gruppen vil
+- [ ] 2026-11-14 [signalet-regnet-i-ettertid-2-17](922-2026-11-14-20-54-38-signalet-regnet-i-ettertid-2-17.md) — skriptet for bildene klikker «Vis meg rundt» med click() fra JavaScript, som 22:00 ga en fokusring rundt boksen; et museklikk gjennom DevTools-protokollen gir bildet på main

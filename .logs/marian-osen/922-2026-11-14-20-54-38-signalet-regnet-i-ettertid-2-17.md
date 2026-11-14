@@ -50,3 +50,21 @@ Tillegg 2 til 2.17 for natta, etter gruppens svar 14.11 kl. 21:07: alle forslage
 ### Åpne punkter
 - Morgenkontrollen etter første kveldskjøring med 2.17 (punkt 2 under «Kontroll etter flettingen»): loggen, `skjema_versjon` og avtrykket med samme dato. Kopien av basen før det er gruppens.
 - Bildegrenen `pr-2-17-bilder` kan slettes når gruppen vil.
+
+## 2026-11-14 kl. 22:01 — Marian Osen
+
+### Oppgave
+Tillegg 2, steg 3: den siste gjennomgangen av bildene på origin/main (gruppens svar 14.11 kl. 16:13), med samme skript og jobbliste som i 2.17.
+
+### Plan
+- Koden og bildene fra `origin/main` (`3aaa45e1`) med `git archive` til scratchpad, demobasen i en midlertidig mappe, demoserveren på en ledig port (50392), ikke 8000.
+- Alle 18 bildene tatt på nytt og sammenlignet byte for byte, og bildetekstene og alt-tekstene i README-en lest mot bildene.
+
+### Resultat
+- 17 av 18 bilder er like byte for byte. `vis-meg-rundt-demo.png` er ulikt i tre runder. Forskjellen er bare fokusringen rundt boksen for omvisningen (`.omvisning:focus-visible`): pikslene er ulike i rektangelet x 861–1268, y 773–988, og bare én piksel er inne i boksen.
+- Koden fra `origin/main` er lik `src` på grenen (`diff -r`), og Edge er ikke oppdatert siden 11.11. Skriptet klikker «Vis meg rundt» med `click()` fra JavaScript. Tatt med et ekte museklikk gjennom DevTools-protokollen (en kopi av skriptet, `bilder-mus.mjs`) er bildet likt det på main, byte for byte. Bildet i README-en er altså det en bruker ser, og ringen kom av måten skriptet klikker på. Derfor er det ikke laget en oppfølging (3.3l).
+- Bildetekstene og alt-tekstene i README-en stemmer med bildene jeg åpnet (14 av 18). De fem jeg ikke åpnet, har generelle tekster og er like byte for byte.
+- Demoserveren er stoppet med `Stop-Process`.
+
+### Åpne punkter
+- Skriptet for bildene bør klikke «Vis meg rundt» med musa gjennom DevTools-protokollen, ikke med `click()`, så fokusringen ikke kommer og går med tilstanden i nettleseren.
