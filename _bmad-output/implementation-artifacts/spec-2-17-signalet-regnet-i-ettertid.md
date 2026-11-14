@@ -83,6 +83,7 @@ Et spørsmål stopper ikke arbeidet, og alt er bygget etter forslaget.
    En CHECK sier at en rad i ettertid aldri har grunn, og en trigger avviser at en
    kveldsrad blir en rad i ettertid. Ingen trigger for `DELETE`, fordi testene
    sletter rader i testbaser, og `vurdering` hadde ingen slik trigger før.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 2. **Porten for kvelden.** `test_ad7_stopper_et_forsoek_paa_aa_etterfylle` skal stå
    uendret, og den krever at `SqliteVurderingslager.les` gir `None` for en dag i
    hullet. *Forslag, som bygget:* `les` og `les_periode` gir bare kveldsradene, som
@@ -91,47 +92,59 @@ Et spørsmål stopper ikke arbeidet, og alt er bygget etter forslaget.
    det. `Vurdering` har feltet `ettertid` (standard `False`), og `skriv` avviser en
    vurdering med `ettertid` satt. Radene i ettertid skrives og slettes bare av
    `SqliteEttertidslager`.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 3. **Hvilken liste.** *Forslag, som bygget:* aksjene i lista i basen på inneværende
    børsdag (`les_lista`), regnet når hentingen er ferdig. En aksje som kom inn i
    lista senere, får da signalet i ettertid for de tidligere dagene med kurser. En
    aksje som er tatt ut, røres ikke.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 4. **Dager før børskalenderen.** Kursene i den ekte basen går ett år tilbake, til
    2025, og kalenderen begynner i 2026 (2.16). *Forslag, som bygget:* en dag før
    2026 får ingen rad i ettertid, fordi kalenderen ikke kan si om den var børsdag.
    Den viser «utenfor børskalenderen, som begynner i 2026» som før.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 5. **Kommandoen.** *Forslag, som bygget:* `uv run python src/fetch_prices.py
    --regn-ettertid-paa-nytt` sletter radene i ettertid og regner dem på nytt med
    kursene i basen, og `--slett-ettertid` sletter dem. Begge rører bare radene i
    ettertid, gjør ingen kall, leser ingen nøkkel og nekter en demobase.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 6. **Dagene fra `--les-inn`.** *Forslag, som bygget:* innlesingen regner ikke selv.
    Dagene får signalet i ettertid ved neste henting, og meldingen sier det.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 7. **Setningene i «Signalet forklart» for en dag i ettertid.** *Forslag, som
    bygget:* setningen om hvor lenge signalet har vært slik, og setningen om hva
    hovedindeksen og bransjen gjorde samme dag, står ikke for en dag i ettertid,
    fordi de er en del av det KI-grunnlaget leser. For en kveldsdag telles bare
    kveldsradene, så setningen er som før.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 8. **Tellingen i uka og måneden.** *Forslag, som bygget:* «3 av 5 dager skilte seg
    ut, 1 i ettertid» betyr at 1 av de 5 vurderte dagene er regnet i ettertid.
    Måneden sier det samme etter antallet børsdager.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 9. **«3 av 3» det siste året.** *Forslag, som bygget:* linja over historikken teller
    dagene i ettertid med og sier hvor mange av dem som er i ettertid, som uka.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 10. **Demobasen fra før.** *Forslag, som bygget:* en demobase uten rader i ettertid
     regnes som gammel (`gammel_demobase`), så webserveren ber om at den lages på
     nytt, som etter 3.4c.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 11. **Kveldens rad over en rad i ettertid.** Det skjer bare om klokka går bakover,
     fordi radene i ettertid bare regnes for dager før inneværende børsdag.
     *Forslag, som bygget:* kveldens rad skriver over raden i ettertid, også med en
     grunn, fordi kveldens rad er den som gjelder.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 12. **Når hentingen ikke henter.** *Forslag, som bygget:* signalet i ettertid regnes
     til slutt i hver henting, også når tidskontrollen sier nei, basen har alt, eller
     hentingen stopper med en kode. Aldri for en demobase, og aldri når basen ikke
     finnes.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 13. **Stiplet i grafen.** Designregler §5 sier at stiplet bare brukes for
     hovedindeksen. Gruppen valgte stiplet kant for en dag i ettertid. *Forslag,
     som bygget:* prikken for en dag i ettertid har hvit midte og stiplet kant i
     fargen for retningen (gul ved 3 av 3), og teksten under grafen sier hva den
     betyr og hvor mange dager i grafen som er i ettertid. Designregler §3 og §5
     får en datert linje.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 14. **«Loggen viser migrasjonen».** Migrasjonsløperen skriver ingenting, og
     kveldsjobben logger bare det hentingen skriver ut. Appen migrerer dessuten
     basen ved første forespørsel (`_migrer_en_gang` i `src/app.py`), så
@@ -139,16 +152,19 @@ Et spørsmål stopper ikke arbeidet, og alt er bygget etter forslaget.
     (beskjeden kl. 19:07). *Forslag:* morgenkontrollen leser raden for
     `0014_regnet.sql` i `skjema_versjon`, med tidspunktet, med kommandoen under
     «Kontroll etter flettingen». Loggen viser antallet dager regnet i ettertid.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 15. **Merket i børsometeret.** Rutene er små, og teksten står bare der ruta har
     plass. *Forslag, som bygget:* ruta har stiplet kant utenfor ruta, mot kartet
     (gjennomgangen, VG1), og «i ettertid» der grunnen ellers står, så kartet regner
     plassen som før (VG2). Teksten står også i tittelen, og tabellen under kartet
     har merket ved styrken. I de minste rutene er det bare kanten og tittelen.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 16. **Sjekkene ved et tenkt kjøp.** *Forslag, som bygget:* «Sjekkene på siden da
     kjøpet ble notert» leses også fra en rad i ettertid, fordi siden viste den.
     Notatet lagrer sjekkene, ikke merket. Et tenkt kjøp noteres bare fra siden for
     siste dag med kurser, og den er en kveldsrad, så det gjelder bare en dag
     hentingen ikke vurderte samme kveld.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 17. **Metoden for bildene.** Tillegg 1 viser til spørsmål 4 i spesifikasjonen
     for 3.3k. Spørsmål 4 og del 2 der beskriver panelet og «Vis meg rundt», men
     teksten i spesifikasjonen for 3.3k sier ikke ordrett hvordan
@@ -158,6 +174,7 @@ Et spørsmål stopper ikke arbeidet, og alt er bygget etter forslaget.
     kopiert uendret: notatene ved 390 px er elementet `#mine-notater` med 16 px
     over og under, panelet tas etter et klikk på «Mine notater», og «Vis meg
     rundt» etter et klikk på knappen, med utsnittet slik vinduet står.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 18. **Dagene før aksjen kom inn i lista.** Hver henting tar et år bakover, så en
     aksje som nettopp er fulgt, får nesten et år med rader i ettertid, og en aksje
     som er tatt inn igjen, får rader for tiden den var ute (gjennomgangen, ECH7).
@@ -165,6 +182,7 @@ Et spørsmål stopper ikke arbeidet, og alt er bygget etter forslaget.
     aksjene i lista. Linja under datoen sier «fordi dagen ikke har en vurdering
     fra kvelden», ikke at hentingen ikke ble kjørt. Vil gruppen ha rader bare fra
     `inn`, er det en endring i `fyll_i_ettertid`.
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt.
 19. **En henting som stopper før kallene** (gjennomgangen, BH1, middels). Steget i
     ettertid kjører til slutt i hver henting, også når tidskontrollen sier nei.
     *Bygget etter rettingen:* da migrerer steget aldri basen selv. Står basen ikke
@@ -172,6 +190,7 @@ Et spørsmål stopper ikke arbeidet, og alt er bygget etter forslaget.
     og sjekken før kallene leser som før (testen fra 2.8 er uendret). På en base
     på siste versjon skriver en slik henting rader i ettertid og sier det i
     utskriften. *Forslag:* slik. Funnet står åpent til gruppen har svart (regel 25).
+    *Svar 2026-11-14 kl. 21:07 (gruppens svar, rådet anbefalte det):* forslaget er godtatt, også som bygget (BH1).
 
 ## Delene
 
@@ -365,7 +384,7 @@ hver for seg, bare med lesing, på diffen `c452e171..92763443`. Rettingene står
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
 | VG1 | høy | Den stiplede kanten i ruta i børsometeret ga 1,3:1 mot grønn og rød fyll | Rettet: kanten står utenfor ruta, mot kartet (4,64:1), og testen sjekker det |
-| BH1 / ECH8 | middels | Steget i ettertid migrerte basen også når hentingen stoppet før kallene | Rettet: hentingen migrerer aldri for steget. Spørsmål 19 står åpent til gruppen har svart (regel 25) |
+| BH1 / ECH8 | middels | Steget i ettertid migrerte basen også når hentingen stoppet før kallene | Rettet: hentingen migrerer aldri for steget. Lukket: gruppen godtok spørsmål 19 som bygget (svaret 14.11 kl. 21:07) |
 | BH2 | middels | «Regn på nytt» slettet radene for en aksje som er tatt ut | Rettet, med test |
 | ECH1 | middels | «Regn på nytt» slettet rader som ikke kan regnes på nytt når vinduet har flyttet seg | Rettet: regner først og bytter ut per aksje i én transaksjon, med test |
 | VG2 / BH6 / ECH4 | middels | Ruta med gul ramme hadde «i ettertid» bare for skjermleseren | Rettet: teksten står der grunnen står, med test |
