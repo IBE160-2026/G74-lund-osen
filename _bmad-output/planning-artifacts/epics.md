@@ -2420,6 +2420,12 @@ tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
 
 *Avgjort 2026-11-08 kl. 11:24 (gruppens svar):* forslagene i spørsmål 1–3 i spesifikasjonen 3.5i (`spec-3-5i-installasjonen-i-egen-fil.md`) er godtatt, og rådet anbefalte alle tre. Overskriften «Enklest: dobbeltklikk (anbefalt)» med ankeret står over de fem stegene i README-en, og setningen om demoen flyttes først i `docs/installasjon.md`. Setningen «Velg versjon», som flyttes, sier «øverst i README-en». `docs/installasjon.md` er levende som README-en og `docs/hjelp.md`, med en ny linje om det i regel 19 i `CLAUDE.md`. Svaret er ført etter instruksjonen kl. 11:27 i `docs/ai-prompts/2026-11-08.md`.
 
+*Lagt til 2026-11-14, etter instruksjonen 12.11 kl. 17:11 og tilleggene 1–6, som føres i `docs/ai-prompts/2026-11-12.md` og `docs/ai-prompts/2026-11-13.md` med flettingen.* Story 3.3k: bildene av appen i README-en i rekkefølgen fra knapperaden, med sidene man kommer til rett etter, og bildene ved 390 px i `docs/appen/mobil/` i en egen pil, med en setning om at mobil kommer senere. Linja nederst på sidene sier at versjon 1 er ferdig (tillegg 1), og tabellen «Demoen og den ekte versjonen» får radene for forskjellene etter natten (tillegg 5). 3.3b–3.3j var brukt, så dette er 3.3k. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-3-3k-bildene-av-appen-i-readme.md`.
+
+*Avgjort 2026-11-12 kl. 17:09 (gruppens svar):* bildene står i rekkefølgen fra knapperaden. Rådet anbefalte rekkefølgen og to nye bilder, panelet «Mine notater» åpent og første steg i «Vis meg rundt»; gruppen valgte en egen mappe for mobil, fordi den viser at sidene alt virker i smal bredde, og at mobil kan komme senere.
+
+*Avgjort 2026-11-12 kl. 20:44 (gruppens svar, tillegg 3):* PR-en flettes uten nytt stopp, etter 9.11, og forslagene i spesifikasjonen godtas som bygget. Rådet anbefalte det.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*
@@ -4790,6 +4796,8 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» vise
 *Avgjort 2026-11-12 kl. 10:16 (gruppens svar, tillegg 22):* spørsmål 1–9 og 12–22 godtas som bygget, spørsmål 11 etter forslag 1, tillegg 11 kommer ikke (spørsmål 15), og forklaringen på en aksje uten kurser rettes (spørsmål 10). PR-en flettes 12.11 kl. 23:50–23:58 når alt er grønt. Rådet anbefalte alt.
 
 *Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
+
+*Lagt til 2026-11-14 (story 3.3k, tillegg 1, gruppens svar 12.11 kl. 16:23):* bunnteksten sier nå «Versjon 1 er ferdig.», som README-en, i begge versjonene (spørsmål 1 i `spec-3-3k-bildene-av-appen-i-readme.md`). Punktet over er lukket.
 
 *Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
 

@@ -470,8 +470,10 @@ KI_TEKSTEN_URL = "https://github.com/IBE160-2026/G74-lund-osen/blob/main/docs/in
 # Story 8.0c (tillegget 11.10, svar 4): linja nederst paa alle sidene. Én
 # innstilling avgjoer den, og docs/innlevering.md §5 sier at den avgjoeres
 # ved innleveringen.
+# Story 3.3k (tillegg 1, gruppens svar 12.11 kl. 16:23 og forslaget i spoersmaal 1):
+# linja sier at versjon 1 er ferdig, som README-en etter 8.26. Navnene staar.
 UNDER_ARBEID = True
-UNDER_ARBEID_TEKST = "Appen er under utvikling og ikke ferdig."
+UNDER_ARBEID_TEKST = "Versjon 1 er ferdig."
 
 
 @app.context_processor
