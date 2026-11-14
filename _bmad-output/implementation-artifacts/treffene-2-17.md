@@ -2,7 +2,7 @@
 title: "Story 2.17: treffene fra søket i tillegg 1"
 status: aktiv
 created: 2026-11-14
-updated: 2026-11-14T20:07
+updated: 2026-11-14T20:35
 ---
 
 # Story 2.17: treffene fra søket i tillegg 1
@@ -20,7 +20,7 @@ de på grenen da tabellen ble laget.
 | ikke i lista | 0 | 46 |
 | regnes aldri | 9 | 35 |
 | bakover | 13 | 46 |
-| etterfyll | 3 | 55 |
+| etterfyll | 4 | 55 |
 | første henting | 12 | 96 |
 | skilte seg ut | 4 | 269 |
 | FR-408 | 12 | 133 |
@@ -548,34 +548,35 @@ de på grenen da tabellen ble laget.
 | 895 | bakover | står |
 | 912 | FR-408 | står |
 | 933 | etterfyll | endret |
-| 935 | etterfyll | står |
-| 942 | første henting | endret |
-| 958 | første henting | endret |
-| 965 | FR-409 | står |
-| 976 | ikke i lista | står |
-| 983 | FR-409 | står |
-| 989 | ikke i lista | står |
-| 1054 | ikke i lista | står |
-| 1055 | FR-409 | endret |
-| 1057 | FR-408 | endret |
-| 1085 | bakover | står |
-| 1212 | ikke i lista | står |
-| 1236 | FR-408 | står |
-| 1262 | FR-408 | står |
-| 1288 | skilte seg ut | står |
-| 1292 | skilte seg ut | står |
-| 1425 | skilte seg ut | står |
-| 1473 | første henting | står |
-| 1507 | skilte seg ut | står |
-| 1541 | første henting | står |
-| 1589 | FR-408 | står |
-| 1590 | FR-409 | står |
-| 1605 | skilte seg ut | står |
-| 1737 | etterfyll | står |
+| 935 | etterfyll | endret |
+| 937 | etterfyll | står |
+| 944 | første henting | endret |
+| 960 | første henting | endret |
+| 967 | FR-409 | står |
+| 978 | ikke i lista | står |
+| 985 | FR-409 | står |
+| 991 | ikke i lista | står |
+| 1056 | ikke i lista | står |
+| 1057 | FR-409 | endret |
+| 1059 | FR-408 | endret |
+| 1087 | bakover | står |
+| 1214 | ikke i lista | står |
+| 1238 | FR-408 | står |
+| 1264 | FR-408 | står |
+| 1290 | skilte seg ut | står |
+| 1294 | skilte seg ut | står |
+| 1427 | skilte seg ut | står |
+| 1475 | første henting | står |
+| 1509 | skilte seg ut | står |
+| 1543 | første henting | står |
+| 1591 | FR-408 | står |
+| 1592 | FR-409 | står |
+| 1607 | skilte seg ut | står |
 | 1739 | etterfyll | står |
 | 1741 | etterfyll | står |
-| 1745 | etterfyll | står |
-| 1852 | ikke vurdert | står |
+| 1743 | etterfyll | står |
+| 1747 | etterfyll | står |
+| 1854 | ikke vurdert | står |
 
 ## `_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md`
 

@@ -215,7 +215,9 @@ KI-tekst lages.
 Commitene `cf045f35` (spesifikasjonen og storyen), `242c210b` (koden og testene),
 `92763443` (PRD-en, AD-7, designreglene, hjelpen, README-en og loggene),
 `0ff7d1cd` (rettingene etter gjennomgangen), `0789f2b3` (flettingen av
-`origin/main`, bare dagsfila) og `00f77291` (bildene og avtrykkene).
+`origin/main`, bare dagsfila), `00f77291` (bildene og avtrykkene), `4d0f3b15`
+(denne delen av spesifikasjonen) og `afe343fe` (rettingene etter
+`--dokumentene`).
 
 **Målt.** I demoen får 13 av 15 aksjer signalet i ettertid fra 13.03 til 18.09,
 1 690 rader. Varde Systemer har for få kurser, og Matfjord Merkevarer har ingen.
@@ -230,7 +232,11 @@ hvis». Hele settet ble kjørt én gang lokalt før gjennomgangen, 14.11 kl.
 17:56–19:16 (5855 bestått, 37 feilet, 24 hoppet over). Feilene var testene som
 gjaldt det som var før, og de er rettet med en Rettet-linje (kontrollisten under).
 Etter det er bare testfilene storyen rører og `--dokumentene` kjørt lokalt, og
-hele settet i CI.
+hele settet i CI. 14.11 kl. 20:10–20:32: de 24 testfilene storyen rører, 2273
+bestått og 16 hoppet over, og så `--dokumentene`, 2954 bestått, 7 hoppet over og 3
+feilet: ankeret til overskriften i FR-408, ordene fra 8.19 i steget «Dag for
+dag», og fila med treffene, som het `spec-2-17-…` og ble lest som en andre
+spesifikasjon. Rettet i `afe343fe`, og de seks testfilene med dem besto (307).
 
 ## Kontrollisten (tillegg 1)
 
