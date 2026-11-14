@@ -2426,6 +2426,8 @@ tredje. Dockerfilen og `compose.yaml` leveres som før. Bygges i 3.5f.
 
 *Avgjort 2026-11-12 kl. 20:44 (gruppens svar, tillegg 3):* PR-en flettes uten nytt stopp, etter 9.11, og forslagene i spesifikasjonen godtas som bygget. Rådet anbefalte det.
 
+*Lagt til 2026-11-14:* 3.3k er squash-flettet med PR #155 i `e8e226ff` 14.11 kl. 05:41, låst til head-en `5a33c9bd`, etter instruksjonen 12.11 kl. 17:11, tilleggene 1–7 og det felles tillegget i `docs/ai-prompts/2026-11-12.md`, `2026-11-13.md` og `2026-11-14.md`. Grenen ble laget fra origin/main `21876255`, etter Utført-linjene for de sju storyene den ventet på, så main måtte ikke flettes inn. Hele settet i CI (run 43557292773), alle fire jobbene grønne, også Windows, etter gruppens svar 13.11 kl. 18:24; lokalt testfilene grenen endrer eller som leser filene den endrer, og `--dokumentene`.
+
 ### Story 3.4: Demoversjonen
 
 *Lagt til 2026-10-03, Marians beslutning kl. 18:10.*

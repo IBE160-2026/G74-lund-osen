@@ -2,7 +2,7 @@
 title: 'Story 3.3 (3.3k): bildene av appen i README-en i rekkefølgen fra knapperaden, med mobilbildene i egen mappe'
 type: 'feature'
 created: '2026-11-14'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '21876255'
 context:
@@ -94,3 +94,7 @@ Edge Case Hunter på `21876255..2e454717`, 14.11. Triage:
 - *Rettet:* ECH1, middels (avtrykket bak `vis-meg-rundt-demo.png` hadde ikke `app.py`, der omvisningen bygges med `demo=`; nå `FILENE_BAK_MIN_LISTE`, og avtrykket er regnet ut på nytt). ECH2, lav (linja under 8.26 i `epics.md` sa at bunnteksten sto åpen; en datert linje sier at den er lukket i 3.3k). ECH3, lav (uten adresse står ingen boble i den ekte versjonen; raden sier «når appen har adressen», og testen sjekker at det ikke er noe mer etter grenen). ECH4, lav (testen for rekkefølgen på mobil krever at hvert bilde ved 390 px har sitt bilde ved 1280 px i den første knappen).
 - *Godtatt:* ECH5, lav (linja om neste henting står ikke når tidspunktet ikke kan regnes ut; raden beskriver det vanlige, og `test_neste_henting` sjekker malen).
 - Mutanten M1 (notatene på aksjesiden og investorsiden byttet om i README-en) ble fanget av `test_begge_bildene_ligger_i_docs_appen_med_alt_tekst_og_teksten_under`. README-en ble lagt tilbake fra kopien, med samme git-objekt som HEAD.
+
+## Flettet
+
+3.3k er squash-flettet med PR #155 i `e8e226ff` 14.11 kl. 05:41, låst til head-en `5a33c9bd`, etter instruksjonen 12.11 kl. 17:11, tilleggene 1–7 og det felles tillegget i `docs/ai-prompts/2026-11-12.md`, `2026-11-13.md` og `2026-11-14.md`. Grenen ble laget fra origin/main `21876255`, etter Utført-linjene for de sju storyene den ventet på, så main måtte ikke flettes inn. Hele settet i CI (run 43557292773), alle fire jobbene grønne, også Windows, etter gruppens svar 13.11 kl. 18:24; lokalt testfilene grenen endrer eller som leser filene den endrer, og `--dokumentene`.
