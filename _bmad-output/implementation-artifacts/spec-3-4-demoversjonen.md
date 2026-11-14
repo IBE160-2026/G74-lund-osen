@@ -2,7 +2,7 @@
 title: 'Story 3.4: Demoversjonen'
 type: 'feature'
 created: '2026-10-10'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b294a9514aca2d455e72b6da3942abe7fff49910'
@@ -567,3 +567,5 @@ C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke
 *Lagt til 2026-10-18 (story 3.3d):* beslutningen 16.10 kl. 21:53–21:58 under story 3.3 i `epics.md`: README-en ryddes i en egen PR etter README-PR-en, med «Status» som to lister, fem spørsmål under «Står du fast?», uv-delen som to lister, forklaringen under «Tester» bak en knapp, en linje «Innhold» og lenker i «Mappestruktur». Den bygges i `spec-3-3d-readme-ryddingen.md`. Grensen på 8 spørsmål fra 11.10 kl. 22:32, som ble 10 18.10 kl. 14:48, blir 5 der.
 
 *Lagt til 2026-10-19 (story 3.3g):* anbefalingen i svaret 2026-10-11 kl. 22:32 over, at README-en skal anbefale den ekte versjonen, er snudd av gruppens svar 19.10 kl. 14:46 under «Prioritering» i `epics.md`: README-en anbefaler demoen for faglærer og sensor, som briefen v8 og tilbakemeldingen 06.10 sier. Resten av svaret står.
+
+*Ferdig 2026-11-14 (story 9.13, tillegg 3 til 2.17 kl. 21:15 i `docs/ai-prompts/2026-11-14.md`, etter gruppens svar 14.11 kl. 17:45 og 21:07):* 3.4 er done. Demoversjonen er flettet og bygget ut i 3.4b–3.4h, og README-en og bildene av den er ferdige i 3.3k. Det eneste storyen ventet på, var README-prøven på en ren maskin (§9 i `docs/kvalitetssikring.md`). Den gjenstår, og står som et punkt i `issues.md` og i vurderingsmatrisen (spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`).

@@ -2591,6 +2591,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Rettet 2026-10-24:* kanten for dem som skilte seg ut er oransje, ikke gul, som linja kl. 15:21 sier: sterk oransje (`--oransje`, #F2B53A) ved 3 av 3 og lys oransje (`--lys-oransje`, #F8DE9C) ved 2 av 3. Den grå ringen står: ringen i logoen har samme farge som kanten ved 3 av 3, og gult (`--gul-symbol`) betyr 3 av 3.
 
+*Ferdig 2026-11-14 (story 9.13, tillegg 3 til 2.17 kl. 21:15 i `docs/ai-prompts/2026-11-14.md`, etter gruppens svar 14.11 kl. 17:45 og 21:07):* 3.4 er done. Demoversjonen er flettet og bygget ut i 3.4b–3.4h, og README-en og bildene av den er ferdige i 3.3k. Det eneste storyen ventet på, var README-prøven på en ren maskin (§9 i `docs/kvalitetssikring.md`). Den gjenstår, og står som et punkt i `issues.md` og i vurderingsmatrisen (spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`).
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -3994,6 +3996,8 @@ Tidligere avgjørelser som sier noe annet, har fått en datert linje: `designreg
 
 *Lagt til 2026-11-05 kl. 17:44:* PR #112 er squash-flettet i `eb492502`, låst til head-en `f9ae2c05` (spesifikasjonen `spec-8-2b-som-designforslaget.md`), med svarene 04.11 kl. 22:23 og 05.11 kl. 14:29, og README-bildene etter svarene 05.11 kl. 12:14 og 12:20. Store ruter har grensen regnet for hver rute og står bare fra 1079 px, en stor gul rute en annen dag viser merket og styrken i stedet for navnet, og lenken sier «Se dagen» eller «Se perioden i Børsometer». Hele settet på `1be0676a`, siste commit med kode: 4072 bestått, 24 hoppet over og 2 porttester for `start.ps1` som feilet. CI var grønn på head-en (42066861195) og på flettecommiten (42067488900), med pytest, docker og dobbeltklikk på macOS og Windows.
 
+*Ferdig 2026-11-14 (story 9.13, tillegg 3 til 2.17 kl. 21:15 i `docs/ai-prompts/2026-11-14.md`, etter gruppens svar 14.11 kl. 17:45 og 21:07):* 8.2 er done. Kontrollpunktet «Funnene fra 8.1 er brukt som grunnlag» er oppfylt: brukertesten i 8.1 ble tatt 10.11, og funnene står som U103–U112 i `docs/ux-logg.md` med storyen de tas i. 8.2a, 8.2b og 8.2c er flettet og done. Det som gjenstår, U33, U46, U57 og U67, som var delvis bygget, U58 og U65, som sto (linja 04.11 kl. 11:34 over), og svaret på papir om hvordan Nyheter og Kalender ville passet inn, står som et punkt i `issues.md` (spørsmål 2 i `spec-9-13-dokumentrunden-etter-v1-1.md`).
+
 ### Story 8.2c: Kursgrafen på smal skjerm
 
 *Lagt til 2026-11-04 (gruppens svar kl. 09:48, spørsmål 8 i `spec-8-2b-funnene-fra-ux-loggen.md`):* «Ekstra, hvis tiden rekker», som 8.4–8.19 (svaret 19.10 kl. 15:43). Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt.
@@ -5264,6 +5268,8 @@ Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som 
 
 *Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene i spesifikasjonen godtas som bygget, med tre avgjørelser. Min liste får sitt eget krav, FR-111, i 9.11 (spørsmål 14). «De 15 mest omsatte» står i FR-412 og bygges i natt som egen story i Epic 8 (spørsmål 15). Tabellen står med ja for FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag (spørsmål 16). PR #150 flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte. Svaret er ført etter tillegg 1 og 2 kl. 20:10 i `docs/ai-prompts/2026-11-12.md`.
 
+*Rettet 2026-11-14 (story 9.13):* tillegg 3 til 2.17 (kl. 21:15 i `docs/ai-prompts/2026-11-14.md`) setter 3.4 til done før prøven på ny PC. Prøven står som et punkt i `issues.md` og som gjenstår i vurderingsmatrisen (spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`).
+
 *Lagt til 2026-11-13:* 9.11 er squash-flettet med PR #150 i `ef802733` kl. 22:47, låst til head-en `7f2edbce` (main med 8.26, 8.27, 3.7, 10.11, 8.19 og 8.28 flettet inn). Det skjedde etter instruksjonen 12.11 kl. 18:03 og tillegg 1 og 3–6 i `docs/ai-prompts/2026-11-12.md`, og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Steg 2 førte flettingene inn i kravteksten, lest i koden 13.11. Hele settet ble kjørt i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24: 5751 bestått og 100 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-11-prd-etter-tilbakemeldingen.md`](../implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md).
 
 ### Story 9.12: Rådordene i alle malene, taggene i CI og technology.md
@@ -5285,3 +5291,19 @@ Som **gruppe**, vil vi at én test går gjennom alt appen viser etter ordene i r
 *Avgjort 2026-11-12 kl. 20:44 (gruppens svar):* forslagene i spesifikasjonen for 9.12 godtas som bygget, og 9.12 flettes uten nytt stopp, sist av alle, etter bildene av appen i README-en (3.3k). Rådet anbefalte det. Svaret er ført etter tillegg 7 til 9.11 kl. 20:52 i `docs/ai-prompts/2026-11-12.md`.
 
 *Lagt til 2026-11-14:* 9.12 er squash-flettet med PR #152 i `e537345f` kl. 06:25, låst til head-en `8cfaef22` (main med 8.19, 8.28, 9.11, 8.29 og 3.3k flettet inn), sist i køen etter Utført-linja for 3.3k, slik tillegg 7 til 9.11 sier (`docs/ai-prompts/2026-11-12.md`). Punkt 26 i §8 i PRD-en er lukket, og NFR-06 sier at testen finnes. Testen fant «følges med» fra 8.28 på siden «Er du sikker?», og setningen er skrevet om uten nye unntak. Hele settet ble kjørt i CI (run 43560865780), etter gruppens svar 13.11 kl. 18:24: 5808 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-12-raadordene-i-alle-malene.md`](../implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md).
+
+### Story 9.13: Dokumentrunden etter v1.1
+
+*Lagt til 2026-11-14, etter tillegg 3 til 2.17 (kl. 21:15) og gruppens svar 14.11 kl. 17:45 og 21:07:* rådet anbefalte det. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-13-dokumentrunden-etter-v1-1.md`.
+
+Som **gruppe**, vil vi at statusene, de åpne punktene og vurderingsmatrisen stemmer med det som er flettet til main etter v1.1, så det som gjenstår, er lett å se.
+
+**Oppfyller:** regel 19 i `CLAUDE.md` · **Begrenses av:** bare dokumenter, README-en og testene for dem, ingen kode i `src/`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- 3.4 og 8.2 er done i `sprint-status.yaml`, spesifikasjonene og her, med en datert linje om hvorfor
+- Hvert åpent punkt i `.logs/marian-osen/issues.md` er sjekket mot main, med en tabell i spesifikasjonen
+- «Status 14.11.2026» i `docs/vurderingsmatrise.md` med bevisene fra 12.–14.11
+- **Ville feilet hvis:** et testnavn i matrisen ikke fantes (`test_hver_test_dokumentene_nevner_finnes`), eller 3.4, 8.2 eller 9.13 ble satt til done uten rad i kvalitetssikringen (`test_hver_ferdige_spesifikasjon_har_en_rad`). Lenkene i matrisen og bevisene i `issues.md` er sjekket for hånd og i gjennomgangen, ikke av en test
+
+**Avhenger av:** 2.17. **Én økt:** ja.
