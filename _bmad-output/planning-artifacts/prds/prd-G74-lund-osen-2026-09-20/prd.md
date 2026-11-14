@@ -930,6 +930,8 @@ siden av de to i FR-406. De lagrer data fra kilden, og dette lagrer hva
 løsningen mente om dem. Vurderingen lagres i samme kjøring som hentingen.
 Ingenting skrives uten at kommandoen kjøres (FR-401).
 
+<a name="vurderinger-etterfylles-ikke-og-det-er-med-vilje"></a>
+
 ##### Kveldens vurdering etterfylles ikke, og det er med vilje
 
 | | Kan etterfylles? | Hvorfor |

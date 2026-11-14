@@ -1014,8 +1014,8 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
                 # rekkefølgen på siden leses av overskriftene (test_ki_visning).
                 "Dag for dag",
                 # Story 2.17: dagene regnet i ettertid er merket.
-                "Det appen skrev om aksjen hver børsdag, en måned om gangen. En dag merket «i ettertid» er "
-                "regnet senere av kursene.",
+                "Det appen skrev om aksjen, lagret hver børsdag og aldri regnet på nytt, en måned om gangen. "
+                "En dag merket «i ettertid» er regnet senere av kursene.",
             ),
         ),
         "innstillinger": (

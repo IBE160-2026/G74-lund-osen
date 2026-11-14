@@ -236,7 +236,7 @@ hele settet i CI.
 
 Stedet, endringen og hvordan den er sjekket: test, bilde eller lest. Treffene fra
 søket i steg 1, med hvert treff som er endret eller står, er i
-[`spec-2-17-treffene.md`](spec-2-17-treffene.md). Treffene som står i `src/`, er
+[`treffene-2-17.md`](treffene-2-17.md). Treffene som står i `src/`, er
 kommentarer om at visningen leser signalet og aldri regner det. Det gjelder
 fortsatt, fordi radene i ettertid regnes i hentingen. Treffene i `tests/`, i
 eldre spesifikasjoner og i loggene er historikk.
