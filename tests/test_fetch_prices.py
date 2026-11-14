@@ -736,9 +736,13 @@ def lager_i(base):
 
 
 def antall_rader(base, tabell: str) -> int:
+    # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): i
+    # vurdering telles kveldsradene. Radene regnet i ettertid til slutt i
+    # hentingen testes i tests/test_ettertid_2_17.py.
     tilkobling = aapne_base(base)
     try:
-        return tilkobling.execute(f"SELECT count(*) FROM {tabell}").fetchone()[0]
+        hvor = " WHERE regnet = 'kveld'" if tabell == "vurdering" else ""
+        return tilkobling.execute(f"SELECT count(*) FROM {tabell}{hvor}").fetchone()[0]
     finally:
         tilkobling.close()
 
@@ -1200,9 +1204,12 @@ def vurderingene(base, dato: date, klokke: datetime = OEYEBLIKK_22_09) -> dict:
 
 
 def datoene_i_vurdering(base) -> list[str]:
+    # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): datoene
+    # med kveldsrader. Til slutt i hver henting regnes signalet i ettertid for
+    # dagene foer uten rad, og de testes i tests/test_ettertid_2_17.py.
     tilkobling = aapne_base(base)
     try:
-        return [r[0] for r in tilkobling.execute("SELECT DISTINCT dato FROM vurdering")]
+        return [r[0] for r in tilkobling.execute("SELECT DISTINCT dato FROM vurdering WHERE regnet = 'kveld'")]
     finally:
         tilkobling.close()
 
@@ -3280,6 +3287,7 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
             tilkobling.execute("INSERT INTO indeksserie VALUES ('OSEBX', ?)", (_utc(2026, 9, 22, 21, 0).isoformat(),))
         finally:
             tilkobling.close()
+
         foer = sha(base)
 
         fil, kall, ut = kjoer_23(
@@ -3610,6 +3618,16 @@ class TestHovedindeksenEtterGjennomgangen:
 
         siste = sorted(lagring_sqlite.MIGRASJONSKATALOG.glob("*.sql"))[-1]
         sql = re.sub(r"--[^\n]*", "", siste.read_text(encoding="utf-8")).lower()
+        # Story 2.17 (0014_regnet.sql) er vurdert: kolonnen regnet og triggeren
+        # paa den. Sjekken leser vurdering gjennom SqliteVurderingslager.les,
+        # som leser regnet bare naar kolonnen finnes (_regnet i
+        # lagring_sqlite.py), saa en base foer 0014 leses som foer, og
+        # test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret viser
+        # det. Derfor tas de to setningene ut, og alt annet mot vurdering
+        # stoppes som foer.
+        if siste.name == "0014_regnet.sql":
+            sql = re.sub(r"alter table vurdering add column regnet text[^;]*;", "", sql)
+            sql = re.sub(r"create trigger vurdering_kveld_blir_ikke_ettertid\b.*?\bend;", "", sql, flags=re.DOTALL)
         if siste.name == "0009_lista.sql":
             sql = re.sub(r"alter table aksje add column (inn|ut) text[^;]*;", "", sql)
             sql = re.sub(r"update aksje set inn = \(select min\(dato\) from vurdering[^;]*;", "", sql)
@@ -3766,7 +3784,10 @@ class TestFoersteHenting:
         rader = vurderingene(base, MANDAG_21_09)
         assert all(isinstance(innhold, Vurdering) for innhold, _ in rader.values())
         assert "første henting" in ut and "forrige børsdag, 2026-09-21" in ut
-        assert "Signalet lagres fra den dagen og regnes aldri bakover" in ut
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her sto
+        # «Signalet lagres fra den dagen og regnes aldri bakover». Dagene foer
+        # faar signalet regnet i ettertid til slutt i hentingen.
+        assert "Signalet lagres fra den dagen, og børsdagene før får signalet regnet i ettertid" in ut
 
     def test_dagens_rad_kommer_aldri_med_selv_om_api_et_har_den(self, stier):
         """Svaret kuttes ved til-datoen, saa dagens rad kommer bare med hvis
@@ -4003,9 +4024,15 @@ class TestFoersteHentingEtterGjennomgangen:
         """16 kall brukt paa dagtid. Kvelden trenger 12 fra bonuskvoten; ellers
         0 kall, og 22.09 faar aldri signal. Ville feilet hvis utskriften og
         koden sa noe annet enn vurder_kvote gjoer (BH1, ECH2, VG3)."""
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her sto
+        # «dagens børsdag får aldri signal» og «regnes aldri bakover». Uten
+        # kvelden faar 22.09 ingen kveldsrad, og neste henting regner signalet
+        # for den i ettertid.
         raa, base = stier
         _, _, ut = kjoer_23(raa, base, DAGTID_22_09, som_api_et([]))
-        assert "dagens børsdag får aldri signal" in ut and "regnes aldri bakover" in ut
+        assert "dagens børsdag får ingen vurdering fra kvelden og ingen KI-tekst" in ut
+        assert "Neste henting regner signalet for den i ettertid" in ut
+        assert "får signalet regnet i ettertid" in ut
         kvelden = kvote(brukt=16, bonus=bonus)
         if henter:
             fil, kall, _ = kjoer_23(raa, base, _utc(2026, 9, 22, 20, 30), som_api_et([]), les_kvote=kvelden)
@@ -4022,7 +4049,8 @@ class TestFoersteHentingEtterGjennomgangen:
         raa.mkdir(parents=True)
         (raa / "kurser-raa-2026-09-21.json").write_text("{}", encoding="utf-8")
         _, _, ut = kjoer_23_kode(raa, base, DAGTID_22_09, ingen_kall, ingen_noekkel, ingen_kall)
-        assert "Hent etter kl. 22:00" in ut and "den dagen får aldri signal" in ut
+        # Rettet 2026-11-14 (story 2.17): her sto «den dagen får aldri signal».
+        assert "Hent etter kl. 22:00" in ut and "den dagen får signalet regnet i ettertid ved neste henting" in ut
 
     def test_ki_tjenesten_ikke_klar_ved_foerste_henting(self, stier):
         """Ville feilet hvis utskriften lovet en ny kjoering som ikke kan lage

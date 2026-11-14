@@ -309,8 +309,10 @@ class TestStyrkenSomTabellen:
         assert treff, "cellen i «Signalet dag for dag» er flyttet (gjennomgangen, VG3)"
         cellen = treff.group(1)
         with app_modul.app.test_request_context("/"):
+            # Rettet 2026-11-14 (story 2.17): cellen har også merket «i ettertid».
             html = render_template_string(
-                '{% from "_brikker.html" import brikker, retningspille, styrke %}' + cellen, dag=_dagen(styrke)
+                '{% from "_brikker.html" import brikker, ettertid, retningspille, styrke %}' + cellen,
+                dag=_dagen(styrke),
             )
         assert STYRKEN.findall(html) == [(_ventet(styrke), str(styrke))], html
 

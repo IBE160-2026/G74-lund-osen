@@ -188,6 +188,9 @@ class Signaldag:
     # Gjennomgangen (BH5, ECH3): radien etter avstanden mellom dagene, så
     # prikkene ikke blir et bånd over kurslinja i lange perioder.
     r: float = 4.0
+    # Story 2.17: signalet er regnet i ettertid. Prikken har stiplet kant, og
+    # teksten under grafen sier det.
+    ettertid: bool = False
 
 
 @dataclass(frozen=True)
@@ -610,7 +613,7 @@ def bygg_graf(
     merker: str = MAANEDSNAVN,
     merket: date | None = None,
     smal: bool = False,
-    signal: dict[date, tuple[int, str]] | None = None,
+    signal: dict[date, tuple] | None = None,
     alle: int = 3,
     justeringer: tuple[date, ...] = (),
     volumfaktor: float | None = None,
@@ -654,6 +657,7 @@ def bygg_graf(
         punktet = Navn(_x(i, len(punkter), bredde, hoeyre), _y(punkter[i].kurs, lav, hoy, hoyde, bunn))
     # Story 8.8: signal er {dato: (styrke, retning)} for dagene som skilte seg
     # ut, lest fra vurdering (les_periode). Bare dager grafen har, får en prikk.
+    # Story 2.17: et tredje ledd sier om signalet er regnet i ettertid.
     avstand = (
         abs(_x(1, len(punkter), bredde, hoeyre) - _x(0, len(punkter), bredde, hoeyre)) if len(punkter) > 1 else 8.0
     )
@@ -667,6 +671,7 @@ def bygg_graf(
             styrke=signal[d][0],
             alle=signal[d][0] >= alle,
             r=radius + (1.0 if signal[d][0] >= alle else 0.0),
+            ettertid=len(signal[d]) > 2 and bool(signal[d][2]),
         )
         for i, d in enumerate(datoene)
         if signal and d in signal

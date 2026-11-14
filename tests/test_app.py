@@ -148,10 +148,13 @@ def fyll_basen(serier: dict[str, list[Kursrad]], hentet: str = HENTET) -> None:
 TOM_TILSTAND = "Ingen kurser i basen ennå"
 # Story 3.4d (gruppens svar 22.10 kl. 23:19): den ekte teksten i fotnoten
 # for «ikke vurdert», uten taggene og med ett mellomrom mellom ordene.
+# Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her sto at
+# signalet «regnes aldri ut bakover». En tidligere børsdag uten vurdering får
+# det regnet i ettertid ved neste henting når aksjen har nok kurser.
 EKTE_FOTNOTE = (
-    "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. "
-    "Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn "
-    "med --les-inn."
+    "«Ikke vurdert»: appen har ingen vurdering for dagen. Signalet lagres den kvelden kursene hentes, "
+    "og for en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen er i "
+    "lista og har minst 51 kursdager i basen til og med dagen."
 )
 
 
@@ -2726,7 +2729,10 @@ class TestStory80dAksjesiden:
             for v, innhold in re.findall(r"([^{}]+)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", stil, flags=re.DOTALL))
             if "dasharray" in innhold or "dashed" in innhold
         ]
-        assert stiplet == [".indekslinje"], stiplet
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): også
+        # merket for en dag med signalet regnet i ettertid er stiplet, i
+        # grafen, i historikken og overalt merket står (designregler §3 og §5).
+        assert stiplet == [".indekslinje", ".signaldag.ettertid", ".ettertid-merke", "li.dag.ettertid"], stiplet
         assert "stroke-dasharray" not in html.split("</head>", 1)[1]
         assert "stroke-width: 1.75" in _regel(stil, ".ma50linje")
         assert "stroke-width: 2.5" in _regel(stil, ".kurslinje")
@@ -3442,7 +3448,11 @@ class TestStipletBareForIndeksenPaaForsiden:
             if "dasharray" in innhold or "dashed" in innhold
         ]
         # Story 8.2b, a (U57): forklaringen under søylene har en bit av linja.
-        assert stiplet == [".soeyler .indekslinje", ".soeyler .linjeprove"], stiplet
+        # Rettet 2026-11-14 (story 2.17): også merket «i ettertid» og ruta i
+        # børsometeret for en dag med signalet regnet i ettertid.
+        assert stiplet == [".soeyler .indekslinje", ".soeyler .linjeprove", ".ettertid-merke", ".rute.ettertid"], (
+            stiplet
+        )
 
 
 # Story 8.16: periodene i kursgrafen. Regelen for startdagen er testet i

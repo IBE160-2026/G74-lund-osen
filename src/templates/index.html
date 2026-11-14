@@ -1,7 +1,7 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
-{% from "_brikker.html" import brikker, retningspille -%}
+{% from "_brikker.html" import brikker, ettertid, retningspille -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% from "_notat.html" import notatet with context -%}
 {% from "_rundtur.html" import rundtur with context -%}
@@ -89,6 +89,8 @@
                 {%- elif rad.skiller_seg_ut %}<span class="pille to-av-tre">{{ rad.styrke }} av {{ antall_sjekker }}</span>
                 {%- else %}<span class="styrketall">{{ rad.styrke }} av {{ antall_sjekker }}</span>{% endif %}
                 {{ brikker(rad.sjekker) }}
+                {#- Story 2.17: en dag med signalet regnet i ettertid. #}
+                {{ ettertid(rad.ettertid) }}
                 {#- Svar 4 på planen for PR 2: merket er skjult for synet, men
                     hver rad sier det med ord. #}
                 {% if rad.skiller_seg_ut %}<span class="merke skjult">skilte seg ut</span>{% endif %}
@@ -110,7 +112,7 @@
             <td class="tall">{% if under.sluttkurs is not none %}{{ under.sluttkurs|tall('kurs') }}{% else %}–{% endif %}</td>
             {% set vist_under = under.endring_prosent|round(2) if under.endring_prosent is not none else none %}
             <td class="tall {% if vist_under is not none %}{{ 'opp' if vist_under > 0 else 'ned' if vist_under < 0 else '' }}{% endif %}">{% if under.endring_prosent is not none %}{{ under.endring_prosent|tall('endring') }}<span class="skjult"> til siste børsdag</span>{% else %}–{% endif %}</td>
-            <td class="tall styrke">{% if under.styrke is not none %}<span class="styrketall">{{ under.styrke }} av {{ antall_sjekker }}</span> {{ brikker(under.sjekker) }}{% else %}– <span class="merke mangler">{{ under.tekst }}</span>{% endif %}</td>
+            <td class="tall styrke">{% if under.styrke is not none %}<span class="styrketall">{{ under.styrke }} av {{ antall_sjekker }}</span> {{ brikker(under.sjekker) }} {{ ettertid(under.ettertid) }}{% else %}– <span class="merke mangler">{{ under.tekst }}</span>{% endif %}</td>
             <td class="retning">{% if under.styrke is not none %}{{ retningspille(under.retning) }}{% endif %}</td>
           </tr>
           {%- endif %}

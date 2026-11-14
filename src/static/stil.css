@@ -1222,6 +1222,32 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
 :where(.side-aksje) .signaldag.negativ { fill: var(--ned); }
 :where(.side-aksje) .signaldag.blandet { fill: var(--blandet); }
 :where(.side-aksje) .signaldag.alle { stroke: var(--gul-symbol); stroke-width: 2.5; }
+/* Story 2.17 (gruppens svar 14.11 kl. 05:41-05:49): en dag med signalet regnet
+   i ettertid har hvit midte og stiplet kant i fargen for retningen, og gul
+   kant ved 3 av 3. Teksten under grafen sier det (designregler §3 og §5). */
+:where(.side-aksje) .signaldag.ettertid { fill: var(--kort); stroke-width: 2; stroke-dasharray: 2 1.5; }
+:where(.side-aksje) .signaldag.ettertid.positiv { stroke: var(--opp); }
+:where(.side-aksje) .signaldag.ettertid.negativ { stroke: var(--ned); }
+:where(.side-aksje) .signaldag.ettertid.blandet { stroke: var(--blandet); }
+:where(.side-aksje) .signaldag.ettertid.alle { stroke: var(--gul-symbol); stroke-width: 2.5; }
+/* Story 2.17: merket «i ettertid», likt overalt der en tidligere dag vises med
+   signal. Teksten bærer merket, og den stiplede kanten i --dempet-2 har
+   4,14:1 mot bakgrunnen og over 3:1 mot kortene (designregler §3). */
+.ettertid-merke { display: inline-block; padding: 0 0.45em; border: 1.5px dashed var(--dempet-2); border-radius: 999px;
+                  color: var(--tekst); background: transparent; font-size: 12px; font-weight: 600; line-height: 1.5;
+                  white-space: nowrap; vertical-align: middle; }
+:where(.side-aksje) p.ettertid-linje { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 12px;
+                                       color: var(--tekst); font-size: 0.9rem; }
+:where(.side-aksje) li.dag.ettertid { border: 1.5px dashed var(--dempet-2); }
+/* Gjennomgangen (VG1): kanten står utenfor ruta, mot bakgrunnen, fordi
+   fyllfargene og rammene i ruta gir for lite kontrast mot --dempet-2. */
+:where(.side-oversikt) .rute.ettertid { outline: 2px dashed var(--dempet-2); outline-offset: 0; }
+@media (forced-colors: active) {
+  .ettertid-merke { border-color: CanvasText; }
+  :where(.side-aksje) li.dag.ettertid { border-color: CanvasText; }
+  :where(.side-aksje) .signaldag.ettertid { fill: Canvas; stroke: CanvasText; }
+  :where(.side-oversikt) .rute.ettertid { outline-color: CanvasText; }
+}
 :where(.side-aksje) figcaption .skjult { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
                                          clip: rect(0 0 0 0); white-space: nowrap; }
 /* Story 2.12 (utdraget 08.11 §1 og §2): «Dine egne aksjer» og «Din egen

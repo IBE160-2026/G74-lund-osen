@@ -45,7 +45,7 @@ from signalberegning import (
     standardavvik,
 )
 from tallformat import desimaler_uten_null, fortegn, tall
-from tilstand import Art, Tilstand
+from tilstand import MED_SIGNAL, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
 # FR-201 og story 8.16: grafen starter paa startdagen fra perioder.startdag,
@@ -240,9 +240,14 @@ class Detalj:
 
     @property
     def vurdering(self) -> Vurdering | None:
-        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+        if self.tilstand is not None and self.tilstand.art in MED_SIGNAL:
             return self.tilstand.innhold
         return None
+
+    @property
+    def ettertid(self) -> bool:
+        """Story 2.17: signalet er regnet i ettertid."""
+        return self.tilstand is not None and self.tilstand.ettertid
 
     @property
     def styrke(self) -> int | None:
@@ -405,7 +410,7 @@ def bygg_detalj(
     # Story 2.11: «ikke i lista» etter at aksjen gikk ut.
     utfall, tekst = les_tilstand(innhold, dato, idag, post.ut)
     sjekker: tuple[SjekkVisning, ...] = ()
-    if utfall is not None and utfall.art is Art.SVAR:
+    if utfall is not None and utfall.art in MED_SIGNAL:
         sjekker = tuple(
             SjekkVisning(
                 navn=s.navn,
@@ -459,9 +464,14 @@ class Dagen:
 
     @property
     def vurdering(self) -> Vurdering | None:
-        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+        if self.tilstand is not None and self.tilstand.art in MED_SIGNAL:
             return self.tilstand.innhold
         return None
+
+    @property
+    def ettertid(self) -> bool:
+        """Story 2.17: signalet er regnet i ettertid."""
+        return self.tilstand is not None and self.tilstand.ettertid
 
     @property
     def retning(self) -> Retningsvisning:

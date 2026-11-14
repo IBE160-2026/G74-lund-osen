@@ -124,10 +124,11 @@ class TestVurderingeneEnGang:
         fra_starten = []
         ekte = lagring_sqlite.SqliteVurderingslager.les_periode
 
-        def tell(self, symbol, fra, til):
+        # Rettet 2026-11-14 (story 2.17): siden leser med med_ettertid=True.
+        def tell(self, symbol, fra, til, **noekkelord):
             if fra.year == 1:
                 fra_starten.append((symbol, til))
-            return ekte(self, symbol, fra, til)
+            return ekte(self, symbol, fra, til, **noekkelord)
 
         monkeypatch.setattr(lagring_sqlite.SqliteVurderingslager, "les_periode", tell)
         symbol = _sql(base, "SELECT symbol FROM aksje WHERE ut IS NULL ORDER BY rowid LIMIT 1")[0][0]

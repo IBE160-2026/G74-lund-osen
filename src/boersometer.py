@@ -46,7 +46,7 @@ from markedsoversikt import (
 )
 from signalberegning import STANDARD, Parametre
 from tallformat import avrundet, dato, tall, ukedag
-from tilstand import Art
+from tilstand import MED_SIGNAL
 from vurderingsdata import Grunn, Vurdering
 
 # De 13 bransjene i designregler.md §4, i rekkefølgen tabellen står.
@@ -76,6 +76,8 @@ GUL, MOERK = "gul", "moerk"
 # hvorfor. Tillegg 8 (ønsket kl. 19:51): de samme ordene som raden på
 # oversikten, også i ruta og i begge kolonnene i tabellen.
 UTEN_DATA = UTEN_DATA_TEKST[0].upper() + UTEN_DATA_TEKST[1:]
+# Story 2.17: teksten i ruta for en dag med signalet regnet i ettertid, som merket.
+I_ETTERTID = "i ettertid"
 
 # Story 8.6b, c: fem fargetrinn etter endringen slik den vises, med grensene i
 # prosent. Navnene er klassene i malen og fargene i :root i stil.css.
@@ -108,6 +110,8 @@ class Rute:
     # etter den første kursen i perioden.
     lik_stoerrelse: bool = False
     fra: date | None = None
+    # Story 2.17: signalet for dagen er regnet i ettertid.
+    ettertid: bool = False
 
     @property
     def stoerrelse(self) -> str:
@@ -142,9 +146,14 @@ class Rute:
     @property
     def grunn(self) -> str | None:
         """Teksten under linja for styrken. Svar 2: «ikke vurdert» står bare
-        én gang i ruta, så teksten står ikke når den er det samme."""
+        én gang i ruta, så teksten står ikke når den er det samme. Story 2.17
+        (gjennomgangen, VG2 og BH6): «i ettertid» for en dag med signalet
+        regnet i ettertid, så teksten bærer merket der ruta har plass, også
+        med gul ramme."""
         if self.uten_data or self.ikke_vurdert:
             return None
+        if self.ettertid:
+            return I_ETTERTID
         return self.tekst
 
     @property
@@ -311,7 +320,7 @@ def bygg_rute(
     # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): ruta sier hvorfor, med
     # samme tall som aksjesiden for dagen, regnet av kursene til og med dato.
     tekst = grunn_med_tall(utfall, tekst, len(kurser), p)
-    vurdering = utfall.innhold if utfall is not None and utfall.art is Art.SVAR else None
+    vurdering = utfall.innhold if utfall is not None and utfall.art in MED_SIGNAL else None
     return Rute(
         aksje=aksje,
         endring=endring_i_prosent(kurser[-2:]),
@@ -320,6 +329,7 @@ def bygg_rute(
         tekst=tekst,
         siste_styrke=siste_styrke,
         er_siste=er_siste,
+        ettertid=utfall is not None and utfall.ettertid,
     )
 
 

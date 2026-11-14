@@ -10,6 +10,11 @@ samme liste over stengte dager som 1.6, og gir en av fire verdier, aldri
 None. Den fjerde er raden med grunn fra punkt 24: kommandoen kjoerte, men
 kunne ikke vurdere aksjen.
 
+Story 2.17 (gruppens svar 2026-11-14 kl. 05:41-05:49): en rad med vurdering
+regnet i ettertid, av kursene for en tidligere boersdag uten kveldsrad, er en
+egen tilstand, ETTERTID. Den har et signal, som SVAR, og MED_SIGNAL er de to.
+Visningene merker den med «i ettertid».
+
 Enhver visning, kommando eller spoerring som senere leser historikken, skal
 bevare skillet (FR-409). Kalleren i produksjonskoden er sidene: fra story
 2.2b viser oversikten og aksjedetaljen raden for datoen til nyeste kurs
@@ -27,11 +32,18 @@ from vurderingsdata import Grunn, Vurdering
 
 class Art(StrEnum):
     SVAR = "svar"  # rad med vurdering, ogsaa styrke 0
+    # Story 2.17: rad med vurdering regnet i ettertid, ikke av kveldens henting.
+    ETTERTID = "ettertid"
     GRUNN = "grunn"  # rad med grunn (punkt 24)
     IKKE_KJOERT = "ikke_kjoert"  # ingen rad, og dagen var boersdag
     IKKE_BOERSDAG = "ikke_boersdag"  # ingen rad, og dagen var ikke boersdag
     # Story 2.11: ingen rad, og aksjen var tatt ut av lista den dagen.
     IKKE_I_LISTA = "ikke_i_lista"
+
+
+# Story 2.17: tilstandene med et signal. En visning som sjekker «har raden en
+# vurdering», sjekker disse to, og merker ETTERTID.
+MED_SIGNAL = frozenset({Art.SVAR, Art.ETTERTID})
 
 
 @dataclass(frozen=True)
@@ -40,6 +52,16 @@ class Tilstand:
 
     art: Art
     innhold: Vurdering | Grunn | None = None
+
+    @property
+    def vurdering(self) -> Vurdering | None:
+        """Vurderingen naar raden har et signal (MED_SIGNAL), ellers None."""
+        return self.innhold if self.art in MED_SIGNAL else None
+
+    @property
+    def ettertid(self) -> bool:
+        """Story 2.17: signalet er regnet i ettertid."""
+        return self.art is Art.ETTERTID
 
 
 def _kontroller_dag(navn: str, verdi) -> None:
@@ -78,7 +100,7 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date, ut: date
             "ikke vaert, og er verken ikke kjoert eller ikke boersdag"
         )
     if isinstance(innhold, Vurdering):
-        return Tilstand(Art.SVAR, innhold)
+        return Tilstand(Art.ETTERTID if innhold.ettertid else Art.SVAR, innhold)
     if isinstance(innhold, Grunn):
         return Tilstand(Art.GRUNN, innhold)
     # Story 2.11: ut er den foerste dagen aksjen ikke er i lista. En boersdag

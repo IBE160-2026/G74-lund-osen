@@ -76,6 +76,15 @@ ny kjoering samme kveld eller i helgen indeksen alene med ett kall
 Story 2.13: --maal-omsetning maaler omsetningen for de neste aksjene i lista
 over Oslo Boers med kallene som er igjen av dagens, og aldri bonuskvoten.
 Logikken staar i omsetning.py, og nettfunksjonene her gis inn til den.
+
+Story 2.17 (gruppens svar 2026-11-14 kl. 05:41-05:49): til slutt i hver
+henting, etter kveldens vurderinger og KI-tekster, regnes signalet i ettertid
+for boersdagene med kurser i basen som mangler rad i vurdering, for aksjene i
+lista (ettertid.py, regn_signalet_i_ettertid). Aldri inneveerende boersdag, og
+en kveldsrad overskrives aldri. En feil der stopper aldri kvelden og endrer
+ikke utgangskoden. Dagene fra --les-inn faar signalet i ettertid ved neste
+henting. --regn-ettertid-paa-nytt og --slett-ettertid roerer bare radene i
+ettertid, uten kall.
 """
 
 import argparse
@@ -107,6 +116,7 @@ from boersdag import (
     norsk_dato,
 )
 from eodhd import UgyldigSerie, serie_fra_eodhd
+from ettertid import fyll_i_ettertid
 from indeksdata import HOVEDINDEKS, Indeks, bare_boersdager
 from ki_modell import Modell
 from ki_tekst import lag_ki_tekster, modell_fra_miljoeet
@@ -118,8 +128,15 @@ from lagring_fil import (
     SnapshotLeser,
     _hentet_fra_tekst,
 )
-from lagring_sqlite import SqliteIndekslager, SqliteKurslager, SqliteVurderingslager, aapne_base, les_lista
-from migrering import MigrasjonsFeil
+from lagring_sqlite import (
+    SqliteEttertidslager,
+    SqliteIndekslager,
+    SqliteKurslager,
+    SqliteVurderingslager,
+    aapne_base,
+    les_lista,
+)
+from migrering import MigrasjonsFeil, siste_versjon, versjon
 from signalberegning import vurder
 from vurderingsdata import Grunn
 
@@ -502,8 +519,9 @@ def _kvelden(behov: int) -> str:
     return (
         f"Kveldens henting etter kl. {_grensen()} trenger {behov} kall. Er det ikke nok igjen av "
         "dagens, tas resten fra bonuskvoten hvis den dekker det. Ellers bruker den 0 kall, og "
-        "dagens børsdag får aldri signal, fordi en vurdering bare kan skrives for "
-        "inneværende børsdag (AD-7). Neste kveld hentes neste børsdag."
+        "dagens børsdag får ingen vurdering fra kvelden og ingen KI-tekst, fordi en kveldsrad bare "
+        "kan skrives for inneværende børsdag (AD-7). Neste henting regner signalet for den i "
+        "ettertid (story 2.17). Neste kveld hentes neste børsdag."
     )
 
 
@@ -962,7 +980,120 @@ def nekt_demobase(base_sti: Path, skriv: Callable[[str], None] = print) -> None:
         sys.exit(1)
 
 
+def regn_signalet_i_ettertid(
+    base_sti: Path,
+    klokke: Callable[[], datetime],
+    skriv: Callable[[str], None] = print,
+    *,
+    paa_nytt: bool = False,
+    bare_migrert: bool = False,
+) -> int | None:
+    """Signalet i ettertid for aksjene i lista - story 2.17, ettertid.py.
+
+    Lista er aksjene i lista i basen paa inneveerende boersdag, regnet fra
+    klokka. Gir antallet rader som ble skrevet, eller None naar noe feilet.
+    En feil stopper aldri kvelden: den fanges her, og utskriften har bare
+    typen, ingen kurser og ingen maalinger (regel 16). En base som ikke
+    finnes, lages ikke. Med paa_nytt regnes radene i ettertid for aksjene i
+    lista paa nytt med kursene som staar, og byttes ut i en transaksjon per
+    aksje; kveldsradene, radene for en aksje som er tatt ut (gjennomgangen,
+    BH2) og en rad som ikke kan regnes paa nytt (ECH1), roeres ikke.
+
+    Gjennomgangen (BH1): med bare_migrert, som hentingen gir, migrerer steget
+    aldri basen selv. Staar basen ikke paa siste versjon, for eksempel naar
+    tidskontrollen sa nei foer hentingen roerte basen, venter steget til
+    hentingen eller webserveren har migrert den.
+    """
+    if not Path(base_sti).is_file():
+        return None
+    try:
+        if bare_migrert:
+            sjekk = _aapne_for_sjekken(base_sti)
+            try:
+                migrert = versjon(sjekk) == siste_versjon(lagring_sqlite.MIGRASJONSKATALOG)
+            finally:
+                sjekk.close()
+            if not migrert:
+                return None
+        tilkobling = aapne_base(base_sti)
+        try:
+            dagens = innevaerende_boersdag(norsk_dato(klokke()))
+            lista = les_lista(tilkobling, dagens)
+            lager = SqliteEttertidslager(tilkobling, klokke, lista)
+            fylt = fyll_i_ettertid(SqliteKurslager(tilkobling, lista), lager, lista, dagens, paa_nytt=paa_nytt)
+        finally:
+            tilkobling.close()
+    except Exception as feil:
+        skriv(
+            f"Signalet i ettertid kunne ikke regnes ({type(feil).__name__}). Kvelden er ikke stoppet, "
+            "og radene fra kvelden står (story 2.17)."
+        )
+        return None
+    if fylt.feilet:
+        # Gjennomgangen (ECH2): symbolene og typen, ingen kurser (regel 16).
+        skriv(
+            "Signalet i ettertid kunne ikke regnes for "
+            + ", ".join(f"{symbol} ({slag})" for symbol, slag in fylt.feilet)
+            + ". De andre aksjene er regnet, og kvelden er ikke stoppet (story 2.17)."
+        )
+    if paa_nytt:
+        skriv(
+            f"Regnet {fylt.antall} rader i ettertid på nytt med kursene som står. Kveldsradene er ikke rørt, "
+            "og en rad som ikke kan regnes med kursene som står, er beholdt (story 2.17)."
+        )
+    elif fylt.antall:
+        skriv(
+            f"Signalet er regnet i ettertid for {fylt.antall} børsdager uten rad i vurdering, for "
+            f"{len(fylt.dager)} aksjer, med kursene til og med hver dag. Dagene er merket «i ettertid» "
+            "(story 2.17)."
+        )
+    return fylt.antall
+
+
 def kjoer(
+    data_katalog: Path,
+    base_sti: Path,
+    oeyeblikk: datetime,
+    api_nokkel: str | Callable[[], str],
+    hent: Callable[[str, str, str, str], list[dict]] = hent_ett_symbol,
+    skriv: Callable[[str], None] = print,
+    klokke: Callable[[], datetime] | None = None,
+    *,
+    uten_tidskontroll: bool = False,
+    les_kvote: Callable[[str], object],
+    lista: tuple[Aksje, ...] | None = None,
+    modell: Modell | None = None,
+) -> Path | None:
+    """En henting (_henting), og til slutt signalet i ettertid - story 2.17.
+
+    Signalet i ettertid regnes etter alt annet i hentingen, ogsaa naar den
+    stopper med en kode, og aldri for en demobase (nekt_demobase stopper
+    foer). Det endrer verken returverdien eller utgangskoden. Et oeyeblikk
+    uten sone gir ValueError fra _henting, og da regnes ingenting.
+    """
+    nekt_demobase(base_sti, skriv)
+    try:
+        return _henting(
+            data_katalog,
+            base_sti,
+            oeyeblikk,
+            api_nokkel,
+            hent,
+            skriv,
+            klokke,
+            uten_tidskontroll=uten_tidskontroll,
+            les_kvote=les_kvote,
+            lista=lista,
+            modell=modell,
+        )
+    finally:
+        if oeyeblikk.tzinfo is not None:
+            regn_signalet_i_ettertid(
+                base_sti, klokke if klokke is not None else (lambda: oeyeblikk), skriv, bare_migrert=True
+            )
+
+
+def _henting(
     data_katalog: Path,
     base_sti: Path,
     oeyeblikk: datetime,
@@ -1217,8 +1348,9 @@ def kjoer(
         skriv(
             f"Øyeblikksbildet for børsdagen {dato.isoformat()}, {fil.name}, finnes "
             "allerede og skrives aldri om (AD-6), men basen er tom. Hent etter kl. "
-            f"{_grensen()}. Med --les-inn {fil} kommer kursene inn, men den dagen får aldri "
-            "signal, fordi innlesingen ikke skriver vurderinger (AD-7). 0 kall brukt."
+            f"{_grensen()}. Med --les-inn {fil} kommer kursene inn, men innlesingen skriver ingen "
+            "vurderinger (AD-7), så den dagen får signalet regnet i ettertid ved neste henting, "
+            "uten KI-tekst (story 2.17). 0 kall brukt."
         )
         sys.exit(1)
     if fil.exists():
@@ -1387,9 +1519,11 @@ def kjoer(
     if foerste_henting:
         # Story 2.3c: hva foerste henting gir, og kallene samme kveld, slik
         # vurder_kvote gjoer det.
+        # Story 2.17: dagene foer faar signalet i ettertid til slutt i hentingen.
         skriv(
-            f"Første henting gjelder børsdagen {dato.isoformat()}. Signalet lagres fra den dagen og "
-            f"regnes aldri bakover. {_kvelden(behov)}"
+            f"Første henting gjelder børsdagen {dato.isoformat()}. Signalet lagres fra den dagen, og "
+            "børsdagene før får signalet regnet i ettertid av kursene, uten KI-tekst. "
+            f"{_kvelden(behov)}"
         )
 
     # FR-402: svaret er ikke fra boersdagen for noen av aksjene. Kursene og
@@ -1840,6 +1974,36 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
         sys.exit(1)
 
 
+def ettertid_kommando(
+    base_sti: Path, klokke: Callable[[], datetime], *, slett: bool, skriv: Callable[[str], None] = print
+) -> int:
+    """--regn-ettertid-paa-nytt og --slett-ettertid - story 2.17.
+
+    Roerer bare radene i ettertid, gjoer ingen kall og leser ingen noekkel.
+    Nekter en demobase, som hentingen (demoen lages paa nytt med
+    demokommandoen). Gir utgangskoden: 0 naar det gikk, 1 ellers."""
+    nekt_demobase(base_sti, skriv)
+    if not Path(base_sti).is_file():
+        skriv(f"Basen {base_sti} finnes ikke. Ingenting å regne. 0 kall brukt.")
+        return 1
+    if not slett:
+        return 0 if regn_signalet_i_ettertid(base_sti, klokke, skriv, paa_nytt=True) is not None else 1
+    try:
+        tilkobling = aapne_base(base_sti)
+        try:
+            slettet = SqliteEttertidslager(tilkobling, klokke, ()).slett()
+        finally:
+            tilkobling.close()
+    except BASEFEIL as feil:
+        skriv(f"Radene i ettertid kunne ikke slettes ({type(feil).__name__}). Ingenting er endret.")
+        return 1
+    skriv(
+        f"Slettet {slettet} rader regnet i ettertid. Kveldsradene er ikke rørt. Neste henting regner "
+        "dem på nytt for aksjene i lista (story 2.17). 0 kall brukt."
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> None:
     """Uten flagg: en henting. Med --les-inn <fil>: innlesing uten kall.
     Med --uten-tidskontroll: en henting paa en boersdag foer TIDSGRENSE, kl.
@@ -1884,6 +2048,19 @@ def main(argv: list[str] | None = None) -> None:
         ),
     )
     parser.add_argument(
+        "--regn-ettertid-paa-nytt",
+        action="store_true",
+        help=(
+            "slett radene med signalet regnet i ettertid og regn dem på nytt med kursene i basen, "
+            "uten API-kall. Kveldsradene røres ikke (story 2.17)"
+        ),
+    )
+    parser.add_argument(
+        "--slett-ettertid",
+        action="store_true",
+        help="slett radene med signalet regnet i ettertid, uten API-kall. Kveldsradene røres ikke (story 2.17)",
+    )
+    parser.add_argument(
         "--les-boerslista",
         action="store_true",
         help=(
@@ -1894,6 +2071,18 @@ def main(argv: list[str] | None = None) -> None:
     argumenter = parser.parse_args(argv)
     if argumenter.med_bonuskvoten and not argumenter.maal_omsetning:
         parser.error("--med-bonuskvoten gjelder bare sammen med --maal-omsetning")
+    if argumenter.regn_ettertid_paa_nytt or argumenter.slett_ettertid:
+        # Story 2.17: bare radene i ettertid, uten kall og uten noekkel.
+        andre = (
+            argumenter.les_inn is not None,
+            argumenter.uten_tidskontroll,
+            argumenter.maal_omsetning,
+            argumenter.les_boerslista,
+            argumenter.regn_ettertid_paa_nytt and argumenter.slett_ettertid,
+        )
+        if any(andre):
+            parser.error("--regn-ettertid-paa-nytt og --slett-ettertid kan ikke kombineres med andre valg")
+        sys.exit(ettertid_kommando(lagring_sqlite.BASE_STI, naa, slett=argumenter.slett_ettertid))
     if argumenter.les_boerslista:
         # Story 2.12, spørsmål 2: ingen kall, bare fila fra malinger.md §40.
         import omsetning

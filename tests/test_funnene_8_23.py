@@ -418,18 +418,26 @@ class TestTreAvTreDetSisteAaret:
 
     def test_paa_aksjesiden_i_demoen(self, klient):
         """Ville feilet hvis antallet eller den siste dagen ikke var de som er
-        lagret. Demoen har vurderinger fra 21.09, så serien er kortere enn et år."""
+        lagret. Demoen har vurderinger fra 21.09, så serien er kortere enn et år.
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): dagene
+        før 21.09 har signalet regnet i ettertid, så serien begynner 13.03, og
+        linja sier hvor mange av dagene med 3 av 3 som er i ettertid."""
         with _demobasen() as t:
             dager = [
                 d for (d,) in t.execute("SELECT dato FROM vurdering WHERE symbol = 'KVST' AND styrke = 3 ORDER BY dato")
             ]
+            ettertid = t.execute(
+                "SELECT count(*) FROM vurdering WHERE symbol = 'KVST' AND styrke = 3 AND regnet = 'ettertid'"
+            ).fetchone()[0]
             foerste = t.execute("SELECT min(dato) FROM vurdering WHERE symbol = 'KVST'").fetchone()[0]
         assert dager
         linje = _html(klient, "/aksje/KVST").split('<p class="alle-sjekkene-aaret">', 1)[1].split("</p>", 1)[0]
         antall = "én gang" if len(dager) == 1 else f"{len(dager)} ganger"
         sist = date.fromisoformat(dager[-1]).strftime("%d.%m")
         fra = date.fromisoformat(foerste).strftime("%d.%m")
-        assert f"</span> {antall} siden {fra}, sist {sist}." in linje
+        assert ettertid
+        assert f"</span> {antall} siden {fra}, sist {sist}, {ettertid} i ettertid." in linje
 
 
 class TestSjekkortene:

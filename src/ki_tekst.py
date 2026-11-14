@@ -342,7 +342,8 @@ def lag_ki_tekster(
         mangler: list[tuple[Aksje, Vurdering]] = []
         for aksje in lista:
             vurdering = vurderinger.les(aksje.symbol, dato)
-            if not isinstance(vurdering, Vurdering):
+            # Story 2.17: ingen KI-tekst for en rad regnet i ettertid.
+            if not isinstance(vurdering, Vurdering) or vurdering.ettertid:
                 continue
             if logg.les(Emne.aksje(aksje.symbol, dato)) is not None:
                 sto += 1

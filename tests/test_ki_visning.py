@@ -805,10 +805,11 @@ class TestSetningenOmDagene:
         eller skrev en setning, naar lesingen av dagene feilet."""
         ekte = lagring_sqlite.SqliteVurderingslager.les_periode
 
-        def les(self, symbol, fra, til):
+        # Rettet 2026-11-14 (story 2.17): siden leser med med_ettertid=True.
+        def les(self, symbol, fra, til, **noekkelord):
             if fra == date.min:
                 raise feil
-            return ekte(self, symbol, fra, til)
+            return ekte(self, symbol, fra, til, **noekkelord)
 
         monkeypatch.setattr(lagring_sqlite.SqliteVurderingslager, "les_periode", les)
         skriv_kirad(kirad(aksje))

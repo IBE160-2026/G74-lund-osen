@@ -593,7 +593,12 @@ class TestVurdering:
     def test_kolonnene_er_feltene_i_vurdering(self):
         """Ville feilet hvis en maaling manglet i VURDERINGSKOLONNER, saa
         upserten og les ikke tok den med."""
-        assert VURDERINGSKOLONNER == tuple(f.name for f in dataclasses.fields(Vurdering))
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): feltet
+        # ettertid er ikke en kolonne i VURDERINGSKOLONNER, men regnet i basen
+        # (0014), og staar sist.
+        felt = tuple(f.name for f in dataclasses.fields(Vurdering))
+        assert felt[-1] == "ettertid"
+        assert VURDERINGSKOLONNER == felt[:-1]
 
     def test_styrke_null_med_retning_ingen(self):
         vurdering(styrke=0, retning="Ingen", trend=0, bevegelse=0, interesse=0)

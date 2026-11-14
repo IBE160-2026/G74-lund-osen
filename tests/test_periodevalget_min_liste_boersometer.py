@@ -131,14 +131,26 @@ class TestDemoen:
     def test_velg_dag_foer_vurderingene_i_demoen(self, klient, demobase, monkeypatch):  # noqa: F811
         """Demoen har vurderinger fra mandag 21.09. «Velg dag» fredag 18.09
         gir «ikke vurdert» i hver linje under og ingen signal, og fotnoten
-        står. Ville feilet hvis et signal ble regnet for dagen."""
+        står. Ville feilet hvis et signal ble regnet for dagen.
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): 18.09
+        har signalet regnet i ettertid, merket «i ettertid» i hver linje, og
+        ingen fotnote. Fredag 06.03 har for få kurser og er «ikke vurdert»,
+        med fotnoten. Ville feilet hvis 18.09 sto uten merket, eller 06.03 fikk
+        et signal."""
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         html = _side(klient, "/min-liste?periode=velg&dag=2026-09-18")
         linjene = re.findall(r'<tr class="sammenligning">(.*?)</tr>', html, re.S)
         assert len(linjene) == 5, len(linjene)
         for linja in linjene:
             tekst = _synlig(linja)
-            assert "fredag 18.09" in tekst and "ikke vurdert" in tekst and "av 3" not in tekst, tekst
+            assert "fredag 18.09" in tekst and "i ettertid" in tekst and "av 3" in tekst, tekst
+        html = _side(klient, "/min-liste?periode=velg&dag=2026-03-06")
+        linjene = re.findall(r'<tr class="sammenligning">(.*?)</tr>', html, re.S)
+        assert len(linjene) == 5, len(linjene)
+        for linja in linjene:
+            tekst = _synlig(linja)
+            assert "fredag 06.03" in tekst and "ikke vurdert" in tekst and "av 3" not in tekst, tekst
         assert fotnoten(html)
 
     def test_boersometeret_i_demoen_ved_en_periode(self, klient, demobase, monkeypatch):  # noqa: F811

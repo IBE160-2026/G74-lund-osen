@@ -9,7 +9,9 @@ Hver dag gaar gjennom les_tilstand, som oversikten og aksjedetaljen, saa
 styrke 0, en grunn, en manglende rad, en dag som ikke er boersdag og en dag
 utenfor boerskalenderen aldri ser like ut. Signalet regnes aldri her:
 historikken viser det hentekommandoen skrev, ikke det dagens parametre ville
-gitt (AD-7). Maalingene staar paa siden for dagen (8.16b), som hver dag med
+gitt (AD-7). Story 2.17: en dag med signalet regnet i ettertid er merket
+(Dag.ettertid), og uka og maaneden sier hvor mange av de vurderte dagene som
+er i ettertid. Maalingene staar paa siden for dagen (8.16b), som hver dag med
 kurs lenker til (avgjoerelsen 2026-10-21 under story 2.7).
 """
 
@@ -24,7 +26,7 @@ from justeringsdager import aaret_foer
 from markedsoversikt import RETNINGSVISNING, SJEKKBOKSTAVER, Retningsvisning, les_tilstand
 from perioder import _gjentatt
 from tallformat import fortegn
-from tilstand import Art, Tilstand
+from tilstand import MED_SIGNAL, Tilstand
 from vurderingsdata import Grunn, Vurdering
 
 # Parameteren i adressen, og ankeret pilene gaar til, saa siden blir staaende
@@ -61,9 +63,14 @@ class Dag:
 
     @property
     def vurdering(self) -> Vurdering | None:
-        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+        if self.tilstand is not None and self.tilstand.art in MED_SIGNAL:
             return self.tilstand.innhold
         return None
+
+    @property
+    def ettertid(self) -> bool:
+        """Story 2.17: signalet er regnet i ettertid."""
+        return self.tilstand is not None and self.tilstand.ettertid
 
     @property
     def retning(self) -> Retningsvisning | None:
@@ -81,12 +88,14 @@ class Dag:
 class Uke:
     """En uke etter ISO 8601. dager er mandag til fredag, None for en dag i
     en annen maaned. vurdert er dagene med en vurdering, og skilte_seg_ut de
-    av dem med styrken paa terskelen eller over."""
+    av dem med styrken paa terskelen eller over. Story 2.17: ettertid er de
+    vurderte dagene med signalet regnet i ettertid."""
 
     nummer: int
     dager: tuple[Dag | None, ...]
     vurdert: int
     skilte_seg_ut: int
+    ettertid: int = 0
 
     @property
     def tom(self) -> bool:
@@ -114,6 +123,8 @@ class Maaned:
     kurs_fra: date
     kurs_til: date
     beskjed: str | None = None
+    # Story 2.17: de vurderte dagene med signalet regnet i ettertid.
+    ettertid: int = 0
 
     @property
     def har_tomme(self) -> bool:
@@ -229,6 +240,7 @@ def bygg_maaned(
                     dager=dager,
                     vurdert=len(vurdert),
                     skilte_seg_ut=sum(dag.skilte_seg_ut for dag in vurdert),
+                    ettertid=sum(dag.ettertid for dag in vurdert),
                 )
             )
         mandag += timedelta(days=7)
@@ -247,6 +259,7 @@ def bygg_maaned(
         kurs_fra=foerste,
         kurs_til=siste,
         beskjed=beskjed,
+        ettertid=sum(uke.ettertid for uke in uker),
     )
 
 
@@ -264,6 +277,8 @@ class AlleSjekkene:
     # minst én vurdering. Uten en eneste sier siden at signalet ikke er
     # regnet ennå, ikke «3 av 3 aldri».
     vurdert: bool = True
+    # Story 2.17: hvor mange av dagene med alle sjekkene som er regnet i ettertid.
+    ettertid: int = 0
 
 
 def alle_sjekkene_det_siste_aaret(
@@ -285,4 +300,5 @@ def alle_sjekkene_det_siste_aaret(
         sist=alle[-1] if alle else None,
         fra=foerste if foerste > start else None,
         vurdert=any(isinstance(v, Vurdering) for v in vurderingene.values()),
+        ettertid=sum(getattr(vurderingene[d], "ettertid", False) for d in alle),
     )

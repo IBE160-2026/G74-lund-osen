@@ -172,9 +172,9 @@ from perioder import (
 from perioder import BOERSOMETERET as BOERSOMETER_VALG
 from perioder import MIN_LISTE as MIN_LISTE_VALG
 from perioder import OVERSIKTEN as OVERSIKTEN_VALG
-from signalberegning import BLANDET, STANDARD
+from signalberegning import BLANDET, STANDARD, nodvendige_dager
 from tallformat import avrundet, dato, med_og, tall, ukedag
-from vurderingsdata import Grunn, Vurdering
+from vurderingsdata import Grunn, Vurdering, i_ettertid
 
 # Kommandoen den tomme siden ber brukeren kjoere. Den staar ogsaa i README, og
 # en test krever at de to er like (story 3.3). Kommer kommandoen for Docker i
@@ -546,6 +546,8 @@ def _eksempeltall():
         "eksempeltall": g.get("eksempeltall", False),
         "eksempeltall_merke": EKSEMPELTALL_MERKE,
         "demo_startdag": demo_startdag(),
+        # Story 2.17: kursdagene signalet trenger, til fotnoten for «ikke vurdert».
+        "signal_trenger": nodvendige_dager(STANDARD),
         "ekte_versjonen_url": EKTE_VERSJONEN_URL,
         "ki_teksten_url": KI_TEKSTEN_URL,
         "under_arbeid": UNDER_ARBEID_TEKST if UNDER_ARBEID else None,
@@ -1911,8 +1913,12 @@ def slett_notat(symbol: str):
 def _sjekkene_paa_siden(post, dag: date):
     """Sjekkene som er lagret for dagen siden viste, (trend, bevegelse,
     interesse), eller None når dagen ikke var vurdert. Lest, aldri regnet
-    (AD-7)."""
-    innhold = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,)).les_periode(post.aksje.symbol, dag, dag).get(dag)
+    (AD-7). Story 2.17: også et signal regnet i ettertid, fordi siden viste det."""
+    innhold = (
+        SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
+        .les_periode(post.aksje.symbol, dag, dag, med_ettertid=True)
+        .get(dag)
+    )
     if isinstance(innhold, Vurdering):
         return (innhold.trend, innhold.bevegelse, innhold.interesse)
     return None
@@ -2038,24 +2044,29 @@ def demoselskap(symbol: str):
 def _vurderingene(post, til: date) -> dict | None:
     """Gjennomgangen av 8.8 (BH8, ECH8): radene i vurdering for aksjen til og
     med den siste dagen i grafen, lest én gang per side med les_periode fra
-    2.7 (AD-3), aldri regnet (AD-7). None når de ikke kan leses."""
+    2.7 (AD-3), aldri regnet (AD-7). None når de ikke kan leses. Story 2.17:
+    med radene regnet i ettertid, merket. Setningen om dagene leser bare
+    kveldsradene (tell_dagene)."""
     try:
-        return SqliteVurderingslager(g.tilkobling, naa, (post.aksje,)).les_periode(post.aksje.symbol, date.min, til)
+        return SqliteVurderingslager(g.tilkobling, naa, (post.aksje,)).les_periode(
+            post.aksje.symbol, date.min, til, med_ettertid=True
+        )
     except (*BASEFEIL, ValueError) as feil:
         app.logger.warning("Vurderingene kunne ikke leses: %s: %s", type(feil).__name__, feil)
         return None
 
 
-def _signaldagene(rader, radene: dict | None) -> tuple[dict[date, tuple[int, str]], date | None]:
+def _signaldagene(rader, radene: dict | None) -> tuple[dict[date, tuple[int, str, bool]], date | None]:
     """Story 8.8 (FR-206): dagene aksjen skilte seg ut, {dato: (styrke,
-    retning)}, og dagen den første raden i vurdering er fra, med vurdering
-    eller grunn. Lest med les_periode fra 2.7, aldri regnet av kursene
-    (AD-7). En dag med grunn eller uten rad er ikke med. Kan vurderingene
-    ikke leses, er det ingen markeringer, og grafen vises som før."""
+    retning, ettertid)}, og dagen den første raden i vurdering er fra, med
+    vurdering eller grunn. Lest med les_periode fra 2.7, aldri regnet av
+    kursene (AD-7). En dag med grunn eller uten rad er ikke med. Kan
+    vurderingene ikke leses, er det ingen markeringer, og grafen vises som
+    før. Story 2.17: ettertid sier om signalet er regnet i ettertid."""
     if not rader or not radene:
         return {}, None
     signal = {
-        dag: (rad.styrke, rad.retning)
+        dag: (rad.styrke, rad.retning, rad.ettertid)
         for dag, rad in radene.items()
         if isinstance(rad, Vurdering) and rad.styrke >= STANDARD.terskel
     }
@@ -2068,7 +2079,8 @@ def _historikken(post, rader, dagen: date, i_dag: date) -> Maaned:
     ogsaa demoselskapene kan leses. Signalet regnes aldri (AD-7)."""
     maaned, beskjed = les_maaned(request.args.get(PARAMETER), dagen, rader[0].dato, rader[-1].dato)
     lager = SqliteVurderingslager(g.tilkobling, naa, (post.aksje,))
-    radene = lager.les_periode(post.aksje.symbol, *perioden(maaned))
+    # Story 2.17: med radene regnet i ettertid, som historikken merker.
+    radene = lager.les_periode(post.aksje.symbol, *perioden(maaned), med_ettertid=True)
     return bygg_maaned(maaned, [rad.dato for rad in rader], radene, i_dag, STANDARD.terskel, beskjed, ut=post.ut)
 
 
@@ -2085,8 +2097,12 @@ def _setningene_om_dagen(
     hva hovedindeksen, bransjen og antallene gjorde samme dag, regnet av
     lag_dagsbilde i dagene.py med lista, kursene og indeksen fra basen, som
     grunnlaget i ki_tekst.py. Kan indeksen ikke leses, staar setningen uten
-    den, som i grunnlaget. Gir (dagene, samme_dag)."""
-    if not detalj.vurdering or vurderingene is None:
+    den, som i grunnlaget. Gir (dagene, samme_dag).
+
+    Story 2.17 (spoersmaal 7): ingen av setningene for en dag med signalet
+    regnet i ettertid, fordi de er en del av det KI-grunnlaget leser, og
+    tell_dagene teller bare kveldsradene."""
+    if not detalj.vurdering or vurderingene is None or detalj.ettertid:
         return None, None
     # Gjennomgangen av 8.8 (BH8, ECH8): vurderingene er lest én gang i
     # aksjedetalj, til siste dag i grafen. Her bare til og med dagen siden viser.
@@ -2205,7 +2221,9 @@ def _boersdagen(
         symboler = lager.symboler()
         indeksserie = lager.serie(valgt_indeks(symboler)) if symboler else None
         lista = tuple(post.aksje for post in poster)
-        vurderinger = {a.symbol: oversiktsleser.vurdering(a.symbol, dag) for a in lista}
+        # Story 2.17: bare kveldsradene, som grunnlaget i hentingen. En aksje
+        # som kom inn i lista senere, kan ha en rad i ettertid for dagen.
+        vurderinger = {a.symbol: None if i_ettertid(v := oversiktsleser.vurdering(a.symbol, dag)) else v for a in lista}
         # Story 10.10 (tillegget kl. 17:21): vurderingene foer dagen, lest som i hentingen.
         lageret = SqliteVurderingslager(g.tilkobling, naa, lista)
         tidligere = {a.symbol: lageret.les_periode(a.symbol, vanlig_fra(dag), dag) for a in lista}

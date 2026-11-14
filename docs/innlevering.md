@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-14T00:46
+updated: 2026-11-14T19:13
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -537,7 +537,7 @@ tatt».
 
 | Punkt | Merknad |
 |---|---|
-| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå. *Rettet 2026-10-05:* koblet til appen. Hentingen skriver kursene og dagens vurdering til basen (story 2.1b og 2.5), og sidene leser kursene og vurderingen derfra (story 2.2, `1570ae9`, og 2.2b, `ff58ecf`). Basen har migrasjonene 0001–0004: `kurs`, `vurdering`, `aksje` og målingene |
+| **Databasen** | Sagt i samtale av faglærer 21.09, ikke bekreftet på emnesiden. Gjøres likevel. **Delvis bygget 23.09:** migrasjonsløper (story 1.1, `57a83c5`), `kurs` og `kursserie` med SQLite-adapter (story 1.3, `f4fada0`). Ikke koblet til appen ennå. *Rettet 2026-10-05:* koblet til appen. Hentingen skriver kursene og dagens vurdering til basen (story 2.1b og 2.5), og sidene leser kursene og vurderingen derfra (story 2.2, `1570ae9`, og 2.2b, `ff58ecf`). Basen har migrasjonene 0001–0004: `kurs`, `vurdering`, `aksje` og målingene. *Rettet 2026-11-14 (story 2.17):* basen har nå migrasjonene 0001–0014. 0014 (`0014_regnet.sql`) legger kolonnen `regnet` til `vurdering`, med `kveld` eller `ettertid`, så en rad med signalet regnet i ettertid er merket, og kveldsradene står som før |
 
 ## Finnes ikke i det hele tatt
 

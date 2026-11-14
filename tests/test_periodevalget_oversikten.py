@@ -363,21 +363,27 @@ class TestVelgDag:
 
     def test_foer_vurderingene_i_demoen_uten_signal(self, klient, monkeypatch):
         """Demoen har vurderinger fra 21.09. Ville feilet hvis «Velg dag»
-        15.09 viste et signal, for eksempel ett regnet av kursene."""
+        15.09 viste et signal, for eksempel ett regnet av kursene.
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): 15.09
+        har signalet regnet i ettertid, så testen bruker tirsdag 03.03, der
+        aksjene har for få kurser og ingen vurdering."""
         sti = lagring_sqlite.demo_sti()
         sti.parent.mkdir(parents=True, exist_ok=True)
         mal = sti.with_name("demomal.db")
         demo.lag_demobase(mal, skriv=lambda _: None, med_ki=False)
         shutil.copy(mal, sti)
         monkeypatch.setenv(app_modul.I_DEMO, "1")
-        html = klient.get("/?periode=velg&dag=2026-09-15").data.decode("utf-8")
+        html = klient.get("/?periode=velg&dag=2026-03-03").data.decode("utf-8")
         rader = re.findall(r"<td class=\"selskap\">(.*?)</tr>", html, re.DOTALL)
         assert len(rader) == 15
         for rad in rader:
             tekst = _synlig(rad).replace("3 av 3 siste børsdag", "")
             assert "av 3" not in tekst, tekst
-            assert "ikke vurdert" in tekst or "ingen kurser ennå" in tekst, tekst
-        assert "Tabellen viser tirsdag 15.09" in _synlig(html)
+            # Rettet 2026-11-14 (story 2.17): Varde Systemer har ingen kurs
+            # 03.03 og står med «ingen kurs fra dagen».
+            assert "ikke vurdert" in tekst or "ingen kurser ennå" in tekst or "ingen kurs fra dagen" in tekst, tekst
+        assert "Tabellen viser tirsdag 03.03" in _synlig(html)
         # Gjennomgangen (VG8): fotnoten om «ikke vurdert» står for dagen.
         assert fotnoten(html)
 

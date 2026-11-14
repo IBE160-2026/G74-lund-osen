@@ -384,7 +384,14 @@ class TestEtterGjennomgangen:
             tilkobling.commit()
             valg.ta_i_bruk(tilkobling, TIRSDAG_22_09)
             assert tilkobling.execute("SELECT ut FROM aksje WHERE symbol = 'DNB'").fetchone()[0] == "2026-09-23"
-            assert tilkobling.execute("SELECT count(*) FROM vurdering WHERE symbol = 'DNB'").fetchone()[0] == 1
+            # Rettet 2026-11-14 (story 2.17): kveldsradene. Til slutt i hentingen
+            # får dagene før signalet regnet i ettertid, og de står også.
+            assert (
+                tilkobling.execute(
+                    "SELECT count(*) FROM vurdering WHERE symbol = 'DNB' AND regnet = 'kveld'"
+                ).fetchone()[0]
+                == 1
+            )
         finally:
             tilkobling.close()
 

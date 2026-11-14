@@ -457,12 +457,17 @@ class TestSiden:
         """18.09 er før vurderingene i demoen starter (STARTDAG 21.09). Gult
         står ved de fire med 3 av 3 på siste børsdag, uten mørk ramme og uten
         styrke for dagen (gruppens svar 23.10 kl. 09:24, a). Ville feilet uten
-        gult den dagen, eller med styrke eller mørk ramme."""
-        html = _side(klient, "/boersometer?dag=2026-09-18")
+        gult den dagen, eller med styrke eller mørk ramme.
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): 18.09
+        har signalet regnet i ettertid, så testen bruker fredag 06.03, der
+        aksjene har for få kurser og ingen vurdering. Varde Systemer har ingen
+        kurs den dagen, så 13, ikke 14, står med «ikke vurdert»."""
+        html = _side(klient, "/boersometer?dag=2026-03-06")
         # Story 8.27: notatene i panelet (<template>) viser styrken som i Min
         # liste. Testen gjelder rutene og tabellen, så panelet tas ut.
         html = re.sub(r'<template id="notatpanel-mal">.*?</template>', "", html, flags=re.S)
-        assert "fredag 18.09" in html
+        assert "fredag 06.03" in html
         ruter = _ruter(html)
         rammer = {symbol: re.search(r"ramme-(\w+)", klasser) for klasser, symbol in ruter}
         assert len(ruter) == 15
@@ -470,7 +475,7 @@ class TestSiden:
         assert not any(r and r.group(1) == "moerk" for r in rammer.values())
         # Rettet 05.11 (gruppens svar 04.11 kl. 20:53 og 20:56, 2): «ikke
         # vurdert» står på linja for styrken, og ikke en gang til som grunn.
-        assert html.count(f'<span class="styrke ikke-vurdert">{IKKE_VURDERT}</span>') == 14
+        assert html.count(f'<span class="styrke ikke-vurdert">{IKKE_VURDERT}</span>') == 13
         assert f'<span class="tekst">{IKKE_VURDERT}</span>' not in html
         assert html.count("3 av 3 siste børsdag</span>") == 4 and "2 av 3</span>" not in html
         tabell = html.split('<table class="boersometertabell">')[1]
@@ -811,8 +816,13 @@ class TestSvaretKl0924:
     def test_gult_en_dag_uten_vurdering_ogsaa_i_merket(self, klient):
         """a) 18.09 har ingen vurderinger i demoen. Ville feilet hvis gult
         forsvant den dagen (mutant N1), eller merket i ruta ikke sa «siste
-        børsdag» (gjennomgangen 23.10, VG5)."""
-        html = _side(klient, "/boersometer?dag=2026-09-18")
+        børsdag» (gjennomgangen 23.10, VG5).
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): 18.09
+        har signalet regnet i ettertid, så testen bruker fredag 06.03, der
+        aksjene har for få kurser og ingen vurdering. Merket med «i ettertid»
+        testes i tests/test_ettertid_2_17.py."""
+        html = _side(klient, "/boersometer?dag=2026-03-06")
         gule = [symbol for klasser, symbol in _ruter(html) if "ramme-gul" in klasser]
         assert sorted(gule) == ["BRFE", "KVST", "LKSV", "TRHF"]
         for symbol in gule:
@@ -898,10 +908,13 @@ class TestSvaretKl0924:
         (regel 19). Ville feilet uten kvelder uten henting, eller uten
         børsometeret blant sidene med fotnoten."""
         hjelp = (Path(__file__).resolve().parents[1] / "docs" / "hjelp.md").read_text(encoding="utf-8")
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her sto at
+        # signalet «regnes aldri ut bakover». Hjelpen sier nå det fotnoten sier.
         assert (
-            "I den ekte versjonen lagres signalet bare den kvelden kursene hentes, og regnes aldri ut "
-            "bakover. Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene "
-            "er lest inn med `--les-inn`."
+            "I den ekte versjonen lagres signalet den kvelden kursene hentes, og for en tidligere børsdag "
+            "uten vurdering regner neste henting det i ettertid, når aksjen er i lista og har minst 51 "
+            "kursdager i basen til og med dagen. Det gjelder dagene før første henting, kvelder uten "
+            "henting, og dager der kursene er lest inn med `--les-inn`."
         ) in hjelp
         assert "Står «ikke vurdert» på oversikten, aksjesiden eller børsometeret, sier en fotnote hvorfor" in hjelp
 
@@ -924,13 +937,17 @@ class TestFotnoten:
     """Story 3.4d: fotnoten står også på børsometeret når en rute sier «ikke
     vurdert», med samme tekster som på aksjesiden og oversikten."""
 
+    # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): begge
+    # tekstene sier at dagene før er regnet i ettertid, ikke at signalet
+    # «regnes aldri ut bakover».
     DEMOTEKST = (
         "«Ikke vurdert»: i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra "
-        "første henting."
+        "første henting. Dagene før er regnet i ettertid når aksjen har minst 51 kursdager til og med dagen."
     )
     EKTE_TEKST = (
-        "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. Det gjelder "
-        "dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med --les-inn."
+        "«Ikke vurdert»: appen har ingen vurdering for dagen. Signalet lagres den kvelden kursene hentes, og for "
+        "en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen er i lista og "
+        "har minst 51 kursdager i basen til og med dagen."
     )
 
     def test_demoen_foer_startdagen_har_fotnoten(self, klient):

@@ -715,13 +715,18 @@ class TestMaalingene0004:
 
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 13
+            # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
 
-            assert kolonner(tilkobling, "vurdering")[-4:] == list(MAALINGENE)
+            # Rettet 2026-11-14 (story 2.17): kolonnen regnet fra 0014 står
+            # sist, og raden fra før er en kveldsrad.
+            assert kolonner(tilkobling, "vurdering")[-5:] == [*MAALINGENE, "regnet"]
             assert tilkobling.execute(
                 "SELECT symbol, dato, grunn, " + ", ".join(MAALINGENE) + " FROM vurdering"
             ).fetchall() == [("DNB", "2026-09-23", "symbol_feilet", None, None, None, None)]
-            assert tilkobling.execute("SELECT * FROM vurdering").fetchall() == [rad + (None,) * 4 for rad in foer]
+            assert tilkobling.execute("SELECT * FROM vurdering").fetchall() == [
+                rad + (None,) * 4 + ("kveld",) for rad in foer
+            ]
             assert "kontroll_0004" not in tabeller(tilkobling)
         finally:
             tilkobling.close()
@@ -754,7 +759,8 @@ class TestMaalingene0004:
         try:
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 13
+            # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
         finally:
             tilkobling.close()
         ny = sqlite3.connect(tmp_path / "v3.db")

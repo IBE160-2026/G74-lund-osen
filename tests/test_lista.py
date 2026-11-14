@@ -73,7 +73,8 @@ class TestMigrasjonen:
                     "INSERT INTO vurdering (symbol, dato, grunn) VALUES ('EQNR', ?, 'symbol_feilet')", (dato,)
                 )
             tilkobling.commit()
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 13
+            # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
             inn = dict(tilkobling.execute("SELECT symbol, inn FROM aksje"))
             assert inn["EQNR"] == "2026-09-28" and inn["DNB"] is None
             assert tilkobling.execute("SELECT count(*) FROM aksje WHERE ut IS NOT NULL").fetchone()[0] == 0

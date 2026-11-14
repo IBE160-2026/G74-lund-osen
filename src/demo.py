@@ -42,10 +42,13 @@ serien fram til dagen, skrevet med SqliteVurderingslager.skriv uendret og
 lagerets klokke stilt paa dagen (AD-7, merknaden 2026-10-03). Story 3.4c
 (avgjoerelsen 21.10 kl. 23:09): bare fra STARTDAG, mandag 21.09, tre uker
 foer SLUTTDATO, slik den ekte versjonen har signal bare fra foerste henting.
-Dagene foer har kurser, men ingen rad, og historikken viser dem uten signal.
-Kursene, de 10 fargekombinasjonene og KI-tekstene paa SLUTTDATO er som foer.
-En demobase fra foer, med en vurdering foer STARTDAG, gjenkjennes med
-gammel_demobase, og webserveren ber om at den lages paa nytt.
+Story 2.17 (gruppens svar 2026-11-14 kl. 05:41-05:49): dagene foer STARTDAG
+faar signalet regnet i ettertid, med samme funksjon som hentingen
+(ettertid.fyll_i_ettertid) og klokka paa SLUTTDATO, og er merket «i
+ettertid». Ingen kveldsrad og ingen KI-tekst endres. Kursene, de 10
+fargekombinasjonene og KI-tekstene paa SLUTTDATO er som foer. En demobase fra
+foer, med en kveldsrad foer STARTDAG eller uten rader i ettertid, gjenkjennes
+med gammel_demobase, og webserveren ber om at den lages paa nytt.
 
 Hovedindeksen (story 2.8, PR 1): DEMOINDEKS, «Demoindeksen», er oppdiktet,
 som selskapene. Den starter paa INDEKS_START, og dagens endring er snittet av
@@ -81,10 +84,12 @@ from zoneinfo import ZoneInfo
 import lagring_sqlite
 from boersdag import er_boersdag
 from demo_ki import les_dagsraden, les_radene, sjekk_radene, skriv_radene
+from ettertid import fyll_i_ettertid
 from indeksdata import Indeks
 from kursdata import Aksje, Kursrad
 from lagring_sqlite import (
     DEMOMERKE,
+    SqliteEttertidslager,
     SqliteIndekslager,
     SqliteKurslager,
     SqliteMinlistelager,
@@ -395,9 +400,18 @@ def lag_demobase(sti: Path, skriv=print, med_ki: bool = True) -> None:
 
 def gammel_demobase(tilkobling) -> bool:
     """Story 3.4c: om demobasen er laget foer vurderingene startet paa
-    STARTDAG, altsaa har en vurdering foer den. Leser bare."""
-    rad = tilkobling.execute("SELECT 1 FROM vurdering WHERE dato < ? LIMIT 1", (STARTDAG.isoformat(),)).fetchone()
-    return rad is not None
+    STARTDAG, altsaa har en kveldsrad foer den. Story 2.17: eller er laget foer
+    signalet ble regnet i ettertid, altsaa ikke har en eneste rad i ettertid.
+    Leser bare."""
+    kolonner = {rad[1] for rad in tilkobling.execute("PRAGMA table_info(vurdering)")}
+    if "regnet" not in kolonner:
+        return True
+    rad = tilkobling.execute(
+        "SELECT 1 FROM vurdering WHERE dato < ? AND regnet = 'kveld' LIMIT 1", (STARTDAG.isoformat(),)
+    ).fetchone()
+    if rad is not None:
+        return True
+    return tilkobling.execute("SELECT 1 FROM vurdering WHERE regnet = 'ettertid' LIMIT 1").fetchone() is None
 
 
 def _ki_radene(skriv) -> list:
@@ -464,6 +478,11 @@ def _bygg(sti: Path, radene: list | None = None) -> None:
             for aksje in DEMOUNIVERS:
                 fram_til = [r for r in serier[aksje.symbol] if r.dato <= dag]
                 lager.skriv(aksje.symbol, dag, vurder(fram_til, dag))
+
+        # Story 2.17: dagene foer STARTDAG faar signalet i ettertid, med samme
+        # funksjon som hentingen og klokka paa SLUTTDATO, kl. 22:30.
+        klokke = _klokke_for(SLUTTDATO)
+        fyll_i_ettertid(kurslager, SqliteEttertidslager(tilkobling, klokke, DEMOUNIVERS), DEMOUNIVERS, SLUTTDATO)
 
         # Story 2.12: lista over «Demo Børs» og to målinger av omsetningen.
         with tilkobling:

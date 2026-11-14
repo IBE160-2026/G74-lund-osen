@@ -331,13 +331,15 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             # Story 8.2b, b (U16): det som er tatt ut av ingressen.
             # Story 8.20a (del E): hoeyst 60 ord. Pilene staar ved maaneden.
             # Story 8.26 (tillegg 18, ønsket 11.11 kl. 22:09): høyst 50 ord, én ting per setning.
-            "det appen skrev om aksjen hver børsdag, aldri regnet på nytt. "
+            # Story 2.17 (gruppens svar 14.11 kl. 05:41-05:49): dagene i ettertid.
+            "det appen skrev hver børsdag, aldri regnet på nytt, og «i ettertid» er regnet senere. "
             f"Uka og måneden teller dagene med signalstyrke {terskel} eller mer, og "
             f"{ANTALL_SJEKKER} av {ANTALL_SJEKKER} har ring. "
             "Klikk på en dag med kurs for å se hele siden for den dagen.",
             (
                 (AKSJE_MAL, "Signalet dag for dag"),
                 (HISTORIKK, "Signalet regnes aldri her"),
+                (AKSJE_MAL, "{{ ettertid(dag.ettertid) }}"),
                 (AKSJE_MAL, "{% if uke.vurdert %}{{ uke.skilte_seg_ut }} av {{ uke.vurdert }}"),
             ),
         ),
@@ -879,7 +881,9 @@ STEGET_RETNINGEN = f"{TAVLA_RETNING} Ga noen +1 og noen -1, står det {BLANDET}.
 # fortalt»: først appens setninger, så KI-teksten om sjekkene.
 STEGET_SIGNALET_FORKLART = (
     "Først appens egne setninger om signalet og dagen. Med KI på kommer en tekst om sjekkene fra en "
-    "språkmodell, merket «Laget av KI». Tall med prikket strek er sjekket mot det appen regnet ut."
+    "språkmodell, merket «Laget av KI». Tall med prikket strek er sjekket mot det appen regnet ut. "
+    # Story 2.17: en dag med signalet regnet i ettertid har ingen KI-tekst.
+    "En dag med signalet regnet i ettertid har ingen KI-tekst."
 )
 
 # Story 8.19 (tillegg 2, gruppens svar 12.11 kl. 17:31, spørsmål 8): steget om
@@ -1009,7 +1013,9 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
                 # Ikke «Signalet dag for dag»: toppen står før delene, og
                 # rekkefølgen på siden leses av overskriftene (test_ki_visning).
                 "Dag for dag",
-                "Det appen skrev om aksjen, lagret hver børsdag og aldri regnet på nytt, en måned om gangen.",
+                # Story 2.17: dagene regnet i ettertid er merket.
+                "Det appen skrev om aksjen, lagret hver børsdag og aldri regnet på nytt, en måned om gangen. "
+                "En dag merket «i ettertid» er regnet senere av kursene.",
             ),
         ),
         "innstillinger": (

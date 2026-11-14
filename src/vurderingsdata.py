@@ -13,9 +13,17 @@ ett sted, i adapterens upsert, og testene bruker SQLite i minnet.
 En rad har enten en Vurdering eller en Grunn (punkt 24 i prd.md §8). Grunnen
 sier hvorfor kjoeringen ikke kunne vurdere aksjen, saa ingen rad paa en
 boersdag bare betyr at kommandoen ikke ble kjoert (FR-409).
+
+Story 2.17 (gruppens svar 2026-11-14 kl. 05:41-05:49): en Vurdering kan vaere
+regnet i ettertid, av kursene i basen for en tidligere boersdag uten rad.
+Da er ettertid True. Slike rader skrives aldri gjennom skriv, bare gjennom
+SqliteEttertidslager, og en kveldsrad roeres aldri av den veien. KI-grunnlaget
+og setningen om hvor lenge signalet har vaert slik leser bare kveldsradene
+(kveldsradene under).
 """
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
 from enum import StrEnum
@@ -110,8 +118,14 @@ class Vurdering:
     dagens_endring: float
     standardavvik: float
     volumforhold: float | None
+    # Story 2.17: True naar raden er regnet i ettertid, ikke skrevet av
+    # kveldens henting. Ikke en kolonne i VURDERINGSKOLONNER, men regnet i
+    # basen (0014).
+    ettertid: bool = False
 
     def __post_init__(self):
+        if not isinstance(self.ettertid, bool):
+            raise UgyldigVurdering(f"ettertid maa vaere True eller False, fikk {self.ettertid!r}")
         for navn in ("trend", "bevegelse", "interesse"):
             verdi = getattr(self, navn)
             if not _heltall(verdi) or verdi not in SJEKKVERDIER:
@@ -157,6 +171,21 @@ class Vurdering:
             object.__setattr__(self, "volumforhold", forhold)
 
 
+def i_ettertid(innhold: "Vurdering | Grunn | None") -> bool:
+    """Om raden er regnet i ettertid - story 2.17."""
+    return isinstance(innhold, Vurdering) and innhold.ettertid
+
+
+def kveldsradene(rader: "Mapping[date, Vurdering | Grunn]") -> "dict[date, Vurdering | Grunn]":
+    """Radene uten dem som er regnet i ettertid - story 2.17.
+
+    KI-grunnlaget, dagsbildet, dagene og moenstrene leser bare kveldsradene,
+    saa KI-tekstene og setningen om hvor lenge signalet har vaert slik er
+    som foer storyen (svaret kl. 05:49). En dag med en rad i ettertid er der
+    det samme som en dag uten rad."""
+    return {dag: rad for dag, rad in rader.items() if not i_ettertid(rad)}
+
+
 @runtime_checkable
 class Vurderingslager(Protocol):
     """Porten for vurderingene - AD-3, AD-7. Bare skriv og les, og fra story
@@ -174,12 +203,19 @@ class Vurderingslager(Protocol):
         Samme (symbol, dato) igjen skriver over, og den siste vinner. Unntaket
         er en Grunn over en Vurdering: den ignoreres, og skriv gir False uten
         aa reise, saa en kjoering der ett symbol feiler, ikke stopper (AD-15).
+        Story 2.17: en Vurdering med ettertid avvises med TypeError, og
+        raden skrives som kveldsrad.
         """
 
-    def les(self, symbol: str, dato: date) -> "Vurdering | Grunn | None":
-        """Raden for symbolet og datoen. None hvis den ikke finnes."""
+    def les(self, symbol: str, dato: date, *, med_ettertid: bool = False) -> "Vurdering | Grunn | None":
+        """Raden for symbolet og datoen. None hvis den ikke finnes. Story
+        2.17: bare en kveldsrad, og med med_ettertid ogsaa en rad regnet i
+        ettertid."""
 
-    def les_periode(self, symbol: str, fra: date, til: date) -> "dict[date, Vurdering | Grunn]":
+    def les_periode(
+        self, symbol: str, fra: date, til: date, *, med_ettertid: bool = False
+    ) -> "dict[date, Vurdering | Grunn]":
         """Radene for symbolet fra og med fra til og med til, etter dato.
         En dag uten rad er ikke med - story 2.7b, historikken paa aksjesiden.
-        Bare lesing, som les (AD-7)."""
+        Bare lesing, som les (AD-7). Story 2.17: bare kveldsradene, og med
+        med_ettertid ogsaa radene regnet i ettertid."""

@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: 2026-11-09T00:04
+updated: 2026-11-14T19:16
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -225,6 +225,8 @@ tallene og ordene i hjelpen er de samme som i beregningen og tabellen.
 - **Merknad 2026-10-22 (story 2.3c, foreslått, ikke godkjent av gruppen):** første henting på dagtid i en tom base skriver vurderingene og KI-radene for forrige børsdag, som ikke er inneværende børsdag. `SqliteVurderingslager` og `SqliteKILogg` får derfor `foerste_dag`: en rad for den dagen godtas bare når den er børsdagen rett før inneværende, og verken tabellen eller `vurdering` har en rad for en annen dato. Uten `foerste_dag` er vernet som før. Det er et unntak fra skjerpingen over, ikke en ny metode, og ingen rad som finnes, kan skrives om på en ny måte. Unntaket må godkjennes av gruppen før 2.3c flettes (`spec-2-3c-foerste-henting-paa-dagtid.md`, «Åpent»).
 - *Godkjent 2026-10-22 kl. 19:30 (gruppens svar):* unntaket fra AD-7 er godkjent. Første henting på dagtid i en tom base skriver vurderingene og KI-radene for børsdagen rett før inneværende, bare når basen ikke har rader for en annen dato, og hver rad skrives én gang og regnes aldri på nytt (under «Prioritering» og story 2.3 i `epics.md`, flettet i `2a84142`).
 
+- **Merknad 2026-11-14 (story 2.17, gruppens svar 14.11 kl. 05:41–05:49, rådet anbefalte det):** kveldsradene er uerstattelige som før, og `SqliteVurderingslager.skriv` avviser fortsatt andre datoer enn inneværende børsdag, med unntaket for første henting. Radene regnet i ettertid er avledet av kursene, med `vurder()` og kursene til og med dagen, og er merket i basen med kolonnen `regnet` (`kveld` eller `ettertid`, `0014_regnet.sql`). De skrives, regnes på nytt og slettes bare gjennom en egen vei, `SqliteEttertidslager`, som aldri rører en kveldsrad: den setter bare inn en rad for en dag uten rad (`ON CONFLICT DO NOTHING`), sletter bare `regnet = 'ettertid'`, og en trigger avviser at en kveldsrad blir en rad i ettertid. `les` og `les_periode` i porten gir bare kveldsradene, og visningene ber om radene i ettertid med `med_ettertid=True`, så hentingen og KI-grunnlaget leser som før. Ingen KI-rad skrives for en rad i ettertid.
+
 ### AD-8 — Nettverk er sperret i testkjøringen `[ADOPTED 2026-09-21]`
 
 - **Binds:** alle tester; punkt 14, lukket 22.09 med denne beslutningen *(rettet 2026-09-26: her sto «åpent punkt 14»)*
@@ -302,6 +304,7 @@ tallene og ordene i hjelpen er de samme som i beregningen og tabellen.
 - **Hvor `migrer()` kalles, avgjort 2026-09-28** (endringsforslaget): én funksjon åpner basen og kjører `migrer()` for både hentekommandoen og webserveren (story 2.1b og 2.2). Testen med to migratorer som overlapper, flyttes fra 3.1 til 2.1b. Se raden «Hvem kjører migrasjonene, og når» under Deferred.
 - **Bygget 2026-09-29, story 2.1b:** `lagring_sqlite.aapne_base(sti)` lager mappa, kobler til og kjører `migrer()` mot `MIGRASJONSKATALOG`. Feiler migreringen, lukkes tilkoblingen, og feilen går videre. Ingen annen kode i `src/` kaller `sqlite3.connect`, og en vakt i `tests/test_konsumentene.py` holder det. Stiene er `lagring_fil.RAA_KATALOG` (`data/raa/`) og `lagring_sqlite.BASE_STI` (`data/db/ose.db`). Hentekommandoen bruker `aapne_base`; webserveren tar den i bruk i 2.2. Testen med to migratorer som overlapper, er på plass (`TestToMigratorerOverlapper` i `tests/test_migrering.py`): to tråder, hver med sin tilkobling, der den første holder transaksjonen åpen inne i migrasjonen til den andre har startet. Mutanten `BEGIN IMMEDIATE` → `BEGIN` feiler nå.
 - **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under. *2026-09-27 (story 1.9):* `0003` legger koblingene til `aksje` med triggere, så ingen tabell bygges om (AD-21).
+- *Lagt til 2026-11-14 (story 2.17):* `0014_regnet.sql` legger kolonnen `regnet` til `vurdering` med `ADD COLUMN ... NOT NULL DEFAULT 'kveld'` og en CHECK, uten `DROP TABLE`, og en trigger på kolonnen (AD-7). Sjekken før kallene leser `vurdering` i en base én versjon bak og leser `regnet` bare når kolonnen finnes.
 - **Nye migrasjoner fra endringsforslaget 08.10 (Marians beslutning):** når aksjen kom inn i lista og gikk ut, i `aksje` (2.11), ønsket om endring av lista (2.12), omsetningen (2.13), eks.datoene (2.14) og innstillingene (8.10). Numrene settes når storyene bygges, etter `0005` (`ki_logg`), `0006` (indeksen) og høy og lav i 2.10. I dag finnes `0001`–`0004`.
 - **0007, 2026-10-19 (story 8.3):** `0007_min_liste.sql` lager `min_liste` med bare symbolet og to triggere mot `aksje`, som for `kurs`, `kursserie` og `vurdering` i 0003 (AD-21). Ingen eksisterende tabell eller trigger endres. Basen står på versjon 7 etter migreringen, og den ekte basen får en tom liste. Webserveren og hentingen migrerer den som før.
 
@@ -470,6 +473,8 @@ erDiagram
 ```
 
 `kurs` er gjenoppbyggbar. `vurdering` og `ki_logg` er det ikke (AD-7).
+*Merknad 2026-11-14 (story 2.17):* radene i `vurdering` med `regnet = 'ettertid'`
+er avledet av kursene og kan regnes på nytt. Kveldsradene kan ikke.
 
 **Utbyttemerkingen (FR-407) er ikke låst til NewsWeb.** Kravet sier selv at
 «datakilden er ikke lenger avhengig av NewsWeb — justeringsdagen kan leses ut av
@@ -513,6 +518,7 @@ G74-lund-osen/
 | Henting og kvote (FR-401..405) | `fetch_prices.py` | AD-2, AD-5, AD-10, AD-15 |
 | To lagre (FR-406) | `lagring_sqlite.py`, `data/raa/` | AD-5, AD-6, AD-11, AD-21 |
 | Dagens vurdering (FR-408) og de tre tilstandene (FR-409) | `Vurderingslager`, skrevet av hentekommandoen. Tilstandene leses av `tilstand.py` | AD-3, AD-7, AD-16, AD-17, AD-18, AD-20, AD-21 |
+| Signalet regnet i ettertid (FR-408, story 2.17) | `ettertid.py` regner, `SqliteEttertidslager` skriver og sletter, `fetch_prices.py` kaller det til slutt i hentingen og har kommandoene, `demo.py` bruker samme funksjon. `tilstand.py` har tilstanden `ETTERTID` | AD-3, AD-7, AD-16, AD-17 |
 | Meldingsfilter (FR-501..503) | `meldinger.py` | AD-1, AD-14. *Ute av v1 fra 2026-09-28 (plan B).* |
 | Utbyttemerking (FR-407) | *ikke plassert* | AD-4 — **kilde ikke valgt**, se åpent punkt 4 |
 | Kommende hendelser (FR-301..303) | *finnes ikke* | **Ingen** — se Deferred. *Ute av v1 fra 2026-09-28 (plan B).* |
