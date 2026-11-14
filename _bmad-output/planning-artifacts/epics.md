@@ -5307,3 +5307,5 @@ Som **gruppe**, vil vi at statusene, de åpne punktene og vurderingsmatrisen ste
 - **Ville feilet hvis:** et testnavn i matrisen ikke fantes (`test_hver_test_dokumentene_nevner_finnes`), eller 3.4, 8.2 eller 9.13 ble satt til done uten rad i kvalitetssikringen (`test_hver_ferdige_spesifikasjon_har_en_rad`). Lenkene i matrisen og bevisene i `issues.md` er sjekket for hånd og i gjennomgangen, ikke av en test
 
 **Avhenger av:** 2.17. **Én økt:** ja.
+
+*Lagt til 2026-11-14:* 9.13 er squash-flettet med PR #158 i `5afabbc9` kl. 22:53, låst til head-en `ee756c36`, etter tillegg 3 i `docs/ai-prompts/2026-11-14.md`, uten nytt ja. CI var grønn i alle jobbene (run 43644459699). Spørsmål 3–18 i spesifikasjonen venter på gruppens svar, og punktene de gjelder, står åpne i `issues.md`.

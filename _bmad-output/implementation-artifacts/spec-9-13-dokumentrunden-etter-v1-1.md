@@ -2,7 +2,7 @@
 title: 'Story 9.13: dokumentrunden etter v1.1'
 type: 'docs'
 created: '2026-11-14'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'ff6e5209'
 context:
@@ -193,10 +193,17 @@ linjenummeret i `issues.md` på `ff6e5209`.
 
 ## Kontroll
 
-- [ ] `uv run pytest tests/test_kvalitetssikring.py tests/test_ryddighet.py tests/test_dokumenttestene.py tests/test_readme.py` består lokalt (`test_kvalitetssikring.py` sjekker testnavnene i matrisen og radene for spesifikasjonene som er done)
-- [ ] `--dokumentene` består lokalt
-- [ ] CI er grønn i alle jobbene
-- [ ] `git diff --stat origin/main` viser bare dokumenter, `issues.md` og ingen fil i `src/`
+- [x] `uv run pytest tests/test_kvalitetssikring.py tests/test_ryddighet.py tests/test_dokumenttestene.py tests/test_readme.py` består lokalt (`test_kvalitetssikring.py` sjekker testnavnene i matrisen og radene for spesifikasjonene som er done)
+- [x] `--dokumentene` består lokalt (2957 bestått og 7 hoppet over på grenen)
+- [x] CI er grønn i alle jobbene (run 43644459699)
+- [x] `git diff --stat origin/main` viser bare dokumenter, `issues.md` og ingen fil i `src/`
+
+## Flettet 14.11
+
+CI var grønn i alle fire jobbene på head-en `ee756c36` (run 43644459699). Triagen
+hadde ingen åpne funn på middels eller høy grad. PR #158 ble squash-flettet i
+`5afabbc9` kl. 22:53, låst til `ee756c36`, uten nytt ja, slik tillegg 3 sier.
+Kveldsjobben sto som Disabled.
 
 ## Mutantene
 

@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-14T21:23
+updated: 2026-11-14T22:53
 ---
 
 # Kvalitetssikring
@@ -436,6 +436,7 @@ sist i dokumentet.
 | 9.12 Rådordene i alle malene, taggene i CI og technology.md: svarene 12.11 kl. 20:04, 20:06 og 20:44 (tillegg 7); hele settet i CI (run 43560865780), etter gruppens svar 13.11 kl. 18:24 | `e537345` (#152) | 1 (1: «Du bør kjøpe aksjene med gul ramme.» i `boersometer.html`) | ingen overlevde | `S/spec-9-12-raadordene-i-alle-malene.md` |
 | 8.30 De ledige rutene i plassstreken med nok kontrast: svarene 14.11 kl. 05:10–05:13 (tillegg 9 til 9.11); hele settet i CI (run 43565183283), etter gruppens svar 13.11 kl. 18:24 | `c1e8a1f` (#156) | 1 (1, M1: `--strek-2` tilbake for de ledige rutene) | ingen overlevde | `S/spec-8-30-plassstreken-kontrast.md` |
 | 2.17 Signalet regnet i ettertid: svarene 14.11 kl. 05:41–05:49 og 21:07, tillegg 1 og 2; hele settet i CI (run 43636648065) | `1fafddc` (#157) | 1 (6, A–F) | ingen overlevde | `S/spec-2-17-signalet-regnet-i-ettertid.md` |
+| 9.13 Dokumentrunden etter v1.1: tillegg 3 til 2.17, etter svarene 14.11 kl. 17:45 og 21:07; hele settet i CI (run 43644459699) | `5afabbc` (#158) | 1 (2, M1 og M2) | ingen overlevde | `S/spec-9-13-dokumentrunden-etter-v1-1.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -732,6 +733,7 @@ funn. Antall rader i loggen:
 | 9.12, uten gjennomgang med Hunter-leserne (tillegg 2 ba ikke om en); testen fant «følges med» fra 8.28 i CI 13.11 (run 43519071873), skrevet om i `a2ae3884` uten nye unntak, talt som rettet | 1 | 1 | 0 | 0 |
 | 8.30, gjennomgangen 14.11 (Edge Case Hunter, 3 lave funn, alle rettet i `af986b9b`) | 3 | 3 | 0 | 0 |
 | 2.17, gjennomgangen 14.11 (Blind Hunter, Edge Case Hunter og Verification Gap; VG1 høy og de middels rettet i `0ff7d1cd`, BH1 lukket med svaret kl. 21:07, de 8 som står er begrunnet i spesifikasjonen) | 30 | 22 | 8 | 0 |
+| 9.13, gjennomgangen 14.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; de seks på middels og tolv lave rettet, E2 og E3 står med grunn i spesifikasjonen, talt som avvist) | 20 | 18 | 2 | 0 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1600,6 +1602,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.12, tillegg 2 | 1: «Du bør kjøpe aksjene med gul ramme.» satt inn i en kopi av `boersometer.html` på `349f052b` | fanget av `test_ingen_raad_i_det_appen_viser` i `tests/test_raadordene_9_12.py`. Malen var lik HEAD etterpå, målt med sha256 | `S/spec-9-12-raadordene-i-alle-malene.md` |
 | 8.30, svarene 14.11 kl. 05:10–05:13 | 1: M1 på `6de80813`, `--dempet-2` til `--strek-2` for de ledige rutene i `stil.css` | fanget av alle 8 testene i `tests/test_plassstreken_8_30.py`, også i nettleseren ved 1280 og 390 px. `stil.css` var lik HEAD etterpå, målt med sha256 og git-hashen | `S/spec-8-30-plassstreken-kontrast.md` |
 | 2.17, svarene 14.11 kl. 05:41–05:49 | A–F på `92763443`, med `tests/test_ettertid_2_17.py` | A (`slett` uten `regnet = 'ettertid'`) `test_ny_utregning_og_sletting_roerer_bare_radene_i_ettertid` og `test_kommandoene_roerer_bare_radene_i_ettertid`; B (signalet regnet med kursen dagen etter) `test_likt_det_som_regnes_med_kursene_etter_dagen_fjernet`; C (`--slett-ettertid` og `--regn-ettertid-paa-nytt` byttet) `test_kommandoene_roerer_bare_radene_i_ettertid`; D (`les_periode` med radene i ettertid uten `med_ettertid`) `test_kveldsporten_ser_ikke_radene_i_ettertid`; E (demoen uten radene før STARTDAG) tre tester i `TestVisningen` og `test_radene_foer_startdagen_og_ingen_kveldsrad_eller_ki_tekst_endret`; F («i ettertid» borte fra cellen i «Signalet dag for dag») `test_signalet_dag_for_dag_merker_dagen_og_teller_dem` i begge versjonene. Hver fil var lik HEAD etter, målt med sha256 og git-hashen | `S/spec-2-17-signalet-regnet-i-ettertid.md` |
+| 9.13, tillegg 3 | M1 og M2 på `8fe6b3cd`, med `tests/test_kvalitetssikring.py` | M1 (et testnavn i matrisen som ikke finnes) `test_hver_test_dokumentene_nevner_finnes`; M2 (spesifikasjonen for 9.13 satt til done uten rad) `test_hver_ferdige_spesifikasjon_har_en_rad`, i §3 og §5. Begge filene var like HEAD etterpå, målt med sha256 | `S/spec-9-13-dokumentrunden-etter-v1-1.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
