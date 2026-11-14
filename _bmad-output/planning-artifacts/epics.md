@@ -5235,3 +5235,5 @@ Som **gruppe**, vil vi at én test går gjennom alt appen viser etter ordene i r
 **Avhenger av:** ingen. Flettes etter 9.11. **Én økt:** ja.
 
 *Avgjort 2026-11-12 kl. 20:44 (gruppens svar):* forslagene i spesifikasjonen for 9.12 godtas som bygget, og 9.12 flettes uten nytt stopp, sist av alle, etter bildene av appen i README-en (3.3k). Rådet anbefalte det. Svaret er ført etter tillegg 7 til 9.11 kl. 20:52 i `docs/ai-prompts/2026-11-12.md`.
+
+*Lagt til 2026-11-14:* 9.12 er squash-flettet med PR #152 i `e537345f` kl. 06:25, låst til head-en `8cfaef22` (main med 8.19, 8.28, 9.11, 8.29 og 3.3k flettet inn), sist i køen etter Utført-linja for 3.3k, slik tillegg 7 til 9.11 sier (`docs/ai-prompts/2026-11-12.md`). Punkt 26 i §8 i PRD-en er lukket, og NFR-06 sier at testen finnes. Testen fant «følges med» fra 8.28 på siden «Er du sikker?», og setningen er skrevet om uten nye unntak. Hele settet ble kjørt i CI (run 43560865780), etter gruppens svar 13.11 kl. 18:24: 5808 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-12-raadordene-i-alle-malene.md`](../implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md).

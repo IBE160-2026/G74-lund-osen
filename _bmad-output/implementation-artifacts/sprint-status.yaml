@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 13-11-2026 22:47
+last_updated: 14-11-2026 06:25
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -224,7 +224,7 @@ development_status:
   9-9-dokumenttestene: done
   9-10-de-lave-funnene: done
   9-11-prd-etter-tilbakemeldingen: done
-  9-12-raadordene-i-alle-malene: review
+  9-12-raadordene-i-alle-malene: done
   epic-9-retrospective: optional
 
   epic-10: in-progress

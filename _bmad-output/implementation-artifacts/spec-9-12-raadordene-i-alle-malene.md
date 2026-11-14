@@ -2,7 +2,7 @@
 title: 'Story 9.12: rådordene i alle malene, taggene i CI og technology.md'
 type: 'chore'
 created: '2026-11-12'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'a93c668f'
 context:
@@ -95,3 +95,13 @@ omsatte», og «følg… med» står i rådlista. Det er ikke et ekte råd, men 
 kunne leses som «følg med». Den første omskrivingen, «beholder», traff også
 rådlista. Setningen er nå «og hver aksje står med sin egen bransje» i malen, i
 `docs/hjelp.md` og i FR-412, og testen er grønn uten nye unntak.
+
+## Flettet 14.11
+
+Main med 8.29 og 3.3k ble flettet inn i grenen etter Utført-linja for 3.3k
+(`8cfaef22`). Konflikten i `docs/hjelp.md` var overskriften «Din egen liste: kom i
+gang» fra 8.29 mot «hver aksje står med» fra 9.12, og begge står. Testen ga ingen
+nye treff i malene fra 8.29 og 3.3k. Dokumenttestene ble kjørt lokalt i tre deler,
+til sammen 2 955, lik `--collect-only`. CI var grønn på head-en `8cfaef22` (run 43560865780):
+5808 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. PR
+#152 ble squash-flettet i `e537345f` kl. 06:25, låst til `8cfaef22`.
