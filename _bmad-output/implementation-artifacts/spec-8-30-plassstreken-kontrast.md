@@ -2,7 +2,7 @@
 title: 'Story 8.30: de ledige rutene i plassstreken med nok kontrast'
 type: 'fix'
 created: '2026-11-14'
-status: 'in-progress'
+status: 'review'
 route: 'dispatch'
 baseline_commit: '8944bf67'
 context:
@@ -118,7 +118,7 @@ med `stil.css`.
 
 Diffen `8944bf67..80483315`. Ingen funn på middels eller høy grad. Tallene i
 spesifikasjonen, hjelpen og designreglene ble regnet på nytt og stemmer. Rettingene
-står i commiten etter `80483315`.
+står i `af986b9b`.
 
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
