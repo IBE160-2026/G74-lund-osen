@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-13T00:38
+updated: 2026-11-14T19:14
 ---
 
 # Brukertesten
@@ -91,6 +91,18 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 | 12.11 | 6 | 18 | 15 | 3 | 1, besto (`dag-2`) |
 
 Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksjene, der 288 besto og 6 ble stoppet, og 4 tekster om dagen, som alle besto. De 6 ble stoppet av punkt 1 i kontrollen (det teksten sa om signalet mot grunnlaget), og én av dem også av punkt 2 (et tall). Én ukes drift er logget, flere ganger over.
+
+## Brukertest 2: en dag «i ettertid» (story 2.17)
+
+*Lagt til 2026-11-14 (story 2.17, tillegg 1, gruppens svar kl. 05:41–05:49):* en oppgave i brukertest 2, etter at 2.17 er flettet og den ekte versjonen har signalet regnet i ettertid. Oppgaven sier ikke hva merket betyr.
+
+| Felt | Notat |
+|---|---|
+| Aksjen og dagen, en dag merket «i ettertid» i «Signalet dag for dag» | |
+| «Hva betyr «i ettertid» her?», svaret ordrett | |
+| Fant personen forskjellen fra en dag uten merket (ja eller nei) | |
+| Så personen at dagen ikke har KI-tekst, og hvorfor (ja eller nei) | |
+| Leste personen «i ettertid» som en annen styrke eller et råd (ja eller nei) | |
 
 ## Funnene
 

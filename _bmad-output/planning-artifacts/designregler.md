@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-14T06:45
+updated: 2026-11-14T19:16
 ---
 
 # Designregler
@@ -80,6 +80,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 *Lagt til 2026-10-17 (story 2.9b, spesifikasjonen `spec-2-9b-soeylene-under-hovedindeksen.md`):* bransjesymbolet over søylen under hovedindeksen er gult ved 3 av 3 i `#a67c00`, ikke i sterk oransje `#F2B53A`. Symbolet står på det hvite kortet, der `#F2B53A` har 1,83:1 og `#a67c00` 3,82:1, og grafikk som bærer mening skal ha minst 3:1 (WCAG 1.4.11). «3 av 3» står også i teksten for skjermleser.
 
 *Lagt til 2026-11-13 (tillegg 2 til story 8.29, gruppens ønske kl. 20:35, rådet anbefalte det):* styrken for én dag i notatene og i «Signalet dag for dag» på aksjesiden vises som i tabellen på oversikten, også en tidligere dag: 3 av 3 i pillen med oransje ring, 2 av 3 i den hvite pillen og 1 og 0 av 3 som tekst uten pille, som skissen 06.11. Linja over om 2 av 3 bare for siste børsdag gjelder fortsatt summen under sjekkene og kortet «Signalstyrke».
+
+*Lagt til 2026-11-14 (story 2.17, gruppens svar kl. 05:41–05:49):* en dag med signalet regnet i ettertid har merket «i ettertid», en tekst med stiplet kant i `--dempet-2` (`#70757D`, 4,14:1 mot Bakgrunn og 4,64:1 mot hvitt), overalt der en tidligere dag vises med signal. Teksten bærer merket, ikke bare kanten. I «Signalet dag for dag» har dagen også stiplet kant, i børsometeret ruta, og i kursgrafen har prikken hvit midte og stiplet kant i fargen for retningen. Merket endrer ikke gult: 3 av 3 har ringen som før. Med høy kontrast får kanten `CanvasText`.
 
 ## 4. Ordliste – samme ord på alle sidene (01.10)
 
@@ -208,6 +210,8 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 **Avstander.** Sidemargen er 120 px ved 1280 px og 16 px ved 390 px. Det er 40–44 px mellom delene i oversikten og 60 px på aksjesiden. Kort har radius 16, kant i Strek og luft 18–22 px. Brikker har radius 6, merker 8 og piller 999. Klikkflater er minst 44 px.
 
 *Lagt til 2026-10-17 (story 2.9b):* **Søylene under hovedindeksen.** Fargen følger endringen slik den vises, med to desimaler, som i tabellen: over 0,00 % Positiv `#13703C`, under 0,00 % Negativ `#B42318`, og 0,00 % Ingen `#5F646C`. Det samme gjelder den stiplede linja for indeksen. Det er de eneste fargegrensene: lengden på søylen viser hvor stor endringen er, med null midt i feltet og den største endringen av søylene og indeksen på halve høyden. Stiplet linje brukes bare for indeksen. Bransjesymbolet ved 3 av 3 tegnes i `#a67c00`, Gul ring i fargelista over, og heter `--gul-symbol` i stilen (§3).
+
+*Lagt til 2026-11-14 (story 2.17, gruppens svar kl. 05:41–05:49):* stiplet brukes også for merket for en dag med signalet regnet i ettertid (§3): prikken i kursgrafen, dagen i «Signalet dag for dag», ruta i børsometeret og merket «i ettertid». Indekslinja er fortsatt den eneste stiplede linja.
 *Rettet 2026-11-04 (gruppens svar kl. 09:58, story 8.2b):* søylene har også en grense ved 2 %: lys farge under 2 % opp eller ned, og mørk fra 2 %, som i børsometeret (`spec-8-6b-som-tavla.md`, punkt c). 0,00 % er fortsatt Ingen. Lengden viser fortsatt størrelsen.
 
 *Lagt til 2026-10-18 (story 2.9c, spesifikasjonen `spec-2-9c-hovedindeksen-i-kursgrafen.md`):* **Stiplet linje brukes bare for hovedindeksen,** under søylene på forsiden og i kursgrafen på aksjesiden. Kurslinja og snittet er heltrukne, som før. I kursgrafen er linja 1,5 px i Dempet `#5F646C` (5,96:1 mot hvitt), med 6 px strek og 4 px mellomrom, og regnet om så den starter på aksjens kurs den første dagen i grafen som indeksen har.

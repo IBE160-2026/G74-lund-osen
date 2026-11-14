@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-11T00:32
+updated: 2026-11-14T19:14
 ---
 
 # UX-loggen
@@ -733,3 +733,11 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 | U110 | 10.11, brukertesten | Flere sider | Feiltolkninger på grunn av feil i appen. | [`brukertest.md`](brukertest.md), «Funnene» | Del A |
 | U111 | 10.11, brukertesten | Aksjesiden | Han ville notere. | [`brukertest.md`](brukertest.md), «Funnene» | Notatene og de tenkte kjøpene (8.21) |
 | U112 | 10.11, brukertesten | Hele appen | Han ønsket anbefalinger og å kunne «spå» hva man bør følge med på, og forsto hvorfor appen ikke gjør det. | [`brukertest.md`](brukertest.md), «Funnene» | Endres ikke (NFR-06) |
+
+## Story 2.17: signalet regnet i ettertid
+
+*Lagt til 2026-11-14 (story 2.17, gruppens svar kl. 05:41–05:49 og tillegg 1, [spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-17-signalet-regnet-i-ettertid.md)):* visningen er valgt av gruppen etter skisser som ikke er i repoet. Brukertest 2 har en oppgave om merket ([`brukertest.md`](brukertest.md)).
+
+| # | Sett | Side | Funnet | Kilde | Tas i |
+|---|---|---|---|---|---|
+| U113 | 14.11, gruppens svar | Aksjesiden, oversikten og børsometeret | En børsdag uten vurdering fra kvelden sto som «ikke vurdert», også når kursene fantes, så historikken hadde hull. | Svaret kl. 05:41–05:49 | 2.17: signalet regnet i ettertid, med stiplet kant og «i ettertid» overalt der en tidligere dag vises med signal |

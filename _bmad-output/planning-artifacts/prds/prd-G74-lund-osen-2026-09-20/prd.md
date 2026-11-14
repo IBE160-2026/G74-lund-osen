@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-13T23:34
+updated: 2026-11-14T19:15
 ---
 
 # PRD — OSE Signal
@@ -52,7 +52,8 @@ ga ikke tillatelse til automatisert henting (plan B, vedlegg A).
   ([FR-401](#fr-401--henting-utløses-eksplisitt-aldri-av-en-oppstart),
   [NFR-01](#nfr-01--daglig-drift-skal-holde-seg-innenfor-api-kvoten)).
 - Dagens vurdering lagres, regnes aldri på nytt og etterfylles ikke
-  ([FR-408](#fr-408--dagens-vurdering-lagres-per-aksje)).
+  ([FR-408](#fr-408--dagens-vurdering-lagres-per-aksje)). En børsdag uten den får
+  signalet regnet i ettertid av kursene, merket «i ettertid» og uten KI-tekst.
 - Regler regner, og KI formulerer. KI-teksten står under regelforklaringen. Den
   kontrolleres og logges, og den kan slås av
   ([FR-601](#fr-601--avpå-bryteren-er-brukersynlig),
@@ -127,7 +128,7 @@ Ordene slik appen bruker dem. Koden og eldre krav kan bruke ordet i parentes.
 | **Aksjesiden** (aksjedetaljen) | Siden for én aksje, med kursgrafen, sjekkene og KI-teksten |
 | **Sjekk** | Én av de tre reglene, trend, bevegelse og interesse. Hver gir +1, 0 eller -1 (FR-701) |
 | **Signal** | Signalstyrken, 0–3, og retningen, Positiv, Negativ, Blandet eller Ingen, for én aksje og én børsdag (FR-703, FR-704). En aksje skiller seg ut ved 2 eller mer (FR-705) |
-| **Vurdering** | Den lagrede raden med signalet, sjekkene og målingene for én aksje og én børsdag, eller grunnen til at den mangler. Den skrives én gang og etterfylles ikke (FR-408) |
+| **Vurdering** | Den lagrede raden med signalet, sjekkene og målingene for én aksje og én børsdag, eller grunnen til at den mangler. Kveldens vurdering skrives én gang og etterfylles ikke. En børsdag uten den kan få signalet regnet i ettertid, merket (FR-408) |
 | **Den justerte sluttkursen** (`adjusted_close`) | Kursen kilden har regnet om bakover etter utbytte og splitt. Signalet, endringen og grafen bruker den. Sluttkursen (`close`) er den ujusterte, og den står i oversikten. På en justeringsdag stemmer derfor ikke differansen mellom to sluttkurser med prosenten (FR-407) |
 
 Kolonnene i oversikten bygger på disse feltene fra kilden:
@@ -189,6 +190,8 @@ lest i koden 12.11.
 | FR-406 | To lagre for kursdata | kjerne | ja |
 | FR-407 | Justeringsdagene merkes | ekstra | ja |
 | FR-408 | Dagens vurdering lagres | kjerne | ja |
+| FR-408 | Signalet regnet i ettertid for børsdager uten vurdering, merket «i ettertid» | ekstra | ja |
+| FR-408 | KI-tekst for små hull, 1–3 kvelder | senere | nei |
 | FR-409 | Tilstandene skilles, også «ikke i lista» | kjerne | ja |
 | FR-410 | Hovedindeksen hentes i samme kjøring | kjerne | ja |
 | FR-411 | Demoversjonen | kjerne | ja |
@@ -211,6 +214,10 @@ lest i koden 12.11.
 
 Uten eget FR, men ekstra og bygget: egne notater på aksjesiden med tenkte kjøp
 og salg, «Følg en aksje» og «Din egen liste». De står i `epics.md`.
+
+KI-tekst for små hull står som senere, fordi den tar tid, krever kontroll, gir
+fare for å se framover, og gir mindre nytte bakover (gruppens svar 14.11 kl.
+05:49).
 
 Løsningen er en **webapplikasjon for PC**. Den er på norsk og kjører lokalt.
 Sidene virker også på smal skjerm, men en mobilapp er utenfor v1.
@@ -328,7 +335,8 @@ en dag i datofeltet med «Vis dagen». Oversikten åpner på siste børsdag.
 Startdagen for hver periode følger én regel, lik for oversikten og kursgrafen
 (FR-201, `designregler.md` §2). Endringen over en periode regnes av kursserien,
 på den justerte sluttkursen. Signalet for en dag vises bare der vurderingen er
-lagret. Det regnes aldri på nytt for en tidligere dag (FR-408).
+lagret, fra kvelden eller regnet i ettertid og merket «i ettertid». Det regnes
+aldri på nytt når siden vises (FR-408).
 
 **Aksjer uten gyldig signal vises likevel.** Signalet krever 51 handelsdager
 fordi MA50 bruker 50 av dem. En nynotert aksje, eller en serie med hull, gir
@@ -769,7 +777,8 @@ eller over (FR-705). Hver retning har sin form, og 3 av 3 har en gul ring.
 Markeringen leses fra de lagrede vurderingene, og signalet regnes aldri på nytt
 (FR-408). Grafen sier fra hvilken dato markeringene finnes. En dag med grunn, en
 dag uten rad og en dag som ikke er børsdag, markeres ikke. De ser aldri ut som
-styrke 0 (FR-409).
+styrke 0 (FR-409). En dag med signalet regnet i ettertid har hvit midte og stiplet
+kant, og teksten under grafen sier det.
 
 *Konsekvenser:*
 - En dag med styrke 2 markeres, og en med 1 markeres ikke.
@@ -817,6 +826,8 @@ Hentekommandoen:
    skriver rådata (NFR-07) og basen (FR-406, FR-410)
 5. skriver dagens vurderinger (FR-408) og så KI-tekstene, også teksten om dagen
    (FR-602, FR-607)
+6. regner til slutt signalet i ettertid for børsdagene uten vurdering (FR-408).
+   En feil der stopper ikke kvelden
 
 **Kveldsjobben.** Oppgaveplanlegging på en PC i gruppen starter hentekommandoen
 hver dag kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45. Den kjører fra en egen
@@ -919,22 +930,37 @@ siden av de to i FR-406. De lagrer data fra kilden, og dette lagrer hva
 løsningen mente om dem. Vurderingen lagres i samme kjøring som hentingen.
 Ingenting skrives uten at kommandoen kjøres (FR-401).
 
-##### Vurderinger etterfylles ikke, og det er med vilje
+##### Kveldens vurdering etterfylles ikke, og det er med vilje
 
 | | Kan etterfylles? | Hvorfor |
 |---|---|---|
 | **Kurs** for 12.09 | **Ja** | Den er den samme uansett når den hentes |
-| **Vurdering** for 12.09 | **Nei** | En vurdering skrevet i dag for 12.09 ville vært *dagens* parametres svar, ikke datidens |
+| **Kveldens vurdering** for 12.09 | **Nei** | En vurdering skrevet i dag for 12.09 ville vært *dagens* parametres svar, ikke datidens |
+| **Signalet i ettertid** for 12.09 | **Ja, merket** | Det regnes av kursene til og med 12.09, er merket «i ettertid» og vises aldri som kveldens vurdering. Ingen KI-tekst |
 
-Lageret avviser enhver dato som ikke er inneværende børsdag. Det ene unntaket er
-første henting på dagtid i en tom base. Den skriver vurderingene og KI-tekstene
-for børsdagen rett før, én gang. Spørsmålet «hva sa løsningen om EQNR for to
-uker siden?» besvares av «Signalet dag for dag» på aksjesiden (FR-203).
+Lageret for kveldens vurderinger avviser enhver dato som ikke er inneværende
+børsdag. Det ene unntaket er første henting på dagtid i en tom base. Den skriver
+vurderingene og KI-tekstene for børsdagen rett før, én gang. Spørsmålet «hva sa
+løsningen om EQNR for to uker siden?» besvares av «Signalet dag for dag» på
+aksjesiden (FR-203).
+
+**Signalet regnet i ettertid.** Til slutt i hver henting, etter kveldens
+vurderinger og KI-tekster, regnes signalet for hver børsdag med kurser i basen,
+for aksjene i lista, når dagen mangler vurdering og aksjen har like mange
+kursdager til og med dagen som kvelden krever. Det regnes bare med kursene til og
+med dagen, aldri for inneværende børsdag, og ingen rad fra kvelden, heller ikke en
+rad med grunn, skrives over. Raden er merket i basen, får ingen KI-tekst, og
+KI-grunnlaget leser bare radene fra kvelden. En kommando regner radene i ettertid
+på nytt eller sletter dem, uten å røre radene fra kvelden. En feil stopper ikke
+hentingen (NFR-03).
 
 *Konsekvenser:*
-- Å skrive en vurdering for en tidligere børsdag gir en feil, utenom første henting i en tom base.
+- Å skrive en vurdering fra kvelden for en tidligere børsdag gir en feil, utenom første henting i en tom base.
 - En rad med grunn skriver aldri over en rad med vurdering samme dag.
 - Målingene på raden gir samme fortegn som sjekkene med parametrene for dagen.
+- Signalet i ettertid for en dag er det samme som det som regnes med kursene etter dagen fjernet.
+- En dag med for få kurser, og inneværende børsdag, får ikke signalet i ettertid.
+- Å regne radene i ettertid på nytt eller slette dem endrer ingen rad fra kvelden.
 
 #### FR-409 — De tre tilstandene skal være skillbare i lageret
 
@@ -942,9 +968,10 @@ Lageret skiller tilstandene for en aksje og en dag **entydig**:
 
 | Tilstand | Hva det betyr |
 |---|---|
-| Rad med vurdering, også styrke 0 | **Et gyldig svar.** Med 0 ga sjekkene ingen utslag |
+| Rad med vurdering fra kvelden, også styrke 0 | **Et gyldig svar.** Med 0 ga sjekkene ingen utslag |
+| Rad med vurdering regnet i ettertid | **Et gyldig svar, merket «i ettertid».** Kvelden skrev ingen vurdering, og signalet er regnet senere av kursene til og med dagen. Ingen KI-tekst |
 | Rad med grunn | Kjøringen kunne ikke vurdere aksjen, og grunnen står |
-| Ingen rad, og dagen var en børsdag | **Kommandoen ble ikke kjørt.** Et hull i vår egen drift |
+| Ingen rad, og dagen var en børsdag | **Kommandoen ble ikke kjørt,** og signalet er ikke regnet i ettertid, fordi aksjen hadde for få kurser eller dagen er inneværende børsdag. Et hull i vår egen drift |
 | Ingen rad, og dagen var ikke en børsdag | Dagen finnes ikke, og telles ikke |
 | Ingen rad etter at aksjen ble tatt ut av lista | «Ikke i lista», ikke et hull |
 
@@ -957,6 +984,7 @@ FR-409 gjelder den lagrede raden for en dag som har passert.
 
 *Konsekvenser:*
 - En dag uten rad på en børsdag gir «ikke kjørt».
+- En dag med signalet regnet i ettertid er merket «i ettertid» overalt der den vises.
 - En helgedag gir «ikke børsdag».
 - En dag etter at aksjen gikk ut, gir «ikke i lista».
 - Ingen av dem vises som 0 i «Signalet dag for dag», i signaldagene (FR-206) eller i oversikten.
@@ -1024,8 +1052,9 @@ avvises med en forklaring. En aksje brukeren har valgt selv, merkes «Egen».
 - En endring tas i bruk ved neste henting, på en børsdag. Webserveren skriver bare
   ønsket og henter aldri, og siden sier at endringen venter.
 - En aksje som tas ut, beholder kursene og vurderingene sine og er «ikke i lista»
-  fra den dagen (FR-409). Tas den inn igjen, begynner vurderingene på nytt, og
-  dagene mellom fylles ikke inn (FR-408).
+  fra den dagen (FR-409). Tas den inn igjen, begynner kveldens vurderinger på
+  nytt, og dagene mellom får signalet regnet i ettertid når kursene finnes, merket
+  (FR-408).
 - En ticker som ikke gir rader ved hentingen, tas ikke inn, og utskriften sier
   det.
 - Er omsetningen målt fra før (FR-413), vises den før brukeren velger.
