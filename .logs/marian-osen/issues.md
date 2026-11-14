@@ -292,9 +292,9 @@
 - [ ] 2026-11-13 [prd-etter-tilbakemeldingen-9-11](931-2026-11-12-19-18-47-prd-etter-tilbakemeldingen-9-11.md) — en test i del 1 av `--dokumentene` feilet én gang på `7f2edbce` og besto ved neste kjøring; navnet er ikke kjent
   - *Sjekket 2026-11-14 (story 9.13):* står: testen er ukjent, og feilen er ikke sett igjen.
 - [x] 2026-11-14 [din-egen-liste-kom-i-gang-8-29](926-2026-11-14-00-38-46-din-egen-liste-kom-i-gang-8-29.md) — spørsmål 7 (ECH3): de ledige rutene i plassstreken har omtrent 1,3:1 mot beige; forslaget er en mørkere farge i en egen runde (løst 2026-11-14: `--dempet-2`, 4,14:1, i 8.30, `c1e8a1f0`)
-- [ ] 2026-11-14 [din-egen-liste-kom-i-gang-8-29](926-2026-11-14-00-38-46-din-egen-liste-kom-i-gang-8-29.md) — VG8: luften og hjørnene i stegkortene i «Din egen liste: kom i gang» er bare sjekket i stilen, ikke målt i nettleseren
+- [x] 2026-11-14 [din-egen-liste-kom-i-gang-8-29](926-2026-11-14-00-38-46-din-egen-liste-kom-i-gang-8-29.md) — VG8: luften og hjørnene i stegkortene i «Din egen liste: kom i gang» er bare sjekket i stilen, ikke målt i nettleseren (løst 2026-11-14: 8.31, `167640bd`, `tests/test_maalene_8_31.py`)
   - *Sjekket 2026-11-14 (story 9.13):* står: tillegg 4 tar VG8 i natt.
-- [ ] 2026-11-14 [din-egen-liste-kom-i-gang-8-29](926-2026-11-14-00-38-46-din-egen-liste-kom-i-gang-8-29.md) — VG4 (tillegg 2): ingen nettlesertest måler stilen til den hvite pillen og teksten uten pille i notatene og historikken
+- [x] 2026-11-14 [din-egen-liste-kom-i-gang-8-29](926-2026-11-14-00-38-46-din-egen-liste-kom-i-gang-8-29.md) — VG4 (tillegg 2): ingen nettlesertest måler stilen til den hvite pillen og teksten uten pille i notatene og historikken (løst 2026-11-14: 8.31, `167640bd`, `tests/test_maalene_8_31.py`)
   - *Sjekket 2026-11-14 (story 9.13):* står: tillegg 4 tar VG4 i natt.
 - [ ] 2026-11-14 [bildene-av-appen-i-readme-3-3k](925-2026-11-14-05-42-17-bildene-av-appen-i-readme-3-3k.md) — spørsmål 11: investorsiden og siden for eodhd.com i demoen har ingen steg i omvisningen (verken «Vis meg rundt» eller «Spill av omvisningen»); egen sak om de skal ha det
   - *Sjekket 2026-11-14 (story 9.13):* trenger gruppen, spørsmål 18 i `spec-9-13-dokumentrunden-etter-v1-1.md`, med forslag.

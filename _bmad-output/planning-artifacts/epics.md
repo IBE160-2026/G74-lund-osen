@@ -4930,6 +4930,8 @@ Som **gruppe** vil vi at målene fra tavla og designreglene for stegkortene og f
 
 **Avhenger av:** 8.29, 2.17. **Én økt:** ja.
 
+*Lagt til 2026-11-14:* 8.31 er squash-flettet med PR #159 i `167640bd` kl. 23:51, låst til head-en `c45cbb7c`, etter tillegg 4 i `docs/ai-prompts/2026-11-14.md`, uten nytt ja. CI var grønn i alle jobbene (run 43649592034). Alle testene besto uten endring i appen, og spørsmålene 1–7 i spesifikasjonen er bygget etter forslaget. VG8 og VG4 fra 8.29 er lukket i `issues.md`.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

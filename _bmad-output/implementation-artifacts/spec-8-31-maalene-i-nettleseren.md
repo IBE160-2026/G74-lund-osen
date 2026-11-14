@@ -2,7 +2,7 @@
 title: 'Story 8.31: stegkortene og styrken for én dag målt i nettleseren'
 type: 'test'
 created: '2026-11-14'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '04c26cdb'
 context:
@@ -82,6 +82,13 @@ og ingenting i appen er endret. Første versjon av testene målte årssummen i
 «Signalet dag for dag» som en dag, og tok ikke med panelet, som står i en
 `<template>` til knappen trykkes. Det er rettet etter gjennomgangen.
 
+## Flettet 14.11
+
+CI var grønn i alle fire jobbene på head-en `c45cbb7c` (run 43649592034). Triagen
+hadde ingen åpne funn på middels eller høy grad. PR #159 ble squash-flettet i
+`167640bd` kl. 23:51, låst til `c45cbb7c`, uten nytt ja, slik tillegg 4 sier.
+Kveldsjobben sto som Disabled.
+
 ## Mutantene
 
 Én mutant per test i `src/static/stil.css`, med kopi før. Fila var lik HEAD
@@ -114,7 +121,7 @@ Ingen funn på middels eller høy står åpne.
 
 ## Kontroll
 
-- [ ] `uv run pytest tests/test_maalene_8_31.py tests/test_kom_i_gang_8_29.py tests/test_ettertid_2_17.py tests/test_kvalitetssikring.py` består lokalt
-- [ ] `--dokumentene` består lokalt
-- [ ] CI er grønn i alle jobbene
-- [ ] `git diff --stat origin/main` viser ingen fil i `src/`
+- [x] `uv run pytest tests/test_maalene_8_31.py tests/test_kom_i_gang_8_29.py tests/test_ettertid_2_17.py tests/test_kvalitetssikring.py` består lokalt
+- [x] `--dokumentene` består lokalt
+- [x] CI er grønn i alle jobbene (run 43649592034)
+- [x] `git diff --stat origin/main` viser ingen fil i `src/`
