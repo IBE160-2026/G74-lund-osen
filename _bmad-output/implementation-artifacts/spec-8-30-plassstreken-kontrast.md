@@ -91,3 +91,37 @@ fra en demobase i en midlertidig mappe, aldri på port 8000. Avtrykkene følger.
 
 Ingen API-kall. `data/db/ose.db` røres ikke. Bare stilen, hjelpen,
 designreglene, testene og bildene endres.
+
+## Bygget 14.11
+
+Commitene `fd28a2fe` (spesifikasjonen, storyen og svarene), `6de80813` (fargen,
+testen, designreglene og hjelpen) og `80483315` (bildet og avtrykkene).
+
+**Målt.** Testen regner 4,14:1 for de ledige rutene mot bakgrunnen og 3,83:1 for
+brukt mot ledig, fra stilarket appen gir ut i begge versjonene. I Edge ved 1280
+og 390 px har rutene fargene fra stilen, er 10 × 10 px og står på sidens beige,
+i demoen og den ekte versjonen.
+
+**Mutanten M1.** `--strek-2` ble satt tilbake for de ledige rutene i en kopi av
+`stil.css` på HEAD `6de80813`. Alle åtte testene i `tests/test_plassstreken_8_30.py`
+feilet. Kopien ble lagt tilbake, og sha256 og git-hashen var lik HEAD.
+
+**Bildene.** Alle bildene ble tatt på nytt fra en demobase i en midlertidig
+mappe, ikke på port 8000. Bare `docs/appen/din-egen-liste-demo.png` viser streken,
+og det er byttet. Ingen av bildene i `docs/appen/mobil/` viser Min liste.
+Notatpanelet, «Vis meg rundt» og notatene ved 390 px ble også ulike, fordi
+skriptet ikke åpner panelet og omvisningen. De viser ikke streken, så bildene fra
+main står. Avtrykkene i `tests/test_docker.py` er regnet ut på nytt, fordi de tar
+med `stil.css`.
+
+## Gjennomgangen 14.11 (Edge Case Hunter)
+
+Diffen `8944bf67..80483315`. Ingen funn på middels eller høy grad. Tallene i
+spesifikasjonen, hjelpen og designreglene ble regnet på nytt og stemmer. Rettingene
+står i commiten etter `80483315`.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | lav | `_bakgrunn` leser første regel, så en senere `@media` med en annen bakgrunn sees bare av nettlesertesten | Rettet: `test_ingen_annen_regel_gir_rutene_en_bakgrunn`, og en tydelig feil i stedet for `None`. En `@media` for 390 px med `--strek-2` ble fanget av den og nettlesertesten |
+| ECH2 | lav | En full eller tom liste gir `null` i skriptet i nettleseren og en uklar feil | Rettet: skriptet melder hva som mangler, og testen sier det |
+| ECH3 | lav | `_hex` tar bare `rgb()`, og `bak()` godtar en halvgjennomsiktig farge og ser bort fra bakgrunnsbilder | Rettet: `rgba` bare helt dekkende, og en forelder med bilde gir en feil |
