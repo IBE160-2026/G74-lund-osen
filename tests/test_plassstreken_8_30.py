@@ -31,7 +31,9 @@ def _bakgrunn(stil: str, velger: str) -> str:
     """Navnet på fargen i background for regelen med akkurat denne velgeren."""
     regel = re.search(re.escape(velger) + r"\s*\{([^}]*)\}", stil)
     assert regel, velger
-    return re.search(r"background:\s*var\(--([a-z0-9-]+)\)", regel.group(1)).group(1)
+    farge = re.search(r"background:\s*var\(--([a-z0-9-]+)\)", regel.group(1))
+    assert farge, (velger, regel.group(1))  # gjennomgangen (ECH1): tydelig feil, ikke None
+    return farge.group(1)
 
 
 def _fargene_i_stilen(stil: str) -> tuple[str, str, str]:
@@ -80,6 +82,29 @@ def test_fargene_i_stilen():
     assert round(_kontrast(ledig, bak), 2) == 4.14 and round(_kontrast(brukt, ledig), 2) == 3.83
 
 
+def test_ingen_annen_regel_gir_rutene_en_bakgrunn():
+    """Gjennomgangen (ECH1): _bakgrunn leser den første regelen med velgeren.
+    Ville feilet hvis en senere regel, for eksempel i en @media for smal
+    skjerm, ga rutene en annen bakgrunn, så testene over ikke så den. Bare
+    grunnregelen, regelen for de brukte og regelen for forced-colors setter
+    bakgrunnen."""
+    med_bakgrunn = [
+        (velger.strip().rsplit("{", 1)[-1].strip(), kropp.strip())
+        for velger, kropp in re.findall(
+            r"([^{}]*\.plassstrek span[^{}]*)\{([^}]*)\}", re.sub(r"/\*.*?\*/", "", STIL, flags=re.S)
+        )
+        if "background" in kropp
+    ]
+    assert med_bakgrunn == [
+        (
+            ":where(.side-oversikt) .plassstrek span",
+            "width: 10px; height: 10px; border-radius: 2px; background: var(--dempet-2);",
+        ),
+        (":where(.side-oversikt) .plassstrek span.brukt", "background: var(--blekk);"),
+        (":where(.side-oversikt) .plassstrek span.brukt", "background: CanvasText;"),
+    ], med_bakgrunn
+
+
 def test_regningen_fanger_den_gamle_fargen():
     """Ville feilet hvis regningen ikke fanget --strek-2 fra før 8.30, så
     testene over ikke prøvde noe."""
@@ -95,22 +120,30 @@ def test_regningen_fanger_den_gamle_fargen():
 MAAL_STREKEN = r"""
 const ledig = document.querySelector('.plassstrek span.ledig');
 const brukt = document.querySelector('.plassstrek span.brukt');
+// Gjennomgangen (ECH3): bare en helt gjennomsiktig forelder uten bilde hoppes over.
 function bak(el) {
   for (let a = el.parentElement; a; a = a.parentElement) {
-    const c = getComputedStyle(a).backgroundColor;
-    if (c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent') return c;
+    const s = getComputedStyle(a);
+    if (s.backgroundImage !== 'none') return 'bilde: ' + s.backgroundImage;
+    if (s.backgroundColor !== 'rgba(0, 0, 0, 0)' && s.backgroundColor !== 'transparent') return s.backgroundColor;
   }
   return getComputedStyle(document.documentElement).backgroundColor;
 }
+// Gjennomgangen (ECH2): en full eller tom liste gir en tydelig feil.
+if (!ledig || !brukt) { ferdig({mangler: {ledig: !ledig, brukt: !brukt}}); } else {
 const b = ledig.getBoundingClientRect();
 ferdig({ledig: getComputedStyle(ledig).backgroundColor, brukt: getComputedStyle(brukt).backgroundColor,
         bak: bak(ledig), stoerrelse: [b.width, b.height],
         rulling: document.documentElement.scrollWidth > document.documentElement.clientWidth});
+}
 """
 
 
 def _hex(rgb: str) -> str:
-    r, g, b = (int(t) for t in re.fullmatch(r"rgb\((\d+), (\d+), (\d+)\)", rgb).groups())
+    """Gjennomgangen (ECH3): også rgba, men bare helt dekkende."""
+    m = re.fullmatch(r"rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)", rgb)
+    assert m and (m.group(4) is None or float(m.group(4)) == 1), rgb
+    r, g, b = (int(t) for t in m.groups()[:3])
     return f"{r:02x}{g:02x}{b:02x}"
 
 
@@ -124,6 +157,7 @@ def test_streken_i_nettleseren(request, tmp_path, hvilken, bredde):
     siden rullet sidelengs, ved 1280 og 390 px i begge versjonene."""
     _, side = _versjonen(request, hvilken)
     r = _kjoer(side, tmp_path, bredde, MAAL_STREKEN)
+    assert "mangler" not in r, r
     ledig, brukt, bak = _fargene_i_stilen(STIL)
     assert (_hex(r["ledig"]), _hex(r["brukt"]), _hex(r["bak"])) == (ledig, brukt, bak), r
     assert _kontrast(ledig, bak) >= MINST and _kontrast(brukt, ledig) >= MINST
