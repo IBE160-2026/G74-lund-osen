@@ -2208,6 +2208,8 @@ kveld, merket «i ettertid», så historikken ikke har hull der kursene finnes.
 
 **Avhenger av:** 2.4, 2.5, 2.7b, 2.16. **Én økt:** nei.
 
+*Lagt til 2026-11-14:* 2.17 er squash-flettet med PR #157 i `1fafddce` kl. 21:23, låst til head-en `2d489390`, etter tillegg 2 i `docs/ai-prompts/2026-11-14.md`. Gruppen godtok alle forslagene i spørsmål 1–19 kl. 21:07, også spørsmål 19 (BH1) som bygget. Avtrykket av kveldsradene rett før flettingen står under «Kontroll etter flettingen» i spesifikasjonen. Hele settet ble kjørt i CI (run 43636648065): 5854 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne.
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss

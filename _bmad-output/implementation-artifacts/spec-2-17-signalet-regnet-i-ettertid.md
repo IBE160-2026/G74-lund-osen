@@ -2,7 +2,7 @@
 title: 'Story 2.17: signalet regnet i ettertid for børsdager uten lagret vurdering'
 type: 'feature'
 created: '2026-11-14'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'c452e171'
 context:
@@ -402,6 +402,14 @@ hver for seg, bare med lesing, på diffen `c452e171..92763443`. Rettingene står
 | ECH5 | lav | «N i ettertid» teller blant de vurderte dagene i uka, men blant dagene med 3 av 3 i linja over | Står: slik eksempelet i instruksjonen er, og spørsmål 8 og 9 sier det |
 | ECH6 | lav | Tallene øverst på oversikten for en valgt dag sier ikke hvor mange som er i ettertid | Står: hver rad har merket |
 
+## Flettet 14.11
+
+Svarene kl. 21:07 står under spørsmål 1–19 (tillegg 2), og BH1 er lukket i
+triagen. `origin/main` ble flettet inn igjen (`d180a3b0`, bare dagsfila). CI var
+grønn på head-en `2d489390` (run 43636648065): 5854 bestått og 99 hoppet over i
+jobben `pytest`, og alle fire jobbene grønne. PR #157 ble squash-flettet i
+`1fafddce` kl. 21:23, låst til `2d489390`. Kveldsjobben sto som Disabled.
+
 ## Kontroll etter flettingen
 
 For gruppen, ikke for vinduet som bygde storyen. Appen migrerer basen ved første
@@ -440,3 +448,9 @@ Den står på pause til mandag 16.11.
    - Kveldens rader har KI-tekst, som før.
 3. **Så** den siste gjennomgangen av alle bildene på main (gruppens svar 14.11
    kl. 16:13), README-prøven og brukertest 2.
+
+*Ført 2026-11-14 kl. 21:22 (tillegg 2), rett før flettingen:* kommandoen i punkt 1
+med datoen `2026-11-14`, kjørt fra hovedkopien, lest med `mode=ro`, ga avtrykket
+`665d4eff98e57820f399d874f233667388ca32470e25818741200da5124e4bf9` og 477
+kveldsrader. sha256 av `data/db/ose.db` var lik før og etter kommandoen. Basen
+stod da før 0014. Kopien av basen i punkt 1 er gruppens.
