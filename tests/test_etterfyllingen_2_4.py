@@ -191,12 +191,15 @@ class TestIngenVurderingerEtterfylles:
         """Ville feilet hvis hentingen etter hullet skrev vurderinger for
         dagene i hullet: de ville vært regnet av en serie som ikke fantes
         de kveldene."""
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): testen
+        # gjelder kveldsradene. Dagene i hullet får signalet regnet i ettertid,
+        # merket i basen, og det testes i tests/test_ettertid_2_17.py.
         raa, base = stier
         _kjoer(raa, base, MANDAG, _hent(MANDAG))
         _kjoer(raa, base, FREDAG, _hent(FREDAG))
         t = aapne_base(base)
         try:
-            datoer = {d for (d,) in t.execute("SELECT DISTINCT dato FROM vurdering")}
+            datoer = {d for (d,) in t.execute("SELECT DISTINCT dato FROM vurdering WHERE regnet = 'kveld'")}
         finally:
             t.close()
         assert datoer == {MANDAG.isoformat(), FREDAG.isoformat()}

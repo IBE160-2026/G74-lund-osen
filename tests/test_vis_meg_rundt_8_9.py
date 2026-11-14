@@ -109,8 +109,12 @@ class TestHverSide:
     def test_aksjesiden_uten_sjekker(self, klient):
         """Ville feilet hvis «Vis meg rundt» forklarte sjekkene på en dag
         siden ikke har dem (en dag uten vurdering), eller et steg pekte på
-        noe siden ikke har."""
-        html = klient.get("/aksje/EQNR?dag=2026-09-21").data.decode("utf-8")
+        noe siden ikke har.
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): 21.09
+        har signalet regnet i ettertid til slutt i hentingen, så dagen uten
+        vurdering er mandag 03.08, der serien har for få kurser."""
+        html = klient.get("/aksje/EQNR?dag=2026-08-03").data.decode("utf-8")
         assert "Hvorfor signalet ble ukjent" in html
         ankrene = [s["anker"] for s in _rundturen(html)]
         assert ankrene == [s.anker for s in ht.rundturer()["aksje_uten_sjekker"]]

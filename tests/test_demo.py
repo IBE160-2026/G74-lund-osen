@@ -186,7 +186,10 @@ class TestDemokommandoen:
         try:
             kurslager = SqliteKurslager(c, demo.DEMOUNIVERS)
             lager = SqliteVurderingslager(c, lambda: datetime.now(timezone.utc), demo.DEMOUNIVERS)
-            antall = c.execute("SELECT COUNT(*) FROM vurdering").fetchone()[0]
+            # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): kveldsradene. Dagene
+            # foer STARTDAG har signalet regnet i ettertid, testet i
+            # tests/test_ettertid_2_17.py.
+            antall = c.execute("SELECT COUNT(*) FROM vurdering WHERE regnet = 'kveld'").fetchone()[0]
             dager = [d for d in demo.handelsdager() if d >= demo.STARTDAG]
             assert antall == len(dager) * len(demo.DEMOUNIVERS)
             for aksje in demo.DEMOUNIVERS:
@@ -734,8 +737,13 @@ class TestAlleTiKombinasjonene:
             kurs = c.execute(
                 "SELECT symbol, dato, slutt, justert_slutt, volum FROM kurs ORDER BY symbol, dato"
             ).fetchall()
+            # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): kveldsradene, med
+            # kolonnene fra foer 0014, saa avtrykket er det samme som foer
+            # storyen. Ingen kveldsrad i demoen er endret.
+            kolonner = [r[1] for r in c.execute("PRAGMA table_info(vurdering)") if r[1] != "regnet"]
             vurdering = c.execute(
-                "SELECT * FROM vurdering WHERE dato < ? ORDER BY symbol, dato", (demo.SLUTTDATO.isoformat(),)
+                f"SELECT {', '.join(kolonner)} FROM vurdering WHERE dato < ? AND regnet = 'kveld' ORDER BY symbol, dato",
+                (demo.SLUTTDATO.isoformat(),),
             ).fetchall()
         finally:
             c.close()
@@ -944,10 +952,14 @@ class TestHistorikkenSomDenEkte:
 
     def test_ingen_vurdering_foer_startdagen(self, mal):
         """Ville feilet med en vurdering foer 21.09 (M1)."""
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): kveldsradene.
+        # Dagene foer 21.09 har signalet regnet i ettertid.
         c = sqlite3.connect(mal)
         try:
-            foer = c.execute("SELECT COUNT(*) FROM vurdering WHERE dato < ?", ("2026-09-21",)).fetchone()[0]
-            foerste = c.execute("SELECT MIN(dato) FROM vurdering").fetchone()[0]
+            foer = c.execute(
+                "SELECT COUNT(*) FROM vurdering WHERE dato < ? AND regnet = 'kveld'", ("2026-09-21",)
+            ).fetchone()[0]
+            foerste = c.execute("SELECT MIN(dato) FROM vurdering WHERE regnet = 'kveld'").fetchone()[0]
         finally:
             c.close()
         assert foer == 0 and foerste == "2026-09-21"
@@ -960,7 +972,8 @@ class TestHistorikkenSomDenEkte:
         assert dager[0] == "2026-09-21" and dager[-1] == "2026-10-09" and len(dager) == 15
         c = sqlite3.connect(mal)
         try:
-            rader = c.execute("SELECT symbol, dato FROM vurdering").fetchall()
+            # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): kveldsradene.
+            rader = c.execute("SELECT symbol, dato FROM vurdering WHERE regnet = 'kveld'").fetchall()
             med_kurs = set(c.execute("SELECT symbol, dato FROM kurs WHERE dato >= ?", ("2026-09-21",)).fetchall())
         finally:
             c.close()
@@ -970,14 +983,29 @@ class TestHistorikkenSomDenEkte:
 
     def test_ikke_vurdert_i_historikken_foer_startdagen(self, klient, monkeypatch, demobase):
         """Ville feilet hvis dagene foer 21.09 hadde signal, eller 21.09 ikke
-        hadde det."""
+        hadde det.
+
+        Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): dagene foer 21.09 har
+        signalet regnet i ettertid, merket «i ettertid», naar aksjen har nok
+        kurser, og «ikke vurdert» foer det, som fredag 06.03. 21.09 har
+        kveldens signal, uten merket. Ville feilet hvis en dag foer 21.09 sto
+        uten merket, eller 21.09 fikk det."""
         import re
 
         monkeypatch.setenv(app_modul.I_DEMO, "1")
-        html = klient.get("/aksje/KVST?maaned=2026-09").data.decode("utf-8")
-        delen = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.split('id="signalet-dag-for-dag"', 1)[1]))
-        assert "fredag 18.09 – ikke vurdert" in delen
-        assert "mandag 21.09 – ikke vurdert" not in delen and "mandag 21.09" in delen
+
+        def delen(maaned: str) -> str:
+            html = klient.get(f"/aksje/KVST?maaned={maaned}").data.decode("utf-8")
+            return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.split('id="signalet-dag-for-dag"', 1)[1]))
+
+        september = delen("2026-09")
+        fredag = september.split("fredag 18.09", 1)[1].split("mandag 21.09", 1)[0]
+        assert "i ettertid" in fredag and "ikke vurdert" not in fredag
+        mandag = september.split("mandag 21.09", 1)[1].split("tirsdag 22.09", 1)[0]
+        assert "i ettertid" not in mandag and "ikke vurdert" not in mandag
+        mars = delen("2026-03")
+        assert "fredag 06.03 – ikke vurdert" in mars
+        assert "i ettertid" in mars.split("fredag 13.03", 1)[1].split("mandag 16.03", 1)[0]
 
     def test_kombinasjonene_og_ki_tekstene_paa_sluttdato_som_foer(self, mal):
         """De 10 fargekombinasjonene og en KI-rad per aksje med vurdering paa
@@ -1045,12 +1073,19 @@ class TestFotnotenIDemoen:
     """Story 3.4d (gruppens svar 22.10 kl. 20:11): fotnoten for «ikke
     vurdert» har en egen tekst i demoen, med datoen fra STARTDAG."""
 
-    DEMOTEKST = "i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting."
+    # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): med
+    # setningen om at dagene før er regnet i ettertid.
+    DEMOTEKST = (
+        "i demoen starter vurderingene mandag 21.09, slik den ekte versjonen har signal fra første henting. "
+        "Dagene før er regnet i ettertid når aksjen har minst 51 kursdager til og med dagen."
+    )
     # Story 3.4e: den ekte teksten, ogsaa i demoen for en dag fra STARTDAG.
+    # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): her sto
+    # at signalet «regnes aldri ut bakover».
     EKTE_TEKST = (
-        "«Ikke vurdert»: signalet lagres bare den kvelden kursene hentes, og regnes aldri ut bakover. "
-        "Det gjelder dagene før første henting, kvelder uten henting, og dager der kursene er lest inn med "
-        "<code>--les-inn</code>."
+        "«Ikke vurdert»: appen har ingen vurdering for dagen. Signalet lagres den kvelden kursene hentes, "
+        "og for en tidligere børsdag uten vurdering regner neste henting det i ettertid når aksjen har "
+        "minst 51 kursdager til og med dagen."
     )
 
     @staticmethod
@@ -1065,8 +1100,10 @@ class TestFotnotenIDemoen:
 
     def test_aksjesiden_for_en_dag_foer_startdagen(self, klient, monkeypatch, demobase):
         """Ville feilet med den ekte teksten i demoen (M1)."""
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): fredag 06.03, ikke
+        # 18.09, som har signalet regnet i ettertid. 06.03 har for faa kurser.
         monkeypatch.setenv(app_modul.I_DEMO, "1")
-        html = klient.get("/aksje/KVST?dag=2026-09-18").data.decode("utf-8")
+        html = klient.get("/aksje/KVST?dag=2026-03-06").data.decode("utf-8")
         fotnoten = self._fotnoten(html)
         assert fotnoten == "«Ikke vurdert»: " + self.DEMOTEKST
         assert "--les-inn" not in html
@@ -1091,10 +1128,12 @@ class TestFotnotenIDemoen:
         """Story 3.4e: KVST uten kurser fra STARTDAG, saa raden er fra fredag
         18.09 og «ikke vurdert». Ville feilet hvis demoteksten forsvant for
         en dag foer STARTDAG paa oversikten."""
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): raden i ettertid for
+        # 18.09 tas ogsaa bort, saa dagen er uten rad, som foer storyen.
         c = sqlite3.connect(demobase)
         try:
             c.execute("DELETE FROM kurs WHERE symbol = 'KVST' AND dato >= '2026-09-21'")
-            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato >= '2026-09-21'")
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato >= '2026-09-18'")
             c.commit()
         finally:
             c.close()
@@ -1139,15 +1178,22 @@ class TestFotnotenIDemoen:
         feilet hvis demoteksten sto når én av datoene er før STARTDAG."""
         c = sqlite3.connect(demobase)
         try:
+            # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): ogsaa raden i ettertid
+            # for KVST 18.09, saa dagen er uten rad, som foer storyen.
             c.execute("DELETE FROM kurs WHERE symbol = 'KVST' AND dato >= '2026-09-21'")
-            c.execute("DELETE FROM vurdering WHERE symbol IN ('KVST', 'LKSV') AND dato >= '2026-09-21'")
+            c.execute("DELETE FROM vurdering WHERE symbol = 'KVST' AND dato >= '2026-09-18'")
+            c.execute("DELETE FROM vurdering WHERE symbol = 'LKSV' AND dato >= '2026-09-21'")
             c.commit()
         finally:
             c.close()
         monkeypatch.setenv(app_modul.I_DEMO, "1")
         assert self._fotnoten(klient.get("/").data.decode("utf-8")) == self.EKTE_TEKST
 
-    @pytest.mark.parametrize("adresse", ["/aksje/KVST?dag=2026-09-18", "/boersometer?dag=2026-09-18"])
+    # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): aksjesiden for 06.03,
+    # fordi 18.09 har signalet regnet i ettertid. Børsometeret 18.09 har
+    # fortsatt Varde Systemer uten vurdering. Teksten har setningen om dagene
+    # foer.
+    @pytest.mark.parametrize("adresse", ["/aksje/KVST?dag=2026-03-06", "/boersometer?dag=2026-09-18"])
     def test_datoen_paa_sidene_kommer_fra_startdag(self, klient, monkeypatch, demobase, adresse):
         """Gjennomgangen av 3.4d (VG1): sidene, ikke bare funksjonen. Ville
         feilet med datoen skrevet fast i malen i stedet for STARTDAG (M1 i
@@ -1157,7 +1203,7 @@ class TestFotnotenIDemoen:
         html = klient.get(adresse).data.decode("utf-8")
         assert self._fotnoten(html) == (
             "«Ikke vurdert»: i demoen starter vurderingene tirsdag 29.09, slik den ekte versjonen har signal "
-            "fra første henting."
+            "fra første henting. Dagene før er regnet i ettertid når aksjen har minst 51 kursdager til og med dagen."
         )
 
     def test_datoen_kommer_fra_startdag(self, monkeypatch):

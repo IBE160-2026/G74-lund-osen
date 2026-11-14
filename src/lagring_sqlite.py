@@ -1,6 +1,7 @@
 """SQLite-adapterne for kursdata, vurderinger og KI-loggen - story 1.3, 1.6
 og 4.3, FR-406, FR-408, FR-604, AD-4, AD-5 og AD-7. Story 8.3: merkingen i
-Min liste (SqliteMinlistelager).
+Min liste (SqliteMinlistelager). Story 2.17: radene regnet i ettertid
+(SqliteEttertidslager).
 
 Skall: dette er en av filene som kjenner teknologi. Kjernen ser bare
 portene, Kurslager med Kursrad og Vurderingslager med Vurdering og Grunn.
@@ -323,13 +324,30 @@ VURDERINGSKOLONNER = (
 # Siste vinner, med ett unntak: en grunn skriver aldri over en vurdering
 # samme dag (punkt 24). WHERE-leddet gjoer da upserten til ingenting, og
 # rowcount blir 0. Reglene for overskriving staar her og ingen andre steder.
+# Story 2.17: raden er en kveldsrad (regnet = 'kveld'). Kveldens rad skriver
+# over en rad regnet i ettertid samme dag, ogsaa med en grunn, fordi kveldens
+# rad er den som gjelder. Det skjer bare om klokka har gaatt bakover:
+# radene i ettertid regnes bare for dager foer inneveerende boersdag.
 _UPSERT = (
-    "INSERT INTO vurdering (symbol, dato, " + ", ".join(VURDERINGSKOLONNER) + ", grunn) "
-    "VALUES (" + ", ".join("?" * (len(VURDERINGSKOLONNER) + 3)) + ") "
+    "INSERT INTO vurdering (symbol, dato, " + ", ".join(VURDERINGSKOLONNER) + ", grunn, regnet) "
+    "VALUES (" + ", ".join("?" * (len(VURDERINGSKOLONNER) + 3)) + ", 'kveld') "
     "ON CONFLICT (symbol, dato) DO UPDATE SET "
     + ", ".join(f"{k} = excluded.{k}" for k in (*VURDERINGSKOLONNER, "grunn"))
-    + " WHERE excluded.grunn IS NULL OR vurdering.grunn IS NOT NULL"
+    + ", regnet = 'kveld'"
+    + " WHERE excluded.grunn IS NULL OR vurdering.grunn IS NOT NULL OR vurdering.regnet = 'ettertid'"
 )
+
+# Story 2.17: verdiene i kolonnen regnet (0014).
+KVELD = "kveld"
+ETTERTID = "ettertid"
+
+
+def _regnet(tilkobling: sqlite3.Connection) -> str:
+    """Uttrykket som gir regnet i en SELECT. En base en versjon bak
+    (godta_en_versjon_bak, story 2.8) har ikke kolonnen fra 0014, og alle
+    radene der er kveldsrader."""
+    kolonner = {rad[1] for rad in tilkobling.execute("PRAGMA table_info(vurdering)")}
+    return "regnet" if "regnet" in kolonner else "'kveld'"
 
 
 def _foerste_dag_godtas(
@@ -385,6 +403,7 @@ class SqliteVurderingslager:
         _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
         self._tilkobling = tilkobling
         self._klokke = klokke
+        self._regnet = _regnet(tilkobling)
         # Story 2.3c: foerste henting paa dagtid i en tom base (_foerste_dag_godtas).
         self._foerste_dag = foerste_dag
         # Story 3.4: lista som skrives, med AKSJEUNIVERS som standard.
@@ -393,6 +412,9 @@ class SqliteVurderingslager:
     def skriv(self, symbol: str, dato: date, innhold: Vurdering | Grunn) -> bool:
         _kontroller_noekkel(symbol, dato, self._symboler)
         if isinstance(innhold, Vurdering):
+            # Story 2.17: en rad i ettertid skrives aldri gjennom porten.
+            if innhold.ettertid:
+                raise TypeError("en vurdering regnet i ettertid skrives bare av SqliteEttertidslager")
             verdier = (*(getattr(innhold, k) for k in VURDERINGSKOLONNER), None)
         elif isinstance(innhold, Grunn):
             verdier = (*(None for _ in VURDERINGSKOLONNER), innhold.value)
@@ -419,20 +441,29 @@ class SqliteVurderingslager:
             raise
         return skrevet > 0
 
-    def les(self, symbol: str, dato: date) -> Vurdering | Grunn | None:
+    def _bare_kveld(self, med_ettertid: bool) -> str:
+        """Story 2.17: uten med_ettertid gir les og les_periode bare
+        kveldsradene, som foer storyen. Hentingen, KI-laget og demoens
+        KI-tekster leser slik. Visningene ber om radene i ettertid."""
+        return "" if med_ettertid else f" AND {self._regnet} = 'kveld'"
+
+    def les(self, symbol: str, dato: date, *, med_ettertid: bool = False) -> Vurdering | Grunn | None:
         # Samme kontroll som skriv: en ticker eller et tidspunkt ville ellers
         # gitt None, som leses som at kommandoen ikke ble kjoert (FR-409).
         _kontroller_noekkel(symbol, dato, self._symboler)
         rad = self._tilkobling.execute(
-            "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering WHERE symbol = ? AND dato = ?",
+            "SELECT " + ", ".join(VURDERINGSKOLONNER) + f", grunn, {self._regnet} FROM vurdering "
+            "WHERE symbol = ? AND dato = ?" + self._bare_kveld(med_ettertid),
             (symbol, dato.isoformat()),
         ).fetchone()
         if rad is None:
             return None
-        *felt, grunn = rad
-        return _innhold(felt, grunn)
+        *felt, grunn, regnet = rad
+        return _innhold(felt, grunn, regnet)
 
-    def les_periode(self, symbol: str, fra: date, til: date) -> dict[date, Vurdering | Grunn]:
+    def les_periode(
+        self, symbol: str, fra: date, til: date, *, med_ettertid: bool = False
+    ) -> dict[date, Vurdering | Grunn]:
         # Story 2.7b: en spoerring for hele perioden, med samme kontroll som les.
         _kontroller_noekkel(symbol, fra, self._symboler)
         _kontroller_noekkel(symbol, til, self._symboler)
@@ -440,21 +471,113 @@ class SqliteVurderingslager:
         if fra > til:
             raise ValueError(f"fra ({fra.isoformat()}) er etter til ({til.isoformat()})")
         return {
-            date.fromisoformat(dato): _innhold(felt, grunn)
-            for dato, *felt, grunn in self._tilkobling.execute(
-                "SELECT dato, " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering "
-                "WHERE symbol = ? AND dato BETWEEN ? AND ? ORDER BY dato",
+            date.fromisoformat(dato): _innhold(felt, grunn, regnet)
+            for dato, *felt, grunn, regnet in self._tilkobling.execute(
+                "SELECT dato, " + ", ".join(VURDERINGSKOLONNER) + f", grunn, {self._regnet} FROM vurdering "
+                "WHERE symbol = ? AND dato BETWEEN ? AND ?" + self._bare_kveld(med_ettertid) + " ORDER BY dato",
                 (symbol, fra.isoformat(), til.isoformat()),
             )
         }
 
 
-def _innhold(felt, grunn) -> Vurdering | Grunn:
+class SqliteEttertidslager:
+    """Radene regnet i ettertid - story 2.17, AD-7 (merknaden 2026-11-14).
+
+    Den egne veien for radene i ettertid, ved siden av SqliteVurderingslager.
+    Kveldsradene er uerstattelige som foer, og denne veien roerer dem aldri:
+    skriv setter bare inn en rad for en dag uten rad (ON CONFLICT DO
+    NOTHING), og slett sletter bare rader med regnet = 'ettertid'. Triggeren
+    fra 0014 avviser at en kveldsrad blir en rad i ettertid.
+
+    skriv godtar bare dager foer inneveerende boersdag, regnet fra klokka ved
+    hvert kall, og bare vurderinger med ettertid satt. Hver aksje skrives i en
+    transaksjon.
+    """
+
+    def __init__(
+        self,
+        tilkobling: sqlite3.Connection,
+        klokke: Callable[[], datetime],
+        univers: tuple[Aksje, ...] = AKSJEUNIVERS,
+    ):
+        _krev_siste_versjon(tilkobling)
+        self._tilkobling = tilkobling
+        self._klokke = klokke
+        self._symboler = SYMBOLER if univers is AKSJEUNIVERS else frozenset(aksje.symbol for aksje in univers)
+
+    def datoer_med_rad(self, symbol: str) -> set[date]:
+        """Datoene med en rad i vurdering for symbolet, kveldsrad eller rad i ettertid."""
+        return {
+            date.fromisoformat(dato)
+            for (dato,) in self._tilkobling.execute("SELECT dato FROM vurdering WHERE symbol = ?", (symbol,))
+        }
+
+    def skriv(self, symbol: str, radene: list[tuple[date, Vurdering]]) -> int:
+        """Skriver radene for dager uten rad. Returnerer hvor mange som ble skrevet."""
+        dagens = innevaerende_boersdag(norsk_dato(self._klokke()))
+        verdier = []
+        for dato, vurdering in radene:
+            _kontroller_noekkel(symbol, dato, self._symboler)
+            if not isinstance(vurdering, Vurdering) or not vurdering.ettertid:
+                raise TypeError("bare en vurdering regnet i ettertid skrives her")
+            if dato >= dagens:
+                raise ValueError(
+                    f"{dato.isoformat()} er ikke foer inneveerende boersdag ({dagens.isoformat()}). "
+                    "Signalet regnes aldri i ettertid for den (AD-7, story 2.17)."
+                )
+            verdier.append((symbol, dato.isoformat(), *(getattr(vurdering, k) for k in VURDERINGSKOLONNER)))
+        if not verdier:
+            return 0
+        return self._i_transaksjon(
+            lambda: self._tilkobling.executemany(
+                "INSERT INTO vurdering (symbol, dato, " + ", ".join(VURDERINGSKOLONNER) + ", grunn, regnet) "
+                "VALUES (" + ", ".join("?" * (len(VURDERINGSKOLONNER) + 2)) + ", NULL, 'ettertid') "
+                "ON CONFLICT (symbol, dato) DO NOTHING",
+                verdier,
+            )
+        )
+
+    def slett(self, symbol: str | None = None) -> int:
+        """Sletter radene i ettertid, for symbolet eller alle. Aldri en kveldsrad."""
+        sql = "DELETE FROM vurdering WHERE regnet = 'ettertid'"
+        argumenter: tuple = ()
+        if symbol is not None:
+            _kontroller_noekkel(symbol, date.min, self._symboler)
+            sql += " AND symbol = ?"
+            argumenter = (symbol,)
+        return self._i_transaksjon(lambda: self._tilkobling.execute(sql, argumenter))
+
+    def _i_transaksjon(self, endring) -> int:
+        """Endringen i en transaksjon. Gir antallet rader den endret."""
+        if self._tilkobling.in_transaction:
+            raise RuntimeError(
+                "Tilkoblingen har en aapen transaksjon. Adapteren styrer transaksjonen selv - avslutt kallerens foerst."
+            )
+        foer = self._tilkobling.total_changes
+        try:
+            self._tilkobling.execute("BEGIN")
+            endring()
+            self._tilkobling.execute("COMMIT")
+        except BaseException:
+            if self._tilkobling.in_transaction:
+                self._tilkobling.execute("ROLLBACK")
+            raise
+        return self._tilkobling.total_changes - foer
+
+    def antall(self) -> int:
+        """Hvor mange rader i ettertid basen har."""
+        return self._tilkobling.execute("SELECT count(*) FROM vurdering WHERE regnet = 'ettertid'").fetchone()[0]
+
+
+def _innhold(felt, grunn, regnet: str = KVELD) -> Vurdering | Grunn:
     """Raden i vurdering som Vurdering eller Grunn, ett sted for begge
-    adapterne som leser den."""
+    adapterne som leser den. Story 2.17: regnet sier om raden er regnet i
+    ettertid."""
     if grunn is not None:
         return Grunn(grunn)
-    return Vurdering(**dict(zip(VURDERINGSKOLONNER, felt)))
+    if regnet not in (KVELD, ETTERTID):
+        raise ValueError(f"ukjent verdi i regnet: {regnet!r}")
+    return Vurdering(**dict(zip(VURDERINGSKOLONNER, felt)), ettertid=regnet == ETTERTID)
 
 
 # Spoerringen med join for oversikten - story 2.2b. En rad per aksje i aksje,
@@ -469,7 +592,7 @@ _OVERSIKT = (
     + ", ".join(f"f.{k}" for k in _KURSFELT.split(", "))
     + ", "
     + ", ".join(f"v.{k}" for k in VURDERINGSKOLONNER)
-    + ", v.grunn, a.ut "
+    + ", v.grunn, v.regnet, a.ut "
     "FROM aksje a "
     "LEFT JOIN kursserie ks ON ks.symbol = a.symbol "
     "LEFT JOIN kurs n ON n.symbol = a.symbol "
@@ -519,29 +642,30 @@ class SqliteOversiktsleser:
         return _post(rad) if rad is not None else None
 
     def vurdering(self, symbol: str, dato: date) -> Vurdering | Grunn | None:
-        # Story 8.16: bare lesing, som resten av porten. Signalet regnes aldri.
+        # Story 8.16: bare lesing, som resten av porten. Signalet regnes
+        # aldri her. Story 2.17: en rad regnet i ettertid har ettertid satt.
         rad = self._tilkobling.execute(
-            "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn FROM vurdering WHERE symbol = ? AND dato = ?",
+            "SELECT " + ", ".join(VURDERINGSKOLONNER) + ", grunn, regnet FROM vurdering WHERE symbol = ? AND dato = ?",
             (symbol, dato.isoformat()),
         ).fetchone()
         if rad is None:
             return None
-        *felt, grunn = rad
-        return _innhold(felt, grunn)
+        *felt, grunn, regnet = rad
+        return _innhold(felt, grunn, regnet)
 
 
 def _post(rad) -> Oversiktspost:
     symbol, ticker, navn, sektor, hentet = rad[:5]
     nyeste = _kursrad(*rad[5:9])
     forrige = _kursrad(*rad[9:13])
-    *felt, grunn, ut = rad[13:]
+    *felt, grunn, regnet, ut = rad[13:]
     har_rad = grunn is not None or felt[0] is not None
     return Oversiktspost(
         aksje=Aksje(symbol, ticker, navn, sektor),
         nyeste=nyeste,
         forrige=forrige,
         hentet=datetime.fromisoformat(hentet) if hentet is not None else None,
-        innhold=_innhold(felt, grunn) if har_rad else None,
+        innhold=_innhold(felt, grunn, regnet) if har_rad else None,
         ut=date.fromisoformat(ut) if ut is not None else None,
     )
 

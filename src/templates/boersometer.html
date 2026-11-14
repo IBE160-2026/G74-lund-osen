@@ -3,6 +3,7 @@
 {% from "_bransjer.html" import bransjesymbol -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% from "_rundtur.html" import rundtur with context -%}
+{% from "_brikker.html" import ettertid -%}
 {#- Story 8.6 (FR-106, avgjørelsen 22.10 kl. 23:19): børsometeret som på
     tavla. Én rute per aksje, ordnet etter bransje med symbolet. Fargen er
     endringen slik den vises, størrelsen volumforholdet, og rammen signalet:
@@ -97,7 +98,7 @@
           {%- set rute = kartrute.rute %}
           {#- Gruppens svar 23.10 kl. 09:24 (b): hver rute lenker til aksjesiden,
               også for en aksje uten kurser. #}
-          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% for navn in kartrute.styrke|sort %} styrke-{{ navn }}{% endfor %}{% for navn in kartrute.grunn|sort %} grunn-{{ navn }}{% endfor %}{% for navn in kartrute.merke|sort %} merke-{{ navn }}{% endfor %}{% for navn in kartrute.navn|sort %} navn-{{ navn }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}" title="{{ rute.aksje.symbol }}: {% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}{{ uten_data_tekst if rute.aldri_kurs else 'ingen kurs den dagen' }}{% else %}–{% endif %}{% if rute.styrke is not none %}, {{ rute.styrke }} av {{ antall_sjekker }}{% elif rute.uten_styrke %}, {{ rute.uten_styrke }}{% endif %}">
+          <li style="{{ plass_stil(kartrute.plass) }}"><a class="rute trinn-{{ rute.fargetrinn or 'ingen' }}{% for navn, nivaa in kartrute.nivaa.items() %} nivaa-{{ navn }}-{{ nivaa }}{% endfor %}{% for navn in kartrute.styrke|sort %} styrke-{{ navn }}{% endfor %}{% for navn in kartrute.grunn|sort %} grunn-{{ navn }}{% endfor %}{% for navn in kartrute.merke|sort %} merke-{{ navn }}{% endfor %}{% for navn in kartrute.navn|sort %} navn-{{ navn }}{% endfor %}{% if rute.ramme %} ramme-{{ rute.ramme }}{% endif %}{% if rute.uten_data %} uten-data{% endif %}{% if rute.ettertid %} ettertid{% endif %}" href="{{ aksjeadresse(rute.aksje.symbol) }}" title="{{ rute.aksje.symbol }}: {% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}{{ uten_data_tekst if rute.aldri_kurs else 'ingen kurs den dagen' }}{% else %}–{% endif %}{% if rute.styrke is not none %}, {{ rute.styrke }} av {{ antall_sjekker }}{% if rute.ettertid %}, i ettertid{% endif %}{% elif rute.uten_styrke %}, {{ rute.uten_styrke }}{% endif %}">
             <span class="ticker">{{ rute.aksje.symbol }}</span>
             <span class="endring">{% if rute.endring is not none %}{{ rute.endring|tall('endring') }}{% elif rute.uten_data %}{{ uten_kurs_kort if rute.aldri_kurs else 'Ingen kurs' }}{% else %}–{% endif %}</span>
             {#- Gruppens svar 04.11 kl. 10:01 og 10:04: styrken står i alle
@@ -108,7 +109,9 @@
                 uten styrke, sier «ikke vurdert» der styrken ellers står, og
                 grunnen står under, uten «ikke vurdert» en gang til. #}
             {% if rute.styrke is not none %}<span class="skjult">, </span><span class="styrke{% if dagen == siste and rute.ramme == 'gul' %} pille tre-av-tre{% elif rute.ramme == 'moerk' %} pille to-av-tre{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% elif rute.uten_styrke %}<span class="skjult">, </span><span class="styrke ikke-vurdert">{{ rute.uten_styrke }}</span>{% endif %}
-            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% endif %}
+            {#- Story 2.17: en dag med signalet regnet i ettertid har stiplet kant
+                og «i ettertid» der merket står. #}
+            {% if rute.ramme == "gul" and dagen != siste %}<span class="merke"><span class="skjult">, </span>{{ antall_sjekker }} av {{ antall_sjekker }} siste børsdag</span>{% if rute.ettertid %}<span class="skjult">, i ettertid</span>{% endif %}{% elif rute.ettertid %}<span class="merke"><span class="skjult">, </span>i ettertid</span>{% endif %}
             {% if rute.grunn %}<span class="skjult">, </span><span class="tekst">{{ rute.grunn }}</span>{% endif %}
             {#- Gruppens svar 04.11 kl. 22:23, 1: navnet står for øyet i store ruter,
                 nivå 4. Skjermleseren leser det i linja under, og stilen setter det under symbolet, så det står bare én gang. #}
@@ -152,7 +155,7 @@
           <td class="selskap"><a href="{{ aksjeadresse(rute.aksje.symbol) }}">{{ rute.aksje.navn }}</a><span class="skjult">, </span><span class="linje">{{ rute.aksje.symbol }}</span></td>
           <td class="tall">{% if rute.endring is not none %}<span class="{{ fortegn(rute.endring) }}">{{ rute.endring|tall('endring') }}</span>{% if rute.fra %} <span class="fra">fra {{ rute.fra|dato }}</span>{% endif %}{% elif rute.uten_data %}{{ uten_kurs_kort if rute.aldri_kurs else 'Ingen kurs den dagen' }}{% else %}–{% endif %}</td>
           <td class="tall">{% if rute.volumforhold is not none %}{{ rute.volum_vist }} <span class="volumord">({{ rute.volumord }})</span>{% else %}–{% endif %}</td>
-          <td class="styrke tall">{% if rute.styrke is not none %}<span class="{% if rute.ramme == 'gul' and dagen == siste %}pille tre-av-tre{% elif rute.ramme == 'moerk' %}pille to-av-tre{% else %}styrketall{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span>{% elif rute.uten_data %}{{ uten_kurs_kort if rute.aldri_kurs else "–" }}{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
+          <td class="styrke tall">{% if rute.styrke is not none %}<span class="{% if rute.ramme == 'gul' and dagen == siste %}pille tre-av-tre{% elif rute.ramme == 'moerk' %}pille to-av-tre{% else %}styrketall{% endif %}">{{ rute.styrke }} av {{ antall_sjekker }}</span> {{ ettertid(rute.ettertid) }}{% elif rute.uten_data %}{{ uten_kurs_kort if rute.aldri_kurs else "–" }}{% else %}{{ rute.tekst or "–" }}{% endif %}</td>
         </tr>
         {%- endfor %}
       </tbody>

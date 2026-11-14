@@ -464,9 +464,13 @@ class TestLesingen:
         kall = []
         ekte = SqliteVurderingslager.les_periode
 
-        def tell(self, *argumenter):
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): siden
+        # leser med med_ettertid=True, saa kallet tar ogsaa noekkelordene, og
+        # begge lesingene skal ha dem.
+        def tell(self, *argumenter, **noekkelord):
             kall.append(argumenter)
-            return ekte(self, *argumenter)
+            assert noekkelord == {"med_ettertid": True}, noekkelord
+            return ekte(self, *argumenter, **noekkelord)
 
         monkeypatch.setattr(SqliteVurderingslager, "les_periode", tell)
         monkeypatch.setattr(SqliteVurderingslager, "les", lambda *a: pytest.fail("les per dag"))
@@ -532,7 +536,8 @@ class TestRenLogikk:
         """Leses ikke vurdering, svarer siden 503 med feiltypen, som ved andre
         basefeil. Ville feilet med 500 eller en traceback (BH1, ECH11)."""
 
-        def feil(*_a):
+        # Rettet 2026-11-14 (story 2.17): ogsaa med noekkelordet med_ettertid.
+        def feil(*_a, **_k):
             raise sqlite3.OperationalError("disk I/O error")
 
         monkeypatch.setattr(SqliteVurderingslager, "les_periode", feil)

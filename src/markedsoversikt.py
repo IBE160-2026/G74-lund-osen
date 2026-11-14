@@ -24,7 +24,7 @@ from kursdata import Aksje, Kursrad
 from oversiktsdata import Oversiktspost
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV, STANDARD, Parametre, nodvendige_dager
 from tallformat import dato, fortegn, tall, ukedag
-from tilstand import Art, Tilstand, tilstand
+from tilstand import MED_SIGNAL, Art, Tilstand, tilstand
 from vurderingsdata import Grunn, Vurdering
 
 
@@ -109,7 +109,7 @@ def les_tilstand(
         utfall = tilstand(innhold, dato, idag, ut)
     except UtenforKalenderen:
         return None, utenfor_kalenderen()
-    if utfall.art is Art.SVAR:
+    if utfall.art in MED_SIGNAL:
         return utfall, None
     if utfall.art is Art.GRUNN:
         return utfall, GRUNNTEKST[utfall.innhold]
@@ -188,9 +188,14 @@ class Rad:
 
     @property
     def vurdering(self) -> Vurdering | None:
-        if self.tilstand is not None and self.tilstand.art is Art.SVAR:
+        if self.tilstand is not None and self.tilstand.art in MED_SIGNAL:
             return self.tilstand.innhold
         return None
+
+    @property
+    def ettertid(self) -> bool:
+        """Story 2.17: signalet er regnet i ettertid."""
+        return self.tilstand is not None and self.tilstand.ettertid
 
     @property
     def styrke(self) -> int | None:
@@ -383,7 +388,7 @@ def bygg_rad(post: Oversiktspost, idag: date, p: Parametre = STANDARD, antall_da
     utfall, tekst = les_tilstand(post.innhold, siste.dato, idag)
     tekst = grunn_med_tall(utfall, tekst, antall_dager, p)
     rader = [r for r in (post.forrige, siste) if r is not None]
-    styrke = utfall.innhold.styrke if utfall is not None and utfall.art is Art.SVAR else None
+    styrke = utfall.innhold.styrke if utfall is not None and utfall.art in MED_SIGNAL else None
     return Rad(
         aksje=post.aksje,
         dato=siste.dato,

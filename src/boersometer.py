@@ -46,7 +46,7 @@ from markedsoversikt import (
 )
 from signalberegning import STANDARD, Parametre
 from tallformat import avrundet, dato, tall, ukedag
-from tilstand import Art
+from tilstand import MED_SIGNAL
 from vurderingsdata import Grunn, Vurdering
 
 # De 13 bransjene i designregler.md §4, i rekkefølgen tabellen står.
@@ -108,6 +108,8 @@ class Rute:
     # etter den første kursen i perioden.
     lik_stoerrelse: bool = False
     fra: date | None = None
+    # Story 2.17: signalet for dagen er regnet i ettertid.
+    ettertid: bool = False
 
     @property
     def stoerrelse(self) -> str:
@@ -311,7 +313,7 @@ def bygg_rute(
     # Story 8.2a, d (gruppens svar 24.10 kl. 11:29): ruta sier hvorfor, med
     # samme tall som aksjesiden for dagen, regnet av kursene til og med dato.
     tekst = grunn_med_tall(utfall, tekst, len(kurser), p)
-    vurdering = utfall.innhold if utfall is not None and utfall.art is Art.SVAR else None
+    vurdering = utfall.innhold if utfall is not None and utfall.art in MED_SIGNAL else None
     return Rute(
         aksje=aksje,
         endring=endring_i_prosent(kurser[-2:]),
@@ -320,6 +322,7 @@ def bygg_rute(
         tekst=tekst,
         siste_styrke=siste_styrke,
         er_siste=er_siste,
+        ettertid=utfall is not None and utfall.ettertid,
     )
 
 

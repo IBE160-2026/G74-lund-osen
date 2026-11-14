@@ -980,7 +980,11 @@ def test_ikke_vurdert_plass(b, h, ventet):
     [
         "/boersometer",
         "/boersometer?periode=velg&dag=2026-10-01",
-        "/boersometer?periode=velg&dag=2026-09-18",
+        # Rettet 2026-11-14 (story 2.17, gruppens svar kl. 05:41-05:49): 18.09
+        # har signalet regnet i ettertid, så dagen uten vurdering er fredag
+        # 06.03, der aksjene har for få kurser. Varde Systemer har ingen kurs
+        # den dagen, så 13 står uten styrke, ikke 14.
+        "/boersometer?periode=velg&dag=2026-03-06",
         "/boersometer?periode=1-uke",
     ],
 )
@@ -1007,8 +1011,8 @@ def test_ikke_vurdert_staar_en_gang_og_uten_data_er_som_foer(klient, adresse):
         assert rute.count("ikke vurdert") == 1, (adresse, symbol)
         assert '<span class="styrke ikke-vurdert">ikke vurdert</span>' in rute, (adresse, symbol)
     assert uten_styrke >= 1
-    if adresse.endswith("2026-09-18"):
-        assert uten_styrke == 14
+    if adresse.endswith("2026-03-06"):
+        assert uten_styrke == 13
 
 
 def test_grunnplass_er_regnet_fra_stilen():

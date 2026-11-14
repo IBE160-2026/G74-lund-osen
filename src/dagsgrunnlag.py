@@ -47,7 +47,7 @@ from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent
 from signalberegning import BLANDET, NEGATIV, POSITIV, STANDARD
 from tallformat import avrundet, ukedag
-from vurderingsdata import Grunn, Vurdering
+from vurderingsdata import Grunn, Vurdering, kveldsradene
 
 RETNINGENE = (POSITIV, NEGATIV, BLANDET)
 # Feltene for retningene blant dem som skilte seg ut, i samme rekkefoelge.
@@ -191,7 +191,9 @@ def vanlig(
     foer dag etter boerskalenderen (spoersmaal 11, gjennomgangen BH5). En dag
     telles bare naar minst én aksje i lista er vurdert den dagen. Snittet
     rundes til et heltall, med halve opp, og sammenlignes slik det staar. Med
-    faerre enn MINST_VANLIG vurderte dager er feltene borte."""
+    faerre enn MINST_VANLIG vurderte dager er feltene borte. Story 2.17:
+    bare kveldsradene telles, saa KI-teksten om dagen er som foer."""
+    tidligere = {symbol: kveldsradene(rader) for symbol, rader in tidligere.items()}
     antallene = []
     for d in dagene_foer(dag, VINDU_VANLIG):
         paa_dagen = [tidligere.get(a.symbol, {}).get(d) for a in lista]

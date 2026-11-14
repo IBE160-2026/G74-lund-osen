@@ -53,7 +53,7 @@ from hovedindeks import indeksendring
 from kursdata import Aksje, Kursrad
 from markedsoversikt import endring_i_prosent
 from tallformat import avrundet, dato, tall, ukedag
-from vurderingsdata import Grunn, Vurdering
+from vurderingsdata import Grunn, Vurdering, kveldsradene
 
 # Story 10.2e: retningen paa hovedindeksen og bransjen.
 STEG, FALT, UENDRET = "steg", "falt", "uendret"
@@ -85,7 +85,11 @@ def tell_dagene(dag: date, vurdering: Vurdering, tidligere: Mapping[date, Vurder
     annen retning eller styrke eller en grunn, og da er antallet kjent. En
     boersdag uten rad, ogsaa foer foerste lagrede vurdering, eller en dag
     utenfor kalenderen, gir «minst»: hvordan signalet var foer, er ukjent.
+
+    Story 2.17: bare kveldsradene telles. En dag med signalet regnet i
+    ettertid er her som en dag uten rad, saa setningen er som foer storyen.
     """
+    tidligere = kveldsradene(tidligere)
     dager = 1
     naa = dag
     while True:

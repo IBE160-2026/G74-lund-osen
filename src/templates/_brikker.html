@@ -15,6 +15,13 @@
     pille tre-av-tre, fra terskelen som pille to-av-tre, og under terskelen
     som tekst uten pille. Brukt i notatene og «Signalet dag for dag»; tabellen
     har samme regel med skiller_seg_ut (markedsoversikt.py). -#}
+{#- Story 2.17 (gruppens svar 14.11 kl. 05:41-05:49): merket for en dag med
+    signalet regnet i ettertid, likt overalt der en tidligere dag vises med
+    signal. Teksten bærer merket, og kanten er stiplet (stil.css). -#}
+{% macro ettertid(vis) -%}
+{% if vis %}<span class="ettertid-merke">i ettertid</span>{% endif %}
+{%- endmacro %}
+
 {% macro styrke(verdi, antall, terskel) -%}
 {% if verdi == antall %}<span class="pille tre-av-tre">{{ verdi }} av {{ antall }}</span>
 {%- elif verdi >= terskel %}<span class="pille to-av-tre">{{ verdi }} av {{ antall }}</span>

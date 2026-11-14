@@ -1024,6 +1024,8 @@ MALENE_BAK_BILDET = (
     # siden regner og demoteksten om dagen.
     "src/dagsgrunnlag.py",
     "src/demo_ki_dagen.json",
+    # Story 2.17: demobasen faar signalet regnet i ettertid foer startdagen.
+    "src/ettertid.py",
 )
 # Story 8.0f: ogsaa hjelpeskriptet (.js), som lastes paa begge sidene.
 SKRIFTFILER = {".woff", ".woff2", ".ttf", ".otf", ".css", ".js"}
@@ -1439,6 +1441,8 @@ FILENE_BAK_AKSJESIDEN = (
     "src/etterpaa.py",
     # Story 3.4h: app.py importerer sidene for selskapene i demoen.
     "src/investorsider.py",
+    # Story 2.17: signalet regnet i ettertid, som demo.py bruker.
+    "src/ettertid.py",
     *sorted(p.relative_to(ROT).as_posix() for p in (ROT / "src" / "migrasjoner").glob("*.sql")),
 )
 # Moduler appen og demoen importerer, men som ikke lager noe aksjesiden viser:

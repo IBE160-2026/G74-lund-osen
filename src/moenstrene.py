@@ -36,7 +36,7 @@ from dagene import FALT, STEG, _endringen, _retningen_paa_dagen, _samme_periode,
 from kursdata import Kursrad
 from perioder import EN_MND, startdag
 from signalberegning import BLANDET, INGEN, NEGATIV, POSITIV
-from vurderingsdata import Grunn, Vurdering
+from vurderingsdata import Grunn, Vurdering, kveldsradene
 
 VINDU_RETNINGEN = 20
 MINST_VURDERTE = 10
@@ -71,7 +71,9 @@ def boersdagene(dag: date, antall: int) -> list[date]:
 
 
 def retningene(dag: date, radene: Mapping[date, Vurdering | Grunn]) -> tuple[int, int, int, int, int] | None:
-    """Moenster 1. radene er de lagrede radene for aksjen, med dag."""
+    """Moenster 1. radene er de lagrede radene for aksjen, med dag. Story
+    2.17: bare kveldsradene."""
+    radene = kveldsradene(radene)
     vurdert = [r.retning for d in boersdagene(dag, VINDU_RETNINGEN) if isinstance(r := radene.get(d), Vurdering)]
     if len(vurdert) < MINST_VURDERTE:
         return None
@@ -94,7 +96,8 @@ def samme_vei(dag: date, serie: list[Kursrad], indeksserie: list[Kursrad] | None
 
 def skiftene(dag: date, radene: Mapping[date, Vurdering | Grunn]) -> tuple[int, bool] | None:
     """Moenster 3. Gir (skift, minst), eller None uten to vurderte
-    boersdager paa rad i maaneden."""
+    boersdager paa rad i maaneden. Story 2.17: bare kveldsradene."""
+    radene = kveldsradene(radene)
     fra = startdag(EN_MND, dag)
     dagene = [dag]
     minst = False

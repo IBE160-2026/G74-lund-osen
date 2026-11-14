@@ -51,8 +51,10 @@ class TestTabellen:
         fra story 2.8 (0006_indeks.sql)."""
         tilkobling = sqlite3.connect(":memory:")
         try:
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 13
-            assert siste_versjon(MIGRASJONSKATALOG) == 13
+            # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
+            assert siste_versjon(MIGRASJONSKATALOG) == 14
         finally:
             tilkobling.close()
 
@@ -254,10 +256,13 @@ class TestBaseIVersjon2:
 
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 13
+            # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
             # 0004 (story 2.1c) legger fire maalinger til vurdering. En rad
             # med grunn har ingen, saa de er NULL.
-            foer["vurdering"] = [rad + (None,) * 4 for rad in foer["vurdering"]]
+            # Rettet 2026-11-14 (story 2.17): og kolonnen regnet fra 0014, med
+            # «kveld» for radene fra før.
+            foer["vurdering"] = [rad + (None,) * 4 + ("kveld",) for rad in foer["vurdering"]]
             assert alle_rader(tilkobling) == foer
             assert antall(tilkobling, "aksje") == 15
             assert (
@@ -372,11 +377,14 @@ class TestIngenKoblingFraVurderingTilKurs:
         triggere = ny.execute(
             "SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'vurdering'"
         ).fetchall()
+        # Rettet 2026-11-14 (story 2.17): triggeren fra 0014_regnet.sql, som
+        # avviser at en kveldsrad blir en rad i ettertid, er med.
         assert {navn for navn, _ in triggere} == {
             "vurdering_kjent_grunn_insert",
             "vurdering_kjent_grunn_update",
             "vurdering_kjent_aksje_insert",
             "vurdering_kjent_aksje_update",
+            "vurdering_kveld_blir_ikke_ettertid",
         }
         for _, sql in triggere:
             assert "kurs" not in sql.replace("kursserie", "")

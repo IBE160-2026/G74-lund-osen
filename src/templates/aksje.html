@@ -1,7 +1,7 @@
 {% extends "_ramme.html" %}
 {% from "_hjelp.html" import hjelpeknapp, hjelpevindu with context -%}
 {% from "_bransjer.html" import bransjesymbol -%}
-{% from "_brikker.html" import brikker, retningspille, styrke -%}
+{% from "_brikker.html" import brikker, ettertid, retningspille, styrke -%}
 {% from "_perioder.html" import periodevalg with context -%}
 {% from "_rundtur.html" import rundtur with context -%}
 {% from "_investorboble.html" import investorboble -%}
@@ -43,6 +43,9 @@
   {% endif %}
   {#- Svar 18: børsen og datoen, «Demo Børs» i demoen. #}
   <p class="meta">{{ "Demo Børs" if eksempeltall else "Oslo Børs" }} · {{ detalj.dato|dato }}</p>
+  {#- Story 2.17 (gruppens svar 14.11 kl. 05:41-05:49): en dag med signalet
+      regnet i ettertid sier det under datoen. #}
+  {% if detalj.ettertid %}<p class="ettertid-linje" role="note">{{ ettertid(true) }} Signalet for {{ detalj.dato|ukedag }} {{ detalj.dato|dato }} er regnet i ettertid av kursene til og med dagen, fordi hentingen ikke skrev en vurdering den kvelden.</p>{% endif %}
   {#- Story 8.2b, c (U62, 8.0d beslutning 7): innledningen fra tavla sa hva
       siden viser. Story 8.26 (gruppens ønske 11.11 kl. 17:44, tillegg 1): den
       er tatt bort, fordi overskriftene og «Vis meg rundt» sier det. #}
@@ -174,7 +177,7 @@
   {% if dagen and dagen_i_linja %}
     <p class="dagen"><strong>{{ dagen.dato|ukedag|capitalize }} {{ dagen.dato|dato }}:</strong>
       endring <span class="{{ 'opp' if dagen.endring and dagen.endring > 0 else 'ned' if dagen.endring and dagen.endring < 0 else '' }}">{% if dagen.endring is not none %}{{ dagen.endring|tall('endring') }}{% else %}–{% endif %}</span>.
-      Signal: {% if dagen.vurdering %}{{ dagen.vurdering.styrke }} av {{ antall_sjekker }}, <span class="{{ dagen.retning.klasse }}"><span aria-hidden="true">{{ dagen.retning.symbol }}</span> {{ dagen.retning.tekst }}</span>{% else %}– {{ dagen.tekst }}{% endif %}.
+      Signal: {% if dagen.vurdering %}{{ dagen.vurdering.styrke }} av {{ antall_sjekker }}, <span class="{{ dagen.retning.klasse }}"><span aria-hidden="true">{{ dagen.retning.symbol }}</span> {{ dagen.retning.tekst }}</span>{% if dagen.ettertid %} {{ ettertid(true) }}{% endif %}{% else %}– {{ dagen.tekst }}{% endif %}.
     </p>
   {% endif %}
   {% if graf %}
@@ -244,7 +247,8 @@
             rund for positiv, firkant for negativ og rute for blandet, og
             gul ring ved 3 av 3. Skjermleseren får dagene under grafen. #}
         {% for s in g.signaldager %}
-          {%- set klasse = "signaldag " ~ s.retning|lower ~ (" alle" if s.alle else "") %}
+          {#- Story 2.17: en dag med signalet regnet i ettertid har stiplet kant. #}
+          {%- set klasse = "signaldag " ~ s.retning|lower ~ (" alle" if s.alle else "") ~ (" ettertid" if s.ettertid else "") %}
           {% if s.retning == "Negativ" %}<rect class="{{ klasse }}" x="{{ "%.1f"|format(s.x - s.r) }}" y="{{ "%.1f"|format(s.y - s.r) }}" width="{{ "%.1f"|format(2 * s.r) }}" height="{{ "%.1f"|format(2 * s.r) }}"></rect>
           {%- elif s.retning == "Blandet" %}<polygon class="{{ klasse }}" points="{{ "%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f"|format(s.x, s.y - s.r * 1.3, s.x + s.r * 1.3, s.y, s.x, s.y + s.r * 1.3, s.x - s.r * 1.3, s.y) }}"></polygon>
           {%- else %}<circle class="{{ klasse }}" cx="{{ "%.1f"|format(s.x) }}" cy="{{ "%.1f"|format(s.y) }}" r="{{ "%.1f"|format(s.r) }}"></circle>{% endif %}
@@ -315,7 +319,7 @@
             bare for skjermleser og bare opptil 31, og en startdato etter
             grafen sies for seg. #}
         {% if signal_fra and signal_fra > graf.siste_dato %}Signalet er lagret fra {{ signal_fra|dato }}, etter den siste dagen i grafen, så grafen har ingen prikker.
-        {% elif signal_fra %}{% set n = graf.signaldager|length %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}. {% if n %}Rund prikk er positiv, firkant negativ og rute blandet. {{ n }} {{ "dag" if n == 1 else "dager" }} i grafen{% if n <= 31 %}<span class="skjult">: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}){% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}.{% else %}Ingen av dagene i grafen hadde signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% endif %}
+        {% elif signal_fra %}{% set n = graf.signaldager|length %}Prikkene på kurslinja viser dagene med signalstyrke {{ parametre.terskel }} eller mer, fra {{ signal_fra|dato }}{% if signal_fra > graf.forste_dato %}; før den dagen er det ikke lagret noe signal{% endif %}. {% if n %}Rund prikk er positiv, firkant negativ og rute blandet.{% set ne = graf.signaldager|selectattr("ettertid")|list|length %}{% if ne %} En prikk med hvit midte og stiplet kant er regnet i ettertid.{% endif %} {{ n }} {{ "dag" if n == 1 else "dager" }} i grafen{% if ne %}, {{ ne }} i ettertid{% endif %}{% if n <= 31 %}<span class="skjult">: {% for s in graf.signaldager %}{{ s.dato|dato }} ({{ s.retning|lower }}, {{ s.styrke }} av {{ antall_sjekker }}{% if s.ettertid %}, i ettertid{% endif %}){% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}.{% else %}Ingen av dagene i grafen hadde signalstyrke {{ parametre.terskel }} eller mer.{% endif %}{% endif %}
         {#- Story 8.14 (FR-407): antallet det siste året og den siste dagen,
             regnet av kursserien. Ordet «utbytte» står ikke her. #}
         <span class="justeringstekst">{% set nj = justeringer|length %}{% if graf.justeringsdager %}De korte strekene nederst i grafen er justeringsdager<span class="skjult"> ({% for d, x in graf.justeringsdager %}{{ d|dato }}{% if not loop.last %}, {% endif %}{% endfor %})</span>: kilden regnet de eldre kursene om, så sluttkursen og endringen stemmer ikke helt den dagen. {% endif %}{% if nj %}Det siste året var det {{ nj }} {{ "justeringsdag" if nj == 1 else "justeringsdager" }}, den siste {{ justeringer[-1]|dato }}.{% else %}Ingen justeringsdager det siste året.{% endif %}</span>
@@ -393,7 +397,11 @@
           samme dag, også når KI er av eller teksten er stoppet. #}
       {% if dagene %}<p class="dagene">{{ dagene }}</p>{% endif %}
       {% if samme_dag %}<p class="samme-dag">{{ samme_dag }}</p>{% endif %}
-      {% if ki_vises %}
+      {#- Story 2.17: en dag med signalet regnet i ettertid har ingen KI-tekst,
+          og ingen setning om dagene eller samme dag (spørsmål 7). #}
+      {% if detalj.ettertid %}
+        <p class="uten ettertid-ki">{{ ettertid(true) }} Signalet for denne dagen er regnet i ettertid. KI-teksten lages bare samme kveld som kursene hentes, så dagen har ingen KI-tekst.</p>
+      {% elif ki_vises %}
         <div class="ki-del">
           {#- Story 8.20a (del D, spørsmål 11 i 8.20, U81): «Laget av KI» står,
               og modellnavnet i en liten linje under teksten (designregler §4).
@@ -434,7 +442,7 @@
         Systemer i demoen, står at signalet ikke er regnet ennå, og hvorfor,
         som øverst på siden. #}
     {% if alle_sjekkene and not alle_sjekkene.vurdert %}<p class="alle-sjekkene-aaret">Signalet er ikke regnet ennå: {% if detalj.for_kort_serie %}Trenger {{ detalj.noedvendige_dager }} dager for å regne signal, fikk {{ detalj.antall_dager }}.{% else %}{{ detalj.tekst }}.{% endif %}</p>
-    {% elif alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}.</p>{% endif %}
+    {% elif alle_sjekkene %}{% set n = alle_sjekkene.antall %}<p class="alle-sjekkene-aaret"><span class="pille tre-av-tre">{{ antall_sjekker }} av {{ antall_sjekker }}</span> {% if n == 0 %}aldri{% elif n == 1 %}én gang{% else %}{{ n }} ganger{% endif %} {% if alle_sjekkene.fra %}siden {{ alle_sjekkene.fra|dato }}{% else %}det siste året{% endif %}{% if alle_sjekkene.sist %}, sist {{ alle_sjekkene.sist|dato }}{% endif %}{% if alle_sjekkene.ettertid %}, {{ alle_sjekkene.ettertid }} i ettertid{% endif %}.</p>{% endif %}
     <nav class="maanedspiler" aria-label="Måned i historikken">
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>
@@ -456,13 +464,15 @@
               {% if dag is none %}
                 <li class="dag utenfor" aria-hidden="true"></li>
               {% else %}
-                <li class="dag{% if dag.tom %} tom{% elif dag.vurdering and dag.vurdering.styrke == antall_sjekker %} alle{% endif %}">
+                {#- Story 2.17: en dag med signalet regnet i ettertid har stiplet kant og «i ettertid». #}
+                <li class="dag{% if dag.tom %} tom{% elif dag.vurdering and dag.vurdering.styrke == antall_sjekker %} alle{% endif %}{% if dag.ettertid %} ettertid{% endif %}">
                   {% if dag.lenke %}<a class="dato" href="/aksje/{{ detalj.aksje.symbol }}?dag={{ dag.dato.isoformat() }}"><span class="ukedag">{{ dag.dato|ukedag }}</span> {{ dag.dato|dato }}</a>{% else %}<span class="dato"><span class="ukedag">{{ dag.dato|ukedag }}</span> {{ dag.dato|dato }}</span>{% endif %}
                   {% if dag.vurdering %}
                     {{ retningspille(dag.retning) }}
                     {{ brikker(dag.brikker) }}
                     {#- Tillegg 2 til 8.29: som tabellen på oversikten (_brikker.html). #}
                     {{ styrke(dag.vurdering.styrke, antall_sjekker, parametre.terskel) }}
+                    {{ ettertid(dag.ettertid) }}
                   {% elif not dag.tom %}
                     <span class="tilstand">– {{ dag.tekst }}</span>
                   {% endif %}
@@ -470,12 +480,12 @@
               {% endif %}
             {% endfor %}
           </ol>
-          {% if not uke.tom %}<p class="ukesum">{% if uke.vurdert %}{{ uke.skilte_seg_ut }} av {{ uke.vurdert }} {{ "dag" if uke.vurdert == 1 else "dager" }} skilte seg ut{% else %}Ingen dager med vurdering{% endif %}</p>{% endif %}
+          {% if not uke.tom %}<p class="ukesum">{% if uke.vurdert %}{{ uke.skilte_seg_ut }} av {{ uke.vurdert }} {{ "dag" if uke.vurdert == 1 else "dager" }} skilte seg ut{% if uke.ettertid %}, {{ uke.ettertid }} i ettertid{% endif %}{% else %}Ingen dager med vurdering{% endif %}</p>{% endif %}
         </li>
       {% endfor %}
     </ol>
     {% if historikk.vurdert %}
-      <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} skilte seg ut {{ historikk.skilte_seg_ut }} av {{ historikk.vurdert }} {{ "børsdag" if historikk.vurdert == 1 else "børsdager" }}.
+      <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} skilte seg ut {{ historikk.skilte_seg_ut }} av {{ historikk.vurdert }} {{ "børsdag" if historikk.vurdert == 1 else "børsdager" }}{% if historikk.ettertid %}, {{ historikk.ettertid }} i ettertid{% endif %}.
         {% for navn, antall in historikk.utslag %}{% if loop.first %}{{ navn|capitalize }} slo ut {{ antall }} {{ "dag" if antall == 1 else "dager" }}{% elif loop.last %} og {{ navn }} {{ antall }}{% else %}, {{ navn }} {{ antall }}{% endif %}{% endfor %}.</p>
     {% else %}
       <p class="maanedssum"><strong>{{ historikk.navn|capitalize }} samlet:</strong> {{ detalj.aksje.navn }} har ingen dager med vurdering.</p>
