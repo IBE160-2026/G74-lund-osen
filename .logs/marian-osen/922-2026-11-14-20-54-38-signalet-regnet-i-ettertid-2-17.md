@@ -30,7 +30,7 @@ Ny story i Epic 2, v1.1: signalet regnet i ettertid for børsdager uten lagret v
 - `docs/kvalitetssikring.md` får radene for 2.17 ved føringen etter flettingen.
 - Bildegrenen `pr-2-17-bilder` kan slettes når gruppen vil.
 
-## 2026-11-14 kl. 21:58 — Marian Osen
+## 2026-11-14 kl. 21:57 — Marian Osen
 
 ### Oppgave
 Tillegg 2 til 2.17 for natta, etter gruppens svar 14.11 kl. 21:07: alle forslagene er godtatt, også spørsmål 19 (BH1) som bygget. Svarene skal føres, PR #157 flettes uten nytt ja når CI er grønn, med avtrykket av kveldsradene rett før, og så føringen. Tillegg 3 og 4 kom samtidig og gjøres etterpå, i rekkefølge.
