@@ -4863,6 +4863,24 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Din egen liste: kom 
 
 *Lagt til 2026-11-14:* 8.29 er squash-flettet med PR #154 i `f98d979e` 14.11 kl. 00:15, låst til head-en `808044a0` (main med 8.27, 10.11, 8.19, 8.28 og 9.11 flettet inn), etter instruksjonen kl. 11:26, tillegg 1 og 2 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. «De 15 mest omsatte» fra 8.28 står først blant brikkene i steg 3, med samme klasse og stil, så det ble ikke et spørsmål. Hele settet i CI (run 43524921914), alle fire jobbene grønne, også Windows, etter gruppens svar 13.11 kl. 18:24; lokalt hele settet i deler før flettingen av 8.27 (5634 bestått og 24 hoppet over, 5658 som `--collect-only`), og etter det testfilene grenen endrer og `--dokumentene`.
 
+*Avgjort 2026-11-14 kl. 05:10–05:13 (gruppens svar på spørsmål 7 og 8, tillegg 9 til 9.11):* spørsmål 8, «Som nå, med ring»: 2 av 3 har den hvite pillen også en tidligere dag, godtatt som bygget, og linja i designregler §3 står. Spørsmål 7, «endre så det blir riktig nå»: de ledige rutene i streken under «Appen følger N av 18» skal ha nok kontrast mot den beige bakgrunnen, bygget i 8.30. Rådet anbefalte begge.
+
+### Story 8.30: De ledige rutene i plassstreken med nok kontrast
+
+*Lagt til 2026-11-14, etter tillegg 9 til 9.11 (limt inn kl. 05:17), som står i `docs/ai-prompts/2026-11-14.md`.* Vinduet som bygde 8.29, er lukket, så vinduet for PRD-en tar det etter 9.12. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-30-plassstreken-kontrast.md`.
+
+Som **bruker i demoen og den ekte versjonen** vil jeg se de ledige plassene i streken under «Appen følger N av 18» på den beige bakgrunnen. Da ser jeg hvor mange aksjer jeg kan følge til.
+
+**Oppfyller:** svaret på spørsmål 7 i 8.29 · **Begrenses av:** NFR-06, designregler §3, WCAG 1.4.11, regel 22
+
+**Kontroll — hva testen ser etter:**
+- De ledige rutene har minst 3:1 mot `--bakgrunn`, regnet ut fra fargene i `stil.css`
+- Brukt og ledig har minst 3:1 mot hverandre, og de brukte står som før
+- Regelen for forced-colors står, og streken er lik i demoen og den ekte versjonen ved 1280 og 390 px
+- **Ville feilet hvis:** de ledige rutene fikk tilbake `--strek-2` (1,34:1), eller brukt og ledig var for like
+
+**Avhenger av:** 8.29. **Én økt:** ja.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen

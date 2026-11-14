@@ -42,7 +42,11 @@ Et spørsmål stopper ikke arbeidet; alt er bygget etter forslaget.
 
 7. **Plassstreken på beige.** Uten den hvite bakgrunnen har de ledige rutene i streken under «Appen følger N av 18» (`--strek-2`) omtrent 1,3:1 i kontrast mot sidens bakgrunn, mot omtrent 1,5:1 mot hvitt før (ECH3). Streken er skjult for skjermlesere, og tallet står som tekst. *Forslag, som bygget:* streken står som før; en mørkere farge for de ledige rutene kan tas i en egen runde.
 
+   *Svar 2026-11-14 kl. 05:10–05:13 (gruppens svar, rådet anbefalte det):* «endre så det blir riktig nå». De ledige rutene skal ha nok kontrast mot den beige bakgrunnen. Det bygges i 8.30 (`spec-8-30-plassstreken-kontrast.md`), etter tillegg 9 til 9.11.
+
 8. **2 av 3 en tidligere dag** (tillegg 2). `designregler.md` §3 (01.10) sier «2 av 3 merkes uten gult, og bare for siste børsdag», og to tester holdt det: `test_to_av_tre_har_ingen_ring_en_tidligere_dag` (8.20a, BH11 og ECH1) og `test_3_av_3_merkes_som_i_oversikten_og_2_av_3_ikke` i `test_historikken.py`. Tillegget og skissen 06.11 (`docs/skisser/2026-11-06/aksjesiden-ki-paa.png`, onsdag 04.11 med «2 av 3» i pille) har den hvite pillen også en tidligere dag. *Forslag, som bygget:* som tillegget og skissen. §3 har en linje om det, testen i 8.20a sjekker nå bare summen og kortet en tidligere dag, og testen i `test_historikken.py` heter `test_styrken_merkes_som_i_tabellen_paa_oversikten`.
+
+   *Svar 2026-11-14 kl. 05:10–05:13 (gruppens svar, rådet anbefalte det):* «Som nå, med ring», altså godtatt som bygget. 2 av 3 har den hvite pillen også en tidligere dag i notatene og i «Signalet dag for dag», slik skissen 06.11 viser, og linja i designregler §3 står.
 9. **Andre steder med styrken for én dag.** Setningen «Signal: 2 av 3, …» for en valgt dag på aksjesiden er tekst, som tabellen for en valgt dag («Velg dag»). Børsometeret har pille ved mørk og gul ramme og ellers tekst, som tabellen. Lista for skjermlesere under hovedindeksen nevner bare «3 av 3» i teksten. *Forslag, som tabellen:* de står som før.
 
 ## Delene
