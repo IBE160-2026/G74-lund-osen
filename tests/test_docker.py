@@ -5040,6 +5040,10 @@ class TestHovedveien:
             "| Dagen",
             "| Endringer i lista",
             "| Notatene",
+            # Story 3.3k (tillegg 5): forskjellene etter natten 12.–13.11.
+            "| Neste henting",
+            "| Investorsiden",
+            "| «Åpne eodhd.com»",
         ], rader
         assert tabellen.splitlines()[0] == "| | Demoen | Den ekte versjonen |"
         # Gjennomgangen etter cc7f587 (ECH2): uten skillelinja, eller med feil

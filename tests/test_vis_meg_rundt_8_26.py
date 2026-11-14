@@ -1916,6 +1916,45 @@ class TestTabellenOmForskjellene:
         assert "uv run python src/demo.py ||" in (ROT / "start" / "start.sh").read_text(encoding="utf-8")
         assert 'entrypoint: ["python", "src/demo.py"]' in (ROT / "compose.yaml").read_text(encoding="utf-8")
 
+    # Story 3.3k (tillegg 5, ønsket 12.11 kl. 21:15): radene for forskjellene etter natten,
+    # sjekket mot koden.
+
+    def test_neste_henting(self):
+        """Ville feilet hvis demoen viste linja om neste henting i stripa, den ekte
+        versjonen ikke gjorde det, eller omvisningen i demoen ikke sa at den ekte
+        versjonen viser den (8.19)."""
+        _, demoen, ekte = _tabellraden("Neste henting")
+        assert demoen == "Står ikke, fordi demoen ikke henter. Omvisningen sier at den ekte versjonen viser den"
+        assert ekte == "Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes"
+        ramme = (ROT / "src" / "templates" / "_ramme.html").read_text(encoding="utf-8")
+        assert "{%- if not eksempeltall and kursdag_felles %}{% set neste = kursdag_felles|neste_henting %}" in ramme
+        assert ht.NESTE_HENTING_STEGET_DEMO.startswith("Den ekte versjonen viser bak «Oppdatert»")
+        assert ht.NESTE_HENTING_STEGET.startswith("Bak «Oppdatert» øverst står når nye kurser tidligst")
+
+    def test_investorsiden(self):
+        """Ville feilet hvis boblen i demoen ikke gikk til siden i appen i samme fane,
+        eller boblen i den ekte versjonen ikke åpnet selskapets side i en ny fane."""
+        _, demoen, ekte = _tabellraden("Investorsiden")
+        assert demoen == "En oppdiktet side i appen, i samme fane"
+        assert ekte == "Selskapets egen side, i en ny fane"
+        boble = (ROT / "src" / "templates" / "_investorboble.html").read_text(encoding="utf-8")
+        demo_del, ekte_del = boble.split("{% elif adresse %}", 1)
+        assert '<a href="/investorside/{{ symbol }}">' in demo_del and "_blank" not in demo_del
+        assert '<a href="{{ adresse }}" target="_blank"' in ekte_del
+
+    def test_aapne_eodhd(self):
+        """Ville feilet hvis «Åpne eodhd.com» i demoen ikke gikk til siden i appen, eller
+        den ekte versjonen ikke åpnet registreringen hos EODHD i en ny fane."""
+        _, demoen, ekte = _tabellraden("«Åpne eodhd.com»")
+        assert demoen == "En side i appen med en tegning laget av KI, fordi demoen ikke trenger nøkkel"
+        assert ekte == "Registreringen hos EODHD, i en ny fane"
+        egne = (ROT / "src" / "templates" / "_egne.html").read_text(encoding="utf-8")
+        assert '{%- if eksempeltall %}<a class="knapp" href="/eodhd-demo">Åpne eodhd.com</a>' in egne
+        assert '<a class="knapp" href="{{ eodhd_registrering }}" target="_blank"' in egne
+        assert app_modul.EODHD_REGISTRERING == "https://eodhd.com/register"
+        siden = (ROT / "src" / "templates" / "eodhd_demo.html").read_text(encoding="utf-8")
+        assert "Illustrasjon laget av KI" in siden
+
     def test_anbefalingen_som_foer(self):
         """Ville feilet hvis «Prøv appen» ikke lenger anbefalte demoen først og
         den ekte etterpå."""

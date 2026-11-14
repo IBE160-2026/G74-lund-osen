@@ -87,6 +87,9 @@ Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (
 | Dagen | Fast: fredag 09.10.2026 | Den siste børsdagen som er hentet |
 | Endringer i lista | Tas ikke i bruk, fordi demoen ikke henter | Tas i bruk ved hentingen etter kl. 22 |
 | Notatene | Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start | Lagres i basen på maskinen |
+| Neste henting | Står ikke, fordi demoen ikke henter. Omvisningen sier at den ekte versjonen viser den | Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes |
+| Investorsiden | En oppdiktet side i appen, i samme fane | Selskapets egen side, i en ny fane |
+| «Åpne eodhd.com» | En side i appen med en tegning laget av KI, fordi demoen ikke trenger nøkkel | Registreringen hos EODHD, i en ny fane |
 
 Til faglærer:
 - Prøv appen: demoen med oppdiktede tall, uten konto og nøkkel, med et dobbeltklikk på «Start demoen» ([Enklest: dobbeltklikk](#enklest-dobbeltklikk-uten-docker)) eller med Docker Desktop etter [steg 1–4](docs/installasjon.md#med-docker-desktop) ([demoen](docs/installasjon.md#demoen)). Prøv gjerne ekte kurser etterpå, med en gratis nøkkel fra EODHD: [den ekte versjonen](#den-ekte-versjonen)
