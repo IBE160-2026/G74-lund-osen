@@ -5285,3 +5285,19 @@ Som **gruppe**, vil vi at én test går gjennom alt appen viser etter ordene i r
 *Avgjort 2026-11-12 kl. 20:44 (gruppens svar):* forslagene i spesifikasjonen for 9.12 godtas som bygget, og 9.12 flettes uten nytt stopp, sist av alle, etter bildene av appen i README-en (3.3k). Rådet anbefalte det. Svaret er ført etter tillegg 7 til 9.11 kl. 20:52 i `docs/ai-prompts/2026-11-12.md`.
 
 *Lagt til 2026-11-14:* 9.12 er squash-flettet med PR #152 i `e537345f` kl. 06:25, låst til head-en `8cfaef22` (main med 8.19, 8.28, 9.11, 8.29 og 3.3k flettet inn), sist i køen etter Utført-linja for 3.3k, slik tillegg 7 til 9.11 sier (`docs/ai-prompts/2026-11-12.md`). Punkt 26 i §8 i PRD-en er lukket, og NFR-06 sier at testen finnes. Testen fant «følges med» fra 8.28 på siden «Er du sikker?», og setningen er skrevet om uten nye unntak. Hele settet ble kjørt i CI (run 43560865780), etter gruppens svar 13.11 kl. 18:24: 5808 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-12-raadordene-i-alle-malene.md`](../implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md).
+
+### Story 9.13: Dokumentrunden etter v1.1
+
+*Lagt til 2026-11-14, etter tillegg 3 til 2.17 (kl. 21:15) og gruppens svar 14.11 kl. 17:45 og 21:07:* rådet anbefalte det. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-13-dokumentrunden-etter-v1-1.md`.
+
+Som **gruppe**, vil vi at statusene, de åpne punktene og vurderingsmatrisen stemmer med det som er flettet til main etter v1.1, så det som gjenstår, er lett å se.
+
+**Oppfyller:** regel 19 i `CLAUDE.md` · **Begrenses av:** bare dokumenter, README-en og testene for dem, ingen kode i `src/`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- 3.4 og 8.2 er done i `sprint-status.yaml`, spesifikasjonene og her, med en datert linje om hvorfor
+- Hvert åpent punkt i `.logs/marian-osen/issues.md` er sjekket mot main, med en tabell i spesifikasjonen
+- «Status 14.11.2026» i `docs/vurderingsmatrise.md` med bevisene fra 12.–14.11
+- **Ville feilet hvis:** et punkt var krysset av uten bevis, eller en lenke i matrisen pekte på noe som ikke finnes
+
+**Avhenger av:** 2.17. **Én økt:** ja.
