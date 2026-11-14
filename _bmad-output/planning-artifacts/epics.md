@@ -5217,3 +5217,21 @@ Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som 
 *Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene i spesifikasjonen godtas som bygget, med tre avgjørelser. Min liste får sitt eget krav, FR-111, i 9.11 (spørsmål 14). «De 15 mest omsatte» står i FR-412 og bygges i natt som egen story i Epic 8 (spørsmål 15). Tabellen står med ja for FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag (spørsmål 16). PR #150 flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte. Svaret er ført etter tillegg 1 og 2 kl. 20:10 i `docs/ai-prompts/2026-11-12.md`.
 
 *Lagt til 2026-11-13:* 9.11 er squash-flettet med PR #150 i `ef802733` kl. 22:47, låst til head-en `7f2edbce` (main med 8.26, 8.27, 3.7, 10.11, 8.19 og 8.28 flettet inn). Det skjedde etter instruksjonen 12.11 kl. 18:03 og tillegg 1 og 3–6 i `docs/ai-prompts/2026-11-12.md`, og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Steg 2 førte flettingene inn i kravteksten, lest i koden 13.11. Hele settet ble kjørt i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24: 5751 bestått og 100 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-11-prd-etter-tilbakemeldingen.md`](../implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md).
+
+### Story 9.12: Rådordene i alle malene, taggene i CI og technology.md
+
+*Lagt til 2026-11-12, etter tillegg 2 til 9.11 (kl. 20:10) og gruppens svar 12.11 kl. 20:04 og 20:06:* punkt 26 i §8 i PRD-en og spørsmål 11 og 18 i spesifikasjonen for 9.11. Rådet anbefalte 9.12. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md`, med spørsmålene og forslagene.
+
+Som **gruppe**, vil vi at én test går gjennom alt appen viser etter ordene i rådlista, så et råd ikke kan komme inn i en mal uten at testen feiler.
+
+**Oppfyller:** NFR-06, forslaget i 4.2 i tilbakemeldingen 12.11, punkt 26 i §8 · **Begrenses av:** regel 17 og 19 i `CLAUDE.md`
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `tests/test_raadordene_9_12.py` går gjennom malene, hjelpetekstene, omvisningen og `hjelp.js` etter `RAAD` i `src/ki_kontroll.py`, med unntakene og grunnene i testen
+- Jobben `pytest` i CI henter taggene, så testen av endringsloggen mot taggen kjører der
+- `technology.md` fra faglærer er lenket under «Dokumentene», som en referanse som beskriver et annet prosjekt
+- **Ville feilet hvis:** et ord fra rådlista sto i noe appen viser utenfor en nektende setning eller notatene om tenkte kjøp og salg, eller testen ikke leste alle malene
+
+**Avhenger av:** ingen. Flettes etter 9.11. **Én økt:** ja.
+
+*Avgjort 2026-11-12 kl. 20:44 (gruppens svar):* forslagene i spesifikasjonen for 9.12 godtas som bygget, og 9.12 flettes uten nytt stopp, sist av alle, etter bildene av appen i README-en (3.3k). Rådet anbefalte det. Svaret er ført etter tillegg 7 til 9.11 kl. 20:52 i `docs/ai-prompts/2026-11-12.md`.

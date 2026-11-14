@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-13T22:13
+updated: 2026-11-13T23:34
 ---
 
 # PRD — OSE Signal
@@ -1036,7 +1036,7 @@ avvises med en forklaring. En aksje brukeren har valgt selv, merkes «Egen».
 
 **Ferdige lister:** de 15 i §3, «De 15 mest omsatte» på hele børsen, og én liste
 per bransje med de opptil 18 med høyest målt omsetning. «De 15 mest omsatte» står
-først blant de ferdige listene i «Din egen liste», og hver aksje følges med sin
+først blant de ferdige listene i «Din egen liste», og hver aksje står med sin
 egen bransje. «De 15 mest omsatte»
 regnes av den samme målingen som bransjelistene, bare med målte aksjer. Den har
 ikke kravet om minst åtte bransjer i §3. En liste vi ikke har målt, står ikke
@@ -1505,7 +1505,7 @@ salg: ikke malene, ikke hjelpen og ikke KI-tekstene.
 - Ingen KI-tekst som vises, har et ord fra rådlista i FR-603. Kontrollen skjer når teksten lages og når den vises.
 - Hjelpetekstene og omvisningen har ingen ord fra rådordene testene for hjelpen bruker.
 - Ord som «råd», «kjøp» og «salg» står bare der en side sier at noe ikke er et råd, og i notatene om tenkte kjøp og salg.
-- En test som går gjennom alle malene, er et åpent punkt (§8, punkt 26).
+- En test går gjennom alle malene, hjelpetekstene og omvisningen etter ordene i rådlista i FR-603, og unntakene står i testen med grunn.
 
 ### NFR-07 — Rådata bevares fra første kjøring
 
@@ -1630,7 +1630,6 @@ lukkede, står ordrett i endringsloggen.
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Ikke oppgitt ennå (`docs/innlevering.md`). SM-1, SM-5, SM-6, SM-8 og SM-9 er bundet til dem | Gruppen | Avventer faglærer |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to (`docs/innlevering.md`, «Eksamen») | Gruppen | Sammen med punkt 13 |
 | 22 | **Kodegjennomgang.** Én samlet `bmad-code-review` av v1-koden. Gjennomgangene per PR står i `docs/kvalitetssikring.md` §5 | Gruppen | Før innleveringen |
-| 26 | **En test som går gjennom alle malene etter rådord** (NFR-06). I dag har hjelpen, omvisningen og enkelte sider hver sin test | Gruppen | Avgjøres av gruppen |
 | 27 | **En misvisende KI-tekst med riktige tall** (FR-603). Kontrollen fanger ord og tall, ikke mening. Hvordan det kunne oppdages og skrives som en testbar konsekvens, er refleksjonsspørsmål 2 i tilbakemeldingen 12.11 | Gruppen | Til refleksjonsrapporten |
 
 ### Utenfor v1
@@ -1641,7 +1640,7 @@ hvordan en justeringsdag finnes, er besvart av metoden i FR-407.
 
 ### Lukket
 
-Punkt 1, 3, 5, 5b, 7, 9, 10, 14, 17, 18, 19, 20, 23, 24 og 25 er lukket. Hva som
+Punkt 1, 3, 5, 5b, 7, 9, 10, 14, 17, 18, 19, 20, 23, 24, 25 og 26 er lukket. Hva som
 lukket dem, står i endringsloggen.
 
 ### v1.1 — vurderes etter at v1 er kontrollert
