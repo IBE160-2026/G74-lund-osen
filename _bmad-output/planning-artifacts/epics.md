@@ -4915,6 +4915,21 @@ Som **bruker i demoen og den ekte versjonen** vil jeg se de ledige plassene i st
 
 *Lagt til 2026-11-14:* 8.30 er squash-flettet med PR #156 i `c1e8a1f0` kl. 07:19, låst til head-en `191a682e`, etter tillegg 9 til 9.11 i `docs/ai-prompts/2026-11-14.md`. De ledige rutene har `--dempet-2`: 4,14:1 mot bakgrunnen og 3,83:1 mot de brukte. Spørsmål 1–3 er bygget etter forslaget. Hele settet ble kjørt i CI (run 43565183283), etter gruppens svar 13.11 kl. 18:24: 5817 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-8-30-plassstreken-kontrast.md`](../implementation-artifacts/spec-8-30-plassstreken-kontrast.md).
 
+### Story 8.31: Stegkortene og styrken for én dag målt i nettleseren
+
+*Lagt til 2026-11-14, etter tillegg 4 til 2.17 (limt inn kl. 21:16, i `docs/ai-prompts/2026-11-14.md`) og gruppens ønske 14.11 kl. 21:07 om at natta brukes. Rådet anbefalte det.* Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-8-31-maalene-i-nettleseren.md`.
+
+Som **gruppe** vil vi at målene fra tavla og designreglene for stegkortene og for styrken for én dag prøves i nettleseren, ikke bare som tekst i stilarket.
+
+**Oppfyller:** VG8 og VG4 fra 8.29 · **Begrenses av:** regel 22, AD-8, bare tester og spesifikasjonen
+
+**Kontroll — hva testen ser etter:**
+- Stegkortene i «Din egen liste: kom i gang» ved 1280 px i demoen og den ekte versjonen: 18 px luft over og på sidene, 20 px nederst, 14 px hjørner og 14 px mellom
+- Styrken for én dag i notatene og i «Signalet dag for dag», også en dag i ettertid: 3 av 3 med fyll i blekk, hvit tekst og en ring på 2 px i oransje, 2 av 3 i den hvite pillen med kant i blekk uten ring, og 1 og 0 av 3 som tekst uten pille
+- **Ville feilet hvis:** luften, hjørnene eller avstanden i stegkortene var andre, eller en styrke ble vist på en annen måte enn regelen, også om en annen regel i stilarket overstyrte den
+
+**Avhenger av:** 8.29, 2.17. **Én økt:** ja.
+
 ---
 
 ## Epic 9: Dokumentasjon av prosessen
