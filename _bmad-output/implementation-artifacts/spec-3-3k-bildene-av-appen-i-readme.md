@@ -86,3 +86,11 @@ Tre rader etter «Notatene»: «Neste henting», «Investorsiden» og «Åpne eo
 - Én mutant, med en kopi før og sha256 mot HEAD etter.
 - Gjennomgang med Edge Case Hunter, og triage.
 - Bilder før og etter på en egen bildegren.
+
+## Gjennomgangen
+
+Edge Case Hunter på `21876255..2e454717`, 14.11. Triage:
+
+- *Rettet:* ECH1, middels (avtrykket bak `vis-meg-rundt-demo.png` hadde ikke `app.py`, der omvisningen bygges med `demo=`; nå `FILENE_BAK_MIN_LISTE`, og avtrykket er regnet ut på nytt). ECH2, lav (linja under 8.26 i `epics.md` sa at bunnteksten sto åpen; en datert linje sier at den er lukket i 3.3k). ECH3, lav (uten adresse står ingen boble i den ekte versjonen; raden sier «når appen har adressen», og testen sjekker at det ikke er noe mer etter grenen). ECH4, lav (testen for rekkefølgen på mobil krever at hvert bilde ved 390 px har sitt bilde ved 1280 px i den første knappen).
+- *Godtatt:* ECH5, lav (linja om neste henting står ikke når tidspunktet ikke kan regnes ut; raden beskriver det vanlige, og `test_neste_henting` sjekker malen).
+- Mutanten M1 (notatene på aksjesiden og investorsiden byttet om i README-en) ble fanget av `test_begge_bildene_ligger_i_docs_appen_med_alt_tekst_og_teksten_under`. README-en ble lagt tilbake fra kopien, med samme git-objekt som HEAD.

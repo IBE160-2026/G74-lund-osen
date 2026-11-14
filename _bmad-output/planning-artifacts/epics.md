@@ -4797,6 +4797,8 @@ Som **bruker i demoen og den ekte versjonen**, vil jeg at «Vis meg rundt» vise
 
 *Avgjort 2026-11-12 kl. 16:23 og 16:24 (gruppens svar, tillegg 23):* gruppen antar at det ikke blir noen presentasjon, så README-en er inngangen for faglærer: to linjer under «Til faglærer», forskjellene mellom demoen og den ekte versjonen, og README-en sier at versjon 1 er ferdig. Bunnteksten i appen, «Appen er under utvikling og ikke ferdig.», er ikke endret, og står åpen til gruppen har svart.
 
+*Lagt til 2026-11-14 (story 3.3k, tillegg 1, gruppens svar 12.11 kl. 16:23):* bunnteksten sier nå «Versjon 1 er ferdig.», som README-en, i begge versjonene (spørsmål 1 i `spec-3-3k-bildene-av-appen-i-readme.md`). Punktet over er lukket.
+
 *Ferdig 2026-11-12:* PR #146 er squash-flettet i `719e5f07` kl. 23:51, låst til head-en `82f50471`. CI var grønn på head-en (run 43261288679), og hele settet lokalt før flettingen: 5551 bestått og 24 hoppet over (5575, likt `--collect-only`).
 
 ### Story 8.27: «Mine notater» i et panel fra en knapp øverst

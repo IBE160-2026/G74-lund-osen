@@ -88,7 +88,7 @@ Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (
 | Endringer i lista | Tas ikke i bruk, fordi demoen ikke henter | Tas i bruk ved hentingen etter kl. 22 |
 | Notatene | Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start | Lagres i basen på maskinen |
 | Neste henting | Står ikke, fordi demoen ikke henter. Omvisningen sier at den ekte versjonen viser den | Bak «Oppdatert» øverst står når nye kurser tidligst kan hentes |
-| Investorsiden | En oppdiktet side i appen, i samme fane | Selskapets egen side, i en ny fane |
+| Investorsiden | En oppdiktet side i appen, i samme fane | Selskapets egen side, i en ny fane, når appen har adressen |
 | «Åpne eodhd.com» | En side i appen med en tegning laget av KI, fordi demoen ikke trenger nøkkel | Registreringen hos EODHD, i en ny fane |
 
 Til faglærer:

@@ -1969,7 +1969,8 @@ DE_NYE_BILDENE = {
     # oversikten, de første 1000 px, og første steg i «Vis meg rundt» på oversikten,
     # 1000 px slik vinduet står når steget vises (siden ruller til steget).
     "docs/appen/notatpanelet-demo.png": ("/", 1280, 1000, FILENE_BAK_MIN_LISTE),
-    "docs/appen/vis-meg-rundt-demo.png": ("/", 1280, 1000, MALENE_BAK_BILDET),
+    # Gjennomgangen (ECH1): omvisningen bygges i app.py (demo=), så app.py er med.
+    "docs/appen/vis-meg-rundt-demo.png": ("/", 1280, 1000, FILENE_BAK_MIN_LISTE),
 }
 # Story 3.3k (svaret 12.11 kl. 17:09): bildene i knappen «Bilder av appen (demoen)» i
 # rekkefølgen fra knapperaden øverst, med sidene man kommer til rett etter: Markedsoversikt
@@ -2180,7 +2181,7 @@ AVTRYKK_BAK_DE_NYE_BILDENE = {
     "docs/appen/innstillinger-demo.png": "b1ec40c753247018c7e7af93c139ca3cd05db88f1d4d44b23fcf338b624eb0f4",
     # Story 3.3k: de to nye bildene.
     "docs/appen/notatpanelet-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
-    "docs/appen/vis-meg-rundt-demo.png": "f42814530e2f3889b46a3fd7709b1fbb2cb06ebde71d09d533786a43cfdf5b5d",
+    "docs/appen/vis-meg-rundt-demo.png": "de0f5d7355cbd9a3ecb45aaf91bb7673ad49b9e58417226bc2ec3c17ce57e73d",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2444,7 +2445,9 @@ class TestBildeneAvAppen:
         # Samme rekkefølge som i den første knappen: hvert bilde ved 390 px har et
         # tilsvarende bilde ved 1280 px med samme navn uten «-390».
         tilsvarende = [f"docs/appen/{sti.rsplit('/', 1)[1].replace('-390', '')}" for sti in BILDENE_PAA_MOBIL]
-        tilsvarende = [s if s in BILDENE_I_KNAPPEN else SKJERMBILDET for s in tilsvarende]
+        # Gjennomgangen (ECH4): hvert bilde ved 390 px har sitt bilde ved 1280 px i den
+        # første knappen, så plassen sjekkes for alle.
+        assert all(s in BILDENE_I_KNAPPEN for s in tilsvarende), tilsvarende
         plass = [BILDENE_I_KNAPPEN.index(s) for s in tilsvarende]
         assert plass == sorted(plass), plass
         for alt, sti, under in bilder:

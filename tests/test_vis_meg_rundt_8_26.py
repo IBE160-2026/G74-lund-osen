@@ -1936,11 +1936,13 @@ class TestTabellenOmForskjellene:
         eller boblen i den ekte versjonen ikke åpnet selskapets side i en ny fane."""
         _, demoen, ekte = _tabellraden("Investorsiden")
         assert demoen == "En oppdiktet side i appen, i samme fane"
-        assert ekte == "Selskapets egen side, i en ny fane"
+        # Gjennomgangen (ECH3): uten adresse står ingen boble.
+        assert ekte == "Selskapets egen side, i en ny fane, når appen har adressen"
         boble = (ROT / "src" / "templates" / "_investorboble.html").read_text(encoding="utf-8")
         demo_del, ekte_del = boble.split("{% elif adresse %}", 1)
         assert '<a href="/investorside/{{ symbol }}">' in demo_del and "_blank" not in demo_del
         assert '<a href="{{ adresse }}" target="_blank"' in ekte_del
+        assert ekte_del.split("{% endif %}", 1)[1].strip() == "{%- endmacro %}"
 
     def test_aapne_eodhd(self):
         """Ville feilet hvis «Åpne eodhd.com» i demoen ikke gikk til siden i appen, eller
