@@ -198,6 +198,20 @@ linjenummeret i `issues.md` på `ff6e5209`.
 - [ ] CI er grønn i alle jobbene
 - [ ] `git diff --stat origin/main` viser bare dokumenter, `issues.md` og ingen fil i `src/`
 
+## Mutantene
+
+To mutanter 14.11 på `8fe6b3cd`, med `tests/test_kvalitetssikring.py`. Begge
+filene var like HEAD etterpå, målt med sha256.
+
+- **M1:** testnavnet `test_ledig_mot_bakgrunnen_og_brukt_mot_ledig` i matrisen
+  byttet med et som ikke finnes. Fanget av
+  `test_hver_test_dokumentene_nevner_finnes[vurderingsmatrise.md]`.
+- **M2:** denne spesifikasjonen satt til `done` uten rad i kvalitetssikringen.
+  Fanget av `test_hver_ferdige_spesifikasjon_har_en_rad`, i §3 og §5.
+
+Ingen test sjekker lenkene i matrisen eller bevisene i `issues.md`. De er
+sjekket for hånd og i gjennomgangen (lav, står).
+
 ## Gjennomgangen 14.11
 
 Én leser gikk gjennom diffen med tre linser (Verification Gap, Edge Case Hunter

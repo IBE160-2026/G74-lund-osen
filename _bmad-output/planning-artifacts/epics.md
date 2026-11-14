@@ -5304,6 +5304,6 @@ Som **gruppe**, vil vi at statusene, de åpne punktene og vurderingsmatrisen ste
 - 3.4 og 8.2 er done i `sprint-status.yaml`, spesifikasjonene og her, med en datert linje om hvorfor
 - Hvert åpent punkt i `.logs/marian-osen/issues.md` er sjekket mot main, med en tabell i spesifikasjonen
 - «Status 14.11.2026» i `docs/vurderingsmatrise.md` med bevisene fra 12.–14.11
-- **Ville feilet hvis:** et punkt var krysset av uten bevis, eller en lenke i matrisen pekte på noe som ikke finnes
+- **Ville feilet hvis:** et testnavn i matrisen ikke fantes (`test_hver_test_dokumentene_nevner_finnes`), eller 3.4, 8.2 eller 9.13 ble satt til done uten rad i kvalitetssikringen (`test_hver_ferdige_spesifikasjon_har_en_rad`). Lenkene i matrisen og bevisene i `issues.md` er sjekket for hånd og i gjennomgangen, ikke av en test
 
 **Avhenger av:** 2.17. **Én økt:** ja.
