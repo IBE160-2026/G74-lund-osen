@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-16T00:15
+updated: 2026-11-16T00:31
 ---
 
 # PRD — OSE Signal
@@ -819,7 +819,8 @@ Hentekommandoen:
 1. nekter på en børsdag før kl. 22:00 norsk tid. Før det er dagens rad ikke
    endelig, og en vurdering kan ikke skrives om (`malinger.md` §37). Unntaket fra
    sperren er første henting i en tom base, som henter forrige børsdag (FR-402).
-   Steg 6 kjøres likevel, også når kommandoen nekter eller stopper
+   Steg 6 kjøres likevel, også når kommandoen nekter eller stopper, utenom
+   for en demobase
 2. tar i bruk endringene i lista brukeren har bedt om (FR-412)
 3. sjekker basen først. Har den kursene for børsdagen for alle i lista, gjøres
    ingen kall til kursene (FR-402). Det som mangler av hovedindeksen,
@@ -1680,8 +1681,7 @@ lukket dem, står i endringsloggen.
 ### v1.1 — vurderes etter at v1 er kontrollert
 
 Gruppen avgjorde 12.11 kl. 20:09 og 20:10 at disse åtte ikke er i v1. Kravene
-står som plan for en senere versjon. Svaret 14.11 kl. 05:49 la til KI-tekst for
-små hull, 1–3 kvelder (FR-408), som står som senere i §2:
+står som plan for en senere versjon:
 
 - endringen i kroner under prosenten i oversikten (FR-101)
 - merket for endret signalstyrke (FR-107)
@@ -1691,6 +1691,9 @@ små hull, 1–3 kvelder (FR-408), som står som senere i §2:
 - kommende eks.dato i kursgrafen (FR-207)
 - eks.datoer ført for hånd (FR-414)
 - ChatGPT med «Sign in with ChatGPT» (FR-608)
+
+Svaret 14.11 kl. 05:49 la til KI-tekst for små hull, 1–3 kvelder (FR-408), som
+også står som senere i §2.
 
 De andre idéene til v1.1 er enten tatt inn som krav over, eller de står med
 forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og

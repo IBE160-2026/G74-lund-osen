@@ -494,6 +494,8 @@ eksperiment uten kode i `src/`, og ingen mutanter er kjørt.
 - **10.2c:** dagsfila sier at to ting ble utsatt, og spesifikasjonen har tre rader med defer.
 - **10.3, PR #51:** spesifikasjonen sier «BH, 15 funn», men BH8 står ikke i tabellen for PR 2.
 
+*Rettet 2026-11-16 (story 9.14):* raden for 10.2a over sier «Spesifikasjonen står in-progress». Statusen er satt til done i 9.14, fordi PR #48 er flettet og 10-2 er done.
+
 ### Mutanter som overlevde
 
 Hver mutant som overlevde en stund, med hvordan den ble funnet, testen som
@@ -909,9 +911,9 @@ har sju punkter uten `resolved:` 03.10:
   i PR-en for `spec-2-3-hentingen-fra-kl-22.md`.
 - **Brukere.** Ingen brukertest er gjort ennå (story 8.1). Sidene er bare
   prøvd med Flask sin testklient, ikke i en nettleser.
-  *Rettet 2026-11-16 (story 9.14):* brukertesten i story 8.1 ble tatt 10.11 (`docs/brukertest.md`), og flere tester åpner sidene i Edge eller Chrome uten hode, for eksempel `tests/test_hjelpefeltet.py` og `tests/test_maalene_8_31.py`.
   *Lagt til 2026-10-17:* står fortsatt. 8.1 står i backlog, og ingen test i
   `tests/` starter en nettleser. Vi har gått gjennom «Kom i gang» selv 16.10 (§13).
+  *Rettet 2026-11-16 (story 9.14):* brukertesten i story 8.1 ble tatt 10.11 (`docs/brukertest.md`), og flere tester åpner sidene i Edge eller Chrome uten hode, for eksempel `tests/test_hjelpefeltet.py` og `tests/test_maalene_8_31.py`.
 - **To kontroller for hånd** står som gjenstående i `malinger.md` §6: de tre
   sjekkene i et regneark, og kursene mot Oslo Børs. Ingenting viser at de er
   gjort. Sluttverdien for OSEBX er kontrollert for hånd én gang (`malinger.md`

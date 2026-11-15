@@ -4466,7 +4466,9 @@ LENKENE_FOER_3_3H = {
 # den ekte versjonen staar uendret i docs/installasjon.md, med samme avtrykk.
 AVTRYKK_I_PILENE = {
     "Demoen": "a49a8d06bb28990eeed5c254fd46f2f9f09772dff7f8ced861088452d97933cf",
-    "Den ekte versjonen": "c087d5b97500a0a7689a714c40f709f1ac8f3f5cd9b49918d90ed7083f753ad7",
+    # Story 9.14 (regel 19): kallene med 18 aksjer i «Den ekte versjonen» i
+    # docs/installasjon.md. Var c087d5b9....
+    "Den ekte versjonen": "b28b08668c430cfff8854fdab79bce28f60a6fee6fe0afb8922b503009eff39b",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): utdraget fra designtavla 08.11
     # i «Dokumentene». Var d80b9ef9..., og cda0d0fd... med «kort fortalt»,
     # som test_de_gamle_ordene_staar_ikke_igjen ikke tillater.
@@ -4475,7 +4477,8 @@ AVTRYKK_I_PILENE = {
     # endringsloggen. Var 79d0a921....
     # Story 9.12 (regel 17 og 19): technology.md fra faglærer 12.11, med flettingen av main (9.11) 13.11.
     # Var 997300f2....
-    "Dokumentene": "a1d849f7a1eb05af7ab3db69e4c0d277f9ca97b880afe587583a53cb13b465ec",
+    # Story 9.14 (regel 19): brukertesten er tatt 10.11. Var a1d849f7....
+    "Dokumentene": "a6a3c7185c6252ed001b016bf15bd2e12893761090ffa86076badf0fed33db1f",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i

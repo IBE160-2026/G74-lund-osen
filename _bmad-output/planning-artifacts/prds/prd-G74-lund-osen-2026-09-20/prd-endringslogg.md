@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-16T00:15
+updated: 2026-11-16T00:31
 ---
 
 # Endringslogg for PRD-en
@@ -1637,4 +1637,4 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 
 *Endret 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 9 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* §7, status for SM-2 og SM-5: hullet i brukslogga er ført. Brukslogga har én linje, 04.11, og fra 05.11 til 14.11 er ingen bruk ført, så de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11. Setningen sto slik: «Brukslogga har én linje 12.11.»
 
-*Rettet 2026-11-16 (story 9.14, kontrollrunden etter v1.1, gruppens svar 15.11 kl. 23:36):* fem klare feil mot main er rettet der teksten står. I §2 var «Bygget» lest i koden bare 12.11, men radene fra 13.11 og 14.11 ble lest ved flettingen. Setningen sto slik: «**Bygget** betyr flettet til main og lest i koden 12.11.». I konsekvensene for FR-408 sto «En rad med grunn skriver aldri over en rad med vurdering samme dag.», men kveldens rad skriver over en rad regnet i ettertid samme dag (`_UPSERT` i `src/lagring_sqlite.py`, `tests/test_ettertid_2_17.py`). I hentekommandoen i FR-401 sto ikke at steg 6 kjøres også når kommandoen nekter, men `kjoer` i `src/fetch_prices.py` regner signalet i ettertid i `finally`. I §8, «v1.1», manglet KI-tekst for små hull, som §2 har som senere etter svaret 14.11 kl. 05:49. I §7 sto «**Status 12.11.**» over linja om brukslogga fra 15.11 (`56adfe5d`).
+*Rettet 2026-11-16 (story 9.14, kontrollrunden etter v1.1, gruppens svar 15.11 kl. 23:36):* fem klare feil mot main er rettet der teksten står. I §2 var «Bygget» lest i koden bare 12.11, men radene fra 13.11 og 14.11 ble lest ved flettingen. Setningen sto slik: «**Bygget** betyr flettet til main og lest i koden 12.11.». I konsekvensene for FR-408 sto «En rad med grunn skriver aldri over en rad med vurdering samme dag.», men kveldens rad skriver over en rad regnet i ettertid samme dag (`_UPSERT` i `src/lagring_sqlite.py`, `tests/test_ettertid_2_17.py`). I hentekommandoen i FR-401 sto ikke at steg 6 kjøres også når kommandoen nekter, men `kjoer` i `src/fetch_prices.py` regner signalet i ettertid i `finally`, utenom for en demobase. I §8, «v1.1», manglet KI-tekst for små hull, som §2 har som senere etter svaret 14.11 kl. 05:49. I §7 sto «**Status 12.11.**» over linja om brukslogga fra 15.11 (`56adfe5d`).

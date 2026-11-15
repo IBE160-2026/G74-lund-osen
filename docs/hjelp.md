@@ -2,7 +2,7 @@
 title: "Hjelp til «Kom i gang»"
 status: aktiv
 created: 2026-10-11
-updated: 2026-11-14T19:13
+updated: 2026-11-16T00:31
 ---
 
 # Hjelp til «Kom i gang»
@@ -249,7 +249,7 @@ Appen henter og vurderer bare aksjene som er i lista. Lista står i basen, med d
 
 ### Hva med nøkkelen?
 
-Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker ett kall per aksje og ett for hovedindeksen: 16 med de 15 aksjene appen begynner med, og 19 med 18. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env`, henter aldri og bruker aldri kvote. Den skriver bare det du velger selv i basen: merkingen i Min liste, aksjene du følger, innstillingene og notatene. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
+Du trenger en egen gratis API-nøkkel fra [EODHD](https://eodhd.com/register), fordi vilkårene ikke lar oss dele vår. Den gir 20 kall i døgnet, og en henting bruker 16: ett per aksje og ett for hovedindeksen. Følger appen 18 aksjer, bruker den 19. Åpne `.env` i en teksteditor (`notepad .env` på Windows, `open -e .env` på macOS, `nano .env` på Linux) og lim den inn etter `EODHD_API_KEY=`. `cp` skriver over en `.env` som finnes, så kopier bare første gang. Webserveren starter uten `.env`, henter aldri og bruker aldri kvote. Den migrerer basen når den startes, og skriver ellers bare det du velger selv: merkingen i Min liste, aksjene du følger, innstillingene og notatene. Bare hentingen trenger nøkkelen, og `docker compose run --rm hent` starter ikke uten `.env`.
 
 ### Hvorfor bare 15 aksjer?
 

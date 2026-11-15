@@ -84,13 +84,13 @@ Desimaltall regnes som like med relativ toleranse 1e-9.
     endret siden kvelden, så ulikheten **kommer av justerte kurser**. Feltene
     er `justert_slutt`, `trend_avvik`, `standardavvik`, `dagens_endring` og i
     18 av dem `volumforhold`. Styrken, retningen og de tre sjekkene er like.
-  - 66 rader der bare `volumforhold` er ulikt, for DNB (16), ORK (9), GJF,
-    NHY og SALM (8 hver), YAR (7), TEL (5), VAR (3) og ATEA, BAKKA, DNO og
-    KOG (1 hver). `slutt` og `justert_slutt` er like, så det kommer ikke av
-    justerte kurser. Volumforholdet regnes av volumene i vinduet. Grunnen er
+  - 68 rader der `slutt` og `justert_slutt` er like, så ulikheten ikke kommer
+    av justerte kurser: DNB (16), ORK (9), GJF, NHY og SALM (8 hver), YAR (7),
+    TEL (5), VAR (3) og ATEA, BAKKA, DNO og KOG (1 hver). I 66 av dem er bare
+    `volumforhold` ulikt. Volumforholdet regnes av volumene i vinduet. Grunnen er
     trolig at serien er hentet på nytt med andre volum, men det er ikke sjekket,
     fordi volum ikke skrives ut (regel 16).
-  - 2 rader der også signalet er ulikt: ORK 2026-10-16 (`styrke` og
+  - De 2 andre av de 68 har også et annet signal: ORK 2026-10-16 (`styrke` og
     `interesse`) og YAR 2026-10-26 (`styrke`, `retning` og `interesse`). Begge
     har samme kurser, og `volumforhold` er ulikt, så volumsjekken slår ut
     annerledes i dag.
@@ -143,7 +143,7 @@ PRD-en virker.
 
 ### Funnene
 
-Ingen funn på høy grad. «Rettet» betyr rettet på grenen, med Rettet-linje der
+Ingen funn i kontrollrunden er på høy grad (gjennomgangen av rettingene fant ett, se under). «Rettet» betyr rettet på grenen, med Rettet-linje der
 regelen krever det. README-en, `docs/hjelp.md`, `docs/installasjon.md` og
 `prd.md` er levende, så der står rettingen i teksten, og for `prd.md` med en
 linje i endringsloggen.
@@ -158,7 +158,7 @@ linje i endringsloggen.
 | A6 | middels | `hjelp.md`: «Planen er at du senere kan velge opptil 18» | `TAK = 18` i `src/valg.py`, 2.12 done | Rettet (`38625e72`) |
 | A7, A11 | lav | `hjelp.md` og `installasjon.md`: en henting bruker 16, opptil 15 KI-kall | `TAK` og `KVOTE` i `src/valg.py`, teksten om dagen i `src/ki_tekst.py` | Rettet (`38625e72`) |
 | A8 | lav | `hjelp.md`: setningene i «Signalet forklart» står alltid | `detalj.ettertid` i `src/app.py` (spørsmål 7 i 2.17) | Rettet (`38625e72`) |
-| A9 | lav | `hjelp.md`: dagene før første henting er regnet i ettertid | `dekker()` i `src/ettertid.py`: fra 2026 | Rettet (`38625e72`) |
+| A9 | lav | `hjelp.md`: dagene før første henting er regnet i ettertid | `dekker()` i `src/boersdag.py`, brukt i `regn_i_ettertid`: fra 2026 | Rettet (`38625e72`) |
 | A10 | middels | `installasjon.md`: grunnlaget har ingen navn eller bransjer | `lag_dagsrad` i `src/ki_tekst.py`, `src/dagsgrunnlag.py` | Rettet (`38625e72`) |
 | A12, A14 | middels | `innlevering.md` og `kvalitetssikring.md`: tallene fra 25.10 «gjelder nå» | 56 moduler, 14 migrasjoner og 100 testfiler (`ls`); CI-kjøring 43649592034 | Rettet (`d60eb0d7`) |
 | A13 | middels | `innlevering.md`: «Dockerfile finnes ikke», og demoen finnes ikke | `Dockerfile` og `compose.yaml`; 3.1 og 3.2 done | Rettet (`d60eb0d7`) |
@@ -195,7 +195,8 @@ testsymbol.
 Ingenting er slettet. Bildegrenene beholdes (svaret 11.11 kl. 16:26). Lokalt
 gjelder det `8-19-bilder`, `pr-2-17-bilder`, `pr-3-3k-bilder`, `pr-8-17b-bilder`,
 `pr-8-26-bilder`, `pr-8-27-bilder` og `pr-8-28-bilder`. Eksternt gjelder det i
-tillegg `pr-8-0f`, `pr-8-17a`, `pr-8-22`, `pr-8-25`, `pr-8-2b` og `pr-8-2c`.
+tillegg `pr-8-0f-bilder`, `pr-8-17a-bilder`, `pr-8-22-bilder`, `pr-8-25-bilder`,
+`pr-8-2b-bilder` og `pr-8-2c-bilder`.
 Kandidatene står i spørsmål 12.
 
 ### Tallene til refleksjonsrapporten
@@ -209,7 +210,7 @@ Talt 16.11 på `origin/main` (`e90f0afa`).
 | Dagsfiler i `docs/ai-prompts/` | 54 | `ls docs/ai-prompts/`, bare filene med navnet `ÅÅÅÅ-MM-DD.md` |
 | Linjer som begynner med `**Utført` | 802 | `grep -c` etter `^\*\*Utført` i dagsfilene |
 | Spesifikasjoner | 140, og 136 med `done` før 9.14 | `git ls-tree` over `_bmad-output/implementation-artifacts/`, og `status:` i hver |
-| Stories i `sprint-status.yaml` | 87 done, 1 review og 11 backlog | `grep -E` etter linjene for stories, og `uniq -c` |
+| Stories i `sprint-status.yaml` | 143: 119 done, 1 review og 23 backlog | `git show e90f0afa:_bmad-output/implementation-artifacts/sprint-status.yaml \| grep -E '^  [0-9][0-9a-z]*-[^:]+: ' \| awk '{print $2}' \| sort \| uniq -c` |
 | Testfiler | 100 `test_*.py`, og 104 `.py` i alt | `ls tests/test_*.py \| wc -l` |
 | Testfunksjoner | 3 486 | `grep -rE` etter `^\s*def test_` i `tests/*.py`, og `wc -l` |
 | Tester i CI | 5 863 bestått og 99 hoppet over | Kjøring 43649592034 på `c45cbb7c` (8.31) |
@@ -288,9 +289,44 @@ er slettet.
 Spørsmål 1 og 2 er på middels. De står åpne til gruppen har svart (regel 25),
 så PR-en stopper ved grønn CI og flettes ikke i natt.
 
+## Gjennomgangen 16.11
+
+Én leser gikk gjennom diffen med tre linser (Verification Gap, Edge Case Hunter
+og Blind Hunter), bare med lesing. Leseren hadde ikke skrevet rettingene.
+Gjennomgangen ga 14 funn: 1 høy, 2 middels og 11 lave. Alle er rettet.
+
+- **VG1 (høy):** rettingen av kallene i `docs/hjelp.md` og
+  `docs/installasjon.md` og av «Dokumentene» i README-en brøt tre tester i
+  `tests/test_docker.py`. Testene låser 16 kall for de 15 aksjene appen
+  begynner med, og avtrykkene i pilene. `--dokumentene` fant de samme tre
+  (2963 bestått og 3 feilet, kl. 00:18–00:30). Setningene om 16 kall står nå
+  som før, og 19 kall med 18 aksjer kommer i tillegg. Avtrykkene for «Den ekte
+  versjonen» og «Dokumentene» er satt på nytt i testen med en kommentar, slik
+  testen sier. Det er den eneste endringen i `tests/`.
+- **ECH3 (middels):** medforfatterlinja i commiten med funnene manglet `>`.
+  Grenen var ikke pushet, så meldingen ble rettet (`e3bfab0b`).
+- **VG2 (middels):** tallet på stories i sprintstatusen kunne ikke gjenskapes.
+  Det er talt på nytt med kommandoen i tabellen: 143, med 119 done, 1 review
+  og 23 backlog.
+- **De lave:**
+  - VG3: 68, ikke 66, rader uten endret kurs.
+  - VG4: navnene på bildegrenene.
+  - VG5: webserveren migrerer basen.
+  - VG6: `dekker()` står i `src/boersdag.py`.
+  - VG7: steg 6 kjøres ikke for en demobase.
+  - ECH1: en Rettet-linje for raden 10.2a i §3.
+  - ECH2: `updated` i hjelpen og installasjonen.
+  - BH1: setningen om KI-tekst for små hull står under lista i §8.
+  - BH2: Rettet-linja om brukerne står under linja fra 17.10.
+  - BH3: bransjen sendes ikke med grunnlaget for hver aksje.
+  - BH4: punktum foran Rettet-linjene i innleveringen.
+
+Ingen funn fra gjennomgangen står åpne. I kontrollrunden står spørsmål 1 og 2
+på middels.
+
 ## Kontroll
 
 - [ ] `--dokumentene` består lokalt
 - [ ] CI er grønn i alle jobbene
-- [ ] `git diff --stat origin/main` viser ingen fil i `src/` eller `tests/`
+- [ ] `git diff --stat origin/main` viser ingen fil i `src/`, og i `tests/` bare avtrykkene i `tests/test_docker.py`
 - [ ] sha256 av `data/db/ose.db` var lik før og etter steg 2
