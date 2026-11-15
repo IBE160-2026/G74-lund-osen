@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-14T23:51
+updated: 2026-11-16T00:14
 ---
 
 # Kvalitetssikring
@@ -28,18 +28,21 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 - 1074 tester i 22 testfiler. Lokalt på Windows består 1058, og 16 hoppes over.
   I CI på Linux består alle 1074 (kjøring 37072797767 på `74fc69b`, den siste
   på main da dette ble skrevet, med samme tester som `3803b4d`; `D/2026-10-03.md`).
+  *Rettet 2026-11-16 (story 9.14):* tallene fra 25.10 under gjelder ikke lenger. Main har 100 testfiler, 56 moduler i `src/` og 14 migrasjoner i `src/migrasjoner/` (`ls`), og den siste kjøringen av hele settet i CI ga 5863 bestått og 99 hoppet over (kjøring 43649592034 på `c45cbb7c`, story 8.31). Antallet er ikke talt med `--collect-only` i 9.14.
   *Oppdatert 2026-10-25, og det er tallene som gjelder nå:* 3656 tester i 49 testfiler, telt med `uv run pytest --collect-only -q` på `d183856`, med 40 moduler i `src/` og sju migrasjoner i `src/migrasjoner/`. I CI på Linux består 3649, og 7 hoppes over (kjøring 40242295656 på `d183856`). Lokalt på Windows besto 3636, og 20 ble hoppet over, i den siste hele kjøringen 25.10 (21:55:10–22:02:40, fil for fil, på `9b28e1e`; `git diff 9b28e1e d183856 -- src tests` er tom). Tabellen fra 25.10 står over den fra 17.10 i §2.
   *Oppdatert 2026-10-17:* 2383 tester i 38 testfiler, telt med `uv run pytest --collect-only -q` på `3699a16`. Lokalt på Windows består 2366, og 17 hoppes over (målt på `59976ee` etter gjennomgangene av PR #60, slik beskrivelsen av PR #60 sier; `git diff 59976ee 3699a16 -- src tests` er tom). I CI på Linux består alle 2383 (kjøring 39066471455 på `3699a16`). Tabellen fra 17.10 står over den fra 03.10 i §2.
   *Lagt til 2026-10-17:* story 9.1 legger til `tests/test_kvalitetssikring.py` med 10 tester, så etter flettingen har main 2393 tester i 39 testfiler. Tabellen i §2 er talt før den kom til.
   *Oppdatert 2026-10-05:* 1148 tester i 23 testfiler, telt med `uv run pytest --collect-only -q` på `3fac7cc`. Lokalt på Windows består 1132, og 16 hoppes over. I CI på Linux består alle 1148 (kjøring 37348017033 på `3fac7cc`). Siden 03.10 har story 2.2 (`1570ae9`, PR #19) og 2.2b (`ff58ecf`, PR #20) kommet til, med den nye testfila `test_oversiktsleser.py`. Tabellen under er fra 03.10.
 - Testene kan ikke nå nettet. En sperre i `tests/conftest.py` stopper det
   (AD-8), men den dekker ikke hele testkjøringen ennå (§6).
+  *Rettet 2026-11-16 (story 9.14):* sperren dekker hele testkjøringen fra story 4.0 (`dc43569`, PR #44), som §2 sier.
 - Hver story med kode er prøvd med mutanter: koden er ødelagt med vilje, og
   en test skal feile. Vedlegget har 197 linjer, én per mutant eller per gruppe
   som kilden bare teller. 18 tilfeller overlevde en stund, og hvert av dem fikk
   en test eller en forklaring (§3).
   *Oppdatert 2026-10-25:* vedlegget har nå 264 linjer: de 197 fra 03.10 og 67 i
   «Fra 2.2 til 10.3, én linje per spesifikasjon», talt på `d183856`.
+  *Rettet 2026-11-16 (story 9.14):* vedlegget har nå 326 linjer: de 197 fra 03.10 og 129 i «Fra 2.2 til 10.3, én linje per spesifikasjon», talt på `e90f0afa`.
 - Fra story 1.4a fikk hver story med kode en gjennomgang med tre eller fire
   lenser før flettingen, og Epic 1 fikk en samlet gjennomgang etterpå (§5).
 - Koden er også kontrollert mot ekte data, og ikke bare mot testdata (§4).
@@ -48,6 +51,8 @@ Forkortelser i kildene: `S/` er `_bmad-output/implementation-artifacts/`, og
 ## 2. Testene
 
 ### Antall
+
+*Rettet 2026-11-16 (story 9.14):* tabellen under er fra 25.10 og gjelder ikke lenger: main har 100 testfiler, og den siste kjøringen av hele settet i CI ga 5863 bestått og 99 hoppet over (kjøring 43649592034 på `c45cbb7c`, story 8.31). Tabellen er ikke talt på nytt.
 
 Talt med `uv run pytest --collect-only -q` 25.10.2026, på `d183856`, med CI-kjøringen 40242295656 for samme commit (3649 bestått og 7 hoppet over). Dette er tallene som gjelder nå:
 
@@ -904,6 +909,7 @@ har sju punkter uten `resolved:` 03.10:
   i PR-en for `spec-2-3-hentingen-fra-kl-22.md`.
 - **Brukere.** Ingen brukertest er gjort ennå (story 8.1). Sidene er bare
   prøvd med Flask sin testklient, ikke i en nettleser.
+  *Rettet 2026-11-16 (story 9.14):* brukertesten i story 8.1 ble tatt 10.11 (`docs/brukertest.md`), og flere tester åpner sidene i Edge eller Chrome uten hode, for eksempel `tests/test_hjelpefeltet.py` og `tests/test_maalene_8_31.py`.
   *Lagt til 2026-10-17:* står fortsatt. 8.1 står i backlog, og ingen test i
   `tests/` starter en nettleser. Vi har gått gjennom «Kom i gang» selv 16.10 (§13).
 - **To kontroller for hånd** står som gjenstående i `malinger.md` §6: de tre
@@ -1205,6 +1211,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 
 *Lagt til 2026-10-23 kl. 14:51:* raden «Brukerutfall»: opplegget for brukertesten står i `spec-8-1-brukertesten.md`, og skjemaet er `docs/brukertest.md`. Testen tas neste uke, med story 10.4 rett etter, med samme person og samme aksje (gruppens svar 23.10 kl. 12:29). Kriteriet er ikke målt ennå.
 
+*Rettet 2026-11-16 (story 9.14):* brukertesten ble tatt 10.11 med én person og den ekte versjonen. Personen brukte over 5 minutter, så kriteriet «Brukerutfall» er målt og ikke nådd (`docs/brukertest.md`, SM-1 i §7 i PRD-en). Raden over sier «Ingen ennå». Brukertest 2 måler det på nytt.
+
 *Lagt til 2026-11-13 (tillegg 24, story 10.4):* raden «KI-forklaringen»: én ukes drift er logget. KI-loggen har 19 kvelder, alle børsdagene fra 19.10 til 12.11, telt fra `ki_logg` med `mode=ro` og samme sha256 før og etter. 294 tekster om aksjene ble laget, 288 besto kontrollen i FR-603 og 6 ble stoppet (3 kvelden 11.11 med versjon 5 og 3 kvelden 12.11 med versjon 6), med versjon 2 av instruksjonen 19.10–23.10, versjon 3 26.10–06.11, versjon 5 09.11–11.11 og versjon 6 12.11. De 4 tekstene om dagen (09.11–12.11, `dag-1` og `dag-2`) besto. Tallene for hver kveld står under del B i `docs/brukertest.md`.
 
 ## 11. Feil vi fant og rettet
@@ -1225,6 +1233,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 | 10 | Sjekken av basen før kallene falt bort når basen sto en versjon bak, og bare filvakten holdt | **Utskriften fra den ekte hentingen** 16.10 kl. 22:10: «Basen ose.db kunne ikke leses (RuntimeError). Henter likevel» (`D/2026-10-16.md`) | `bcac2b5` (#57, `1610a24`) | `tests/test_fetch_prices.py::TestSjekkenLeserEnBaseEnVersjonBak::test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret` |
 | 11 | Kontrollen stoppet 9 av 15 KI-tekster på regel 4 («skyldes» og «indikerer»), også der ordet bare forklarte regelen | **Kontrollen av KI-teksten** i prøvekjøringen 16.10 (`malinger.md` §32) | `cafe067` (#55), prompten versjon 2. I prøvekjøringen etter besto 15 av 15 (§34) | `tests/test_ki_modell.py::TestPrompten::test_regelen_forklares_med_fordi` og `tests/test_ki_modell.py::TestPrompten::test_versjonen_foelger_teksten` |
 | 12 | I «Kom i gang» ble ZIP-fila dratt inn i stedet for mappa, mellomrommet etter `cd` manglet, «Cannot find path» hadde ikke noe svar, og det var uklart hvor kommandoen limes inn og hvor kopi-ikonet er | **Vår egen gjennomgang** av «Kom i gang» 16.10 kl. 20:40–21:11 (under story 3.3 i `epics.md`) | **Ikke rettet ennå.** Det bygges i README-PR-en søndag 18.10 | Ingen ennå |
+
+*Rettet 2026-11-16 (story 9.14):* rad 12 sier «Ikke rettet ennå». De fire tingene ble rettet i README-PR-en, story 3.3c, flettet i `fdaf403` (PR #66), som linja 18.10 i §13 sier.
 
 ## 12. Feilhåndtering, validering av input og hemmeligheter
 
@@ -1271,6 +1281,8 @@ interesse, står i `malinger.md` §6, ved siden av EQNR 05.10 og GJF 02.10.
 *Lagt til 2026-10-18 kl. 15:41 (story 3.3c, ECH16 i triagen):* README-en har nå tre skjermbilder i «Kom i gang», fra gruppens gjennomgang 16.10 kl. 20:40–21:11 (raden i tabellen over): «Engine running» i steg 1, menyen under «Code» med «Download ZIP» i steg 2, og PowerShell med mappenavnet foran `>` i steg 4. De ligger i `docs/bilder/readme/` og viser ikke appen. Demoen står før den ekte versjonen, og de fire tingene gjennomgangen fant, er rettet. Flettet i `fdaf403`, PR #66.
 
 *Lagt til 2026-10-23 kl. 14:51:* raden «Brukertesten (story 8.1)»: opplegget står i `spec-8-1-brukertesten.md`, med story 10.4 i samme økt (gruppens svar 23.10 kl. 12:29), og skjemaet er `docs/brukertest.md`. Testen er ikke tatt, og tas neste uke. 8-1 og 10-4 er ready-for-dev i `sprint-status.yaml`.
+
+*Rettet 2026-11-16 (story 9.14):* raden «Brukertesten (story 8.1)» sier «Ikke tatt» og «8-1 i backlog». Testen ble tatt 10.11, og 8-1 er done i `sprint-status.yaml` (PR #140, `10265324`).
 
 ## Vedlegg: hver mutant
 
