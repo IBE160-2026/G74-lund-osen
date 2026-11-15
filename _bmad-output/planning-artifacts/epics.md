@@ -5353,4 +5353,4 @@ Som **gruppe**, vil vi at basen, dokumentene og koden er sjekket mot main etter 
 
 **Avhenger av:** 2.17, 9.13. **Én økt:** ja.
 
-*Lagt til 2026-11-16:* PR #160 er grønn eller venter på CI, og flettes ikke før gruppen har svart på spørsmål 1 og 2 i spesifikasjonen, som er på middels (regel 25). De klare feilene i dokumentene er rettet på grenen, og de andre funnene står som spørsmål med forslag.
+*Lagt til 2026-11-16:* PR #160 flettes ikke før gruppen har svart på spørsmål 1 og 2 i spesifikasjonen, som er på middels (regel 25). De klare feilene i dokumentene er rettet på grenen, og de andre funnene står som spørsmål med forslag.
