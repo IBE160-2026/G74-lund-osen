@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-14T19:15
+updated: 2026-11-15T05:23
 ---
 
 # Endringslogg for PRD-en
@@ -1634,3 +1634,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Rettet 2026-11-13 (story 9.12):* FR-412 sier «og hver aksje står med sin egen bransje», ikke «følges med». «følges med» står i rådlista i FR-603, og testen av alle malene fant det i siden «Er du sikker?» for «De 15 mest omsatte». Malen og `docs/hjelp.md` er rettet på samme måte.
 
 *Endret 2026-11-14 (story 2.17, gruppens svar 14.11 kl. 05:41–05:49, rådet anbefalte det):* signalet regnes i ettertid for børsdager uten vurdering fra kvelden. FR-408 sier at kveldens vurdering fortsatt ikke etterfylles, og at signalet i ettertid regnes til slutt i hver henting av kursene til og med dagen, for aksjene i lista, når aksjen har nok kurser, aldri for inneværende børsdag og aldri over en rad fra kvelden, merket i basen og uten KI-tekst. Tabellen i FR-409 har raden «Rad med vurdering regnet i ettertid», og «Ingen rad, og dagen var en børsdag» sier at signalet da heller ikke er regnet i ettertid. Hentekommandoen har steg 6, og «Kort fortalt», ordlisten, oversikten, kursgrafen og lista sier det samme. I §2 står signalet i ettertid som ekstra, og KI-tekst for små hull, 1–3 kvelder, som senere, fordi den tar tid, krever kontroll, gir fare for å se framover og gir mindre nytte bakover (svaret kl. 05:49). Teksten som sto, er i taggen `prd-vurdert-2026-11-12` og i git.
+
+*Endret 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 9 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* §7, status for SM-2 og SM-5: hullet i brukslogga er ført. Brukslogga har én linje, 04.11, og fra 05.11 til 14.11 er ingen bruk ført, så de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11. Setningen sto slik: «Brukslogga har én linje 12.11.»

@@ -2,7 +2,7 @@
 title: "Brukslogga"
 status: aktiv
 created: 2026-11-03
-updated: 2026-11-04T20:59
+updated: 2026-11-15T05:23
 ---
 
 # Brukslogga
@@ -25,3 +25,5 @@ Ingen kurser, volumer eller annet innhold fra kildene for en bestemt dag (regel 
 | Dato | Hvem | Hva vi gjorde i appen | Feil vi så |
 |---|---|---|---|
 | 2026-11-04 | Marian Osen | Børsometeret og sjekkortene på en aksjeside i demoen, med skjermbilder kl. 10:00. | Liten tekst i rutene og under kartet, ingen ramme rundt bransjene, styrken uten ring og bare i noen ruter, «?» for periodene etter knappene, og «?» ved «Ga» og «Målt mot» bare i det første sjekkortet. Rettet samme dag i PR #109 og #110. |
+
+*Lagt til 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 9 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* ingen linje er ført fra 05.11 til 14.11, så de dagene regnes ikke som loggført (status for SM-2 og SM-5 i §7 i PRD-en). Logga føres igjen fra 15.11, med én linje for hver dag gruppen bruker appen, i tabellen over.

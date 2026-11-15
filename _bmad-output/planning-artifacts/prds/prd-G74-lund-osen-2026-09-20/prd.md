@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-14T19:15
+updated: 2026-11-15T05:23
 ---
 
 # PRD — OSE Signal
@@ -1612,7 +1612,8 @@ beskriver.
   suksess. Promptversjonen er 6 i dag, så uka gjelder en eldre prompt.
 - SM-2 og SM-5 føres i [brukslogga](../../../../docs/brukslogg.md) fra 4.11, med
   én linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk.
-  Brukslogga har én linje 12.11.
+  Brukslogga har én linje, 04.11. Fra 05.11 til 14.11 er ingen bruk ført, så
+  de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11.
 - SM-9: README-prøven tas når v1 er ferdig bygget.
 - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
 
