@@ -2,7 +2,7 @@
 title: 'Story 9.14: kontrollrunden etter v1.1'
 type: 'docs'
 created: '2026-11-16'
-status: 'in-progress'
+status: 'review'
 route: 'dispatch'
 baseline_commit: 'e90f0afa'
 context:
