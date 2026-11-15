@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-09T00:04
+updated: 2026-11-16T00:16
 ---
 
 # Kilder og rettigheter
@@ -1281,11 +1281,13 @@ lenger uimotsagt» over.
       Teksten som sto: En av oss slår opp adressen til
       selskapssidene og hva Euronexts vilkår sier om lenker, før lenken bygges.
       Sidene leses av et menneske og hentes ikke av programmet. **Eier: Gruppen.**
-- [ ] **Lenken til selskapenes nettsider.** En av oss slår opp adressen til den
+- [x] **Lenken til selskapenes nettsider.** En av oss slår opp adressen til den
       norske nettsiden for hver av de femten, før lenken bygges. Sidene leses av
       et menneske og hentes ikke av programmet. **Eier: Gruppen.**
       *Lagt til 2026-10-06, Marians beslutning:* lenken går til selskapets
       investorside. Se «Lenker til Euronexts nettsteder (lest 2026-10-06)».
+      *Rettet 2026-11-16 (story 9.14):* krysset av. Lenken til investorsiden er bygget i story 10.5, som er done i
+      `sprint-status.yaml`, og README-en og `docs/hjelp.md` beskriver den.
 - [x] ~~**Beslutning hvis Euronext ikke svarer innen 2026-09-28.**~~ — **avgjort 2026-09-28: plan B.** Se punkt 1 i `prd.md` §8. Vilkårene
       krever tillatelse på forhånd, og vi henter allerede. Beslutningen 23.09:
       det hentes ikke, og 28.09 avgjør om Epic 5B utløses. Skal avgjøres og
