@@ -41,6 +41,8 @@ Bare dokumenter, README-en og testene for dem. Ingen kode i `src/`.
    lenke og hvert testnavn er sjekket på `ff6e5209`. README-prøven, brukertest
    2 og refleksjonsrapporten står som gjenstår.
 
+*Rettet 2026-11-15 (gruppens svar kl. 05:20, spørsmål 1):* 3.4 er tilbake i review, ikke done, så «done» i punkt 1 over gjelder nå bare 8.2. Svarene på alle spørsmålene står under hvert av dem.
+
 ## Spørsmål til gruppen, med forslag
 
 Et spørsmål stopper ikke arbeidet. Det som er bygget, er bygget etter
@@ -56,64 +58,100 @@ gruppen har svart.
    datert linje under avgjørelsen i `epics.md`. *Forslag:* 3.4 er done, og README-prøven
    står som et eget punkt i `issues.md` og som gjenstår i vurderingsmatrisen.
    Bygget slik.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas ikke. Gruppen holder fast ved avgjørelsen 12.11 kl. 20:04 og 20:06: 3.4 er tilbake i review i sprintstatusen, spesifikasjonen for 3.4 og `epics.md`, med en datert Rettet-linje (`515c645c`), og blir done når README-prøven er tatt og ført. Vurderingsmatrisen følger.
 2. **8.2 til done.** Kontrollpunktet «Funnene fra 8.1 er brukt som grunnlag» er
    oppfylt: brukertesten ble tatt 10.11, og funnene står som U103–U112 i
    `docs/ux-logg.md`. Det som gjenstår, er U33, U46, U57 og U67, som var delvis
    bygget, U58 og U65, som sto (linja 04.11 kl. 11:34 i `epics.md`), og svaret
    på papir om hvordan Nyheter og Kalender ville passet inn. *Forslag:* 8.2 er
    done, og resten står som ett punkt i `issues.md`. Bygget slik.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. 8.2 er done, og resten står som ett punkt i `issues.md`.
 3. **10.4 sier to ting.** `sprint-status.yaml` har `10-4: done` (`10265324`,
    PR #140), men `spec-10-4-loggdelen.md` har `status: 'in-progress'`, og
    kommentaren over 10-4 i sprintstatusen sier at delen med én person venter
    på brukertesten. Tillegg 3 sier at 10.4 står til brukertest 2 er ført.
    *Forslag:* begge rettes når brukertest 2 er ført, ikke nå. Ikke endret.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. 10.4 rettes når brukertest 2 er ført, ikke nå.
 4. **2.17 i «Status» i README-en.** 2.17 (v1.1) er flettet, men står ikke under
    «Ekstra, ferdig». Lista har åtte punkter, som er grensen i
    `test_status_uten_storynumre_og_uten_kommando`, og bildeteksten øverst nevner
    alt prikkene som er regnet i ettertid. *Forslag:* ingen endring nå. Vil
    gruppen ha den med, slås to punkter sammen i en egen sak. Ikke endret.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Ingen endring i README-en nå.
 5. **Prøven med 0 kall fra hentingen (2.3d, `issues.md` linje 7).** Rad 5 i
    Prøve 4 i `docs/kvalitetssikring.md` har bare kjøringen 28.10, og «0 kall»
    er ikke ført for 29.10. *Forslag:* loggen fra første kveld etter pausen
    (16.11) leses, og en datert linje føres i Prøve 4. Til da står punktet.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Loggen fra første kveldskjøring 16.11 leses, og en datert linje føres i Prøve 4. Til da står punktet.
 6. **«Kort fortalt» før timen 29.10 (linje 25).** Datoen er passert, og delen
    er skrevet om i 9.11 (`ef802733`). *Forslag:* punktet lukkes som utgått.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Punktet er lukket som utgått.
 7. **Windows Update (linje 49).** PC-en startet på nytt 11.11 kl. 04:29
    (`docs/ai-prompts/2026-11-11.md`). *Forslag:* punktet lukkes som utgått, og
    morgenkontrollen etter 16.11 viser om jobben har kjørt etter omstarten.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Punktet er lukket som utgått, og morgenkontrollen etter 16.11 viser om jobben har kjørt etter omstarten.
 8. **Neste § i `malinger.md` (linje 56).** Siste § er 57. Målingen av
    omsetning fra 02.11 og målingen i 2.13b (`178107d9`) står ikke der.
    *Forslag:* én samlet §58 i en egen sak.
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Én samlet §58 tas i en egen sak, og punktet står til da.
 9. **Bruksloggen (linje 59).** `docs/brukslogg.md` har bare 04.11, og SM-2 og
    SM-5 bygger på den. *Forslag:* loggen føres fra i dag, og hullet skrives
    inn i §7 i PRD-en etter regel 19 (en datert linje i endringsloggen).
+
+   *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Hullet fra 05.11 til 14.11 står i §7 i PRD-en, med en datert linje i endringsloggen og i brukslogga (`56adfe5d`), og logga føres fra 15.11. Punktet står.
 10. **macOS uten maskin på `dc027575` (linje 72).** Kjøringen er ikke tatt på
     nytt, og commiten endret bare to filer under `.logs/`. *Forslag:* lukkes
     uten ny kjøring, fordi ingen fletting venter på den.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Punktet er lukket uten ny kjøring.
 11. **Store ruter bare i `bredest` (linje 96).** `STORE_KLASSER = frozenset({"bredest"})`
     i `src/boersometer.py`. *Forslag:* tolkningen står, som bygget.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Tolkningen står, og punktet er lukket.
 12. **Tellingen for 10.4 med versjon 5 (VG10, linje 133).** Versjon 6 ble
     flettet 11.11 (`e5268b30`), så versjon 5 gikk høyst tre kvelder.
     *Forslag:* børsdagene 09.–13.11 telles med klassene fra spørsmål 9 i 10.4,
     delt på versjon 5 og 6, i en egen sak, når jobben går igjen.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Tellingen tas i en egen sak etter første kveldskjøring 16.11, og punktet står til da.
 13. **«Vis hjelp» og «Vis KI-tekst» i «Ferdig» (linje 179).** *Forslag:* de
     navnes ikke. «Innstillinger» og «med bryter» står alt, og grensen er åtte
     punkter med høyst 20 ord.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. De navnes ikke, og punktet er lukket.
 14. **Dokumenttestene følger importer (`3641ce50`, linje 185).** *Forslag:*
     endringen godtas. Vakten er ikke svekket, og README-en oppgir ikke
     antallet moduler.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Endringen i `3641ce50` står, og punktet er lukket.
 15. **Spørsmål 1–18 i 8.23 (linje 199).** Gruppen svarte samlet «ja» til del A
     og B 10.11 kl. 13:54, før spørsmålene fantes. *Forslag:* 1–18 godtas som bygget og flettet i
     `7fb9b1fd`.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Spørsmål 1–18 i 8.23 er godtatt som bygget og flettet i `7fb9b1fd`, og punktet er lukket.
 16. **Hva 3 av 3 betyr (linje 200).** Det står bare i `docs/hjelp.md`, mot
     forslaget i spørsmål 15 i 8.23. *Forslag:* avviket godtas, fordi grensen på
     60 ord og ett «?» per del (8.20a) går foran.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Avviket står, og punktet er lukket.
 17. **Dagsteksten når eldre data kommer inn senere (BH2, linje 218).**
     Spørsmål 13 i 10.10 er åpent i `epics.md`. *Forslag:* ja, som før.
     Hentingen fyller ikke inn eldre dager, og dagen sier «Dagen er uten
     KI-tekst.».
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas: ja, som før. Spørsmål 13 i 10.10 er besvart med en datert linje i spesifikasjonen for 10.10 og i `epics.md`, og punktet er lukket.
 18. **Investorsiden og siden for eodhd.com i omvisningen (linje 254).**
     *Forslag:* ingen steg i v1. Sidene finnes bare i demoen.
+
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar, rådet anbefalte det):* forslaget godtas. Ingen steg i v1, og punktet er lukket.
 
 ## Punktene i `issues.md`
 

@@ -3489,6 +3489,8 @@ Som **bruker**, vil jeg at KI-tekstene sier hvilke aksjer og bransjer som skilte
 
 *Avgjort 2026-11-11 kl. 19:30 (gruppens svar):* formen med antallet i én bransje står bare uten «mest», rekkefølgen er fast, og storyen flettes i kveld. Rådet anbefalte det. Spørsmål 13 (BH2) står åpent til gruppen har svart.
 
+*Avgjort 2026-11-15 kl. 05:20 (gruppens svar 15.11 kl. 05:20, spørsmål 17 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* spørsmål 13 (BH2) i 10.10 godtas som foreslått. Hentingen fyller ikke inn eldre dager, og en dag uten tekst sier «Dagen er uten KI-tekst.».
+
 *Ferdig 2026-11-11:* PR #145 er squash-flettet i `e5268b30`, låst til head-en `497548e0`.
 
 *Rettet 2026-11-12 (story 10.11, gruppens svar 11.11 kl. 22:04):* formene med «mest» er nå «I snitt steg ‹bransje_mest_opp› mest av bransjene med minst to aksjer.» og det samme med «falt», i promptversjon dag-3, og kontrollen godtar bare dem. Formene uten «av bransjene med minst to aksjer» i dag-2 gjelder ikke lenger. Se story 10.11.
@@ -5330,3 +5332,5 @@ Som **gruppe**, vil vi at statusene, de åpne punktene og vurderingsmatrisen ste
 **Avhenger av:** 2.17. **Én økt:** ja.
 
 *Lagt til 2026-11-14:* 9.13 er squash-flettet med PR #158 i `5afabbc9` kl. 22:53, låst til head-en `ee756c36`, etter tillegg 3 i `docs/ai-prompts/2026-11-14.md`, uten nytt ja. CI var grønn i alle jobbene (run 43644459699). Spørsmål 3–18 i spesifikasjonen venter på gruppens svar, og punktene de gjelder, står åpne i `issues.md`.
+
+*Avgjort 2026-11-15 kl. 05:20 (gruppens svar):* alle forslagene i spørsmål 1–18 i spesifikasjonen godtas, utenom spørsmål 1. Gruppen holder fast ved avgjørelsen 12.11 kl. 20:04 og 20:06, så 3.4 er tilbake i review og blir done når README-prøven er tatt og ført. Rådet anbefalte det. Svarene står under hvert spørsmål i spesifikasjonen, og punktene i `issues.md` følger dem.

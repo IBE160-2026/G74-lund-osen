@@ -218,6 +218,8 @@ Gjennomgangen av denne rettingen (Edge Case Hunter) fant fire lave funn. ECH1: s
 
 13. **Hva skjer når data kommer inn etter teksten (BH2)?** Forsiden viser teksten bare når grunnlaget er det samme som det siden regner ut (FR-607). Kommer en kurs eller en indeksrad inn senere for en dag i vinduene, blir grunnlaget annerledes, og teksten for den dagen forsvinner. Det gjaldt også før for bransjene og «bedre enn indeksen». De nye delene har lengre vinduer: 20 og 5 børsdager. *Forslag:* godta det, som før. Hentingen fyller ikke inn eldre dager, og en dag uten tekst sier «Dagen er uten KI-tekst.».
 
+    *Svar 2026-11-15 kl. 05:20 (gruppens svar 15.11 kl. 05:20, spørsmål 17 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* forslaget godtas, som før. BH2 er lukket.
+
 ## Svaret kl. 19:30 (tillegget kl. 19:33)
 
 *Svar 2026-11-11 kl. 19:30 (gruppens svar):* dagsteksten rettes, og PR-en flettes i kveld når alt er grønt. Modellen valgte to av bransjene selv, og formene med «mest» sier det bedre. Når «I snitt steg ‹bransje› mest» eller «I snitt falt ‹bransje› mest» kan stå, er formen «I ‹bransje› steg ‹steg› av ‹med_endring› aksjer.» ikke med i reglene, og kontrollen stopper den. Kan ingen av dem stå, gjelder formen som før. Rekkefølgen i reglene er hovedindeksen den dagen, de siste fem børsdagene, «bedre enn indeksen», «skilte seg ut» med «flere/færre enn vanlig» rett etter, navnene, og til slutt bransjene. Rådet anbefalte det.
