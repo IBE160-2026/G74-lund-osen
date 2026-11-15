@@ -2210,6 +2210,8 @@ kveld, merket «i ettertid», så historikken ikke har hull der kursene finnes.
 
 *Lagt til 2026-11-14:* 2.17 er squash-flettet med PR #157 i `1fafddce` kl. 21:23, låst til head-en `2d489390`, etter tillegg 2 i `docs/ai-prompts/2026-11-14.md`. Gruppen godtok alle forslagene i spørsmål 1–19 kl. 21:07, også spørsmål 19 (BH1) som bygget. Avtrykket av kveldsradene rett før flettingen står under «Kontroll etter flettingen» i spesifikasjonen. Hele settet ble kjørt i CI (run 43636648065): 5854 bestått og 99 hoppet over i jobben `pytest`, og alle jobbene grønne.
 
+*Lagt til 2026-11-15 (beskjeden fra rådet 15.11 kl. 22:58, med tallene fra gruppens kjøring; vinduet leste ikke `data/`):* første kjøring med 2.17 mot `data/db/ose.db`. Gruppen kjørte kveldsjobben uten nye kurser kl. 22:52 (Enable, Start og Disable). Før det tok gruppen en ny kopi av basen (`Get-FileHash` ga True) og avtrykket av kveldsradene med kommandoen i punkt 1: `665d4eff98e57820f399d874f233667388ca32470e25818741200da5124e4bf9` og 477 rader. Etter kjøringen: `LastTaskResult` er 0 og `State` er Disabled; avtrykket med datoen `2026-11-14` er det samme, med 477 rader; `skjema_versjon` har `(14, 0014_regnet.sql, 2026-11-15T21:53:02+00:00)`; `vurdering` har 3105 rader i ettertid og 477 kveldsrader; og loggen for 15.11 sier kl. 22:53:02 at signalet er regnet i ettertid for 3105 børsdager, for 18 aksjer. Kontrollen etter flettingen er tatt, utenom at kveldens rader har KI-tekst, som sjekkes etter kveldsjobben 16.11 (spesifikasjonen, «Kontroll etter flettingen»).
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss
