@@ -3396,6 +3396,166 @@ Det vi lærte: steg 0 holder en instruksjon i feil vindu ute, og nummererte till
 
 ---
 
+## 12.11.2026 – Tilbakemeldingen på PRD-en, en ny versjon med gjeldende tekst, og fire vinduer til
+
+*Joakim og Marian.*
+
+Kl. 11:38 kom faglærers tilbakemelding på PRD-en inn i repoet, som `tilbakemelding-prd.md` i mappa for PRD-en (`29cf2874`). Den var formativ, ikke en karakter. Tesen, de målte tallene bak tersklene og de ærlige avveiningene fikk ros. Formen fikk kritikk: dokumentet var blitt en endringslogg, der «Rettet»- og «Lagt til»-linjer lå oppå krav som ikke lenger gjaldt. «Brukbarhet for neste fase» og «Formtilpasning» var vurdert som svake, og punkt 4.1, at gjeldende krav må kunne leses uten historikken, hadde høy alvorlighet.
+
+Kl. 18:00 svarte vi at PRD-en skal få en ny versjon med gjeldende tekst, slik briefen fikk v8, og rådet anbefalte det. Instruksjonen kl. 18:03 startet 9.11 i et nytt vindu. Først fikk PRD-en slik den var, taggen `prd-vurdert-2026-11-12` (kl. 18:06). Så ble hvert FR og NFR skrevet om til én gjeldende tekst med «*Konsekvenser:*», og alle de daterte linjene ble flyttet ordrett til `prd-endringslogg.md`. Den har en tabell øverst med hvert punkt i tilbakemeldingen og hva som er gjort. PRD-en gikk fra 2 264 linjer og 28 752 ord i taggen til 1 672 linjer og 13 777 ord (spesifikasjonen for 9.11, «Lengden»). Kl. 20:04 og 20:06 godtok vi alle 20 forslagene i spesifikasjonen, med tre avgjørelser:
+- Min liste fikk sitt eget krav, FR-111.
+- «De 15 mest omsatte» skulle bygges i natt som egen story (8.28).
+- 3.4 settes til done etter README-prøven på ny PC.
+
+Kl. 20:09 og 20:10 la vi de åtte kravene som var ekstra og ikke bygget, under «senere». Rådet anbefalte alt utenom at lista bygges, som vi valgte selv.
+
+Kl. 20:44 godtok vi forslagene i spesifikasjonen for 9.12, rådordene i alle malene. Den kom fra punkt 26 i §8 i PRD-en: én test skal gå gjennom alt appen viser, etter ordene i rådlista i FR-603. Samme svar sa at 9.12 flettes sist, etter bildene i README-en (3.3k), og tillegg 7 til 9.11 kl. 20:52 førte det inn i vinduet.
+
+Samme dag ble fire andre storyer bygget i hvert sitt vindu:
+- **3.7**, snarveien spør før nettleseren åpnes (kl. 16:48–18:34).
+- **10.11**, KI-teksten med «av bransjene med minst to aksjer» (kl. 17:03–19:51).
+- **8.19**, neste henting i stripa øverst (kl. 19:01–19:44).
+- **3.3k**, bildene i README-en (instruksjonen kl. 17:11). Vinduet ventet på at de andre storyene var flettet, før bildene ble tatt.
+
+Alle stoppet grønne og ventet på svarene våre. «Vis meg rundt» (8.26) fikk tilleggene 21–24 og ble flettet kl. 23:51 (#146, `719e5f07`). Kl. 16:23 antok vi at det ikke blir noen presentasjon, så README-en er inngangen for faglærer (tillegg 23).
+
+**Utfordringer**
+
+1. **Tillegg før instruksjonen, og tillegg i feil vindu.**
+   *Problem:* kl. 16:36 kom tillegg 1 til snarveien før grunninstruksjonen var limt inn. Tillegg 2 og 3 til KI-teksten (10.11) ble limt inn kl. 17:34 og 17:46 i vinduet for bildene.
+   *Løsning:* steg 0 stoppet alle tre uten endringer. Tillegg 1 ble utført med grunninstruksjonen kl. 16:48. Tilleggene til KI-teksten kom til riktig vindu kl. 17:59 og 18:58, og de tre stoppene står med egne Utført-linjer.
+   *KI sin rolle:* Claude Code sjekket hvilken instruksjon og hvilken story vinduet hadde, før noe ble gjort.
+
+2. **Ventekommandoer stoppet av lite minne, og én som gikk dobbelt.**
+   *Problem:* kl. 22:15 stoppet lite minne ventekommandoene i flere vinduer. I vinduet for snarveien gikk kopien fra kl. 20:11 likevel videre, så den hentet dobbelt.
+   *Løsning:* ventekommandoene ble startet igjen uten å spørre, som tilleggene sier. Spørsmålet kl. 23:07 fant den doble kopien, og den ble stoppet. Ingen andre programmer ble rørt.
+   *KI sin rolle:* Claude Code meldte først at kopien var stoppet, men den gikk. Det ble funnet fordi vi spurte etter alle ventekommandoene.
+
+Det vi lærte: tilbakemeldingen traff det vi selv hadde gjort for å være ærlige. Hver retting fikk en datert linje, men linjene gjorde kravene vanskelige å lese. Historikken kan ligge i en endringslogg og en tag, mens kravteksten sier hva appen gjør nå. Et tillegg må komme etter instruksjonen det hører til, og til vinduet den står i.
+
+---
+
+## 13.11.2026 – Køen med kveldsjobben av, og seks storyer flettet før midnatt
+
+*Joakim og Marian.*
+
+Om morgenen sto fire vinduer og ventet på hverandre. Tillegg 6 og 8 kl. 10:22 satte rekkefølgen til 3.7 → 10.11 → 8.27 → 8.19. 3.7 ble flettet kl. 11:29 (#148, `b565ccd0`). 10.11 fulgte kl. 14:19 (#149, `0c223890`), med teksten om dagen og den korte hjelpen ved «Børsdagen kort fortalt». Rådet så på bilder av Innstillinger og fant at tillegg 6 til 9.11 hadde gitt bryterne navnene på overskriftene. Det ble rettet med tillegg 8 kl. 10:16. Kl. 10:32–10:54 svarte vi på hvordan «Din egen liste: kom i gang» skulle se ut, som på tavla, og det ble story 8.29 (instruksjonen kl. 11:26).
+
+Kl. 18:24 svarte vi at kveldsjobben hoppes over i kveld, så køen kunne bli ferdig. Vi slo den av selv og ville slå den på igjen lørdag. Hele settet ble kjørt i CI i stedet for lokalt, og rådet anbefalte det. Det felles tillegget kl. 18:25 gikk til alle vinduene i køen. Står jobben som Disabled, gjelder ikke pausene om kvelden. Lokalt kjøres bare testfilene storyen rører og `--dokumentene`, og aldri to pytest samtidig. Kl. 18:26 satte vi rekkefølgen 8.27 → 8.19 → 8.28 → 9.11 → 8.29 → 3.3k → 9.12. Før midnatt ble fire flettet:
+- **8.27**, «Mine notater» i et panel: kl. 18:50 (#147, `2a363adb`).
+- **8.19**, neste henting i stripa: kl. 19:43 (#151, `4fa06fc0`).
+- **8.28**, «De 15 mest omsatte»: kl. 21:51 (#153, `c8ad6f4c`).
+- **9.11**, PRD-en etter tilbakemeldingen: kl. 22:47 (#150, `ef802733`).
+
+Hver PR hadde CI grønn i alle jobbene på head-en før flettingen, og `--dokumentene` på main etter føringen. Kveldsjobben sto som Disabled hver gang et vindu sjekket den.
+
+**Utfordringer**
+
+1. **Main ble rød etter 10.11.**
+   *Problem:* testene for dokumentene ble kjørt kl. 14:22–14:38, før 10.11 ble satt til done i `e6a6b018`. Testen som krever en rad i `docs/kvalitetssikring.md` for hver spesifikasjon som er done, feilet da på main.
+   *Løsning:* radene ble ført i `b92ebe0a` etter beskjeden kl. 18:01. Fra 8.19 ble `--dokumentene` kjørt på main etter føringen og før Utført-linja.
+   *KI sin rolle:* Claude Code fant grunnen i rekkefølgen på kommandoene. Rekkefølgen ble en regel i instruksjonene.
+
+2. **To avvik i flettingene.**
+   *Problem:* 10.11 ble flettet som en vanlig merge-commit, ikke squash som de andre. Commit-tittelen for 8.19 fikk med «(flettes ikke før gruppen svarer)» fra PR-tittelen.
+   *Løsning:* begge står som avvik i Utført-linjene. Historikken skrives ikke om (regel 7).
+   *KI sin rolle:* Claude Code førte avvikene selv, i stedet for å rette dem med en force-push.
+
+3. **En ventekommando som lette etter feil tekst.**
+   *Problem:* vinduet for 8.27 ventet på «Utført-linja» for 8.26. 8.26 ble flettet kl. 23:51 12.11, men ventekommandoen fant den først kl. 00:59 13.11, fordi den lette etter ordet «Utført-linja».
+   *Løsning:* Utført-linja for tillegg 3 til 8.27 fører feilen. Tillegg 4 til bildevinduet kl. 21:03 12.11 hadde alt fått ventingen der til å se etter done i sprintstatusen i tillegg.
+   *KI sin rolle:* feilen var Claude Codes egen, og den står med de ordene i dagsfila.
+
+4. **Et tillegg i et ferdig vindu.**
+   *Problem:* det felles tillegget ble limt inn på nytt kl. 19:37 i vinduet for 8.27. Da var 8.27 flettet og ført (`6af78c0d`), og vinduet hadde ingen story igjen i køen.
+   *Løsning:* steg 0 stoppet det, med en Utført-linje uten commit.
+   *KI sin rolle:* steg 0 sa «Har dette vinduet ingen story i køen i kveld, stopp her», og Claude Code fulgte det.
+
+5. **Lite minne, igjen.**
+   *Problem:* lite minne stoppet ventekommandoen for 3.7 to ganger og den for 8.27 tre ganger. I 8.28 og 8.29 stoppet det `--dokumentene` i bakgrunnen. Én del i 8.29 startet kl. 22:24–22:29 mens et annet vindu kjørte pytest, fordi sjekken skrev ut antallet uten å stoppe.
+   *Løsning:* `--dokumentene` ble kjørt i tre deler i forgrunnen, og sjekken ble rettet til å stoppe. Hele settet ble kjørt i CI.
+   *KI sin rolle:* Claude Code startet det som ble stoppet, igjen uten å spørre og førte hver stopp i sesjonsloggen. Bruddet på regelen om én pytest står der også.
+
+Det vi lærte: med kveldsjobben av og hele settet i CI kunne seks vinduer flette etter tur uten å vente på pausene. Køen må ha en fast rekkefølge, og hver fletting en sjekk av at forrige story er ført, ikke bare flettet. En ventekommando må se etter noe som faktisk står i fila.
+
+---
+
+## 14.11.2026 – Versjon 1 ferdig om morgenen, v1.1 om kvelden, og tre flettinger i natt
+
+*Joakim og Marian.*
+
+Køen fra 13.11 ble ferdig om morgenen:
+- **8.29**, «Din egen liste: kom i gang»: kl. 00:15 (#154, `f98d979e`).
+- **3.3k**, bildene i README-en: kl. 05:41 (#155, `e8e226ff`). Linja nederst på sidene sier nå «Versjon 1 er ferdig.».
+- **9.12**, rådordene i alle malene: kl. 06:25 (#152, `e537345f`). Testen fant «følges med» fra 8.28, og setningen ble skrevet om uten nye unntak.
+
+Kl. 05:10–05:13 svarte vi på to spørsmål fra 8.29: den hvite pillen ved 2 av 3 står, og de ledige rutene i streken under «Appen følger N av 18» skal ha nok kontrast. Det siste ble 8.30, flettet kl. 07:19 (#156, `c1e8a1f0`). Kveldsjobben sto som Ready igjen om morgenen, og flettingene lå utenfor pausene.
+
+Kl. 05:41–05:49 avgjorde vi v1.1: signalet regnes i ettertid for børsdager uten lagret vurdering. Til slutt i hver henting regnes signalet for dagene som har kurser men mangler rad, bare med kursene til og med dagen. En kveldsrad overskrives aldri, og radene får et eget merke. Rådet anbefalte det. Svaret kl. 05:49 forklarer hvorfor dagene i ettertid ikke får KI-tekst: det tar tid, krever kontroll, gir fare for å se framover og gir mindre nytte bakover. KI-tekst for små hull står derfor som «senere» i PRD-en. Kl. 05:51 ønsket vi en kontrolliste over alle endringene, med hvor de gjøres og hvordan de sjekkes etterpå. Kl. 16:34 satte vi kveldsjobben på pause til mandag 16.11.
+
+Taggen `versjon-1-ferdig-2026-11-14` ble laget kl. 17:04 på `a3fb6cd9`, Utført-linja for 8.30. Meldingen i taggen sier at den er appen slik den var da versjon 1 var ferdig, før 2.17, låst etter ønsket vårt kl. 17:01. Spesifikasjonen for 2.17 foreslo at vi tar en kopi av `data/db/ose.db` før første kjøring med v1.1, og at kopien er vår, ikke vinduets.
+
+2.17 ble bygget fra kl. 16:57 i et nytt vindu, med 37 tester og seks mutanter som alle ble fanget. Gjennomgangen med tre linser fant VG1 (høy), som ble rettet, og BH1 (middels), som ble spørsmål 19. PR #157 var grønn kl. 20:55 og ventet på oss. Kl. 21:07 godtok vi alle forslagene, også spørsmål 19, og sa at natta kunne brukes. Rett før flettingen ble avtrykket av kveldsradene regnet med `mode=ro`: 477 rader (kl. 21:22). Så ble PR-ene flettet etter vilkårene i tilleggene: uten nytt ja, låst til head-en, med CI grønn i alle jobbene og ingen åpne funn på middels eller høy grad i triagen (regel 25). Kveldsjobben sto som Disabled.
+- **2.17**, signalet regnet i ettertid: kl. 21:23 (#157, `1fafddce`).
+- **9.13**, dokumentrunden etter v1.1: kl. 22:53 (#158, `5afabbc9`). De 67 åpne punktene i `issues.md` ble sjekket mot main, og 3.4 og 8.2 ble satt til done.
+- **8.31**, nettlesertestene for stegkortene og styrken for én dag: kl. 23:51 (#159, `167640bd`). De ni testene besto uten endring i appen.
+
+Den siste gjennomgangen av alle bildene på main ble tatt først etter 2.17, kl. 21:58–22:02. Svaret kl. 16:13 la den etter 2.17, og tillegg 2 kl. 21:15 la den rett etter Utført-linja for 2.17. 2.17 hadde endret to av bildene (`00f77291`). 17 av 18 bilder var like byte for byte. Det siste, omvisningen, var likt med et ekte museklikk, så ingen oppfølging ble laget.
+
+**Utfordringer**
+
+1. **Instruksjoner uten sluttlinje.**
+   *Problem:* tillegg 7 til bildene ble limt inn to ganger like før kl. 05:15 uten sluttmarkøren. Instruksjonen for 2.17 ble først limt inn like før kl. 16:57, avkortet i steg 2 ved «Radene får». 13.11 hadde også instruksjonen for 8.29 kommet uten markøren like før kl. 11:26.
+   *Løsning:* ingenting ble gjort før teksten kom hel, med markøren (regel 1). Hver avkortet innliming står i dagsfila.
+   *KI sin rolle:* Claude Code så at linja manglet og stoppet. Teksten fram til der så hel ut.
+
+2. **API-feilen kl. 18:57.**
+   *Problem:* svaret i vinduet for 2.17 stoppet med en API-feil midt i `docs/hjelp.md`, der fire avsnitt sa at signalet aldri regnes bakover. Hele settet kjørte da i bakgrunnen.
+   *Løsning:* rådet skrev en fortsettelse kl. 19:00, limt inn kl. 19:07. Den ba vinduet se hvordan kjøringen gikk, før en ny pytest ble startet. Den la også til at appen migrerer basen ved første forespørsel. Derfor kan den ekte versjonen vi starter selv, være det første som kjører 2.17 mot basen, og kopien og avtrykket må tas før det.
+   *KI sin rolle:* Claude Code tok opp arbeidet fra filene og kjøringen, ikke fra det avbrutte svaret. Rådet fant risikoen med migrasjonen, og den står nå under «Kontroll etter flettingen».
+
+3. **Lite minne om natta.**
+   *Problem:* natt til 14.11 stoppet lite minne både demoserveren og en kjøring av `--dokumentene` i vinduet for bildene.
+   *Løsning:* kl. 05:18 svarte vi at det som stoppes av lite minne, startes igjen uten å spørre, og beskjeden kl. 05:21 sa det til vinduene. Instruksjonen for 2.17 hadde samme regel, og etter det stoppet lite minne ingenting.
+   *KI sin rolle:* Claude Code førte hver stopp i sesjonsloggen og ventet ikke på et nytt ja for å starte igjen.
+
+4. **Kvotesjekken ble glemt.**
+   *Problem:* vinduene for 3.3k og 8.29 gjorde ikke kvotesjekken etter regel 15.
+   *Løsning:* begge fører det under «Ikke gjort» i sesjonsloggen. Ingen av dem gjorde API-kall.
+   *KI sin rolle:* Claude Code skrev selv at kvotesjekken ikke ble gjort, i stedet for å utelate den.
+
+Det vi lærte: en stor endring sent i prosjektet kan gjøres trygt når grunnen står skrevet, appen er låst i en tag før endringen, og kontrollen etter flettingen er gruppens og står i spesifikasjonen. Vilkårene for fletting uten nytt ja må være like for alle PR-ene og sjekkes på head-en. Og en gjennomgang av bildene hører hjemme etter den siste endringen som rører dem.
+
+---
+
+## 15.11.2026 – Svarene på dokumentrunden, 3.4 tilbake til review, og første kjøring med v1.1
+
+*Joakim og Marian.*
+
+Natta endte kl. 00:08 med sesjonsloggen for 8.31 og en oppsummering til oss. Den viste hva som var flettet, hva som venter, og at spørsmål 3–18 i 9.13 ventet på svar.
+
+Kl. 05:20 svarte vi på alle 18 spørsmålene i 9.13, og rådet anbefalte det. Alle forslagene ble godtatt, utenom spørsmål 1. Vi holdt fast ved avgjørelsen 12.11 kl. 20:04 og 20:06: 3.4 blir done når README-prøven er tatt og ført, ikke før. Tillegg 3 hadde satt 3.4 til done kvelden før, og det rettet vi nå. 3.4 er tilbake i review i sprintstatusen, spesifikasjonen og `epics.md`, med en Rettet-linje i hver og i vurderingsmatrisen (`515c645c`). Hullet i brukslogga fra 05.11 til 14.11 står nå i §7 i PRD-en, og logga føres igjen fra 15.11 (`56adfe5d`). Svarene står under hvert spørsmål i spesifikasjonen for 9.13 (`830a6790`), og `issues.md` følger dem:
+- 10 punkter er lukket.
+- Fire står med en datert linje: to tas etter første kveldskjøring 16.11, §58 i `malinger.md` i en egen sak, og brukslogga føres fra 15.11.
+
+Kl. 22:52 kjørte vi kveldsjobben uten nye kurser. Vi slo den på, startet den og slo den av igjen. Før det tok vi en ny kopi av basen og regnet avtrykket av kveldsradene. Etterpå var avtrykket det samme, med 477 rader. Migrasjonen 0014 var tatt, 3105 dager var regnet i ettertid for 18 aksjer, og jobben endte med kode 0 (beskjeden kl. 22:58). Tallene står under «Kontroll etter flettingen» i spesifikasjonen for 2.17. Det som står igjen, er at kveldens rader har KI-tekst, og det sjekkes etter kveldsjobben 16.11.
+
+**Utfordringer**
+
+1. **En avgjørelse som ble overkjørt av et tillegg.**
+   *Problem:* avgjørelsen 12.11 sa at 3.4 settes til done etter README-prøven. Tillegg 3 til 2.17 kl. 21:15 14.11 sa at den skulle settes til done nå. 9.13 fulgte tillegget og førte det med en Rettet-linje under avgjørelsen.
+   *Løsning:* svaret kl. 05:20 satte 3.4 tilbake til review. Alle stedene som sa done, fikk en ny datert linje, også punktene i `issues.md` og vurderingsmatrisen.
+   *KI sin rolle:* Claude Code gjorde avviket synlig i spørsmål 1 med et forslag, og pekte på avgjørelsen det gikk imot. Avgjørelsen var vår.
+
+2. **En beskjed i feil vindu.**
+   *Problem:* beskjeden om kveldskjøringen kl. 22:58 var stilet til vinduet som skriver refleksjonsloggen. Den ble limt inn i vinduet som bygde 2.17, 9.13 og 8.31, før det vinduet fikk instruksjonen om refleksjonsloggen.
+   *Løsning:* vinduet gjorde ingenting og sa fra. Da instruksjonen kom, ble beskjeden limt inn på nytt kl. 23:00 og ført.
+   *KI sin rolle:* Claude Code så at vinduet ikke hadde noen oppgave med refleksjonsloggen, og stoppet i stedet for å gjette.
+
+Det vi lærte: et tillegg som går imot en tidligere avgjørelse, må si det. Ellers blir det et spørsmål etterpå. Kontrollen etter en fletting som rører basen, kan bare gruppen ta, og den er bare ferdig når hvert punkt er sjekket, også KI-teksten neste kveld.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
