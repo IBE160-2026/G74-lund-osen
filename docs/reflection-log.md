@@ -3493,14 +3493,14 @@ Kl. 05:10–05:13 svarte vi på to spørsmål fra 8.29: den hvite pillen ved 2 a
 
 Kl. 05:41–05:49 avgjorde vi v1.1: signalet regnes i ettertid for børsdager uten lagret vurdering. Til slutt i hver henting regnes signalet for dagene som har kurser men mangler rad, bare med kursene til og med dagen. En kveldsrad overskrives aldri, og radene får et eget merke. Rådet anbefalte det. Svaret kl. 05:49 forklarer hvorfor dagene i ettertid ikke får KI-tekst: det tar tid, krever kontroll, gir fare for å se framover og gir mindre nytte bakover. KI-tekst for små hull står derfor som «senere» i PRD-en. Kl. 05:51 ønsket vi en kontrolliste over alle endringene, med hvor de gjøres og hvordan de sjekkes etterpå. Kl. 16:34 satte vi kveldsjobben på pause til mandag 16.11.
 
-Taggen `versjon-1-ferdig-2026-11-14` ble laget kl. 17:04 på `a3fb6cd9`, Utført-linja for 8.30. Meldingen i taggen sier at den er appen slik den var da versjon 1 var ferdig, før 2.17, låst etter ønsket vårt kl. 17:01. Spesifikasjonen for 2.17 foreslo at vi tar en kopi av `data/db/ose.db` før første kjøring med v1.1, og at kopien er vår, ikke vinduets.
+Kl. 17:01 spurte vi rådet om det som er bygget, er sikkerhetskopiert. Koden lå på GitHub med hele historikken, men ingen tagg markerte versjon 1. `data/` og `_privat/` står i `.gitignore` og fantes bare på PC-en. Rådet anbefalte en kopi av begge og en tagg, og kl. 17:05 var begge deler gjort (beskjeden 15.11 kl. 23:24 i dagsfila 15.11). Kopien ligger i en mappe utenfor repoet, og `Get-FileHash` viste at kopien av basen var lik originalen. Taggen `versjon-1-ferdig-2026-11-14` peker på `a3fb6cd9`, Utført-linja for 8.30, og er pushet til GitHub. Meldingen i taggen sier at den er appen slik den var da versjon 1 var ferdig, før 2.17. Spesifikasjonen for 2.17 foreslo i tillegg en kopi av `data/db/ose.db` før første kjøring med v1.1, og den kopien er vår, ikke vinduets.
 
 2.17 ble bygget fra kl. 16:57 i et nytt vindu, med 37 tester og seks mutanter som alle ble fanget. Gjennomgangen med tre linser fant VG1 (høy), som ble rettet, og BH1 (middels), som ble spørsmål 19. PR #157 var grønn kl. 20:55 og ventet på oss. Kl. 21:07 godtok vi alle forslagene, også spørsmål 19, og sa at natta kunne brukes. Rett før flettingen ble avtrykket av kveldsradene regnet med `mode=ro`: 477 rader (kl. 21:22). Så ble PR-ene flettet etter vilkårene i tilleggene: uten nytt ja, låst til head-en, med CI grønn i alle jobbene og ingen åpne funn på middels eller høy grad i triagen (regel 25). Kveldsjobben sto som Disabled.
 - **2.17**, signalet regnet i ettertid: kl. 21:23 (#157, `1fafddce`).
 - **9.13**, dokumentrunden etter v1.1: kl. 22:53 (#158, `5afabbc9`). De 67 åpne punktene i `issues.md` ble sjekket mot main, og 3.4 og 8.2 ble satt til done.
 - **8.31**, nettlesertestene for stegkortene og styrken for én dag: kl. 23:51 (#159, `167640bd`). De ni testene besto uten endring i appen.
 
-Den siste gjennomgangen av alle bildene på main ble tatt først etter 2.17, kl. 21:58–22:02. Svaret kl. 16:13 la den etter 2.17, og tillegg 2 kl. 21:15 la den rett etter Utført-linja for 2.17. 2.17 hadde endret to av bildene (`00f77291`). 17 av 18 bilder var like byte for byte. Det siste, omvisningen, var likt med et ekte museklikk, så ingen oppfølging ble laget.
+Den siste gjennomgangen av alle bildene på main ble tatt først etter 2.17, kl. 21:58–22:02. Kl. 16:13 avgjorde vi at den tas etter at v1.1 er flettet. Rådet hadde anbefalt å ta den med en gang, i vinduet for bildene. Tillegg 2 kl. 21:15 la den rett etter Utført-linja for 2.17. 2.17 hadde endret to av bildene (`00f77291`). 17 av 18 bilder var like byte for byte. Det siste, omvisningen, var likt med et ekte museklikk, så ingen oppfølging ble laget.
 
 **Utfordringer**
 
@@ -3509,22 +3509,27 @@ Den siste gjennomgangen av alle bildene på main ble tatt først etter 2.17, kl.
    *Løsning:* ingenting ble gjort før teksten kom hel, med markøren (regel 1). Hver avkortet innliming står i dagsfila.
    *KI sin rolle:* Claude Code så at linja manglet og stoppet. Teksten fram til der så hel ut.
 
-2. **API-feilen kl. 18:57.**
+2. **Et tillegg som aldri ble kjørt, og to tillegg med samme nummer.**
+   *Problem:* kl. 05:23 ga rådet vinduet for bildene (3.3k) et tillegg med overskriften «Tillegg 7 til bildene av appen i README-en». Det skulle ta den siste gjennomgangen av alle bildene på main etter 8.30. Tillegget som heter tillegg 7 i dagsfila (kl. 05:15), er et annet: svaret kl. 05:10 om å starte testene på nytt. Tillegget fra kl. 05:23 står ikke i dagsfila for 14.11 og ble aldri kjørt.
+   *Løsning:* rådet fant det kl. 16:12, da vi sendte loggen fra vinduet. Kl. 16:13 avgjorde vi at gjennomgangen tas etter at v1.1 er flettet, og den ble tatt etter flettingen av #157. Kilden er beskjeden 15.11 kl. 23:24 i dagsfila 15.11.
+   *KI sin rolle:* Claude Code fant det ikke, fordi det ikke står i noen dagsfil. Steg 0 stopper et tillegg i feil vindu, men ikke et som aldri blir kjørt. Rådet fant det ved å lese loggen fra vinduet.
+
+3. **API-feilen kl. 18:57.**
    *Problem:* svaret i vinduet for 2.17 stoppet med en API-feil midt i `docs/hjelp.md`, der fire avsnitt sa at signalet aldri regnes bakover. Hele settet kjørte da i bakgrunnen.
    *Løsning:* rådet skrev en fortsettelse kl. 19:00, limt inn kl. 19:07. Den ba vinduet se hvordan kjøringen gikk, før en ny pytest ble startet. Den la også til at appen migrerer basen ved første forespørsel. Derfor kan den ekte versjonen vi starter selv, være det første som kjører 2.17 mot basen, og kopien og avtrykket må tas før det.
    *KI sin rolle:* Claude Code tok opp arbeidet fra filene og kjøringen, ikke fra det avbrutte svaret. Rådet fant risikoen med migrasjonen, og den står nå under «Kontroll etter flettingen».
 
-3. **Lite minne om natta.**
+4. **Lite minne om natta.**
    *Problem:* natt til 14.11 stoppet lite minne både demoserveren og en kjøring av `--dokumentene` i vinduet for bildene.
    *Løsning:* kl. 05:18 svarte vi at det som stoppes av lite minne, startes igjen uten å spørre, og beskjeden kl. 05:21 sa det til vinduene. Instruksjonen for 2.17 hadde samme regel, og etter det stoppet lite minne ingenting.
    *KI sin rolle:* Claude Code førte hver stopp i sesjonsloggen og ventet ikke på et nytt ja for å starte igjen.
 
-4. **Kvotesjekken ble glemt.**
+5. **Kvotesjekken ble glemt.**
    *Problem:* vinduene for 3.3k og 8.29 gjorde ikke kvotesjekken etter regel 15.
    *Løsning:* begge fører det under «Ikke gjort» i sesjonsloggen. Ingen av dem gjorde API-kall.
    *KI sin rolle:* Claude Code skrev selv at kvotesjekken ikke ble gjort, i stedet for å utelate den.
 
-Det vi lærte: en stor endring sent i prosjektet kan gjøres trygt når grunnen står skrevet, appen er låst i en tag før endringen, og kontrollen etter flettingen er gruppens og står i spesifikasjonen. Vilkårene for fletting uten nytt ja må være like for alle PR-ene og sjekkes på head-en. Og en gjennomgang av bildene hører hjemme etter den siste endringen som rører dem.
+Det vi lærte: en stor endring sent i prosjektet kan gjøres trygt når grunnen står skrevet, appen er låst i en tag før endringen, og kontrollen etter flettingen er gruppens og står i spesifikasjonen. Vilkårene for fletting uten nytt ja må være like for alle PR-ene og sjekkes på head-en. Og en gjennomgang av bildene hører hjemme etter den siste endringen som rører dem. To tillegg med samme nummer skjuler at det ene mangler, så hvert tillegg må ha sitt eget nummer.
 
 ---
 
