@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-15T05:23
+updated: 2026-11-16T00:15
 ---
 
 # PRD — OSE Signal
@@ -153,7 +153,8 @@ omfanget 19.10. **Ekstra** er det som er bygget utover briefen. Det ble bygget p
 egen gren og flettet ferdig og grønt før funksjonsstoppen, README-prøven senest
 én uke før innleveringen. **Senere** er plan A og det som ikke er i v1, men står
 som plan for en senere versjon (§8, «v1.1»). **Bygget** betyr flettet til main og
-lest i koden 12.11.
+lest i koden 12.11, 13.11 for flettingene den dagen (9.11) og 14.11 for signalet
+i ettertid (2.17).
 
 | FR | Krav | Kjerne / ekstra / senere | Bygget? |
 |---|---|---|---|
@@ -817,7 +818,8 @@ Hentekommandoen:
 
 1. nekter på en børsdag før kl. 22:00 norsk tid. Før det er dagens rad ikke
    endelig, og en vurdering kan ikke skrives om (`malinger.md` §37). Unntaket fra
-   sperren er første henting i en tom base, som henter forrige børsdag (FR-402)
+   sperren er første henting i en tom base, som henter forrige børsdag (FR-402).
+   Steg 6 kjøres likevel, også når kommandoen nekter eller stopper
 2. tar i bruk endringene i lista brukeren har bedt om (FR-412)
 3. sjekker basen først. Har den kursene for børsdagen for alle i lista, gjøres
    ingen kall til kursene (FR-402). Det som mangler av hovedindeksen,
@@ -958,7 +960,7 @@ hentingen (NFR-03).
 
 *Konsekvenser:*
 - Å skrive en vurdering fra kvelden for en tidligere børsdag gir en feil, utenom første henting i en tom base.
-- En rad med grunn skriver aldri over en rad med vurdering samme dag.
+- En rad med grunn skriver aldri over en vurdering fra kvelden samme dag. Kveldens rad skriver over en rad regnet i ettertid samme dag.
 - Målingene på raden gir samme fortegn som sjekkene med parametrene for dagen.
 - Signalet i ettertid for en dag er det samme som det som regnes med kursene etter dagen fjernet.
 - En dag med for få kurser, og inneværende børsdag, får ikke signalet i ettertid.
@@ -1601,7 +1603,7 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 og KI-teksten når den er på. SM-1 og SM-6 måler denne flyten, som brukerreisen UJ-1
 beskriver.
 
-**Status 12.11.**
+**Status 12.11, med brukslogga 15.11.**
 
 - SM-1 er ikke nådd. Brukertesten 10.11 hadde én person og den ekte versjonen.
   Personen forklarte uoppfordret hvorfor en aksje skilte seg ut, men brukte over
@@ -1678,7 +1680,8 @@ lukket dem, står i endringsloggen.
 ### v1.1 — vurderes etter at v1 er kontrollert
 
 Gruppen avgjorde 12.11 kl. 20:09 og 20:10 at disse åtte ikke er i v1. Kravene
-står som plan for en senere versjon:
+står som plan for en senere versjon. Svaret 14.11 kl. 05:49 la til KI-tekst for
+små hull, 1–3 kvelder (FR-408), som står som senere i §2:
 
 - endringen i kroner under prosenten i oversikten (FR-101)
 - merket for endret signalstyrke (FR-107)
