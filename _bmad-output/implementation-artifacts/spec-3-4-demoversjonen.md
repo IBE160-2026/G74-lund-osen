@@ -2,7 +2,7 @@
 title: 'Story 3.4: Demoversjonen'
 type: 'feature'
 created: '2026-10-10'
-status: 'done'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'b294a9514aca2d455e72b6da3942abe7fff49910'
@@ -569,3 +569,5 @@ C3 la igjen volumet `ose-ci-34_ose-db`, fordi mutanten la til et volum trap ikke
 *Lagt til 2026-10-19 (story 3.3g):* anbefalingen i svaret 2026-10-11 kl. 22:32 over, at README-en skal anbefale den ekte versjonen, er snudd av gruppens svar 19.10 kl. 14:46 under «Prioritering» i `epics.md`: README-en anbefaler demoen for faglærer og sensor, som briefen v8 og tilbakemeldingen 06.10 sier. Resten av svaret står.
 
 *Ferdig 2026-11-14 (story 9.13, tillegg 3 til 2.17 kl. 21:15 i `docs/ai-prompts/2026-11-14.md`, etter gruppens svar 14.11 kl. 17:45 og 21:07):* 3.4 er done. Demoversjonen er flettet og bygget ut i 3.4b–3.4h, og README-en og bildene av den er ferdige i 3.3k. Det eneste storyen ventet på, var README-prøven på en ren maskin (§9 i `docs/kvalitetssikring.md`). Den gjenstår, og står som et punkt i `issues.md` og i vurderingsmatrisen (spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`).
+
+*Rettet 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* linja over gjelder ikke lenger. Gruppen holder fast ved avgjørelsen 12.11 kl. 20:04 og 20:06 under story 9.11 i `epics.md`: 3.4 blir done etter README-prøven på en ren maskin. Status er `in-review` igjen, som før 14.11, og blir `done` når prøven er tatt og ført i §9 i `docs/kvalitetssikring.md`.

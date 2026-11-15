@@ -2593,6 +2593,8 @@ avgjøres i planen for 3.1 og 3.4, uten at webserveren lager basen selv
 
 *Ferdig 2026-11-14 (story 9.13, tillegg 3 til 2.17 kl. 21:15 i `docs/ai-prompts/2026-11-14.md`, etter gruppens svar 14.11 kl. 17:45 og 21:07):* 3.4 er done. Demoversjonen er flettet og bygget ut i 3.4b–3.4h, og README-en og bildene av den er ferdige i 3.3k. Det eneste storyen ventet på, var README-prøven på en ren maskin (§9 i `docs/kvalitetssikring.md`). Den gjenstår, og står som et punkt i `issues.md` og i vurderingsmatrisen (spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`).
 
+*Rettet 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* linja over gjelder ikke lenger. Gruppen holder fast ved avgjørelsen 12.11 kl. 20:04 og 20:06 under story 9.11: 3.4 er tilbake i review og blir done når README-prøven på en ren maskin er tatt og ført (§9 i `docs/kvalitetssikring.md`). Prøven står som et punkt i `issues.md`.
+
 ### Story 3.4b: KI-tekstene i demoen
 
 *Lagt til 2026-10-05, gruppens beslutning kl. 16:53.*
@@ -5286,6 +5288,8 @@ Som **den som skal lage UX, stories eller tester**, vil jeg lese hvert krav som 
 *Avgjort 2026-11-12 kl. 20:04 og 20:06 (gruppens svar):* alle 20 forslagene i spesifikasjonen godtas som bygget, med tre avgjørelser. Min liste får sitt eget krav, FR-111, i 9.11 (spørsmål 14). «De 15 mest omsatte» står i FR-412 og bygges i natt som egen story i Epic 8 (spørsmål 15). Tabellen står med ja for FR-411, og 3.4 settes til done i dokumentrunden etter prøven på ny PC fredag (spørsmål 16). PR #150 flettes i natt, sist, etter 8.19 og lista. Rådet anbefalte alt utenom at lista bygges, som gruppen valgte. Svaret er ført etter tillegg 1 og 2 kl. 20:10 i `docs/ai-prompts/2026-11-12.md`.
 
 *Rettet 2026-11-14 (story 9.13):* tillegg 3 til 2.17 (kl. 21:15 i `docs/ai-prompts/2026-11-14.md`) setter 3.4 til done før prøven på ny PC. Prøven står som et punkt i `issues.md` og som gjenstår i vurderingsmatrisen (spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`).
+
+*Rettet 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* avgjørelsen over står. 3.4 er tilbake i review og settes til done i dokumentrunden etter README-prøven, ikke før.
 
 *Lagt til 2026-11-13:* 9.11 er squash-flettet med PR #150 i `ef802733` kl. 22:47, låst til head-en `7f2edbce` (main med 8.26, 8.27, 3.7, 10.11, 8.19 og 8.28 flettet inn). Det skjedde etter instruksjonen 12.11 kl. 18:03 og tillegg 1 og 3–6 i `docs/ai-prompts/2026-11-12.md`, og tillegg 8 og det felles tillegget i `docs/ai-prompts/2026-11-13.md`. Steg 2 førte flettingene inn i kravteksten, lest i koden 13.11. Hele settet ble kjørt i CI (run 43512687583), etter gruppens svar 13.11 kl. 18:24: 5751 bestått og 100 hoppet over i jobben `pytest`, og alle jobbene grønne. Spesifikasjonen: [`spec-9-11-prd-etter-tilbakemeldingen.md`](../implementation-artifacts/spec-9-11-prd-etter-tilbakemeldingen.md).
 
