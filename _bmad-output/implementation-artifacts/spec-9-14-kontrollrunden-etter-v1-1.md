@@ -326,7 +326,7 @@ på middels.
 
 ## Kontroll
 
-- [ ] `--dokumentene` består lokalt
+- [x] `--dokumentene` består lokalt (2966 bestått og 7 hoppet over, kl. 00:32–00:44 på `aec37c87`)
 - [ ] CI er grønn i alle jobbene
-- [ ] `git diff --stat origin/main` viser ingen fil i `src/`, og i `tests/` bare avtrykkene i `tests/test_docker.py`
-- [ ] sha256 av `data/db/ose.db` var lik før og etter steg 2
+- [x] `git diff --stat origin/main` viser ingen fil i `src/`, og i `tests/` bare avtrykkene i `tests/test_docker.py`
+- [x] sha256 av `data/db/ose.db` var lik før og etter steg 2
