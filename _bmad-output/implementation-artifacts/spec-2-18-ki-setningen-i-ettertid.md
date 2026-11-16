@@ -166,7 +166,7 @@ under datoen og rammen, og setningen igjen med KI på.
 
 - [x] Testen feiler mot malen før rettingen (kl. 11:48–11:50, begge versjonene)
 - [x] Testfilene storyen rører, består lokalt (`tests/test_ettertid_2_17.py`, 39 bestått, og `tests/test_docker.py`, 158 bestått)
-- [ ] `--dokumentene` består lokalt
+- [x] `--dokumentene` består lokalt (2966 bestått og 7 hoppet over, kl. 12:13–12:30 på `cb21c7d2`)
 - [ ] CI er grønn i alle jobbene
 - [x] Gjennomgangen er tatt, og funnene er rettet eller står med grunn (9 lave, 8 rettet og 1 står)
 - [x] Bildene er tatt på nytt og er byte for byte de samme (kl. 12:10–12:11)
