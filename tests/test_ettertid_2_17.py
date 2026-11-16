@@ -532,6 +532,37 @@ class TestVisningen:
             assert f'<p class="{klasse}">' not in ki, klasse
 
     @VERSJONENE
+    def test_med_ki_av_ingen_melding_om_ki_for_dagen(self, request, hvilken, symbol, dag, maaned):
+        """Story 2.18 (FR-601, spørsmål 1 i 9.14): ville feilet hvis
+        «Signalet forklart» for en dag i ettertid sa noe om KI-teksten med KI
+        av, eller ikke sa det igjen med KI på. Bryteren og linja under datoen
+        står begge gangene."""
+        klient = request.getfixturevalue(hvilken)
+        adresse = f"/aksje/{symbol}?dag={dag}"
+        assert klient.post("/ki", data={"til": "av", "tilbake": adresse}).status_code == 303
+        html = _side(klient, adresse)
+        assert '<p class="ettertid-linje" role="note">' in html
+        ki = html.split('id="ki-tittel"', 1)[1].split("</section>", 1)[0]
+        assert 'aria-checked="false"' in ki
+        assert "ettertid-ki" not in ki
+        for klasse in ('<p class="uten', '<p class="ki-tekst">', '<p class="merke-ki">', '<div class="ki-del">'):
+            assert klasse not in ki, klasse
+        synlig = _synlig(ki)
+        assert "Vis KI-tekst" in synlig
+        for setning in (
+            "KI-teksten lages bare",
+            "ingen KI-tekst",
+            "Ingen KI-tekst",
+            "Laget av KI",
+            "regnet i ettertid",
+        ):
+            assert setning not in synlig, setning
+        assert klient.post("/ki", data={"til": "paa", "tilbake": adresse}).status_code == 303
+        ki = _side(klient, adresse).split('id="ki-tittel"', 1)[1].split("</section>", 1)[0]
+        assert 'aria-checked="true"' in ki
+        assert "KI-teksten lages bare samme kveld som kursene hentes" in _synlig(ki)
+
+    @VERSJONENE
     def test_grafen_boersometeret_og_oversikten_merker_dagen(self, request, hvilken, symbol, dag, maaned):
         """Ville feilet hvis grafen, børsometeret eller oversikten for en
         tidligere dag med signalet regnet i ettertid viste signalet uten merket
