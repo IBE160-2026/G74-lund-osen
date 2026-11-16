@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-16T00:31
+updated: 2026-11-16T09:54
 ---
 
 # PRD — OSE Signal
@@ -1617,7 +1617,10 @@ beskriver.
   én linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk.
   Brukslogga har én linje, 04.11. Fra 05.11 til 14.11 er ingen bruk ført, så
   de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11.
-- SM-9: README-prøven tas når v1 er ferdig bygget.
+- SM-9: README-prøven tas når v1 er ferdig bygget. Signalet regnet i ettertid
+  (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet
+  14.11, før prøven. Etter svaret 15.11 kl. 05:20 står 3.4 i review og blir
+  done når README-prøven er tatt og ført.
 - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
 
 **Drift: hva målet ga opp.** Målet sa først «ingen manuelle steg», og det målte
@@ -1697,7 +1700,9 @@ også står som senere i §2.
 
 De andre idéene til v1.1 er enten tatt inn som krav over, eller de står med
 forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og
-virker.
+virker. Signalet regnet i ettertid (2.17) ble likevel tatt inn etter svaret 14.11
+kl. 05:41–05:49 og flettet 14.11, før README-prøven. Etter svaret 15.11
+kl. 05:20 blir 3.4 done når README-prøven er tatt og ført.
 
 ---
 
