@@ -669,13 +669,19 @@ def _basen_feilet(feil: BaseException, base_sti: Path, fil: Path, skrevet: int, 
 
 
 def _kan_skrives_til(dato: date) -> str:
-    return f"En rad for {dato.isoformat()} kan bare skrives så lenge den er inneværende børsdag (AD-7)."
+    # Story 9.15 (D2): fra 2.17 faar en dag uten kveldsrad signalet i ettertid
+    # i siste steg av en henting (regn_signalet_i_ettertid i finally i kjoer).
+    return (
+        f"Kveldsraden for {dato.isoformat()} kan bare skrives så lenge datoen er inneværende børsdag (AD-7). "
+        "Når datoen ikke lenger er inneværende børsdag, regner siste steg i en henting signalet for den "
+        "i ettertid av kursene i basen, uten KI-tekst (story 2.17)."
+    )
 
 
 def _stoppet_ved_midnatt(dato: date, skrevet: int, skriv, aarsak: str = "") -> None:
     skriv(
         f"Kjøringen gikk over midnatt i Oslo. Vurderingene for {dato.isoformat()} "
-        f"er stoppet etter {skrevet} rader, og datoen regnes ikke på nytt."
+        f"er stoppet etter {skrevet} rader, og resten får ingen kveldsrad i denne kjøringen."
         f"{' ' + aarsak if aarsak else ''} Kursene og fila står. "
         f"{_kan_skrives_til(dato)}"
     )
@@ -1970,6 +1976,13 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
     for symbol, rader in serier.items():
         skriv(f"  {symbol}: {len(rader)} dager, {rader[0].dato.isoformat()} til {rader[-1].dato.isoformat()}")
     skrevne = skriv_til_basen(base_sti, serier, hentet, fil, skriv)
+    if skrevne:
+        # Story 9.15 (D4): innlesingen regner ikke selv (spoersmaal 6 i 2.17).
+        skriv(
+            "Innlesingen skriver ingen vurderinger (AD-7). Børsdagene før inneværende børsdag uten rad i "
+            "vurdering får signalet regnet i ettertid ved neste henting, av kursene i basen og uten "
+            "KI-tekst (story 2.17)."
+        )
     if skrevne is None or skrevne != set(serier) or not alt_lest:
         sys.exit(1)
 
