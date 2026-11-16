@@ -399,7 +399,9 @@
       {% if samme_dag %}<p class="samme-dag">{{ samme_dag }}</p>{% endif %}
       {#- Story 2.17: en dag med signalet regnet i ettertid har ingen KI-tekst,
           og ingen setning om dagene eller samme dag (spørsmål 7). #}
-      {% if detalj.ettertid %}
+      {#- Story 2.18 (FR-601, svaret 16.11 kl. 09:51): setningen om KI-teksten
+          står bare med KI på. Med KI av har siden ingen melding om KI. #}
+      {% if detalj.ettertid and ki_er_paa %}
         <p class="uten ettertid-ki">{{ ettertid(true) }} Signalet for denne dagen er regnet i ettertid. KI-teksten lages bare samme kveld som kursene hentes, så dagen har ingen KI-tekst.</p>
       {% elif ki_vises %}
         <div class="ki-del">

@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-16T09:54
+updated: 2026-11-16T11:50
 ---
 
 # Endringslogg for PRD-en
@@ -1640,3 +1640,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Rettet 2026-11-16 (story 9.14, kontrollrunden etter v1.1, gruppens svar 15.11 kl. 23:36):* fem klare feil mot main er rettet der teksten står. I §2 var «Bygget» lest i koden bare 12.11, men radene fra 13.11 og 14.11 ble lest ved flettingen. Setningen sto slik: «**Bygget** betyr flettet til main og lest i koden 12.11.». I konsekvensene for FR-408 sto «En rad med grunn skriver aldri over en rad med vurdering samme dag.», men kveldens rad skriver over en rad regnet i ettertid samme dag (`_UPSERT` i `src/lagring_sqlite.py`, `tests/test_ettertid_2_17.py`). I hentekommandoen i FR-401 sto ikke at steg 6 kjøres også når kommandoen nekter, men `kjoer` i `src/fetch_prices.py` regner signalet i ettertid i `finally`, utenom for en demobase. I §8, «v1.1», manglet KI-tekst for små hull, som §2 har som senere etter svaret 14.11 kl. 05:49. I §7 sto «**Status 12.11.**» over linja om brukslogga fra 15.11 (`56adfe5d`).
 
 *Endret 2026-11-16 (story 9.14, gruppens svar 16.11 kl. 09:51, spørsmål 6 i `spec-9-14-kontrollrunden-etter-v1-1.md`, rådet anbefalte det):* §8 og statusen for SM-9 i §7 har fått en setning om svarene 14.11 og 15.11. Signalet regnet i ettertid (2.17) ble tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet 14.11, før README-prøven, og etter svaret 15.11 kl. 05:20 blir 3.4 done når prøven er tatt og ført. Setningene som sto, er uendret: «Ingen av dem tas før v1 er kontrollert og virker.» i §8 og «SM-9: README-prøven tas når v1 er ferdig bygget.» i §7.
+
+*Endret 2026-11-16 (story 2.18, gruppens svar 16.11 kl. 11:20, rådet anbefalte det):* FR-601, «Konsekvenser»: forsiden har et unntak. Med KI av har aksjesiden ingen KI-tekst og ingen melding om KI, heller ikke for en dag med signalet regnet i ettertid, og forsiden har bryteren og den ene linja «KI-teksten er slått av. Tabellen over viser bare det reglene har regnet ut.» under «Børsdagen kort fortalt», som valgt i 10.6. Boksen ville ellers stå tom, med bare overskriften og bryteren. Setningen sto slik: «Med KI av har aksjesiden og forsiden ingen KI-tekst og ingen melding om KI.»
