@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-15T05:23
+updated: 2026-11-16T09:54
 ---
 
 # PRD — OSE Signal
@@ -153,7 +153,8 @@ omfanget 19.10. **Ekstra** er det som er bygget utover briefen. Det ble bygget p
 egen gren og flettet ferdig og grønt før funksjonsstoppen, README-prøven senest
 én uke før innleveringen. **Senere** er plan A og det som ikke er i v1, men står
 som plan for en senere versjon (§8, «v1.1»). **Bygget** betyr flettet til main og
-lest i koden 12.11.
+lest i koden 12.11, 13.11 for flettingene den dagen (9.11) og 14.11 for signalet
+i ettertid (2.17).
 
 | FR | Krav | Kjerne / ekstra / senere | Bygget? |
 |---|---|---|---|
@@ -817,7 +818,9 @@ Hentekommandoen:
 
 1. nekter på en børsdag før kl. 22:00 norsk tid. Før det er dagens rad ikke
    endelig, og en vurdering kan ikke skrives om (`malinger.md` §37). Unntaket fra
-   sperren er første henting i en tom base, som henter forrige børsdag (FR-402)
+   sperren er første henting i en tom base, som henter forrige børsdag (FR-402).
+   Steg 6 kjøres likevel, også når kommandoen nekter eller stopper, utenom
+   for en demobase
 2. tar i bruk endringene i lista brukeren har bedt om (FR-412)
 3. sjekker basen først. Har den kursene for børsdagen for alle i lista, gjøres
    ingen kall til kursene (FR-402). Det som mangler av hovedindeksen,
@@ -958,7 +961,7 @@ hentingen (NFR-03).
 
 *Konsekvenser:*
 - Å skrive en vurdering fra kvelden for en tidligere børsdag gir en feil, utenom første henting i en tom base.
-- En rad med grunn skriver aldri over en rad med vurdering samme dag.
+- En rad med grunn skriver aldri over en vurdering fra kvelden samme dag. Kveldens rad skriver over en rad regnet i ettertid samme dag.
 - Målingene på raden gir samme fortegn som sjekkene med parametrene for dagen.
 - Signalet i ettertid for en dag er det samme som det som regnes med kursene etter dagen fjernet.
 - En dag med for få kurser, og inneværende børsdag, får ikke signalet i ettertid.
@@ -1601,7 +1604,7 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 og KI-teksten når den er på. SM-1 og SM-6 måler denne flyten, som brukerreisen UJ-1
 beskriver.
 
-**Status 12.11.**
+**Status 12.11, med brukslogga 15.11.**
 
 - SM-1 er ikke nådd. Brukertesten 10.11 hadde én person og den ekte versjonen.
   Personen forklarte uoppfordret hvorfor en aksje skilte seg ut, men brukte over
@@ -1614,7 +1617,10 @@ beskriver.
   én linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk.
   Brukslogga har én linje, 04.11. Fra 05.11 til 14.11 er ingen bruk ført, så
   de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11.
-- SM-9: README-prøven tas når v1 er ferdig bygget.
+- SM-9: README-prøven tas når v1 er ferdig bygget. Signalet regnet i ettertid
+  (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet
+  14.11, før prøven. Etter svaret 15.11 kl. 05:20 står 3.4 i review og blir
+  done når README-prøven er tatt og ført.
 - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
 
 **Drift: hva målet ga opp.** Målet sa først «ingen manuelle steg», og det målte
@@ -1689,9 +1695,14 @@ står som plan for en senere versjon:
 - eks.datoer ført for hånd (FR-414)
 - ChatGPT med «Sign in with ChatGPT» (FR-608)
 
+Svaret 14.11 kl. 05:49 la til KI-tekst for små hull, 1–3 kvelder (FR-408), som
+også står som senere i §2.
+
 De andre idéene til v1.1 er enten tatt inn som krav over, eller de står med
 forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og
-virker.
+virker. Signalet regnet i ettertid (2.17) ble likevel tatt inn etter svaret 14.11
+kl. 05:41–05:49 og flettet 14.11, før README-prøven. Etter svaret 15.11
+kl. 05:20 blir 3.4 done når README-prøven er tatt og ført.
 
 ---
 

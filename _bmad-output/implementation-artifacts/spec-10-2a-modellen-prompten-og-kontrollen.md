@@ -2,7 +2,7 @@
 title: 'Story 10.2, PR E (10.2a): porten Modell, prompten og kontrollen i FR-603'
 type: 'feature'
 created: '2026-10-15'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 baseline_commit: 'f87931a'
@@ -70,6 +70,8 @@ Planen for KI-laget ble vist i chatten 15.10 kl. 15:43 og er ført kort i Utfør
 - `src/ki_prompt.py`: `PROMPTVERSJON`, `lag_prompt`.
 - `src/ki_kontroll.py`: `kontroller`, `Kontrollsvar`, ordlistene.
 - `tests/test_ki_modell.py`: testene, med `FalskModell`.
+
+*Rettet 2026-11-16 (story 9.14):* statusen sto som `in-progress`, men PR #48 er flettet i `77ebf31`, og 10-2 er done i `sprint-status.yaml`. Statusen er nå `done`, og radene i §3 og §5 i `docs/kvalitetssikring.md` finnes.
 
 ## Commitene
 

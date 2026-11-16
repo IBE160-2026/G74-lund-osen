@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-15T05:23
+updated: 2026-11-16T09:54
 ---
 
 # Endringslogg for PRD-en
@@ -1636,3 +1636,7 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-14 (story 2.17, gruppens svar 14.11 kl. 05:41–05:49, rådet anbefalte det):* signalet regnes i ettertid for børsdager uten vurdering fra kvelden. FR-408 sier at kveldens vurdering fortsatt ikke etterfylles, og at signalet i ettertid regnes til slutt i hver henting av kursene til og med dagen, for aksjene i lista, når aksjen har nok kurser, aldri for inneværende børsdag og aldri over en rad fra kvelden, merket i basen og uten KI-tekst. Tabellen i FR-409 har raden «Rad med vurdering regnet i ettertid», og «Ingen rad, og dagen var en børsdag» sier at signalet da heller ikke er regnet i ettertid. Hentekommandoen har steg 6, og «Kort fortalt», ordlisten, oversikten, kursgrafen og lista sier det samme. I §2 står signalet i ettertid som ekstra, og KI-tekst for små hull, 1–3 kvelder, som senere, fordi den tar tid, krever kontroll, gir fare for å se framover og gir mindre nytte bakover (svaret kl. 05:49). Teksten som sto, er i taggen `prd-vurdert-2026-11-12` og i git.
 
 *Endret 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 9 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* §7, status for SM-2 og SM-5: hullet i brukslogga er ført. Brukslogga har én linje, 04.11, og fra 05.11 til 14.11 er ingen bruk ført, så de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11. Setningen sto slik: «Brukslogga har én linje 12.11.»
+
+*Rettet 2026-11-16 (story 9.14, kontrollrunden etter v1.1, gruppens svar 15.11 kl. 23:36):* fem klare feil mot main er rettet der teksten står. I §2 var «Bygget» lest i koden bare 12.11, men radene fra 13.11 og 14.11 ble lest ved flettingen. Setningen sto slik: «**Bygget** betyr flettet til main og lest i koden 12.11.». I konsekvensene for FR-408 sto «En rad med grunn skriver aldri over en rad med vurdering samme dag.», men kveldens rad skriver over en rad regnet i ettertid samme dag (`_UPSERT` i `src/lagring_sqlite.py`, `tests/test_ettertid_2_17.py`). I hentekommandoen i FR-401 sto ikke at steg 6 kjøres også når kommandoen nekter, men `kjoer` i `src/fetch_prices.py` regner signalet i ettertid i `finally`, utenom for en demobase. I §8, «v1.1», manglet KI-tekst for små hull, som §2 har som senere etter svaret 14.11 kl. 05:49. I §7 sto «**Status 12.11.**» over linja om brukslogga fra 15.11 (`56adfe5d`).
+
+*Endret 2026-11-16 (story 9.14, gruppens svar 16.11 kl. 09:51, spørsmål 6 i `spec-9-14-kontrollrunden-etter-v1-1.md`, rådet anbefalte det):* §8 og statusen for SM-9 i §7 har fått en setning om svarene 14.11 og 15.11. Signalet regnet i ettertid (2.17) ble tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet 14.11, før README-prøven, og etter svaret 15.11 kl. 05:20 blir 3.4 done når prøven er tatt og ført. Setningene som sto, er uendret: «Ingen av dem tas før v1 er kontrollert og virker.» i §8 og «SM-9: README-prøven tas når v1 er ferdig bygget.» i §7.

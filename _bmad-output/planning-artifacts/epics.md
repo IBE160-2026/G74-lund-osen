@@ -3906,6 +3906,8 @@ noteres det, med tidspunkt.
 
 *Avgjort 2026-11-10 kl. 22:26 og 22:30 (gruppens svar):* brukertesten er tatt 10.11 med én testperson, med den ekte versjonen og dataene fra 09.11. Personen forklarte uoppfordret, med KI av, hvorfor en aksje skilte seg ut, men brukte over 5 minutter, så kravet om under 5 minutter ble ikke oppfylt. Notatene og funnene står i `docs/brukertest.md` og `docs/ux-logg.md`. Svarene er ført etter instruksjonen kl. 22:35 i `docs/ai-prompts/2026-11-10.md`.
 
+*Lagt til 2026-11-16 (gruppens svar kl. 09:51, spørsmål 2 i `spec-9-14-kontrollrunden-etter-v1-1.md`):* 8.1 står som done. Kravet om under 5 minutter ble ikke nådd i brukertest 1 10.11. Spesifikasjonen for 8.1, som står `ready-for-dev`, og kvalitetssikringen rettes når brukertest 2 er ført.
+
 ### Story 8.2: UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 
 Som **gruppe**, vil vi at de to skjermbildene er vurdert som design, så
@@ -5336,3 +5338,23 @@ Som **gruppe**, vil vi at statusene, de åpne punktene og vurderingsmatrisen ste
 *Lagt til 2026-11-14:* 9.13 er squash-flettet med PR #158 i `5afabbc9` kl. 22:53, låst til head-en `ee756c36`, etter tillegg 3 i `docs/ai-prompts/2026-11-14.md`, uten nytt ja. CI var grønn i alle jobbene (run 43644459699). Spørsmål 3–18 i spesifikasjonen venter på gruppens svar, og punktene de gjelder, står åpne i `issues.md`.
 
 *Avgjort 2026-11-15 kl. 05:20 (gruppens svar):* alle forslagene i spørsmål 1–18 i spesifikasjonen godtas, utenom spørsmål 1. Gruppen holder fast ved avgjørelsen 12.11 kl. 20:04 og 20:06, så 3.4 er tilbake i review og blir done når README-prøven er tatt og ført. Rådet anbefalte det. Svarene står under hvert spørsmål i spesifikasjonen, og punktene i `issues.md` følger dem.
+
+### Story 9.14: Kontrollrunden etter v1.1
+
+*Lagt til 2026-11-16, etter instruksjonen 15.11 kl. 23:38 i `docs/ai-prompts/2026-11-15.md` og gruppens svar 15.11 kl. 23:36 («Sjekk og rett klare feil»):* rådet anbefalte det. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-14-kontrollrunden-etter-v1-1.md`.
+
+Som **gruppe**, vil vi at basen, dokumentene og koden er sjekket mot main etter v1.1, og at klare feil i dokumentene er rettet, så det vi leverer, stemmer med det appen gjør.
+
+**Oppfyller:** regel 3, 12, 19 og 22 i `CLAUDE.md` · **Begrenses av:** ingen endringer i `src/`, ingenting slettes, `data/db/ose.db` leses bare
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Basen sjekket på en kopi med appens egne funksjoner: kveldsradene regnet på nytt, KI-tekstene mot visningen og kontrollen i dag, og radene; sha256 lik før og etter
+- README-en, dokumentene i `docs/`, den gjeldende teksten i PRD-en, `epics.md`, `sprint-status.yaml` og `issues.md` sjekket mot main, og klare feil rettet med Rettet-linje der regelen krever det
+- Koden, malene og testene lest for tekster som motsier v1.1, TODO og FIXME, og kode og filer som ikke brukes; ryddekandidatene som spørsmål
+- Funnene med grad og kilde i spesifikasjonen, og spørsmål med forslag for alt som ikke er en klar feil
+
+**Avhenger av:** 2.17, 9.13. **Én økt:** ja.
+
+*Lagt til 2026-11-16:* PR #160 flettes ikke før gruppen har svart på spørsmål 1 og 2 i spesifikasjonen, som er på middels (regel 25). De klare feilene i dokumentene er rettet på grenen, og de andre funnene står som spørsmål med forslag.
+
+*Avgjort 2026-11-16 kl. 09:51 (gruppens svar):* forslagene i spørsmål 2–11 i spesifikasjonen godtas. Spørsmål 1 (FR-601) rettes i dag i en egen liten story i epicen til 2.17. For spørsmål 2 står 8.1 som done, og spesifikasjonen for 8.1 og kvalitetssikringen rettes når brukertest 2 er ført. For spørsmål 6 har §8 og SM-9 i PRD-en fått en setning om svarene 14.11 og 15.11. Spørsmål 12: ryddingen tas etter innleveringen, og ingenting slettes nå. Rådet anbefalte alle svarene. Svarene står under hvert spørsmål i spesifikasjonen, og er ført etter instruksjonen kl. 09:52 i `docs/ai-prompts/2026-11-16.md`.
