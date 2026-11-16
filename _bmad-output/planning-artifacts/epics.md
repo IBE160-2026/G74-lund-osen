@@ -5380,3 +5380,18 @@ Som **gruppe**, vil vi at basen, dokumentene og koden er sjekket mot main etter 
 *Avgjort 2026-11-16 kl. 09:51 (gruppens svar):* forslagene i spørsmål 2–11 i spesifikasjonen godtas. Spørsmål 1 (FR-601) rettes i dag i en egen liten story i epicen til 2.17. For spørsmål 2 står 8.1 som done, og spesifikasjonen for 8.1 og kvalitetssikringen rettes når brukertest 2 er ført. For spørsmål 6 har §8 og SM-9 i PRD-en fått en setning om svarene 14.11 og 15.11. Spørsmål 12: ryddingen tas etter innleveringen, og ingenting slettes nå. Rådet anbefalte alle svarene. Svarene står under hvert spørsmål i spesifikasjonen, og er ført etter instruksjonen kl. 09:52 i `docs/ai-prompts/2026-11-16.md`.
 
 *Lagt til 2026-11-16:* 9.14 er squash-flettet med PR #160 i `19d37f80` kl. 11:45, låst til head-en `930deda1`, etter instruksjonen kl. 09:52 i `docs/ai-prompts/2026-11-16.md`, uten nytt ja. CI var grønn i alle jobbene (run 43850770160). Spørsmål 1 og 2 var besvart, så ingen funn på middels sto åpne. Spørsmål 1 bygges i 2.18, og 2, 4, 10, 11 og 12 venter, som svarene sier, og står i `issues.md`.
+
+### Story 9.15: Meldingene etter v1.1 og det som ikke brukes
+
+*Lagt til 2026-11-16, etter instruksjonen kl. 15:39 i `docs/ai-prompts/2026-11-16.md` og gruppens svar 16.11 kl. 15:39 på spørsmål 10, 11 og 12 i 9.14:* rådet anbefalte det. Svaret endrer svaret kl. 09:51 («etter innleveringen»). Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-15-meldingene-og-det-som-ikke-brukes.md`.
+
+Som **gruppe** vil vi at meldingene fra hentingen sier det v1.1 gjør med en dag uten kveldsrad, og at kode som ikke brukes noe sted, er tatt bort, så det vi leverer, ikke motsier seg selv.
+
+**Oppfyller:** spørsmål 10 og 11 i 9.14 · **Begrenses av:** 2.17 (FR-401, FR-408, AD-7), regel 16, 22 og 23
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- D1–D4: meldingene i `_stoppet_ved_midnatt` og `_kan_skrives_til` i `src/fetch_prices.py`, docstringen i `src/tilstand.py` og utskriften fra `--les-inn` sier at en dag uten kveldsrad får signalet regnet i ettertid, med en test for hver som feilet mot teksten før rettingen
+- D5–D10: `MinneNotatlagerMedKjoep` og `RETNINGENE` er tatt bort etter et søk i hele repoet; det testene bruker, ikonfilene som `src/ikon.py` lager, og `src/meldinger.py` (Epic 6) står med grunn
+- Ingen bilder endret, og ingen endring i hva hentingen gjør
+
+**Avhenger av:** 2.17, 9.14. **Én økt:** ja.
