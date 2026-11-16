@@ -138,7 +138,7 @@ lesing, på `303841a9`. 9 funn: 2 på middels og 7 lave.
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
 | ECH1 | middels | Meldingene i `_kan_skrives_til` og `les_inn` lovet signal i ettertid uten forbehold, men `regn_i_ettertid` gir ingen rad for en aksje utenfor lista, med for få kurser eller uten kursene for dagen, og to kallsteder gjelder nettopp basen som feilet | Rettet: «for aksjene i lista som har nok kurser i basen til og med dagen», som `docs/hjelp.md`, med test (`d2f3f5e3`) |
-| BH1 | middels | D10: svaret kl. 15:39 nevner ikonfilene «som ingenting viser til», men spesifikasjonen lar dem stå fordi `src/ikon.py` lager dem og testene leser dem | **Står åpent, følger av et svar (regel 25).** Spørsmål 1 under |
+| BH1 | middels | D10: svaret kl. 15:39 nevner ikonfilene «som ingenting viser til», men spesifikasjonen lar dem stå fordi `src/ikon.py` lager dem og testene leser dem | Besvart 16.11 kl. 18:51: ikonfilene står, som forslaget. Spørsmål 1 under |
 | ECH2 | lav | Docstringen i `tilstand.py`: «første rad i tabellen» og «hullet står bare der …» | Rettet: «første kveldsrad», og hullet står til en henting har regnet signalet (`d2f3f5e3`) |
 | ECH3 | lav | Utskriften fra `--les-inn` sier ingenting om inneværende børsdag | Står: meldingen gjelder dagene før inneværende børsdag og sier det. Hva som skjer med inneværende dag, er hentingens sak og uendret |
 | VG1 | lav | D1-testen sjekket ikke selve rettingen | Rettet (`d2f3f5e3`) |
@@ -160,8 +160,16 @@ lesing, på `303841a9`. 9 funn: 2 på middels og 7 lave.
    `src/ikon.py` og de to testene, i denne storyen. `ikon.ico` lages av
    `ICO_STOERRELSER` uten filene og endres ikke.
 
+   *Svart 2026-11-16 kl. 18:51:* «La dem stå». Ikonfilene står, som
+   forslaget sier, fordi `src/ikon.py` lager dem og testene bruker dem.
+   Ingen kode endres. BH1 er besvart og står ikke åpent.
+
 Spørsmål 1 er på middels og følger av et svar, så det står åpent til gruppen
 har svart (regel 25). PR-en stopper ved grønn CI og flettes ikke før det.
+
+*Svart 2026-11-16 kl. 18:51:* spørsmål 1 er besvart, og ingen funn på
+middels eller høy grad står åpne. PR-en flettes etter kl. 23:58, når CI er
+grønn i alle jobbene (instruksjonen kl. 21:50).
 
 ## Kontroll
 
