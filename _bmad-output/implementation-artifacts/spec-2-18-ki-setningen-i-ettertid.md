@@ -34,9 +34,9 @@ regel 19 og 22
 *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det), spørsmål 1 i
 `spec-9-14-kontrollrunden-etter-v1-1.md`:* rettes i dag i en egen liten story.
 Setningen om KI-teksten for en dag i ettertid vises bare når KI er på, og kravet
-i FR-601 står. Se etter samme mønster i de andre malene. Testene: med KI av har
-aksjesiden for en dag i ettertid ingen melding om KI, og med KI på står
-setningen som før.
+i FR-601 står. Steg 3 i instruksjonen kl. 09:52 legger til: se etter samme
+mønster i de andre malene, og testene ser at aksjesiden for en dag i ettertid
+med KI av ikke har noen melding om KI, og at setningen står som før med KI på.
 
 *Svar 2026-11-16 kl. 11:20 (gruppens svar, rådet anbefalte det), spørsmålet om
 forsiden:* vinduet spurte kl. 09:57 om storyen også skulle ta bort linja «KI-teksten
@@ -66,6 +66,7 @@ så bare på siden med KI på, som er standard i testene.
 - `prd.md`, FR-601, «Konsekvenser»: unntaket for forsiden, og en linje i
   `prd-endringslogg.md` (svaret kl. 11:20).
 - Ingen endring i `src/app.py`, `src/ki_visning.py` eller de andre malene.
+- `tests/test_docker.py`: avtrykkene bak bildene, se «Bildene».
 
 ## De andre malene
 
@@ -82,7 +83,12 @@ Sett gjennom etter samme mønster: en melding om KI som står uten at
   de andre: ingen melding om KI som avhenger av en dag i ettertid. Innstillinger
   har bryteren og forklaringen av den.
 - Hjelpetekstene i `src/hjelpetekster.py` står med KI av og på, fordi de
-  forklarer bryteren.
+  forklarer rammen og bryteren. Det gjelder også steget «Signalet forklart» i
+  «Vis meg rundt» (`STEGET_SIGNALET_FORKLART`), som sier at en dag i ettertid
+  ikke har KI-tekst. Brukeren starter omvisningen selv, som «?», så den står.
+- «Illustrasjon laget av KI» i `investorside.html` og `eodhd_demo.html` står
+  uten bryteren. Den merker en tegning, ikke KI-teksten, og FR-601 gjelder
+  aksjesiden og forsiden.
 
 ## Testene
 
@@ -93,13 +99,26 @@ I `tests/test_ettertid_2_17.py`, i `TestVisningen`, i begge versjonene:
   under datoen står.
 - Med KI på igjen står setningen som før.
 
-Testen ble kjørt mot malen før rettingen og feilet der den skulle.
+Testen ble kjørt mot malen før rettingen kl. 11:48–11:50 (mellom `5bf104fd`
+og `684bdd19`, etter `git log`), og feilet i begge versjonene på
+`assert "ettertid-ki" not in ki`, med setningen i rammen. Etter rettingen besto
+alle 39 testene i fila.
 
 ## Bildene
 
-Bildene av aksjesiden i README-en er tatt av `/aksje/BRFE` i demoen, altså
-siste børsdag, som har en kveldsrad, med KI på. Ingen av bildene viser en dag i
-ettertid med KI av, så ingen bilder endres, og ingen nye lages.
+Bildet av aksjesiden i README-en viser, etter alt-teksten i `README.md`,
+setningene om dagene og om samme dag og KI-teksten. De står bare med KI på og
+for en dag som ikke er regnet i ettertid (`_setningene_om_dagen` i
+`src/app.py`). Ingen av bildene viser en dag i ettertid med KI av, så ingen
+bilder endres, og ingen nye lages. Svaret kl. 11:20 sier det samme.
+
+Avtrykkene bak bildene i `tests/test_docker.py` regnes av malene, så
+kommentaren og vilkåret i `aksje.html` ga nye avtrykk for aksjesidebildet og 16
+av bildene. `--dokumentene` fant det (2963 bestått, 3 feilet og 7 hoppet over,
+kl. 11:50–12:09). Alle de 18 bildene ble tatt på nytt kl. 12:10–12:11 fra
+demobasen i en midlertidig mappe, med demoserveren på en ledig port (ikke 8000)
+og skriptet og jobblista fra 2.17. Alle er byte for byte like bildene i
+repoet, så bare avtrykkene er satt på nytt, med en kommentar (`856432ac`).
 
 ## Grenser
 
@@ -110,10 +129,44 @@ ettertid med KI av, så ingen bilder endres, og ingen nye lages.
 - Flettes uten nytt ja, låst til head-en, når CI er grønn og ingen funn på
   middels eller høy grad står åpne (regel 25), og bare før kl. 22:10.
 
+## Gjennomgangen 16.11
+
+Én leser gikk gjennom diffen `b68ea82a..0dd12b08` med tre linser (Blind Hunter,
+Edge Case Hunter og Verification Gap), bare med lesing, mens `--dokumentene`
+kjørte. Leseren hadde ikke skrevet rettingen. Gjennomgangen ga 9 funn, alle
+lave, og ingen på middels eller høy grad. 8 er rettet, og 1 står.
+
+- **BH1:** testen så etter linja under datoen bare med KI av. Den ser nå også
+  etter linja med KI på igjen.
+- **BH2:** en tom linje for mye foran 2.18 i `epics.md`.
+- **BH3 (står):** FR-601 og kommentaren i malen sier at aksjesiden med KI av
+  ikke har noen melding om KI, men bryteren heter «Vis KI-tekst», og linja
+  «Signalet bygger bare på kurs og volum i sjekkene over, ikke på KI-teksten
+  …» står alltid. Ordlyden i FR-601 er den fra svaret kl. 11:20 og sto før
+  2.18. Bryteren og linja om grunnlaget er ikke meldinger om KI-teksten for
+  dagen, så teksten står.
+- **ECH1:** steget «Signalet forklart» i «Vis meg rundt» er nevnt under «De
+  andre malene».
+- **ECH2:** «Illustrasjon laget av KI» er nevnt under «De andre malene».
+- **VG1:** «Bildene» bygger nå på alt-teksten i README-en og på
+  `_setningene_om_dagen`, ikke på en adresse uten kilde i repoet.
+- **VG2:** kjøringen før rettingen er ført under «Testene», med tid og hvilken
+  assert som feilet, og avkrysset.
+- **VG3:** punktet om FR-601 i storyen i `epics.md` sier at det er PRD-en som
+  sjekkes, ikke en test.
+- **VG4:** «Svarene» skiller nå svaret kl. 09:51 fra det steg 3 i instruksjonen
+  legger til.
+
+Leseren fant logikken i malen i orden. Med KI av og en dag i ettertid står
+ingen av grenene, og ingenting faller ned til `ki.grunn`. Testen kan ikke bestå
+av feil grunn, fordi den krever 303 fra `/ki`, `aria-checked="false"`, linja
+under datoen og rammen, og setningen igjen med KI på.
+
 ## Kontroll
 
-- [ ] Testen feiler mot malen før rettingen
-- [ ] Testfilene storyen rører, består lokalt
+- [x] Testen feiler mot malen før rettingen (kl. 11:48–11:50, begge versjonene)
+- [x] Testfilene storyen rører, består lokalt (`tests/test_ettertid_2_17.py`, 39 bestått, og `tests/test_docker.py`, 158 bestått)
 - [ ] `--dokumentene` består lokalt
 - [ ] CI er grønn i alle jobbene
-- [ ] Gjennomgangen er tatt, og funnene er rettet eller står som spørsmål
+- [x] Gjennomgangen er tatt, og funnene er rettet eller står med grunn (9 lave, 8 rettet og 1 står)
+- [x] Bildene er tatt på nytt og er byte for byte de samme (kl. 12:10–12:11)

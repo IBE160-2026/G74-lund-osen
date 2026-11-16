@@ -558,7 +558,9 @@ class TestVisningen:
         ):
             assert setning not in synlig, setning
         assert klient.post("/ki", data={"til": "paa", "tilbake": adresse}).status_code == 303
-        ki = _side(klient, adresse).split('id="ki-tittel"', 1)[1].split("</section>", 1)[0]
+        html = _side(klient, adresse)
+        assert '<p class="ettertid-linje" role="note">' in html
+        ki = html.split('id="ki-tittel"', 1)[1].split("</section>", 1)[0]
         assert 'aria-checked="true"' in ki
         assert "KI-teksten lages bare samme kveld som kursene hentes" in _synlig(ki)
 

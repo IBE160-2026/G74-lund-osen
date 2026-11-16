@@ -2212,7 +2212,6 @@ kveld, merket «i ettertid», så historikken ikke har hull der kursene finnes.
 
 *Lagt til 2026-11-15 (beskjeden fra rådet 15.11 kl. 22:58, med tallene fra gruppens kjøring; vinduet leste ikke `data/`):* første kjøring med 2.17 mot `data/db/ose.db`. Gruppen kjørte kveldsjobben uten nye kurser kl. 22:52 (Enable, Start og Disable). Før det tok gruppen en ny kopi av basen (`Get-FileHash` ga True) og avtrykket av kveldsradene med kommandoen i punkt 1: `665d4eff98e57820f399d874f233667388ca32470e25818741200da5124e4bf9` og 477 rader. Etter kjøringen: `LastTaskResult` er 0 og `State` er Disabled; avtrykket med datoen `2026-11-14` er det samme, med 477 rader; `skjema_versjon` har `(14, 0014_regnet.sql, 2026-11-15T21:53:02+00:00)`; `vurdering` har 3105 rader i ettertid og 477 kveldsrader; og loggen for 15.11 sier kl. 22:53:02 at signalet er regnet i ettertid for 3105 børsdager, for 18 aksjer. Kontrollen etter flettingen er tatt, utenom at kveldens rader har KI-tekst, som sjekkes etter kveldsjobben 16.11 (spesifikasjonen, «Kontroll etter flettingen»).
 
-
 ### Story 2.18: Setningen om KI-teksten for en dag i ettertid bare med KI på
 
 *Lagt til 2026-11-16, etter steg 3 i instruksjonen kl. 09:52 i `docs/ai-prompts/2026-11-16.md`, gruppens svar kl. 09:51 på spørsmål 1 i 9.14 og svaret kl. 11:20 om forsiden:* rådet anbefalte det. Spesifikasjonen er [`spec-2-18-ki-setningen-i-ettertid.md`](../implementation-artifacts/spec-2-18-ki-setningen-i-ettertid.md).
@@ -2226,7 +2225,7 @@ den sier.
 **Kontroll — hva testen ser etter:**
 - Med KI av har «Signalet forklart» for en dag i ettertid ingen setning om KI-teksten, i begge versjonene
 - Med KI på står setningen som før, og linja under datoen står begge gangene
-- FR-601 har unntaket for forsiden: bryteren og linja om at KI-teksten er slått av (svaret kl. 11:20)
+- I PRD-en, ikke i en test: FR-601 har unntaket for forsiden, med bryteren og linja om at KI-teksten er slått av (svaret kl. 11:20)
 - **Ville feilet hvis:** setningen sto med KI av, eller var borte med KI på
 
 **Avhenger av:** 2.17, 9.14. **Én økt:** ja.
