@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-16T00:14
+updated: 2026-11-16T11:46
 ---
 
 # Kvalitetssikring
@@ -443,6 +443,7 @@ sist i dokumentet.
 | 8.31 Stegkortene og styrken for én dag målt i nettleseren: tillegg 4 til 2.17, etter gruppens ønske 14.11 kl. 21:07; hele settet i CI (run 43649592034) | `167640b` (#159) | 1 (2, M1 og M2) | ingen overlevde | `S/spec-8-31-maalene-i-nettleseren.md` |
 | 2.17 Signalet regnet i ettertid: svarene 14.11 kl. 05:41–05:49 og 21:07, tillegg 1 og 2; hele settet i CI (run 43636648065) | `1fafddc` (#157) | 1 (6, A–F) | ingen overlevde | `S/spec-2-17-signalet-regnet-i-ettertid.md` |
 | 9.13 Dokumentrunden etter v1.1: tillegg 3 til 2.17, etter svarene 14.11 kl. 17:45 og 21:07; hele settet i CI (run 43644459699) | `5afabbc` (#158) | 1 (2, M1 og M2) | ingen overlevde | `S/spec-9-13-dokumentrunden-etter-v1-1.md` |
+| 9.14 Kontrollrunden etter v1.1: svaret 15.11 kl. 23:36 og svarene 16.11 kl. 09:51; hele settet i CI (run 43850770160) | `19d37f8` (#160) | 0 | – bare dokumenter og avtrykkene i én test, og instruksjonen ba ikke om mutant | `S/spec-9-14-kontrollrunden-etter-v1-1.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -743,6 +744,7 @@ funn. Antall rader i loggen:
 | 8.31, gjennomgangen 14.11 (Edge Case Hunter, 3 middels og 5 lave funn, alle rettet før commit) | 8 | 8 | 0 | 0 |
 | 2.17, gjennomgangen 14.11 (Blind Hunter, Edge Case Hunter og Verification Gap; VG1 høy og de middels rettet i `0ff7d1cd`, BH1 lukket med svaret kl. 21:07, de 8 som står er begrunnet i spesifikasjonen) | 30 | 22 | 8 | 0 |
 | 9.13, gjennomgangen 14.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; de seks på middels og tolv lave rettet, E2 og E3 står med grunn i spesifikasjonen, talt som avvist) | 20 | 18 | 2 | 0 |
+| 9.14, gjennomgangen 16.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; VG1 høy, VG2 og ECH3 middels og de 11 lave rettet i `aec37c87` og `e3bfab0b`) | 14 | 14 | 0 | 0 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |

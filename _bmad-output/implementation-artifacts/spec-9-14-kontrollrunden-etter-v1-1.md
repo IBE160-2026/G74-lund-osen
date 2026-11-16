@@ -2,7 +2,7 @@
 title: 'Story 9.14: kontrollrunden etter v1.1'
 type: 'docs'
 created: '2026-11-16'
-status: 'review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'e90f0afa'
 context:
@@ -354,6 +354,17 @@ på middels.
 ## Kontroll
 
 - [x] `--dokumentene` består lokalt (2966 bestått og 7 hoppet over, kl. 00:32–00:44 på `aec37c87`)
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 43850770160 på `930deda1`, med svarene; før det run 43776504963 på `85ba4609`)
 - [x] `git diff --stat origin/main` viser ingen fil i `src/`, og i `tests/` bare avtrykkene i `tests/test_docker.py`
 - [x] sha256 av `data/db/ose.db` var lik før og etter steg 2
+- [x] `--dokumentene` består lokalt med svarene og main flettet inn (2966 bestått og 7 hoppet over, kl. 11:22–11:38 16.11 på `930deda1`)
+
+## Flettet 16.11
+
+Gruppen svarte på spørsmål 1–12 kl. 09:51, og svarene står under hvert
+spørsmål. Svarene og setningene i §8 og SM-9 ble ført på grenen, og main ble
+flettet inn i `930deda1`. CI var grønn i alle fire jobbene på head-en
+`930deda1` (run 43850770160, med 5863 bestått og 99 hoppet over i `pytest`).
+Spørsmål 1 og 2 var besvart, så ingen funn på middels eller høy grad sto åpne
+(regel 25). PR #160 ble squash-flettet i `19d37f80` kl. 11:45, låst til
+`930deda1`, uten nytt ja, slik instruksjonen kl. 09:52 sier.
