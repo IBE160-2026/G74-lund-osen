@@ -145,6 +145,11 @@ lave, og ingen på middels eller høy grad. 8 er rettet, og 1 står.
   …» står alltid. Ordlyden i FR-601 er den fra svaret kl. 11:20 og sto før
   2.18. Bryteren og linja om grunnlaget er ikke meldinger om KI-teksten for
   dagen, så teksten står.
+  *Svar 2026-11-16 kl. 15:37 (gruppens svar, rådet anbefalte det):* FR-601
+  presiseres. Med KI av står bryteren «Vis KI-tekst» og linja om hva signalet
+  bygger på, som før, og ellers har aksjesiden ingen KI-tekst og ingen melding
+  om KI. Presiseringen og linja i endringsloggen for PRD-en er ført på main.
+  Kommentaren i malen står, fordi ingen kode endres.
 - **ECH1:** steget «Signalet forklart» i «Vis meg rundt» er nevnt under «De
   andre malene».
 - **ECH2:** «Illustrasjon laget av KI» er nevnt under «De andre malene».

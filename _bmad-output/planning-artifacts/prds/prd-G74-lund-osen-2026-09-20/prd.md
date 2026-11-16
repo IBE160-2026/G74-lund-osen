@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-16T11:50
+updated: 2026-11-16T15:42
 ---
 
 # PRD — OSE Signal
@@ -1170,9 +1170,12 @@ Med KI på sier siden hvorfor en tekst mangler:
   vurderingen.
 
 *Konsekvenser:*
-- Med KI av har aksjesiden ingen KI-tekst og ingen melding om KI, heller ikke
-  for en dag med signalet regnet i ettertid. Forsiden har bryteren og den ene
-  linja om at KI-teksten er slått av, under «Børsdagen kort fortalt» (FR-607).
+- Med KI av står bryteren «Vis KI-tekst» og linja om hva signalet bygger på
+  («Signalet bygger bare på kurs og volum i sjekkene over, ikke på
+  KI-teksten …») på aksjesiden, som før. Ellers har aksjesiden ingen KI-tekst
+  og ingen melding om KI, heller ikke for en dag med signalet regnet i
+  ettertid. Forsiden har bryteren og den ene linja om at KI-teksten er slått
+  av, under «Børsdagen kort fortalt» (FR-607).
 - Et klikk på bryteren ved teksten endrer valget i Innstillinger.
 - En tidligere dag uten rader i loggen gir meldingen om at KI var av, eller at modellen ikke svarte.
 - Den siste børsdagen uten rader i loggen gir lenken «Slik slår du den på».
