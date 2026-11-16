@@ -33,3 +33,22 @@ Instruksjonen kl. 15:39 i `docs/ai-prompts/2026-11-16.md`, etter gruppens svar 1
 ### Åpne punkter
 - BH1 i 9.15 (middels, følger av svaret kl. 15:39): skal ikonfilene `ikon-16`, `-48`, `-192` og `-512` stå eller tas bort? Det står som spørsmål 1 i spesifikasjonen, og PR #162 flettes ikke før gruppen har svart.
 - Ryddingen (spørsmål 12) tas etter at PR #162 er flettet, og ikke i pausene om kvelden. Kartleggingen må tas på nytt da.
+
+## 2026-11-16 kl. 18:52 — Marian Osen
+
+### Oppgave
+Beskjeden kl. 15:42 fra rådet, etter gruppens svar kl. 15:41: gruppen flytter selv `local-tests/` til `_privat/local-tests`. Arbeidet stopper ikke. Når ryddingen føres, skal `issues.md` under spørsmål 12 si at gruppen flyttet mappa 16.11, og finnes mappa fortsatt i roten da, føres det, og den står.
+
+### Plan
+- Lagre beskjeden ordrett i scratchpad og dagsfila før noe annet.
+- Slå opp påstandene i beskjeden uten å lese mappa: `.gitignore` og `tests/test_ryddighet.py`.
+- Legge en underlinje under spørsmål 12 i `issues.md`, så beskjeden følger med til ryddingen.
+
+### Resultat
+- Beskjeden er lagret ordrett i dagsfila (`64a98576`).
+- Påstandene stemmer: `local-tests/` står i `.gitignore` (linje 58), og `tests/test_ryddighet.py` bruker bare tenkte stier som `local-tests/proeve.py` og `local-tests/x.py`. README-en nevner mappa i én linje under «Ikke i repoet», og den står som den er, etter beskjeden.
+- Under spørsmål 12 i `issues.md` står en underlinje om beskjeden. Selve føringen tas når ryddingen gjøres, etter at PR #162 er flettet.
+- Mappa er ikke lest eller rørt, og om den fortsatt står i roten, er ikke sjekket nå. Det sjekkes ved ryddingen.
+
+### Åpne punkter
+- Ved ryddingen: før under spørsmål 12 i `issues.md` at gruppen flyttet `local-tests/` til `_privat/` 16.11, og om mappa fortsatt sto i roten. Står som underlinje under punktet for spørsmål 12.
