@@ -282,6 +282,8 @@ er slettet.
     testene for meldingene, etter innleveringen, eller før hvis gruppen vil.
 
     *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Storyen tas etter innleveringen.
+
+    *Svar 2026-11-16 kl. 15:39 (gruppens svar, rådet anbefalte det):* svaret kl. 09:51 er endret, fordi testen tidligst blir i morgen. Storyen tas nå, som neste ledige nummer i Epic 9: meldingene i `src/fetch_prices.py` (`_stoppet_ved_midnatt` og `_kan_skrives_til`), i `src/tilstand.py` og i utskriften fra `--les-inn` skal si det v1.1 gjør, og hver melding får en test som feiler mot teksten før rettingen.
 11. **D5–D10: kode og filer som ikke brukes.**
     - `MinneNotatlagerMedKjoep` i `src/notater.py` og `RETNINGENE` i
       `src/dagsgrunnlag.py` brukes ikke.
@@ -294,6 +296,8 @@ er slettet.
     *Forslag:* de står til etter innleveringen, og ryddes da i én story.
 
     *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Koden og filene står til etter innleveringen, og ryddes da i én story.
+
+    *Svar 2026-11-16 kl. 15:39 (gruppens svar, rådet anbefalte det):* svaret kl. 09:51 er endret. Det som ikke brukes noe sted i repoet, tas bort i samme story som spørsmål 10: `MinneNotatlagerMedKjoep`, `RETNINGENE` og ikonfilene i `src/static/` som ingenting viser til, etter et søk i hele repoet. Det testene bruker, og `src/meldinger.py` (Epic 6), står, og spesifikasjonen for storyen sier hvorfor.
 12. **Ryddingen.** *Forslag:*
     - **Behold:** `G74-lund-osen-jobb`, som er kveldsjobben, og bildegrenene.
     - **Fjern:** gruppen gjør det selv eller sier ja. Det gjelder:
@@ -309,6 +313,8 @@ er slettet.
       `_privat/` eller slettes.
 
     *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* ryddingen tas etter innleveringen, og ingenting slettes nå.
+
+    *Svar 2026-11-16 kl. 15:39 (gruppens svar, rådet anbefalte det):* svaret kl. 09:51 er endret. Ryddingen tas etter at storyen for spørsmål 10 og 11 er flettet, og ikke i pausene om kvelden. En worktree med flettet PR fjernes med `git worktree remove` uten `--force`, bare når git sier at den er ren. En lokal eller ekstern gren fjernes bare når PR-en er flettet og grenen står på head-en PR-en ble flettet fra. `G74-lund-osen-jobb`, bildegrenene og main står. Alt som fjernes, føres i sesjonsloggen med navn og commit.
 
 Spørsmål 1 og 2 er på middels. De står åpne til gruppen har svart (regel 25),
 så PR-en stopper ved grønn CI og flettes ikke i natt.
