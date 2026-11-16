@@ -2,7 +2,7 @@
 title: 'Story 2.18: setningen om KI-teksten for en dag i ettertid bare med KI på'
 type: 'bugfix'
 created: '2026-11-16'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'b68ea82a'
 context:
@@ -167,6 +167,13 @@ under datoen og rammen, og setningen igjen med KI på.
 - [x] Testen feiler mot malen før rettingen (kl. 11:48–11:50, begge versjonene)
 - [x] Testfilene storyen rører, består lokalt (`tests/test_ettertid_2_17.py`, 39 bestått, og `tests/test_docker.py`, 158 bestått)
 - [x] `--dokumentene` består lokalt (2966 bestått og 7 hoppet over, kl. 12:13–12:30 på `cb21c7d2`)
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 43858445935 på `b1fa8c50`, med 5865 bestått og 99 hoppet over i `pytest`)
 - [x] Gjennomgangen er tatt, og funnene er rettet eller står med grunn (9 lave, 8 rettet og 1 står)
 - [x] Bildene er tatt på nytt og er byte for byte de samme (kl. 12:10–12:11)
+
+## Flettet 16.11
+
+CI var grønn i alle fire jobbene på head-en `b1fa8c50` (run 43858445935). Ingen
+funn på middels eller høy grad sto åpne (regel 25). PR #161 ble squash-flettet
+i `05bc46e7` kl. 12:36, låst til `b1fa8c50`, uten nytt ja, slik steg 3 i
+instruksjonen kl. 09:52 sier, før kl. 22:10.

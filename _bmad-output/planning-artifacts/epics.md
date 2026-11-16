@@ -2230,6 +2230,8 @@ den sier.
 
 **Avhenger av:** 2.17, 9.14. **Én økt:** ja.
 
+*Lagt til 2026-11-16:* 2.18 er squash-flettet med PR #161 i `05bc46e7` kl. 12:36, låst til head-en `b1fa8c50`, etter steg 3 i instruksjonen kl. 09:52 i `docs/ai-prompts/2026-11-16.md`, uten nytt ja. CI var grønn i alle jobbene (run 43858445935), med 5865 bestått og 99 hoppet over i jobben `pytest`. Alle de 18 bildene ble tatt på nytt og er byte for byte de samme, så ingen bilder er endret.
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss
