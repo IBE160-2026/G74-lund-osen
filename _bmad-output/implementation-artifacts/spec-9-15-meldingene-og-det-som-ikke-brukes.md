@@ -98,14 +98,29 @@ skal feile mot teksten før rettingen, og kjøringen før rettingen føres her.
   kall.
 - D5 og D6: navnene finnes ikke i modulene (`hasattr`).
 
+**Kjøringen før rettingen:** kl. 16:25, med testfila på spesifikasjonen
+(`42730a24`) og koden før rettingen. Alle seks feilet: D1 på «regnes ikke på
+nytt», D2 på starten «Kveldsraden for …», D3 på «Hullet er endelig først», D4
+på «Innlesingen skriver ingen vurderinger (AD-7)», og D5 og D6 på `hasattr`.
+Etter gjennomgangen sjekker testene også forbeholdet om lista og kursene
+(ECH1), rettingen i D1 (VG1), at utskriften fra `--les-inn` ikke har tall med
+desimaler (VG2), og at innlesingen ikke nevner signalet i ettertid når basen
+feilet (VG2).
+
 Lokalt kjøres bare testfilene storyen rører og `--dokumentene`. Hele settet
 kjøres i CI. `src/fetch_prices.py` kjøres ikke, bare testene.
 
 ## Bildene
 
 Storyen endrer ingen mal og ingen fil i `src/static/`. Avtrykkene bak bildene i
-`tests/test_docker.py` regnes av malene, så `--dokumentene` viser om noe er
-endret. Ingen nye bilder hvis ikke.
+`tests/test_docker.py` regnes av malene og noen moduler, blant dem
+`src/dagsgrunnlag.py` og `src/tilstand.py` (gjennomgangen, VG3). Begge er endret,
+så avtrykkene ble endret. Alle 18 bildene ble tatt på nytt kl. 16:37–16:38 og
+igjen kl. 16:50–16:51 etter rettingene, med demobasen i en midlertidig mappe,
+demoserveren på en ledig port (62931 og 62933, aldri 8000) og skriptet og
+jobblista fra 2.17. Alle 18 er byte for byte de samme som i `docs/appen/` og
+`docs/appen/mobil/`, så bare avtrykkene er satt på nytt (`303841a9` og
+`d2f3f5e3`), og ingen bilder er endret. Demoserveren er stoppet.
 
 ## Grenser
 
@@ -115,11 +130,44 @@ endret. Ingen nye bilder hvis ikke.
 - Atferden i hentingen endres ikke, bare tekstene.
 - ruff før hver commit som endrer `src/` eller `tests/` (regel 23).
 
+## Gjennomgangen 16.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `303841a9`. 9 funn: 2 på middels og 7 lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | middels | Meldingene i `_kan_skrives_til` og `les_inn` lovet signal i ettertid uten forbehold, men `regn_i_ettertid` gir ingen rad for en aksje utenfor lista, med for få kurser eller uten kursene for dagen, og to kallsteder gjelder nettopp basen som feilet | Rettet: «for aksjene i lista som har nok kurser i basen til og med dagen», som `docs/hjelp.md`, med test (`d2f3f5e3`) |
+| BH1 | middels | D10: svaret kl. 15:39 nevner ikonfilene «som ingenting viser til», men spesifikasjonen lar dem stå fordi `src/ikon.py` lager dem og testene leser dem | **Står åpent, følger av et svar (regel 25).** Spørsmål 1 under |
+| ECH2 | lav | Docstringen i `tilstand.py`: «første rad i tabellen» og «hullet står bare der …» | Rettet: «første kveldsrad», og hullet står til en henting har regnet signalet (`d2f3f5e3`) |
+| ECH3 | lav | Utskriften fra `--les-inn` sier ingenting om inneværende børsdag | Står: meldingen gjelder dagene før inneværende børsdag og sier det. Hva som skjer med inneværende dag, er hentingens sak og uendret |
+| VG1 | lav | D1-testen sjekket ikke selve rettingen | Rettet (`d2f3f5e3`) |
+| VG2 | lav | D4-testen sjekket ikke regel 16, og ikke tilfellet der basen feilet | Rettet, med en ny test (`d2f3f5e3`) |
+| VG3 | lav | «Bildene» sa at avtrykkene bare regnes av malene, og kjøringen før rettingen sto bare i commit-meldingen | Rettet her |
+| VG4 | lav | `90d93016` alene feiler avtrykkstestene, rettet i `303841a9` | Står: PR-en squash-flettes, så mellomcommiten kommer ikke på main |
+| BH2 | lav | `AVTRYKK_BAK_BILDET` manglet en 9.15-kommentar | Rettet (`d2f3f5e3`) |
+
+## Spørsmål til gruppen
+
+1. **BH1: ikonfilene `ikon-16.png`, `ikon-48.png`, `ikon-192.png` og
+   `ikon-512.png` (middels, følger av svaret kl. 15:39).** Ingen mal viser til
+   dem, men `src/ikon.py` lager dem (`IKON_STOERRELSER = (16, 32, 48, 180, 192,
+   512)`), og `test_filene_i_repoet_er_det_modulen_lager` og `test_stoerrelsene`
+   i `tests/test_ikonet_og_snarveien_3_6.py` leser dem. Svaret sier både at
+   ikonfilene som ingenting viser til, tas bort, og at det testene bruker,
+   står. *Forslag:* de står, som nå, fordi modulen og testene bruker dem. Det
+   andre valget er å ta dem bort med `IKON_STOERRELSER = (32, 180)` i
+   `src/ikon.py` og de to testene, i denne storyen. `ikon.ico` lages av
+   `ICO_STOERRELSER` uten filene og endres ikke.
+
+Spørsmål 1 er på middels og følger av et svar, så det står åpent til gruppen
+har svart (regel 25). PR-en stopper ved grønn CI og flettes ikke før det.
+
 ## Kontroll
 
-- [ ] D1–D4 rettet, med en test for hver som feilet mot teksten før rettingen
-- [ ] D5 og D6 tatt bort, og D7–D10 står med grunn
+- [x] D1–D4 rettet, med en test for hver som feilet mot teksten før rettingen
+- [x] D5 og D6 tatt bort, og D7–D10 står med grunn
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
-- [ ] Ingen bilder endret
-- [ ] Gjennomgangen er tatt
+- [x] Ingen bilder endret
+- [x] Gjennomgangen er tatt
 - [ ] CI er grønn i alle jobbene
