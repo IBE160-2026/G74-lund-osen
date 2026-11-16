@@ -167,7 +167,7 @@ har svart (regel 25). PR-en stopper ved grønn CI og flettes ikke før det.
 
 - [x] D1–D4 rettet, med en test for hver som feilet mot teksten før rettingen
 - [x] D5 og D6 tatt bort, og D7–D10 står med grunn
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: de 25 testfilene som importerer modulene, kl. 16:27–16:36 (1428 bestått, og 4 i `tests/test_docker.py` feilet på avtrykkene, satt på nytt i `303841a9`); etter gjennomgangen `test_meldingene_9_15.py`, `test_tilstand.py`, `test_docker.py`, `test_fetch_prices.py`, `test_ettertid_2_17.py`, `test_etterfyllingen_2_4.py` og `test_notater.py` kl. 16:44–16:50 (711 bestått, de 4 avtrykkene satt på nytt i `d2f3f5e3`), og så de tre første på nytt (195 bestått); `--dokumentene` på `82f97c58` kl. 16:52–17:10 (2966 bestått og 7 hoppet over)
 - [x] Ingen bilder endret
 - [x] Gjennomgangen er tatt
 - [ ] CI er grønn i alle jobbene
