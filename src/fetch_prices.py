@@ -674,7 +674,7 @@ def _kan_skrives_til(dato: date) -> str:
     return (
         f"Kveldsraden for {dato.isoformat()} kan bare skrives så lenge datoen er inneværende børsdag (AD-7). "
         "Når datoen ikke lenger er inneværende børsdag, regner siste steg i en henting signalet for den "
-        "i ettertid av kursene i basen, uten KI-tekst (story 2.17)."
+        "i ettertid, uten KI-tekst, for aksjene i lista som har nok kurser i basen til og med dagen (story 2.17)."
     )
 
 
@@ -1980,8 +1980,8 @@ def les_inn(fil: Path, base_sti: Path, skriv: Callable[[str], None] = print) -> 
         # Story 9.15 (D4): innlesingen regner ikke selv (spoersmaal 6 i 2.17).
         skriv(
             "Innlesingen skriver ingen vurderinger (AD-7). Børsdagene før inneværende børsdag uten rad i "
-            "vurdering får signalet regnet i ettertid ved neste henting, av kursene i basen og uten "
-            "KI-tekst (story 2.17)."
+            "vurdering får signalet regnet i ettertid ved neste henting, uten KI-tekst, for aksjene i lista "
+            "som har nok kurser i basen til og med dagen (story 2.17)."
         )
     if skrevne is None or skrevne != set(serier) or not alt_lest:
         sys.exit(1)
