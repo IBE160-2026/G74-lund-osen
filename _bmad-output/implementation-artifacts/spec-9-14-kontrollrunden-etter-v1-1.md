@@ -233,35 +233,55 @@ er slettet.
    kursene hentes. Det skjer fordi `detalj.ettertid` sjekkes før `ki_vises` i
    `aksje.html`. *Forslag:* en liten story som viser setningen bare med KI på,
    med en test med KI av. Kravet står.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* rettes i dag i en egen liten story i epicen til 2.17, på en gren fra main etter at PR #160 er flettet. Setningen om KI-teksten for en dag i ettertid vises bare når KI er på, og kravet i FR-601 står.
 2. **C1 og C2: 8.1 (middels).** 8-1 er done i sprintstatusen fra PR #140, men
    spesifikasjonen står `ready-for-dev`, og kravet om under 5 minutter er ikke
    nådd. *Forslag:* som for 10.4 (spørsmål 3 i 9.13). Spesifikasjonen og
    kvalitetssikringen rettes når brukertest 2 er ført, og 8-1 står som done
    til da, med en datert linje i `epics.md` om kravet.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. 8.1 står som done, med en datert linje i `epics.md` om at kravet om under 5 minutter ikke ble nådd i brukertest 1. Spesifikasjonen for 8.1 og kvalitetssikringen rettes når brukertest 2 er ført.
 3. **A2: «alle sidene» eller «seks av sidene».** Ordene i hovedflyten er låst
    av en test, etter svaret 12.11 kl. 09:58. *Forslag:* ingen endring. Linja i
    «Status» sier hvor mange sider det er.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Ingen endring.
 4. **A20: «Status 14.11.2026» i vurderingsmatrisen er talt før 9.13 og 8.31.**
    *Forslag:* en ny status når refleksjonsrapporten skrives, med tallene over.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Statusen tas når refleksjonsrapporten skrives.
 5. **B4: «ikke kjørt» i FR-409.** *Forslag:* teksten står. Det er navnet på
    tilstanden. Visningen sier «ikke vurdert», og det sier FR-101 også.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Teksten står.
 6. **B7 og B8: §8 og SM-9 etter v1.1.** §8 sier at ingen av idéene tas før v1
    er kontrollert, men 2.17 ble flettet 14.11, før README-prøven. SM-9 sier at
    prøven tas når v1 er ferdig bygget. *Forslag:* begge får en setning om
    svarene 14.11 og 15.11. 2.17 ble tatt inn etter svaret kl. 05:41–05:49, og
    3.4 blir done når README-prøven er tatt.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. §8 og statusen for SM-9 i §7 har fått setningen om svarene 14.11 og 15.11 på grenen, med en linje i endringsloggen (regel 19).
 7. **C7: underpunktene i sprintstatusen.** *Forslag:* som de er. Ingen test
    eller leser trenger dem.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Underpunktene står som de er.
 8. **K1: kveldsradene som er ulike når de regnes på nytt.** De står som de ble
    skrevet (AD-7). 116 av dem kommer av justerte kurser, og 68 av volumet. Bare
    2 har et annet signal (ORK 2026-10-16 og YAR 2026-10-26). *Forslag:* de står.
    Kveldsraden er det appen visste den kvelden.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Kveldsradene står.
 9. **K2: KI-tekster som besto kontrollen da, men ikke i dag.** Det gjelder 21
    tekster fra promptversjon 5 (09.–11.11) og teksten om dagen 12.11 (`dag-2`).
    De vises, og de besto reglene som gjaldt da. *Forslag:* de står. Loggen
    endres ikke (AD-7), og raden har promptversjonen.
+
+   *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Tekstene står.
 10. **D1–D4: meldinger i koden fra før 2.17.** *Forslag:* en liten story med
     testene for meldingene, etter innleveringen, eller før hvis gruppen vil.
+
+    *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Storyen tas etter innleveringen.
 11. **D5–D10: kode og filer som ikke brukes.**
     - `MinneNotatlagerMedKjoep` i `src/notater.py` og `RETNINGENE` i
       `src/dagsgrunnlag.py` brukes ikke.
@@ -272,6 +292,8 @@ er slettet.
       `ikon-512.png` i `src/static/`.
 
     *Forslag:* de står til etter innleveringen, og ryddes da i én story.
+
+    *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* forslaget godtas. Koden og filene står til etter innleveringen, og ryddes da i én story.
 12. **Ryddingen.** *Forslag:*
     - **Behold:** `G74-lund-osen-jobb`, som er kveldsjobben, og bildegrenene.
     - **Fjern:** gruppen gjør det selv eller sier ja. Det gjelder:
@@ -286,8 +308,13 @@ er slettet.
       ignorert og kan ha nøkler. Gruppen ser selv om filene flyttes til
       `_privat/` eller slettes.
 
+    *Svar 2026-11-16 kl. 09:51 (gruppens svar, rådet anbefalte det):* ryddingen tas etter innleveringen, og ingenting slettes nå.
+
 Spørsmål 1 og 2 er på middels. De står åpne til gruppen har svart (regel 25),
 så PR-en stopper ved grønn CI og flettes ikke i natt.
+
+*Lagt til 2026-11-16:* gruppen svarte på alle spørsmålene kl. 09:51, og rådet
+anbefalte svarene. Spørsmål 1 og 2 er besvart, så de står ikke lenger åpne.
 
 ## Gjennomgangen 16.11
 
