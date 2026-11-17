@@ -459,7 +459,7 @@ class TestAksjedetalj:
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "mot MA50" in html
+        assert "mot 50-dagers snitt" in html
         assert "standardavvik" in html
         assert "× medianen" in html
 
@@ -1418,7 +1418,7 @@ class TestVurderingenIDetaljen:
         assert "3 av 3" in html
         assert "Blandet" in html
         assert "volum 4,95 × medianen" in html
-        assert "mot MA50" in html
+        assert "mot 50-dagers snitt" in html
 
     def test_rad_med_grunn_gir_200_med_grafen_og_grunnen(self, klient):
         rader = serie([100.0] * 61)
@@ -3801,7 +3801,7 @@ class TestStory816bDagenPaaHeleSiden:
         assert "Hvorfor signalet ble 3" in toppen
         # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» i alle tre kortene.
         # Story 8.20a (del E): «?» står ved navnet, ikke ved «Ga».
-        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
+        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot 50-dagers snitt" in toppen
         assert "volum 7,00 × medianen" in toppen
         assert "skilte seg ut fredag" not in toppen and "Positiv" not in toppen
 

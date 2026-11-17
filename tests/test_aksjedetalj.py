@@ -270,7 +270,7 @@ class TestVurderingenIDetaljen:
             ("Interesse", -1),
         ]
         maalinger = [s.maaling for s in d.sjekker]
-        assert maalinger[0] == f"+3,1{NB}% mot MA5"
+        assert maalinger[0] == f"+3,1{NB}% mot 5-dagers snitt"
         assert maalinger[1].startswith(f"-3,5{NB}% mot 1,1{NB}%")
         assert maalinger[2] == "volum 4,95 × medianen"
         assert d.styrke == 3
