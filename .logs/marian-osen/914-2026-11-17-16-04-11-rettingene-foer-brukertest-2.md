@@ -25,3 +25,22 @@ Instruksjonen om rettingene før brukertest 2 (limt inn kl. 14:15), med beskjede
 - Spørsmål 1 i 9.18 (HE15): aksjer fulgt før 11.11 eller tatt inn med en ferdig liste har ingen stjerne. Forslaget er at gruppen setter stjernen selv før testen, og at ferdige lister og Fjern tas etter testen.
 - Spørsmål 3 og 4 i 9.18 (lave): setningen om tenkte kjøp i stegene for notatene, og linja mellom 640 og 760 px.
 - Føringen av 9.18 på main kommer etter flettingen.
+
+## 2026-11-17 kl. 17:23 — Marian Osen
+
+### Oppgave
+Beskjeden kl. 16:21 med gruppens svar kl. 16:19 på spørsmål 1 og 2 i 9.18, og resten av instruksjonen: push, fletting, føring, Utført-linja og loggen.
+
+### Plan
+- Føre svarene i 9.18, kjøre `--dokumentene`, pushe, flette når CI er grønn, og føre på main.
+
+### Resultat
+- **HE15:** lukket som alt bygget. Gruppen setter stjernen selv på de tre egne aksjene i den ekte versjonen (`84187858`).
+- **VG1:** besvart. Bildene i `docs/appen/` tas på nytt i en egen liten story rett etter 9.18, før rubrikk-passet, med egen instruksjon. Graden står (`358aa863`).
+- **Testene:** `--dokumentene` på grenen ga 3009 bestått og 7 hoppet over kl. 16:53–17:14, etter én omstart for lite minne. CI var grønn (run 44123485449).
+- **Flettingen:** PR #165 ble squash-flettet i `9bf8769e` kl. 17:20. Føringen står i `36464e3f` og `aeb7b958`, og tallet på funn i gjennomgangen er rettet fra 18 til 16. Utført-linja står i `3ba1c22a`, og ble skrevet før denne loggseksjonen, ikke etter.
+- **Avvik:** kl. 16:23 ble main pushet etter en kjøring av `--dokumentene` med «1 error» (exit 1), fordi kommandoen ikke sjekket utfallet før push. Commitene var bare dagsfila, loggen og Utført-linja. Ny kjøring kl. 16:23–16:42 ga 2970 bestått og 7 hoppet over. Hvilken test som ga feilen, er ikke kjent, fordi utskriften bare viste antallet. Fra nå sjekkes utfallet i samme kommando som push.
+
+### Åpne punkter
+- Storyen som tar bildene i `docs/appen/` på nytt, med egen instruksjon (VG1).
+- Spørsmål 3 og 4 i 9.18 (lave) står.
