@@ -37,6 +37,14 @@ godtas, og stegene om notatene står uten setningen om tenkte kjøp, med testen
 for rådord uendret (rådet anbefalte det). Spørsmål 4 rettes i denne storyen,
 etter gruppens valg.
 
+*Svar 2026-11-17 kl. 18:26 (gruppens svar, rådet anbefalte det, beskjeden kl.
+18:27):* bildene fra mobil vises ikke lenger i README-en. Pila «Bilder av appen
+på mobil (demoen)», som ble lagt til i 3.3k (spørsmål 2 i
+`spec-3-3k-bildene-av-appen-i-readme.md`), er tatt ut. I stedet står én linje:
+bildene fra smal skjerm ligger i `docs/appen/mobil/`, og mobil kanskje kommer
+senere, fordi appen i v1 bare svarer på denne maskinen. Mappa står, og bildene
+der tas på nytt som før. Testene sjekker linja og mappa, ikke pila.
+
 ## Det som gjøres
 
 1. **Grensen.** Mellom 640 og 760 px skal styrken og retningen stå bare én
@@ -56,6 +64,49 @@ etter gruppens valg.
    VG1 der får en datert linje om at bildene er tatt. UX-loggen får en linje om
    grensen.
 
+## Bygget
+
+Bygget 17.11 av én agent i worktreen, og kontrollert i vinduet: commitene, at
+ingen demoserver eller nettleser står igjen, og at ingen migrasjon er med.
+
+| Del | Commit | Testen eller kontrollen |
+|---|---|---|
+| Grensen, første trinn | `c06cbc39` | `tests/test_rettingene_9_18.py::TestBareEnGangIAlleBredder` |
+| README-en uten pila for mobil | `20a39b47` | `test_mobillinja_lenker_til_mappa_med_bildene_ved_390_px` og de andre README-testene i `tests/test_docker.py` |
+| Bildene og avtrykkene | `10a96e50` | `tests/test_docker.py` |
+| To trinn i linja | `960ca037` | `TestBareEnGangIAlleBredder::test_styrken_og_retningen_en_gang_hver`, som feilet for styrken ved 610, 640, 700 og 739 px før rettingen |
+| Avtrykkene etter de to trinnene | `5f83c0d5` | `tests/test_docker.py` |
+| Bildegrenen | `5e60ee19` på `pr-9-19-bilder` | Bildene før og etter, med `LESMEG.md` |
+
+- **Grensen:** målt i Edge med demodataene er tabellen 709 px bred, og boksen
+  34 px smalere enn vinduet. Kolonnen for styrken får plass fra 607 px, og
+  kolonnen for retningen fra 743 px. Linja viser «N av 3 · retning» under
+  607 px, bare retningen fra 607 til 743 px, og ingenting fra 743 px. Merket
+  «i ettertid» og grunnen for en rad uten signal hører til styrken.
+- **Bildene:** alle 18 er tatt to ganger med ny demobase, og kjøringene var
+  like byte for byte. Seks er byttet: `aksjesiden-brfe-demo.png` (HE8),
+  `din-egen-liste-demo.png` (HE10), `innstillinger-demo.png` (HE5),
+  `min-liste-demo.png` (HE9), `vis-meg-rundt-demo.png` (HE16 og HE18) og
+  `mobil/oversikten-390-demo.png` (HE3, tatt i full høyde, 4773 px). Tolv var
+  like og står. Etter de to trinnene ble alle tatt på nytt igjen, og alle var
+  like med det som var committet.
+- Spørsmålet før sletting (HE2) og lenken «Til <måned>» (HE14) står ikke i noen
+  av bildene.
+
+## Spørsmål til gruppen, med forslag
+
+Et spørsmål stopper ikke arbeidet.
+
+1. **Nye bilder i README-en.** HE2 og HE14 står ikke i noen av bildene.
+   *Forslag:* ingen nye bilder nå. Etter brukertest 2 kan bildet av spørsmålet
+   før sletting og bildet av «Signalet dag for dag» med lenken tilbake legges i
+   pila «Bilder av appen (demoen)».
+2. **Bruddene er målt med demodataene.** Tabellen er like bred med eller uten
+   linja, men andre tickere og bransjer i den ekte versjonen kan gjøre den noen
+   px bredere eller smalere. Da kan et smalt spenn vise styrken eller retningen
+   to ganger eller ingen ganger. *Forslag:* godta det for v1, og se på det i den
+   ekte versjonen på telefonbredde i brukertest 2.
+
 ## Grenser
 
 - Ingen API-kall, ingen ny migrasjon, og `data/` og `_privat/` røres ikke. Den
@@ -65,10 +116,10 @@ etter gruppens valg.
 
 ## Kontroll
 
-- [ ] Styrken og retningen står bare én gang i alle bredder, med en test
-- [ ] Bildene er tatt på nytt fra grenen i demoen, og de som er like, er ikke byttet
-- [ ] Avtrykkene er regnet ut fra de nye bildene, og bildegrenen har bildene før og etter
-- [ ] Svarene og VG1 i spesifikasjonen for 9.18, og linja i UX-loggen
+- [x] Styrken og retningen står bare én gang i alle bredder, med en test
+- [x] Bildene er tatt på nytt fra grenen i demoen, og de som er like, er ikke byttet
+- [x] Avtrykkene er regnet ut fra de nye bildene, og bildegrenen har bildene før og etter
+- [x] Svarene og VG1 i spesifikasjonen for 9.18, og linja i UX-loggen
 - [ ] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
