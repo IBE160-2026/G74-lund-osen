@@ -1524,6 +1524,10 @@ def aksjedetalj(symbol: str):
             # Story 8.23 (tillegg 2): 3 av 3 det siste året, av radene som er lagret.
             alle_sjekkene=alle_sjekkene_det_siste_aaret(vurderingene, rader[-1].dato, ANTALL_SJEKKER),
             pil=pil,
+            # Story 9.18 (HE14, gruppens svar 17.11 kl. 13:03–13:33): måneden
+            # for dagen siden viser, når pilene har bladd til en annen. None
+            # ellers, og da står lenken tilbake ikke.
+            maaned_for_dagen=slutt.replace(day=1) if historikk.foerste != slutt.replace(day=1) else None,
             # Story 8.21: «Mine notater», med dagen et nytt notat får.
             # Tillegget kl. 14:44: bryteren «Notater» skjuler delen, og
             # notatene leses da ikke.

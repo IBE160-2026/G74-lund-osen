@@ -816,6 +816,10 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
                          box-sizing: border-box; border: 0; border-radius: 999px;
                          color: var(--blekk); font-weight: 600; text-decoration: none; }
 :where(.side-aksje) .maanedspiler a.pil:hover { background: var(--bakgrunn); }
+/* Story 9.18 (HE14, gruppens svar 17.11 kl. 13:03–13:33): lenken tilbake til
+   måneden for dagen står ved månedsvelgeren, 44 px høy som pilene. */
+:where(.side-aksje) a.tilbake-maaned { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 12px 8px;
+                                       padding: 0 4px; color: var(--blekk); font-weight: 600; }
 :where(.side-aksje) .historikk a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-aksje) ol.uker, :where(.side-aksje) ol.dager { list-style: none; margin: 0; padding: 0; }
 /* Story 8.2b, c (U68): en kompakt tabell, én rad per uke med uka, mandag
