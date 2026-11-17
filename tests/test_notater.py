@@ -1368,6 +1368,29 @@ class TestSlettSpoerFoerst:
         klient.post(f"/aksje/{AKSJE}/notat/salg", data=_salgsknapp(_min_liste_delen(klient)))
         side = self._spoersmaalet(klient, {"id": rad[0], "vis": "min-liste"})
         assert "Det tenkte kjøpet og salget ved notatet slettes også." in _tekst(side)
+        # Gjennomgangen av 9.18 (BH1): knappen sier det samme som teksten.
+        assert "Slett notatet, kjøpet og salget" in _tekst(side)
+
+    @pytest.mark.parametrize("tilbake", ["//ond.example", "https://ond.example", "javascript:alert(1)"])
+    def test_avbryt_gaar_bare_til_en_side_i_appen(self, klient, demobase, tilbake):
+        """Gjennomgangen av 9.18 (VG3): ville feilet hvis «Avbryt» eller
+        skjemaet på siden med spørsmålet tok med en adresse utenfor appen."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        side = self._spoersmaalet(klient, {"id": rad[0], "tilbake": tilbake, "vis": tilbake})
+        avbryt = re.search(r'<a href="([^"]*)">Avbryt</a>', side).group(1)
+        assert avbryt.startswith("/") and not avbryt.startswith("//"), avbryt
+        assert "ond.example" not in side and "javascript:" not in side
+        assert len(_rader(demobase)) == 1
+
+    def test_en_annen_side_kan_ikke_faa_spoersmaalet(self, klient, demobase):
+        """Gjennomgangen av 9.18 (VG3): ville feilet hvis en annen side fikk
+        spørsmålet, uten bekreftet=1, i stedet for 403."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]}, headers={"Origin": "http://ond.example"})
+        assert svar.status_code == 403
+        assert len(_rader(demobase)) == 1
 
     def test_bekreftet_sletter_notatet_og_kjoepet(self, klient, demobase):
         """Ville feilet hvis svaret på spørsmålet ikke slettet notatet og kjøpet."""

@@ -17,7 +17,7 @@
     {% if panelside %}<input type="hidden" name="tilbake" value="{{ panelside }}">{% endif %}
     {% if alle %}<input type="hidden" name="alle" value="1">{% endif %}
     <input type="hidden" name="bekreftet" value="1">
-    <button type="submit" class="knapp">{{ "Slett notatet og det tenkte kjøpet" if kjoep else "Slett" }}</button>
+    <button type="submit" class="knapp">{{ "Slett notatet, kjøpet og salget" if kjoep and kjoep.solgt else "Slett notatet og det tenkte kjøpet" if kjoep else "Slett" }}</button>
   </form>
   <p><a href="{{ tilbake_adresse }}">Avbryt</a></p>
 </section>

@@ -1822,6 +1822,14 @@ def _visningen(valg: Valg, slutt: date, periode: str | None) -> str:
     return f"periode={periode}" if periode else ""
 
 
+def _godtatt_visning(visningen: str | None) -> str | None:
+    """Visningen fra et notatskjema når _tilbake_til_notatene kjenner den, ellers
+    None (gjennomgangen av 9.18, BH4)."""
+    if visningen in MIN_LISTE_TILBAKE or _VISNINGEN.fullmatch(visningen or ""):
+        return visningen
+    return None
+
+
 def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
     """Samme side, med samme periode eller dag, ved «Mine notater» (del B).
     En visning siden ikke kjenner, gir standardvisningen."""
@@ -1924,8 +1932,10 @@ def slett_notat(symbol: str):
                 aksje=post.aksje,
                 notat=notat,
                 kjoep=lager.kjoepene().get(notat.id),
-                vis=request.form.get("vis"),
-                panelside=request.form.get("tilbake"),
+                # Gjennomgangen av 9.18 (BH4): bare verdier _tilbake_til_notatene
+                # godtar, går videre i skjemaet, som fjern_egen gjør.
+                vis=_godtatt_visning(request.form.get("vis")),
+                panelside=_panelsiden(request.form.get("tilbake")),
                 alle=request.form.get("alle") == "1",
                 tilbake_adresse=tilbake,
             )
