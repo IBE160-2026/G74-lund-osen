@@ -114,7 +114,7 @@ lesing, på `acc52a83`. 18 funn: 3 på middels og 15 lave.
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
 | ECH1 | middels | Linja under navnet på smal skjerm manglet merket «i ettertid» | Rettet, med en test som feilet mot malen før (`3e225584`) |
-| VG1 | middels | Avtrykkene er regnet ut på nytt, men bildene i `docs/appen/` er ikke tatt på nytt | **Står åpent, følger av instruksjonen (bildene blir i scratchpad) (regel 25).** Spørsmål 2 |
+| VG1 | middels | Avtrykkene er regnet ut på nytt, men bildene i `docs/appen/` er ikke tatt på nytt | Middels, følger av instruksjonen (regel 25). Besvart 17.11 kl. 16:19: bildene tas på nytt i en egen liten story rett etter 9.18, før rubrikk-passet. Spørsmål 2 |
 | VG2 | middels | Raden for HE15 i evalueringen og U128 var ikke rettet, og spørsmål 4 manglet svarlinja kl. 14:16 | Rettet i dokumentene |
 | BH1 | lav | Knappen sa «det tenkte kjøpet» når salget også slettes | Rettet: «Slett notatet, kjøpet og salget», med test (`9b186fa8`) |
 | BH2 | lav | Lenken «Til …» sto utenfor navigasjonen for måneden | Rettet (`5fa19b16`) |
@@ -135,6 +135,8 @@ lesing, på `acc52a83`. 18 funn: 3 på middels og 15 lave.
 Et spørsmål stopper ikke arbeidet. Spørsmål 2 er VG1 i gjennomgangen, på
 middels og fra instruksjonen, så PR-en flettes ikke før gruppen har svart
 (regel 25).
+*Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* spørsmål 1 og 2 er besvart, og ingen funn på middels
+eller høy grad står åpne.
 
 1. **HE15 er alt bygget.** Følg setter stjernen fra 11.11. Gruppen så ingen
    stjerne i den ekte versjonen. Det kan være en aksje som ble fulgt før 11.11,
@@ -143,12 +145,18 @@ middels og fra instruksjonen, så PR-en flettes ikke før gruppen har svart
    Gruppen setter stjernen selv på de aksjene den følger, i den ekte versjonen.
    Om en ferdig liste også skal sette stjerner, tas etter testen, sammen med
    spørsmålet om Fjern.
+   *Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* HE15 lukkes som alt bygget. Følg har satt
+   stjernen siden 8.26 (11.11), og en test låser det. De tre egne aksjene ble
+   fulgt før det, og gruppen setter stjernen på dem selv i den ekte versjonen.
 2. **Bildene i `docs/appen/`.** Malene, stilen og hjelpetekstene er endret, så
    bildene av appen viser den gamle versjonen. Instruksjonen sier at bildene
    blir i scratchpad, så bare avtrykkene er regnet ut på nytt. *Forslag:* ta
    bildene på nytt fra demoen i en egen liten story etter brukertest 2, og
    flett 9.18 nå med bildene som de er. Det andre valget er å ta bildene på
    nytt i 9.18, før flettingen.
+   *Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* bildene i `docs/appen/` tas på nytt i en egen
+   liten story rett etter 9.18, før rubrikk-passet, med sin egen instruksjon.
+   Graden på VG1 står (regel 25).
 3. **HE17 uten setningen om tenkte kjøp.** *Forslag:* godta det. Stegene sier
    hvor notatene står, og at appen aldri sier om noe var riktig.
 4. **HE3 mellom 640 og 760 px.** Linja vises under 760 px, som er bruddet
