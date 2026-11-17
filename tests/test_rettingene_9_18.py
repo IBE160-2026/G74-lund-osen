@@ -78,6 +78,10 @@ class TestTabellenPaaSmalSkjerm:
         # Story 9.19: bruddet er der kolonnen for retningen slutter å få
         # plass, ikke 760 px (TestBareEnGangIAlleBredder).
         assert "display: block" in kropper[("@media (width < 743px)", velger)]
+        # Story 9.19: fra 607 px står styrken i sin kolonne, så linja viser
+        # bare retningen.
+        styrken = ":where(.side-oversikt) td.selskap .smal-styrke"
+        assert kropper[("@media (607px <= width < 743px)", styrken)] == "display: none"
 
     @pytest.mark.parametrize("bredde, synlig", [(390, True), (1280, False)])
     @I_NETTLESEREN
@@ -107,33 +111,50 @@ class TestTabellenPaaSmalSkjerm:
 
 class TestBareEnGangIAlleBredder:
     """Story 9.19 (spørsmål 4 i 9.18, gruppens svar 17.11 kl. 18:23): styrken
-    og retningen står bare én gang i alle bredder. Linja under navnet vises
-    bare når kolonnen for retningen ikke får plass i boksen. Målt i Edge
-    17.11: tabellen er 709 px bred med demoens aksjer, og boksen er 34 px
-    smalere enn vinduet, så kolonnene får plass fra 743 px. Før sto linja
-    til og med 760 px, og i 743–760 px sto retningen to ganger."""
+    og retningen står hver bare én gang i alle bredder. Målt i Edge 17.11:
+    tabellen er 709 px bred med demoens aksjer, og boksen er 34 px smalere enn
+    vinduet. Kolonnen for signalstyrken får plass fra 607 px og kolonnen for
+    retningen fra 743 px. Under 607 px står styrken og retningen i linja under
+    navnet, fra 607 px bare retningen, og fra 743 px ingen linje. Før sto hele
+    linja til og med 760 px: i 743–760 px sto retningen to ganger, og i
+    607–760 px styrken."""
 
-    @pytest.mark.parametrize("bredde", [390, 600, 639, 640, 700, 739, 746, 760, 761, 1280])
+    # Ingen bredde nærmere enn 3 px fra bruddene, fordi skriftene i CI kan gi
+    # en annen bredde på tabellen.
+    @pytest.mark.parametrize("bredde", [390, 600, 604, 610, 640, 700, 739, 746, 760, 761, 1280])
     @I_NETTLESEREN
-    def test_linja_eller_kolonnen_aldri_begge(self, side, tmp_path, bredde):
-        """Ville feilet hvis linja og hele kolonnen for retningen sto samtidig
-        (som ved 746 og 760 px før 9.19), eller ingen av dem sto."""
+    def test_styrken_og_retningen_en_gang_hver(self, side, tmp_path, bredde):
+        """Ville feilet hvis styrken eller retningen sto både i linja og i en
+        kolonne som får plass i boksen (som styrken ved 640–739 px og
+        retningen ved 746 og 760 px før 9.19), eller ingen av stedene."""
         skript = """
           const boks = document.querySelector(".tabellboks");
-          const ramme = boks.getBoundingClientRect();
-          const innerst = ramme.left + boks.clientLeft;
-          const retning = document.querySelector("#kolonne-retning").getBoundingClientRect();
-          const linjer = Array.from(document.querySelectorAll(".tabellboks .smal-signal"));
-          ferdig({linjer: linjer.length,
-                  synlige: linjer.filter((l) => l.getBoundingClientRect().width > 0).length,
-                  kolonnen: boks.scrollLeft === 0 && retning.left >= innerst
-                            && retning.right <= innerst + boks.clientWidth + 0.5});
+          const innerst = boks.getBoundingClientRect().left + boks.clientLeft;
+          const faarPlass = (velger) => {
+            const r = document.querySelector(velger).getBoundingClientRect();
+            return boks.scrollLeft === 0 && r.left >= innerst && r.right <= innerst + boks.clientWidth + 0.5;
+          };
+          // Teksten som synes i linja (innerText tar ikke med det som er skjult),
+          // for hver rad med signal.
+          const rader = Array.from(document.querySelectorAll(".tabellboks tbody tr")).filter(
+            (tr) => tr.querySelector("td.styrke .pille, td.styrke .styrketall"));
+          const linjer = rader.map((tr) => {
+            const l = tr.querySelector(".smal-signal");
+            const celle = tr.querySelector("td.retning");
+            const symbol = celle.querySelector(".symbol");
+            const ord = celle.textContent.replace(symbol ? symbol.textContent : "", "").trim();
+            const tekst = l.getBoundingClientRect().width > 0 ? l.innerText : "";
+            return {styrke: /[0-9] av [0-9]/.test(tekst), retning: ord.length > 0 && tekst.includes(ord)};
+          });
+          ferdig({rader: rader.length, linjer,
+                  styrkekolonnen: faarPlass("#kolonne-signal"),
+                  retningskolonnen: faarPlass("#kolonne-retning")});
         """
         svar = _kjoer(side("/"), tmp_path, bredde, skript)
-        assert svar["linjer"] > 5
-        assert svar["synlige"] in (0, svar["linjer"]), svar
-        linja = svar["synlige"] > 0
-        assert linja != svar["kolonnen"], (bredde, svar)
+        assert svar["rader"] > 5
+        for linja in svar["linjer"]:
+            assert linja["styrke"] + svar["styrkekolonnen"] == 1, (bredde, "styrken", linja, svar)
+            assert linja["retning"] + svar["retningskolonnen"] == 1, (bredde, "retningen", linja, svar)
 
 
 class TestBoksenIOmvisningen:
