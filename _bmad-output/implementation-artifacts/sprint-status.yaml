@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 17-11-2026 21:28
+last_updated: 17-11-2026 22:20
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -248,6 +248,8 @@ development_status:
   9-18-rettingene-foer-brukertest-2: done
   # Story 9.19 (2026-11-17, gruppens svar kl. 16:19, 18:23 og 18:26): grensen for linja på smal skjerm og bildene av appen.
   9-19-grensen-og-bildene: done
+  # Story 9.20 (2026-11-17, gruppens svar kl. 12:29–13:40): PRD-en mot faglærers rubrikk.
+  9-20-prd-mot-rubrikken: in-progress
   epic-9-retrospective: optional
 
   epic-10: in-progress
