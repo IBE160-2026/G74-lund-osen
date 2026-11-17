@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-16T15:42
+updated: 2026-11-17T11:42
 ---
 
 # Endringslogg for PRD-en
@@ -1644,3 +1644,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-16 (story 2.18, gruppens svar 16.11 kl. 11:20, rådet anbefalte det):* FR-601, «Konsekvenser»: forsiden har et unntak. Med KI av har aksjesiden ingen KI-tekst og ingen melding om KI, heller ikke for en dag med signalet regnet i ettertid, og forsiden har bryteren og den ene linja «KI-teksten er slått av. Tabellen over viser bare det reglene har regnet ut.» under «Børsdagen kort fortalt», som valgt i 10.6. Boksen ville ellers stå tom, med bare overskriften og bryteren. Setningen sto slik: «Med KI av har aksjesiden og forsiden ingen KI-tekst og ingen melding om KI.»
 
 *Endret 2026-11-16 (BH3 i 2.18, gruppens svar 16.11 kl. 15:37, rådet anbefalte det):* FR-601, «Konsekvenser»: punktet om KI av er presisert. Med KI av står bryteren «Vis KI-tekst» og linja om hva signalet bygger på, som før, og ellers har aksjesiden ingen KI-tekst og ingen melding om KI. Ordlyden er sjekket mot `src/templates/aksje.html` på main (`d45e3e6b`), der bryteren og linja om grunnlaget står utenfor sjekkene av `ki_er_paa`. Ingen kode er endret. Setningen sto slik: «Med KI av har aksjesiden ingen KI-tekst og ingen melding om KI, heller ikke for en dag med signalet regnet i ettertid.»
+
+*Endret 2026-11-17 (story 9.16, gruppens svar 16.11 kl. 20:22, rådet anbefalte det):* §1 har fått to brukerreiser til, UJ-2 (Min liste med notater for en som kommer tilbake) og UJ-3 (KI-teksten av og på), i samme form som UJ-1. De er skrevet 17.11, etter at appen ble bygget, og beskriver det appen gjør på main. Hvert steg er sjekket mot malene og testene, med kilde i `spec-9-16-flere-brukerreiser.md`. Ingen krav er endret, og UJ-1 står som før.
