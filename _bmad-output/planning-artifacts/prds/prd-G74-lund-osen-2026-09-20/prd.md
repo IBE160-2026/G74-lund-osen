@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T22:38
+updated: 2026-11-17T22:41
 ---
 
 # PRD — OSE Signal
@@ -1929,8 +1929,8 @@ lista én gang og vedlikeholdes for hånd hvis lista endres.
 
 #### FR-302 — Hvilke hendelser og hvor langt fram
 
-`[ANTAKELSE]` Aksjesiden viser kommende hendelser for selskapet innenfor de
-neste `[FORELØPIG] 90` dagene. Hendelsestypene er de kalenderen oppgir. Typisk
+`[ANTAKELSE]` ([A1](prd-sporing.md#a1)) Aksjesiden viser kommende hendelser for
+selskapet innenfor de neste `[FORELØPIG] 90` ([A2](prd-sporing.md#a2)) dagene. Hendelsestypene er de kalenderen oppgir. Typisk
 er det resultatfremleggelser, generalforsamlinger og utbyttedatoer. Horisonten og
 typeutvalget er antatt. De bekreftes når kalenderens innhold for aksjene i lista er
 undersøkt.
@@ -2100,7 +2100,7 @@ KI-vurderingen av en melding i samlekategorien gir én av tre verdier:
 
 Meldinger vurdert som *påvirker direkte* eller *kan påvirke*, vises. *Lite
 relevant* skjules bak bryteren **Anbefalt**/**Alle**, skjult, men ikke borte.
-Grensen `[FORELØPIG]` kan ikke avgjøres på papir (punkt 2 i §8).
+Grensen `[FORELØPIG]` ([A3](prd-sporing.md#a3)) kan ikke avgjøres på papir (punkt 2 i §8).
 
 Med bryteren Anbefalt/Alle står det over meldingene hvor mange som ble funnet og
 hvor mange som vises. Grunnen til at resten er skjult, står også. Eks.dato er
