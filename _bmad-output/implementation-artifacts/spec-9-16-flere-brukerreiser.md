@@ -178,5 +178,5 @@ lesing, på `32885761`. 24 funn: 6 på middels og 18 lave.
 - [x] Linja i endringsloggen
 - [x] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13): bare `updated` er endret i det som sto
 - [x] Gjennomgangen er tatt
-- [ ] `--dokumentene` er grønn lokalt
+- [x] `--dokumentene` er grønn lokalt: på `248d71ce` kl. 12:04–12:23, med 2970 bestått og 7 hoppet over. Første kjøring kl. 11:54 ble stoppet for lite minne og startet igjen
 - [ ] CI er grønn i alle jobbene
