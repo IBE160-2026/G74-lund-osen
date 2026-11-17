@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-16T12:37
+updated: 2026-11-17T11:09
 ---
 
 # Vurderingsmatrise for del 1
@@ -39,6 +39,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Rettet 2026-11-15 (gruppens svar 15.11 kl. 05:20, spørsmål 1 i `spec-9-13-dokumentrunden-etter-v1-1.md`, rådet anbefalte det):* avsnittet og raden «Funksjonalitet og omfang» over sa «Story 3.4 og 8.2 er done i sprintstatusen fra story 9.13.» og «Story 3.4 er done i sprintstatusen». Gruppen holder fast ved avgjørelsen 12.11 kl. 20:04 og 20:06, så 3.4 er tilbake i review og blir done når README-prøven er tatt og ført. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-16 (story 9.14 og 2.18):* etter tellingen 14.11 er 9.14, kontrollrunden etter v1.1 (PR #160, `19d37f80`), og 2.18, setningen om KI-teksten for en dag i ettertid bare med KI på (PR #161, `05bc46e7`), flettet. 2.18 retter FR-601 for aksjesiden og har testen `tests/test_ettertid_2_17.py::TestVisningen::test_med_ki_av_ingen_melding_om_ki_for_dagen`, og radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `b1fa8c50`: 5865 bestått og 99 hoppet over i jobben `pytest` (kjøring 43858445935). Statusen i tabellen er ikke endret. En ny status tas når refleksjonsrapporten skrives (svaret 16.11 kl. 09:51, spørsmål 4 i [`spec-9-14-kontrollrunden-etter-v1-1.md`](../_bmad-output/implementation-artifacts/spec-9-14-kontrollrunden-etter-v1-1.md)).
+
+*Lagt til 2026-11-17 (story 9.15):* etter tellingen 14.11 er også 9.15, meldingene etter v1.1 og det som ikke brukes (PR #162, `9fea9fc8`), flettet. 9.15 retter meldingene fra hentingen og docstringen i `src/tilstand.py` etter 2.17, tar bort to navn som ingenting brukte, og har testene i `tests/test_meldingene_9_15.py`. Radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `c040f478`: 5872 bestått og 99 hoppet over i jobben `pytest` (kjøring 44060835062). Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
