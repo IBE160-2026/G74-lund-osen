@@ -500,7 +500,7 @@ td .justeringsdag { display: block; font-size: 12px; font-weight: 400; color: va
    Fargen på retningen kommer fra .opp, .ned, .blandet og .ingen. */
 :where(.side-oversikt) td.selskap .smal-signal { display: none; }
 @media (max-width: 760px) {
-  :where(.side-oversikt) td.selskap .smal-signal { display: block; margin-top: 2px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  :where(.side-oversikt) td.selskap .smal-signal { display: block; margin-top: 2px; font-size: 13px; font-weight: 600; }
 }
 :where(.side-oversikt) .periodehode { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 :where(.side-oversikt) .periodehode nav.periodevalg { margin-bottom: 12px; }

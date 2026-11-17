@@ -61,7 +61,9 @@
                   synes uten å dra tabellen sidelengs (avgjørelsen 17.10 om
                   tabellen på smal skjerm). Den er skjult på bred skjerm, og for
                   skjermleseren, som har kolonnene. #}
-              <span class="smal-signal" aria-hidden="true">{% if rad.styrke is not none %}{{ rad.styrke }} av {{ antall_sjekker }} · <span class="{{ rad.retning.klasse }}">{{ rad.retning.symbol }} {{ rad.retning.tekst }}</span>{% else %}– {{ rad.tekst }}{% endif %}</span>
+              {#- Gjennomgangen av 9.18 (ECH1): merket «i ettertid» står også her,
+                  likt overalt der en tidligere dag vises med signal (2.17). #}
+              <span class="smal-signal" aria-hidden="true">{% if rad.styrke is not none %}{{ rad.styrke }} av {{ antall_sjekker }} · <span class="{{ rad.retning.klasse }}">{{ rad.retning.symbol }} {{ rad.retning.tekst }}</span>{% if rad.ettertid %} · i ettertid{% endif %}{% else %}– {{ rad.tekst }}{% endif %}</span>
               {% if rad.aksje.symbol in eget %}<span class="hentet">hentet {{ rad.sist_hentet|norsk_tid }}</span>{% endif %}
               {#- Gruppens svar 03.11 kl. 14:28 (story 8.17b): en rad med eldre
                   dag enn sidens viser datoen sin. Ikke for «Velg dag», der
