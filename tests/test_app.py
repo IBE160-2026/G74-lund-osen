@@ -2010,7 +2010,11 @@ class TestStory80e:
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
         # Story 8.2a, b: og de 13 aksjene uten kurser (gjennomgangen 24.10, BH4).
-        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten kurser"]
+        # Story 9.18 (HE9): ett tall per gruppe, skilt med «·».
+        assert _tabell(html).ekstra["bak"] == [
+            "signalstyrke 3 eller mer",
+            "1 med signalstyrke 0 til 2 · 13 uten kurser",
+        ]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
@@ -2069,16 +2073,27 @@ class TestStory80e:
         # Story 8.2a, b (U23): de 12 aksjene uten kurser har en rad i båndet
         # og telles med. Gjennomgangen 24.10 (BH4): «uten data» for seg.
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        # Story 9.18 (HE9, gruppens svar 17.11 kl. 13:03–13:33): ett tall per
+        # gruppe, skilt med «·», og pillen er fortsatt summen.
         assert tabell.ekstra["bak"] == [
             "signalstyrke 2 eller mer",
-            "signalstyrke 0 eller 1 og 1 uten signal og 12 uten kurser",
+            "1 med signalstyrke 0 eller 1 · 1 uten signal · 12 uten kurser",
         ]
         assert tabell.ekstra["antall"] == ["1", "14"]
         _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         # Gjennomgangen 24.10 (VG4): MOWI går fra uten data til uten signal.
-        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal og 11 uten kurser"
+        assert tabell.ekstra["bak"][1] == "1 med signalstyrke 0 eller 1 · 2 uten signal · 11 uten kurser"
         assert tabell.ekstra["antall"] == ["1", "14"] and len(tabell.uten_data) == 11
+
+    def test_oevrige_uten_en_gruppe_nevner_den_ikke(self, klient):
+        """Story 9.18 (HE9): ville feilet hvis en gruppe uten aksjer sto med 0,
+        eller teksten begynte med «·»."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        assert tabell.ekstra["bak"][1] == "1 uten signal · 13 uten kurser"
+        assert tabell.ekstra["antall"] == ["1", "14"]
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)

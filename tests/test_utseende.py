@@ -746,11 +746,17 @@ class TestOversikten:
         )
         # Story 8.0d, PR 3: «og N uten signal» når rader uten signal står der.
         # Story 8.2a, b (gjennomgangen 24.10, BH4): «og N uten data» for seg.
+        # Story 9.18 (HE9, gruppens svar 17.11 kl. 13:03–13:33): ett tall per
+        # gruppe, skilt med «·», og pillen er summen.
         uten_data = html.count('<span class="merke mangler">ingen kurser ennå</span>')
         uten = html.count('<span class="merke mangler">') - uten_data
-        assert oevrige and oevrige.group(1) == "signalstyrke 0 eller 1" + (
-            f" og {uten} uten signal" if uten else ""
-        ) + (f" og {uten_data} uten kurser" if uten_data else "")
+        alle = int(re.search(r'Øvrige aksjer <span class="antall">(\d+)</span>', html).group(1))
+        grupper = [
+            f"{alle - uten - uten_data} med signalstyrke 0 eller 1",
+            f"{uten} uten signal",
+            f"{uten_data} uten kurser",
+        ]
+        assert oevrige and oevrige.group(1) == " · ".join(g for g in grupper if not g.startswith("0 "))
         stil = _stil(html)
         assert "var(--brun)" in _regel(stil, "tr.del.ut .antall")
         skjult = _regel(stil, ".merke.skjult")

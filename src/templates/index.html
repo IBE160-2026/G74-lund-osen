@@ -354,7 +354,15 @@
           (8.26, tillegg 2: var «uten data»). #}
       {% if not er_sortert and (oevrige or mangler) %}
       <tbody>
-        {% if foerste_del %}<tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length + mangler|length }}</span> <span class="bak">signalstyrke 0{% if parametre.terskel == 2 %} eller 1{% elif parametre.terskel > 2 %} til {{ parametre.terskel - 1 }}{% endif %}{% set uten_signal = oevrige|selectattr("styrke", "none")|list|length %}{% if uten_signal %} og {{ uten_signal }} uten signal{% endif %}{% set antall_venter = mangler|selectattr("venter")|list|length %}{% if mangler|length > antall_venter %} og {{ mangler|length - antall_venter }} uten kurser{% endif %}{% if antall_venter %} og {{ antall_venter }} venter på henting{% endif %}</span></th></tr>{% endif %}
+        {#- Story 9.18 (HE9, gruppens svar 17.11 kl. 13:03–13:33): ett tall per
+            gruppe, skilt med «·», og pillen er summen. En gruppe uten aksjer
+            står ikke. #}
+        {% if foerste_del %}{% set uten_signal = oevrige|selectattr("styrke", "none")|list|length %}{% set antall_venter = mangler|selectattr("venter")|list|length %}{% set grupper = [] %}
+        {%- if oevrige|length > uten_signal %}{% set _ = grupper.append((oevrige|length - uten_signal)|string ~ " med signalstyrke 0" ~ (" eller 1" if parametre.terskel == 2 else " til " ~ (parametre.terskel - 1) if parametre.terskel > 2 else "")) %}{% endif %}
+        {%- if uten_signal %}{% set _ = grupper.append(uten_signal|string ~ " uten signal") %}{% endif %}
+        {%- if mangler|length > antall_venter %}{% set _ = grupper.append((mangler|length - antall_venter)|string ~ " uten kurser") %}{% endif %}
+        {%- if antall_venter %}{% set _ = grupper.append(antall_venter|string ~ " venter på henting") %}{% endif %}
+        <tr class="del oevrige"><th colspan="5" scope="rowgroup">Øvrige aksjer <span class="antall">{{ oevrige|length + mangler|length }}</span> <span class="bak">{{ grupper|join(" · ") }}</span></th></tr>{% endif %}
         {% for rad in oevrige %}{{ tabellrad(rad) }}{% endfor %}
         {% for rad in mangler %}{{ tabellrad(rad) }}{% endfor %}
       </tbody>
