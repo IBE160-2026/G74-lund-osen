@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T22:34
+updated: 2026-11-17T22:35
 ---
 
 # PRD — OSE Signal
@@ -1408,18 +1408,32 @@ fra modellen:
    Ordet «resultat» står ikke i lista, fordi det i prøven viste til sjekkene. En
    forklaring av regelen selv er lov, som «fordi ingen sjekk ga utslag».
    Grunnlaget har ingen årsaker, så en årsak i teksten er alltid gjettet.
+5. **Målingen.** Sier teksten hva en sjekk målte, skal det stemme med fortegnet
+   for sjekken i grunnlaget. «Kursen ligger over snittet» er lov bare med trend
+   +1. «Kursen falt mer i dag enn den vanligvis svinger» er lov bare med
+   bevegelse -1. «Det ble ikke handlet mye mer enn vanlig» er lov bare med
+   interesse 0, og «på en dag kursen steg» bare med interesse +1. Det samme
+   gjelder de andre formene kontrollen kjenner for hver sjekk: under eller nær
+   snittet, steg mer enn vanlig, dagens endring stor eller liten, og handlet mer
+   enn vanlig på en dag kursen falt. Et «ikke» snur utsagnet.
 
 En tekst som ikke består, vises ikke, men logges med grunnen (FR-604). Siden
 sier da at dagen er uten KI-tekst (FR-601).
 
-**Kontrollen er grov.** Den fanger feil tall, feil retning og ord, men ikke en
-misvisende tekst med riktige tall. Hvordan det kunne oppdages, er et åpent
-refleksjonsspørsmål (§8).
+**Kontrollen er grov.** Den fanger feil tall, feil retning eller styrke, ord fra
+rådlista og gjetningslista, og ord om målingen som strider mot fortegnet. Den
+fanger ikke en misvisende tekst der tallene og ordene er riktige, og ikke noe
+som står utenfor listene og formene den kjenner: en formulering kontrollen ikke
+kjenner, slipper gjennom. Hvordan en misvisende tekst kunne oppdages, er åpent
+punkt 27 i §8.
 
 *Konsekvenser:*
 - Hvert ord i rådlista og gjetningslista stopper en tekst som ellers ville bestått.
 - «Retningen er positiv» stoppes når grunnlaget sier blandet.
 - «4,2 %» og «femti prosent» stoppes.
+- «Det ble ikke handlet mer enn vanlig, fordi interessen ga et negativt utslag» stoppes når interesse er -1. Den besto før kontrollen leste målingen.
+- «Kursen ligger over snittet» består med trend +1 og stoppes med trend 0 eller -1.
+- «Kursen steg mer i dag enn den vanligvis svinger» stoppes med bevegelse -1.
 - En tekst som stoppes, har en rad i loggen med grunnen og vises ikke.
 
 #### FR-604 — Logging av KI-bidraget, fra første kjøring

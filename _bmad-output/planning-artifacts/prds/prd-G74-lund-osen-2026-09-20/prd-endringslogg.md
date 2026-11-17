@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T22:34
+updated: 2026-11-17T22:35
 ---
 
 # Endringslogg for PRD-en
@@ -1676,3 +1676,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* fire nye krav med nye ID-er i sine avsnitt, hver med konsekvenser og en rad i tabellen i §2 (V1 i valideringen): FR-112 «Din egen liste» i §4.1, FR-208 notatene med «Etterpå» og FR-209 tenkte kjøp og salg ved et notat i §4.2, og FR-415 «Følg en aksje» med stjernen og «Dine egne aksjer» i §4.4, ved siden av FR-412. Alle fire er ekstra og bygget, lest i malene, `src/app.py`, `src/valg.py`, `src/notater.py`, `src/etterpaa.py` og testene 17.11. Et tenkt salg uten et tenkt kjøp først står som senere i FR-209 og i tabellen. UJ-2 viser til FR-208 og FR-209, og SM-10 har de samme kravene som UJ-2. Ingen ID er endret. Det som sto i §2: «Uten eget FR, men ekstra og bygget: egne notater på aksjesiden med tenkte kjøp og salg, «Følg en aksje» og «Din egen liste». De står i `epics.md`.» I UJ-2 sto: «Notatene med «Etterpå» og de tenkte kjøpene har ikke eget FR (§2).» SM-10 viste til FR-110, FR-111 og FR-203.
 
 *Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* FR-407 står i §4.4, mellom FR-406 og FR-408, med samme overskrift og samme anker (V6 i valideringen). Innledningen til §4 sier at første siffer i ID-en er avsnittet, hvorfor §4 ikke har 4.3 og 4.5, og at FR-404, FR-405 og A-variantene bare står i vedlegg A. Kravteksten i FR-407 er ikke endret. Innledningen sto slik: «Rekkefølgen følger kravnumrene: grensesnittet først, så data og beregning. FR-407 står i 4.1, fordi det hører til visningen. ID-en er beholdt. Plan A står i vedlegg A.»
+
+*Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* FR-603 har fått punkt 5, «Målingen»: ordene om hva en sjekk målte, skal stemme med fortegnet for sjekken, slik kontrollen har lest dem siden del F i story 10.9 (`_maalingene` i `src/ki_kontroll.py`, `TestMaalingen` i `tests/test_ki_teksten_forklarer.py`). Konsekvensene har eksemplet fra prøven av demotekstene 07.11 (`malinger.md` §56), «Det ble ikke handlet mer enn vanlig, fordi interessen ga et negativt utslag», som besto før det (V2 i valideringen). «Kontrollen er grov» sier nå nøyaktig hva som fanges og ikke. Setningen sto slik: «**Kontrollen er grov.** Den fanger feil tall, feil retning og ord, men ikke en misvisende tekst med riktige tall. Hvordan det kunne oppdages, er et åpent refleksjonsspørsmål (§8).»
