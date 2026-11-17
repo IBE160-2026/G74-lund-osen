@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-17T11:11
+updated: 2026-11-17T13:14
 ---
 
 # Kvalitetssikring
@@ -446,6 +446,7 @@ sist i dokumentet.
 | 9.14 Kontrollrunden etter v1.1: svaret 15.11 kl. 23:36 og svarene 16.11 kl. 09:51; hele settet i CI (run 43850770160) | `19d37f8` (#160) | 0 | – bare dokumenter og avtrykkene i én test, og instruksjonen ba ikke om mutant | `S/spec-9-14-kontrollrunden-etter-v1-1.md` |
 | 2.18 Setningen om KI-teksten for en dag i ettertid bare med KI på: svarene 16.11 kl. 09:51 og 11:20; hele settet i CI (run 43858445935) | `05bc46e` (#161) | 1 (1, malen før rettingen) | ingen overlevde | `S/spec-2-18-ki-setningen-i-ettertid.md` |
 | 9.15 Meldingene etter v1.1 og det som ikke brukes: svarene 16.11 kl. 15:39 og 18:51; hele settet i CI (run 44060835062) | `9fea9fc` (#162) | 1 (1, koden før rettingen) | ingen overlevde | `S/spec-9-15-meldingene-og-det-som-ikke-brukes.md` |
+| 9.16 Flere brukerreiser i PRD-en: svarene 16.11 kl. 20:22 og 17.11 kl. 12:32 og 12:39; hele settet i CI (run 44080174325) | `7d4a331` (#163) | 1 (1, sjekkortene med KI på) | ingen overlevde | `S/spec-9-16-flere-brukerreiser.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -749,6 +750,7 @@ funn. Antall rader i loggen:
 | 9.14, gjennomgangen 16.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; VG1 høy, VG2 og ECH3 middels og de 11 lave rettet i `aec37c87` og `e3bfab0b`) | 14 | 14 | 0 | 0 |
 | 2.18, gjennomgangen 16.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; 9 lave, 8 rettet i `cb21c7d2`, BH3 står med grunn i spesifikasjonen, talt som avvist) | 9 | 8 | 1 | 0 |
 | 9.15, gjennomgangen 16.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 middels og fem lave rettet i `d2f3f5e3` og `82f97c58`; ECH3 og VG4 står med grunn, og BH1 middels står etter gruppens svar 16.11 kl. 18:51, talt som avvist) | 9 | 6 | 3 | 0 |
+| 9.16, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1–ECH3, VG1 og VG2 middels og tolv lave rettet, BH1 middels besvart 17.11 kl. 12:32 med SM-10 og SM-11, talt som rettet; sju lave står med grunn, talt som avvist) | 24 | 17 | 7 | 0 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1630,6 +1632,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.13, tillegg 3 | M1 og M2 på `8fe6b3cd`, med `tests/test_kvalitetssikring.py` | M1 (et testnavn i matrisen som ikke finnes) `test_hver_test_dokumentene_nevner_finnes`; M2 (spesifikasjonen for 9.13 satt til done uten rad) `test_hver_ferdige_spesifikasjon_har_en_rad`, i §3 og §5. Begge filene var like HEAD etterpå, målt med sha256 | `S/spec-9-13-dokumentrunden-etter-v1-1.md` |
 | 2.18, svaret 16.11 kl. 09:51 | 1: malen før rettingen, `{% if detalj.ettertid %}` på `5bf104fd`, med den nye testen | fanget av `test_med_ki_av_ingen_melding_om_ki_for_dagen` i `tests/test_ettertid_2_17.py`, i begge versjonene | `S/spec-2-18-ki-setningen-i-ettertid.md` |
 | 9.15, svaret 16.11 kl. 15:39 | 1: koden før rettingen, meldingene i `src/fetch_prices.py` og docstringen i `src/tilstand.py` på `c2adf7f5`, med de nye testene | fanget av `test_d1_stoppet_ved_midnatt_sier_at_dagen_faar_signalet_i_ettertid`, `test_d2_kan_skrives_til_gjelder_kveldsraden`, `test_d3_tilstand_sier_ikke_at_hullet_er_endelig` og `test_d4_les_inn_sier_at_dagene_faar_signalet_ved_neste_henting` i `tests/test_meldingene_9_15.py`, og D5 og D6 av `test_d5_minnenotatlager_med_kjoep_er_tatt_bort` og `test_d6_retningene_er_tatt_bort` | `S/spec-9-15-meldingene-og-det-som-ikke-brukes.md` |
+| 9.16, gjennomgangen 17.11 (VG1) | 1: et ekstra element i `sjekkort-rad` bare med KI på, i `aksje.html` på `32885761` | fanget av `test_sjekkortene_er_like_med_ki_av_og_paa` i `tests/test_ki_visning.py`; malen ble satt tilbake | `S/spec-9-16-flere-brukerreiser.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |

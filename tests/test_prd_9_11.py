@@ -266,6 +266,16 @@ def test_brukerreisen_og_ordlista():
     assert 8 <= len(rader) <= 10, len(rader)
 
 
+@pytest.mark.parametrize("n", [1, 2, 3])
+def test_brukerreisene_har_samme_form(n):
+    """Story 9.16 (VG9 i gjennomgangen): UJ-2 og UJ-3 har samme form som
+    UJ-1: personen, Climax, Edge, kravene og suksessmålet. Ville feilet hvis
+    en av dem manglet en av delene."""
+    uj = _prd().split(f"### Brukerreisen UJ-{n}\n", 1)[1].split("\n### ", 1)[0]
+    assert f"**UJ-{n}." in uj and "*Climax:*" in uj and "*Edge:*" in uj
+    assert f"Kravene UJ-{n} hviler på: FR-" in uj and "Suksessmålet SM-" in uj
+
+
 def test_endringsloggen_har_like_mange_linjer_som_taggen():
     """Ingenting går tapt: hver «Rettet» og «Lagt til» i taggen står i
     endringsloggen. Ville feilet hvis en linje falt ut, eller en ble skrevet

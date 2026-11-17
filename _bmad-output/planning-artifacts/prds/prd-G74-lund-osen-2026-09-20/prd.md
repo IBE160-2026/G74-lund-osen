@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-16T15:42
+updated: 2026-11-17T12:39
 ---
 
 # PRD — OSE Signal
@@ -113,6 +113,53 @@ på står en kort tekst under sjekkene, som sier det samme i hele setninger.
 
 Kravene UJ-1 hviler på: FR-101, FR-102, FR-109, FR-201, FR-202, FR-401, FR-402,
 FR-602, FR-706 og NFR-03. Suksessmålet SM-1 måler reisen.
+
+### Brukerreisen UJ-2
+
+**UJ-2. Sindre** har merket tre aksjer med stjernen og ser innom appen et par
+kvelder i uka. Han åpner «Min liste». Overskriften sier hvor mange av de merkede
+som skilte seg ut siste børsdag. Nederst, under «Mine notater», står alle
+notatene hans, det nyeste først, med navnet på aksjen som lenke. Under hvert
+notat står «Etterpå»: hva aksjen og hovedindeksen gjorde fra notatdagen til
+siste dag med kurs, og signalet begge dagene. Ved et tenkt kjøp som er solgt, og
+der sluttkursen etter salget er hentet, står salgsdagen, sjekkene da salget ble
+notert, og hva aksjen og hovedindeksen gjorde fra kjøpet til salget. Han trykker
+på navnet og skriver et nytt notat på aksjesiden. På en bred skjerm viser
+knappen «Mine notater» øverst de samme notatene i et panel ved siden av siden.
+
+- *Climax:* han ser hva som skjedde etter et notat, med tallene, og appen sier
+  ikke om han hadde rett.
+- *Edge:* notatet er fra siste dag med kurs, og «Etterpå» sier at det ikke er
+  børsdager med kurs etter notatdagen ennå. Med «Vis notater» av er notatene
+  borte fra sidene, men ingenting er slettet.
+
+Kravene UJ-2 hviler på: FR-110, FR-111, FR-203 og NFR-06. Notatene med
+«Etterpå» og de tenkte kjøpene har ikke eget FR (§2). Suksessmålet SM-10 måler
+reisen.
+
+### Brukerreisen UJ-3
+
+**UJ-3. Ingrid** vil vite hva KI-teksten tilfører før hun stoler på den. Hun
+åpner en aksje med 3 av 3. Under «Hvorfor signalet ble 3» står de tre sjekkene
+med verdiene og målingene. Lenger ned, i rammen «Signalet forklart», står
+appens setninger om dagene, og under dem KI-teksten, merket «Laget av KI» og
+med modellen. Hun slår «Vis KI-tekst» av ved teksten. Sjekkene står som før. I
+rammen står bryteren, appens setninger og linja om at signalet bygger bare på
+kurs og volum i sjekkene, ikke på KI-teksten. I Innstillinger viser «Vis
+KI-tekst» også «Av». På oversikten står bryteren og én linje om at KI-teksten
+er slått av, under «Børsdagen kort fortalt». Hun slår KI-teksten på igjen ved
+teksten på aksjesiden, og den står der igjen.
+
+- *Climax:* hun ser at KI-teksten ikke endrer signalet, fordi sjekkene er de
+  samme med KI-teksten av og på.
+- *Edge:* i den ekte versjonen har maskinen ingen språkmodell. For siste
+  børsdag, når ingen aksje har KI-tekst for dagen, sier oversikten med
+  KI-teksten på at dagen er uten KI-tekst, og at den lages når kursene hentes,
+  på en maskin med en språkmodell, med lenken «Slik slår du den på». På
+  aksjesiden står sjekkene som før.
+
+Kravene UJ-3 hviler på: FR-110, FR-203, FR-601, FR-602, FR-607 og FR-706.
+Suksessmålet SM-11 måler reisen.
 
 ### Ordliste
 
@@ -1603,6 +1650,8 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 | SM-7 | Riktige beregninger | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består, og en kontroll for hånd stemmer med appen (`malinger.md` §6) | Ved hver testkjøring | FR-701, FR-702, FR-703, FR-704, NFR-08 |
 | SM-8 | KI-forklaringen | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og hver tekst er logget | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen | FR-601, FR-602, FR-603, FR-604, FR-605, FR-607, NFR-04 |
 | SM-9 | Kjørbar for andre | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler. Demoen virker uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin | Senest én uke før innleveringen | FR-411, FR-608, NFR-01 |
+| SM-10 | Notatene etterpå | En person utenfor gruppen finner et notat i Min liste og sier hva aksjen og hovedindeksen har gjort siden | Minst 1 person, uten hjelp | I brukertest 2 | FR-110, FR-111, FR-203 |
+| SM-11 | KI-teksten av og på | En person utenfor gruppen slår på KI-teksten og sier om signalet og sjekkene er de samme som før | Minst 1 person, og svaret er ja | I brukertest 2 | FR-601, FR-602, FR-706 |
 
 **Hovedflyten** er: åpne markedsoversikten, se hvilke aksjer som skiller seg ut,
 åpne én av dem, og lese hvorfor. Forklaringen er de tre sjekkene med målingene,
@@ -1626,6 +1675,8 @@ beskriver.
   (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet
   14.11, før prøven. Etter svaret 15.11 kl. 05:20 står 3.4 i review og blir
   done når README-prøven er tatt og ført.
+- SM-10 og SM-11 måles i brukertest 2, med oppgave G og et ekstra spørsmål i
+  oppgave B (`docs/brukertest.md`).
 - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
 
 **Drift: hva målet ga opp.** Målet sa først «ingen manuelle steg», og det målte
