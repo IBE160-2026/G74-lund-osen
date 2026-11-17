@@ -77,6 +77,19 @@ class TestSiden:
         )
         assert "Valgene gjelder alle sidene og lagres på denne maskinen." in side
 
+    def test_teksten_og_steget_sier_at_av_ogsaa_skjuler_omvisningen(self, klient):
+        """Story 9.18 (HE5, gruppens svar 17.11 kl. 13:03–13:33): ville feilet
+        hvis teksten under «Vis hjelp» eller steget i omvisningen bare nevnte
+        forklaringene, når av også tar bort knappene for omvisningen."""
+        from hjelpetekster import rundturer
+
+        setningen = "Av skjuler også «Vis meg rundt» og «Spill av omvisningen»."
+        side = klient.get("/innstillinger").data.decode("utf-8")
+        valget = side.split('id="hjelp-valget"', 1)[1].split("</div>", 1)[0]
+        assert f"og uten KI. {setningen}</p>" in valget
+        (steget,) = [s for s in rundturer()["innstillinger"] if s.anker == "hjelp-valget"]
+        assert steget.tekst == f"Slår spørsmålstegnene ved overskriftene av og på. {setningen}"
+
     def test_vis_hjelp_av_tar_bort_hjelpen_paa_alle_sidene(self, klient):
         """Ville feilet hvis en side viste «?» med hjelpen av, eller valget
         gjaldt bare én side."""

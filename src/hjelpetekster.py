@@ -1038,7 +1038,12 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
         ),
         "innstillinger": (
             Steg("innstillinger-tittel", "Innstillinger", "Valgene her gjelder alle sidene og huskes på maskinen."),
-            Steg("hjelp-valget", "Hjelp", "Slår spørsmålstegnene ved overskriftene av og på."),
+            # Story 9.18 (HE5): av tar også bort knappene for omvisningen.
+            Steg(
+                "hjelp-valget",
+                "Hjelp",
+                "Slår spørsmålstegnene ved overskriftene av og på. Av skjuler også «Vis meg rundt» og «Spill av omvisningen».",
+            ),
             Steg("ki-valget", "KI-tekst", "Slår tekstene skrevet av KI av og på."),
         ),
         "folg": (

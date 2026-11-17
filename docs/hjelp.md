@@ -221,7 +221,7 @@ I raden øverst, etter «Innstillinger», står knappene «Vis meg rundt» og «
 
 ### Hva er «Innstillinger»?
 
-Knappen «Innstillinger» står øverst på alle sidene, etter «Min liste». Der slår du «Vis hjelp» av og på: hjelpen er de faste forklaringene bak «?», som vi har skrevet og sjekket, om hva tallene, bokstavene og fargene betyr. Med hjelpen av står ingen «?» på noen side. Et nytt trykk på samme «?» lukker hjelpen. Bryterne i Innstillinger er oransje når de er på. Der slår du også «Vis KI-tekst» av og på. Det er det samme valget som bryteren ved hver KI-tekst, så de viser alltid det samme, og et trykk på det ene stedet endrer det andre. Valgene gjelder alle sidene og lagres på denne maskinen, i basen, så de huskes neste gang. Det er ingen innlogging. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter.
+Knappen «Innstillinger» står øverst på alle sidene, etter «Min liste». Der slår du «Vis hjelp» av og på: hjelpen er de faste forklaringene bak «?», som vi har skrevet og sjekket, om hva tallene, bokstavene og fargene betyr. Med hjelpen av står ingen «?» på noen side, og heller ikke «Vis meg rundt» og «Spill av omvisningen», og teksten under bryteren sier det. Et nytt trykk på samme «?» lukker hjelpen. Bryterne i Innstillinger er oransje når de er på. Der slår du også «Vis KI-tekst» av og på. Det er det samme valget som bryteren ved hver KI-tekst, så de viser alltid det samme, og et trykk på det ene stedet endrer det andre. Valgene gjelder alle sidene og lagres på denne maskinen, i basen, så de huskes neste gang. Det er ingen innlogging. I demoen lagres de i demobasen, som lages på nytt hver gang demoen starter.
 
 ### Hva er «Mine notater»?
 
