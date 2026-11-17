@@ -921,9 +921,12 @@ class _Tabell(HTMLParser):
     Story 8.2a, b (U23): hver aksje i lista har en rad, ogsaa de i
     migrasjonen som testen ikke gir kurser. Radene «uten data» staar i
     uten_data og ikke i rader, saa testene gjelder radene med kurs, som foer.
-    Raden uten data proeves i TestStory82aRadUtenData og test_demoproeven.py."""
+    Raden uten data proeves i TestStory82aRadUtenData og test_demoproeven.py.
 
-    EKSTRA = ("linje", "antall", "bak", "under", "stjerne")
+    Story 9.18 (HE3): styrken og retningen under navnet, som bare vises paa
+    smal skjerm, staar ogsaa i ekstra, saa cellen fortsatt er navnet."""
+
+    EKSTRA = ("linje", "antall", "bak", "under", "stjerne", "smal-signal")
 
     def __init__(self):
         super().__init__()
