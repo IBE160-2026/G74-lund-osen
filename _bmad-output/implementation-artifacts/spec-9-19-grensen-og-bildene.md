@@ -150,6 +150,15 @@ Et spørsmål stopper ikke arbeidet.
    bruddene i den ekte versjonen selv i kveld, med vinduet gjort smalere, og
    resultatet kommer som en egen beskjed. Vinduet starter ikke den ekte
    versjonen.
+   *Målt og svart 2026-11-17 kl. 22:50 (beskjeden fra rådet):* rådet målte i
+   den ekte versjonen kl. 22:34–22:45, med boksen rundt tabellen satt til
+   480–800 px. Med ekte data er tabellen minst 717,5 px, mot 709 i demoen.
+   På forsiden (18 rader) og i Min liste (13 rader) mangler styrken eller
+   retningen ikke i noen bredde. Styrken står dobbelt når boksen er 569–572
+   px (vinduet ca. 603–606 px), og retningen når boksen er 674–708 px
+   (vinduet ca. 708–742 px). Full bredde og 390 px er riktige. Gruppens svar
+   kl. 22:50: mobil er ikke viktig nå, de to spennene godtas for v1, og
+   ingen kode endres.
 
 ## Grenser
 

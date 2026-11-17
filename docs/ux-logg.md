@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-17T20:07
+updated: 2026-11-17T23:15
 ---
 
 # UX-loggen
@@ -766,6 +766,7 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 | U129 | 17.11 kl. 13:11, gruppen (evaluerer nr. 2) | Omvisningen | Boksen bytter hjørne, og bredden følger teksten, så «Neste» flytter seg (HE16, H4 og H5, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE16 | Fast bredde før brukertest 2; plasseringen etter testen (svaret kl. 13:13) |
 | U130 | 17.11 kl. 13:11, gruppen (evaluerer nr. 2) | Omvisningen | Notatene er ikke forklart i omvisningen (HE17, H10, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE17 | Før brukertest 2: ett steg ved notatfeltet og ett i Min liste |
 | U131 | 17.11 kl. 13:32, gruppen (evaluerer nr. 2) | Omvisningen | Omvisningen blar alltid, også når det merkede synes, og ved «Oppdatert …» forsvinner stripa (HE18, H1 og H3, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE18 | Før brukertest 2: bla bare når det merkede ikke synes |
+| U132 | 17.11 kl. 22:34–22:45, rådet (måling i den ekte versjonen) | Tabellen på smal skjerm | Med ekte data er tabellen minst 717,5 px. Styrken står dobbelt når boksen er 569–572 px, og retningen når den er 674–708 px. Ingenting mangler, og full bredde og 390 px er riktige (lav). | Beskjeden fra rådet kl. 22:50, spørsmål 2 i [`spec-9-19-…`](../_bmad-output/implementation-artifacts/spec-9-19-grensen-og-bildene.md) | Godtatt for v1, ingen kode endres (gruppens svar kl. 22:50) |
 
 *Lagt til 2026-11-17 (gruppens svar kl. 13:03–13:13, rådet anbefalte det):* «Tas i» for U114–U126 er avgjort: U115 og U116 (HE2 og HE3) og U118, U121, U122 og U123 (HE5, HE8, HE9 og HE10) rettes før brukertest 2 i en egen story. U114 (HE1) blir først et spørsmål i brukertest 2. U117, U119, U120, U124, U125 og U126 venter til etter testen. U127–U130 er funnet av gruppen selv i den ekte versjonen, som evaluerer nr. 2.
 
