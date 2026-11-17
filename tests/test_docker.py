@@ -884,7 +884,10 @@ class TestReadme:
             [
                 SKJERMBILDET,
                 AKSJESIDEBILDET,
-                *DE_NYE_BILDENE,
+                # Story 9.19 (gruppens svar 17.11 kl. 18:26): bildene ved 390 px vises
+                # ikke lenger i README-en. De ligger i docs/appen/mobil/, som linja
+                # lenker til (test_mobillinja_lenker_til_mappa_med_bildene_ved_390_px).
+                *(sti for sti in DE_NYE_BILDENE if sti not in BILDENE_PAA_MOBIL),
             ]
         )
         for alt, sti in andre:
@@ -2013,8 +2016,13 @@ BILDENE_I_KNAPPEN = (
 # samme rekkefølge, med setningen om mobil først (spørsmål 2 og 3).
 MOBILMAPPA = "docs/appen/mobil/"
 MOBILKNAPPEN = "Bilder av appen på mobil (demoen)"
-MOBILSETNINGEN = (
-    "Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (127.0.0.1), så mobil kommer senere."
+# Story 9.19 (gruppens svar 17.11 kl. 18:26): knappen med bildene ved 390 px er tatt
+# bort, og én linje rett etter knappen med bildene lenker til mappa, med gruppens ord
+# «mobil kanskje kommer senere». Bildene står i mappa og i «Mappestruktur».
+MOBILLINJEN = (
+    "Bildene fra smal skjerm, 390 px bred som på en mobil, ligger i "
+    f"[`{MOBILMAPPA}`]({MOBILMAPPA}). I v1 svarer appen bare på denne maskinen (127.0.0.1), "
+    "så mobil kanskje kommer senere."
 )
 BILDENE_PAA_MOBIL = (
     "docs/appen/mobil/oversikten-390-demo.png",
@@ -2361,14 +2369,6 @@ def _knappen_med_bildene() -> str:
     return deler[1].split("</details>", 1)[0]
 
 
-def _mobilknappen() -> str:
-    """Story 3.3k: innholdet i knappen «Bilder av appen på mobil (demoen)»."""
-    tekst = README.read_text(encoding="utf-8")
-    deler = tekst.split(f"<summary>{MOBILKNAPPEN}</summary>\n", 1)
-    assert len(deler) == 2, f"knappen «{MOBILKNAPPEN}» mangler"
-    return deler[1].split("</details>", 1)[0]
-
-
 def _bildene(del_: str) -> list[tuple[str, str, str]]:
     """(alt-teksten, stien, teksten under) for hvert bilde i del_."""
     return re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", del_, re.MULTILINE)
@@ -2396,8 +2396,10 @@ class TestBildeneAvAppen:
         # Story 3.3k: knappen med bildene ved 390 px står rett etter, og så «Innhold».
         # Ville feilet hvis den sto et annet sted, eller «Innhold» kom mellom dem.
         etter = etter.split("</details>\n\n", 1)[1]
-        assert etter.startswith(f"<details>\n<summary>{MOBILKNAPPEN}</summary>\n\n"), etter[:80]
-        assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): linja om mappa med bildene ved
+        # 390 px står rett etter knappen, i stedet for en knapp til, og så «Innhold».
+        # Ville feilet med knappen igjen, uten linja, eller med linja et annet sted.
+        assert etter.startswith(MOBILLINJEN + "\n\n**Innhold:** "), etter[:200]
         # Lukket som de andre knappene: ingen <details> i README-en er åpen.
         # Story 3.5i: heller ikke i docs/installasjon.md, der pilene står.
         for del_ in (tekst, _installasjonen()):
@@ -2437,7 +2439,10 @@ class TestBildeneAvAppen:
         # Gruppens svar 05.11 kl. 12:14: toppen av oversikten står over knappen.
         tekst = tekst.replace(f"]({TOPPEN_AV_OVERSIKTEN})", "", 1)
         # Story 3.3k: og knappen med bildene ved 390 px.
-        uten_knappen = tekst.replace(_knappen_med_bildene(), "").replace(_mobilknappen(), "")
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): knappen er borte, og linja lenker
+        # bare til mappa, ikke til et bilde.
+        assert tekst.count(MOBILLINJEN) == 1
+        uten_knappen = tekst.replace(_knappen_med_bildene(), "").replace(MOBILLINJEN, "")
         assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
         assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
         # Story 3.5i: heller ikke i docs/installasjon.md.
@@ -2463,31 +2468,26 @@ class TestBildeneAvAppen:
         assert all(DE_NYE_BILDENE[sti][1] == 390 for sti in BILDENE_PAA_MOBIL)
         assert all(v[1] == 1280 for sti, v in DE_NYE_BILDENE.items() if sti not in BILDENE_PAA_MOBIL)
 
-    def test_mobilknappen_har_setningen_og_bildene_ved_390_px_i_samme_rekkefoelge(self):
-        """Story 3.3k (svaret 12.11 kl. 17:09, spørsmål 2 og 3): bildene ved 390 px står
-        i en egen knapp, med setningen om mobil først og bildene i samme rekkefølge som i
-        den første knappen. Ville feilet uten setningen, med et bilde i en annen
-        rekkefølge enn sidene i den første knappen, uten alt-tekst eller teksten under,
-        eller med andre ord enn setningen og bildene."""
-        knappen = _mobilknappen()
-        assert knappen.startswith("\n" + MOBILSETNINGEN + "\n\n"), knappen[:200]
-        bilder = _bildene(knappen)
-        assert [sti for _, sti, _ in bilder] == list(BILDENE_PAA_MOBIL)
-        # Samme rekkefølge som i den første knappen: hvert bilde ved 390 px har et
-        # tilsvarende bilde ved 1280 px med samme navn uten «-390».
-        tilsvarende = [f"docs/appen/{sti.rsplit('/', 1)[1].replace('-390', '')}" for sti in BILDENE_PAA_MOBIL]
-        # Gjennomgangen (ECH4): hvert bilde ved 390 px har sitt bilde ved 1280 px i den
-        # første knappen, så plassen sjekkes for alle.
-        assert all(s in BILDENE_I_KNAPPEN for s in tilsvarende), tilsvarende
-        plass = [BILDENE_I_KNAPPEN.index(s) for s in tilsvarende]
-        assert plass == sorted(plass), plass
-        for alt, sti, under in bilder:
+    def test_mobillinja_lenker_til_mappa_med_bildene_ved_390_px(self):
+        """Story 3.3k (svaret 12.11 kl. 17:09, spørsmål 2 og 3) la bildene ved 390 px i
+        en egen knapp. Story 9.19 (gruppens svar 17.11 kl. 18:26): knappen er tatt bort,
+        og én linje lenker til mappa og sier at mobil kanskje kommer senere. Mappa står,
+        med de samme bildene, og hvert av dem har sitt bilde ved 1280 px i knappen.
+        Ville feilet uten linja, med knappen eller et bilde ved 390 px igjen i
+        README-en utenfor «Mappestruktur», eller uten mappa eller et av bildene."""
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.count(MOBILLINJEN) == 1
+        assert "mobil kanskje kommer senere" in MOBILLINJEN
+        assert MOBILKNAPPEN not in tekst
+        foer_mappestrukturen = tekst.split("\n## Mappestruktur\n", 1)[0]
+        assert re.findall(r"\]\((docs/appen/mobil/[^)]*)\)", foer_mappestrukturen) == [MOBILMAPPA]
+        assert (ROT / MOBILMAPPA).is_dir()
+        for sti in BILDENE_PAA_MOBIL:
             assert sti.startswith(MOBILMAPPA) and (ROT / sti).is_file(), sti
-            assert "i demoen på en mobil, 390 px bred" in alt and "ikke data fra Oslo Børs" in alt, alt
-            assert under.startswith("*") and under.endswith("*") and "ved 390 px" in under, under
-            assert "oppdiktede" in under and "«Eksempeltall»" in under, under
-        rest = re.sub(r"^!\[[^\]]*\]\([^)]+\)\n\*[^\n]*\*$", "", knappen, flags=re.MULTILINE)
-        assert rest.replace(MOBILSETNINGEN, "").strip() == "", rest
+        # Hvert bilde ved 390 px har et tilsvarende bilde ved 1280 px med samme navn
+        # uten «-390» i knappen (gjennomgangen av 3.3k, ECH4).
+        tilsvarende = [f"docs/appen/{sti.rsplit('/', 1)[1].replace('-390', '')}" for sti in BILDENE_PAA_MOBIL]
+        assert all(s in BILDENE_I_KNAPPEN for s in tilsvarende), tilsvarende
         # Det samme som docs/installasjon.md sier under «Mer for den som vil».
         assert "Appen svarer bare på denne maskinen (127.0.0.1)" in _installasjonen()
 
@@ -3629,7 +3629,10 @@ class TestReadmeForNybegynnere:
         # 3.3f rett under knappen.
         assert avsnitt[-5].startswith("**Innhold:** "), avsnitt[-5]
         # Story 3.3k: knappen med bildene ved 390 px rett etter den første.
-        assert avsnitt[-6] == avsnitt[-7] == "<details>", avsnitt[-7:-5]
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): i stedet for den står linja som
+        # lenker til mappa med bildene ved 390 px.
+        assert avsnitt[-6] == MOBILLINJEN, avsnitt[-6]
+        assert avsnitt[-7] == "<details>", avsnitt[-7]
         # Gruppens svar 05.11 kl. 12:14: toppen av oversikten mellom
         # beskrivelsen og knappen.
         assert avsnitt[-8].startswith("![Toppen av oversikten i demoen"), avsnitt[-8]
