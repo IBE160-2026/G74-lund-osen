@@ -146,5 +146,5 @@ stopper ikke arbeidet.
 - [x] Hvert funn har heuristikken, siden, grad, kilden og et forslag
 - [x] Radene i UX-loggen og lenken i README-en
 - [x] Gjennomgangen er tatt
-- [ ] `--dokumentene` er grønn lokalt
+- [x] `--dokumentene` er grønn lokalt: på `21ecc0b3` kl. 12:23–12:42, med 2966 bestått og 7 hoppet over. Tas på nytt når main med 9.16 er flettet inn
 - [ ] CI er grønn i alle jobbene
