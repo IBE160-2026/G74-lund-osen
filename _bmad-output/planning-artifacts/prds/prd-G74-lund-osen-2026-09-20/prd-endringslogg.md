@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T22:48
+updated: 2026-11-17T23:53
 ---
 
 # Endringslogg for PRD-en
@@ -23,7 +23,7 @@ nederst, under «Endringer etter 12.11», som en datert linje med kravets ID.
 
 Svaret punkt for punkt står i [svaret på tilbakemeldingen](tilbakemelding-prd-svar.md),
 i faglærers rekkefølge 1–7, med tallene for linjer, ord og daterte linjer.
-Tabellen som sto her fra 12.11, er flyttet dit 17.11 (story 9.20) og rettet:
+Tabellen som sto her fra 12.11, er flyttet dit 17.11 (story 9.20) og oppdatert:
 den sa UJ-1 alene, ti ord i ordlista, SM-1–SM-9, hentekommandoen i fem steg,
 at FR-407 står i 4.1, at variablene i `.env` står i kravene, og at en egen
 indeks over antakelsene ikke var laget. Tabellen slik den sto, er i git.
