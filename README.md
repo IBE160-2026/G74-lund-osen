@@ -264,6 +264,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Vurderingsmatrise for del 1](docs/vurderingsmatrise.md)
 - [UX-loggen](docs/ux-logg.md): hva vi har sett og gjort for brukeropplevelsen fra starten, og funnene som står åpne før brukertesten
 - [Brukertesten](docs/brukertest.md): skjemaet for story 8.1 og 10.4, tatt 10.11; brukertest 2 gjenstår
+- [Den heuristiske evalueringen](docs/heuristisk-evaluering.md): demoen gått gjennom mot de ti heuristikkene 17.11, med funn og forslag før brukertest 2
 - [Brukslogga](docs/brukslogg.md): dagene gruppen bruker appen fra 4.11, for «Adopsjon» og «Fortsatt bruk» i §7 i PRD-en
 - [Kontrollrapport 22.09](docs/kontroll-2026-09-22.md), med [rettingsplanen](docs/kontroll-2026-09-22-plan.md)
 - [Kontrollrapport 26.09](docs/kontroll-2026-09-26.md)

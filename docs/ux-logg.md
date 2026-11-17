@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-14T19:14
+updated: 2026-11-17T13:28
 ---
 
 # UX-loggen
@@ -741,3 +741,31 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 | # | Sett | Side | Funnet | Kilde | Tas i |
 |---|---|---|---|---|---|
 | U113 | 14.11, gruppens svar | Aksjesiden, oversikten og børsometeret | En børsdag uten vurdering fra kvelden sto som «ikke vurdert», også når kursene fantes, så historikken hadde hull. | Svaret kl. 05:41–05:49 | 2.17: signalet regnet i ettertid, med stiplet kant og «i ettertid» overalt der en tidligere dag vises med signal |
+
+## Den heuristiske evalueringen 17.11
+
+*Lagt til 2026-11-17 (story 9.17, gruppens svar 16.11 kl. 20:22, rådet anbefalte det; [spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-17-heuristisk-evaluering.md)):* demoen er gått gjennom mot de ti heuristikkene til Nielsen, etter at appen ble bygget, av én evaluerer (KI-assistenten i økten). Funnene, gradene og forslagene står i [den heuristiske evalueringen](heuristisk-evaluering.md). Her står bare funnene som ikke sto i loggen fra før. Ingen kode er endret, og «Tas i» venter på gruppens svar.
+
+| # | Sett | Side | Funnet | Kilde | Tas i |
+|---|---|---|---|---|---|
+| U114 | 17.11, den heuristiske evalueringen | Min liste og oversikten | «Min liste» (stjernen) og «Dine egne aksjer» eller «Din egen liste» (det appen henter) har nesten like navn og står på samme side (HE1, H4 og H2, middels). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE1 | Venter på gruppens svar |
+| U115 | 17.11, den heuristiske evalueringen | Notatene | «Slett» sletter et notat med en gang, uten å spørre og uten angre, også et tenkt kjøp, mens det kan angres å slutte å følge en aksje (HE2, H3 og H5, middels). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE2 | Venter på gruppens svar |
+| U116 | 17.11, den heuristiske evalueringen | Tabellen på 390 px | Signalstyrken og retningen ligger utenfor skjermen, og ingenting viser at tabellen kan dras sidelengs. Gruppen tok inn «tabellen på smal skjerm» 17.10 (HE3, H6 og H1, middels). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE3 | Venter på gruppens svar |
+| U117 | 17.11, den heuristiske evalueringen | Stripa på 390 px | Knappene går over fire rader, og innholdet begynner omtrent midt på skjermen (HE4, H8 og H7, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE4 | Venter på gruppens svar |
+| U118 | 17.11, den heuristiske evalueringen | Innstillinger | Når «Vis hjelp» er av, forsvinner også «Vis meg rundt» og omvisningen, uten at teksten sier det (HE5, H1 og H6, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE5 | Venter på gruppens svar |
+| U119 | 17.11, den heuristiske evalueringen | Stripa | «Vis meg rundt» og «Spill av omvisningen» står side om side, og forskjellen synes først etter et trykk (HE6, H4 og H8, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE6 | Venter på gruppens svar |
+| U120 | 17.11, den heuristiske evalueringen | «Vis meg rundt» | Steget om dagen og perioden merker bare datofeltet, og to steg på aksjesiden merker samme sted (HE7, H1, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE7 | Venter på gruppens svar |
+| U121 | 17.11, den heuristiske evalueringen | Aksjesiden, sjekk 1 | Målingen sier «mot MA50», mens resten av siden sier 50-dagers snitt (HE8, H2, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE8 | Venter på gruppens svar |
+| U122 | 17.11, den heuristiske evalueringen | Oversikten, «Øvrige aksjer» | Ett tall for tre grupper, og tre ledd bundet med «og»; ordlyden er gruppens fra 14.10 (HE9, H2 og H8, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE9 | Venter på gruppens svar |
+| U123 | 17.11, den heuristiske evalueringen | Min liste, «Din egen liste» | Tittelen «Lim inn nøkkelen din» villeder, fordi siden ikke har noe felt; teksten sier at startskriptet spør (HE10, H4, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE10 | Venter på gruppens svar |
+| U124 | 17.11, den heuristiske evalueringen | Hjelpevinduene | Ingen side eller hjelpevindu lenker til `docs/hjelp.md`, der svarene som ikke får plass, står (HE11, H10, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE11 | Venter på gruppens svar |
+| U125 | 17.11, den heuristiske evalueringen | Aksjesiden, periodevalget | Aksjesiden åpner på en periode, så datofeltet er tomt og uten piler fra start (HE12, H6, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE12 | Venter på gruppens svar |
+| U126 | 17.11, den heuristiske evalueringen | Aksjesiden, «Signalet dag for dag» | Ukene etter siste demodag står som tomme rader (HE13, H8, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE13 | Venter på gruppens svar |
+| U127 | 17.11 kl. 12:48, gruppen (evaluerer nr. 2) | Aksjesiden, «Signalet dag for dag» | Pilene går én måned om gangen, og ingenting tar deg tilbake til måneden for dagen siden viser (HE14, H3 og H7, middels). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE14 | Før brukertest 2: en lenke tilbake ved pilene |
+| U128 | 17.11 kl. 13:03, gruppen (evaluerer nr. 2) | «Dine egne aksjer» og Min liste | En aksje du følger, får ingen stjerne, så den står ikke i Min liste (HE15, H2 og H7, middels). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE15 | Før brukertest 2: Følg setter også stjernen |
+| U129 | 17.11 kl. 13:11, gruppen (evaluerer nr. 2) | Omvisningen | Boksen bytter hjørne, og bredden følger teksten, så «Neste» flytter seg (HE16, H4 og H5, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE16 | Fast bredde før brukertest 2; plasseringen etter testen (svaret kl. 13:13) |
+| U130 | 17.11 kl. 13:11, gruppen (evaluerer nr. 2) | Omvisningen | Notatene er ikke forklart i omvisningen (HE17, H10, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE17 | Før brukertest 2: ett steg ved notatfeltet og ett i Min liste |
+
+*Lagt til 2026-11-17 (gruppens svar kl. 13:03–13:13, rådet anbefalte det):* «Tas i» for U114–U126 er avgjort: U115 og U116 (HE2 og HE3) og U118, U121, U122 og U123 (HE5, HE8, HE9 og HE10) rettes før brukertest 2 i en egen story. U114 (HE1) blir først et spørsmål i brukertest 2. U117, U119, U120, U124, U125 og U126 venter til etter testen. U127–U130 er funnet av gruppen selv i den ekte versjonen, som evaluerer nr. 2.
+
+*Idé 2026-11-17 kl. 13:08 (gruppen), ikke et funn:* et tenkt salg uten et tenkt kjøp først, for aksjer man har fra før. Appen sier aldri om et kjøp eller salg er godt (NFR-06), bare hva aksjen og indeksen gjorde etterpå. Den tas etter brukertest 2, og hører sammen med U112 fra brukertest 1.

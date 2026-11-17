@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 17-11-2026 13:14
+last_updated: 17-11-2026 13:15
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -242,6 +242,8 @@ development_status:
   9-15-meldingene-og-det-som-ikke-brukes: done
   # Story 9.16 (2026-11-17, gruppens svar 16.11 kl. 20:22): flere brukerreiser i PRD-en.
   9-16-flere-brukerreiser: done
+  # Story 9.17 (2026-11-17, gruppens svar 16.11 kl. 20:22): en heuristisk evaluering av demoen.
+  9-17-heuristisk-evaluering: in-progress
   epic-9-retrospective: optional
 
   epic-10: in-progress

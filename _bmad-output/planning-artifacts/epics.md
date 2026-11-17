@@ -5416,3 +5416,18 @@ Som **gruppe** vil vi at §1 i PRD-en har flere brukerreiser enn UJ-1, slik at b
 **Avhenger av:** 2.18, 8.21, 8.27, 9.11. **Én økt:** ja.
 
 *Lagt til 2026-11-17:* 9.16 er squash-flettet med PR #163 i `7d4a331c` kl. 13:14, låst til head-en `61db61e0`, etter beskjeden fra rådet kl. 12:32 i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. Gruppens svar kl. 12:32 og 12:39: SM-10 og SM-11 i §7, målt i brukertest 2. CI var grønn i alle jobbene (run 44080174325), med 5876 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.17: En heuristisk evaluering av demoen
+
+*Lagt til 2026-11-17, etter instruksjonen etter gruppens svar 16.11 kl. 20:22 i `docs/ai-prompts/2026-11-16.md` (design og UX før brukertest 2):* rådet anbefalte det. Laget etter at appen ble bygget. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-17-heuristisk-evaluering.md`.
+
+Som **gruppe** vil vi ha en heuristisk evaluering av demoen før brukertest 2, så vi vet hvilke brukbarhetsproblemer som finnes, og kan svare på små rettinger før testen.
+
+**Oppfyller:** steg 2 i instruksjonen etter svaret 16.11 kl. 20:22 · **Begrenses av:** regel 3, 16, 19 og 22, og FR-411
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Oversikten, aksjesiden, Min liste, Innstillinger, «Vis meg rundt», hjelpen og visningen på 390 px er gått gjennom mot de ti heuristikkene (Nielsen), bare i demoen
+- Hvert funn har heuristikken, siden, grad (lav, middels eller høy) og et forslag, i et nytt dokument i `docs/`, med rader i `docs/ux-logg.md` og en lenke fra README-en
+- Ingen kode endret; små rettinger er forslag til gruppen
+
+**Avhenger av:** 8.2, 8.9, 8.21, 8.27, 2.18. **Én økt:** ja.
