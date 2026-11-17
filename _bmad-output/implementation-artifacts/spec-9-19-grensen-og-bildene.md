@@ -2,7 +2,7 @@
 title: 'Story 9.19: grensen på 640–760 px og bildene av appen'
 type: 'feature'
 created: '2026-11-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'e00f6502'
 context:
@@ -157,5 +157,12 @@ Et spørsmål stopper ikke arbeidet.
 - [x] Avtrykkene er regnet ut fra de nye bildene, og bildegrenen har bildene før og etter
 - [x] Svarene og VG1 i spesifikasjonen for 9.18, og linja i UX-loggen
 - [x] Gjennomgangen er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
-- [ ] CI er grønn i alle jobbene
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: `--dokumentene` på `b5f5b77b` kl. 20:58–21:19, med 3058 bestått og 7 hoppet over, etter to kjøringer som fant en feil hver i README-testene (rettet i `deaf2672` og `b5f5b77b`) og én som ble stoppet for lite minne
+- [x] CI er grønn i alle jobbene (run 44168092781 på `b5f5b77b`, med 5975 bestått og 99 hoppet over i `pytest`)
+
+## Flettet 17.11
+
+CI var grønn i alle fire jobbene på head-en `b5f5b77b` (run 44168092781). Ingen
+funn på middels eller høy grad sto åpne (regel 25). PR #166 ble squash-flettet
+i `fced670f` kl. 21:28, låst til `b5f5b77b`, uten nytt ja, før pausen kl. 22:10.
+Bildegrenen `pr-9-19-bilder` er pushet (`c14466c7`).

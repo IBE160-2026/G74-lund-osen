@@ -5466,3 +5466,5 @@ Som **gruppe** vil vi at styrken og retningen står bare én gang i tabellen i a
 - Svarene kl. 18:23 og VG1 i spesifikasjonen for 9.18, og en linje i UX-loggen om grensen
 
 **Avhenger av:** 9.18, 3.3k. **Én økt:** ja.
+
+*Lagt til 2026-11-17:* 9.19 er squash-flettet med PR #166 i `fced670f` kl. 21:28, låst til head-en `b5f5b77b`, etter instruksjonen om grensen og bildene i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. Styrken og retningen står bare én gang i alle bredder (bruddene i tabellboksen), seks bilder av appen er tatt på nytt, og README-en viser ikke lenger bildene fra mobil i en egen pil (gruppens svar kl. 18:26). CI var grønn i alle jobbene (run 44168092781), med 5975 bestått og 99 hoppet over i jobben `pytest`.
