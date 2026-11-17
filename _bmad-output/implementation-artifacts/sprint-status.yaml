@@ -246,7 +246,7 @@ development_status:
   9-17-heuristisk-evaluering: done
   # Story 9.18 (2026-11-17, gruppens svar kl. 13:03–13:33): rettingene før brukertest 2.
   9-18-rettingene-foer-brukertest-2: done
-  # Story 9.19 (2026-11-17, gruppens svar kl. 16:19 og 18:23): grensen på 640–760 px og bildene av appen.
+  # Story 9.19 (2026-11-17, gruppens svar kl. 16:19, 18:23 og 18:26): grensen for linja på smal skjerm og bildene av appen.
   9-19-grensen-og-bildene: in-progress
   epic-9-retrospective: optional
 

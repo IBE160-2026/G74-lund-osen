@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-17T19:12
+updated: 2026-11-17T20:07
 ---
 
 # UX-loggen
@@ -778,3 +778,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* U128 (HE15) lukkes som alt bygget. Følg har satt stjernen siden 8.26 (11.11), og en test låser det. De tre egne aksjene ble fulgt før det, og gruppen setter stjernen på dem selv i den ekte versjonen.
 
 *Lagt til 2026-11-17 (story 9.19, gruppens svar kl. 18:23 og 18:26):* linja under selskapsnavnet fra U116 (HE3) har to trinn, så styrken og retningen står bare én gang i alle bredder: «N av 3 · retning» under 607 px, bare retningen fra 607 til 743 px, og ingenting fra 743 px, der begge kolonnene får plass. Bruddene er målt i Edge med demodataene. Bildene av appen er tatt på nytt, og README-en viser ikke lenger bildene fra mobil i en egen pil, bare én linje om mappa `docs/appen/mobil/`.
+
+*Lagt til 2026-11-17 (story 9.19, gjennomgangen):* bruddene for linja under selskapsnavnet regnes mot tabellboksen, ikke vinduet, så et fast rullefelt ikke flytter dem, og tabellen er minst 709 px, så Min liste har de samme bruddene som oversikten. Tallene i linja over (607 og 743 px) gjelder vinduet uten rullefelt. README-en og installasjonen sier at mobil kommer kanskje senere.
