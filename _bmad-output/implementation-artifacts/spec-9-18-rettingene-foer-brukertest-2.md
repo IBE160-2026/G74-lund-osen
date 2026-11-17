@@ -48,7 +48,7 @@ Hver retting får en test som feiler mot koden før rettingen.
 | Funn | Retting |
 |---|---|
 | HE14 | En lenke ved månedspilene i «Signalet dag for dag», tilbake til måneden for dagen siden viser, for eksempel «Til november 2026». Den vises bare når en annen måned er valgt, og beholder dagen eller perioden og ankeret |
-| HE15 | Følg setter også stjernen, så aksjen står i tabellen i Min liste. Stjernen kan tas bort etterpå. Fjern endres ikke |
+| HE15 | Følg setter også stjernen, så aksjen står i tabellen i Min liste. Stjernen kan tas bort etterpå. Fjern endres ikke. *Slått opp 17.11:* det er alt bygget, se «Bygget» og spørsmål 1 |
 | HE2 | «Slett» ved et notat spør først, som `bekreft_fjern.html`, og sier om et tenkt kjøp slettes også. Avbryt lar alt stå |
 | HE3 | På smal skjerm (390 px) står styrken og retningen under selskapsnavnet, så kjernen synes uten å dra sidelengs. Avgjørelsen 17.10 om tabellen på smal skjerm gjelder |
 | HE16 | Boksen i omvisningen får fast bredde, så knappene står likt hver gang. At den bytter hjørne, endres ikke |
@@ -68,9 +68,64 @@ Hver retting får en test som feiler mot koden før rettingen.
   funn om hva som er gjort.
 - `docs/brukertest.md`, under «Brukertest 2», etter oppgave G: «Hva er
   forskjellen på «Min liste» og «Dine egne aksjer»?» (HE1).
-- Avtrykkene bak bildene i `tests/test_docker.py` settes på nytt der malene
-  endres. Bildene i `docs/appen/` tas ikke på nytt i denne storyen uten at
-  gruppen ber om det; avtrykkene sier hvilke kildefiler som er endret.
+- Avtrykkene bak bildene i `tests/test_docker.py` er satt på nytt, med en
+  kommentar. Bildene i `docs/appen/` er ikke tatt på nytt, fordi instruksjonen
+  sier at bildene blir i scratchpad. Spørsmål 2.
+
+## Bygget
+
+Bygget 17.11 av én agent i worktreen, med én commit per retting, og
+kontrollert i vinduet: commitene, at ingen migrasjon og ingen bilder er med, og
+to av bildene fra demoen. Hver test ble kjørt og sett feile før rettingen og
+bestå etter den. HE3 og HE18 ble også kjørt mot koden før med `git stash`.
+
+| Funn | Commit | Testen |
+|---|---|---|
+| HE14 | `773c78ab` | `tests/test_historikken.py::TestTilbakeTilMaaneden` |
+| HE2 | `3d2599cf` | `tests/test_notater.py::TestSlettSpoerFoerst`, og testene som sletter, sender nå `bekreftet=1` |
+| HE3 | `fde463cd`, `8ffd671f` | `tests/test_rettingene_9_18.py::TestTabellenPaaSmalSkjerm`, også i nettleseren ved 390 og 1280 px |
+| HE16 | `46082e05` | `tests/test_rettingene_9_18.py::TestBoksenIOmvisningen` |
+| HE18 | `32a69e6f` | `tests/test_rettingene_9_18.py::TestOmvisningenBlarBareNaarDetTrengs` (`OMVISNING.maaBla` med Node, og i nettleseren) |
+| HE17 | `73cb94c4` | `tests/test_rettingene_9_18.py::TestStegetOmNotatene` |
+| HE5 | `a1720f3a` | `tests/test_innstillinger.py::test_teksten_og_steget_sier_at_av_ogsaa_skjuler_omvisningen` |
+| HE8 | `a2a28bdc` | `tests/test_signalberegning.py::test_trend_sier_snittet_med_ord`, og tre endrede tester |
+| HE9 | `a88aa68d` | `tests/test_app.py::test_oevrige_uten_en_gruppe_nevner_den_ikke`, og de endrede testene for båndet |
+| HE10 | `4f01c344` | `tests/test_din_egen_liste_8_22.py::test_tre_stegkort_i_rekkefoelgen_fra_utdraget` |
+| Avtrykkene | `261e1e2a` | `tests/test_docker.py` |
+| PRD-en | `5586b394` | FR-706 (HE8) og FR-101 (HE3), med en linje i endringsloggen |
+| Dokumentene | `ddeef476` | Evalueringen, UX-loggen (U131 for HE18) og spørsmålet om HE1 i brukertest 2 |
+
+- **HE8:** målingen lages i `_trendforklaring` når siden vises. Basen lagrer
+  bare tall, og KI-grunnlaget har ingen målinger, så bare visningen er endret.
+- **HE15:** `Valglager.folg` i `src/valg.py` setter stjernen i samme
+  transaksjon som ønsket, fra 8.26 (gruppens svar 11.11 kl. 17:47), og
+  `test_vis_meg_rundt_8_26.py::TestStjernenOgDeSomVenter::test_foelg_gir_stjerne_og_rad_i_min_liste`
+  låser det. Ingen kode er endret.
+- **HE17:** setningen om tenkte kjøp og salg fra Innstillinger står ikke i
+  stegene, fordi testen for rådordene i omvisningen ikke tillater «kjøp» der.
+- **Demoen:** sjekket på port 62971 i 1280 og 390 px, og stoppet etterpå.
+  Bildene ligger i scratchpad, `ux918\ut\`.
+
+## Spørsmål til gruppen, med forslag
+
+Et spørsmål stopper ikke arbeidet.
+
+1. **HE15 er alt bygget.** Følg setter stjernen fra 11.11. Gruppen så ingen
+   stjerne i den ekte versjonen. Det kan være en aksje som ble fulgt før 11.11,
+   eller en som kom inn med en ferdig liste eller «De 15 mest omsatte»
+   (`bruk_liste` setter ingen stjerne). *Forslag:* ingen kodeendring før testen.
+   Gruppen setter stjernen selv på de aksjene den følger, i den ekte versjonen.
+   Om en ferdig liste også skal sette stjerner, tas etter testen, sammen med
+   spørsmålet om Fjern.
+2. **Bildene i `docs/appen/`.** Malene, stilen og hjelpetekstene er endret, så
+   bildene av appen viser den gamle versjonen. Instruksjonen sier at bildene
+   blir i scratchpad, så bare avtrykkene er regnet ut på nytt. *Forslag:* ta
+   bildene på nytt fra demoen i en egen liten story etter brukertest 2.
+3. **HE17 uten setningen om tenkte kjøp.** *Forslag:* godta det. Stegene sier
+   hvor notatene står, og at appen aldri sier om noe var riktig.
+4. **HE3 mellom 640 og 760 px.** Linja vises under 760 px, som er bruddet
+   prosjektet bruker. I det spennet står styrken og retningen både i linja og i
+   kolonnene. *Forslag:* godta det.
 
 ## Grenser
 
@@ -83,10 +138,10 @@ Hver retting får en test som feiler mot koden før rettingen.
 
 ## Kontroll
 
-- [ ] Hver retting har en test som feilet mot koden før rettingen
-- [ ] Hjelpen, `docs/hjelp.md`, omvisningen og kravene sier det samme som appen
-- [ ] Datert linje per funn i evalueringen og UX-loggen, og spørsmålet om HE1 i brukertest 2
-- [ ] Sjekket i demoen i full bredde og på 390 px
+- [x] Hver retting har en test som feilet mot koden før rettingen
+- [x] Hjelpen, `docs/hjelp.md`, omvisningen og kravene sier det samme som appen
+- [x] Datert linje per funn i evalueringen og UX-loggen, og spørsmålet om HE1 i brukertest 2
+- [x] Sjekket i demoen i full bredde og på 390 px
 - [ ] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
