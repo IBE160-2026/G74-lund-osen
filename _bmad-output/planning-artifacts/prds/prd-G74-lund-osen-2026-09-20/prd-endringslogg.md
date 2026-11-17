@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T12:39
+updated: 2026-11-17T15:21
 ---
 
 # Endringslogg for PRD-en
@@ -1648,3 +1648,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-17 (story 9.16, gruppens svar 16.11 kl. 20:22, rådet anbefalte det):* §1 har fått to brukerreiser til, UJ-2 (Min liste med notater for en som kommer tilbake) og UJ-3 (KI-teksten av og på), i samme form som UJ-1. De er skrevet 17.11, etter at appen ble bygget, og beskriver det appen gjør på main. Hvert steg er sjekket mot malene og testene, med kilde i `spec-9-16-flere-brukerreiser.md`. Ingen krav er endret, og UJ-1 står som før.
 
 *Endret 2026-11-17 (story 9.16, gruppens svar 17.11 kl. 12:32 på spørsmål 1 og 3, rådet anbefalte det):* §7 har fått to nye suksessmål, SM-10 (notatene etterpå, måler UJ-2) og SM-11 (KI-teksten av og på, måler UJ-3), i samme form som de andre og med kolonnen «Krav». Begge måles i brukertest 2, SM-10 med en ny oppgave G og SM-11 med et ekstra spørsmål i oppgave B (`docs/brukertest.md`). UJ-2 og UJ-3 sier at SM-10 og SM-11 måler dem, og statusen i §7 nevner dem.
+
+*Endret 2026-11-17 (story 9.18, gruppens svar 17.11 kl. 13:03–13:33, rådet anbefalte det):* FR-706: eksemplet på målingen bak trendsjekken er «+3,1 % mot 50-dagers snitt», ikke «mot MA50», som siden nå sier (HE8). FR-101: på smal skjerm står styrken og retningen også under selskapsnavnet (HE3). Målingen er ikke lagret i basen eller i KI-grunnlaget, så bare visningen er endret.
