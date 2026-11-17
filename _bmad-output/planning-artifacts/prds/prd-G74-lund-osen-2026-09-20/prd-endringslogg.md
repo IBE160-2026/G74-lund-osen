@@ -21,19 +21,12 @@ nederst, under «Endringer etter 12.11», som en datert linje med kravets ID.
 
 ## Tilbakemeldingen 12.11 og hva som er gjort
 
-| Punkt i tilbakemeldingen | Hva som er gjort |
-|---|---|
-| 4.1 Gjeldende krav må kunne leses uten historikken | Hvert FR og NFR har én gjeldende tekst som sier hva appen gjør nå, lest i koden 12.11. Alle de daterte linjene står under, ordrett. FR-201 sier periodevalget, FR-101 lista som er aktiv med opptil 18, FR-202 volumsøylene og båndet, og NFR-01 fordelingen av de 20 kallene |
-| 4.2 Gi alle FR-er testbare konsekvenser | Hvert FR og NFR har «*Konsekvenser:*» med det en test kan sjekke, også FR-108 og NFR-06 slik tilbakemeldingen foreslo. Testen `tests/test_prd_9_11.py` sjekker at hvert krav har dem |
-| 4.3 Én brukerreise og et glossar | UJ-1 med climax og edge, og en ordliste med ti ord, i §1. Ordlista skiller bransje og sektor, aksjesiden og aksjedetaljen, lista og Min liste, og signal og vurdering |
-| 4.4 Implementasjonsdetaljer og byggestatus ut av kravene | Kodenavn, commits, migrasjoner, storynummer og «ikke bygget per» er ute av kravene. Det som manglet i arkitekturen eller `epics.md`, står under story 9.11 i `epics.md`. Feltnavn som er grensesnittet mot brukeren, som `close`, `adjusted_close` og variablene i `.env`, står |
-| 4.5 Scope-status i én tabell | Tabellen «Kjerne, ekstra og senere» i §2: FR, krav, kjerne / ekstra / senere og bygget, lest i koden 12.11. Plan A står i vedlegg A til slutt |
-| §5 Ingen glossar, UJ eller Assumptions Index | Glossar og UJ som i 4.3. Antakelsene som står igjen, `[ANTAKELSE]` og `[FORELØPIG]` i FR-302 og FR-606A, er i vedlegg A. Antakelsen i FR-501 var avkreftet 21.09 og er ute av kravteksten. En egen indeks er ikke laget (spørsmål i spesifikasjonen) |
-| §5 FR-ID-ene er ikke sammenhengende | ID-ene er beholdt, så lenker og stories holder. Innledningen til §4 sier at FR-407 står i 4.1 |
-| §5 Suksessmålene mangler ID og henvisning til FR | SM-1–SM-9 med kolonnen «Krav» i §7. «KI-bidrag i drift» og «Relevanseksperiment», som ikke gjelder lenger, står her |
-| §5 Foreldet tekst: FR-401 «kravteksten over står uendret» | FR-401 er skrevet om: hentekommandoen i fem steg, kveldsjobben og «Start den ekte versjonen» |
-| §5 Beslutninger tilskrevet enkeltpersoner | `prd.md` har ingen navn utenom gruppelinja. Avgjørelsene står som gruppens. Linjene under står ordrett, med navnene der de sto |
-| §6 og §7 | «Under 5 minutter» står i SM-1, og spørsmålene og stikkordene til refleksjonsrapporten står i spesifikasjonen for 9.11 |
+Svaret punkt for punkt står i [svaret på tilbakemeldingen](tilbakemelding-prd-svar.md),
+i faglærers rekkefølge 1–7, med tallene for linjer, ord og daterte linjer.
+Tabellen som sto her fra 12.11, er flyttet dit 17.11 (story 9.20) og rettet:
+den sa UJ-1 alene, ti ord i ordlista, SM-1–SM-9, hentekommandoen i fem steg,
+at FR-407 står i 4.1, at variablene i `.env` står i kravene, og at en egen
+indeks over antakelsene ikke var laget. Tabellen slik den sto, er i git.
 
 ## Linjene, ordnet etter krav og dato
 

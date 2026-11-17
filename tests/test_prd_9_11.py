@@ -20,6 +20,8 @@ ROT = Path(__file__).resolve().parent.parent
 MAPPA = ROT / "_bmad-output" / "planning-artifacts" / "prds" / "prd-G74-lund-osen-2026-09-20"
 PRD = MAPPA / "prd.md"
 ENDRINGSLOGGEN = MAPPA / "prd-endringslogg.md"
+# Story 9.20: svaret på tilbakemeldingen, ved siden av faglærers fil.
+SVARET = MAPPA / "tilbakemelding-prd-svar.md"
 TAGGEN = "prd-vurdert-2026-11-12"
 TAGGENS_STI = "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md"
 
@@ -372,14 +374,23 @@ def test_alle_lenker_til_ankre_i_prd_virker():
 
 def test_endringsloggen_lenkes_oeverst():
     """Ville feilet hvis lenken til endringsloggen ikke sto før «Kort
-    fortalt», eller endringsloggen manglet en rad for et punkt i
-    tilbakemeldingen."""
+    fortalt», eller svaret på tilbakemeldingen manglet en rad for et punkt i
+    tilbakemeldingen. Story 9.20 (gruppens svar 17.11 kl. 12:29, V12 i
+    valideringen): tabellen er flyttet fra endringsloggen til svaret,
+    tilbakemelding-prd-svar.md, i faglærers rekkefølge 1–7. Testen feiler også
+    hvis toppen av prd.md eller endringsloggen ikke lenket til svaret."""
     tekst = _prd()
-    assert tekst.index("](prd-endringslogg.md)") < tekst.index("\n## Kort fortalt\n")
-    logg = ENDRINGSLOGGEN.read_text(encoding="utf-8")
-    tabellen = logg.split("## Tilbakemeldingen 12.11 og hva som er gjort\n", 1)[1].split("\n## ", 1)[0]
-    for punkt in ("| 4.1 ", "| 4.2 ", "| 4.3 ", "| 4.4 ", "| 4.5 ", "| §5 "):
+    kort_fortalt = tekst.index("\n## Kort fortalt\n")
+    assert tekst.index("](prd-endringslogg.md)") < kort_fortalt
+    assert tekst.index("](tilbakemelding-prd-svar.md)") < kort_fortalt
+    assert "](tilbakemelding-prd-svar.md)" in ENDRINGSLOGGEN.read_text(encoding="utf-8")
+    svaret = SVARET.read_text(encoding="utf-8")
+    tabellen = svaret.split("## Punkt for punkt\n", 1)[1].split("\n## ", 1)[0]
+    punktene = ("| 1 ", "| 2 ", "| 3 ", "| 4.1 ", "| 4.2 ", "| 4.3 ", "| 4.4 ", "| 4.5 ", "| §5 ", "| §6 ", "| §7 ")
+    for punkt in punktene:
         assert punkt in tabellen, punkt
+    # I faglærers rekkefølge.
+    assert [tabellen.index(p) for p in punktene] == sorted(tabellen.index(p) for p in punktene)
 
 
 def _taggens_prd() -> str | None:
