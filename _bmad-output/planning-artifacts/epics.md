@@ -5449,3 +5449,5 @@ Som **gruppe** vil vi rette funnene fra den heuristiske evalueringen som gruppen
 - Ingen ny migrasjon
 
 **Avhenger av:** 9.17, 8.21, 8.22, 8.25, 8.26. **Én økt:** nei.
+
+*Lagt til 2026-11-17:* 9.18 er squash-flettet med PR #165 i `9bf8769e` kl. 17:20, låst til head-en `dfcebde8`, etter beskjeden fra rådet kl. 16:21 i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. HE2, HE3, HE5, HE8, HE9, HE10 og HE14–HE18 er rettet, hver med en test, og HE15 er lukket som alt bygget (gruppens svar kl. 16:19). Bildene i `docs/appen/` tas på nytt i en egen liten story rett etter 9.18. CI var grønn i alle jobbene (run 44123485449), med 5926 bestått og 99 hoppet over i jobben `pytest`.

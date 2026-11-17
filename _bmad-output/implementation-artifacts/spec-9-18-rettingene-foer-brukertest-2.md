@@ -2,7 +2,7 @@
 title: 'Story 9.18: rettingene før brukertest 2'
 type: 'feature'
 created: '2026-11-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'e29f3020'
 context:
@@ -109,7 +109,7 @@ bestå etter den. HE3 og HE18 ble også kjørt mot koden før med `git stash`.
 ## Gjennomgangen 17.11
 
 Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
-lesing, på `acc52a83`. 18 funn: 3 på middels og 15 lave.
+lesing, på `acc52a83`. 16 funn: 3 på middels og 13 lave.
 
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
@@ -180,4 +180,16 @@ eller høy grad står åpne.
 - [x] Sjekket i demoen i full bredde og på 390 px
 - [x] Gjennomgangen er tatt
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: testfilene én om gangen etter gjennomgangen, og `--dokumentene` på `6ab838d8` kl. 15:44–16:03, med 2996 bestått og 20 hoppet over. De 13 ekstra som hoppet over, er i `tests/test_dobbeltklikk.py`, fordi gruppens app var på port 8000. Første kjøring kl. 15:39 ble stoppet for lite minne og startet igjen. Etter svarene kl. 16:19: på `358aa863` kl. 16:53–17:14, med 3009 bestått og 7 hoppet over (port 8000 var ledig), etter én omstart til for lite minne
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 44123485449 på `dfcebde8`, med 5926 bestått og 99 hoppet over i `pytest`)
+
+*Rettet 2026-11-17 i føringen:* gjennomgangen ga 16 funn, ikke 18: 3 på
+middels og 13 lave, som tabellen viser.
+
+## Flettet 17.11
+
+Svarene 17.11 kl. 16:19 står under spørsmål 1 og 2. HE15 er lukket som alt
+bygget, og VG1 er besvart med en egen liten story for bildene rett etter 9.18.
+CI var grønn i alle fire jobbene på head-en `dfcebde8` (run 44123485449).
+Ingen andre funn på middels eller høy grad sto åpne (regel 25). PR #165 ble
+squash-flettet i `9bf8769e` kl. 17:20, låst til `dfcebde8`, uten nytt ja, slik
+beskjeden kl. 16:21 sier, før fristen torsdag 19.11 kl. 20:00.
