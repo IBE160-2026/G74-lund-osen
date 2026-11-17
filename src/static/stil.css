@@ -1588,7 +1588,10 @@ th.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 
 .omvisning.til-venstre { right: auto; left: 16px; }
 .omvisning.oeverst { bottom: auto; top: 16px; }
 @media (forced-colors: active) { .omvisning-kolonne { outline: 3px solid Highlight; outline-offset: -3px; } }
-.omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
+/* Story 9.18 (HE16, gruppens svar 17.11 kl. 13:03–13:33): fast bredde, med
+   kanten og luften innenfor, så «Tilbake» og «Neste» står likt ved hvert steg
+   og boksen holder seg innenfor skjermen ved 390 px. Hjørnet byttes som før. */
+.omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; width: min(360px, calc(100vw - 32px)); box-sizing: border-box;
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
              border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
 .omvisning:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }

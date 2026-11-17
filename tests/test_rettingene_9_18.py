@@ -91,3 +91,43 @@ class TestTabellenPaaSmalSkjerm:
             # Kolonnen for styrken ligger fortsatt utenfor, som før: tabellen
             # ruller i sin boks.
             assert svar["styrke_utenfor"] is True
+
+
+class TestBoksenIOmvisningen:
+    """HE16: boksen i omvisningen har fast bredde, så knappene står likt hver
+    gang. At den bytter hjørne (8.26), endres ikke."""
+
+    def test_stilarket_gir_fast_bredde(self):
+        """Ville feilet med bare max-width, der bredden fulgte teksten."""
+        from test_utseende import STILARKET, _reglene
+
+        kropper = {
+            velger: kropp for ramme, velger, kropp in _reglene(STILARKET.read_text(encoding="utf-8")) if not ramme
+        }
+        boksen = [d.strip() for d in kropper[".omvisning"].split(";")]
+        assert "width: min(360px, calc(100vw - 32px))" in boksen
+        assert "box-sizing: border-box" in boksen
+        assert kropper[".omvisning.til-venstre"] == "right: auto; left: 16px"
+
+    @pytest.mark.parametrize("bredde, venta", [(1280, 360), (390, 358)])
+    def test_i_nettleseren(self, side, tmp_path, bredde, venta):
+        """Ville feilet hvis en kort og en lang tekst ga ulik bredde, eller
+        boksen gikk utenfor skjermen ved 390 px."""
+        skript = """
+          const maal = (tekst) => {
+            const b = document.createElement("div");
+            b.className = "omvisning";
+            b.innerHTML = "<h2>Steg</h2><p>" + tekst + "</p><div class='omvisning-knapper'><button>Tilbake</button><button>Neste</button></div>";
+            document.body.append(b);
+            const r = b.getBoundingClientRect();
+            const knapp = b.querySelector("button:last-child").getBoundingClientRect();
+            b.remove();
+            return [r.width, r.left, r.right, knapp.left - r.left];
+          };
+          ferdig({kort: maal("Kort."), lang: maal("En lang tekst ".repeat(20)),
+                  vindu: document.documentElement.clientWidth});
+        """
+        svar = _kjoer(side("/"), tmp_path, bredde, skript)
+        assert round(svar["kort"][0]) == round(svar["lang"][0]) == venta
+        assert svar["kort"][3] == svar["lang"][3]
+        assert svar["kort"][1] >= 0 and svar["kort"][2] <= svar["vindu"]
