@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T11:42
+updated: 2026-11-17T11:53
 ---
 
 # PRD — OSE Signal
@@ -120,43 +120,47 @@ FR-602, FR-706 og NFR-03. Suksessmålet SM-1 måler reisen.
 kvelder i uka. Han åpner «Min liste». Overskriften sier hvor mange av de merkede
 som skilte seg ut siste børsdag. Nederst, under «Mine notater», står alle
 notatene hans, det nyeste først, med navnet på aksjen som lenke. Under hvert
-notat står «Etterpå»: hva aksjen og hovedindeksen gjorde fra notatdagen til siste
-børsdag, og signalet begge dagene. Ved et tenkt kjøp som er solgt, står
-salgsdagen, sjekkene da salget ble notert, og hva aksjen og hovedindeksen gjorde
-fra kjøpet til salget. Han trykker på navnet og skriver et nytt notat på
-aksjesiden. På en bred skjerm viser knappen «Mine notater» øverst de samme
-notatene i et panel ved siden av siden.
+notat står «Etterpå»: hva aksjen og hovedindeksen gjorde fra notatdagen til
+siste dag med kurs, og signalet begge dagene. Ved et tenkt kjøp som er solgt, og
+der sluttkursen etter salget er hentet, står salgsdagen, sjekkene da salget ble
+notert, og hva aksjen og hovedindeksen gjorde fra kjøpet til salget. Han trykker
+på navnet og skriver et nytt notat på aksjesiden. På en bred skjerm viser
+knappen «Mine notater» øverst de samme notatene i et panel ved siden av siden.
 
 - *Climax:* han ser hva som skjedde etter et notat, med tallene, og appen sier
   ikke om han hadde rett.
-- *Edge:* notatet er fra siste børsdag, og «Etterpå» sier at det ikke er
+- *Edge:* notatet er fra siste dag med kurs, og «Etterpå» sier at det ikke er
   børsdager med kurs etter notatdagen ennå. Med «Vis notater» av er notatene
   borte fra sidene, men ingenting er slettet.
 
-Kravene UJ-2 hviler på: FR-110, FR-111, FR-203 og NFR-06. Suksessmålet SM-2
-måler reisen.
+Kravene UJ-2 hviler på: FR-110, FR-111, FR-203 og NFR-06. Notatene med
+«Etterpå» og de tenkte kjøpene har ikke eget FR (§2). Suksessmålet SM-2 er det
+nærmeste, men det måler at gruppen bruker appen, ikke reisen.
 
 ### Brukerreisen UJ-3
 
 **UJ-3. Ingrid** vil vite hva KI-teksten tilfører før hun stoler på den. Hun
-åpner en aksje som skilte seg ut. Under «Hvorfor signalet ble 3» står de tre
-sjekkene med verdiene og målingene. Lenger ned, i rammen «Signalet forklart»,
-står appens setninger om dagene, og under dem KI-teksten, merket «Laget av KI»
-og med modellen. Hun slår «Vis KI-tekst» av ved teksten. Sjekkene står som før. I
+åpner en aksje med 3 av 3. Under «Hvorfor signalet ble 3» står de tre sjekkene
+med verdiene og målingene. Lenger ned, i rammen «Signalet forklart», står
+appens setninger om dagene, og under dem KI-teksten, merket «Laget av KI» og
+med modellen. Hun slår «Vis KI-tekst» av ved teksten. Sjekkene står som før. I
 rammen står bryteren, appens setninger og linja om at signalet bygger bare på
 kurs og volum i sjekkene, ikke på KI-teksten. I Innstillinger viser «Vis
-KI-tekst» også «Av». På markedsoversikten står bryteren og én linje om at
-KI-teksten er slått av, under «Børsdagen kort fortalt». Hun slår KI-teksten på
-igjen, og begge tekstene er tilbake.
+KI-tekst» også «Av». På oversikten står bryteren og én linje om at KI-teksten
+er slått av, under «Børsdagen kort fortalt». Hun slår KI-teksten på igjen ved
+teksten på aksjesiden, og den står der igjen.
 
 - *Climax:* hun ser at KI-teksten ikke endrer signalet, fordi sjekkene er de
   samme med KI-teksten av og på.
-- *Edge:* maskinen har ingen språkmodell. Med KI-teksten på sier forsiden at
-  dagen er uten KI-tekst, og at den lages når kursene hentes, på en maskin med en
-  språkmodell, med lenken «Slik slår du den på». Sjekkene står som før.
+- *Edge:* i den ekte versjonen har maskinen ingen språkmodell. For siste
+  børsdag, når ingen aksje har KI-tekst for dagen, sier oversikten med
+  KI-teksten på at dagen er uten KI-tekst, og at den lages når kursene hentes,
+  på en maskin med en språkmodell, med lenken «Slik slår du den på». På
+  aksjesiden står sjekkene som før.
 
 Kravene UJ-3 hviler på: FR-110, FR-203, FR-601, FR-602, FR-607 og FR-706.
-Suksessmålet SM-8 måler reisen.
+Suksessmålet SM-8 er det nærmeste, men det måler kontrollen og loggen av
+KI-teksten, ikke vekslingen.
 
 ### Ordliste
 
