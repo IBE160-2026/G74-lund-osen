@@ -5414,3 +5414,5 @@ Som **gruppe** vil vi at §1 i PRD-en har flere brukerreiser enn UJ-1, slik at b
 - En linje i `prd-endringslogg.md`, og ingen kode endret
 
 **Avhenger av:** 2.18, 8.21, 8.27, 9.11. **Én økt:** ja.
+
+*Lagt til 2026-11-17:* 9.16 er squash-flettet med PR #163 i `7d4a331c` kl. 13:14, låst til head-en `61db61e0`, etter beskjeden fra rådet kl. 12:32 i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. Gruppens svar kl. 12:32 og 12:39: SM-10 og SM-11 i §7, målt i brukertest 2. CI var grønn i alle jobbene (run 44080174325), med 5876 bestått og 99 hoppet over i jobben `pytest`.

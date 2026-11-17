@@ -2,7 +2,7 @@
 title: 'Story 9.16: flere brukerreiser i PRD-en'
 type: 'docs'
 created: '2026-11-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'ba866204'
 context:
@@ -203,4 +203,12 @@ lesing, på `32885761`. 24 funn: 6 på middels og 18 lave.
 - [x] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13): bare `updated` er endret i det som sto
 - [x] Gjennomgangen er tatt
 - [x] `--dokumentene` er grønn lokalt etter svarene kl. 12:32 og 12:39: på `4b3fac06` kl. 12:42–13:00, med 2957 bestått og 20 hoppet over. De 13 ekstra som hoppet over, er i `tests/test_dobbeltklikk.py`, fordi port 8000 var i bruk på maskinen (sett med `-rs` kl. 13:01–13:07), og CI kjører dem. Før svarene: på `248d71ce` kl. 12:04–12:23, med 2970 bestått og 7 hoppet over. Første kjøring kl. 11:54 ble stoppet for lite minne og startet igjen
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 44080174325 på `61db61e0`, med 5876 bestått og 99 hoppet over i `pytest`)
+
+## Flettet 17.11
+
+Svarene 17.11 kl. 12:32 og 12:39 står under spørsmålene, og BH1 er besvart.
+CI var grønn i alle fire jobbene på head-en `61db61e0` (run 44080174325).
+Ingen funn på middels eller høy grad sto åpne (regel 25). PR #163 ble
+squash-flettet i `7d4a331c` kl. 13:14, låst til `61db61e0`, uten nytt ja, slik
+beskjeden kl. 12:32 sier.
