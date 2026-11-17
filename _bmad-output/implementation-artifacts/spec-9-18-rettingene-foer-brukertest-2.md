@@ -106,9 +106,35 @@ bestå etter den. HE3 og HE18 ble også kjørt mot koden før med `git stash`.
 - **Demoen:** sjekket på port 62971 i 1280 og 390 px, og stoppet etterpå.
   Bildene ligger i scratchpad, `ux918\ut\`.
 
+## Gjennomgangen 17.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `acc52a83`. 18 funn: 3 på middels og 15 lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | middels | Linja under navnet på smal skjerm manglet merket «i ettertid» | Rettet, med en test som feilet mot malen før (`3e225584`) |
+| VG1 | middels | Avtrykkene er regnet ut på nytt, men bildene i `docs/appen/` er ikke tatt på nytt | **Står åpent, følger av instruksjonen (bildene blir i scratchpad) (regel 25).** Spørsmål 2 |
+| VG2 | middels | Raden for HE15 i evalueringen og U128 var ikke rettet, og spørsmål 4 manglet svarlinja kl. 14:16 | Rettet i dokumentene |
+| BH1 | lav | Knappen sa «det tenkte kjøpet» når salget også slettes | Rettet: «Slett notatet, kjøpet og salget», med test (`9b186fa8`) |
+| BH2 | lav | Lenken «Til …» sto utenfor navigasjonen for måneden | Rettet (`5fa19b16`) |
+| BH3 | lav | Kommentaren i `hjelp.js` talte 23 steg | Rettet |
+| BH4 | lav | `vis` og `tilbake` gikk urørt inn i skjemaet på siden med spørsmålet | Rettet: bare verdier som godtas (`9b186fa8`) |
+| BH5 | lav | `docs/hjelp.md` sa at stegene sier det samme som Innstillinger, og «trykker «Slett»» | Rettet |
+| ECH2 | lav | `white-space: nowrap` på linja kunne gjøre navnekolonnen bred | Rettet: linja kan brytes |
+| ECH3 | lav | Linja under i Min liste (sammenligningen) har ikke linja på smal skjerm | Står: sammenligningen er en detalj under raden, og styrken står i raden over |
+| ECH4 | lav | `maaBla` ser ikke på `.tabellboks` eller boksen selv | Står: boksen flytter seg når den dekker (8.26), og noe som er klippet, blir merket |
+| ECH5 | lav | To lange hopp i Min liste | Står: rekkefølgen er bundet av 8.27 |
+| ECH6 | lav | Stegene om notatene har ingen demovariant | Står: teksten gjelder begge versjonene |
+| VG3 | lav | Ingen test for «Avbryt» med en adresse utenfor appen, eller 403 uten bekreftet | Rettet: to tester (`9b186fa8`) |
+| VG4 | lav | Noen mellomcommits er røde | Står: PR-en squash-flettes |
+| VG5 | lav | Én av testene for HE2 er en vakt | Står: de andre feilet før rettingen |
+
 ## Spørsmål til gruppen, med forslag
 
-Et spørsmål stopper ikke arbeidet.
+Et spørsmål stopper ikke arbeidet. Spørsmål 2 er VG1 i gjennomgangen, på
+middels og fra instruksjonen, så PR-en flettes ikke før gruppen har svart
+(regel 25).
 
 1. **HE15 er alt bygget.** Følg setter stjernen fra 11.11. Gruppen så ingen
    stjerne i den ekte versjonen. Det kan være en aksje som ble fulgt før 11.11,
@@ -120,7 +146,9 @@ Et spørsmål stopper ikke arbeidet.
 2. **Bildene i `docs/appen/`.** Malene, stilen og hjelpetekstene er endret, så
    bildene av appen viser den gamle versjonen. Instruksjonen sier at bildene
    blir i scratchpad, så bare avtrykkene er regnet ut på nytt. *Forslag:* ta
-   bildene på nytt fra demoen i en egen liten story etter brukertest 2.
+   bildene på nytt fra demoen i en egen liten story etter brukertest 2, og
+   flett 9.18 nå med bildene som de er. Det andre valget er å ta bildene på
+   nytt i 9.18, før flettingen.
 3. **HE17 uten setningen om tenkte kjøp.** *Forslag:* godta det. Stegene sier
    hvor notatene står, og at appen aldri sier om noe var riktig.
 4. **HE3 mellom 640 og 760 px.** Linja vises under 760 px, som er bruddet
@@ -142,6 +170,6 @@ Et spørsmål stopper ikke arbeidet.
 - [x] Hjelpen, `docs/hjelp.md`, omvisningen og kravene sier det samme som appen
 - [x] Datert linje per funn i evalueringen og UX-loggen, og spørsmålet om HE1 i brukertest 2
 - [x] Sjekket i demoen i full bredde og på 390 px
-- [ ] Gjennomgangen er tatt
+- [x] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
