@@ -6,7 +6,11 @@ server og ingenting fra nettet (AD-8), og de hoppes over uten Edge eller
 Chrome, unntatt i CI.
 """
 
+import json
 import re
+import shutil
+import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -131,3 +135,82 @@ class TestBoksenIOmvisningen:
         assert round(svar["kort"][0]) == round(svar["lang"][0]) == venta
         assert svar["kort"][3] == svar["lang"][3]
         assert svar["kort"][1] >= 0 and svar["kort"][2] <= svar["vindu"]
+
+
+SKRIPTET = Path(__file__).resolve().parent.parent / "src" / "static" / "hjelp.js"
+NODE = shutil.which("node")
+
+
+class TestOmvisningenBlarBareNaarDetTrengs:
+    """HE18 (funnet av gruppen 17.11 kl. 13:32): omvisningen blar bare når det
+    merkede ikke synes helt. Før blar den ved hvert steg, og ved linja
+    «Oppdatert …» hoppet siden et hakk ned, så stripa forsvant."""
+
+    def _node(self, uttrykk: str):
+        if NODE is None:
+            pytest.skip("node finnes ikke")
+        kode = f"const o = require({json.dumps(str(SKRIPTET))}); console.log(JSON.stringify({uttrykk}));"
+        svar = subprocess.run([NODE, "-e", kode], capture_output=True, text=True, timeout=60)
+        assert svar.returncode == 0, svar.stderr
+        return json.loads(svar.stdout)
+
+    @pytest.mark.parametrize(
+        "rute, venta",
+        [
+            ("{top: 100, bottom: 300, left: 10, right: 500}", False),
+            ("{top: -1, bottom: 300, left: 10, right: 500}", True),
+            ("{top: 100, bottom: 901, left: 10, right: 500}", True),
+            ("{top: 100, bottom: 300, left: 10, right: 1300}", True),
+            ("{top: 100, bottom: 300, left: -5, right: 500}", True),
+            # Rammen rundt det merkede står 7 px utenfor (stil.css), så den
+            # skal også synes.
+            ("{top: 4, bottom: 300, left: 10, right: 500}", True),
+            ("{top: 8, bottom: 892, left: 8, right: 1272}", False),
+            # Høyere enn vinduet: blar som før, så toppen står øverst.
+            ("{top: 0, bottom: 2000, left: 10, right: 500}", True),
+        ],
+    )
+    def test_blar_bare_naar_det_merkede_ikke_synes(self, rute, venta):
+        """Ville feilet uten funksjonen, eller hvis den blar når alt synes."""
+        assert self._node(f"o.maaBla({rute}, 900, 1280)") is venta
+
+    def test_skriptet_spoer_foer_det_blar(self):
+        """Ville feilet hvis scrollIntoView sto uten spørsmålet foran."""
+        kilde = SKRIPTET.read_text(encoding="utf-8")
+        foer = kilde.split('oeverst.scrollIntoView({ block: "start" })', 1)[0]
+        assert foer.rstrip().endswith(
+            "if (OMVISNING.maaBla(ruten, window.innerHeight, document.documentElement.clientWidth))"
+        )
+
+    # Ved 390 px står dagvalget under kanten av vinduet, så første steg må
+    # bla der.
+    @pytest.mark.parametrize("bredde, staar", [(1280, True), (390, False)])
+    def test_i_nettleseren(self, side, tmp_path, bredde, staar):
+        """Ville feilet hvis første steg på oversikten, øverst på siden, blar
+        siden så stripa forsvinner når alt det merkede alt synes, eller et
+        steg lar det merkede stå utenfor vinduet."""
+        skript = """
+          window.scrollTo(0, 0);
+          await vent(100);
+          document.querySelector("button.vis-meg-rundt").click();
+          await vent(200);
+          const r = {foerste: window.scrollY, steg: []};
+          for (let i = 0; i < 10; i++) {
+            const merket = Array.from(document.querySelectorAll(".omvisning-merket, .omvisning-kolonne"));
+            const rutene = merket.map((m) => m.getBoundingClientRect());
+            const topp = Math.min(...rutene.map((b) => b.top));
+            const bunn = Math.max(...rutene.map((b) => b.bottom));
+            r.steg.push({tittel: document.getElementById("omvisning-tittel").textContent,
+                         synes: topp >= 0 && (bunn <= window.innerHeight || topp < 40)});
+            const neste = Array.from(document.querySelectorAll(".omvisning-knapper button")).find(
+              (b) => b.textContent === "Neste" && !b.disabled);
+            if (!neste) break;
+            neste.click();
+            await vent(200);
+          }
+          ferdig(r);
+        """
+        svar = _kjoer(side("/"), tmp_path, bredde, skript)
+        assert (svar["foerste"] == 0) is staar
+        assert len(svar["steg"]) >= 5
+        assert all(s["synes"] for s in svar["steg"]), svar["steg"]
