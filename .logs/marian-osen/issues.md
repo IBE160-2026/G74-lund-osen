@@ -360,4 +360,6 @@
 - [x] 2026-11-17 [rettingene-foer-brukertest-2](914-2026-11-17-16-04-11-rettingene-foer-brukertest-2.md) — spørsmål 3 og 4 i 9.18 (lave): setningen om tenkte kjøp i stegene for notatene, og linja mellom 640 og 760 px (løst 2026-11-17: gruppens svar kl. 18:23; 3 godtatt, 4 rettet i 9.19)
 - [x] 2026-11-17 [rettingene-foer-brukertest-2](914-2026-11-17-16-04-11-rettingene-foer-brukertest-2.md) — en egen liten story tar bildene i `docs/appen/` på nytt rett etter 9.18, før rubrikk-passet, med egen instruksjon (svaret kl. 16:19 på VG1) (løst 2026-11-17: 9.19, PR #166 flettet i `fced670f`)
 - [ ] 2026-11-17 [grensen-og-bildene-9-19](913-2026-11-17-21-29-22-grensen-og-bildene-9-19.md) — spørsmål 1 i 9.19: nye bilder i README-en av spørsmålet før sletting og lenken tilbake; forslaget er etter brukertest 2
+  - *Svart 2026-11-17 kl. 22:18:* README-en får bildene av HE2 og HE14 før brukertest 2, i en egen liten story etter 9.20, med egen instruksjon. Punktet står til den er gjort.
 - [ ] 2026-11-17 [grensen-og-bildene-9-19](913-2026-11-17-21-29-22-grensen-og-bildene-9-19.md) — spørsmål 2 i 9.19: bruddene er målt med demodataene; forslaget er å godta det for v1 og se på det i brukertest 2
+  - *Svart 2026-11-17 kl. 22:18:* gruppen måler bruddene i den ekte versjonen selv i kveld, og resultatet kommer som en egen beskjed. Punktet står til da.
