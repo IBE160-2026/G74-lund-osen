@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-17T13:14
+updated: 2026-11-17T14:02
 ---
 
 # Kvalitetssikring
@@ -447,6 +447,7 @@ sist i dokumentet.
 | 2.18 Setningen om KI-teksten for en dag i ettertid bare med KI på: svarene 16.11 kl. 09:51 og 11:20; hele settet i CI (run 43858445935) | `05bc46e` (#161) | 1 (1, malen før rettingen) | ingen overlevde | `S/spec-2-18-ki-setningen-i-ettertid.md` |
 | 9.15 Meldingene etter v1.1 og det som ikke brukes: svarene 16.11 kl. 15:39 og 18:51; hele settet i CI (run 44060835062) | `9fea9fc` (#162) | 1 (1, koden før rettingen) | ingen overlevde | `S/spec-9-15-meldingene-og-det-som-ikke-brukes.md` |
 | 9.16 Flere brukerreiser i PRD-en: svarene 16.11 kl. 20:22 og 17.11 kl. 12:32 og 12:39; hele settet i CI (run 44080174325) | `7d4a331` (#163) | 1 (1, sjekkortene med KI på) | ingen overlevde | `S/spec-9-16-flere-brukerreiser.md` |
+| 9.17 En heuristisk evaluering av demoen: svarene 16.11 kl. 20:22 og 17.11 kl. 13:03–13:13; hele settet i CI (run 44087764478) | `fc70bdf` (#164) | 0 | – bare dokumenter og avtrykket for «Dokumentene» i én test, og ingen kode å prøve en mutant mot | `S/spec-9-17-heuristisk-evaluering.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -751,6 +752,7 @@ funn. Antall rader i loggen:
 | 2.18, gjennomgangen 16.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; 9 lave, 8 rettet i `cb21c7d2`, BH3 står med grunn i spesifikasjonen, talt som avvist) | 9 | 8 | 1 | 0 |
 | 9.15, gjennomgangen 16.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 middels og fem lave rettet i `d2f3f5e3` og `82f97c58`; ECH3 og VG4 står med grunn, og BH1 middels står etter gruppens svar 16.11 kl. 18:51, talt som avvist) | 9 | 6 | 3 | 0 |
 | 9.16, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1–ECH3, VG1 og VG2 middels og tolv lave rettet, BH1 middels besvart 17.11 kl. 12:32 med SM-10 og SM-11, talt som rettet; sju lave står med grunn, talt som avvist) | 24 | 17 | 7 | 0 |
+| 9.17, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 og VG1 middels og 15 lave rettet, BH4 og VG2 står med grunn, talt som avvist) | 19 | 17 | 2 | 0 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |

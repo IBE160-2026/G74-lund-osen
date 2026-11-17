@@ -2,7 +2,7 @@
 title: 'Story 9.17: en heuristisk evaluering av demoen'
 type: 'docs'
 created: '2026-11-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'ba866204'
 context:
@@ -97,7 +97,7 @@ så regel 25 gjelder gjennomgangen under.
 ## Gjennomgangen 17.11
 
 Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
-lesing, på `d5ce16b3`. 18 funn: 2 på middels og 16 lave. Ingen av dem følger
+lesing, på `d5ce16b3`. 19 funn: 2 på middels og 17 lave. Ingen av dem følger
 av et svar.
 
 | Funn | Grad | Hva | Utfall |
@@ -163,4 +163,18 @@ stopper ikke arbeidet.
 - [x] Radene i UX-loggen og lenken i README-en
 - [x] Gjennomgangen er tatt
 - [x] `--dokumentene` er grønn lokalt: på `21ecc0b3` kl. 12:23–12:42, med 2966 bestått og 7 hoppet over. Etter at main med 9.16 ble flettet inn og svarene ført: på `181907a2` kl. 13:37–13:55, med 2957 bestått og 20 hoppet over. De 13 ekstra som hoppet over, er i `tests/test_dobbeltklikk.py`, fordi port 8000 var i bruk av gruppens app, og CI kjører dem
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 44087764478 på `ba17be8e`, med 5876 bestått og 99 hoppet over i `pytest`)
+
+*Rettet 2026-11-17 i føringen:* gjennomgangen ga 19 funn, ikke 18: 2 på
+middels og 17 lave, som tabellen viser. Det samme tallet sto feil i
+beskrivelsen av PR #164.
+
+## Flettet 17.11
+
+Svarene 17.11 kl. 13:03–13:13 står under spørsmålene, med HE14–HE17 fra
+gruppen. `origin/main` med 9.16 ble flettet inn i grenen (`c908bfd2`), og 9.16
+står foran 9.17 i `epics.md` og sprintstatusen. CI var grønn i alle fire
+jobbene på head-en `ba17be8e` (run 44087764478). Ingen funn i gjennomgangen
+på middels eller høy grad sto åpne (regel 25). PR #164 ble squash-flettet i
+`fc70bdf3` kl. 14:01, låst til `ba17be8e`, uten nytt ja, slik beskjeden
+kl. 13:19 sier.

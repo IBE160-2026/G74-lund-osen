@@ -5431,3 +5431,5 @@ Som **gruppe** vil vi ha en heuristisk evaluering av demoen før brukertest 2, s
 - Ingen kode endret; små rettinger er forslag til gruppen
 
 **Avhenger av:** 8.2, 8.9, 8.21, 8.27, 2.18. **Én økt:** ja.
+
+*Lagt til 2026-11-17:* 9.17 er squash-flettet med PR #164 i `fc70bdf3` kl. 14:01, låst til head-en `ba17be8e`, etter beskjeden fra rådet kl. 13:19 i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. Gruppens svar kl. 13:03–13:13: HE2, HE3, HE5, HE8, HE9 og HE10 og gruppens HE14–HE17 rettes før brukertest 2 i en egen story, HE1 blir et spørsmål i testen, og resten venter. CI var grønn i alle jobbene (run 44087764478), med 5876 bestått og 99 hoppet over i jobben `pytest`.
