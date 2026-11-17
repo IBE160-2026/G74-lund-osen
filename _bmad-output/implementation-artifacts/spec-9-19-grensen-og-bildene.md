@@ -76,10 +76,19 @@ ingen demoserver eller nettleser står igjen, og at ingen migrasjon er med.
 | Bildene og avtrykkene | `10a96e50` | `tests/test_docker.py` |
 | To trinn i linja | `960ca037` | `TestBareEnGangIAlleBredder::test_styrken_og_retningen_en_gang_hver`, som feilet for styrken ved 610, 640, 700 og 739 px før rettingen |
 | Avtrykkene etter de to trinnene | `5f83c0d5` | `tests/test_docker.py` |
-| Bildegrenen | `5e60ee19` på `pr-9-19-bilder` | Bildene før og etter, med `LESMEG.md` |
+| Bildegrenen | `5e60ee19` og `c14466c7` på `pr-9-19-bilder` | Bildene før og etter, med `LESMEG.md` |
+| Bruddene i boksen, etter gjennomgangen | `85b34046` | `TestBareEnGangIAlleBredder` over fem visninger, `test_en_dag_i_ettertid` og `test_med_rullefelt` |
+| «Mobil kommer kanskje senere» | `d7bd8dd7` | `tests/test_ikonet_og_snarveien_3_6.py` |
+| Tabellen minst 709 px | `280b51d8` | `test_linja_vises_bare_paa_smal_skjerm`, og en kontroll ved 605–608 og 741–744 px i ni visninger |
+| Avtrykkene | `33376444`, `aa7ad47c` | `tests/test_docker.py` |
 
 - **Grensen:** målt i Edge med demodataene er tabellen 709 px bred, og boksen
-  34 px smalere enn vinduet. Kolonnen for styrken får plass fra 607 px, og
+  34 px smalere enn vinduet uten rullefelt. *Etter gjennomgangen:* bruddene
+  regnes mot boksen (`@container`), ikke vinduet, så et fast rullefelt ikke
+  flytter dem: linja vises når boksen er smalere enn 709 px, og fra 573 px
+  viser den bare retningen. Tabellen i `#aksjene` er minst 709 px, så Min liste
+  med bare stjernene, som var 707 px, får de samme bruddene. Tallene under
+  gjelder vinduet uten rullefelt. Kolonnen for styrken får plass fra 607 px, og
   kolonnen for retningen fra 743 px. Linja viser «N av 3 · retning» under
   607 px, bare retningen fra 607 til 743 px, og ingenting fra 743 px. Merket
   «i ettertid» og grunnen for en rad uten signal hører til styrken.
@@ -93,6 +102,29 @@ ingen demoserver eller nettleser står igjen, og at ingen migrasjon er med.
 - Spørsmålet før sletting (HE2) og lenken «Til <måned>» (HE14) står ikke i noen
   av bildene.
 
+## Gjennomgangen 17.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `ce259c71`. 15 funn: 3 på middels og 12 lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| BH1 | middels | Bruddene ble regnet mot vinduet, så et fast rullefelt flyttet dem 15–17 px, og testen skjulte rullefeltene | Rettet: `@container` på boksen, og `test_med_rullefelt` (`85b34046`) |
+| ECH1 | middels | Bruddene var bare målt på oversikten, og Min liste med bare stjernene var 2 px smalere | Rettet: testen går over fem visninger, ni er målt, og tabellen er minst 709 px (`85b34046` og `280b51d8`) |
+| BH2 | middels | README-en og `docs/installasjon.md` sa «Mobil kommer i en senere versjon» | Rettet: «Mobil kommer kanskje senere», med testen (`d7bd8dd7`) |
+| BH3 | lav | Kommentaren i malen sa at `smal-retning` skjules i stilen | Rettet |
+| BH4 | lav | En tom linje i mellomtrinnet for rader uten signal | Rettet: linja skjules der |
+| BH5 | lav | To kommentarer for 9.19 ved hvert avtrykk | Rettet: slått sammen |
+| BH6 | lav | Kommentaren i sprintstatusen nevnte ikke svaret kl. 18:26, og tittelen sier 640–760 px | Rettet i sprintstatusen. Tittelen står, og «Bygget» sier hvor bruddene ble |
+| ECH2 | lav | Radene «Sammenlign med» kunne krasje testen | Rettet: de hoppes over |
+| VG1 | lav | «i ettertid» og grunnen i mellomtrinnet var ikke prøvd i nettleseren | Rettet: `test_en_dag_i_ettertid` |
+| VG2 | lav | En vakt i README-testen sjekker bare konstanten | Står: testen over den sjekker README-en |
+| VG3 | lav | Noen mellomcommits er røde | Står: PR-en squash-flettes |
+| VG4 | lav | Beskjeden kl. 18:27 sto ikke i dagsfila | Rettet på main (`0459a028`) |
+| VG5 | lav | `LESMEG.md` på bildegrenen nevnte ikke at bildene ble tatt på nytt | Rettet (`c14466c7`) |
+| ECH3 | lav | Testen hoppet over rader uten signal | Rettet: ingen linje står tom |
+| VG6 | lav | `--hide-scrollbars` i testverktøyet | Rettet sammen med BH1 |
+
 ## Spørsmål til gruppen, med forslag
 
 Et spørsmål stopper ikke arbeidet.
@@ -101,10 +133,10 @@ Et spørsmål stopper ikke arbeidet.
    *Forslag:* ingen nye bilder nå. Etter brukertest 2 kan bildet av spørsmålet
    før sletting og bildet av «Signalet dag for dag» med lenken tilbake legges i
    pila «Bilder av appen (demoen)».
-2. **Bruddene er målt med demodataene.** Tabellen er like bred med eller uten
-   linja, men andre tickere og bransjer i den ekte versjonen kan gjøre den noen
-   px bredere eller smalere. Da kan et smalt spenn vise styrken eller retningen
-   to ganger eller ingen ganger. *Forslag:* godta det for v1, og se på det i den
+2. **Bruddene er målt med demodataene.** Tabellen er minst 709 px, så den
+   blir ikke smalere, men en lang ticker og bransje i den ekte versjonen kan
+   gjøre den bredere. Da kan et smalt spenn vise retningen ingen steder. I
+   demoen stemmer det i alle ni visningene som er målt. *Forslag:* godta det for v1, og se på det i den
    ekte versjonen på telefonbredde i brukertest 2.
 
 ## Grenser
@@ -120,6 +152,6 @@ Et spørsmål stopper ikke arbeidet.
 - [x] Bildene er tatt på nytt fra grenen i demoen, og de som er like, er ikke byttet
 - [x] Avtrykkene er regnet ut fra de nye bildene, og bildegrenen har bildene før og etter
 - [x] Svarene og VG1 i spesifikasjonen for 9.18, og linja i UX-loggen
-- [ ] Gjennomgangen er tatt
+- [x] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
