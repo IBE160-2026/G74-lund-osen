@@ -75,7 +75,9 @@
       </p>
     </li>
     <li class="kort-steg">
-      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">2</span><h3>Lim inn nøkkelen din</h3> {{ hjelpeknapp("hjelp-noekkel", "Hjelp: slik bytter du nøkkel") }}</div>
+      {#- Story 9.18 (HE10, gruppens svar 17.11 kl. 13:03–13:33): tittelen sier
+          hvor nøkkelen limes inn, fordi siden ikke har noe felt for den. #}
+      <div class="steg-topp"><span class="stegnummer" aria-hidden="true">2</span><h3>Lim inn nøkkelen i startskriptet</h3> {{ hjelpeknapp("hjelp-noekkel", "Hjelp: slik bytter du nøkkel") }}</div>
       <p>Nøkkelen står på kontosiden hos EODHD. Startskriptet til den ekte versjonen spør etter den første gang, og den lagres bare på denne maskinen.</p>
       {#- Tillegg 4 til 8.22: statusen regnet av siste henting, uten kall og
           uten å lese .env. Story 8.26: én linje med ✓, i samme stil i demoen. #}
