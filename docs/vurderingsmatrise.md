@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-17T17:21
+updated: 2026-11-17T21:28
 ---
 
 # Vurderingsmatrise for del 1
@@ -47,6 +47,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-17 (story 9.17):* 9.17, en heuristisk evaluering av demoen (PR #164, `fc70bdf3`), er flettet. [Den heuristiske evalueringen](heuristisk-evaluering.md) har 17 funn mot de ti heuristikkene til Nielsen, 13 fra evalueringen og 4 fra gruppen som evaluerer nr. 2, og de nye står som U114–U130 i [UX-loggen](ux-logg.md). Rettingene før brukertest 2 kommer i en egen story. Hele settet ble kjørt i CI på head-en `ba17be8e`: 5876 bestått og 99 hoppet over i jobben `pytest` (kjøring 44087764478). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-17 (story 9.18):* 9.18, rettingene før brukertest 2 (PR #165, `9bf8769e`), er flettet. HE2, HE3, HE5, HE8, HE9, HE10 og HE14–HE18 fra [den heuristiske evalueringen](heuristisk-evaluering.md) er rettet, hver med en test som feilet mot koden før, og radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `dfcebde8`: 5926 bestått og 99 hoppet over i jobben `pytest` (kjøring 44123485449). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-11-17 (story 9.19):* 9.19 (PR #166, `fced670f`) er flettet. Styrken og retningen står bare én gang i tabellen i alle bredder, bildene av appen i `docs/appen/` viser rettingene fra 9.18, og README-en viser ikke lenger bildene fra mobil i en egen pil. Hele settet ble kjørt i CI på head-en `b5f5b77b`: 5975 bestått og 99 hoppet over i jobben `pytest` (kjøring 44168092781). Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
