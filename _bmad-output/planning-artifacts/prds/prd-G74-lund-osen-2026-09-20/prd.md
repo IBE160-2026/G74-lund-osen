@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T22:32
+updated: 2026-11-17T22:34
 ---
 
 # PRD — OSE Signal
@@ -133,9 +133,8 @@ knappen «Mine notater» øverst de samme notatene i et panel ved siden av siden
   børsdager med kurs etter notatdagen ennå. Med «Vis notater» av er notatene
   borte fra sidene, men ingenting er slettet.
 
-Kravene UJ-2 hviler på: FR-110, FR-111, FR-203 og NFR-06. Notatene med
-«Etterpå» og de tenkte kjøpene har ikke eget FR (§2). Suksessmålet SM-10 måler
-reisen.
+Kravene UJ-2 hviler på: FR-110, FR-111, FR-203, FR-208, FR-209 og NFR-06.
+Suksessmålet SM-10 måler reisen.
 
 ### Brukerreisen UJ-3
 
@@ -219,6 +218,7 @@ koden. Når hver rad ble lest, står i endringsloggen.
 | FR-109 | «Lær noe nytt» | senere | nei |
 | FR-110 | Innstillinger | ekstra | ja |
 | FR-111 | Min liste | kjerne | ja |
+| FR-112 | «Din egen liste» i Min liste | ekstra | ja |
 | FR-201 | Kursgrafen med periodevalget | kjerne | ja |
 | FR-202 | MA50 og hovedindeksen i grafen | kjerne | ja |
 | FR-202 | Volumsøylene og båndet for sjekk 2 | ekstra | ja |
@@ -228,6 +228,9 @@ koden. Når hver rad ble lest, står i endringsloggen.
 | FR-205 | «Se nærmere» | senere | nei |
 | FR-206 | Signaldager i kursgrafen | ekstra | ja |
 | FR-207 | Kommende eks.dato i kursgrafen | senere | nei |
+| FR-208 | Notatene med «Etterpå» | ekstra | ja |
+| FR-209 | Tenkte kjøp og salg ved et notat | ekstra | ja |
+| FR-209 | Et tenkt salg uten et tenkt kjøp først | senere | nei |
 | FR-301–FR-303 | Kommende finansielle hendelser (vedlegg A) | senere | nei |
 | FR-401 | Henting bare når kommandoen kjøres, og kveldsjobben | kjerne | ja |
 | FR-402 | Kontroll mot forventet børsdag | kjerne | ja |
@@ -245,6 +248,7 @@ koden. Når hver rad ble lest, står i endringsloggen.
 | FR-412 | «De 15 mest omsatte» | ekstra | ja |
 | FR-413 | Måling av omsetning | ekstra | ja |
 | FR-414 | Eks.datoer ført for hånd | senere | nei |
+| FR-415 | «Følg en aksje» med stjernen og «Dine egne aksjer» | ekstra | ja |
 | FR-501–FR-503 | Meldingsfilteret (vedlegg A) | senere | nei |
 | FR-601 | Av/på-bryteren | kjerne | ja |
 | FR-602 | Visningen av KI-teksten | kjerne | ja |
@@ -258,8 +262,10 @@ koden. Når hver rad ble lest, står i endringsloggen.
 | FR-602A–FR-604A, FR-606A | KI-laget over meldinger (vedlegg A) | senere | nei |
 | FR-701–FR-706 | Signalet og forklaringen | kjerne | ja |
 
-Uten eget FR, men ekstra og bygget: egne notater på aksjesiden med tenkte kjøp
-og salg, «Følg en aksje» og «Din egen liste». De står i `epics.md`.
+Notatene med «Etterpå» (FR-208), de tenkte kjøpene og salgene (FR-209), «Følg
+en aksje» med stjernen (FR-415) og «Din egen liste» (FR-112) er ekstra og
+bygget, med egne krav. Et tenkt salg uten et tenkt kjøp først er senere. Også
+da skal appen aldri si om salget var godt (NFR-06).
 
 KI-tekst for små hull står som senere, fordi den tar tid, krever kontroll, gir
 fare for å se framover, og gir mindre nytte bakover.
@@ -664,6 +670,31 @@ siden av siden, og ellers går den til notatene i Min liste. Min liste er et utv
 - Et klikk på stjernen gjør ingen API-kall og går tilbake til samme side med sorteringen.
 - Et merke for en aksje som ikke er i lista, avvises med en feil (400).
 
+#### FR-112 — Din egen liste
+
+Min liste har delen «Din egen liste: kom i gang», med tre steg som kort: lag en
+gratis konto hos EODHD, lim inn nøkkelen i startskriptet, og velg aksjene. Steg
+1 lenker til registreringen hos EODHD i en ny fane, og i demoen til en egen
+side i appen. Steg 2 har ikke noe felt for nøkkelen, fordi webserveren aldri
+rører den. Steget sier om nøkkelen virket ved siste henting, regnet av det som
+er lagret, uten kall og uten å lese nøkkelen. I demoen sier steget at demoen
+ikke trenger noen nøkkel. Steg 3 har de ferdige listene (FR-412) og «+ Følg en
+aksje» (FR-415).
+
+Etter stegene står «Følg flere aksjer», med hvor mange av de 18 plassene som er
+brukt, og aksjene i lista samlet etter bransje, hver med «Bytt ut». Plassene som
+er brukt, er aksjene i lista, pluss dem som venter på å følges, minus dem som
+fjernes ved neste henting. En aksje som fjernes ved neste henting, står med det
+i stedet for knappen. I demoen sier en boks at demoen ikke henter, og at et
+valg står som «Venter på henting» (FR-411).
+
+*Konsekvenser:*
+- Min liste har de tre stegene, og steg 2 har ikke noe felt for nøkkelen.
+- Statusen i steg 2 leser aldri nøkkelen og gjør ingen API-kall.
+- I demoen sier steg 2 at demoen ikke trenger noen nøkkel, og steg 1 går til en side i appen.
+- Tallet for plassene som er brukt, er lista med ønskene som venter.
+- Hver aksje i lista står under sin bransje med «Bytt ut», eller med at den fjernes ved neste henting.
+
 #### FR-407 — Merking av utbyttedager
 
 Et utbytte skal ikke se ut som et kursfall. Endringen regnes derfor på den
@@ -845,6 +876,76 @@ oppdiktet og merket «Eksempeltall» (FR-411).
 *Konsekvenser:*
 - En dato sjekket for 8 dager siden er grå, med teksten.
 - En dato uten sjekkdato vises ikke.
+
+#### FR-208 — Notater med «Etterpå»
+
+Aksjesiden har delen «Mine notater» når «Vis notater» er på (FR-110). Brukeren
+kan skrive et notat på høyst 280 tegn. Notatet får dagen siden viser, og den
+dagen må ha kurs for aksjen. En aksje som er tatt ut av lista, får ingen nye
+notater. Notatene lagres i basen på maskinen og overlever en omstart.
+Webserveren skriver bare notatet og henter aldri (NFR-02). Et notat kan
+slettes, men ikke endres. Før det slettes, spør siden «Slett notatet?», og
+ingenting slettes før svaret.
+
+Aksjesiden viser de to nyeste notatene for aksjen og resten bak «Vis alle».
+Min liste viser alle notatene samlet, den nyeste notatdagen først, med navnet
+på aksjen som lenke (FR-111).
+
+Under hvert notat står «Etterpå», med bare fakta:
+
+- endringen i aksjen og i hovedindeksen fra notatdagen til siste dag med kurs,
+  på den justerte sluttkursen, som i FR-101
+- signalet som er lagret for notatdagen og for siste dag, som i «Signalet dag
+  for dag» (FR-203). Det regnes aldri på nytt (FR-408)
+
+Er notatdagen siste dag med kurs, sier «Etterpå» at det ikke er børsdager med
+kurs etter notatdagen ennå. Mangler en kurs, står «–» med grunnen (NFR-08).
+Appen sier aldri om notatet var riktig eller galt, og gir ingen råd (NFR-06).
+
+*Konsekvenser:*
+- Et tomt notat, eller et på over 280 tegn, avvises, og ingenting lagres.
+- Notatet får dagen siden viser, og en dag uten kurs for aksjen har ikke skjemaet.
+- Endringen i «Etterpå» er endringen på den justerte sluttkursen fra notatdagen til siste dag med kurs.
+- Signalet i «Etterpå» er det som er lagret for dagen, og regnes aldri av kursene.
+- «Slett» sletter ingenting før svaret på spørsmålet.
+- Ingen tekst i «Etterpå» sier at noe var riktig eller galt, eller har et ord fra rådlista.
+
+#### FR-209 — Tenkte kjøp og salg ved et notat
+
+Ved et notat kan brukeren notere et tenkt kjøp med «Noter et tenkt kjøp», og
+senere et tenkt salg med «Noter et tenkt salg». Det er ikke en portefølje og
+ikke et råd (NFR-06). Ingenting står i kroner, og appen sier aldri om kjøpet
+eller salget var godt.
+
+- Et kjøp eller salg noteres bare fra siden for siste dag med kurs, på
+  aksjesiden eller i Min liste. En aksje har høyst ett åpent tenkt kjøp om
+  gangen, og et notat høyst ett kjøp.
+- Ved trykket lagres tidspunktet og de tre sjekkene slik de sto på siden.
+  Kursen lagres ikke. Kjøpet og salget får den første sluttkursen i serien etter
+  den siste dagen med kurs da brukeren trykket, eller etter børsdagen før
+  trykket, om den er senere. Kursen leses fra serien når siden vises. Til den
+  er hentet, står «venter på sluttkursen».
+- Et salg kan noteres først når kjøpet har fått sluttkursen.
+- Ved kjøpet står kjøpsdagen, sjekkene da kjøpet ble notert, og endringen i
+  aksjen og hovedindeksen siden kjøpet. Ved et salg som har fått sluttkursen,
+  står salgsdagen, hvor mange børsdager etter kjøpet, sjekkene da salget ble
+  notert, og endringen i aksjen og hovedindeksen fra kjøpet til salget.
+  Endringen er i prosent, på den justerte sluttkursen.
+- En aksje som fjernes fra lista ved neste henting, får ikke et nytt kjøp eller
+  salg. Har den et åpent kjøp, sier siden først at kursene for den stopper, før
+  den fjernes eller byttes ut.
+- Slettes notatet, slettes kjøpet og salget med det, og spørsmålet før
+  slettingen sier det.
+
+Et tenkt salg uten et tenkt kjøp først er ikke i v1, men kan komme senere (§2).
+
+*Konsekvenser:*
+- Et kjøp fra en annen dag enn siste dag med kurs avvises, og ingenting lagres.
+- Et nytt kjøp for en aksje med et åpent kjøp avvises.
+- Et salg før kjøpet har fått sluttkursen avvises.
+- Med siste kurs mandag og trykket tirsdag før kveldens henting er kjøpsdagen tirsdag.
+- Tabellen for kjøpene har ingen kolonne for kursen, og ingen side viser et kronebeløp ved et kjøp eller salg.
+- Et dobbeltklikk gir ett kjøp, ikke to.
 
 ---
 
@@ -1171,6 +1272,37 @@ svarer 403 på gratisnivået, og Euronext er ute (`begrunnelser.md` §11).
 *Konsekvenser:*
 - Kommandoen gjør 0 nettkall.
 - En dato uten sjekkdato eller kilde avvises.
+
+#### FR-415 — Følg en aksje
+
+«+ Følg en aksje» på oversikten og i Min liste åpner en egen side med aksjene på
+Oslo Børs som kan følges, uten dem appen følger eller som venter på henting. I
+demoen er selskapene oppdiktet (FR-411). Siden har søk på ticker eller navn,
+filter på én eller flere bransjer og på målt omsetning, og sorteringen «Mest
+omsatt først», «A–Å» eller «Bransje». Den sorterer aldri etter kursen eller
+signalet (NFR-06). Hver rad har den målte omsetningen med datoen, eller «ikke
+målt ennå».
+
+Et klikk på «Følg» viser aksjen med bransjen, omsetningen og hvor mange kall
+neste henting bruker. Bransjen er fast og velges ikke av brukeren, og en aksje
+uten bransje kan ikke følges. «Følg aksjen» lagrer ønsket, som tas i bruk ved
+neste henting (FR-412). Aksjen får stjernen og står i Min liste med en gang
+(FR-111). «Angre» før hentingen tar bort både ønsket og stjernen. «Bytt ut»
+bruker den samme siden og lager et bytte: ønsket om å følge den nye og ønsket om
+å fjerne den gamle, som angres sammen. Med 18 aksjer kan en aksje bare byttes
+inn.
+
+Etter tabellen på oversikten står «Dine egne aksjer», med hver aksje brukeren
+har valgt selv og om den er hentet, venter på henting eller fjernes ved neste
+henting, med «Fjern» eller «Angre».
+
+*Konsekvenser:*
+- En aksje appen følger, eller som venter, står ikke på siden.
+- Lista på siden er aldri ordnet etter kursen eller signalet.
+- Etter «Følg aksjen» har aksjen stjernen og står i Min liste før hentingen.
+- «Angre» tar bort både ønsket og stjernen.
+- Med 18 aksjer avvises et nytt ønske om å følge, og lista er uendret.
+- Siden og skjemaet gjør ingen API-kall, og webserveren skriver bare ønsket og stjernen.
 
 ---
 
@@ -1648,7 +1780,7 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 | SM-7 | Riktige beregninger | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består, og en kontroll for hånd stemmer med appen (`malinger.md` §6) | Ved hver testkjøring | FR-701, FR-702, FR-703, FR-704, NFR-08 |
 | SM-8 | KI-forklaringen | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og hver tekst er logget | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen | FR-601, FR-602, FR-603, FR-604, FR-605, FR-607, NFR-04 |
 | SM-9 | Kjørbar for andre | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler. Demoen virker uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin | Senest én uke før innleveringen | FR-411, FR-608, NFR-01 |
-| SM-10 | Notatene etterpå | En person utenfor gruppen finner et notat i Min liste og sier hva aksjen og hovedindeksen har gjort siden | Minst 1 person, uten hjelp | I brukertest 2 | FR-110, FR-111, FR-203 |
+| SM-10 | Notatene etterpå | En person utenfor gruppen finner et notat i Min liste og sier hva aksjen og hovedindeksen har gjort siden | Minst 1 person, uten hjelp | I brukertest 2 | FR-110, FR-111, FR-203, FR-208, FR-209, NFR-06 |
 | SM-11 | KI-teksten av og på | En person utenfor gruppen slår på KI-teksten og sier om signalet og sjekkene er de samme som før | Minst 1 person, og svaret er ja | I brukertest 2 | FR-601, FR-602, FR-706 |
 
 **Hovedflyten** er: åpne markedsoversikten, se hvilke aksjer som skiller seg ut,
@@ -1721,8 +1853,8 @@ lukket dem, står i endringsloggen.
 ### v1.1 — vurderes etter at v1 er kontrollert
 
 Det som står som «senere» i tabellen i §2, er plan for en senere versjon: plan A
-i vedlegg A, åtte deler av kravene i v1 og KI-tekst for små hull (FR-408). Ingen
-av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er i v1.
+i vedlegg A, åtte deler av kravene i v1, KI-tekst for små hull (FR-408) og et
+tenkt salg uten et tenkt kjøp først (FR-209). Ingen av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er i v1.
 
 Av idéene som sto under v1.1, er de som ble bygget, tatt inn som krav i §4:
 sjekk 2 og 3 i kursgrafen (FR-202), signaldagene (FR-206), hjelpen bak «?»

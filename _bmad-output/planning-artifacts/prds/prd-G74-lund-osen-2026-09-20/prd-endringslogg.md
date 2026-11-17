@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T22:32
+updated: 2026-11-17T22:34
 ---
 
 # Endringslogg for PRD-en
@@ -1672,3 +1672,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 - §8, «v1.1»: «Gruppen avgjorde 12.11 kl. 20:09 og 20:10 at disse åtte ikke er i v1. Kravene står som plan for en senere versjon:», med lista over de åtte (FR-101, FR-107, FR-109, FR-203, FR-205, FR-207, FR-414 og FR-608), som nå er «senere»-radene i tabellen i §2. Videre: «Svaret 14.11 kl. 05:49 la til KI-tekst for små hull, 1–3 kvelder (FR-408), som også står som senere i §2.» og «De andre idéene til v1.1 er enten tatt inn som krav over, eller de står med forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og virker. Signalet regnet i ettertid (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet 14.11, før README-prøven. Etter svaret 15.11 kl. 05:20 blir 3.4 done når README-prøven er tatt og ført.»
 
 `tests/test_prd_9_11.py` sjekker nå at de åtte står som «senere» i tabellen i §2, og at «v1.1» viser til tabellen uten en egen liste.
+
+*Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* fire nye krav med nye ID-er i sine avsnitt, hver med konsekvenser og en rad i tabellen i §2 (V1 i valideringen): FR-112 «Din egen liste» i §4.1, FR-208 notatene med «Etterpå» og FR-209 tenkte kjøp og salg ved et notat i §4.2, og FR-415 «Følg en aksje» med stjernen og «Dine egne aksjer» i §4.4, ved siden av FR-412. Alle fire er ekstra og bygget, lest i malene, `src/app.py`, `src/valg.py`, `src/notater.py`, `src/etterpaa.py` og testene 17.11. Et tenkt salg uten et tenkt kjøp først står som senere i FR-209 og i tabellen. UJ-2 viser til FR-208 og FR-209, og SM-10 har de samme kravene som UJ-2. Ingen ID er endret. Det som sto i §2: «Uten eget FR, men ekstra og bygget: egne notater på aksjesiden med tenkte kjøp og salg, «Følg en aksje» og «Din egen liste». De står i `epics.md`.» I UJ-2 sto: «Notatene med «Etterpå» og de tenkte kjøpene har ikke eget FR (§2).» SM-10 viste til FR-110, FR-111 og FR-203.

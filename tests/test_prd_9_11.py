@@ -203,7 +203,10 @@ TAGGENS_ANKRE = (
 )
 ID = re.compile(r"\bN?FR-\d{3}A?\b|\bNFR-\d\d\b")
 # Gruppens svar 12.11 kl. 20:04 (spørsmål 14): Min liste får eget krav.
-NYE_KRAV = ("FR-111",)
+# Story 9.20 (gruppens svar 17.11 kl. 12:29): notatene med «Etterpå»
+# (FR-208), de tenkte kjøpene og salgene (FR-209), «Din egen liste» (FR-112)
+# og «Følg en aksje» (FR-415) får egne krav, med nye ID-er i sine avsnitt (V1).
+NYE_KRAV = ("FR-111", "FR-112", "FR-208", "FR-209", "FR-415")
 KRAVOVERSKRIFT = re.compile(r"^(#{3,4}) ((?:FR-\d{3}A?|NFR-\d\d)) — .+$", re.MULTILINE)
 
 
