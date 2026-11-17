@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-17T12:40
+updated: 2026-11-17T15:21
 ---
 
 # Brukertesten
@@ -121,6 +121,13 @@ Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksj
 | Fant personen et av notatene uten hjelp (ja eller nei) | |
 | Sa personen hva både aksjen og hovedindeksen har gjort siden (ja eller nei) | |
 | Notatene ble skrevet av gruppen, dagen | |
+
+**Et spørsmål etter oppgave G (HE1).** *Lagt til 2026-11-17 (story 9.18, gruppens svar kl. 13:03):* funnet HE1 i den heuristiske evalueringen tas som et spørsmål i testen før det rettes.
+
+| Felt | Notat |
+|---|---|
+| «Hva er forskjellen på «Min liste» og «Dine egne aksjer»?», svaret ordrett | |
+| Skilte personen stjernen (hva du ser) fra Følg (hva appen henter) (ja eller nei) | |
 
 ## Funnene
 
