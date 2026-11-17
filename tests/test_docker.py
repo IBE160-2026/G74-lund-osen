@@ -4577,7 +4577,9 @@ AVTRYKK_I_KOM_I_GANG = {
     # Var 3a938e6a....
     # Story 3.7 (regel 19): spørsmålet om KI-teksten i den ekte versjonen, og at
     # snarveien spør før nettleseren og venter høyst 30 sekunder. Var 1f7571e7....
-    "Slik virker dobbeltklikket": "f9b7a68dfb5c413f38e062e43357f3c17c07e6b46df88f5ebe46e83a728bbdf5",
+    # Story 9.19 (gruppens svar 17.11 kl. 18:26, regel 19): «Mobil kommer kanskje senere.»
+    # Var f9b7a68d....
+    "Slik virker dobbeltklikket": "48ad48ed9a2513b62691fe3f159a93ac5357e90d83eedbf0d682f11419c63abc",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 

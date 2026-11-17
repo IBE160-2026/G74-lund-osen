@@ -191,7 +191,7 @@ Når vinduet er åpent:
 - Den ekte versjonen spør første gang, etter nøkkelen, om KI-teksten: hente Gemma, en gratis språkmodell som kjører på maskinen, bruke din egen API-nøkkel, eller ikke nå. Se [den lokale modellen](#ki-teksten).
 - På Windows spør vinduet første gang om det skal lage snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen, med ikonet under. Spørsmålet kommer før nettleseren åpnes. Skriv `j` og trykk Enter for ja, eller bare Enter for nei. Vinduet venter høyst 30 sekunder; uten svar lages ingen snarvei, og spørsmålet kommer igjen neste gang. Ikonet er de tre søylene fra logoen, med den høyeste i oransje. Et nei huskes, og finnes snarveien, spørres det ikke igjen. Starter snarveien en annen kopi av appen, sier vinduet hvilken mappe den peker på, og spør én gang om den skal starte denne kopien i stedet. Snarveien starter appen som dobbeltklikket. Vil du bli spurt på nytt, sletter du fila i `data` som begynner med `snarvei-nei`.
 - Nettleseren åpner http://127.0.0.1:8000 når appen svarer og spørsmålet om snarveien er besvart.
-- Appen svarer bare på denne maskinen (127.0.0.1), så den kan ikke åpnes fra en mobil. Mobil kommer i en senere versjon.
+- Appen svarer bare på denne maskinen (127.0.0.1), så den kan ikke åpnes fra en mobil. Mobil kommer kanskje senere.
 - Stopp appen ved å lukke vinduet, eller med Ctrl+C.
 
 **Advarselen fra Windows.** Første gang kan Windows vise «Windows beskyttet PC-en», fordi fila er lastet ned fra nettet. Klikk «Mer informasjon», og så «Kjør likevel». Spør Windows om du vil kjøre fila, svarer du ja.
