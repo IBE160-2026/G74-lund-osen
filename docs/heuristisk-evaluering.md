@@ -2,7 +2,7 @@
 title: "Den heuristiske evalueringen"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-17T15:39
+updated: 2026-11-17T16:22
 ---
 
 # Den heuristiske evalueringen av demoen
@@ -89,6 +89,7 @@ HE14–HE17 er satt etter den samme skalaen.
 - HE10: steg 2 heter «Lim inn nøkkelen i startskriptet».
 - HE14: ved månedspilene står en lenke tilbake til måneden for dagen siden viser, for eksempel «Til oktober 2026», bare når en annen måned er valgt.
 - HE15: ingen kodeendring. Følg setter alt stjernen (8.26, 11.11). Beskrivelsen er rettet: notatene synes under «Mine notater» uten stjerne (svaret på spørsmål 4, beskjeden kl. 14:16). Se spørsmålet i spesifikasjonen for 9.18.
+  *Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* HE15 lukkes som alt bygget. Følg har satt stjernen siden 8.26 (11.11), og en test låser det. De tre egne aksjene ble fulgt før det, og gruppen setter stjernen på dem selv i den ekte versjonen.
 - HE16: boksen i omvisningen har fast bredde. At den bytter hjørne, er ikke endret.
 - HE17: et steg om notatene sist på aksjesiden og et i Min liste, rett før «Mine notater», med ordene fra Innstillinger.
 - HE18: omvisningen blar bare når det merkede ikke synes.
