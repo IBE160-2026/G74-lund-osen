@@ -49,6 +49,10 @@ samlede UX-dokumentet tas senere, med `/goal`, som gruppen starter selv.
   bygget, står i endringsloggen og her.
 - **`prd-endringslogg.md`:** én datert linje under «Endringer etter 12.11»
   (regel 19).
+- *Etter svaret 17.11 kl. 12:32:* SM-10 og SM-11 i §7, som måler UJ-2 og UJ-3,
+  med en linje til i endringsloggen, og oppgave G og et ekstra spørsmål i
+  oppgave B under «Brukertest 2» i `docs/brukertest.md`. Brukertest 2 har i
+  dag bare oppgaven om «i ettertid» i fila, så bokstavene B og G er gruppens.
 - `updated` i begge filene settes fra `date` (regel 4).
 - Ingen kode og ingen maler endres. Ingen nye krav: reisene hviler på krav
   som finnes.
@@ -109,6 +113,8 @@ lenken.
 Et spørsmål stopper ikke arbeidet, og alt er skrevet etter forslaget. Spørsmål
 1 og 3 er BH1 i gjennomgangen, på middels og fra svaret, så PR-en flettes ikke
 før gruppen har svart (regel 25).
+*Svar 2026-11-17 kl. 12:32:* gruppen har svart på alle spørsmålene, og BH1 er
+besvart. Ingen funn på middels eller høy grad står åpne.
 
 1. **Suksessmålet for UJ-2 (BH1, middels).** Ingen SM måler reisen. Som
    skrevet sier PRD-en at SM-2 er det nærmeste, men at den måler at gruppen
@@ -116,6 +122,12 @@ før gruppen har svart (regel 25).
    person utenfor gruppen finner et notat i Min liste og sier hva aksjen og
    hovedindeksen gjorde etterpå, minst 1 person, uten hjelp, før innleveringen,
    med FR-110, FR-111 og FR-203. Det andre valget er at teksten står som nå.
+   *Svar 2026-11-17 kl. 12:32 (gruppens svar, rådet anbefalte det):* forslaget
+   godtas. SM-10 står i §7, i samme form som de andre og med kolonnen «Krav»,
+   og måles med en ny oppgave G i brukertest 2: «Finn notatet i Min liste, og
+   si hva aksjen og hovedindeksen har gjort siden.» Gruppen skriver notatet i
+   den ekte versjonen 17.11. Oppgaven står i `docs/brukertest.md`, og
+   endringen i endringsloggen for PRD-en.
 2. **«Sjekkene er de samme» hadde ingen direkte test.** *Rettet etter
    gjennomgangen (VG1):* `test_sjekkortene_er_like_med_ki_av_og_paa` låser
    det nå, i denne storyen. Spørsmålet er besvart av rettingen.
@@ -124,12 +136,20 @@ før gruppen har svart (regel 25).
    vekslingen. *Forslag:* et nytt SM-11 for brukertest 2: en person utenfor
    gruppen slår KI-teksten av og på og sier at signalet og sjekkene er de samme,
    med FR-601, FR-602 og FR-706. Det andre valget er at teksten står som nå.
+   *Svar 2026-11-17 kl. 12:32 (gruppens svar, rådet anbefalte det):* forslaget
+   godtas. SM-11 står i §7 og måles med et ekstra spørsmål i oppgave B i
+   brukertest 2, når personen har slått på KI-teksten: «Er signalet og
+   sjekkene de samme som før du slo på KI?» Det står i `docs/brukertest.md`.
 4. **UJ-1 nevnes alene i «Kort fortalt» og under §7.** *Forslag:* de står,
    fordi UJ-1 er hovedflyten som SM-1 og SM-6 måler.
+   *Svar 2026-11-17 kl. 12:32 (gruppens svar, rådet anbefalte det):* forslaget
+   godtas.
 5. **Lavt, utenfor PRD-en:** docstringen i
    `test_demo_ki.py::TestAksjesiden::test_knappen_skjuler_og_viser_teksten`
    nevner «Skjul KI-teksten» og «Vis KI-teksten», mens bryteren heter «Vis
    KI-tekst». *Forslag:* rettes neste gang fila endres.
+   *Svar 2026-11-17 kl. 12:32 (gruppens svar, rådet anbefalte det):* forslaget
+   godtas.
 
 ## Gjennomgangen 17.11
 
@@ -138,7 +158,7 @@ lesing, på `32885761`. 24 funn: 6 på middels og 18 lave.
 
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
-| BH1 | middels | SM-2 og SM-8 måler ikke reisene, og kravene deres mangler noen av kravene reisene hviler på | **Står åpent, følger av svaret (regel 25).** Svaret ba om suksessmålet som måler reisen, og ingen SM gjør det. Teksten sier nå at SM-2 og SM-8 er de nærmeste. Spørsmål 1 og 3 |
+| BH1 | middels | SM-2 og SM-8 måler ikke reisene, og kravene deres mangler noen av kravene reisene hviler på | Besvart 17.11 kl. 12:32 (spørsmål 1 og 3): nye SM-10 og SM-11 i §7, målt i brukertest 2 |
 | ECH1 | middels | «Hvorfor signalet ble 3» gjelder ikke enhver aksje som skiller seg ut, fordi grensen er 2 | Rettet: «en aksje med 3 av 3», som UJ-1 |
 | ECH2 | middels | Edgen i UJ-3 gjelder bare den ekte versjonen, siste børsdag og når ingen aksje har KI-tekst | Rettet: forbeholdene står i Edgen |
 | ECH3 | middels | Kravene for UJ-2 dekker ikke «Etterpå» og de tenkte kjøpene | Rettet: «Notatene med «Etterpå» og de tenkte kjøpene har ikke eget FR (§2).» |
@@ -178,5 +198,5 @@ lesing, på `32885761`. 24 funn: 6 på middels og 18 lave.
 - [x] Linja i endringsloggen
 - [x] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13): bare `updated` er endret i det som sto
 - [x] Gjennomgangen er tatt
-- [x] `--dokumentene` er grønn lokalt: på `248d71ce` kl. 12:04–12:23, med 2970 bestått og 7 hoppet over. Første kjøring kl. 11:54 ble stoppet for lite minne og startet igjen
+- [ ] `--dokumentene` er grønn lokalt etter svarene kl. 12:32. Før svarene: på `248d71ce` kl. 12:04–12:23, med 2970 bestått og 7 hoppet over. Første kjøring kl. 11:54 ble stoppet for lite minne og startet igjen
 - [ ] CI er grønn i alle jobbene
