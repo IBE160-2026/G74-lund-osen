@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-17T15:21
+updated: 2026-11-17T15:39
 ---
 
 # UX-loggen
@@ -772,3 +772,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Idé 2026-11-17 kl. 13:08 (gruppen), ikke et funn:* et tenkt salg uten et tenkt kjøp først, for aksjer man har fra før. Appen sier aldri om et kjøp eller salg er godt (NFR-06), bare hva aksjen og indeksen gjorde etterpå. Den tas etter brukertest 2, og hører sammen med U112 fra brukertest 1.
 
 *Lagt til 2026-11-17 (story 9.18):* rettet før brukertest 2: U115 (HE2, «Slett» spør først), U116 (HE3, styrken og retningen under navnet på smal skjerm), U118 (HE5), U121 (HE8, «mot 50-dagers snitt»), U122 (HE9, ett tall per gruppe), U123 (HE10, «Lim inn nøkkelen i startskriptet»), U127 (HE14, lenken tilbake til måneden), U129 (HE16, fast bredde), U130 (HE17, stegene om notatene) og U131 (HE18, blar bare når det trengs). U128 (HE15): ingen kodeendring, fordi Følg alt setter stjernen; beskrivelsen er rettet etter svaret kl. 14:16. U114 (HE1) er et spørsmål i brukertest 2. Detaljene står i [evalueringen](heuristisk-evaluering.md).
+
+*Rettet 2026-11-17 (svaret kl. 14:16 på spørsmål 4 i 9.17, gjennomgangen av 9.18):* U128 (HE15) beskriver en aksje uten stjerne. Følg setter stjernen fra 11.11 (8.26), og notatene synes under «Mine notater» også uten stjerne, så det er ingen kodeendring. En aksje uten stjerne kan være fulgt før 11.11, eller tatt inn med en ferdig liste (spørsmål 1 i spesifikasjonen for 9.18).
