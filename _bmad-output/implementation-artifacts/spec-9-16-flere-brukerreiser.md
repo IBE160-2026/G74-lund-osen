@@ -40,10 +40,13 @@ samlede UX-dokumentet tas senere, med `/goal`, som gruppen starter selv.
 
 ## Det som skrives
 
-- **§1 i `prd.md`:** to nye avsnitt under «Brukerreisen UJ-1», UJ-2 (Min liste
-  med notater) og UJ-3 (KI av og på), i samme form som UJ-1. Overskriften blir
-  «Brukerreisene». Hver reise sier at den er skrevet 17.11, etter at appen ble
-  bygget, og beskriver det appen gjør på main.
+- **§1 i `prd.md`:** to nye avsnitt etter «Brukerreisen UJ-1», med hver sin
+  overskrift, «Brukerreisen UJ-2» (Min liste med notater) og «Brukerreisen
+  UJ-3» (KI-teksten av og på), i samme form som UJ-1. Overskriften for UJ-1 står
+  urørt, fordi `test_brukerreisen_og_ordlista` i `tests/test_prd_9_11.py` deler
+  teksten ved den. `prd.md` har ingen «Lagt til»-linjer eller storynumre
+  (`test_prd_9_11.py`), så at reisene er skrevet 17.11, etter at appen ble
+  bygget, står i endringsloggen og her.
 - **`prd-endringslogg.md`:** én datert linje under «Endringer etter 12.11»
   (regel 19).
 - `updated` i begge filene settes fra `date` (regel 4).
@@ -52,8 +55,73 @@ samlede UX-dokumentet tas senere, med `/goal`, som gruppen starter selv.
 
 ## Sjekken mot main
 
-Hvert steg i reisene har en kilde i malene eller `src/app.py`, og en test som
-låser det. Tabellen under fylles når reisene er skrevet.
+Slått opp på `ba866204`, først av én leser med bare lesing og så kontrollert i
+vinduet: hvert testnavn under finnes, og malstedene er lest. Personene Sindre og
+Ingrid er oppdiktet og står ikke andre steder i `docs/`, `_bmad-output/` eller
+README-en.
+
+**UJ-2, Min liste med notater**
+
+| Steget | Malen eller koden | Testen |
+|---|---|---|
+| «Min liste» med overskriften om de merkede som skilte seg ut | `index.html` (`h1` med «i Min liste»), ruten `/min-liste` i `app.py` | `test_min_liste.py::TestSidene::test_min_liste_har_overskriften_teksten_og_knappen_med_antallet` |
+| «Mine notater» nederst, alle notatene, den nyeste først, navnet som lenke | `index.html` («Alle notatene dine, den nyeste først. …»), `_notat.html` | `test_notater.py::TestMinListe::test_alle_notatene_samlet_nyeste_foerst_med_lenke` |
+| «Etterpå»: aksjen og hovedindeksen fra notatdagen til siste børsdag, og signalet begge dagene | `_notat.html` (`etterpaa`) | `test_notater.py::TestSiden::test_etterpaa_paa_siden` og `::TestSiden::test_samme_tall_som_basen` |
+| Et tenkt kjøp som er solgt: salgsdagen, sjekkene da salget ble notert, aksjen og hovedindeksen fra kjøpet til salget | `_notat.html` («Tenkt kjøp og salg», «Salgsdag …», «Aksjen fra kjøpet til salget:») | `test_notater.py::TestDemoen::test_eksemplene_har_tall_og_ett_aapent_og_ett_avsluttet_kjoep` |
+| Nytt notat på aksjesiden | `aksje.html` («Notatet får datoen …», «Lagre notatet») | `test_notater.py::TestSkjemaet::test_notatet_faar_dagen_siden_viser` |
+| Knappen og panelet «Mine notater» på en bred skjerm | `_ramme.html`, `_notatpanel.html` | `test_notatpanel_8_27.py::TestKnappen::test_etter_min_liste_med_ikon_paa_hver_side` og `::TestPanelet::test_alle_notatene_nyeste_foerst_som_i_min_liste` |
+| Climax: ingen dom over notatet | `innstillinger.html` («Appen sier aldri om noe var riktig.») | `test_notater.py::TestSiden::test_ingen_ord_om_riktig_eller_galt_og_ingen_raad` |
+| Edge: notat fra siste børsdag | `_notat.html` («Ingen børsdager med kurs etter notatdagen ennå.») | `test_notater.py::TestEtterGjennomgangen::test_siste_dag_sier_at_det_ikke_er_dager_etter` |
+| Edge: «Vis notater» av | `innstillinger.html`, `_ramme.html`, `index.html` og `aksje.html` | `test_notater.py::TestBryteren::test_av_skjuler_notatene_og_sletter_ingenting` |
+
+Linja for et tenkt kjøp som ikke er solgt, har ingen test mot siden, så den er
+ikke med i reisen.
+
+**UJ-3, KI-teksten av og på**
+
+| Steget | Malen eller koden | Testen |
+|---|---|---|
+| De tre sjekkene under «Hvorfor signalet ble 3», uten betingelse på KI | `aksje.html` | `test_ki_visning.py::TestSiden::test_regelforklaringen_staar_alltid` (bare overskriften, spørsmål 2) |
+| KI på: «Signalet forklart», appens setninger, «Laget av KI» og modellen | `aksje.html` (`ki-del`, `merke-ki` og `modell`) | `test_ki_visning.py::TestSiden::test_ki_teksten_under_regelforklaringen` |
+| Bryteren «Vis KI-tekst» ved teksten | `aksje.html` (`ki-bryter`), ruten `/ki` i `app.py` | `test_ki_visning.py::TestSiden::test_med_ki_av_ingen_ki_tekst_og_bryteren_sier_vis` |
+| KI av: bryteren, appens setninger og linja om grunnlaget står | `aksje.html` (`dagene`, `samme-dag` og `grunnlaget`) | `test_aksjesiden_8_20a.py::TestBunnen::test_linja_nederst_i_rammen_og_ingen_fotnote_to_ganger`, `test_ki_visning.py::TestSetningenOmSammeDag::test_ogsaa_med_ki_av`, `test_ki_visning.py::TestSiden::test_med_ki_av_er_siden_lik_med_og_uten_rad` og `test_ettertid_2_17.py::TestVisningen::test_med_ki_av_ingen_melding_om_ki_for_dagen` |
+| Innstillinger viser samme verdi | `innstillinger.html` | `test_innstillinger_ki.py::TestSammeValg::test_bryteren_ved_teksten_slaar_av_innstillinger` og `::test_innstillinger_slaar_av_bryteren_ved_teksten` |
+| Forsiden med KI av: bryteren og én linje under «Børsdagen kort fortalt» | `index.html`, `DAGEN_AV` i `ki_visning.py` | `test_ki_dagen.py::TestForsiden::test_bryteren_slaar_av_begge_ki_tekstene` |
+| Edge: ingen språkmodell, med lenken «Slik slår du den på» | `index.html`, `DAGEN_UTEN_MODELL` i `ki_visning.py` | `test_ki_dagen.py::TestForsiden::test_uten_rad`, og for aksjesiden `test_ki_visning.py::TestSiden::test_en_dag_uten_rad_sier_det` |
+
+**Demoen.** Begge reisene kan vises i demoen. Den merker fem aksjer, har fire
+oppdiktede notater med ett solgt og ett åpent tenkt kjøp, og har KI-tekster for
+siste demodag (`src/demo.py`,
+`test_notater.py::TestDemoen::test_notatene_samlet_i_min_liste_i_demoen` og
+`test_demo_ki.py::TestAksjesiden::test_viser_teksten_med_merket_og_modellinja`).
+Edgen i UJ-3 kan ikke vises i demoen, som sier «Dagen er uten KI-tekst.» uten
+lenken.
+
+## Spørsmål til gruppen, med forslag
+
+Et spørsmål stopper ikke arbeidet, og alt er skrevet etter forslaget.
+
+1. **Suksessmålet for UJ-2.** Ingen SM måler notatene. *Forslag, som skrevet:*
+   SM-2 (Adopsjon), som viser til FR-111 og måler at gruppen bruker appen på
+   egne aksjer. Det andre valget er et nytt SM-10 for brukertest 2, for
+   eksempel at en person utenfor gruppen finner et notat i Min liste og sier
+   hva aksjen og hovedindeksen gjorde etterpå. Det er et nytt mål, så det
+   venter på gruppen.
+2. **«Sjekkene er de samme» har ingen direkte test.** Climax i UJ-3 hviler på
+   at sjekkortene ikke har noen betingelse på KI i `aksje.html`, og på
+   konsekvensen i FR-602. `test_regelforklaringen_staar_alltid` sjekker bare
+   overskriften. *Forslag:* en test som sammenligner sjekkortene med KI av og
+   på, i en egen liten story. Ingen kode endres her.
+3. **Suksessmålet for UJ-3.** SM-8 måler kontrollen og loggen av KI-teksten,
+   ikke selve vekslingen. *Forslag, som skrevet:* SM-8, fordi den viser til
+   FR-601 og FR-602. Det andre valget er SM-6, fordi FR-601 sier at bidraget
+   skal kunne vises fram mens noen ser på.
+4. **UJ-1 nevnes alene i «Kort fortalt» og under §7.** *Forslag:* de står,
+   fordi UJ-1 er hovedflyten som SM-1 og SM-6 måler.
+5. **Lavt, utenfor PRD-en:** docstringen i
+   `test_demo_ki.py::TestAksjesiden::test_knappen_skjuler_og_viser_teksten`
+   nevner «Skjul KI-teksten» og «Vis KI-teksten», mens bryteren heter «Vis
+   KI-tekst». *Forslag:* rettes neste gang fila endres.
 
 ## Grenser
 
@@ -65,10 +133,10 @@ låser det. Tabellen under fylles når reisene er skrevet.
 
 ## Kontroll
 
-- [ ] UJ-2 og UJ-3 i §1, i samme form som UJ-1
-- [ ] Hvert steg sjekket mot malene og testene, med kilde i tabellen
-- [ ] Linja i endringsloggen
-- [ ] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13)
+- [x] UJ-2 og UJ-3 i §1, i samme form som UJ-1
+- [x] Hvert steg sjekket mot malene og testene, med kilde i tabellen
+- [x] Linja i endringsloggen
+- [x] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13): bare `updated` er endret i det som sto
 - [ ] Gjennomgangen er tatt
 - [ ] `--dokumentene` er grønn lokalt
 - [ ] CI er grønn i alle jobbene
