@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-17T11:09
+updated: 2026-11-17T11:11
 ---
 
 # Kvalitetssikring
@@ -1190,6 +1190,8 @@ hentingen kan gi kurser, se «Når kan jeg hente?» i
 - **Rettet i** (commit eller story): –
 
 *Lagt til 2026-10-28 kl. 11:43:* rad 5 ble tatt samme dag som flettingen, så jobben stoppet før hentingen, som den skal. Prøven med 0 kall fra selve hentingen tas 29.10 før kl. 22:00, eller leses i loggen etter første kjøring 29.10 kl. 22:15.
+
+*Lagt til 2026-11-17 (spørsmål 5 i `spec-9-13-dokumentrunden-etter-v1-1.md`, beskjeden fra rådet 17.11 kl. 11:02, med gruppens lesing av loggen; vinduet leste ikke `data/`):* prøven med 0 kall fra selve hentingen. Kjøringen kl. 22:45 16.11, etter at kvelden var hentet kl. 22:15, sa «Dagen er ferdig (FERDIG 2026-11-16 …)» og «Basen har alt kursene for børsdagen 2026-11-16 for alle 18 aksjene. Ingenting å hente (FR-402). 0 kall brukt.», og målingen brukte 0 kall.
 
 ## 10. Suksesskriteriene og testene
 

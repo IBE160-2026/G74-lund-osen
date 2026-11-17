@@ -4,7 +4,7 @@
 - [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH4: om ventingen første gang skal stå i et eget steg (løst 2026-10-30: svaret 29.10 kl. 19:36 c, ingen endring)
 - [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH7: om pila «Demoen og den ekte versjonen» skal få et annet navn nå som tabellen står øverst (løst 2026-10-30: fe21d95, i a3e6057)
 - [x] 2026-10-28 [3-5g-videre](997-2026-10-28-20-02-58-3-5g-videre.md) — 3.5g BH9: om Linux skal ha en egen rad i §9 (løst 2026-10-30: D7 i 05cc7f0, i a3e6057)
-- [ ] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: prøven med 0 kall fra hentingen 29.10 før kl. 22:00, eller i loggen etter første kjøring 29.10 kl. 22:15
+- [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d: prøven med 0 kall fra hentingen 29.10 før kl. 22:00, eller i loggen etter første kjøring 29.10 kl. 22:15 (løst 2026-11-17: spørsmål 5 i 9.13, beskjeden fra rådet kl. 11:02; kjøringen kl. 22:45 16.11 sa at dagen var ferdig og brukte 0 kall, ført i Prøve 4 i `docs/kvalitetssikring.md`)
   - *Sjekket 2026-11-14 (story 9.13):* trenger gruppen, spørsmål 5 i `spec-9-13-dokumentrunden-etter-v1-1.md`, med forslag.
   - *Svart 2026-11-15 kl. 05:20 (spørsmål 5 i 9.13):* står: tas etter første kveldskjøring 16.11, når loggen er lest og en datert linje er ført i Prøve 4.
 - [x] 2026-10-28 [hentingen-hver-kveld](998-2026-10-28-11-22-41-hentingen-hver-kveld.md) — 2.3d BH6: en henting for hånd samtidig med jobben er ikke sperret (spørsmål til gruppen før flettingen) (løst 2026-10-28, gruppens svar kl. 11:34: ingen lås nå)
