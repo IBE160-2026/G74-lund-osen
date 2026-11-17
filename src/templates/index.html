@@ -65,8 +65,8 @@
                   likt overalt der en tidligere dag vises med signal (2.17). #}
               {#- Story 9.19 (spørsmål 4 i 9.18): styrken og retningen står hver
                   bare én gang. Delen med styrken (smal-styrke) skjules når
-                  kolonnen for signalstyrken får plass, og retningen
-                  (smal-retning) når kolonnen for retningen gjør det (stil.css).
+                  kolonnen for signalstyrken får plass i boksen, og hele linja
+                  når kolonnen for retningen gjør det (@container i stil.css).
                   Merket «i ettertid» og «– grunn» for en rad uten signal står i
                   cellen for styrken, så de hører til delen med styrken. #}
               <span class="smal-signal" aria-hidden="true">{% if rad.styrke is not none %}<span class="smal-styrke">{{ rad.styrke }} av {{ antall_sjekker }} · </span><span class="smal-retning"><span class="{{ rad.retning.klasse }}">{{ rad.retning.symbol }} {{ rad.retning.tekst }}</span></span>{% if rad.ettertid %}<span class="smal-styrke"> · i ettertid</span>{% endif %}{% else %}<span class="smal-styrke">– {{ rad.tekst }}</span>{% endif %}</span>

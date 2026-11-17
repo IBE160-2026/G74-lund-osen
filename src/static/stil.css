@@ -499,17 +499,22 @@ td .justeringsdag { display: block; font-size: 12px; font-weight: 400; color: va
    under navnet bare på smal skjerm, der kolonnene ligger utenfor boksen.
    Fargen på retningen kommer fra .opp, .ned, .blandet og .ingen.
    Story 9.19 (spørsmål 4 i 9.18): styrken og retningen står hver bare én
-   gang. Tabellen er 709 px bred med demoens aksjer, og boksen er 34 px
-   smalere enn vinduet. Kolonnen for signalstyrken får plass fra 607 px og
-   kolonnen for retningen fra 743 px (målt i Edge 17.11). Under 607 px står
-   styrken og retningen i linja, fra 607 px bare retningen, og fra 743 px
-   ingen linje. Før var bruddet 760 px for hele linja. */
+   gang. Bruddene er i bredden på boksen rundt tabellen, som er containeren,
+   så et rullefelt ikke flytter dem (gjennomgangen, BH1). Målt i Edge 17.11
+   med demoens aksjer: kolonnen for signalstyrken får plass når boksen er
+   minst 573 px, og kolonnen for retningen når den er minst 709 px. Under
+   573 px står styrken og retningen i linja, fra 573 px bare retningen, og
+   fra 709 px ingen linje. En rad uten signal har bare delen med styrken, så
+   linja står ikke tom fra 573 px (BH4). Før var bruddet 760 px vindu for
+   hele linja. */
+:where(.side-oversikt) .tabellboks#aksjene { container-type: inline-size; }
 :where(.side-oversikt) td.selskap .smal-signal { display: none; }
-@media (width < 743px) {
+@container (width < 709px) {
   :where(.side-oversikt) td.selskap .smal-signal { display: block; margin-top: 2px; font-size: 13px; font-weight: 600; }
 }
-@media (607px <= width < 743px) {
+@container (573px <= width < 709px) {
   :where(.side-oversikt) td.selskap .smal-styrke { display: none; }
+  :where(.side-oversikt) td.selskap .smal-signal:not(:has(.smal-retning)) { display: none; }
 }
 :where(.side-oversikt) .periodehode { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 :where(.side-oversikt) .periodehode nav.periodevalg { margin-bottom: 12px; }
