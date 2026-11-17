@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T15:21
+updated: 2026-11-17T22:32
 ---
 
 # Endringslogg for PRD-en
@@ -1650,3 +1650,25 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-17 (story 9.16, gruppens svar 17.11 kl. 12:32 på spørsmål 1 og 3, rådet anbefalte det):* §7 har fått to nye suksessmål, SM-10 (notatene etterpå, måler UJ-2) og SM-11 (KI-teksten av og på, måler UJ-3), i samme form som de andre og med kolonnen «Krav». Begge måles i brukertest 2, SM-10 med en ny oppgave G og SM-11 med et ekstra spørsmål i oppgave B (`docs/brukertest.md`). UJ-2 og UJ-3 sier at SM-10 og SM-11 måler dem, og statusen i §7 nevner dem.
 
 *Endret 2026-11-17 (story 9.18, gruppens svar 17.11 kl. 13:03–13:33, rådet anbefalte det):* FR-706: eksemplet på målingen bak trendsjekken er «+3,1 % mot 50-dagers snitt», ikke «mot MA50», som siden nå sier (HE8). FR-101: på smal skjerm står styrken og retningen også under selskapsnavnet (HE3). Målingen er ikke lagret i basen eller i KI-grunnlaget, så bare visningen er endret.
+
+*Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* status og prosess er tatt ut av §2, §7, §8 og FR-108 og står her som historikk (V3 og V4 i valideringen), mens terskler, frister og begrunnelser står i `prd.md`. «v1.1» i §8 viser til tabellen i §2 i stedet for å gjenta de åtte radene, og sier hvilke idéer som er bygget. Det som sto, ordrett:
+
+- §2, før tabellen: «**Kjerne** er det briefen v8 lover, og det som var flettet da gruppen avgjorde omfanget 19.10. **Ekstra** er det som er bygget utover briefen. Det ble bygget på egen gren og flettet ferdig og grønt før funksjonsstoppen, README-prøven senest én uke før innleveringen. **Senere** er plan A og det som ikke er i v1, men står som plan for en senere versjon (§8, «v1.1»). **Bygget** betyr flettet til main og lest i koden 12.11, 13.11 for flettingene den dagen (9.11) og 14.11 for signalet i ettertid (2.17).»
+- §2, etter tabellen, bak begrunnelsen for KI-tekst for små hull: «(gruppens svar 14.11 kl. 05:49)».
+- FR-108: «Filteret er tatt bort 11.11, etter gruppens ønske. Raden «Alle», «3 av 3 positiv» og «3 av 3 negativ» viste ikke noe tabellen ikke alt viser under «Skilte seg ut». Med raden gikk også linja om filteret og lenken til dem som fikk 2 av 3. Over tabellen står nå bare «Alle» og «Min liste» (FR-111). At signalstyrken ikke er et råd om å kjøpe eller selge, står fortsatt i innledningen på oversikten (NFR-06).»
+- §7, statusen, som nå er historikk:
+
+  **Status 12.11, med brukslogga 15.11.**
+
+  - SM-1 er ikke nådd. Brukertesten 10.11 hadde én person og den ekte versjonen. Personen forklarte uoppfordret hvorfor en aksje skilte seg ut, men brukte over 5 minutter (`docs/brukertest.md`). Terskelen står.
+  - SM-8: uka 29.10–04.11 er logget, med 75 tekster, 15 på hver av de fem børsdagene. De er laget med `gemma4:e4b` lokalt og promptversjon 3. Alle besto kontrollen, og 0 ble stoppet. Etter motmålet under er det et varsel, ikke en suksess. Promptversjonen er 6 i dag, så uka gjelder en eldre prompt.
+  - SM-2 og SM-5 føres i [brukslogga](../../../../docs/brukslogg.md) fra 4.11, med én linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk. Brukslogga har én linje, 04.11. Fra 05.11 til 14.11 er ingen bruk ført, så de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11.
+  - SM-9: README-prøven tas når v1 er ferdig bygget. Signalet regnet i ettertid (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet 14.11, før prøven. Etter svaret 15.11 kl. 05:20 står 3.4 i review og blir done når README-prøven er tatt og ført.
+  - SM-10 og SM-11 måles i brukertest 2, med oppgave G og et ekstra spørsmål i oppgave B (`docs/brukertest.md`).
+  - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
+
+  I `prd.md` står nå hvordan målene måles, under «Slik måles de»: brukslogga, at jobbens logger ikke er bruk, README-prøven, brukertest 2 og punkt 13.
+- §7, etter «Drift: hva målet ga opp»: «To mål fra eldre versjoner gjelder ikke lenger. «KI-bidrag i drift» er erstattet av SM-8 etter plan B, og «Relevanseksperiment» utgikk etter del 1. Begge står i endringsloggen.»
+- §8, «v1.1»: «Gruppen avgjorde 12.11 kl. 20:09 og 20:10 at disse åtte ikke er i v1. Kravene står som plan for en senere versjon:», med lista over de åtte (FR-101, FR-107, FR-109, FR-203, FR-205, FR-207, FR-414 og FR-608), som nå er «senere»-radene i tabellen i §2. Videre: «Svaret 14.11 kl. 05:49 la til KI-tekst for små hull, 1–3 kvelder (FR-408), som også står som senere i §2.» og «De andre idéene til v1.1 er enten tatt inn som krav over, eller de står med forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og virker. Signalet regnet i ettertid (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet 14.11, før README-prøven. Etter svaret 15.11 kl. 05:20 blir 3.4 done når README-prøven er tatt og ført.»
+
+`tests/test_prd_9_11.py` sjekker nå at de åtte står som «senere» i tabellen i §2, og at «v1.1» viser til tabellen uten en egen liste.

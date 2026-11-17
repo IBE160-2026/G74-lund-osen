@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T15:21
+updated: 2026-11-17T22:32
 ---
 
 # PRD — OSE Signal
@@ -195,13 +195,11 @@ Sluttkursen vises som `close`, mens endringen regnes på `adjusted_close` (FR-40
 
 ### Kjerne, ekstra og senere
 
-**Kjerne** er det briefen v8 lover, og det som var flettet da gruppen avgjorde
-omfanget 19.10. **Ekstra** er det som er bygget utover briefen. Det ble bygget på
-egen gren og flettet ferdig og grønt før funksjonsstoppen, README-prøven senest
-én uke før innleveringen. **Senere** er plan A og det som ikke er i v1, men står
-som plan for en senere versjon (§8, «v1.1»). **Bygget** betyr flettet til main og
-lest i koden 12.11, 13.11 for flettingene den dagen (9.11) og 14.11 for signalet
-i ettertid (2.17).
+**Kjerne** er det briefen v8 lover, og det som var bygget da omfanget ble
+avgjort 19.10. **Ekstra** er det som er bygget utover briefen. **Senere** er
+plan A og det som ikke er i v1, men står som plan for en senere versjon (§8,
+«v1.1»). «Ja» under «Bygget?» betyr at det finnes i appen på main, lest i
+koden. Når hver rad ble lest, står i endringsloggen.
 
 | FR | Krav | Kjerne / ekstra / senere | Bygget? |
 |---|---|---|---|
@@ -264,8 +262,7 @@ Uten eget FR, men ekstra og bygget: egne notater på aksjesiden med tenkte kjøp
 og salg, «Følg en aksje» og «Din egen liste». De står i `epics.md`.
 
 KI-tekst for små hull står som senere, fordi den tar tid, krever kontroll, gir
-fare for å se framover, og gir mindre nytte bakover (gruppens svar 14.11 kl.
-05:49).
+fare for å se framover, og gir mindre nytte bakover.
 
 Løsningen er en **webapplikasjon for PC**. Den er på norsk og kjører lokalt.
 Sidene virker også på smal skjerm, men en mobilapp er utenfor v1.
@@ -581,12 +578,11 @@ ikke noe merke. Merket skjules når en sammenligning med en annen dag er valgt.
 
 #### FR-108 — Filter på signalet
 
-Filteret er tatt bort 11.11, etter gruppens ønske. Raden «Alle», «3 av 3
-positiv» og «3 av 3 negativ» viste ikke noe tabellen ikke alt viser under
-«Skilte seg ut». Med raden gikk også linja om filteret og lenken til dem som
-fikk 2 av 3. Over tabellen står nå bare «Alle» og «Min liste» (FR-111). At
-signalstyrken ikke er et råd om å kjøpe eller selge, står fortsatt i
-innledningen på oversikten (NFR-06).
+Oversikten har ikke noe filter på signalet. Et filter med «Alle», «3 av 3
+positiv» og «3 av 3 negativ» ville ikke vist noe tabellen ikke alt viser under
+«Skilte seg ut». Over tabellen står bare «Alle» og «Min liste» (FR-111). At
+signalstyrken ikke er et råd om å kjøpe eller selge, står i innledningen på
+oversikten (NFR-06).
 
 *Konsekvenser:*
 - Oversikten og Min liste har ikke noe valg for signalet, og adressen leser ikke `?signal=`.
@@ -1660,26 +1656,13 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 og KI-teksten når den er på. SM-1 og SM-6 måler denne flyten, som brukerreisen UJ-1
 beskriver.
 
-**Status 12.11, med brukslogga 15.11.**
-
-- SM-1 er ikke nådd. Brukertesten 10.11 hadde én person og den ekte versjonen.
-  Personen forklarte uoppfordret hvorfor en aksje skilte seg ut, men brukte over
-  5 minutter (`docs/brukertest.md`). Terskelen står.
-- SM-8: uka 29.10–04.11 er logget, med 75 tekster, 15 på hver av de fem
-  børsdagene. De er laget med `gemma4:e4b` lokalt og promptversjon 3. Alle besto
-  kontrollen, og 0 ble stoppet. Etter motmålet under er det et varsel, ikke en
-  suksess. Promptversjonen er 6 i dag, så uka gjelder en eldre prompt.
-- SM-2 og SM-5 føres i [brukslogga](../../../../docs/brukslogg.md) fra 4.11, med
-  én linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk.
-  Brukslogga har én linje, 04.11. Fra 05.11 til 14.11 er ingen bruk ført, så
-  de dagene regnes ikke som loggført for SM-2. Logga føres igjen fra 15.11.
-- SM-9: README-prøven tas når v1 er ferdig bygget. Signalet regnet i ettertid
-  (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet
-  14.11, før prøven. Etter svaret 15.11 kl. 05:20 står 3.4 i review og blir
-  done når README-prøven er tatt og ført.
-- SM-10 og SM-11 måles i brukertest 2, med oppgave G og et ekstra spørsmål i
-  oppgave B (`docs/brukertest.md`).
-- Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
+**Slik måles de.** SM-2 og SM-5 føres i [brukslogga](../../../../docs/brukslogg.md),
+med én linje per dag gruppen bruker appen. Jobbens logger regnes ikke som bruk.
+SM-9 er README-prøven fra en ren maskin, tatt når v1 er ferdig bygget. SM-10 og
+SM-11 måles i brukertest 2, med oppgave G og et ekstra spørsmål i oppgave B
+(`docs/brukertest.md`). Fristene som er bundet til demonstrasjonen og
+innleveringen, venter på datoene (§8, punkt 13). Hvor langt et mål er nådd, er
+status og står i endringsloggen, med datoen det ble ført.
 
 **Drift: hva målet ga opp.** Målet sa først «ingen manuelle steg», og det målte
 to ting. *Ingenting utløses av et menneske* er **gitt opp, og det var et valg**.
@@ -1689,10 +1672,6 @@ Henting ved oppstart ville brukt 16 kall per start mot en dagskvote på 20
 basen åpnes, ikke som et eget steg. Målet er omformulert og ikke strøket. Men den
 første halvdelen er oppgitt, ikke myknet opp. Ellers ville det sett ut som om
 målet ble justert til å passe det vi bygde.
-
-To mål fra eldre versjoner gjelder ikke lenger. «KI-bidrag i drift» er erstattet
-av SM-8 etter plan B, og «Relevanseksperiment» utgikk etter del 1. Begge står i
-endringsloggen.
 
 ### Motmål
 
@@ -1741,26 +1720,14 @@ lukket dem, står i endringsloggen.
 
 ### v1.1 — vurderes etter at v1 er kontrollert
 
-Gruppen avgjorde 12.11 kl. 20:09 og 20:10 at disse åtte ikke er i v1. Kravene
-står som plan for en senere versjon:
+Det som står som «senere» i tabellen i §2, er plan for en senere versjon: plan A
+i vedlegg A, åtte deler av kravene i v1 og KI-tekst for små hull (FR-408). Ingen
+av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er i v1.
 
-- endringen i kroner under prosenten i oversikten (FR-101)
-- merket for endret signalstyrke (FR-107)
-- «Lær noe nytt» (FR-109)
-- høy og lav og endringen i kroner på aksjesiden (FR-203)
-- «Se nærmere» (FR-205)
-- kommende eks.dato i kursgrafen (FR-207)
-- eks.datoer ført for hånd (FR-414)
-- ChatGPT med «Sign in with ChatGPT» (FR-608)
-
-Svaret 14.11 kl. 05:49 la til KI-tekst for små hull, 1–3 kvelder (FR-408), som
-også står som senere i §2.
-
-De andre idéene til v1.1 er enten tatt inn som krav over, eller de står med
-forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og
-virker. Signalet regnet i ettertid (2.17) ble likevel tatt inn etter svaret 14.11
-kl. 05:41–05:49 og flettet 14.11, før README-prøven. Etter svaret 15.11
-kl. 05:20 blir 3.4 done når README-prøven er tatt og ført.
+Av idéene som sto under v1.1, er de som ble bygget, tatt inn som krav i §4:
+sjekk 2 og 3 i kursgrafen (FR-202), signaldagene (FR-206), hjelpen bak «?»
+(FR-109) og signalet regnet i ettertid (FR-408). De andre står med forbeholdene
+sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og virker.
 
 ---
 

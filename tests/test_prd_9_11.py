@@ -419,8 +419,12 @@ SENERE = (
 
 def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
     """Gruppens svar 12.11 kl. 20:09 og 20:10. Ville feilet hvis en av de åtte
-    sto som ekstra eller kjerne i tabellen i §2, manglet i tabellen eller i
-    lista under «v1.1» i §8, eller kravteksten ikke sa at den ikke er i v1.
+    sto som ekstra eller kjerne i tabellen i §2, manglet i tabellen, eller
+    kravteksten ikke sa at den ikke er i v1, eller hvis «v1.1» i §8 ikke viste
+    til tabellen i §2. Story 9.20 (gruppens svar 17.11 kl. 12:29): «v1.1» har
+    ikke lenger sin egen liste over de åtte, fordi den gjentok «senere»-radene i
+    tabellen (V4 i valideringen). Den viser til tabellen, og testen feiler hvis
+    en egen punktliste kommer tilbake.
     Ekstra er det som er bygget utover briefen, så det feiler også hvis en
     annen ekstra-rad enn filteret i FR-108 sto uten «ja», også «De 15 mest
     omsatte», som er flettet med 8.28. Filteret ble tatt bort 11.11 (8.26), så
@@ -434,9 +438,11 @@ def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
             status[(fr, krav)] = s
     v11 = tekst.split("### v1.1 — vurderes etter at v1 er kontrollert\n", 1)[1].split("\n---\n", 1)[0]
     kravene = _kravene(tekst)
+    assert "«senere» i tabellen i §2" in " ".join(v11.split())
+    # Story 9.20: ingen egen punktliste i «v1.1».
+    assert [linje for linje in v11.splitlines() if linje.startswith("- ")] == []
     for fr, krav in SENERE:
         assert status.get((fr, krav)) == "senere", (fr, krav, status.get((fr, krav)))
-        assert f"({fr})" in v11, fr
         assert "ikke i v1" in " ".join(kravene[fr].split()).lower(), fr
     ekstra_uten_bygg = [
         k for k, s in status.items() if s == "ekstra" and k != ("FR-108", "Filter på signalet, tatt bort 11.11")
