@@ -310,7 +310,7 @@ const OMVISNING = {
 
   // Story 8.26 (tillegg 21, gruppens svar 12.11 kl. 09:58, «Brukerutfall» i
   // §7 i PRD-en): tilbudet starter «Vis meg rundt» for oversikten, ikke hele
-  // omvisningen på 23 steg, så en ny bruker kommer fort til en aksje selv.
+  // hele omvisningen, så en ny bruker kommer fort til en aksje selv.
   TILBUDET: "Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.",
 
   // Linja på det siste steget i «Vis meg rundt» på oversikten, og hvor
@@ -324,6 +324,17 @@ const OMVISNING = {
       return { linje: "Klikk så et navn under «Skilte seg ut» for å se hvorfor aksjen skilte seg ut.", maal: "ut" };
     }
     return { linje: "Klikk så et navn i tabellen for å se sjekkene for aksjen.", maal: "tabellen" };
+  },
+
+  // Story 9.18 (HE18, funnet av gruppen 17.11 kl. 13:32): omvisningen blar
+  // bare når det merkede ikke synes helt i vinduet, med rammen rundt, som
+  // står 7 px utenfor (LUFT). Før blar den ved hvert steg, og ved linja
+  // «Oppdatert …» hoppet siden et hakk ned, så stripa forsvant. Er det
+  // merkede høyere eller bredere enn vinduet, blar den som før.
+  LUFT: 8,
+  maaBla(rute, hoeyde, bredde) {
+    const l = OMVISNING.LUFT;
+    return rute.top - l < 0 || rute.bottom + l > hoeyde || rute.left - l < 0 || rute.right + l > bredde;
   },
 };
 
@@ -590,7 +601,16 @@ if (typeof module === "object" && module.exports) {
     // mindre av den, også på smal skjerm. Story 8.19 (spørsmål 8): står den
     // andre delen over, som linja bak «Oppdatert», rulles det dit, så begge vises.
     const oeverst = ogsaa && ogsaa.compareDocumentPosition(del) & Node.DOCUMENT_POSITION_FOLLOWING ? ogsaa : del;
-    oeverst.scrollIntoView({ block: "start" });
+    // Story 9.18 (HE18): bare når det merkede, med den andre delen, ikke
+    // synes helt.
+    const rutene = (kolonnen.length ? kolonnen : [del]).concat(ogsaa ? [ogsaa] : []).map((el) => el.getBoundingClientRect());
+    const ruten = {
+      top: Math.min(...rutene.map((r) => r.top)),
+      bottom: Math.max(...rutene.map((r) => r.bottom)),
+      left: Math.min(...rutene.map((r) => r.left)),
+      right: Math.max(...rutene.map((r) => r.right)),
+    };
+    if (OMVISNING.maaBla(ruten, window.innerHeight, document.documentElement.clientWidth)) oeverst.scrollIntoView({ block: "start" });
     if (!boksen) {
       fokusFoer = document.activeElement;
       boksen = document.createElement("div");

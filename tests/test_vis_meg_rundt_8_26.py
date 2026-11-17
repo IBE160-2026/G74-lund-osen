@@ -485,7 +485,8 @@ class TestStjernenOgDeSomVenter:
             assert '– <span class="merke mangler">venter på henting</span>' in rad, sti
             assert f'href="/aksje/{kode}"' not in rad and '<span class="egenmerke">Egen</span>' in rad, sti
         side = _side(klient, "/")
-        assert "og 1 venter på henting</span>" in side
+        # Story 9.18 (HE9): ett tall per gruppe, skilt med «·».
+        assert " · 1 venter på henting</span>" in side
 
     def test_bare_oensket_og_stjernen_skrives(self, klient):
         """Regel 22, AD-3: ville feilet hvis «Følg» skrev noe annet enn

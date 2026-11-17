@@ -131,9 +131,13 @@ def _nodvendige_dager(p: Parametre) -> int:
 def _trendforklaring(avvik: float, p: Parametre) -> str:
     """Avviket fra snittet, med saa mange desimaler at det skilles fra
     noytralsonen. Ellers kunne «+2,0 % mot MA50» staa ved en sjekk som ga +1
-    (story 8.0)."""
+    (story 8.0).
+
+    Story 9.18 (HE8, gruppens svar 17.11 kl. 13:03–13:33): «mot 50-dagers
+    snitt», ikke fagforkortelsen «MA50», som resten av siden. Teksten lages
+    naar siden vises, og lagres verken i basen eller i KI-grunnlaget."""
     antall = desimaler_mot_grense(avvik * 100, p.noytralsone * 100)
-    return f"{tall(avvik * 100, 'maaling', antall)} mot MA{p.ma_vindu}"
+    return f"{tall(avvik * 100, 'maaling', antall)} mot {p.ma_vindu}-dagers snitt"
 
 
 def bevegelsesdesimaler(dagens: float, avvik: float) -> int:

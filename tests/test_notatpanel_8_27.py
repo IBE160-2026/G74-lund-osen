@@ -391,7 +391,7 @@ class TestSkjemaet:
         assert felt["tilbake"] == "/min-liste"
         svar = klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
         assert svar.headers["Location"] == "/min-liste#notatpanel"
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": felt["id"], "tilbake": "/folg"})
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": felt["id"], "tilbake": "/folg"})
         assert svar.headers["Location"] == "/folg#notatpanel"
         assert _notatene(base) == []
 
@@ -568,7 +568,7 @@ class TestGjennomgangen:
         slett = re.search(r'<form class="slett-notat".*?</form>', nede, re.S).group(0)
         felt = dict(re.findall(r'name="(id|vis|alle)" value="([^"]*)"', slett))
         assert felt["alle"] == "1"
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data=felt)
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={**felt, "bekreftet": "1"})
         assert svar.headers["Location"] == f"/aksje/{AKSJE}?alle=1#mine-notater"
         assert '<details class="alle-notater" open>' not in _side(klient, f"/aksje/{AKSJE}")
         _notat(base, AKSJE, date(2026, 10, 6), "n3")
@@ -717,14 +717,17 @@ class TestReglerIPanelet:
         """VG7: ville feilet hvis «Slett» godtok en adresse utenfor appen."""
         _notat(base, AKSJE, SISTE, "s")
         notat_id = str(_id(base))
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": notat_id, "vis": "min-liste", "tilbake": tilbake})
+        svar = klient.post(
+            f"/aksje/{AKSJE}/notat/slett",
+            data={"bekreftet": "1", "id": notat_id, "vis": "min-liste", "tilbake": tilbake},
+        )
         assert svar.headers["Location"] == "/min-liste#mine-notater"
 
     def test_en_gyldig_tilbake_gaar_foran_min_liste(self, klient, base):
         """VG7: ville feilet hvis vis=min-liste gikk foran siden man sto på."""
         _notat(base, AKSJE, SISTE, "s")
         data = {"id": str(_id(base)), "vis": "min-liste", "tilbake": "/boersometer"}
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data=data)
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={**data, "bekreftet": "1"})
         assert svar.headers["Location"] == "/boersometer#notatpanel"
 
 

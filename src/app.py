@@ -1524,6 +1524,10 @@ def aksjedetalj(symbol: str):
             # Story 8.23 (tillegg 2): 3 av 3 det siste året, av radene som er lagret.
             alle_sjekkene=alle_sjekkene_det_siste_aaret(vurderingene, rader[-1].dato, ANTALL_SJEKKER),
             pil=pil,
+            # Story 9.18 (HE14, gruppens svar 17.11 kl. 13:03–13:33): måneden
+            # for dagen siden viser, når pilene har bladd til en annen. None
+            # ellers, og da står lenken tilbake ikke.
+            maaned_for_dagen=slutt.replace(day=1) if historikk.foerste != slutt.replace(day=1) else None,
             # Story 8.21: «Mine notater», med dagen et nytt notat får.
             # Tillegget kl. 14:44: bryteren «Notater» skjuler delen, og
             # notatene leses da ikke.
@@ -1818,6 +1822,14 @@ def _visningen(valg: Valg, slutt: date, periode: str | None) -> str:
     return f"periode={periode}" if periode else ""
 
 
+def _godtatt_visning(visningen: str | None) -> str | None:
+    """Visningen fra et notatskjema når _tilbake_til_notatene kjenner den, ellers
+    None (gjennomgangen av 9.18, BH4)."""
+    if visningen in MIN_LISTE_TILBAKE or _VISNINGEN.fullmatch(visningen or ""):
+        return visningen
+    return None
+
+
 def _tilbake_til_notatene(symbol: str, visningen: str | None) -> str:
     """Samme side, med samme periode eller dag, ved «Mine notater» (del B).
     En visning siden ikke kjenner, gir standardvisningen."""
@@ -1895,19 +1907,43 @@ def skriv_notat(symbol: str):
 @app.post("/aksje/<symbol>/notat/slett")
 def slett_notat(symbol: str):
     """Sletter ett notat for aksjen (spørsmål 7), og sender tilbake til samme
-    side og dag (303). Et notat for en annen aksje slettes ikke."""
+    side og dag (303). Et notat for en annen aksje slettes ikke.
+
+    Story 9.18 (HE2, gruppens svar 17.11 kl. 13:03–13:33): uten bekreftet=1
+    spør siden først, som bekreft_fjern.html, og sier om et tenkt kjøp slettes
+    også. Ingenting er slettet før «Slett» på den siden, og «Avbryt» går
+    tilbake dit slettingen ville sendt. Et notat som ikke finnes for aksjen,
+    gir ikke noe spørsmål."""
     post, _kursdager, feilside = _notatsiden(symbol)
     if feilside is not None:
         return feilside
     notat_id = request.form.get("id", "")
     if not _NOTAT_ID.fullmatch(notat_id):
         abort(400)
+    tilbake = _tilbake_til_notatene(post.aksje.symbol, request.form.get("vis"))
     try:
-        SqliteNotatlager(g.tilkobling).slett(post.aksje.symbol, int(notat_id))
+        lager = SqliteNotatlager(g.tilkobling)
+        if request.form.get("bekreftet") != "1":
+            notat = next((n for n in lager.notater(post.aksje.symbol) if n.id == int(notat_id)), None)
+            if notat is None:
+                return redirect(tilbake, code=303)
+            return render_template(
+                "bekreft_slett_notat.html",
+                aksje=post.aksje,
+                notat=notat,
+                kjoep=lager.kjoepene().get(notat.id),
+                # Gjennomgangen av 9.18 (BH4): bare verdier _tilbake_til_notatene
+                # godtar, går videre i skjemaet, som fjern_egen gjør.
+                vis=_godtatt_visning(request.form.get("vis")),
+                panelside=_panelsiden(request.form.get("tilbake")),
+                alle=request.form.get("alle") == "1",
+                tilbake_adresse=tilbake,
+            )
+        lager.slett(post.aksje.symbol, int(notat_id))
     except BASEFEIL as feil:
         g.basefeil = _basefeil(feil)
         return _basen_kan_ikke_aapnes()
-    return redirect(_tilbake_til_notatene(post.aksje.symbol, request.form.get("vis")), code=303)
+    return redirect(tilbake, code=303)
 
 
 def _sjekkene_paa_siden(post, dag: date):

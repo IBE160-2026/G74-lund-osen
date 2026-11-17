@@ -379,6 +379,47 @@ class TestPilene:
         assert "så historikken viser mai 2026." in avsnittet
 
 
+class TestTilbakeTilMaaneden:
+    """Story 9.18 (HE14, gruppens svar 17.11 kl. 13:03–13:33): en lenke ved
+    pilene tilbake til måneden for dagen siden viser, bare når en annen
+    måned er valgt. Den beholder dagen eller perioden og ankeret, som pilene."""
+
+    LENKE = re.compile(r'<a class="tilbake-maaned" href="([^"]+)">([^<]+)</a>')
+
+    def test_lenken_vises_naar_en_annen_maaned_er_valgt(self, klient, base):
+        """Ville feilet uten lenken tilbake etter at pilene har bladd bort."""
+        avsnittet = _avsnittet(_side(klient, f"/aksje/{SYMBOL}?maaned=2026-05"))
+        assert self.LENKE.findall(avsnittet) == [
+            (f"/aksje/{SYMBOL}?maaned=2026-10#signalet-dag-for-dag", "Til oktober 2026")
+        ]
+
+    def test_lenken_beholder_dagen_eller_perioden(self, klient, base):
+        """Ville feilet hvis lenken tok bort dagen eller perioden siden viser."""
+        avsnittet = _avsnittet(_side(klient, f"/aksje/{SYMBOL}?dag=2026-05-13&maaned=2026-02"))
+        assert self.LENKE.findall(avsnittet) == [
+            (f"/aksje/{SYMBOL}?maaned=2026-05&amp;dag=2026-05-13#signalet-dag-for-dag", "Til mai 2026")
+        ]
+        avsnittet = _avsnittet(_side(klient, f"/aksje/{SYMBOL}?periode=1-mnd&maaned=2026-03"))
+        assert self.LENKE.findall(avsnittet) == [
+            (f"/aksje/{SYMBOL}?maaned=2026-10&amp;periode=1-mnd#signalet-dag-for-dag", "Til oktober 2026")
+        ]
+
+    @pytest.mark.parametrize(
+        "adresse",
+        [
+            f"/aksje/{SYMBOL}",
+            f"/aksje/{SYMBOL}?maaned=2026-10",
+            f"/aksje/{SYMBOL}?dag=2026-05-13",
+            f"/aksje/{SYMBOL}?dag=2026-05-13&maaned=2026-05",
+            # En måned som ikke kan leses, gir måneden for dagen.
+            f"/aksje/{SYMBOL}?maaned=tull",
+        ],
+    )
+    def test_ingen_lenke_i_maaneden_for_dagen(self, klient, base, adresse):
+        """Ville feilet hvis lenken sto også når måneden er den for dagen."""
+        assert "tilbake-maaned" not in _avsnittet(_side(klient, adresse))
+
+
 class TestEtterSisteKursrad:
     def test_dagene_etter_siste_kursrad_er_tomme(self, klient, base):
         """Ville feilet hvis en rad som ikke er skrevet ennå, ble vist som

@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-17T13:28
+updated: 2026-11-17T16:22
 ---
 
 # UX-loggen
@@ -765,7 +765,14 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 | U128 | 17.11 kl. 13:03, gruppen (evaluerer nr. 2) | «Dine egne aksjer» og Min liste | En aksje du følger, får ingen stjerne, så den står ikke i Min liste (HE15, H2 og H7, middels). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE15 | Før brukertest 2: Følg setter også stjernen |
 | U129 | 17.11 kl. 13:11, gruppen (evaluerer nr. 2) | Omvisningen | Boksen bytter hjørne, og bredden følger teksten, så «Neste» flytter seg (HE16, H4 og H5, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE16 | Fast bredde før brukertest 2; plasseringen etter testen (svaret kl. 13:13) |
 | U130 | 17.11 kl. 13:11, gruppen (evaluerer nr. 2) | Omvisningen | Notatene er ikke forklart i omvisningen (HE17, H10, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE17 | Før brukertest 2: ett steg ved notatfeltet og ett i Min liste |
+| U131 | 17.11 kl. 13:32, gruppen (evaluerer nr. 2) | Omvisningen | Omvisningen blar alltid, også når det merkede synes, og ved «Oppdatert …» forsvinner stripa (HE18, H1 og H3, lav). | [`heuristisk-evaluering.md`](heuristisk-evaluering.md), HE18 | Før brukertest 2: bla bare når det merkede ikke synes |
 
 *Lagt til 2026-11-17 (gruppens svar kl. 13:03–13:13, rådet anbefalte det):* «Tas i» for U114–U126 er avgjort: U115 og U116 (HE2 og HE3) og U118, U121, U122 og U123 (HE5, HE8, HE9 og HE10) rettes før brukertest 2 i en egen story. U114 (HE1) blir først et spørsmål i brukertest 2. U117, U119, U120, U124, U125 og U126 venter til etter testen. U127–U130 er funnet av gruppen selv i den ekte versjonen, som evaluerer nr. 2.
 
 *Idé 2026-11-17 kl. 13:08 (gruppen), ikke et funn:* et tenkt salg uten et tenkt kjøp først, for aksjer man har fra før. Appen sier aldri om et kjøp eller salg er godt (NFR-06), bare hva aksjen og indeksen gjorde etterpå. Den tas etter brukertest 2, og hører sammen med U112 fra brukertest 1.
+
+*Lagt til 2026-11-17 (story 9.18):* rettet før brukertest 2: U115 (HE2, «Slett» spør først), U116 (HE3, styrken og retningen under navnet på smal skjerm), U118 (HE5), U121 (HE8, «mot 50-dagers snitt»), U122 (HE9, ett tall per gruppe), U123 (HE10, «Lim inn nøkkelen i startskriptet»), U127 (HE14, lenken tilbake til måneden), U129 (HE16, fast bredde), U130 (HE17, stegene om notatene) og U131 (HE18, blar bare når det trengs). U128 (HE15): ingen kodeendring, fordi Følg alt setter stjernen; beskrivelsen er rettet etter svaret kl. 14:16. U114 (HE1) er et spørsmål i brukertest 2. Detaljene står i [evalueringen](heuristisk-evaluering.md).
+
+*Rettet 2026-11-17 (svaret kl. 14:16 på spørsmål 4 i 9.17, gjennomgangen av 9.18):* U128 (HE15) beskriver en aksje uten stjerne. Følg setter stjernen fra 11.11 (8.26), og notatene synes under «Mine notater» også uten stjerne, så det er ingen kodeendring. En aksje uten stjerne kan være fulgt før 11.11, eller tatt inn med en ferdig liste (spørsmål 1 i spesifikasjonen for 9.18).
+
+*Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* U128 (HE15) lukkes som alt bygget. Følg har satt stjernen siden 8.26 (11.11), og en test låser det. De tre egne aksjene ble fulgt før det, og gruppen setter stjernen på dem selv i den ekte versjonen.

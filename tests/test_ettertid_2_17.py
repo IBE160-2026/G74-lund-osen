@@ -587,6 +587,23 @@ class TestVisningen:
         assert '<span class="ettertid-merke">i ettertid</span>' in tabellen
 
     @VERSJONENE
+    def test_linja_under_navnet_paa_smal_skjerm_har_merket(self, request, hvilken, symbol, dag, maaned):
+        """Gjennomgangen av 9.18 (ECH1): ville feilet hvis linja under navnet,
+        som er det som synes på smal skjerm (HE3), viste signalet for en dag i
+        ettertid uten merket, eller merket en kveldsrad."""
+        klient = request.getfixturevalue(hvilken)
+        html = _side(klient, f"/?periode=velg&dag={dag}")
+        rader = re.findall(r'<td class="selskap">(.*?)</td>.*?<td class="tall styrke">(.*?)</td>', html, re.S)
+        assert rader
+        med_merket = 0
+        for selskap, styrke in rader:
+            linja = selskap.split('class="smal-signal"', 1)[1].split('<span class="hentet"')[0]
+            merket = '<span class="ettertid-merke">i ettertid</span>' in styrke
+            assert ("· i ettertid" in linja) == merket, (selskap, styrke)
+            med_merket += merket
+        assert med_merket
+
+    @VERSJONENE
     def test_min_liste_sammenlignet_med_en_dag_i_ettertid(self, request, hvilken, symbol, dag, maaned):
         """Gjennomgangen (VG6): ville feilet hvis linja under i Min liste for en
         dag i ettertid viste signalet uten merket, i en av versjonene."""

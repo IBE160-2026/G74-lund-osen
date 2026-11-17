@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T12:39
+updated: 2026-11-17T15:21
 ---
 
 # PRD — OSE Signal
@@ -375,7 +375,9 @@ prosent, og det er fortsatt fem kolonner.
 
 Tabellen er delt i to. «Skilte seg ut» har aksjene med styrke på terskelen eller
 over (FR-705), og «Øvrige aksjer» har resten. Selskapscellen har også merkene
-«Egen» og «Utenfor målingen» (FR-412) og stjernen for Min liste.
+«Egen» og «Utenfor målingen» (FR-412) og stjernen for Min liste. På smal
+skjerm står styrken og retningen også under navnet, så de synes uten å dra
+tabellen sidelengs.
 
 **Periodevalget.** Over tabellen velges siste børsdag («I dag», «I går» eller
 ukedagen), 1 uke, 1 mnd, 3 mnd, 6 mnd, I år eller 1 år. Det går også an å velge
@@ -1490,7 +1492,7 @@ Aksjesiden lister de tre sjekkene ved navn, med **tre ting per sjekk**:
 |---|---|
 | Navn | Trend |
 | Verdien den ga | +1 |
-| **Målingen bak verdien** | +3,1 % mot MA50 |
+| **Målingen bak verdien** | +3,1 % mot 50-dagers snitt |
 
 **Alle tre sjekkene vises, også de som ga 0.** En sjekk uten utslag sier at
 akkurat den tingen ikke skjedde.
@@ -1500,7 +1502,7 @@ akkurat den tingen ikke skjedde.
 «Trend +1» kan ikke etterprøves uten å vite hvor langt over snittet kursen lå.
 Med målingen kan brukeren regne etter:
 
-> Trend +1 (+3,1 % mot MA50) · Bevegelse −1 (−3,5 % mot 1,1 % standardavvik) ·
+> Trend +1 (+3,1 % mot 50-dagers snitt) · Bevegelse −1 (−3,5 % mot 1,1 % standardavvik) ·
 > Interesse −1 (volum 4,95 × medianen) → styrke 3, retning Blandet
 
 Tallene i parentes er grunnlaget. Styrken og retningen etter pila er utledet av

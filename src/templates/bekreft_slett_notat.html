@@ -1,0 +1,24 @@
+{% extends "_ramme.html" %}
+{#- Story 9.18 (HE2, gruppens svar 17.11 kl. 13:03–13:33): «Slett» ved et
+    notat spør først, som bekreft_fjern.html. Siden sier om et tenkt kjøp,
+    eller et kjøp og et salg, slettes også, fordi triggeren i 0012 sletter dem
+    med notatet. Et skjema, som virker uten skript. Ingenting er slettet før
+    «Slett», og «Avbryt» går tilbake dit slettingen ville sendt. #}
+{% block tittel %}Slett notatet — OSE Signal{% endblock %}
+{% block side %}side-oversikt{% endblock %}
+{% block innhold %}
+<section class="bekreft" aria-labelledby="bekreft-tittel">
+  <h1 class="overskrift" id="bekreft-tittel">Slett notatet?</h1>
+  <p>Notatet om {{ aksje.navn }} fra {{ notat.dato|dato }} slettes, og det kan ikke angres.{% if kjoep and kjoep.solgt %} Det tenkte kjøpet og salget ved notatet slettes også.{% elif kjoep %} Det tenkte kjøpet ved notatet slettes også.{% endif %}</p>
+  <blockquote>{{ notat.tekst }}</blockquote>
+  <form method="post" action="/aksje/{{ aksje.symbol }}/notat/slett">
+    <input type="hidden" name="id" value="{{ notat.id }}">
+    {% if vis is not none %}<input type="hidden" name="vis" value="{{ vis }}">{% endif %}
+    {% if panelside %}<input type="hidden" name="tilbake" value="{{ panelside }}">{% endif %}
+    {% if alle %}<input type="hidden" name="alle" value="1">{% endif %}
+    <input type="hidden" name="bekreftet" value="1">
+    <button type="submit" class="knapp">{{ "Slett notatet, kjøpet og salget" if kjoep and kjoep.solgt else "Slett notatet og det tenkte kjøpet" if kjoep else "Slett" }}</button>
+  </form>
+  <p><a href="{{ tilbake_adresse }}">Avbryt</a></p>
+</section>
+{% endblock %}

@@ -449,6 +449,11 @@
       {% if historikk.forrige %}<a class="pil" href="{{ pil(historikk.forrige) }}">‹ {{ historikk.forrige|maanedsnavn }}</a>{% endif %}
       <span class="maaned">{{ historikk.tittel|capitalize }}</span>
       {% if historikk.neste %}<a class="pil" href="{{ pil(historikk.neste) }}">{{ historikk.neste|maanedsnavn }} ›</a>{% endif %}
+      {#- Story 9.18 (HE14, gruppens svar 17.11 kl. 13:03–13:33): tilbake til
+          måneden for dagen siden viser, bare når pilene har bladd bort. Den
+          beholder dagen eller perioden og ankeret, som pilene. I navigasjonen
+          for måneden (gjennomgangen av 9.18, BH2). #}
+      {% if maaned_for_dagen %}<a class="tilbake-maaned" href="{{ pil(maaned_for_dagen) }}">Til {{ maaned_for_dagen|maanedsnavn }}</a>{% endif %}
     </nav>
     {% if historikk.beskjed %}<p class="periodebeskjed" role="status">{{ historikk.beskjed }}</p>{% endif %}
     {#- Gjennomgangen (ECH1, ECH2): dagene utenfor kursserien står tomme, og

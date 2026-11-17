@@ -495,6 +495,13 @@ td .justeringsdag { display: block; font-size: 12px; font-weight: 400; color: va
 :where(.side-oversikt) tr.sammenligning td.opp { color: var(--opp); }
 :where(.side-oversikt) tr.sammenligning td.ned { color: var(--ned); }
 :where(.side-oversikt) td.selskap .egen-dag { display: block; font-weight: normal; color: var(--dempet); font-size: 0.8rem; }
+/* Story 9.18 (HE3, gruppens svar 17.11 kl. 13:03–13:33): styrken og retningen
+   under navnet bare på smal skjerm, der kolonnene ligger utenfor boksen.
+   Fargen på retningen kommer fra .opp, .ned, .blandet og .ingen. */
+:where(.side-oversikt) td.selskap .smal-signal { display: none; }
+@media (max-width: 760px) {
+  :where(.side-oversikt) td.selskap .smal-signal { display: block; margin-top: 2px; font-size: 13px; font-weight: 600; }
+}
 :where(.side-oversikt) .periodehode { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; }
 :where(.side-oversikt) .periodehode nav.periodevalg { margin-bottom: 12px; }
 /* Gruppens svar 04.11 kl. 19:21, 2: «?» står midt på høyden av den første
@@ -816,6 +823,10 @@ a.tilbake:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; 
                          box-sizing: border-box; border: 0; border-radius: 999px;
                          color: var(--blekk); font-weight: 600; text-decoration: none; }
 :where(.side-aksje) .maanedspiler a.pil:hover { background: var(--bakgrunn); }
+/* Story 9.18 (HE14, gruppens svar 17.11 kl. 13:03–13:33): lenken tilbake til
+   måneden for dagen står ved månedsvelgeren, 44 px høy som pilene. */
+:where(.side-aksje) a.tilbake-maaned { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 12px 8px;
+                                       padding: 0 4px; color: var(--blekk); font-weight: 600; }
 :where(.side-aksje) .historikk a:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }
 :where(.side-aksje) ol.uker, :where(.side-aksje) ol.dager { list-style: none; margin: 0; padding: 0; }
 /* Story 8.2b, c (U68): en kompakt tabell, én rad per uke med uka, mandag
@@ -1553,6 +1564,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                                      border: 1px solid var(--strek-2); border-radius: 999px; padding: 0 8px; }
 :where(.side-oversikt) .bekreft { margin: 24px 0; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
                                   border-radius: 16px; }
+/* Story 9.18 (HE2): teksten i notatet som slettes, med en strek foran. */
+:where(.side-oversikt) .bekreft blockquote { margin: 12px 0; padding: 0 0 0 12px; border-left: 3px solid var(--strek-2);
+                                             overflow-wrap: anywhere; }
 /* Brikkene og «N av 3» på linje med teksten i «Etterpå» og ved kjøpet. */
 .etterpaa .sjekker, .tenkt .sjekker { display: inline-flex; vertical-align: middle; margin: 0 4px; }
 .etterpaa .pille, .tenkt .pille { display: inline-block; }
@@ -1574,7 +1588,10 @@ th.omvisning-kolonne { box-shadow: inset 3px 0 0 var(--oransje), inset -3px 0 0 
 .omvisning.til-venstre { right: auto; left: 16px; }
 .omvisning.oeverst { bottom: auto; top: 16px; }
 @media (forced-colors: active) { .omvisning-kolonne { outline: 3px solid Highlight; outline-offset: -3px; } }
-.omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; max-width: min(360px, calc(100vw - 32px));
+/* Story 9.18 (HE16, gruppens svar 17.11 kl. 13:03–13:33): fast bredde, med
+   kanten og luften innenfor, så «Tilbake» og «Neste» står likt ved hvert steg
+   og boksen holder seg innenfor skjermen ved 390 px. Hjørnet byttes som før. */
+.omvisning { position: fixed; right: 16px; bottom: 16px; z-index: 50; width: min(360px, calc(100vw - 32px)); box-sizing: border-box;
              padding: 16px 18px; background: var(--kort); color: var(--tekst); border: 1px solid var(--strek-2);
              border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
 .omvisning:focus-visible { outline: 3px solid var(--blekk); outline-offset: 2px; }

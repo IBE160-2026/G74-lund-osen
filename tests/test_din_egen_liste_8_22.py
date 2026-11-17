@@ -26,11 +26,14 @@ def test_tre_stegkort_i_rekkefoelgen_fra_utdraget(klient):  # noqa: F811
     nøkkel og aksjer, med nummeret i kortet."""
     kortene = _kortene(klient.get("/min-liste").data.decode("utf-8"))
     # Story 8.29 (gjennomgangen, BH1): titlene er h3.
+    # Story 9.18 (HE10, gruppens svar 17.11 kl. 13:03–13:33): steg 2 sier hvor
+    # nøkkelen limes inn, som teksten i kortet, fordi siden ikke har noe felt.
     assert [re.search(r"<h3>(.*?)</h3>", k).group(1) for k in kortene] == [
         "Lag en gratis konto hos EODHD",
-        "Lim inn nøkkelen din",
+        "Lim inn nøkkelen i startskriptet",
         "Velg aksjene dine",
     ]
+    assert "Startskriptet til den ekte versjonen spør etter den første gang" in kortene[1]
     assert [re.search(r'<span class="stegnummer" aria-hidden="true">(\d)</span>', k).group(1) for k in kortene] == [
         "1",
         "2",

@@ -20,7 +20,9 @@
       <input type="hidden" name="til" value="{{ 'av' if valgene.vis_hjelp else 'paa' }}">
       <button type="submit" class="innstillingsbryter" role="switch" aria-checked="{{ 'true' if valgene.vis_hjelp else 'false' }}"{% if not kan_lagres %} disabled{% endif %}><span class="spor" aria-hidden="true"></span><span class="navn">Vis hjelp</span> <span class="verdi" aria-hidden="true">{{ 'På' if valgene.vis_hjelp else 'Av' }}</span></button>
     </form>
-    <p>Faste forklaringer som vi har skrevet og sjekket: hva tallene, bokstavene og fargene betyr. Lik for alle aksjer hver dag, og uten KI.</p>
+    {#- Story 9.18 (HE5, gruppens svar 17.11 kl. 13:03–13:33): av tar også bort
+        knappene for omvisningen (_rundtur.html), og teksten sier det. #}
+    <p>Faste forklaringer som vi har skrevet og sjekket: hva tallene, bokstavene og fargene betyr. Lik for alle aksjer hver dag, og uten KI. Av skjuler også «Vis meg rundt» og «Spill av omvisningen».</p>
   </div>
   {#- Story 8.10b (utdraget 08.11 §4): «Vis KI-tekst», samme valg som
       bryteren ved hver KI-tekst (FR-601). #}

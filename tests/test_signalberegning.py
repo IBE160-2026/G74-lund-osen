@@ -315,12 +315,20 @@ class TestForklaringenPaaNorsk:
         assert tekst == f"+3,4{self.NB}% mot 1,2{self.NB}% standardavvik"
 
     def test_trend_like_over_sonen_skilles(self):
-        assert _trendforklaring(0.02004, STANDARD) == f"+2,004{self.NB}% mot MA50"
+        assert _trendforklaring(0.02004, STANDARD) == f"+2,004{self.NB}% mot 50-dagers snitt"
+
+    def test_trend_sier_snittet_med_ord(self):
+        """Story 9.18 (HE8, gruppens svar 17.11 kl. 13:03–13:33): ville feilet
+        med fagforkortelsen «MA50», når resten av siden sier 50-dagers snitt.
+        Teksten lages når siden vises, og er verken i basen eller i
+        KI-grunnlaget."""
+        tekst = _trendforklaring(0.031, STANDARD)
+        assert tekst.endswith(f"mot {STANDARD.ma_vindu}-dagers snitt") and "MA" not in tekst
 
     def test_trend_paa_sonen_har_en_desimal(self):
         """Matrisen i spesifikasjonen: noeyaktig paa grensen er riktig likt."""
-        assert _trendforklaring(0.02, STANDARD) == f"+2,0{self.NB}% mot MA50"
-        assert _trendforklaring(-0.02, STANDARD) == f"-2,0{self.NB}% mot MA50"
+        assert _trendforklaring(0.02, STANDARD) == f"+2,0{self.NB}% mot 50-dagers snitt"
+        assert _trendforklaring(-0.02, STANDARD) == f"-2,0{self.NB}% mot 50-dagers snitt"
 
     def test_interesse_viser_forholdstallet(self):
         """Story 2.1c: teksten er tallet regelen avgjorde med (FR-706), ikke
@@ -391,7 +399,7 @@ class TestMaalingen:
 
         assert resultat.maaling == 0.02
         assert resultat.verdi == 0
-        assert resultat.forklaring == "+2,0 % mot MA50"
+        assert resultat.forklaring == "+2,0 % mot 50-dagers snitt"
 
     def test_bevegelse_maaler_dagens_endring_mot_standardavviket(self):
         kurser = stigende_kurser(0.0123)

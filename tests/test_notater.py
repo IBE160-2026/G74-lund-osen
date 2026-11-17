@@ -342,7 +342,10 @@ class TestSkjemaet:
             klient.post(f"/aksje/{AKSJE}/notat", data=data, headers={"Origin": "http://localhost"}).status_code == 303
         )
         (rad,) = _rader(demobase)
-        assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]}, headers=ond).status_code == 403
+        assert (
+            klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": rad[0]}, headers=ond).status_code
+            == 403
+        )
         assert len(_rader(demobase)) == 1
 
     def test_get_endrer_ingenting_og_post_bare_notat(self, klient, demobase):
@@ -353,7 +356,7 @@ class TestSkjemaet:
         assert _rader(demobase) == []
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"})
         (rad,) = _rader(demobase)
-        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]})
+        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": rad[0]})
         assert _alle_andre_tabeller(demobase) == foer
 
     def test_slett_sender_tilbake_til_samme_dag(self, klient, demobase):
@@ -362,9 +365,11 @@ class TestSkjemaet:
         klient.post(f"/aksje/{ANNEN}/notat", data={"dag": "2026-10-09", "tekst": "annen"})
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "mitt"})
         annen_id, mitt_id = (rad[0] for rad in _rader(demobase))
-        assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": annen_id}).status_code == 303
+        assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": annen_id}).status_code == 303
         assert len(_rader(demobase)) == 2
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": mitt_id, "vis": "dag=2026-10-01"})
+        svar = klient.post(
+            f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": mitt_id, "vis": "dag=2026-10-01"}
+        )
         assert svar.headers["Location"] == f"/aksje/{AKSJE}?dag=2026-10-01#mine-notater"
         assert [rad[3] for rad in _rader(demobase)] == ["annen"]
 
@@ -566,7 +571,7 @@ class TestEtterGjennomgangen:
         svar = klient.post(f"/aksje/{AKSJE}/notat", data={**felt, "tekst": "x"})
         assert svar.headers["Location"] == adresse + "#mine-notater"
         (rad,) = _rader(demobase)
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0], "vis": felt["vis"]})
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": rad[0], "vis": felt["vis"]})
         assert svar.headers["Location"] == adresse + "#mine-notater"
 
     @pytest.mark.parametrize("vis", ["periode=velg", "periode=ukjent", "dag=2026-02-30", "https://ond.example", "x"])
@@ -629,7 +634,7 @@ class TestEtterGjennomgangen:
         assert 'class="nytt-notat"' not in delen and "før" in _tekst(delen)
         assert klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-09", "tekst": "x"}).status_code == 400
         (rad,) = _rader(demobase)
-        assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]}).status_code == 303
+        assert klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": rad[0]}).status_code == 303
         assert _rader(demobase) == []
 
     def test_demobase_fra_foer_0012_vises_ikke(self, klient, demobase):
@@ -840,7 +845,7 @@ class TestTenkteKjoep:
         felt = self._notat(klient)
         klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
         assert "Slett notatet og det tenkte kjøpet" in _uten_panelet(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
-        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": felt["id"]})
+        klient.post(f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": felt["id"]})
         assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
 
     def test_tabellen_har_ingen_kurs(self, mal, tmp_path):
@@ -1215,7 +1220,9 @@ class TestKnappeneIMinListe:
             r'action="/aksje/[A-Z]+/notat/slett"><input type="hidden" name="id" value="(\d+)"><input type="hidden" name="vis" value="([^"]*)"',
             _min_liste_delen(klient),
         )
-        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": slett.group(1), "vis": slett.group(2)})
+        svar = klient.post(
+            f"/aksje/{AKSJE}/notat/slett", data={"bekreftet": "1", "id": slett.group(1), "vis": slett.group(2)}
+        )
         assert svar.headers["Location"] == "/min-liste#mine-notater"
         assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
 
@@ -1312,3 +1319,114 @@ class TestMinListeEtterGjennomgangen:
         etiketter på «Slett» i Min liste."""
         klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
         assert 'aria-label="Slett notatet om Brattfjell Energi fra 01.10"' in _min_liste_delen(klient)
+
+
+class TestSlettSpoerFoerst:
+    """Story 9.18 (HE2, gruppens svar 17.11 kl. 13:03–13:33): «Slett» ved et
+    notat spør først, som bekreft_fjern.html, og sier om et tenkt kjøp slettes
+    også. Ingenting slettes før svaret, og «Avbryt» lar alt stå. De andre
+    testene som sletter et notat, sender derfor bekreftet=1, som skjemaet på
+    siden med spørsmålet."""
+
+    def _spoersmaalet(self, klient, data: dict) -> str:
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data=data)
+        assert svar.status_code == 200
+        return svar.data.decode("utf-8")
+
+    def _skjemaet(self, side: str) -> dict:
+        treff = re.search(r'<form method="post" action="/aksje/[A-Z]+/notat/slett">(.*?)</form>', side, re.S)
+        return dict(re.findall(r'name="([a-z]+)" value="([^"]*)"', treff.group(1)))
+
+    def test_foerste_trykk_sletter_ingenting_og_spoer(self, klient, demobase):
+        """Ville feilet hvis «Slett» slettet notatet med en gang."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "mitt"})
+        (rad,) = _rader(demobase)
+        side = self._spoersmaalet(klient, {"id": rad[0], "vis": "dag=2026-10-01"})
+        assert _rader(demobase) == [rad]
+        assert '<h1 class="overskrift" id="bekreft-tittel">Slett notatet?</h1>' in side
+        tekst = _tekst(side)
+        assert "Notatet om Brattfjell Energi fra 01.10 slettes, og det kan ikke angres." in tekst
+        assert "tenkte kjøpet" not in tekst
+        assert '<body class="side-oversikt">' in side
+        assert self._skjemaet(side) == {"id": str(rad[0]), "vis": "dag=2026-10-01", "bekreftet": "1"}
+        assert ">Slett</button>" in side
+
+    def test_spoersmaalet_sier_at_det_tenkte_kjoepet_slettes(self, klient, demobase):
+        """Ville feilet hvis spørsmålet ikke sa at kjøpet slettes med notatet."""
+        felt = TestTenkteKjoep()._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        side = self._spoersmaalet(klient, {"id": felt["id"]})
+        assert "Det tenkte kjøpet ved notatet slettes også." in _tekst(side)
+        assert ">Slett notatet og det tenkte kjøpet</button>" in side
+        assert len(_rader(demobase)) == 1 and len(_rader(demobase, "tenkt_kjoep")) == 1
+
+    def test_et_salg_som_er_notert_slettes_ogsaa(self, klient, demobase):
+        """Ville feilet hvis spørsmålet ikke sa at salget slettes også."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        _kjoep_i_basen(demobase, rad[0], "2026-10-07")
+        klient.post(f"/aksje/{AKSJE}/notat/salg", data=_salgsknapp(_min_liste_delen(klient)))
+        side = self._spoersmaalet(klient, {"id": rad[0], "vis": "min-liste"})
+        assert "Det tenkte kjøpet og salget ved notatet slettes også." in _tekst(side)
+        # Gjennomgangen av 9.18 (BH1): knappen sier det samme som teksten.
+        assert "Slett notatet, kjøpet og salget" in _tekst(side)
+
+    @pytest.mark.parametrize("tilbake", ["//ond.example", "https://ond.example", "javascript:alert(1)"])
+    def test_avbryt_gaar_bare_til_en_side_i_appen(self, klient, demobase, tilbake):
+        """Gjennomgangen av 9.18 (VG3): ville feilet hvis «Avbryt» eller
+        skjemaet på siden med spørsmålet tok med en adresse utenfor appen."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        side = self._spoersmaalet(klient, {"id": rad[0], "tilbake": tilbake, "vis": tilbake})
+        avbryt = re.search(r'<a href="([^"]*)">Avbryt</a>', side).group(1)
+        assert avbryt.startswith("/") and not avbryt.startswith("//"), avbryt
+        assert "ond.example" not in side and "javascript:" not in side
+        assert len(_rader(demobase)) == 1
+
+    def test_en_annen_side_kan_ikke_faa_spoersmaalet(self, klient, demobase):
+        """Gjennomgangen av 9.18 (VG3): ville feilet hvis en annen side fikk
+        spørsmålet, uten bekreftet=1, i stedet for 403."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]}, headers={"Origin": "http://ond.example"})
+        assert svar.status_code == 403
+        assert len(_rader(demobase)) == 1
+
+    def test_bekreftet_sletter_notatet_og_kjoepet(self, klient, demobase):
+        """Ville feilet hvis svaret på spørsmålet ikke slettet notatet og kjøpet."""
+        felt = TestTenkteKjoep()._notat(klient)
+        klient.post(f"/aksje/{AKSJE}/notat/kjoep", data=felt)
+        side = self._spoersmaalet(klient, {"id": felt["id"], "vis": felt["vis"]})
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data=self._skjemaet(side))
+        assert svar.status_code == 303
+        assert svar.headers["Location"] == f"/aksje/{AKSJE}#mine-notater"
+        assert _rader(demobase) == [] and _rader(demobase, "tenkt_kjoep") == []
+
+    @pytest.mark.parametrize(
+        "data, tilbake",
+        [
+            ({"vis": "dag=2026-10-01"}, f"/aksje/{AKSJE}?dag=2026-10-01#mine-notater"),
+            ({"vis": "periode=1-mnd", "alle": "1"}, f"/aksje/{AKSJE}?periode=1-mnd&amp;alle=1#mine-notater"),
+            ({"vis": "min-liste"}, "/min-liste#mine-notater"),
+            ({"vis": "min-liste-alle"}, "/min-liste?vis=alle#mine-notater"),
+            ({"vis": "min-liste", "tilbake": "/folg"}, "/folg#notatpanel"),
+        ],
+    )
+    def test_avbryt_gaar_tilbake_og_lar_alt_staa(self, klient, demobase, data, tilbake):
+        """Ville feilet hvis «Avbryt» gikk et annet sted enn slettingen ville
+        sendt tilbake til, eller skjemaet mistet visningen eller panelet."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        side = self._spoersmaalet(klient, {"id": rad[0], **data})
+        assert f'<a href="{tilbake}">Avbryt</a>' in side
+        assert self._skjemaet(side) == {"id": str(rad[0]), **data, "bekreftet": "1"}
+        assert _rader(demobase) == [rad]
+
+    def test_et_notat_som_ikke_finnes_gir_ingen_spoersmaal(self, klient, demobase):
+        """Ville feilet hvis et notat for en annen aksje ga et spørsmål, eller
+        ble slettet."""
+        klient.post(f"/aksje/{ANNEN}/notat", data={"dag": "2026-10-09", "tekst": "annen"})
+        (rad,) = _rader(demobase)
+        svar = klient.post(f"/aksje/{AKSJE}/notat/slett", data={"id": rad[0]})
+        assert svar.status_code == 303
+        assert _rader(demobase) == [rad]

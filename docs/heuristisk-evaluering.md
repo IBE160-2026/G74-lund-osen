@@ -2,7 +2,7 @@
 title: "Den heuristiske evalueringen"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-17T13:28
+updated: 2026-11-17T16:22
 ---
 
 # Den heuristiske evalueringen av demoen
@@ -12,7 +12,7 @@ i svaret 16.11 kl. 20:22, og rådet anbefalte den (instruksjonen i
 [dagsfila](ai-prompts/2026-11-16.md)). Spesifikasjonen er
 [`spec-9-17-heuristisk-evaluering.md`](../_bmad-output/implementation-artifacts/spec-9-17-heuristisk-evaluering.md).
 Ingen kode er endret. Hvert funn har et forslag som gruppen svarer på, og de
-nye funnene står også i [UX-loggen](ux-logg.md) som U114–U130.
+nye funnene står også i [UX-loggen](ux-logg.md) som U114–U131.
 
 ## Metoden
 
@@ -74,9 +74,27 @@ HE14–HE17 er satt etter den samme skalaen.
 | HE12 | H6 | Aksjesiden, periodevalget | lav | Aksjesiden åpner på en periode, så datofeltet er tomt og uten piler fra start. Oversikten åpner på siste børsdag, med dagen og pilene. Med en periode valgt er feltet tomt på alle sidene, valgt med vilje i 8.20a, og et lignende punkt ble avvist 18.10 i 8.16. | `_perioder.html`, `perioder.py` | Vis dagen siden viser i feltet, eller en kort tekst foran feltet |
 | HE13 | H8 | Aksjesiden, «Signalet dag for dag» | lav | Ukene etter siste demodag står som tomme rader, med linja «… så dagene utenfor står tomme.» | `aksje.html` (`kursserien`) | Skjul uker der alle dagene er etter siste kursdag |
 | HE14 | H3, H7 | Aksjesiden, «Signalet dag for dag» | middels | Pilene går én måned om gangen, og ingenting tar deg tilbake til måneden for dagen siden viser. Oppgaven om «i ettertid» i brukertest 2 sender testpersonen måneder bakover der. | Funnet av gruppen 17.11 kl. 12:48, i den ekte versjonen | En lenke tilbake ved pilene, som bare vises når du har bladd bort. Før testen |
-| HE15 | H2, H7 | «Dine egne aksjer» og Min liste | middels | En aksje du følger, får ingen stjerne, så den står ikke i Min liste. Gruppen så også at notatene på den ikke synes der. | Funnet av gruppen 17.11 kl. 13:03, i den ekte versjonen. Sjekket mot main 17.11: «Mine notater» i Min liste viser alle notatene, også for aksjer uten stjerne (`_alle_notatene` i `app.py`), så den delen stemmer ikke med koden. At aksjen ikke står i tabellen i Min liste, stemmer. Spørsmål 4 | Følg setter også stjernen, og Fjern endres ikke. Før testen |
+| HE15 | H2, H7 | «Dine egne aksjer» og Min liste | middels | Gruppen så en aksje den følger, uten stjerne, så den sto ikke i tabellen i Min liste. *Rettet 17.11 (svaret kl. 14:16, spørsmål 4):* Følg setter stjernen fra 11.11 (8.26), og notatene synes under «Mine notater» uten stjerne. En aksje uten stjerne kan være fulgt før 11.11, eller tatt inn med en ferdig liste. | Funnet av gruppen 17.11 kl. 13:03, i den ekte versjonen, og sjekket mot main: `folg` i `valg.py` og `_alle_notatene` i `app.py` | Ingen kodeendring før testen. Spørsmål 1 i spesifikasjonen for 9.18 |
 | HE16 | H4, H5 | Omvisningen | lav | Boksen bytter hjørne (8.26), og bredden følger teksten. Da flytter «Neste» seg, og man trykker «Tilbake». | Funnet av gruppen 17.11 kl. 13:11, i den ekte versjonen | Fast bredde på boksen før testen. Plasseringen tas etter testen |
 | HE17 | H10 | Omvisningen | lav | Notatene er ikke forklart i omvisningen. | Funnet av gruppen 17.11 kl. 13:11, i den ekte versjonen | Ett steg ved notatfeltet på aksjesiden og ett ved notatene i Min liste. Før testen |
+| HE18 | H1, H3 | Omvisningen | lav | Omvisningen blar alltid så det merkede havner øverst, også når det synes fra før. Ved linja «Oppdatert …» hopper siden et hakk ned, og stripa forsvinner. | Funnet av gruppen 17.11 kl. 13:32, i den ekte versjonen | Bla bare når det merkede ikke synes. Før testen |
+
+*Lagt til 2026-11-17 (story 9.18, gruppens svar kl. 13:03–13:33):* rettet før brukertest 2, hver med en test som feilet mot koden før rettingen:
+
+- HE2: «Slett» ved et notat spør først, nevner aksjen, datoen og notatet, og sier om et tenkt kjøp slettes også. «Avbryt» lar alt stå.
+- HE3: på smal skjerm står styrken og retningen under selskapsnavnet, for eksempel «2 av 3 · ↑ Positiv».
+- HE5: teksten ved «Vis hjelp» og steget i omvisningen sier at av også skjuler «Vis meg rundt» og «Spill av omvisningen».
+- HE8: målingen sier «mot 50-dagers snitt». Den er ikke lagret i basen eller i KI-grunnlaget, så bare visningen er endret.
+- HE9: «Øvrige aksjer» har ett tall per gruppe, skilt med «·».
+- HE10: steg 2 heter «Lim inn nøkkelen i startskriptet».
+- HE14: ved månedspilene står en lenke tilbake til måneden for dagen siden viser, for eksempel «Til oktober 2026», bare når en annen måned er valgt.
+- HE15: ingen kodeendring. Følg setter alt stjernen (8.26, 11.11). Beskrivelsen er rettet: notatene synes under «Mine notater» uten stjerne (svaret på spørsmål 4, beskjeden kl. 14:16). Se spørsmålet i spesifikasjonen for 9.18.
+  *Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* HE15 lukkes som alt bygget. Følg har satt stjernen siden 8.26 (11.11), og en test låser det. De tre egne aksjene ble fulgt før det, og gruppen setter stjernen på dem selv i den ekte versjonen.
+- HE16: boksen i omvisningen har fast bredde. At den bytter hjørne, er ikke endret.
+- HE17: et steg om notatene sist på aksjesiden og et i Min liste, rett før «Mine notater», med ordene fra Innstillinger.
+- HE18: omvisningen blar bare når det merkede ikke synes.
+
+HE1 er et spørsmål i brukertest 2, og HE4, HE6, HE7, HE11, HE12 og HE13 venter til etter testen.
 
 **Ført fra før og fortsatt synlig, ikke nye funn:**
 
@@ -143,6 +161,10 @@ gruppen har svart.
    notatene. *Forslag:* storyen med rettingene ser på det i den ekte
    versjonen først, for eksempel om en valgt dag eller «Vis notater» spilte
    inn. At Følg setter stjernen, gjelder uansett.
+   *Svar 2026-11-17 kl. 14:16 (gruppens svar, rådet anbefalte det):* «Mine
+   notater» i Min liste viser alle notatene, også uten stjerne. Følg setter
+   også stjernen, og beskrivelsen av HE15 er rettet. Slått opp i 9.18: Følg
+   setter alt stjernen fra 11.11 (8.26), så det er ingen kodeendring.
 
 ## En idé fra gruppen
 

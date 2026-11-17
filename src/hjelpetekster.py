@@ -908,6 +908,19 @@ NOTATSTEGET = (
 )
 NOTATSTEGET_DEMO = NOTATSTEGET.removesuffix(".") + ", i demoen til den startes på nytt."
 
+# Story 9.18 (HE17, gruppens svar 17.11 kl. 13:03–13:33): et steg om notatene
+# ved notatfeltet på aksjesiden og et ved notatene i Min liste, med de samme
+# ordene som under «Notater» i Innstillinger (innstillinger.html), uten
+# setningen om tenkte kjøp og salg, som rådordene i omvisningen ikke tillater.
+# NOTATENE_ANKER er NOTATANKER i app.py, delen «Mine notater» på begge sidene.
+NOTATENE_ANKER = "mine-notater"
+_NOTATENE_ETTERPAA = (
+    "Under hvert notat står hva aksjen og hovedindeksen gjorde etterpå, på kurs justert for utbytte. "
+    "Appen sier aldri om noe var riktig. «Vis notater» av i Innstillinger skjuler dem, men sletter ingenting."
+)
+NOTATENE_AKSJESIDEN = "Dine egne notater på aksjesiden, samlet nederst i Min liste. " + _NOTATENE_ETTERPAA
+NOTATENE_MIN_LISTE = "Dine egne notater fra aksjesidene, samlet her, det nyeste først. " + _NOTATENE_ETTERPAA
+
 
 @dataclass(frozen=True)
 class Steg:
@@ -973,6 +986,8 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
             ),
             styrke,
             retning,
+            # Story 9.18 (HE17): notatene nederst, før knappen, som står sist.
+            Steg(NOTATENE_ANKER, "Notatene", NOTATENE_MIN_LISTE),
             # Story 8.27 (spørsmål 13): etter stegene for Min liste, og før
             # «Følg en aksje» i omvisningen. Tas ut under når «Notater» er av.
             Steg(NOTATKNAPP, "Mine notater", NOTATSTEGET_DEMO if demo else NOTATSTEGET),
@@ -1017,10 +1032,18 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
                 "Det appen skrev om aksjen, lagret hver børsdag og aldri regnet på nytt, en måned om gangen. "
                 "En dag merket «i ettertid» er regnet senere av kursene.",
             ),
+            # Story 9.18 (HE17): notatfeltet nederst på siden. Tas ut under
+            # når «Notater» er av.
+            Steg(NOTATENE_ANKER, "Notatene", NOTATENE_AKSJESIDEN),
         ),
         "innstillinger": (
             Steg("innstillinger-tittel", "Innstillinger", "Valgene her gjelder alle sidene og huskes på maskinen."),
-            Steg("hjelp-valget", "Hjelp", "Slår spørsmålstegnene ved overskriftene av og på."),
+            # Story 9.18 (HE5): av tar også bort knappene for omvisningen.
+            Steg(
+                "hjelp-valget",
+                "Hjelp",
+                "Slår spørsmålstegnene ved overskriftene av og på. Av skjuler også «Vis meg rundt» og «Spill av omvisningen».",
+            ),
             Steg("ki-valget", "KI-tekst", "Slår tekstene skrevet av KI av og på."),
         ),
         "folg": (
@@ -1036,8 +1059,11 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
     sider["aksje_uten_sjekker"] = tuple(s for s in sider["aksje"] if s.anker not in ("sjekkene", KI_ANKER))
     # Story 8.27: uten «Notater» er knappen borte, og steget med den, så
     # telleren i boksen ikke teller et steg som ikke vises.
+    # Story 9.18 (HE17): også stegene om notatene, fordi delen er borte.
     if not notater:
-        sider["min_liste"] = tuple(s for s in sider["min_liste"] if s.anker != NOTATKNAPP)
+        sider = {
+            side: tuple(s for s in steg if s.anker not in (NOTATKNAPP, NOTATENE_ANKER)) for side, steg in sider.items()
+        }
     for side, steg in sider.items():
         assert len(steg) <= MAKS_STEG, side
     return sider

@@ -459,7 +459,7 @@ class TestAksjedetalj:
 
         html = klient.get("/aksje/EQNR").data.decode("utf-8")
 
-        assert "mot MA50" in html
+        assert "mot 50-dagers snitt" in html
         assert "standardavvik" in html
         assert "× medianen" in html
 
@@ -921,9 +921,12 @@ class _Tabell(HTMLParser):
     Story 8.2a, b (U23): hver aksje i lista har en rad, ogsaa de i
     migrasjonen som testen ikke gir kurser. Radene «uten data» staar i
     uten_data og ikke i rader, saa testene gjelder radene med kurs, som foer.
-    Raden uten data proeves i TestStory82aRadUtenData og test_demoproeven.py."""
+    Raden uten data proeves i TestStory82aRadUtenData og test_demoproeven.py.
 
-    EKSTRA = ("linje", "antall", "bak", "under", "stjerne")
+    Story 9.18 (HE3): styrken og retningen under navnet, som bare vises paa
+    smal skjerm, staar ogsaa i ekstra, saa cellen fortsatt er navnet."""
+
+    EKSTRA = ("linje", "antall", "bak", "under", "stjerne", "smal-signal")
 
     def __init__(self):
         super().__init__()
@@ -1418,7 +1421,7 @@ class TestVurderingenIDetaljen:
         assert "3 av 3" in html
         assert "Blandet" in html
         assert "volum 4,95 × medianen" in html
-        assert "mot MA50" in html
+        assert "mot 50-dagers snitt" in html
 
     def test_rad_med_grunn_gir_200_med_grafen_og_grunnen(self, klient):
         rader = serie([100.0] * 61)
@@ -2007,7 +2010,11 @@ class TestStory80e:
         }
         # Story 8.0d, PR 2 (BH10): grensene i båndene følger terskelen.
         # Story 8.2a, b: og de 13 aksjene uten kurser (gjennomgangen 24.10, BH4).
-        assert _tabell(html).ekstra["bak"] == ["signalstyrke 3 eller mer", "signalstyrke 0 til 2 og 13 uten kurser"]
+        # Story 9.18 (HE9): ett tall per gruppe, skilt med «·».
+        assert _tabell(html).ekstra["bak"] == [
+            "signalstyrke 3 eller mer",
+            "1 med signalstyrke 0 til 2 · 13 uten kurser",
+        ]
 
     def test_setningene_fra_8_0c_der_skilte_seg_ut_ellers_staar(self, klient):
         """Svar 3. Ville feilet hvis «Skilte seg ut» stod sammen med
@@ -2066,16 +2073,27 @@ class TestStory80e:
         # Story 8.2a, b (U23): de 12 aksjene uten kurser har en rad i båndet
         # og telles med. Gjennomgangen 24.10 (BH4): «uten data» for seg.
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        # Story 9.18 (HE9, gruppens svar 17.11 kl. 13:03–13:33): ett tall per
+        # gruppe, skilt med «·», og pillen er fortsatt summen.
         assert tabell.ekstra["bak"] == [
             "signalstyrke 2 eller mer",
-            "signalstyrke 0 eller 1 og 1 uten signal og 12 uten kurser",
+            "1 med signalstyrke 0 eller 1 · 1 uten signal · 12 uten kurser",
         ]
         assert tabell.ekstra["antall"] == ["1", "14"]
         _lagret("MOWI", 0.0, 0, 0, 0, vurdert=False)
         tabell = _tabell(klient.get("/").data.decode("utf-8"))
         # Gjennomgangen 24.10 (VG4): MOWI går fra uten data til uten signal.
-        assert tabell.ekstra["bak"][1] == "signalstyrke 0 eller 1 og 2 uten signal og 11 uten kurser"
+        assert tabell.ekstra["bak"][1] == "1 med signalstyrke 0 eller 1 · 2 uten signal · 11 uten kurser"
         assert tabell.ekstra["antall"] == ["1", "14"] and len(tabell.uten_data) == 11
+
+    def test_oevrige_uten_en_gruppe_nevner_den_ikke(self, klient):
+        """Story 9.18 (HE9): ville feilet hvis en gruppe uten aksjer sto med 0,
+        eller teksten begynte med «·»."""
+        _lagret("KOG", 0.0, 1, 1, 0)
+        _lagret("DNB", 0.0, 0, 0, 0, vurdert=False)
+        tabell = _tabell(klient.get("/").data.decode("utf-8"))
+        assert tabell.ekstra["bak"][1] == "1 uten signal · 13 uten kurser"
+        assert tabell.ekstra["antall"] == ["1", "14"]
 
     def test_alle_over_terskelen_gir_bare_skilte_seg_ut(self, klient):
         _lagret("EQNR", 1.0, 1, 1, 0)
@@ -3801,7 +3819,7 @@ class TestStory816bDagenPaaHeleSiden:
         assert "Hvorfor signalet ble 3" in toppen
         # Gruppens svar 04.11 kl. 09:58: «?» ved «Ga» i alle tre kortene.
         # Story 8.20a (del E): «?» står ved navnet, ikke ved «Ga».
-        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot MA50" in toppen
+        assert "Sjekk 2 Ga -1 negativ" in toppen and "+12,3 % mot 50-dagers snitt" in toppen
         assert "volum 7,00 × medianen" in toppen
         assert "skilte seg ut fredag" not in toppen and "Positiv" not in toppen
 
