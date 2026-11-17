@@ -85,7 +85,8 @@ bare på bildene.
 Radene i UX-loggen som dokumentet viser til, er også slått opp (U23, U105, og
 radene om smal skjerm og 404-siden).
 
-13 funn: 3 på middels (HE1–HE3) og 10 lave (HE4–HE13), og ingen høye. To ting
+13 funn: 3 på middels (HE1–HE3) og 10 lave (HE4–HE13), og ingen høye. Etter
+svarene kl. 13:03–13:13 kom HE14–HE17 fra gruppen, så det er 17 funn i alt. To ting
 som alt står i UX-loggen, er nevnt, men ikke ført som nye. Funnene står i
 `docs/heuristisk-evaluering.md` og som U114–U126 i `docs/ux-logg.md`.
 
@@ -129,10 +130,25 @@ stopper ikke arbeidet.
 1. **HE1–HE3 (middels).** Skal de rettes før brukertest 2? *Forslag:* HE2 og
    HE3 før testen, og HE1 som et spørsmål i brukertest 2 først. Grunnene står
    i dokumentet.
+   *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* HE2 og HE3 rettes før brukertest 2. HE1 blir først et
+   spørsmål i brukertest 2.
 2. **HE4–HE13 (lave).** *Forslag:* HE5, HE8, HE9 og HE10 er tekst og kan tas i
    én liten story. Resten venter til etter brukertest 2.
+   *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* HE5, HE8, HE9 og HE10 tas i samme story som HE2 og HE3, før
+   testen. HE4, HE6, HE7, HE11, HE12 og HE13 venter til etter testen.
 3. **Én evaluerer.** *Forslag:* gruppen går selv gjennom tabellen før
    brukertest 2 og fører funn den er uenig i, som en datert linje.
+   *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* gruppen er evaluerer nr. 2 og fant HE14–HE17 selv i den
+   ekte versjonen. De står i tabellen i dokumentet og som U127–U130 i
+   UX-loggen, med gradene satt etter skalaen: HE14 og HE15 middels, HE16 og
+   HE17 lave. Idéen kl. 13:08 står som idé, ikke som funn. Ingen kode
+   endres i 9.17, og rettingene kommer i en egen story etter flettingen.
+4. **HE15 og koden.** Gruppen så at notatene på en aksje uten stjerne ikke
+   synes i Min liste, men på main viser «Mine notater» i Min liste alle
+   notatene (`_alle_notatene` i `src/app.py` leser alle radene i `notat`).
+   *Forslag:* storyen med rettingene ser på det i den ekte versjonen først.
+   Det er en merknad til gruppens funn, ikke et funn i gjennomgangen, og det
+   stopper ikke flettingen.
 
 ## Grenser
 
