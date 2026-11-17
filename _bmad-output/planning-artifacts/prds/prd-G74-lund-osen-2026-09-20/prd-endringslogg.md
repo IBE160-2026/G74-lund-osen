@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T22:41
+updated: 2026-11-17T22:48
 ---
 
 # Endringslogg for PRD-en
@@ -1684,3 +1684,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* de andre klare funnene fra valideringen. V8: FR-110, FR-111, FR-203 og FR-602 har fått en konsekvens for «Vis notater» av, knappen og panelet «Mine notater», «Signalet dag for dag» og den korte lista over ord om kjøp, salg og anbefaling, som visningen stopper (`_VAKT` i `src/ki_visning.py`). V10: SM-1 har de samme kravene som UJ-1, med FR-401, og SM-11 de samme som UJ-3, med FR-110, FR-203 og FR-607. V11: punkt 2, 6, 8, 11, 12, 15 og 16 er skrevet ut i en tabell under «Utenfor v1» i §8, med en linje hver, kortet ned fra punktene slik de står i «Åpne punkter og idéene til v1.1, slik de sto», og FR-501 og FR-606A viser til «punkt 16 i §8» og «punkt 2 i §8». V14: NFR-03 og SM-4 sier «dager der alle aksjene har styrke 0» i stedet for «dager uten tydelige signaler». V9, om FR-606 skal stå i §4.6 eller i vedlegg A, er et spørsmål til gruppen og ikke endret. Det som sto i §8: «Punkt 2, 6, 8, 11, 12, 15 og 16 gjelder plan A, børsmeldingene og de kommende hendelsene. De tas opp igjen bare hvis plan A tas opp (vedlegg A).»
 
 *Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* [`prd-sporing.md`](prd-sporing.md) er ny ved siden av `prd.md`: hver FR-, NFR-, UJ- og SM-ID med avsnittet, statusen fra tabellen i §2, storyene fra `epics.md` og testfilene, hvorfor noen numre mangler, og lista over `[ANTAKELSE]` og `[FORELØPIG]` (V13 i valideringen). Markørene i FR-302 og FR-606A lenker til sin rad i lista, og lista lenker til kravet. `tests/test_prd_sporing_9_20.py` låser fila.
+
+*Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* «Slik leser du PRD-en» står øverst, før «Kort fortalt» (V5 i valideringen): alt i §1–§8 gjelder nå, historikken står her og i taggene, vedlegg A er plan A og ikke bygget, og lenkene til sporingen, svaret på tilbakemeldingen og «Teknologi og nøkler». Avsnittet sto slik: «Dette er den gjeldende teksten. Hvert krav sier hva appen gjør nå, og hva en test kan sjekke. Hvordan kravene har endret seg, står i [endringsloggen](prd-endringslogg.md), med de daterte linjene ordrett. PRD-en slik faglærer vurderte den 12.11, står i taggen `prd-vurdert-2026-11-12`. Slik den var ved fristen 5.11, står den i taggen `prd-ferdig-2026-11-03`.»

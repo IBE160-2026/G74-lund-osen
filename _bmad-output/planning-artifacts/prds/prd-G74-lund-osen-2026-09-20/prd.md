@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T22:41
+updated: 2026-11-17T22:48
 ---
 
 # PRD — OSE Signal
@@ -10,11 +10,25 @@ updated: 2026-11-17T22:41
 **Emne:** IBE160 Programmering med KI, Høgskolen i Molde
 **Gruppe:** G74 — Joakim Lund, Marian Osen
 
-Dette er den gjeldende teksten. Hvert krav sier hva appen gjør nå, og hva en
-test kan sjekke. Hvordan kravene har endret seg, står i
-[endringsloggen](prd-endringslogg.md), med de daterte linjene ordrett. PRD-en
-slik faglærer vurderte den 12.11, står i taggen `prd-vurdert-2026-11-12`. Slik
-den var ved fristen 5.11, står den i taggen `prd-ferdig-2026-11-03`.
+## Slik leser du PRD-en
+
+- **Alt i §1–§8 gjelder nå.** Hvert krav sier hva appen gjør, og
+  «*Konsekvenser:*» sier hva en test kan sjekke. ID-ene står fast, også når et
+  krav endres.
+- **Historikken** står i [endringsloggen](prd-endringslogg.md), med de daterte
+  linjene ordrett og hver endring etter 12.11. PRD-en slik faglærer vurderte den
+  12.11, står i taggen `prd-vurdert-2026-11-12`, og slik den var ved fristen
+  5.11 i taggen `prd-ferdig-2026-11-03`.
+- **Vedlegg A er plan A:** børsmeldingene, de kommende hendelsene og KI over
+  meldingene. Den er ikke bygget, og kravene der gjelder bare hvis plan A tas
+  opp igjen.
+- **[Sporingen](prd-sporing.md)** viser for hver brukerreise, hvert krav og
+  hvert suksessmål avsnittet, statusen, storyene og testene, og hvorfor noen
+  numre mangler. Der står også lista over antakelsene og de foreløpige tallene.
+- **[Svaret på tilbakemeldingen](tilbakemelding-prd-svar.md)** sier punkt for
+  punkt hva som er gjort etter tilbakemeldingen fra faglærer 12.11.
+- **Tjenestene, teknologien og navnene på nøklene** står i
+  [«Teknologi og nøkler»](../../architecture/teknologi-og-noekler.md).
 
 ## Kort fortalt
 
