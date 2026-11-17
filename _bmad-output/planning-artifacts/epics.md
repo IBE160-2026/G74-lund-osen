@@ -5433,3 +5433,19 @@ Som **gruppe** vil vi ha en heuristisk evaluering av demoen før brukertest 2, s
 **Avhenger av:** 8.2, 8.9, 8.21, 8.27, 2.18. **Én økt:** ja.
 
 *Lagt til 2026-11-17:* 9.17 er squash-flettet med PR #164 i `fc70bdf3` kl. 14:01, låst til head-en `ba17be8e`, etter beskjeden fra rådet kl. 13:19 i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. Gruppens svar kl. 13:03–13:13: HE2, HE3, HE5, HE8, HE9 og HE10 og gruppens HE14–HE17 rettes før brukertest 2 i en egen story, HE1 blir et spørsmål i testen, og resten venter. CI var grønn i alle jobbene (run 44087764478), med 5876 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.18: Rettingene før brukertest 2
+
+*Lagt til 2026-11-17, etter instruksjonen om rettingene før brukertest 2 og beskjeden kl. 14:16 i `docs/ai-prompts/2026-11-17.md`, og gruppens svar 17.11 kl. 13:03–13:33 på spørsmålene i 9.17:* rådet anbefalte svarene. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-18-rettingene-foer-brukertest-2.md`.
+
+Som **gruppe** vil vi rette funnene fra den heuristiske evalueringen som gruppen valgte før brukertest 2, så testen måler appen uten hindrene vi alt kjenner.
+
+**Oppfyller:** svarene 17.11 kl. 13:03–13:33 i 9.17, og HE18 · **Begrenses av:** regel 3, 16, 19, 21, 22 og 23, NFR-06, og ingen ny migrasjon før testen
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- HE2, HE3, HE5, HE8, HE9, HE10 og HE14–HE18 er rettet, hver med en test som feilet mot koden før rettingen
+- Hjelpen, `docs/hjelp.md`, «Vis meg rundt» og kravene i `prd.md` sier det samme som appen, med en linje i endringsloggen der et krav endres
+- En datert linje per funn i `docs/heuristisk-evaluering.md` og `docs/ux-logg.md`, og spørsmålet om HE1 under «Brukertest 2» i `docs/brukertest.md`
+- Ingen ny migrasjon
+
+**Avhenger av:** 9.17, 8.21, 8.22, 8.25, 8.26. **Én økt:** nei.
