@@ -80,6 +80,8 @@ class TestTabellenPaaSmalSkjerm:
         # (TestBareEnGangIAlleBredder). Fra 573 px står styrken i sin kolonne,
         # så linja viser bare retningen.
         assert kropper[("", ":where(.side-oversikt) .tabellboks#aksjene")] == "container-type: inline-size"
+        # Tabellen er like bred i alle visningene, så kolonnene står på samme sted.
+        assert kropper[("", ":where(.side-oversikt) .tabellboks#aksjene table")] == "min-width: 709px"
         assert "display: block" in kropper[("@container (width < 709px)", velger)]
         styrken = ":where(.side-oversikt) td.selskap .smal-styrke"
         assert kropper[("@container (573px <= width < 709px)", styrken)] == "display: none"
@@ -117,11 +119,12 @@ class TestBareEnGangIAlleBredder:
     flytter dem (gjennomgangen, BH1). Målt i Edge 17.11 med demoens aksjer:
     kolonnen for signalstyrken får plass når boksen er minst 573 px, og
     kolonnen for retningen når den er minst 709 px, på oversikten, med en
-    periode, med «Velg dag» og i Min liste med «Alle». Min liste med bare
-    stjernene er 2 px smalere (571 og 707 px). Under 573 px står styrken og
-    retningen i linja under navnet, fra 573 px bare retningen, og fra 709 px
-    ingen linje. Før sto hele linja til og med 760 px vindu: retningen sto to
-    ganger i 743–760 px og styrken i 607–760 px."""
+    periode, med «Velg dag» og i Min liste, også med bare stjernene, fordi
+    tabellen er minst 709 px (før var den 707 px der, og bruddene kom 2 px for
+    tidlig). Under 573 px står styrken og retningen i linja under navnet, fra
+    573 px bare retningen, og fra 709 px ingen linje. Før sto hele linja til
+    og med 760 px vindu: retningen sto to ganger i 743–760 px og styrken i
+    607–760 px."""
 
     # Gjennomgangen (ECH1): samme rad i Min liste, med en periode og med
     # «Velg dag», også en dag med signalet i ettertid (2.17).
@@ -176,7 +179,8 @@ class TestBareEnGangIAlleBredder:
         return svar
 
     # Ingen bredde nærmere enn 3 px fra bruddene, fordi skriftene i CI kan gi
-    # en annen bredde på tabellen. Boksen er 34 px smalere enn vinduet.
+    # en annen bredde på tabellen. Boksen er 34 px smalere enn vinduet. Lokalt
+    # 17.11 besto også 605–608 og 741–744 px i ni visninger.
     @pytest.mark.parametrize("bredde", [390, 604, 610, 640, 705, 739, 746, 760, 1280])
     @pytest.mark.parametrize("adresse", SIDENE)
     @I_NETTLESEREN

@@ -505,9 +505,12 @@ td .justeringsdag { display: block; font-size: 12px; font-weight: 400; color: va
    minst 573 px, og kolonnen for retningen når den er minst 709 px. Under
    573 px står styrken og retningen i linja, fra 573 px bare retningen, og
    fra 709 px ingen linje. En rad uten signal har bare delen med styrken, så
-   linja står ikke tom fra 573 px (BH4). Før var bruddet 760 px vindu for
-   hele linja. */
+   linja står ikke tom fra 573 px (BH4). Tabellen er minst 709 px, den
+   målte bredden med alle aksjene, så kolonnene står på samme sted i alle
+   visningene; Min liste med bare stjernene var 707 px og fikk bruddene
+   2 px for tidlig. Før var bruddet 760 px vindu for hele linja. */
 :where(.side-oversikt) .tabellboks#aksjene { container-type: inline-size; }
+:where(.side-oversikt) .tabellboks#aksjene table { min-width: 709px; }
 :where(.side-oversikt) td.selskap .smal-signal { display: none; }
 @container (width < 709px) {
   :where(.side-oversikt) td.selskap .smal-signal { display: block; margin-top: 2px; font-size: 13px; font-weight: 600; }
