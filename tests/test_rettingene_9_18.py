@@ -7,6 +7,7 @@ Chrome, unntatt i CI.
 """
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -14,8 +15,12 @@ from pathlib import Path
 
 import pytest
 
-from test_hjelpefeltet import _kjoer
+import app as app_modul
+from test_hjelpefeltet import NETTLESER, _kjoer
 from test_hjelpetekster import base, basemal, klient  # noqa: F401
+
+# Uten Edge eller Chrome hoppes testene i nettleseren over, unntatt i CI.
+I_NETTLESEREN = pytest.mark.skipif(NETTLESER is None and not os.environ.get("CI"), reason="ingen Edge eller Chrome")
 
 
 def _tekst(html: str) -> str:
@@ -73,6 +78,7 @@ class TestTabellenPaaSmalSkjerm:
         assert "display: block" in kropper[("@media (max-width: 760px)", velger)]
 
     @pytest.mark.parametrize("bredde, synlig", [(390, True), (1280, False)])
+    @I_NETTLESEREN
     def test_i_nettleseren(self, side, tmp_path, bredde, synlig):
         """Ville feilet hvis styrken og retningen lå utenfor skjermen ved
         390 px, eller linja sto under navnet ved 1280 px."""
@@ -114,6 +120,7 @@ class TestBoksenIOmvisningen:
         assert kropper[".omvisning.til-venstre"] == "right: auto; left: 16px"
 
     @pytest.mark.parametrize("bredde, venta", [(1280, 360), (390, 358)])
+    @I_NETTLESEREN
     def test_i_nettleseren(self, side, tmp_path, bredde, venta):
         """Ville feilet hvis en kort og en lang tekst ga ulik bredde, eller
         boksen gikk utenfor skjermen ved 390 px."""
@@ -185,6 +192,7 @@ class TestOmvisningenBlarBareNaarDetTrengs:
     # Ved 390 px står dagvalget under kanten av vinduet, så første steg må
     # bla der.
     @pytest.mark.parametrize("bredde, staar", [(1280, True), (390, False)])
+    @I_NETTLESEREN
     def test_i_nettleseren(self, side, tmp_path, bredde, staar):
         """Ville feilet hvis første steg på oversikten, øverst på siden, blar
         siden så stripa forsvinner når alt det merkede alt synes, eller et
@@ -214,3 +222,78 @@ class TestOmvisningenBlarBareNaarDetTrengs:
         assert (svar["foerste"] == 0) is staar
         assert len(svar["steg"]) >= 5
         assert all(s["synes"] for s in svar["steg"]), svar["steg"]
+
+
+INNSTILLINGER = Path(__file__).resolve().parent.parent / "src" / "templates" / "innstillinger.html"
+
+
+def _vis_meg_rundt(html: str) -> list[dict]:
+    import html as html_modul
+
+    treff = re.search(r'<button type="button" class="sideknapp vis-meg-rundt" data-steg="([^"]*)" hidden>', html)
+    assert treff, "ingen «Vis meg rundt»"
+    return json.loads(html_modul.unescape(treff.group(1)))
+
+
+class TestStegetOmNotatene:
+    """HE17: et steg om notatene ved notatfeltet på aksjesiden og et ved
+    notatene i Min liste, i «Vis meg rundt» og i hele omvisningen, med de
+    samme ordene som under «Notater» i Innstillinger."""
+
+    def test_sist_paa_aksjesiden_og_foer_knappen_i_min_liste(self):
+        """Ville feilet uten stegene, eller med «Mine notater» (knappen) som
+        ikke sist i Min liste."""
+        import hjelpetekster as ht
+
+        for demo in (False, True):
+            sider = ht.rundturer(demo=demo)
+            for side in ("aksje", "aksje_uten_sjekker"):
+                assert sider[side][-1] == ht.Steg("mine-notater", "Notatene", ht.NOTATENE_AKSJESIDEN), side
+            assert [s.anker for s in sider["min_liste"]] == [
+                "aksjene",
+                "kolonne-signal",
+                "kolonne-retning",
+                "mine-notater",
+                "notatknapp",
+            ]
+            assert sider["min_liste"][3] == ht.Steg("mine-notater", "Notatene", ht.NOTATENE_MIN_LISTE)
+        assert ht.NOTATENE_ANKER == app_modul.NOTATANKER == "mine-notater"
+
+    def test_de_samme_ordene_som_i_innstillinger(self):
+        """Ville feilet hvis steget sa noe annet enn teksten under «Notater» i
+        Innstillinger, eller hadde over 50 ord."""
+        import hjelpetekster as ht
+
+        innstillinger = " ".join(INNSTILLINGER.read_text(encoding="utf-8").split())
+        for tekst in (ht.NOTATENE_AKSJESIDEN, ht.NOTATENE_MIN_LISTE):
+            for setning in (
+                "Under hvert notat står hva aksjen og hovedindeksen gjorde etterpå, på kurs justert for utbytte",
+                "Appen sier aldri om noe var riktig.",
+            ):
+                assert setning in tekst and setning in innstillinger, setning
+            assert "men sletter ingenting." in tekst
+            assert len(re.findall(r"\w+", f"Notatene {tekst}")) <= 50
+        assert ht.NOTATENE_AKSJESIDEN.startswith("Dine egne notater på aksjesiden, samlet nederst i Min liste.")
+        assert "Dine egne notater på aksjesiden, samlet nederst i Min liste." in innstillinger
+
+    def test_i_hele_omvisningen(self):
+        """Ville feilet hvis stegene manglet i hele omvisningen, eller sto med
+        «Notater» av."""
+        import hjelpetekster as ht
+
+        stegene = [(s["side"], s["anker"]) for s in ht.omvisningen()]
+        assert ("aksje", "mine-notater") in stegene and ("min_liste", "mine-notater") in stegene
+        i = stegene.index(("min_liste", "notatknapp"))
+        assert stegene[i - 1] == ("min_liste", "mine-notater") and stegene[i + 1][0] == "folg"
+        uten = ht.rundturer(notater=False)
+        assert all(s.anker != "mine-notater" for steg in uten.values() for s in steg)
+        assert all(s["anker"] != "mine-notater" for s in ht.omvisningen(notater=False))
+
+    @pytest.mark.parametrize("adresse", ["/aksje/BRFE", "/min-liste?vis=alle"])
+    def test_paa_sidene(self, side, adresse):
+        """Ville feilet hvis steget ikke var i «Vis meg rundt» på siden, eller
+        ankeret ikke sto der nøyaktig én gang."""
+        html = side(adresse)
+        stegene = [s["anker"] for s in _vis_meg_rundt(html)]
+        assert "mine-notater" in stegene
+        assert len(re.findall(r'(?<![\w-])id="mine-notater"', html)) == 1
