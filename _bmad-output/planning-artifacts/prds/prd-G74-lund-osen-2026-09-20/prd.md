@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T11:53
+updated: 2026-11-17T12:39
 ---
 
 # PRD — OSE Signal
@@ -134,8 +134,8 @@ knappen «Mine notater» øverst de samme notatene i et panel ved siden av siden
   borte fra sidene, men ingenting er slettet.
 
 Kravene UJ-2 hviler på: FR-110, FR-111, FR-203 og NFR-06. Notatene med
-«Etterpå» og de tenkte kjøpene har ikke eget FR (§2). Suksessmålet SM-2 er det
-nærmeste, men det måler at gruppen bruker appen, ikke reisen.
+«Etterpå» og de tenkte kjøpene har ikke eget FR (§2). Suksessmålet SM-10 måler
+reisen.
 
 ### Brukerreisen UJ-3
 
@@ -159,8 +159,7 @@ teksten på aksjesiden, og den står der igjen.
   aksjesiden står sjekkene som før.
 
 Kravene UJ-3 hviler på: FR-110, FR-203, FR-601, FR-602, FR-607 og FR-706.
-Suksessmålet SM-8 er det nærmeste, men det måler kontrollen og loggen av
-KI-teksten, ikke vekslingen.
+Suksessmålet SM-11 måler reisen.
 
 ### Ordliste
 
@@ -1651,6 +1650,8 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 | SM-7 | Riktige beregninger | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består, og en kontroll for hånd stemmer med appen (`malinger.md` §6) | Ved hver testkjøring | FR-701, FR-702, FR-703, FR-704, NFR-08 |
 | SM-8 | KI-forklaringen | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og hver tekst er logget | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen | FR-601, FR-602, FR-603, FR-604, FR-605, FR-607, NFR-04 |
 | SM-9 | Kjørbar for andre | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler. Demoen virker uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin | Senest én uke før innleveringen | FR-411, FR-608, NFR-01 |
+| SM-10 | Notatene etterpå | En person utenfor gruppen finner et notat i Min liste og sier hva aksjen og hovedindeksen har gjort siden | Minst 1 person, uten hjelp | I brukertest 2 | FR-110, FR-111, FR-203 |
+| SM-11 | KI-teksten av og på | En person utenfor gruppen slår på KI-teksten og sier om signalet og sjekkene er de samme som før | Minst 1 person, og svaret er ja | I brukertest 2 | FR-601, FR-602, FR-706 |
 
 **Hovedflyten** er: åpne markedsoversikten, se hvilke aksjer som skiller seg ut,
 åpne én av dem, og lese hvorfor. Forklaringen er de tre sjekkene med målingene,
@@ -1674,6 +1675,8 @@ beskriver.
   (2.17) ble likevel tatt inn etter svaret 14.11 kl. 05:41–05:49 og flettet
   14.11, før prøven. Etter svaret 15.11 kl. 05:20 står 3.4 i review og blir
   done når README-prøven er tatt og ført.
+- SM-10 og SM-11 måles i brukertest 2, med oppgave G og et ekstra spørsmål i
+  oppgave B (`docs/brukertest.md`).
 - Datoene for demonstrasjon og innlevering er ikke kjent (§8, punkt 13).
 
 **Drift: hva målet ga opp.** Målet sa først «ingen manuelle steg», og det målte

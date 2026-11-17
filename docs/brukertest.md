@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-14T19:14
+updated: 2026-11-17T12:39
 ---
 
 # Brukertesten
@@ -103,6 +103,24 @@ Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksj
 | Fant personen forskjellen fra en dag uten merket (ja eller nei) | |
 | Så personen at dagen ikke har KI-tekst, og hvorfor (ja eller nei) | |
 | Leste personen «i ettertid» som en annen styrke eller et råd (ja eller nei) | |
+
+*Lagt til 2026-11-17 (story 9.16, gruppens svar kl. 12:32, rådet anbefalte det):* to oppgaver for suksessmålene SM-10 og SM-11 i §7 i PRD-en, som måler brukerreisene UJ-2 og UJ-3.
+
+**Oppgave B, et ekstra spørsmål (SM-11, UJ-3).** Spørres når personen har slått på KI-teksten.
+
+| Felt | Notat |
+|---|---|
+| «Er signalet og sjekkene de samme som før du slo på KI?», svaret ordrett | |
+| Svarte personen ja (ja eller nei) | |
+
+**Oppgave G (SM-10, UJ-2).** Gruppen skriver notatet i den ekte versjonen 17.11, så det finnes dager etterpå når testen tas. Notatene fra testen sier at notatet ble skrevet av gruppen.
+
+| Felt | Notat |
+|---|---|
+| «Finn notatet i Min liste, og si hva aksjen og hovedindeksen har gjort siden.», svaret ordrett | |
+| Fant personen notatet uten hjelp (ja eller nei) | |
+| Sa personen hva både aksjen og hovedindeksen har gjort siden (ja eller nei) | |
+| Notatet ble skrevet av gruppen, dagen | |
 
 ## Funnene
 
