@@ -2,7 +2,7 @@
 title: 'Story 9.15: meldingene etter v1.1 og det som ikke brukes'
 type: 'chore'
 created: '2026-11-16'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'c2adf7f5'
 context:
@@ -178,4 +178,15 @@ grønn i alle jobbene (instruksjonen kl. 21:50).
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: de 25 testfilene som importerer modulene, kl. 16:27–16:36 (1428 bestått, og 4 i `tests/test_docker.py` feilet på avtrykkene, satt på nytt i `303841a9`); etter gjennomgangen `test_meldingene_9_15.py`, `test_tilstand.py`, `test_docker.py`, `test_fetch_prices.py`, `test_ettertid_2_17.py`, `test_etterfyllingen_2_4.py` og `test_notater.py` kl. 16:44–16:50 (711 bestått, de 4 avtrykkene satt på nytt i `d2f3f5e3`), og så de tre første på nytt (195 bestått); `--dokumentene` på `82f97c58` kl. 16:52–17:10 (2966 bestått og 7 hoppet over)
 - [x] Ingen bilder endret
 - [x] Gjennomgangen er tatt
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 44060835062 på `c040f478`, med 5872 bestått og 99 hoppet over i `pytest`)
+
+## Flettet 17.11
+
+Svaret 16.11 kl. 18:51 står under spørsmål 1, og BH1 er besvart. `origin/main`
+ble flettet inn i grenen (`c040f478`), og `--dokumentene` ga 2966 bestått og 7
+hoppet over kl. 10:41–11:00. CI var grønn i alle fire jobbene på head-en
+`c040f478` (run 44060835062). Ingen funn på middels eller høy grad sto åpne
+(regel 25). PR #162 ble squash-flettet i `9fea9fc8` 17.11 kl. 11:07, låst til
+`c040f478`, uten nytt ja, slik steg 2 i instruksjonen kl. 21:50 sier. Flettingen
+skulle vært tatt etter kl. 23:58, men PC-en var i hvilemodus fra 16.11 kl. 23:06
+til 17.11 kl. 10:40 (beskjeden 17.11 kl. 11:02).

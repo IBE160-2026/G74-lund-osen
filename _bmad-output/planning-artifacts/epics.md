@@ -5395,3 +5395,5 @@ Som **gruppe** vil vi at meldingene fra hentingen sier det v1.1 gjør med en dag
 - Ingen bilder endret, og ingen endring i hva hentingen gjør
 
 **Avhenger av:** 2.17, 9.14. **Én økt:** ja.
+
+*Lagt til 2026-11-17:* 9.15 er squash-flettet med PR #162 i `9fea9fc8` kl. 11:07, låst til head-en `c040f478`, etter steg 2 i instruksjonen kl. 21:50 i `docs/ai-prompts/2026-11-16.md`, uten nytt ja. Gruppens svar 16.11 kl. 18:51 på spørsmål 1 (BH1): ikonfilene står. CI var grønn i alle jobbene (run 44060835062), med 5872 bestått og 99 hoppet over i jobben `pytest`. Alle de 18 bildene ble tatt på nytt og er byte for byte de samme, så ingen bilder er endret.
