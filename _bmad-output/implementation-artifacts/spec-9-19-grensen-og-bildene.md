@@ -137,11 +137,19 @@ Et spørsmål stopper ikke arbeidet.
    *Forslag:* ingen nye bilder nå. Etter brukertest 2 kan bildet av spørsmålet
    før sletting og bildet av «Signalet dag for dag» med lenken tilbake legges i
    pila «Bilder av appen (demoen)».
+   *Svar 2026-11-17 kl. 22:18 (gruppens svar, mot rådets forslag, gruppens valg):* README-en får
+   bildene av spørsmålet før sletting (HE2) og lenken tilbake i «Signalet dag
+   for dag» (HE14) før brukertest 2, i en egen liten story etter 9.20, med egen
+   instruksjon.
 2. **Bruddene er målt med demodataene.** Tabellen er minst 709 px, så den
    blir ikke smalere, men en lang ticker og bransje i den ekte versjonen kan
    gjøre den bredere. Da kan et smalt spenn vise retningen ingen steder. I
    demoen stemmer det i alle ni visningene som er målt. *Forslag:* godta det for v1, og se på det i den
    ekte versjonen på telefonbredde i brukertest 2.
+   *Svar 2026-11-17 kl. 22:18 (gruppens svar, mot rådets forslag, gruppens valg):* gruppen måler
+   bruddene i den ekte versjonen selv i kveld, med vinduet gjort smalere, og
+   resultatet kommer som en egen beskjed. Vinduet starter ikke den ekte
+   versjonen.
 
 ## Grenser
 
