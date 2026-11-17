@@ -1882,7 +1882,10 @@ class TestTabellenOmForskjellene:
         Gemma og egen nøkkel, eller aksjesiden ikke hadde lenken uten modell.
         Rettet i story 3.7 (tillegg 1 og 5): .env.example har lokal, ikke av."""
         _, demoen, ekte = _tabellraden("KI-tekst")
-        assert demoen == "Ferdige tekster for siste dag, laget én gang med Gemma"
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): pila for mobil, som nevnte
+        # «Børsdagen kort fortalt», er tatt ut, så raden nevner den. Demoen har
+        # teksten om dagen (test_ki_dagen.py::TestDemoen).
+        assert demoen == "Ferdige tekster for siste dag, også «Børsdagen kort fortalt», laget én gang med Gemma"
         assert ekte == (
             "På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel "
             "til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på"

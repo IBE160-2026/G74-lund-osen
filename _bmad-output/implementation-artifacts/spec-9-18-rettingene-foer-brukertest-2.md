@@ -130,6 +130,12 @@ lesing, på `acc52a83`. 16 funn: 3 på middels og 13 lave.
 | VG4 | lav | Noen mellomcommits er røde | Står: PR-en squash-flettes |
 | VG5 | lav | Én av testene for HE2 er en vakt | Står: de andre feilet før rettingen |
 
+*Lagt til 2026-11-17 (story 9.19, VG1):* bildene i `docs/appen/` og
+`docs/appen/mobil/` er tatt på nytt fra grenen i demoen, to ganger og like
+byte for byte. Seks bilder viste rettingene og er byttet, og tolv var like og
+står. Avtrykkene er regnet ut fra de nye bildene, og bildene før og etter står
+på bildegrenen `pr-9-19-bilder`.
+
 ## Spørsmål til gruppen, med forslag
 
 Et spørsmål stopper ikke arbeidet. Spørsmål 2 er VG1 i gjennomgangen, på
@@ -159,9 +165,18 @@ eller høy grad står åpne.
    Graden på VG1 står (regel 25).
 3. **HE17 uten setningen om tenkte kjøp.** *Forslag:* godta det. Stegene sier
    hvor notatene står, og at appen aldri sier om noe var riktig.
+   *Svar 2026-11-17 kl. 18:23 (gruppens svar, rådet anbefalte det):* godtatt.
+   Stegene om notatene står uten setningen om tenkte kjøp, og testen for
+   rådord står uendret.
 4. **HE3 mellom 640 og 760 px.** Linja vises under 760 px, som er bruddet
    prosjektet bruker. I det spennet står styrken og retningen både i linja og i
    kolonnene. *Forslag:* godta det.
+   *Svar 2026-11-17 kl. 18:23 (gruppens svar):* rettes i story 9.19, etter
+   gruppens valg: styrken og retningen skal stå bare én gang i alle bredder.
+   *Lagt til 2026-11-17 (story 9.19):* målt i Edge med demodataene står
+   styrken i sin kolonne fra 607 px og retningen fra 743 px. Linja viser
+   styrken og retningen under 607 px, bare retningen fra 607 til 743 px, og
+   ingenting fra 743 px.
 
 ## Grenser
 

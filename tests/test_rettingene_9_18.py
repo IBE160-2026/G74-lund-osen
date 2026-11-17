@@ -75,7 +75,16 @@ class TestTabellenPaaSmalSkjerm:
         kropper = {(ramme, velger): kropp for ramme, velger, kropp in reglene}
         velger = ":where(.side-oversikt) td.selskap .smal-signal"
         assert "display: none" in kropper[("", velger)]
-        assert "display: block" in kropper[("@media (max-width: 760px)", velger)]
+        # Story 9.19: bruddene er i bredden på boksen rundt tabellen, der
+        # kolonnene slutter å få plass, ikke 760 px vindu
+        # (TestBareEnGangIAlleBredder). Fra 573 px står styrken i sin kolonne,
+        # så linja viser bare retningen.
+        assert kropper[("", ":where(.side-oversikt) .tabellboks#aksjene")] == "container-type: inline-size"
+        # Tabellen er like bred i alle visningene, så kolonnene står på samme sted.
+        assert kropper[("", ":where(.side-oversikt) .tabellboks#aksjene table")] == "min-width: 709px"
+        assert "display: block" in kropper[("@container (width < 709px)", velger)]
+        styrken = ":where(.side-oversikt) td.selskap .smal-styrke"
+        assert kropper[("@container (573px <= width < 709px)", styrken)] == "display: none"
 
     @pytest.mark.parametrize("bredde, synlig", [(390, True), (1280, False)])
     @I_NETTLESEREN
@@ -101,6 +110,110 @@ class TestTabellenPaaSmalSkjerm:
             # Kolonnen for styrken ligger fortsatt utenfor, som før: tabellen
             # ruller i sin boks.
             assert svar["styrke_utenfor"] is True
+
+
+class TestBareEnGangIAlleBredder:
+    """Story 9.19 (spørsmål 4 i 9.18, gruppens svar 17.11 kl. 18:23): styrken
+    og retningen står hver bare én gang i alle bredder. Bruddene er i bredden
+    på boksen rundt tabellen (@container), ikke vinduet, så et rullefelt ikke
+    flytter dem (gjennomgangen, BH1). Målt i Edge 17.11 med demoens aksjer:
+    kolonnen for signalstyrken får plass når boksen er minst 573 px, og
+    kolonnen for retningen når den er minst 709 px, på oversikten, med en
+    periode, med «Velg dag» og i Min liste, også med bare stjernene, fordi
+    tabellen er minst 709 px (før var den 707 px der, og bruddene kom 2 px for
+    tidlig). Under 573 px står styrken og retningen i linja under navnet, fra
+    573 px bare retningen, og fra 709 px ingen linje. Før sto hele linja til
+    og med 760 px vindu: retningen sto to ganger i 743–760 px og styrken i
+    607–760 px."""
+
+    # Gjennomgangen (ECH1): samme rad i Min liste, med en periode og med
+    # «Velg dag», også en dag med signalet i ettertid (2.17).
+    SIDENE = (
+        "/",
+        "/min-liste",
+        "/min-liste?vis=alle&periode=1-uke",
+        "/?periode=1-mnd",
+        "/?periode=velg&dag=2026-09-18",
+    )
+    SKRIPT = """
+      ${foer}
+      const boks = document.querySelector("#aksjene");
+      const innerst = boks.getBoundingClientRect().left + boks.clientLeft;
+      const faarPlass = (velger) => {
+        const r = document.querySelector(velger).getBoundingClientRect();
+        return boks.scrollLeft === 0 && r.left >= innerst && r.right <= innerst + boks.clientWidth + 0.5;
+      };
+      // Teksten som synes i linja (innerText tar ikke med det som er skjult),
+      // for hver rad med signal. Gjennomgangen (ECH2): ikke linja under i
+      // Min liste med «Sammenlign med».
+      const rader = Array.from(document.querySelectorAll("#aksjene tbody tr:not(.sammenligning)")).filter(
+        (tr) => tr.querySelector("td.styrke .pille, td.styrke .styrketall"));
+      const linjer = rader.map((tr) => {
+        const l = tr.querySelector(".smal-signal");
+        const celle = tr.querySelector("td.retning");
+        const symbol = celle.querySelector(".symbol");
+        const ord = celle.textContent.replace(symbol ? symbol.textContent : "", "").trim();
+        const tekst = l.getBoundingClientRect().width > 0 ? l.innerText : "";
+        return {styrke: /[0-9] av [0-9]/.test(tekst), retning: ord.length > 0 && tekst.includes(ord),
+                merket: !!tr.querySelector("td.styrke .ettertid-merke"), ettertid: tekst.includes("i ettertid")};
+      });
+      // Gjennomgangen (BH4): ingen tom linje i en rad uten signal.
+      const tomme = Array.from(document.querySelectorAll("#aksjene .smal-signal")).filter(
+        (l) => getComputedStyle(l).display !== "none" && !l.innerText.trim()).length;
+      ferdig({boksen: boks.clientWidth, rader: rader.length, linjer, tomme,
+              styrkekolonnen: faarPlass("#kolonne-signal"),
+              retningskolonnen: faarPlass("#kolonne-retning")});
+    """
+
+    def _sjekk(self, side, tmp_path, adresse, bredde, foer=""):
+        svar = _kjoer(side(adresse), tmp_path, bredde, self.SKRIPT.replace("${foer}", foer))
+        assert svar["rader"] > 3, (adresse, svar)
+        assert svar["tomme"] == 0, (adresse, bredde, svar)
+        for linja in svar["linjer"]:
+            hvor = (adresse, bredde, svar["boksen"], linja)
+            assert linja["styrke"] + svar["styrkekolonnen"] == 1, ("styrken", *hvor)
+            assert linja["retning"] + svar["retningskolonnen"] == 1, ("retningen", *hvor)
+            # Merket «i ettertid» står i cellen for styrken, så det følger
+            # delen med styrken i linja (gjennomgangen, VG1).
+            assert linja["ettertid"] == (linja["merket"] and linja["styrke"]), ("i ettertid", *hvor)
+        return svar
+
+    # Ingen bredde nærmere enn 3 px fra bruddene, fordi skriftene i CI kan gi
+    # en annen bredde på tabellen. Boksen er 34 px smalere enn vinduet. Lokalt
+    # 17.11 besto også 605–608 og 741–744 px i ni visninger.
+    @pytest.mark.parametrize("bredde", [390, 604, 610, 640, 705, 739, 746, 760, 1280])
+    @pytest.mark.parametrize("adresse", SIDENE)
+    @I_NETTLESEREN
+    def test_styrken_og_retningen_en_gang_hver(self, side, tmp_path, adresse, bredde):
+        """Ville feilet hvis styrken eller retningen sto både i linja og i en
+        kolonne som får plass i boksen (som styrken ved 640–739 px og
+        retningen ved 746 og 760 px før 9.19), eller ingen av stedene, eller
+        merket «i ettertid» sto uten styrken i linja."""
+        self._sjekk(side, tmp_path, adresse, bredde)
+
+    @pytest.mark.parametrize("bredde, merket", [(390, True), (640, False)])
+    @I_NETTLESEREN
+    def test_en_dag_i_ettertid(self, side, tmp_path, bredde, merket):
+        """Gjennomgangen (VG1): fredag 18.09 er Kvitstein Mineral og de andre
+        regnet i ettertid i demoen. Ved 390 px står «· i ettertid» med styrken
+        i linja, og ved 640 px står bare retningen, fordi merket står i
+        kolonnen for styrken. Ville feilet hvis merket fulgte retningen."""
+        svar = self._sjekk(side, tmp_path, "/?periode=velg&dag=2026-09-18", bredde)
+        med_merket = [l for l in svar["linjer"] if l["merket"]]
+        assert len(med_merket) > 5
+        assert all(l["ettertid"] is merket for l in med_merket), svar["linjer"]
+
+    # Gjennomgangen (BH1): med et rullefelt på 17 px er boksen smalere enn
+    # vinduet sier. Ved 620 px vindu er boksen da 569 px, så styrken må stå i
+    # linja, og ved 756 px er den 705 px, så retningen må stå der.
+    @pytest.mark.parametrize("bredde", [620, 756])
+    @I_NETTLESEREN
+    def test_med_rullefelt(self, side, tmp_path, bredde):
+        """Ville feilet med bruddene i bredden på vinduet (@media), der et
+        rullefelt gjorde boksen smalere uten å flytte bruddet."""
+        foer = 'document.documentElement.style.paddingRight = "17px"; await vent(100);'
+        svar = self._sjekk(side, tmp_path, "/", bredde, foer)
+        assert svar["boksen"] == bredde - 34 - 17
 
 
 class TestBoksenIOmvisningen:

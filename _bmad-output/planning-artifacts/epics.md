@@ -5451,3 +5451,18 @@ Som **gruppe** vil vi rette funnene fra den heuristiske evalueringen som gruppen
 **Avhenger av:** 9.17, 8.21, 8.22, 8.25, 8.26. **Én økt:** nei.
 
 *Lagt til 2026-11-17:* 9.18 er squash-flettet med PR #165 i `9bf8769e` kl. 17:20, låst til head-en `dfcebde8`, etter beskjeden fra rådet kl. 16:21 i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. HE2, HE3, HE5, HE8, HE9, HE10 og HE14–HE18 er rettet, hver med en test, og HE15 er lukket som alt bygget (gruppens svar kl. 16:19). Bildene i `docs/appen/` tas på nytt i en egen liten story rett etter 9.18. CI var grønn i alle jobbene (run 44123485449), med 5926 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.19: Grensen på 640–760 px og bildene av appen
+
+*Lagt til 2026-11-17, etter instruksjonen om grensen og bildene i `docs/ai-prompts/2026-11-17.md` og gruppens svar 17.11 kl. 16:19 og 18:23:* spørsmål 4 og VG1 i 9.18. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-19-grensen-og-bildene.md`.
+
+Som **gruppe** vil vi at styrken og retningen står bare én gang i tabellen i alle bredder, og at bildene av appen viser rettingene fra 9.18, så README-en og brukertest 2 viser appen slik den er.
+
+**Oppfyller:** spørsmål 4 og VG1 i 9.18 · **Begrenses av:** regel 3, 16, 19, 21, 22 og 23, og ingen ny migrasjon før testen
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Styrken og retningen står bare én gang i tabellen i alle bredder, med en test i nettleseren
+- Bildene i `docs/appen/` og `docs/appen/mobil/` er tatt på nytt fra grenen i demoen, og avtrykkene er regnet ut fra dem, med bildene før og etter på en egen bildegren
+- Svarene kl. 18:23 og VG1 i spesifikasjonen for 9.18, og en linje i UX-loggen om grensen
+
+**Avhenger av:** 9.18, 3.3k. **Én økt:** ja.

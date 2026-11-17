@@ -884,7 +884,10 @@ class TestReadme:
             [
                 SKJERMBILDET,
                 AKSJESIDEBILDET,
-                *DE_NYE_BILDENE,
+                # Story 9.19 (gruppens svar 17.11 kl. 18:26): bildene ved 390 px vises
+                # ikke lenger i README-en. De ligger i docs/appen/mobil/, som linja
+                # lenker til (test_mobillinja_lenker_til_mappa_med_bildene_ved_390_px).
+                *(sti for sti in DE_NYE_BILDENE if sti not in BILDENE_PAA_MOBIL),
             ]
         )
         for alt, sti in andre:
@@ -1377,7 +1380,12 @@ HOEYDE_PAA_BILDET = 1864
 # HE14, HE16, HE17, HE18). Bildene i docs/appen/ er ikke tatt på nytt i denne storyen (instruksjonen:
 # bildene blir i scratchpad), og avtrykkene er regnet ut på nytt. Spørsmål til gruppen i
 # spesifikasjonen.
-AVTRYKK_BAK_BILDET = "5623c53343f9091e5f925962f82026ecfab7a3f5030c5cabffebfbc788acd122"
+# Story 9.19: bildene er tatt på nytt fra grenen i demoen etter 9.18, så det 9.18 sier om
+# bildene over, gjelder ikke lenger. Etter de to trinnene i linja, bruddene i bredden på
+# boksen og tabellen på minst 709 px ble alle bildene tatt på nytt igjen, to ganger, og var
+# byte for byte de samme.
+# Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
+AVTRYKK_BAK_BILDET = "19fb8898836522ebde8738294da61c3845b9a9193ac413d4ac349150ab2d5149"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1858,7 +1866,12 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # HE14, HE16, HE17, HE18). Bildene i docs/appen/ er ikke tatt på nytt i denne storyen (instruksjonen:
 # bildene blir i scratchpad), og avtrykkene er regnet ut på nytt. Spørsmål til gruppen i
 # spesifikasjonen.
-AVTRYKK_BAK_AKSJESIDEN = "eb3e8ce9211d9c8dca74c574edb35725e9f34af3155535fde70c9a5a0bf81295"
+# Story 9.19: bildene er tatt på nytt fra grenen i demoen etter 9.18, så det 9.18 sier om
+# bildene over, gjelder ikke lenger. Etter de to trinnene i linja, bruddene i bredden på
+# boksen og tabellen på minst 709 px ble alle bildene tatt på nytt igjen, to ganger, og var
+# byte for byte de samme.
+# Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
+AVTRYKK_BAK_AKSJESIDEN = "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -1926,7 +1939,9 @@ DE_NYE_BILDENE = {
     # Story 8.26: 4534, med knappene i raden øverst, uten fotnoten og filteret (målt etter flettingen av 10.10).
     # Story 8.26 (tilleggene 5–20): 4534 -> 4424, uten eksempelboksen (tillegg 19).
     # Story 8.27: 4424 -> 4477, med «Mine notater» i raden øverst (en linje til ved 390 px).
-    "docs/appen/mobil/oversikten-390-demo.png": ("/", 390, 4477, MALENE_BAK_BILDET),
+    # Story 9.19: 4477 -> 4773, hele siden, med styrken og retningen under navnet i hver rad
+    # (HE3 i 9.18), målt i Edge 17.11.
+    "docs/appen/mobil/oversikten-390-demo.png": ("/", 390, 4773, MALENE_BAK_BILDET),
     # Story 8.20b: 3327, med kortene under hverandre og feltene bredt nok til
     # linja med antallet og snittet, så kartet er høyere. Var 1687.
     # Story 8.23 (tillegg 3): 5021, med tabellen åpen fra start. Var 3327.
@@ -2013,8 +2028,13 @@ BILDENE_I_KNAPPEN = (
 # samme rekkefølge, med setningen om mobil først (spørsmål 2 og 3).
 MOBILMAPPA = "docs/appen/mobil/"
 MOBILKNAPPEN = "Bilder av appen på mobil (demoen)"
-MOBILSETNINGEN = (
-    "Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (127.0.0.1), så mobil kommer senere."
+# Story 9.19 (gruppens svar 17.11 kl. 18:26): knappen med bildene ved 390 px er tatt
+# bort, og én linje rett etter knappen med bildene lenker til mappa, med gruppens ord
+# «mobil kanskje kommer senere». Bildene står i mappa og i «Mappestruktur».
+MOBILLINJEN = (
+    "Bildene fra smal skjerm, 390 px bred som på en mobil, ligger i "
+    f"[`{MOBILMAPPA}`]({MOBILMAPPA}). I v1 svarer appen bare på denne maskinen (127.0.0.1), "
+    "så mobil kanskje kommer senere."
 )
 BILDENE_PAA_MOBIL = (
     "docs/appen/mobil/oversikten-390-demo.png",
@@ -2195,24 +2215,29 @@ BILDENE_PAA_MOBIL = (
 # HE14, HE16, HE17, HE18). Bildene i docs/appen/ er ikke tatt på nytt i denne storyen (instruksjonen:
 # bildene blir i scratchpad), og avtrykkene er regnet ut på nytt. Spørsmål til gruppen i
 # spesifikasjonen.
+# Story 9.19: bildene er tatt på nytt fra grenen i demoen etter 9.18, så det 9.18 sier om
+# bildene over, gjelder ikke lenger. Etter de to trinnene i linja, bruddene i bredden på
+# boksen og tabellen på minst 709 px ble alle bildene tatt på nytt igjen, to ganger, og var
+# byte for byte de samme.
+# Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "2e58df1c06990462967b5d399069d60471a2aa415be961ba43ab1d09a614e040",
-    TOPPEN_AV_OVERSIKTEN: "5623c53343f9091e5f925962f82026ecfab7a3f5030c5cabffebfbc788acd122",
-    "docs/appen/boersometeret-demo.png": "d5d755207ab09b0c45bdec5b2733610ccedb6d175fa04e7ab8d0f16fe5493794",
-    "docs/appen/min-liste-demo.png": "f027fa063185267a5a6f186d94787efa9f0930240d1f6ddf3cd137ac10c8a6df",
-    "docs/appen/mobil/oversikten-390-demo.png": "5623c53343f9091e5f925962f82026ecfab7a3f5030c5cabffebfbc788acd122",
-    "docs/appen/mobil/boersometeret-390-demo.png": "d5d755207ab09b0c45bdec5b2733610ccedb6d175fa04e7ab8d0f16fe5493794",
-    "docs/appen/din-egen-liste-demo.png": "f027fa063185267a5a6f186d94787efa9f0930240d1f6ddf3cd137ac10c8a6df",
-    "docs/appen/investorsiden-brfe-demo.png": "071c0beac3d016181c92fe25724775bf8a33969e4e02f8fa3496cf42392705bb",
-    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "071c0beac3d016181c92fe25724775bf8a33969e4e02f8fa3496cf42392705bb",
-    "docs/appen/mobil/folg-en-aksje-390-demo.png": "2e58df1c06990462967b5d399069d60471a2aa415be961ba43ab1d09a614e040",
-    "docs/appen/mobil/notatene-brfe-390-demo.png": "eb3e8ce9211d9c8dca74c574edb35725e9f34af3155535fde70c9a5a0bf81295",
-    "docs/appen/notatene-brfe-demo.png": "eb3e8ce9211d9c8dca74c574edb35725e9f34af3155535fde70c9a5a0bf81295",
-    "docs/appen/notatene-min-liste-demo.png": "f027fa063185267a5a6f186d94787efa9f0930240d1f6ddf3cd137ac10c8a6df",
-    "docs/appen/innstillinger-demo.png": "86d4475bf171a645894bc830f7bca7d0cbf0d6876c1055c51caba5e8e693c152",
+    "docs/appen/folg-en-aksje-demo.png": "89bba61c192522de8d098564fd5eccbc94d66f2acef84acb0788708a030d2844",
+    TOPPEN_AV_OVERSIKTEN: "19fb8898836522ebde8738294da61c3845b9a9193ac413d4ac349150ab2d5149",
+    "docs/appen/boersometeret-demo.png": "35cbce250c8ce3868d2787beca5932a87f1c80a1c158dbb6d1604dcba13a8d8a",
+    "docs/appen/min-liste-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
+    "docs/appen/mobil/oversikten-390-demo.png": "19fb8898836522ebde8738294da61c3845b9a9193ac413d4ac349150ab2d5149",
+    "docs/appen/mobil/boersometeret-390-demo.png": "35cbce250c8ce3868d2787beca5932a87f1c80a1c158dbb6d1604dcba13a8d8a",
+    "docs/appen/din-egen-liste-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
+    "docs/appen/investorsiden-brfe-demo.png": "9159ffe29a18a365b8388e54254db7a4bbf9294614f397d116810e76b16f2ce2",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "9159ffe29a18a365b8388e54254db7a4bbf9294614f397d116810e76b16f2ce2",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "89bba61c192522de8d098564fd5eccbc94d66f2acef84acb0788708a030d2844",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e",
+    "docs/appen/notatene-brfe-demo.png": "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e",
+    "docs/appen/notatene-min-liste-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
+    "docs/appen/innstillinger-demo.png": "5cb726858fa25922955acd2032b235db2471c5e364a5a48574605c350432c8ee",
     # Story 3.3k: de to nye bildene.
-    "docs/appen/notatpanelet-demo.png": "f027fa063185267a5a6f186d94787efa9f0930240d1f6ddf3cd137ac10c8a6df",
-    "docs/appen/vis-meg-rundt-demo.png": "f027fa063185267a5a6f186d94787efa9f0930240d1f6ddf3cd137ac10c8a6df",
+    "docs/appen/notatpanelet-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
+    "docs/appen/vis-meg-rundt-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -2361,14 +2386,6 @@ def _knappen_med_bildene() -> str:
     return deler[1].split("</details>", 1)[0]
 
 
-def _mobilknappen() -> str:
-    """Story 3.3k: innholdet i knappen «Bilder av appen på mobil (demoen)»."""
-    tekst = README.read_text(encoding="utf-8")
-    deler = tekst.split(f"<summary>{MOBILKNAPPEN}</summary>\n", 1)
-    assert len(deler) == 2, f"knappen «{MOBILKNAPPEN}» mangler"
-    return deler[1].split("</details>", 1)[0]
-
-
 def _bildene(del_: str) -> list[tuple[str, str, str]]:
     """(alt-teksten, stien, teksten under) for hvert bilde i del_."""
     return re.findall(r"^!\[([^\]]*)\]\(([^)]+)\)\n(.*)$", del_, re.MULTILINE)
@@ -2396,8 +2413,10 @@ class TestBildeneAvAppen:
         # Story 3.3k: knappen med bildene ved 390 px står rett etter, og så «Innhold».
         # Ville feilet hvis den sto et annet sted, eller «Innhold» kom mellom dem.
         etter = etter.split("</details>\n\n", 1)[1]
-        assert etter.startswith(f"<details>\n<summary>{MOBILKNAPPEN}</summary>\n\n"), etter[:80]
-        assert etter.split("</details>\n\n", 1)[1].startswith("**Innhold:** ")
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): linja om mappa med bildene ved
+        # 390 px står rett etter knappen, i stedet for en knapp til, og så «Innhold».
+        # Ville feilet med knappen igjen, uten linja, eller med linja et annet sted.
+        assert etter.startswith(MOBILLINJEN + "\n\n**Innhold:** "), etter[:200]
         # Lukket som de andre knappene: ingen <details> i README-en er åpen.
         # Story 3.5i: heller ikke i docs/installasjon.md, der pilene står.
         for del_ in (tekst, _installasjonen()):
@@ -2437,7 +2456,10 @@ class TestBildeneAvAppen:
         # Gruppens svar 05.11 kl. 12:14: toppen av oversikten står over knappen.
         tekst = tekst.replace(f"]({TOPPEN_AV_OVERSIKTEN})", "", 1)
         # Story 3.3k: og knappen med bildene ved 390 px.
-        uten_knappen = tekst.replace(_knappen_med_bildene(), "").replace(_mobilknappen(), "")
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): knappen er borte, og linja lenker
+        # bare til mappa, ikke til et bilde.
+        assert tekst.count(MOBILLINJEN) == 1
+        uten_knappen = tekst.replace(_knappen_med_bildene(), "").replace(MOBILLINJEN, "")
         assert "docs/appen/" in uten_knappen.split("\n## Mappestruktur\n", 1)[1]
         assert "](docs/appen/" not in uten_knappen.split("\n## Mappestruktur\n", 1)[0]
         # Story 3.5i: heller ikke i docs/installasjon.md.
@@ -2463,31 +2485,26 @@ class TestBildeneAvAppen:
         assert all(DE_NYE_BILDENE[sti][1] == 390 for sti in BILDENE_PAA_MOBIL)
         assert all(v[1] == 1280 for sti, v in DE_NYE_BILDENE.items() if sti not in BILDENE_PAA_MOBIL)
 
-    def test_mobilknappen_har_setningen_og_bildene_ved_390_px_i_samme_rekkefoelge(self):
-        """Story 3.3k (svaret 12.11 kl. 17:09, spørsmål 2 og 3): bildene ved 390 px står
-        i en egen knapp, med setningen om mobil først og bildene i samme rekkefølge som i
-        den første knappen. Ville feilet uten setningen, med et bilde i en annen
-        rekkefølge enn sidene i den første knappen, uten alt-tekst eller teksten under,
-        eller med andre ord enn setningen og bildene."""
-        knappen = _mobilknappen()
-        assert knappen.startswith("\n" + MOBILSETNINGEN + "\n\n"), knappen[:200]
-        bilder = _bildene(knappen)
-        assert [sti for _, sti, _ in bilder] == list(BILDENE_PAA_MOBIL)
-        # Samme rekkefølge som i den første knappen: hvert bilde ved 390 px har et
-        # tilsvarende bilde ved 1280 px med samme navn uten «-390».
-        tilsvarende = [f"docs/appen/{sti.rsplit('/', 1)[1].replace('-390', '')}" for sti in BILDENE_PAA_MOBIL]
-        # Gjennomgangen (ECH4): hvert bilde ved 390 px har sitt bilde ved 1280 px i den
-        # første knappen, så plassen sjekkes for alle.
-        assert all(s in BILDENE_I_KNAPPEN for s in tilsvarende), tilsvarende
-        plass = [BILDENE_I_KNAPPEN.index(s) for s in tilsvarende]
-        assert plass == sorted(plass), plass
-        for alt, sti, under in bilder:
+    def test_mobillinja_lenker_til_mappa_med_bildene_ved_390_px(self):
+        """Story 3.3k (svaret 12.11 kl. 17:09, spørsmål 2 og 3) la bildene ved 390 px i
+        en egen knapp. Story 9.19 (gruppens svar 17.11 kl. 18:26): knappen er tatt bort,
+        og én linje lenker til mappa og sier at mobil kanskje kommer senere. Mappa står,
+        med de samme bildene, og hvert av dem har sitt bilde ved 1280 px i knappen.
+        Ville feilet uten linja, med knappen eller et bilde ved 390 px igjen i
+        README-en utenfor «Mappestruktur», eller uten mappa eller et av bildene."""
+        tekst = README.read_text(encoding="utf-8")
+        assert tekst.count(MOBILLINJEN) == 1
+        assert "mobil kanskje kommer senere" in MOBILLINJEN
+        assert MOBILKNAPPEN not in tekst
+        foer_mappestrukturen = tekst.split("\n## Mappestruktur\n", 1)[0]
+        assert re.findall(r"\]\((docs/appen/mobil/[^)]*)\)", foer_mappestrukturen) == [MOBILMAPPA]
+        assert (ROT / MOBILMAPPA).is_dir()
+        for sti in BILDENE_PAA_MOBIL:
             assert sti.startswith(MOBILMAPPA) and (ROT / sti).is_file(), sti
-            assert "i demoen på en mobil, 390 px bred" in alt and "ikke data fra Oslo Børs" in alt, alt
-            assert under.startswith("*") and under.endswith("*") and "ved 390 px" in under, under
-            assert "oppdiktede" in under and "«Eksempeltall»" in under, under
-        rest = re.sub(r"^!\[[^\]]*\]\([^)]+\)\n\*[^\n]*\*$", "", knappen, flags=re.MULTILINE)
-        assert rest.replace(MOBILSETNINGEN, "").strip() == "", rest
+        # Hvert bilde ved 390 px har et tilsvarende bilde ved 1280 px med samme navn
+        # uten «-390» i knappen (gjennomgangen av 3.3k, ECH4).
+        tilsvarende = [f"docs/appen/{sti.rsplit('/', 1)[1].replace('-390', '')}" for sti in BILDENE_PAA_MOBIL]
+        assert all(s in BILDENE_I_KNAPPEN for s in tilsvarende), tilsvarende
         # Det samme som docs/installasjon.md sier under «Mer for den som vil».
         assert "Appen svarer bare på denne maskinen (127.0.0.1)" in _installasjonen()
 
@@ -3629,7 +3646,10 @@ class TestReadmeForNybegynnere:
         # 3.3f rett under knappen.
         assert avsnitt[-5].startswith("**Innhold:** "), avsnitt[-5]
         # Story 3.3k: knappen med bildene ved 390 px rett etter den første.
-        assert avsnitt[-6] == avsnitt[-7] == "<details>", avsnitt[-7:-5]
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): i stedet for den står linja som
+        # lenker til mappa med bildene ved 390 px.
+        assert avsnitt[-6] == MOBILLINJEN, avsnitt[-6]
+        assert avsnitt[-7] == "<details>", avsnitt[-7]
         # Gruppens svar 05.11 kl. 12:14: toppen av oversikten mellom
         # beskrivelsen og knappen.
         assert avsnitt[-8].startswith("![Toppen av oversikten i demoen"), avsnitt[-8]
@@ -4557,7 +4577,9 @@ AVTRYKK_I_KOM_I_GANG = {
     # Var 3a938e6a....
     # Story 3.7 (regel 19): spørsmålet om KI-teksten i den ekte versjonen, og at
     # snarveien spør før nettleseren og venter høyst 30 sekunder. Var 1f7571e7....
-    "Slik virker dobbeltklikket": "f9b7a68dfb5c413f38e062e43357f3c17c07e6b46df88f5ebe46e83a728bbdf5",
+    # Story 9.19 (gruppens svar 17.11 kl. 18:26, regel 19): «Mobil kommer kanskje senere.»
+    # Var f9b7a68d....
+    "Slik virker dobbeltklikket": "48ad48ed9a2513b62691fe3f159a93ac5357e90d83eedbf0d682f11419c63abc",
     "Står du fast?": "830bc5284b7e7c7445ab840daad4b7e8a2a22a5fb8678b9f8dd1979f0f4e7082",
 }
 

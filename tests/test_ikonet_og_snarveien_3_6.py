@@ -404,10 +404,15 @@ class TestDokumentene:
         readme = (ROT / "README.md").read_text(encoding="utf-8")
         assert "snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen" in readme
         assert "Der står også snarveien på skrivebordet i Windows" in readme
-        assert "Mobil kommer i en senere versjon" in readme
+        # Story 9.19 (gruppens svar 17.11 kl. 18:26): «mobil kanskje kommer senere»,
+        # likt i README-en og installasjonen. Ville feilet med de gamle ordene igjen.
+        assert "Mobil kommer kanskje senere, fordi appen bare svarer på denne maskinen." in readme
+        assert "så mobil kanskje kommer senere." in readme
+        assert "Mobil kommer i en senere versjon" not in readme
         inst = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
         assert "snarveien «OSE Signal» på skrivebordet, eller «OSE Signal (demo)» for demoen" in inst
-        assert "Ikonet er de tre søylene fra logoen" in inst and "Mobil kommer i en senere versjon." in inst
+        assert "Ikonet er de tre søylene fra logoen" in inst and "Mobil kommer kanskje senere." in inst
+        assert "Mobil kommer i en senere versjon" not in inst
         # Spørsmål 8 (gruppens svar 11.11 kl. 13:47): én setning om en
         # snarvei til en annen kopi. Ville feilet hvis den manglet.
         assert (

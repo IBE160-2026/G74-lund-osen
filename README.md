@@ -50,27 +50,7 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 
 </details>
 
-<details>
-<summary>Bilder av appen på mobil (demoen)</summary>
-
-Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (127.0.0.1), så mobil kommer senere.
-
-![Oversikten i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/oversikten-390-demo.png)
-*Oversikten i demoen ved 390 px, som på en mobil, med «Dine egne aksjer» under tabellen og «Børsdagen kort fortalt» nederst, KI-teksten om hele børsdagen, med oppdiktede tall («Eksempeltall»).*
-
-![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/notatene-brfe-390-demo.png)
-*«Mine notater» på aksjesiden for BRFE i demoen ved 390 px, som på en mobil, bare delen med notatene, med oppdiktede selskaper («Eksempeltall»).*
-
-![Investorsiden for Brattfjell Energi (BRFE) i demoen på en mobil, 390 px bred, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/investorsiden-brfe-390-demo.png)
-*Investorsiden for BRFE i demoen ved 390 px, som på en mobil, med oppdiktede selskaper («Eksempeltall»).*
-
-![Børsometeret i demoen på en mobil, 390 px bred, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/boersometeret-390-demo.png)
-*Børsometeret i demoen ved 390 px, som på en mobil, med oppdiktede tall («Eksempeltall»).*
-
-![«Følg en aksje» i demoen på en mobil, 390 px bred, med bransjen Kraft valgt, brikkene for filteret og sorteringen og tabellen med «Følg» på hver rad, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/mobil/folg-en-aksje-390-demo.png)
-*«Følg en aksje» i demoen ved 390 px, som på en mobil, med Kraft valgt og «Mest omsatt først», med oppdiktede selskaper («Eksempeltall»).*
-
-</details>
+Bildene fra smal skjerm, 390 px bred som på en mobil, ligger i [`docs/appen/mobil/`](docs/appen/mobil/). I v1 svarer appen bare på denne maskinen (127.0.0.1), så mobil kanskje kommer senere.
 
 **Innhold:** [Kom i gang](#kom-i-gang) · [Status](#status) · [Tester](#tester) · [Dokumentene](#dokumentene) · [Mappestruktur](#mappestruktur) · [Medlemmer](#medlemmer)
 
@@ -83,7 +63,7 @@ Sidene virker alt i smal bredde, men i v1 svarer appen bare på denne maskinen (
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
 | Klar | Med en gang | Etter første henting, som kan startes når som helst. Før kl. 22 på en børsdag henter den forrige børsdag, og dagens kurser etter kl. 22 trenger da bonuskvote hos EODHD. Børsdagene før får signalet regnet i ettertid av kursene, merket «i ettertid» og uten KI-tekst |
-| KI-tekst | Ferdige tekster for siste dag, laget én gang med Gemma | På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på |
+| KI-tekst | Ferdige tekster for siste dag, også «Børsdagen kort fortalt», laget én gang med Gemma | På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på |
 | Dagen | Fast: fredag 09.10.2026 | Den siste børsdagen som er hentet |
 | Endringer i lista | Tas ikke i bruk, fordi demoen ikke henter | Tas i bruk ved hentingen etter kl. 22 |
 | Notatene | Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start | Lagres i basen på maskinen |
@@ -118,7 +98,7 @@ Til faglærer:
 4. **Svar `j`** og trykk Enter hvis vinduet spør om uv. Nettleseren åpner appen når den er klar, første gang etter noen minutter.
 5. **Lukk vinduet** for å stoppe appen.
 
-**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen, før nettleseren åpner appen. Første gang tilbyr appen «Vis meg rundt» på oversikten. «Spill av omvisningen» øverst viser alle sidene, og «Vis meg rundt» viser siden du står på. Mobil kommer i en senere versjon, fordi appen bare svarer på denne maskinen.
+**Første gang** kan Windows og Mac stoppe fila, fordi den er lastet ned fra nettet. Slik går du videre: [Windows](docs/hjelp.md#windows-advarer-mot-fila) og [Mac](docs/hjelp.md#mac-sier-at-fila-ikke-kan-åpnes). På Windows spør vinduet også om det skal lage snarveien «OSE Signal» med ikonet på skrivebordet, eller «OSE Signal (demo)» for demoen, før nettleseren åpner appen. Første gang tilbyr appen «Vis meg rundt» på oversikten. «Spill av omvisningen» øverst viser alle sidene, og «Vis meg rundt» viser siden du står på. Mobil kommer kanskje senere, fordi appen bare svarer på denne maskinen.
 
 <a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Første gang tilbyr den også å hente Gemma, en gratis språkmodell som skriver KI-teksten på maskinen (prøvd med 15,7 GB minne), eller å bruke din egen API-nøkkel. Appen virker også uten KI-tekst. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
 
