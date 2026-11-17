@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-17T12:39
+updated: 2026-11-17T12:40
 ---
 
 # Brukertesten
@@ -113,14 +113,14 @@ Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksj
 | «Er signalet og sjekkene de samme som før du slo på KI?», svaret ordrett | |
 | Svarte personen ja (ja eller nei) | |
 
-**Oppgave G (SM-10, UJ-2).** Gruppen skriver notatet i den ekte versjonen 17.11, så det finnes dager etterpå når testen tas. Notatene fra testen sier at notatet ble skrevet av gruppen.
+**Oppgave G (SM-10, UJ-2).** Gruppen skriver notater på tre aksjer i Min liste i den ekte versjonen 17.11, så det finnes dager etterpå når testen tas (gruppens svar kl. 12:39). Notatene fra testen sier at notatene ble skrevet av gruppen.
 
 | Felt | Notat |
 |---|---|
-| «Finn notatet i Min liste, og si hva aksjen og hovedindeksen har gjort siden.», svaret ordrett | |
-| Fant personen notatet uten hjelp (ja eller nei) | |
+| «Finn et av notatene i Min liste, og si hva aksjen og hovedindeksen har gjort siden.», svaret ordrett | |
+| Fant personen et av notatene uten hjelp (ja eller nei) | |
 | Sa personen hva både aksjen og hovedindeksen har gjort siden (ja eller nei) | |
-| Notatet ble skrevet av gruppen, dagen | |
+| Notatene ble skrevet av gruppen, dagen | |
 
 ## Funnene
 

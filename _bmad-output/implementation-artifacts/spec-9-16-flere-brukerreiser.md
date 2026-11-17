@@ -128,6 +128,10 @@ besvart. Ingen funn på middels eller høy grad står åpne.
    si hva aksjen og hovedindeksen har gjort siden.» Gruppen skriver notatet i
    den ekte versjonen 17.11. Oppgaven står i `docs/brukertest.md`, og
    endringen i endringsloggen for PRD-en.
+   *Svar 2026-11-17 kl. 12:39 (gruppens svar, tillegg til svaret kl. 12:32):*
+   gruppen skriver notater på tre aksjer i Min liste, ikke på én, så oppgave G
+   sier «Finn et av notatene i Min liste, og si hva aksjen og hovedindeksen har
+   gjort siden.»
 2. **«Sjekkene er de samme» hadde ingen direkte test.** *Rettet etter
    gjennomgangen (VG1):* `test_sjekkortene_er_like_med_ki_av_og_paa` låser
    det nå, i denne storyen. Spørsmålet er besvart av rettingen.
