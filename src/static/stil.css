@@ -1557,6 +1557,9 @@ p.investorboble .skjult { position: absolute; width: 1px; height: 1px; overflow:
                                                      border: 1px solid var(--strek-2); border-radius: 999px; padding: 0 8px; }
 :where(.side-oversikt) .bekreft { margin: 24px 0; padding: 20px 22px; background: var(--kort); border: 1px solid var(--strek);
                                   border-radius: 16px; }
+/* Story 9.18 (HE2): teksten i notatet som slettes, med en strek foran. */
+:where(.side-oversikt) .bekreft blockquote { margin: 12px 0; padding: 0 0 0 12px; border-left: 3px solid var(--strek-2);
+                                             overflow-wrap: anywhere; }
 /* Brikkene og «N av 3» på linje med teksten i «Etterpå» og ved kjøpet. */
 .etterpaa .sjekker, .tenkt .sjekker { display: inline-flex; vertical-align: middle; margin: 0 4px; }
 .etterpaa .pille, .tenkt .pille { display: inline-block; }

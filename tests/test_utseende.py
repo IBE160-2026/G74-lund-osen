@@ -1013,8 +1013,10 @@ class TestStilarket:
         # bekreftelsen før «Fjern» (bekreft_fjern.html) er den niende.
         # Tillegg 3 til 8.22: «Er du sikker?» før en ferdig liste
         # (ferdig_liste.html) er den tiende. Story 8.26 (tillegg 12): siden for
-        # «Åpne eodhd.com» i demoen (eodhd_demo.html) er den ellevte.
-        assert sider == 11
+        # «Åpne eodhd.com» i demoen (eodhd_demo.html) er den ellevte. Story 9.18
+        # (HE2): spørsmålet før «Slett» ved et notat (bekreft_slett_notat.html)
+        # er den tolvte.
+        assert sider == 12
 
     def test_fargene_staar_bare_i_root(self):
         """Ville feilet med en farge skrevet fast utenfor :root i stilarket,
