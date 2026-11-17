@@ -27,3 +27,7 @@ hver gang, og var like byte for byte. «Før» er bildet på main (`e00f6502`), 
 Spørsmålet før sletting av et notat (HE2) og lenken «Til <måned>» i «Signalet
 dag for dag» (HE14) står ikke i noen av bildene, fordi ingen av dem viser den
 siden eller en annen måned valgt.
+
+Etter 960ca037 (to trinn i linja) og 85b34046 (bruddene i bredden på boksen) ble alle
+de 18 bildene tatt på nytt to ganger, og de var byte for byte de samme, så ingen
+bilder er byttet etter det (avtrykkene i 5f83c0d5 og 33376444).
