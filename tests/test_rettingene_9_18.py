@@ -75,7 +75,9 @@ class TestTabellenPaaSmalSkjerm:
         kropper = {(ramme, velger): kropp for ramme, velger, kropp in reglene}
         velger = ":where(.side-oversikt) td.selskap .smal-signal"
         assert "display: none" in kropper[("", velger)]
-        assert "display: block" in kropper[("@media (max-width: 760px)", velger)]
+        # Story 9.19: bruddet er der kolonnen for retningen slutter å få
+        # plass, ikke 760 px (TestBareEnGangIAlleBredder).
+        assert "display: block" in kropper[("@media (width < 743px)", velger)]
 
     @pytest.mark.parametrize("bredde, synlig", [(390, True), (1280, False)])
     @I_NETTLESEREN
@@ -101,6 +103,37 @@ class TestTabellenPaaSmalSkjerm:
             # Kolonnen for styrken ligger fortsatt utenfor, som før: tabellen
             # ruller i sin boks.
             assert svar["styrke_utenfor"] is True
+
+
+class TestBareEnGangIAlleBredder:
+    """Story 9.19 (spørsmål 4 i 9.18, gruppens svar 17.11 kl. 18:23): styrken
+    og retningen står bare én gang i alle bredder. Linja under navnet vises
+    bare når kolonnen for retningen ikke får plass i boksen. Målt i Edge
+    17.11: tabellen er 709 px bred med demoens aksjer, og boksen er 34 px
+    smalere enn vinduet, så kolonnene får plass fra 743 px. Før sto linja
+    til og med 760 px, og i 743–760 px sto retningen to ganger."""
+
+    @pytest.mark.parametrize("bredde", [390, 600, 639, 640, 700, 739, 746, 760, 761, 1280])
+    @I_NETTLESEREN
+    def test_linja_eller_kolonnen_aldri_begge(self, side, tmp_path, bredde):
+        """Ville feilet hvis linja og hele kolonnen for retningen sto samtidig
+        (som ved 746 og 760 px før 9.19), eller ingen av dem sto."""
+        skript = """
+          const boks = document.querySelector(".tabellboks");
+          const ramme = boks.getBoundingClientRect();
+          const innerst = ramme.left + boks.clientLeft;
+          const retning = document.querySelector("#kolonne-retning").getBoundingClientRect();
+          const linjer = Array.from(document.querySelectorAll(".tabellboks .smal-signal"));
+          ferdig({linjer: linjer.length,
+                  synlige: linjer.filter((l) => l.getBoundingClientRect().width > 0).length,
+                  kolonnen: boks.scrollLeft === 0 && retning.left >= innerst
+                            && retning.right <= innerst + boks.clientWidth + 0.5});
+        """
+        svar = _kjoer(side("/"), tmp_path, bredde, skript)
+        assert svar["linjer"] > 5
+        assert svar["synlige"] in (0, svar["linjer"]), svar
+        linja = svar["synlige"] > 0
+        assert linja != svar["kolonnen"], (bredde, svar)
 
 
 class TestBoksenIOmvisningen:
