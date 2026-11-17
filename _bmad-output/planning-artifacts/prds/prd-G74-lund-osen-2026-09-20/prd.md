@@ -349,8 +349,17 @@ ikke er målt, merkes «Utenfor målingen».
 ## 4. Funksjonelle krav
 
 Rekkefølgen følger kravnumrene: grensesnittet først, så data og beregning.
-FR-407 står i 4.1, fordi det hører til visningen. ID-en er beholdt. Plan A står i
-vedlegg A.
+Første siffer i ID-en er avsnittet: FR-1xx er oversikten og de andre sidene i
+stripa (§4.1), FR-2xx aksjesiden (§4.2), FR-4xx hentingen og lagrene (§4.4),
+FR-6xx KI-teksten (§4.6) og FR-7xx signalet (§4.7). Innenfor et avsnitt følger
+numrene rekkefølgen kravene kom til, og et nummer gis aldri til et annet krav.
+
+Plan A står i vedlegg A. Der står 4.3 med FR-3xx, de kommende hendelsene, og
+4.5 med FR-5xx, meldingsfilteret, og derfor har §4 ingen 4.3 og 4.5. Der står
+også FR-404 og FR-405 om børsmeldingene, og A-variantene av FR-602, FR-603,
+FR-604 og FR-606, så de numrene mangler i §4.4 og §4.6. FR-407 om
+justeringsdagene står i §4.4 med de andre FR-4xx, fordi merket finnes av
+kursserien. Oversikten (FR-101) og aksjesiden viser det.
 
 ### 4.1 Markedsoversikten
 
@@ -695,31 +704,6 @@ valg står som «Venter på henting» (FR-411).
 - Tallet for plassene som er brukt, er lista med ønskene som venter.
 - Hver aksje i lista står under sin bransje med «Bytt ut», eller med at den fjernes ved neste henting.
 
-#### FR-407 — Merking av utbyttedager
-
-Et utbytte skal ikke se ut som et kursfall. Endringen regnes derfor på den
-justerte sluttkursen, mens oversikten viser sluttkursen (se ordlista). På dagen
-kilden har regnet de eldre kursene om, stemmer ikke differansen mellom to
-sluttkurser med prosenten. Dagen merkes derfor som **justeringsdag**, så avviket
-er forklart.
-
-En justeringsdag finnes av kursserien alene. Endringen på sluttkursen og
-endringen på den justerte sluttkursen skiller seg da med mer enn 0,1
-prosentpoeng (`begrunnelser.md` §11). Metoden ser justeringer, ikke utbytter, og
-en splitt gir samme utslag. Derfor sier appen «justeringsdag», ikke «utbytte».
-
-- Oversikten merker endringen «justeringsdag» for dagen.
-- Aksjesiden forklarer merket ved endringen. Den markerer justeringsdagene i
-  perioden kursgrafen viser. Den sier hvor mange det var det siste året og datoen
-  for den siste, eller at det ikke var noen.
-- Historikken sier ingenting om neste justering (NFR-06).
-
-*Konsekvenser:*
-- En serie der sluttkursen falt 3 % og den justerte sluttkursen 0 %, gir en justeringsdag.
-- Et avvik på 0,1 prosentpoeng eller mindre gir det ikke.
-- Ordet «utbytte» står ikke ved merket.
-- Med 1 år valgt er antallet i teksten antallet markerte dager i grafen.
-
 ---
 
 ### 4.2 Aksjedetaljen
@@ -1057,6 +1041,31 @@ intervall (`malinger.md` §2), og gratisnivået gir ett år.
 - Etter en henting har basen for hvert symbol nøyaktig radene i siste svar, også når svaret har en annen `adjusted_close` for en gammel dag.
 - En henting som feiler midt i et symbol, etterlater den gamle serien hel.
 - Rådatafila for en henting skrives ikke over av neste.
+
+#### FR-407 — Merking av utbyttedager
+
+Et utbytte skal ikke se ut som et kursfall. Endringen regnes derfor på den
+justerte sluttkursen, mens oversikten viser sluttkursen (se ordlista). På dagen
+kilden har regnet de eldre kursene om, stemmer ikke differansen mellom to
+sluttkurser med prosenten. Dagen merkes derfor som **justeringsdag**, så avviket
+er forklart.
+
+En justeringsdag finnes av kursserien alene. Endringen på sluttkursen og
+endringen på den justerte sluttkursen skiller seg da med mer enn 0,1
+prosentpoeng (`begrunnelser.md` §11). Metoden ser justeringer, ikke utbytter, og
+en splitt gir samme utslag. Derfor sier appen «justeringsdag», ikke «utbytte».
+
+- Oversikten merker endringen «justeringsdag» for dagen.
+- Aksjesiden forklarer merket ved endringen. Den markerer justeringsdagene i
+  perioden kursgrafen viser. Den sier hvor mange det var det siste året og datoen
+  for den siste, eller at det ikke var noen.
+- Historikken sier ingenting om neste justering (NFR-06).
+
+*Konsekvenser:*
+- En serie der sluttkursen falt 3 % og den justerte sluttkursen 0 %, gir en justeringsdag.
+- Et avvik på 0,1 prosentpoeng eller mindre gir det ikke.
+- Ordet «utbytte» står ikke ved merket.
+- Med 1 år valgt er antallet i teksten antallet markerte dager i grafen.
 
 #### FR-408 — Dagens vurdering lagres per aksje
 
