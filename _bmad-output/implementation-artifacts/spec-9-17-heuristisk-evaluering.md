@@ -162,5 +162,5 @@ stopper ikke arbeidet.
 - [x] Hvert funn har heuristikken, siden, grad, kilden og et forslag
 - [x] Radene i UX-loggen og lenken i README-en
 - [x] Gjennomgangen er tatt
-- [x] `--dokumentene` er grønn lokalt: på `21ecc0b3` kl. 12:23–12:42, med 2966 bestått og 7 hoppet over. Tas på nytt når main med 9.16 er flettet inn
+- [x] `--dokumentene` er grønn lokalt: på `21ecc0b3` kl. 12:23–12:42, med 2966 bestått og 7 hoppet over. Etter at main med 9.16 ble flettet inn og svarene ført: på `181907a2` kl. 13:37–13:55, med 2957 bestått og 20 hoppet over. De 13 ekstra som hoppet over, er i `tests/test_dobbeltklikk.py`, fordi port 8000 var i bruk av gruppens app, og CI kjører dem
 - [ ] CI er grønn i alle jobbene
