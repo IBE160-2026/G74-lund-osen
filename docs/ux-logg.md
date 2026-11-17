@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-17T16:22
+updated: 2026-11-17T19:12
 ---
 
 # UX-loggen
@@ -776,3 +776,5 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 *Rettet 2026-11-17 (svaret kl. 14:16 på spørsmål 4 i 9.17, gjennomgangen av 9.18):* U128 (HE15) beskriver en aksje uten stjerne. Følg setter stjernen fra 11.11 (8.26), og notatene synes under «Mine notater» også uten stjerne, så det er ingen kodeendring. En aksje uten stjerne kan være fulgt før 11.11, eller tatt inn med en ferdig liste (spørsmål 1 i spesifikasjonen for 9.18).
 
 *Svar 2026-11-17 kl. 16:19 (gruppens svar, rådet anbefalte det):* U128 (HE15) lukkes som alt bygget. Følg har satt stjernen siden 8.26 (11.11), og en test låser det. De tre egne aksjene ble fulgt før det, og gruppen setter stjernen på dem selv i den ekte versjonen.
+
+*Lagt til 2026-11-17 (story 9.19, gruppens svar kl. 18:23 og 18:26):* linja under selskapsnavnet fra U116 (HE3) har to trinn, så styrken og retningen står bare én gang i alle bredder: «N av 3 · retning» under 607 px, bare retningen fra 607 til 743 px, og ingenting fra 743 px, der begge kolonnene får plass. Bruddene er målt i Edge med demodataene. Bildene av appen er tatt på nytt, og README-en viser ikke lenger bildene fra mobil i en egen pil, bare én linje om mappa `docs/appen/mobil/`.
