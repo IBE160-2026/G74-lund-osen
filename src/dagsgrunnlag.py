@@ -49,7 +49,6 @@ from signalberegning import BLANDET, NEGATIV, POSITIV, STANDARD
 from tallformat import avrundet, ukedag
 from vurderingsdata import Grunn, Vurdering, kveldsradene
 
-RETNINGENE = (POSITIV, NEGATIV, BLANDET)
 # Feltene for retningene blant dem som skilte seg ut, i samme rekkefoelge.
 SKILTE_SEG_UT = "skilte_seg_ut"
 RETNINGSFELTENE = {POSITIV: "skilte_seg_ut_positiv", NEGATIV: "skilte_seg_ut_negativ", BLANDET: "skilte_seg_ut_blandet"}

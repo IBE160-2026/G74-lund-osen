@@ -84,11 +84,17 @@ def tilstand(innhold: Vurdering | Grunn | None, dato: date, idag: date, ut: date
     aa gjette.
 
     IKKE_KJOERT er ikke et endelig hull saa lenge dato er inneveerende
-    boersdag. Raden kan skrives helt til neste boersdag begynner, saa
-    fredagens rad kan komme paa loerdag. Hullet er endelig foerst naar dato
-    ikke lenger er inneveerende boersdag (AD-7). Boersdager foer foerste
-    kjoering er ogsaa IKKE_KJOERT: startdatoen lagres ikke, og trengs den, er
-    den datoen til foerste rad i tabellen.
+    boersdag. Kveldsraden kan skrives helt til neste boersdag begynner, saa
+    fredagens rad kan komme paa loerdag. Etter det skrives ingen kveldsrad
+    for dato (AD-7), men fra story 2.17 regner siste steg i en henting
+    (regn_signalet_i_ettertid i fetch_prices.py) signalet i ettertid av
+    kursene i basen, og da er tilstanden ETTERTID. Hullet staar til en
+    henting har regnet signalet, og for godt der det ikke kan regnes, for
+    eksempel naar aksjen ikke er i lista, har for faa kurser i basen til og
+    med dagen, eller kursene for dagen mangler (story 9.15, D3). Boersdager
+    foer foerste kjoering er ogsaa IKKE_KJOERT naar signalet ikke er regnet
+    for dem: startdatoen lagres ikke, og trengs den, er den datoen til
+    foerste kveldsrad i tabellen.
     """
     if innhold is not None and not isinstance(innhold, (Vurdering, Grunn)):
         raise TypeError(f"innhold maa vaere Vurdering, Grunn eller None, fikk {type(innhold).__name__}")
