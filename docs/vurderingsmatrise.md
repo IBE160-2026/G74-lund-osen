@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-17T13:14
+updated: 2026-11-17T14:02
 ---
 
 # Vurderingsmatrise for del 1
@@ -43,6 +43,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-17 (story 9.15):* etter tellingen 14.11 er også 9.15, meldingene etter v1.1 og det som ikke brukes (PR #162, `9fea9fc8`), flettet. 9.15 retter meldingene fra hentingen og docstringen i `src/tilstand.py` etter 2.17, tar bort to navn som ingenting brukte, og har testene i `tests/test_meldingene_9_15.py`. Radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `c040f478`: 5872 bestått og 99 hoppet over i jobben `pytest` (kjøring 44060835062). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-17 (story 9.16):* 9.16, flere brukerreiser i PRD-en (PR #163, `7d4a331c`), er flettet. §1 i PRD-en har UJ-2 (Min liste med notater) og UJ-3 (KI-teksten av og på), og §7 har SM-10 og SM-11, som måles i brukertest 2 (`docs/brukertest.md`). Testen `tests/test_ki_visning.py::TestSiden::test_sjekkortene_er_like_med_ki_av_og_paa` låser at sjekkene er de samme med KI av og på, og radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `61db61e0`: 5876 bestått og 99 hoppet over i jobben `pytest` (kjøring 44080174325). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-11-17 (story 9.17):* 9.17, en heuristisk evaluering av demoen (PR #164, `fc70bdf3`), er flettet. [Den heuristiske evalueringen](heuristisk-evaluering.md) har 17 funn mot de ti heuristikkene til Nielsen, 13 fra evalueringen og 4 fra gruppen som evaluerer nr. 2, og de nye står som U114–U130 i [UX-loggen](ux-logg.md). Rettingene før brukertest 2 kommer i en egen story. Hele settet ble kjørt i CI på head-en `ba17be8e`: 5876 bestått og 99 hoppet over i jobben `pytest` (kjøring 44087764478). Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
