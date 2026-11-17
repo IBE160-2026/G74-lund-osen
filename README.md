@@ -63,7 +63,7 @@ Bildene fra smal skjerm, 390 px bred som på en mobil, ligger i [`docs/appen/mob
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
 | Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
 | Klar | Med en gang | Etter første henting, som kan startes når som helst. Før kl. 22 på en børsdag henter den forrige børsdag, og dagens kurser etter kl. 22 trenger da bonuskvote hos EODHD. Børsdagene før får signalet regnet i ettertid av kursene, merket «i ettertid» og uten KI-tekst |
-| KI-tekst | Ferdige tekster for siste dag, laget én gang med Gemma | På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på |
+| KI-tekst | Ferdige tekster for siste dag, også «Børsdagen kort fortalt», laget én gang med Gemma | På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på |
 | Dagen | Fast: fredag 09.10.2026 | Den siste børsdagen som er hentet |
 | Endringer i lista | Tas ikke i bruk, fordi demoen ikke henter | Tas i bruk ved hentingen etter kl. 22 |
 | Notatene | Bare til demoen startes på nytt, fordi demobasen lages på nytt ved hver start | Lagres i basen på maskinen |
