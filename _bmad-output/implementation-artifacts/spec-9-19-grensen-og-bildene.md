@@ -101,6 +101,10 @@ ingen demoserver eller nettleser står igjen, og at ingen migrasjon er med.
   like med det som var committet.
 - Spørsmålet før sletting (HE2) og lenken «Til <måned>» (HE14) står ikke i noen
   av bildene.
+- `--dokumentene` kl. 20:23–20:36 fant at README-en ikke lenger nevnte
+  «Børsdagen kort fortalt», fordi den sto i teksten til bildet i pila for mobil
+  (`test_ki_dagen.py::TestHjelpen::test_docs_hjelp_og_readme_sier_det_samme`).
+  Raden «KI-tekst» i tabellen øverst nevner den nå.
 
 ## Gjennomgangen 17.11
 
