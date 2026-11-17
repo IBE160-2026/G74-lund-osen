@@ -1373,7 +1373,11 @@ HOEYDE_PAA_BILDET = 1864
 # Story 3.3k (tillegg 1): linja nederst og UNDER_ARBEID_TEKST i avtrykket; avtrykket er regnet ut paa nytt.
 # Story 9.15 (src/dagsgrunnlag.py): avtrykket er regnet ut paa nytt, og bildet er tatt paa nytt og er byte for
 # byte det samme.
-AVTRYKK_BAK_BILDET = "591c91da83114ab3780ab8a12ee41242c2f7b1232dc2c5b0cca3472ac23c881c"
+# Story 9.18: malene, stilen, skriptet og hjelpetekstene er endret (HE2, HE3, HE5, HE8, HE9, HE10,
+# HE14, HE16, HE17, HE18). Bildene i docs/appen/ er ikke tatt på nytt i denne storyen (instruksjonen:
+# bildene blir i scratchpad), og avtrykkene er regnet ut på nytt. Spørsmål til gruppen i
+# spesifikasjonen.
+AVTRYKK_BAK_BILDET = "09167b71ed3adce8b8a6d9defe0204ea3cf19e7fc9c7377a5959f7b17ec9107d"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1850,7 +1854,11 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # byte det samme.
 # Story 9.15 (src/dagsgrunnlag.py): avtrykket er regnet ut paa nytt, og bildet er tatt paa nytt og er byte for
 # byte det samme.
-AVTRYKK_BAK_AKSJESIDEN = "dbaa60c28bec0c1b8dc494bc72058150f146301654a795acc73f147525d9685d"
+# Story 9.18: malene, stilen, skriptet og hjelpetekstene er endret (HE2, HE3, HE5, HE8, HE9, HE10,
+# HE14, HE16, HE17, HE18). Bildene i docs/appen/ er ikke tatt på nytt i denne storyen (instruksjonen:
+# bildene blir i scratchpad), og avtrykkene er regnet ut på nytt. Spørsmål til gruppen i
+# spesifikasjonen.
+AVTRYKK_BAK_AKSJESIDEN = "45ba9f411941509e59ff2400697d09ab518b7e1590729389dd155fc4e4da887c"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2183,24 +2191,28 @@ BILDENE_PAA_MOBIL = (
 # Story 9.15: RETNINGENE er tatt bort fra src/dagsgrunnlag.py, som er med bak bildene.
 # Avtrykkene er regnet ut paa nytt, og alle de 18 bildene er tatt paa nytt med skriptet og
 # jobblista fra 2.17. Alle er byte for byte de samme, saa ingen bilder er endret.
+# Story 9.18: malene, stilen, skriptet og hjelpetekstene er endret (HE2, HE3, HE5, HE8, HE9, HE10,
+# HE14, HE16, HE17, HE18). Bildene i docs/appen/ er ikke tatt på nytt i denne storyen (instruksjonen:
+# bildene blir i scratchpad), og avtrykkene er regnet ut på nytt. Spørsmål til gruppen i
+# spesifikasjonen.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "3b0d44b084246140e2a875b12d0a12e235bf9f4074c2caec9093e40fb5d705cd",
-    TOPPEN_AV_OVERSIKTEN: "591c91da83114ab3780ab8a12ee41242c2f7b1232dc2c5b0cca3472ac23c881c",
-    "docs/appen/boersometeret-demo.png": "153dbfac4554904607faeda6f2dd03282be8d59e9acec551ba74022e89f94046",
-    "docs/appen/min-liste-demo.png": "8905851fe37bf361a47ce856b483b610d590109943afb9989866d5ea8b1e6db5",
-    "docs/appen/mobil/oversikten-390-demo.png": "591c91da83114ab3780ab8a12ee41242c2f7b1232dc2c5b0cca3472ac23c881c",
-    "docs/appen/mobil/boersometeret-390-demo.png": "153dbfac4554904607faeda6f2dd03282be8d59e9acec551ba74022e89f94046",
-    "docs/appen/din-egen-liste-demo.png": "8905851fe37bf361a47ce856b483b610d590109943afb9989866d5ea8b1e6db5",
-    "docs/appen/investorsiden-brfe-demo.png": "4e16968ec328e43a9b1210a2b67fbd09c7651d7d25db4fdd64bf84022ee2fc6c",
-    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "4e16968ec328e43a9b1210a2b67fbd09c7651d7d25db4fdd64bf84022ee2fc6c",
-    "docs/appen/mobil/folg-en-aksje-390-demo.png": "3b0d44b084246140e2a875b12d0a12e235bf9f4074c2caec9093e40fb5d705cd",
-    "docs/appen/mobil/notatene-brfe-390-demo.png": "dbaa60c28bec0c1b8dc494bc72058150f146301654a795acc73f147525d9685d",
-    "docs/appen/notatene-brfe-demo.png": "dbaa60c28bec0c1b8dc494bc72058150f146301654a795acc73f147525d9685d",
-    "docs/appen/notatene-min-liste-demo.png": "8905851fe37bf361a47ce856b483b610d590109943afb9989866d5ea8b1e6db5",
-    "docs/appen/innstillinger-demo.png": "addd45622f880b11c139a9ae6b50a21a5b968e41dabd10f66492a9515ceae92f",
+    "docs/appen/folg-en-aksje-demo.png": "5976944c61f2a61430d744f9287e0c574d1bde8d38d69d419c976367668afa7e",
+    TOPPEN_AV_OVERSIKTEN: "09167b71ed3adce8b8a6d9defe0204ea3cf19e7fc9c7377a5959f7b17ec9107d",
+    "docs/appen/boersometeret-demo.png": "cd0e8baee730fcb199e78583ad1f991392da9aa5c7f713f1bca24342c56fcc74",
+    "docs/appen/min-liste-demo.png": "a3d64fee480184b8ac73a35c894b37e37ddef006faf12ac86743e5b455721824",
+    "docs/appen/mobil/oversikten-390-demo.png": "09167b71ed3adce8b8a6d9defe0204ea3cf19e7fc9c7377a5959f7b17ec9107d",
+    "docs/appen/mobil/boersometeret-390-demo.png": "cd0e8baee730fcb199e78583ad1f991392da9aa5c7f713f1bca24342c56fcc74",
+    "docs/appen/din-egen-liste-demo.png": "a3d64fee480184b8ac73a35c894b37e37ddef006faf12ac86743e5b455721824",
+    "docs/appen/investorsiden-brfe-demo.png": "c0c53e1f51c02991a77c0d03703af1451a2e718bf4820250722a75f46801972e",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "c0c53e1f51c02991a77c0d03703af1451a2e718bf4820250722a75f46801972e",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "5976944c61f2a61430d744f9287e0c574d1bde8d38d69d419c976367668afa7e",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "45ba9f411941509e59ff2400697d09ab518b7e1590729389dd155fc4e4da887c",
+    "docs/appen/notatene-brfe-demo.png": "45ba9f411941509e59ff2400697d09ab518b7e1590729389dd155fc4e4da887c",
+    "docs/appen/notatene-min-liste-demo.png": "a3d64fee480184b8ac73a35c894b37e37ddef006faf12ac86743e5b455721824",
+    "docs/appen/innstillinger-demo.png": "62d40bbfdbd26fb6c2c0fed49220749012f159a620db7e7d803be4fc407dddaf",
     # Story 3.3k: de to nye bildene.
-    "docs/appen/notatpanelet-demo.png": "8905851fe37bf361a47ce856b483b610d590109943afb9989866d5ea8b1e6db5",
-    "docs/appen/vis-meg-rundt-demo.png": "8905851fe37bf361a47ce856b483b610d590109943afb9989866d5ea8b1e6db5",
+    "docs/appen/notatpanelet-demo.png": "a3d64fee480184b8ac73a35c894b37e37ddef006faf12ac86743e5b455721824",
+    "docs/appen/vis-meg-rundt-demo.png": "a3d64fee480184b8ac73a35c894b37e37ddef006faf12ac86743e5b455721824",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
