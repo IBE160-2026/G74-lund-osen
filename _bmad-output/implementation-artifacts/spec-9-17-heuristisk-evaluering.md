@@ -61,9 +61,45 @@ README-en.
 - `docs/ux-logg.md`: en ny del med én rad per nytt funn, med neste ledige
   U-nummer.
 - `README.md`: lenken i «Dokumentene» (regel 19).
-- Bilder av demoen kan legges ved dokumentet i `docs/bilder/`, men ikke i
-  README-en.
-- Ingen kode, ingen maler og ingen tester endres.
+- Ingen bilder i repoet. `TestBildeneIDocs::test_bare_de_tre_bildene_i_docs_bilder` i
+  `tests/test_docker.py` låser hvilke filer som står i `docs/bilder/`, så de 33
+  bildene av demoen ligger bare i scratchpad, og dokumentet sier det.
+- Ingen kode og ingen maler endres. Den eneste endringen i testene er avtrykket
+  for «Dokumentene» i `AVTRYKK_I_PILENE` i `tests/test_docker.py`, med en
+  kommentar, som README-lenken krever. Testen sier selv at avtrykket settes på
+  nytt i samme commit når innholdet endres, slik 9.11, 9.12 og 9.14 gjorde.
+
+## Resultatet
+
+Én leser gikk gjennom demoen 17.11, på port 62957 fra en
+midlertidig mappe i scratchpad, og stoppet serveren og nettleseren den startet.
+Vinduet slo opp funnene mot malene før de ble skrevet inn: overskriftene i
+`_egne.html` (HE1), slettingen i `_notat.html` og `app.py` (HE2), bildet av
+tabellen på 390 px (HE3), `_rundtur.html`, `innstillinger.html` og
+`hjelpetekster.py` (HE5), `signalberegning.py` (HE8), `index.html` (HE9),
+`_egne.html` (HE10) og at ingen mal lenker til `docs/hjelp.md` (HE11).
+Radene i UX-loggen som dokumentet viser til, er også slått opp (U23, U105, og
+radene om smal skjerm og 404-siden).
+
+13 funn: 3 på middels (HE1–HE3) og 10 lave (HE4–HE13), og ingen høye. To ting
+som alt står i UX-loggen, er nevnt, men ikke ført som nye. Funnene står i
+`docs/heuristisk-evaluering.md` og som U114–U126 i `docs/ux-logg.md`.
+
+Funnene i evalueringen er innholdet i storyen, forslag som gruppen svarer på.
+De er ikke funn i gjennomgangen av denne PR-en, og de følger ikke av et svar,
+så regel 25 gjelder gjennomgangen under.
+
+## Spørsmål til gruppen
+
+Spørsmålene står også nederst i `docs/heuristisk-evaluering.md`. Et spørsmål
+stopper ikke arbeidet.
+
+1. **HE1–HE3 (middels).** Skal de rettes før brukertest 2? *Forslag:* HE2 og
+   HE3 før testen, og HE1 som et spørsmål i brukertest 2 først.
+2. **HE4–HE13 (lave).** *Forslag:* HE5, HE8, HE9 og HE10 er tekst og kan tas i
+   én liten story. Resten venter til etter brukertest 2.
+3. **Én evaluerer.** *Forslag:* gruppen går selv gjennom tabellen før
+   brukertest 2 og fører funn den er uenig i, som en datert linje.
 
 ## Grenser
 
@@ -73,9 +109,9 @@ README-en.
 
 ## Kontroll
 
-- [ ] Alle de sju delene er gått gjennom mot de ti heuristikkene
-- [ ] Hvert funn har heuristikken, siden, grad, kilden og et forslag
-- [ ] Radene i UX-loggen og lenken i README-en
+- [x] Alle de sju delene er gått gjennom mot de ti heuristikkene
+- [x] Hvert funn har heuristikken, siden, grad, kilden og et forslag
+- [x] Radene i UX-loggen og lenken i README-en
 - [ ] Gjennomgangen er tatt
 - [ ] `--dokumentene` er grønn lokalt
 - [ ] CI er grønn i alle jobbene
