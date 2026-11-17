@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T22:37
+updated: 2026-11-17T22:38
 ---
 
 # PRD — OSE Signal
@@ -657,6 +657,7 @@ KI-tekst», så de to viser aldri hver sin verdi.
 *Konsekvenser:*
 - Et valg som slås av, er av på alle sidene og etter en omstart.
 - Bryteren ved KI-teksten og bryteren i Innstillinger viser samme verdi.
+- Med «Vis notater» av står verken notatene, knappen «Mine notater» eller panelet på sidene, og ingen notat er slettet.
 
 #### FR-111 — Min liste
 
@@ -682,6 +683,7 @@ siden av siden, og ellers går den til notatene i Min liste. Min liste er et utv
 - Merket står etter en omstart.
 - Et klikk på stjernen gjør ingen API-kall og går tilbake til samme side med sorteringen.
 - Et merke for en aksje som ikke er i lista, avvises med en feil (400).
+- Med «Vis notater» på har raden øverst på hver side knappen «Mine notater», og panelet viser de samme notatene som Min liste, den nyeste notatdagen først.
 
 #### FR-112 — Din egen liste
 
@@ -787,6 +789,7 @@ Aksjesiden viser i tillegg:
 - Lenken til investorsiden åpnes i en ny fane i den ekte versjonen.
 - Lenken peker aldri til `newsweb.oslobors.no`, `oslobors.no` eller `live.euronext.com`.
 - Ingen kode i `src/` henter fra investorsiden.
+- «Signalet dag for dag» viser de lagrede vurderingene, og en dag uten rad, en dag med grunn og en dag regnet i ettertid er merket hver for seg og vises aldri som styrke 0 (FR-409).
 
 #### FR-204 — Aksjedetaljen for en aksje uten gyldig signal
 
@@ -1388,6 +1391,7 @@ kontrollen.
 - Sjekkene er de samme med KI av og på, og det eneste som skiller sidene, er KI-teksten.
 - En logget tekst med en annen styrke enn vurderingen vises ikke.
 - Modellnavnet står ved hver tekst som vises.
+- En tekst med «kjøp», «selg», «salg» eller «anbefal» vises ikke, selv om den besto kontrollen da den ble laget.
 
 #### FR-603 — KI-teksten sier ikke mer enn grunnlaget
 
@@ -1712,7 +1716,7 @@ data med tidsstempel, fordi den aldri henter.
 
 ### NFR-03 — Manglende data stopper ikke hovedflyten
 
-Kildefeil, manglende data og dager uten tydelige signaler stopper ikke
+Kildefeil, manglende data og dager der alle aksjene har styrke 0, stopper ikke
 hovedflyten. De tvinger heller ikke fram et resultat. Siste kjente data vises med
 tidsstempel, og signalstyrke 0 er et gyldig svar (FR-702).
 
@@ -1798,17 +1802,17 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 
 | ID | Mål | Hva vi måler | Terskel | Frist | Krav |
 |---|---|---|---|---|---|
-| SM-1 | Brukerutfall | En person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering | FR-101, FR-102, FR-109, FR-201, FR-202, FR-402, FR-602, FR-706, NFR-03 |
+| SM-1 | Brukerutfall | En person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering | FR-101, FR-102, FR-109, FR-201, FR-202, FR-401, FR-402, FR-602, FR-706, NFR-03 |
 | SM-2 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon, ført i brukslogga | Løpende | FR-111, FR-401, FR-412, NFR-02 |
 | SM-3 | Drift | Én henting fullfører innenfor kvoten. Ved kildefeil vises siste kjente data med tidsstempel | Én kommando gjør hele hentingen, også migrasjonene. Ingen stopp ved manglende data | Ukentlig | FR-401, FR-402, FR-406, FR-408, NFR-01, NFR-03 |
-| SM-4 | Dager uten signal | Dager uten tydelige signaler håndteres uten at hovedflyten stopper eller tvinger fram et resultat | Signalstyrke 0 forekommer og vises riktig | Løpende | FR-702, FR-703, FR-409, NFR-03 |
+| SM-4 | Dager uten signal | Dager der alle aksjene har styrke 0, håndteres uten at hovedflyten stopper eller tvinger fram et resultat | Signalstyrke 0 forekommer og vises riktig | Løpende | FR-702, FR-703, FR-409, NFR-03 |
 | SM-5 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig | Minst tre dager i uka de to siste ukene, ført i brukslogga | Ved prosjektinnlevering | FR-101, FR-401 |
 | SM-6 | Grensesnitt og stabilitet | Hovedflyten fungerer uten feil i en demonstrasjon | Hovedflyten gjennomført uten feil eller manuelle inngrep | Ved demonstrasjonen | FR-101, FR-201, FR-204, FR-411, NFR-03 |
 | SM-7 | Riktige beregninger | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består, og en kontroll for hånd stemmer med appen (`malinger.md` §6) | Ved hver testkjøring | FR-701, FR-702, FR-703, FR-704, NFR-08 |
 | SM-8 | KI-forklaringen | Hver KI-tekst som vises, har bestått kontrollen mot grunnlaget, og hver tekst er logget | Testene viser at feil stoppes. Én ukes drift er logget | Før demonstrasjonen | FR-601, FR-602, FR-603, FR-604, FR-605, FR-607, NFR-04 |
 | SM-9 | Kjørbar for andre | README-oppskriften fullføres gratis på en ren maskin, uten gruppens nøkler. Demoen virker uten konto, og den ekte versjonen med egen gratiskonto hos EODHD | README-prøven fra en ren maskin | Senest én uke før innleveringen | FR-411, FR-608, NFR-01 |
 | SM-10 | Notatene etterpå | En person utenfor gruppen finner et notat i Min liste og sier hva aksjen og hovedindeksen har gjort siden | Minst 1 person, uten hjelp | I brukertest 2 | FR-110, FR-111, FR-203, FR-208, FR-209, NFR-06 |
-| SM-11 | KI-teksten av og på | En person utenfor gruppen slår på KI-teksten og sier om signalet og sjekkene er de samme som før | Minst 1 person, og svaret er ja | I brukertest 2 | FR-601, FR-602, FR-706 |
+| SM-11 | KI-teksten av og på | En person utenfor gruppen slår på KI-teksten og sier om signalet og sjekkene er de samme som før | Minst 1 person, og svaret er ja | I brukertest 2 | FR-110, FR-203, FR-601, FR-602, FR-607, FR-706 |
 
 **Hovedflyten** er: åpne oversikten, se hvilke aksjer som skiller seg ut,
 åpne én av dem, og lese hvorfor. Forklaringen er de tre sjekkene med målingene,
@@ -1868,9 +1872,20 @@ lukkede, står ordrett i endringsloggen.
 
 ### Utenfor v1
 
-Punkt 2, 6, 8, 11, 12, 15 og 16 gjelder plan A, børsmeldingene og de kommende
-hendelsene. De tas opp igjen bare hvis plan A tas opp (vedlegg A). Punkt 4,
-hvordan en justeringsdag finnes, er besvart av metoden i FR-407.
+Disse punktene gjelder plan A, børsmeldingene og de kommende hendelsene. De tas
+opp igjen bare hvis plan A tas opp (vedlegg A).
+
+| # | Punkt |
+|---|---|
+| 2 | **KI-terskelen i samlekategorien.** Hvor grensen mellom «kan påvirke» og «lite relevant» skal gå (FR-606A). Den kan ikke avgjøres på papir, og relevanseksperimentet er grunnlaget |
+| 6 | **Usikkerhetskriteriene er skrevet for medieartikler** (FR-603A). Det første kjennetegnet bærer svakt når utstederen selv er avsender |
+| 8 | **Oppstart av et tilbakekjøpsprogram** er ekte nyhet, men filtreres bort sammen med de ukentlige statusrapportene (FR-502) |
+| 11 | **Meldepliktig handel for primærinnsidere** justeres hvis den viser seg å være i hovedsak opsjonsutøvelse (FR-502) |
+| 12 | **Horisonten og hendelsestypene** i FR-302 er antatt og må bekreftes |
+| 15 | **Kategoriene som havner i «ukjent kategori»**, plasseres i riktig bøtte etter en ukes drift (FR-502) |
+| 16 | **Språkregelen leser Vår Energi som norsk.** Ett norsk tegn avgjør alene, og navnet har «å», så FR-501 ville beholdt den engelske meldingen hver gang selskapet sender et meldingspar |
+
+Punkt 4, hvordan en justeringsdag finnes, er besvart av metoden i FR-407.
 
 ### Lukket
 
@@ -1979,7 +1994,7 @@ beholdes:** den norske når begge finnes.
 Meldingen har ikke noe felt for språket (`malinger.md` §7.3). Språket avgjøres
 derfor av tittelen. Æ, ø eller å avgjør alene. Ellers telles kjente norske ord mot
 kjente engelske. **Er det uavklart, beholdes den første.** Regelen slår feil for
-Vår Energi, som har «å» i navnet (punkt 16). Dedupliseringen kjøres **før**
+Vår Energi, som har «å» i navnet (punkt 16 i §8). Dedupliseringen kjøres **før**
 kategorifilteret.
 
 *Konsekvenser:*
@@ -2085,7 +2100,7 @@ KI-vurderingen av en melding i samlekategorien gir én av tre verdier:
 
 Meldinger vurdert som *påvirker direkte* eller *kan påvirke*, vises. *Lite
 relevant* skjules bak bryteren **Anbefalt**/**Alle**, skjult, men ikke borte.
-Grensen `[FORELØPIG]` kan ikke avgjøres på papir (punkt 2).
+Grensen `[FORELØPIG]` kan ikke avgjøres på papir (punkt 2 i §8).
 
 Med bryteren Anbefalt/Alle står det over meldingene hvor mange som ble funnet og
 hvor mange som vises. Grunnen til at resten er skjult, står også. Eks.dato er
