@@ -260,13 +260,16 @@ def test_ingen_andre_daterte_merker_storynummer_eller_navn_i_prd():
 
 def test_brukerreisen_og_ordlista():
     """4.3. Ville feilet hvis UJ-1 manglet climax eller edge, eller ordlista
-    ikke hadde 8–10 ord."""
+    ikke hadde 8–12 ord."""
     tekst = _prd()
     uj = tekst.split("### Brukerreisen UJ-1\n", 1)[1].split("\n### ", 1)[0]
     assert "**UJ-1." in uj and "*Climax:*" in uj and "*Edge:*" in uj
     ordlista = tekst.split("### Ordliste\n", 1)[1].split("\n---\n", 1)[0]
     rader = [r for r in ordlista.splitlines() if r.startswith("| **")]
-    assert 8 <= len(rader) <= 10, len(rader)
+    # Story 9.20 (gruppens svar 17.11 kl. 12:29, V7 i valideringen): ordlista
+    # har også «Oversikten» og «KI-teksten», så ordene brukes likt overalt.
+    # Tilbakemeldingen foreslo 8–10 ord, og grensen er 12.
+    assert 8 <= len(rader) <= 12, len(rader)
 
 
 @pytest.mark.parametrize("n", [1, 2, 3])
