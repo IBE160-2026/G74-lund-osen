@@ -310,7 +310,7 @@ const OMVISNING = {
 
   // Story 8.26 (tillegg 21, gruppens svar 12.11 kl. 09:58, «Brukerutfall» i
   // §7 i PRD-en): tilbudet starter «Vis meg rundt» for oversikten, ikke hele
-  // omvisningen på 23 steg, så en ny bruker kommer fort til en aksje selv.
+  // hele omvisningen, så en ny bruker kommer fort til en aksje selv.
   TILBUDET: "Første gang her? «Vis meg rundt» viser deg denne siden, ett steg om gangen.",
 
   // Linja på det siste steget i «Vis meg rundt» på oversikten, og hvor
