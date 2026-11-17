@@ -2,7 +2,7 @@
 title: "Den heuristiske evalueringen"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-17T11:58
+updated: 2026-11-17T13:28
 ---
 
 # Den heuristiske evalueringen av demoen
@@ -12,7 +12,7 @@ i svaret 16.11 kl. 20:22, og rådet anbefalte den (instruksjonen i
 [dagsfila](ai-prompts/2026-11-16.md)). Spesifikasjonen er
 [`spec-9-17-heuristisk-evaluering.md`](../_bmad-output/implementation-artifacts/spec-9-17-heuristisk-evaluering.md).
 Ingen kode er endret. Hvert funn har et forslag som gruppen svarer på, og de
-nye funnene står også i [UX-loggen](ux-logg.md) som U114–U126.
+nye funnene står også i [UX-loggen](ux-logg.md) som U114–U130.
 
 ## Metoden
 
@@ -31,6 +31,8 @@ nye funnene står også i [UX-loggen](ux-logg.md) som U114–U126.
 - **Hvem:** én evaluerer, KI-assistenten i økten. Metoden anbefaler tre til fem
   evaluerere, fordi hver finner bare en del av problemene. Én evaluerer er
   derfor en svakhet, og brukertest 2 er den andre kilden.
+  *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* gruppen er evaluerer nr. 2. Den fant HE14–HE17 selv i den ekte
+  versjonen 17.11, og kilden for dem er gruppen, ikke malene.
 - **Sjekket mot UX-loggen:** et funn som alt står i [UX-loggen](ux-logg.md),
   får nummeret sitt der og er ikke ført som nytt.
 - **Bildene** er av demoen og ligger ikke i repoet. Svaret ba ikke om dem, og
@@ -51,7 +53,8 @@ nye funnene står også i [UX-loggen](ux-logg.md) som U114–U126.
 
 **Gradene.** *Høy:* hindrer en kjerneoppgave. *Middels:* gjør en vanlig oppgave
 vanskeligere eller kan gi en feil som er vanskelig å rette. *Lav:* et hinder som
-er lett å komme rundt, eller bare ser rotete ut. Ingen funn er høye.
+er lett å komme rundt, eller bare ser rotete ut. Ingen funn er høye. Gradene for
+HE14–HE17 er satt etter den samme skalaen.
 
 ## Funnene
 
@@ -70,6 +73,10 @@ er lett å komme rundt, eller bare ser rotete ut. Ingen funn er høye.
 | HE11 | H10 | Hjelpevinduene | lav | Svarene som ikke får plass i et hjelpevindu, står i `docs/hjelp.md`, men ingen side eller hjelpevindu lenker dit. Bare kommentarer i malen og i `hjelpetekster.py` nevner fila. | `aksje.html` og `hjelpetekster.py` (kommentarene) | En lenke til hjelpen nederst i hjelpevinduet |
 | HE12 | H6 | Aksjesiden, periodevalget | lav | Aksjesiden åpner på en periode, så datofeltet er tomt og uten piler fra start. Oversikten åpner på siste børsdag, med dagen og pilene. Med en periode valgt er feltet tomt på alle sidene, valgt med vilje i 8.20a, og et lignende punkt ble avvist 18.10 i 8.16. | `_perioder.html`, `perioder.py` | Vis dagen siden viser i feltet, eller en kort tekst foran feltet |
 | HE13 | H8 | Aksjesiden, «Signalet dag for dag» | lav | Ukene etter siste demodag står som tomme rader, med linja «… så dagene utenfor står tomme.» | `aksje.html` (`kursserien`) | Skjul uker der alle dagene er etter siste kursdag |
+| HE14 | H3, H7 | Aksjesiden, «Signalet dag for dag» | middels | Pilene går én måned om gangen, og ingenting tar deg tilbake til måneden for dagen siden viser. Oppgaven om «i ettertid» i brukertest 2 sender testpersonen måneder bakover der. | Funnet av gruppen 17.11 kl. 12:48, i den ekte versjonen | En lenke tilbake ved pilene, som bare vises når du har bladd bort. Før testen |
+| HE15 | H2, H7 | «Dine egne aksjer» og Min liste | middels | En aksje du følger, får ingen stjerne, så den står ikke i Min liste. Gruppen så også at notatene på den ikke synes der. | Funnet av gruppen 17.11 kl. 13:03, i den ekte versjonen. Sjekket mot main 17.11: «Mine notater» i Min liste viser alle notatene, også for aksjer uten stjerne (`_alle_notatene` i `app.py`), så den delen stemmer ikke med koden. At aksjen ikke står i tabellen i Min liste, stemmer. Spørsmål 4 | Følg setter også stjernen, og Fjern endres ikke. Før testen |
+| HE16 | H4, H5 | Omvisningen | lav | Boksen bytter hjørne (8.26), og bredden følger teksten. Da flytter «Neste» seg, og man trykker «Tilbake». | Funnet av gruppen 17.11 kl. 13:11, i den ekte versjonen | Fast bredde på boksen før testen. Plasseringen tas etter testen |
+| HE17 | H10 | Omvisningen | lav | Notatene er ikke forklart i omvisningen. | Funnet av gruppen 17.11 kl. 13:11, i den ekte versjonen | Ett steg ved notatfeltet på aksjesiden og ett ved notatene i Min liste. Før testen |
 
 **Ført fra før og fortsatt synlig, ikke nye funn:**
 
@@ -118,8 +125,28 @@ gruppen har svart.
    HE3 før testen, fordi HE2 kan slette et notat ved et feiltrykk, og HE3
    skjuler signalet på en telefon. HE1 tas som et spørsmål i brukertest 2
    først, fordi brukertest 1 fant flest merknader på Min liste (U105).
+   *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* HE2 og HE3 rettes før brukertest 2. HE1 blir først et
+   spørsmål i brukertest 2.
 2. **HE4–HE13 (lave).** *Forslag:* HE5, HE8, HE9 og HE10 er tekst og kan tas i én
    liten story. HE4, HE6, HE7, HE11, HE12 og HE13 venter til etter brukertest 2.
+   *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* HE5, HE8, HE9 og HE10 tas i samme story som HE2 og HE3, før
+   testen. HE4, HE6, HE7, HE11, HE12 og HE13 venter til etter testen.
 3. **Én evaluerer.** *Forslag:* gruppen går selv gjennom tabellen før
    brukertest 2 og fører funn den er uenig i, som en datert linje under
    tabellen.
+   *Svar 2026-11-17 kl. 13:03–13:13 (gruppens svar, rådet anbefalte det):* gruppen er evaluerer nr. 2 og fant HE14–HE17 selv. De står i
+   tabellen. Før testen rettes HE14, HE15, fast bredde i HE16 og HE17, og
+   plasseringen i HE16 tas etter testen. Rettingene kommer i en egen story
+   etter at 9.17 er flettet.
+4. **HE15 og koden.** Gruppen så at notatene på en aksje uten stjerne ikke
+   synes i Min liste, men på main viser «Mine notater» i Min liste alle
+   notatene. *Forslag:* storyen med rettingene ser på det i den ekte
+   versjonen først, for eksempel om en valgt dag eller «Vis notater» spilte
+   inn. At Følg setter stjernen, gjelder uansett.
+
+## En idé fra gruppen
+
+*Idé 2026-11-17 kl. 13:08 (gruppen), ikke et funn:* et tenkt salg uten et
+tenkt kjøp først, for aksjer man har fra før. Appen sier aldri om et kjøp
+eller salg er godt (NFR-06), bare hva aksjen og indeksen gjorde etterpå. Den
+tas etter brukertest 2, og hører sammen med U112 fra brukertest 1.
