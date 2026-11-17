@@ -5399,3 +5399,18 @@ Som **gruppe** vil vi at meldingene fra hentingen sier det v1.1 gjør med en dag
 **Avhenger av:** 2.17, 9.14. **Én økt:** ja.
 
 *Lagt til 2026-11-17:* 9.15 er squash-flettet med PR #162 i `9fea9fc8` kl. 11:07, låst til head-en `c040f478`, etter steg 2 i instruksjonen kl. 21:50 i `docs/ai-prompts/2026-11-16.md`, uten nytt ja. Gruppens svar 16.11 kl. 18:51 på spørsmål 1 (BH1): ikonfilene står. CI var grønn i alle jobbene (run 44060835062), med 5872 bestått og 99 hoppet over i jobben `pytest`. Alle de 18 bildene ble tatt på nytt og er byte for byte de samme, så ingen bilder er endret.
+
+### Story 9.16: Flere brukerreiser i PRD-en
+
+*Lagt til 2026-11-17, etter instruksjonen etter gruppens svar 16.11 kl. 20:22 i `docs/ai-prompts/2026-11-16.md` (design og UX før brukertest 2):* rådet anbefalte det. Skrevet etter at appen ble bygget. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-16-flere-brukerreiser.md`.
+
+Som **gruppe** vil vi at §1 i PRD-en har flere brukerreiser enn UJ-1, slik at brukertest 2 og vurderingen kan se hvem appen er for også utenfor hovedflyten.
+
+**Oppfyller:** steg 1 i instruksjonen etter svaret 16.11 kl. 20:22 · **Begrenses av:** regel 3, 11, 19 og 20
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- UJ-2 (Min liste med notater for en som kommer tilbake) og UJ-3 (KI av og på) i §1, i samme form som UJ-1: en person, stegene, Climax, Edge, kravene og suksessmålet
+- Hvert steg sjekket mot malene og testene på main, med kilde i spesifikasjonen
+- En linje i `prd-endringslogg.md`, og ingen kode endret
+
+**Avhenger av:** 2.18, 8.21, 8.27, 9.11. **Én økt:** ja.

@@ -205,6 +205,22 @@ class TestSiden:
         for kapsel in (None, "av"):
             assert "Hvorfor signalet ble 2" in side(klient, kapsel)
 
+    def test_sjekkortene_er_like_med_ki_av_og_paa(self, klient, aksje):
+        """Story 9.16 (VG1 i gjennomgangen): climax i brukerreisen UJ-3 og
+        konsekvensen i FR-602, «Sjekkene er de samme med KI av og på». Ville
+        feilet hvis sjekkortene var ulike med KI-teksten av og på, eller
+        KI-teksten ikke sto med KI på."""
+        skriv_kirad(kirad(aksje))
+
+        def kortene(html: str) -> str:
+            start = html.index('<div class="sjekkort-rad">')
+            return html[start : html.index("\n    </div>\n", start)]
+
+        paa, av = side(klient), side(klient, "av")
+        assert TEKST in paa and TEKST not in av
+        assert kortene(paa).count('class="sjekkort ') == 3
+        assert kortene(paa) == kortene(av)
+
     def test_vises_ikke_naar_grunnlaget_ikke_stemmer(self, klient, aksje):
         """Ville feilet hvis teksten ble vist mot en annen vurdering (V2)."""
         skriv_kirad(kirad(aksje, grunnlag={**GRUNNLAG, "trend": 0, "styrke": 1}))
