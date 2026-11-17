@@ -179,5 +179,5 @@ eller høy grad står åpne.
 - [x] Datert linje per funn i evalueringen og UX-loggen, og spørsmålet om HE1 i brukertest 2
 - [x] Sjekket i demoen i full bredde og på 390 px
 - [x] Gjennomgangen er tatt
-- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: testfilene én om gangen etter gjennomgangen, og `--dokumentene` på `6ab838d8` kl. 15:44–16:03, med 2996 bestått og 20 hoppet over. De 13 ekstra som hoppet over, er i `tests/test_dobbeltklikk.py`, fordi gruppens app var på port 8000. Første kjøring kl. 15:39 ble stoppet for lite minne og startet igjen
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: testfilene én om gangen etter gjennomgangen, og `--dokumentene` på `6ab838d8` kl. 15:44–16:03, med 2996 bestått og 20 hoppet over. De 13 ekstra som hoppet over, er i `tests/test_dobbeltklikk.py`, fordi gruppens app var på port 8000. Første kjøring kl. 15:39 ble stoppet for lite minne og startet igjen. Etter svarene kl. 16:19: på `358aa863` kl. 16:53–17:14, med 3009 bestått og 7 hoppet over (port 8000 var ledig), etter én omstart til for lite minne
 - [ ] CI er grønn i alle jobbene
