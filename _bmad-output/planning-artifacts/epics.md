@@ -5518,3 +5518,5 @@ Som **gruppen som leser morgensjekken og bruker appen i brukertest 2** vil vi at
 - En test for hver retting, som feiler før rettingen
 
 **Avhenger av:** 9.20, 9.21. **Én økt:** ja.
+
+*Lagt til 2026-11-19:* 9.22 er squash-flettet med PR #169 i `7480e72c` 19.11 kl. 00:16, låst til head-en `1557ff5e`, etter instruksjonen om oppgavene for brukertest 2 og tre små rettinger i `docs/ai-prompts/2026-11-18.md`, uten nytt ja. Morgensjekken merker ikke lenger dagsfilene, taggen v8, de kjente plassholderne og commitene utenfor gruppen, FR-101 og kilden sier «51 børsdager», og knappen ved et notat med kjøp og salg heter som spørsmålet. CI var grønn i alle jobbene (run 44418120615), med 6002 bestått og 99 hoppet over i jobben `pytest`.

@@ -2,7 +2,7 @@
 title: 'Story 9.22: morgensjekken uten falske alarmer, «51 børsdager» og ett navn på sletteknappen'
 type: 'code'
 created: '2026-11-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '0c650e14'
 context:
@@ -203,7 +203,14 @@ og kilden.
 - [x] Morgensjekken kjørt mot main før og etter, med utskriften her
 - [x] «51 børsdager» i FR-101 og i kilden, med en linje i endringsloggen
 - [x] Knappen har samme navn på aksjesiden og i spørsmålet, og bildene, avtrykkene og bildegrenen følger
-- [ ] Spørsmål 7 i 9.20, spørsmål 1 i 9.21 og punktene i `issues.md` har en datert linje
+- [x] Spørsmål 7 i 9.20, spørsmål 1 i 9.21 og punktene i `issues.md` har en datert linje: spørsmålene i `b99bd3f3`, og punktene i `issues.md` lukkes i loggen etter føringen på main
 - [x] Gjennomgangen er tatt
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 44418120615 på `1557ff5e`, med 6002 bestått og 99 hoppet over i `pytest`)
+
+## Flettet 19.11
+
+CI var grønn i alle fire jobbene på head-en `1557ff5e` (run 44418120615). Ingen
+funn på middels eller høy grad sto åpne (regel 25). PR #169 ble squash-flettet i
+`7480e72c` 19.11 kl. 00:16, etter pausene om kvelden, låst til `1557ff5e`, uten
+nytt ja. Bildegrenen `pr-9-22-bilder` er pushet (`dd395dc3`).
