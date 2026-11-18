@@ -2010,7 +2010,7 @@ DE_NYE_BILDENE = {
     # Story 9.21 (gruppens svar 17.11 kl. 22:18): «Signalet dag for dag» på aksjesiden for BRFE
     # med september valgt, bare delen (id-en signalet-dag-for-dag), klippet ut med 16 px over
     # og under, så lenken «Til oktober 2026» synes (HE14 i 9.18). Og spørsmålet før et notat
-    # slettes (HE2), siden knappen «Slett notatet og det tenkte kjøpet» ved notatet om BRFE
+    # slettes (HE2), siden knappen «Slett notatet, kjøpet og salget» (9.22) ved notatet om BRFE
     # fra 22.09 går til, 640 px, hele siden. Målt i Edge 18.11. Hvordan de tas på nytt,
     # står i SLIK_NAAS_BILDET.
     "docs/appen/signalet-dag-for-dag-demo.png": ("/aksje/BRFE?maaned=2026-09", 1280, 977, FILENE_BAK_AKSJESIDEN),
@@ -2272,7 +2272,7 @@ SLIK_TAS_DE_NYE_BILDENE = (
 # sletting nås bare med en POST, og «Signalet dag for dag» er klippet ut etter id-en.
 SLIK_NAAS_BILDET = {
     "docs/appen/slett-notatet-demo.png": (
-        " Bildet er ikke toppen av /aksje/BRFE: klikk «Slett notatet og det tenkte kjøpet» ved notatet"
+        " Bildet er ikke toppen av /aksje/BRFE: klikk «Slett notatet, kjøpet og salget» ved notatet"
         " fra 22.09 på /aksje/BRFE (POST /aksje/BRFE/notat/slett), vent på «Slett notatet?», og ta"
         " hele siden, 1280 × 640."
     ),

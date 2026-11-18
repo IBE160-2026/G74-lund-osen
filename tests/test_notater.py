@@ -1371,6 +1371,24 @@ class TestSlettSpoerFoerst:
         # Gjennomgangen av 9.18 (BH1): knappen sier det samme som teksten.
         assert "Slett notatet, kjøpet og salget" in _tekst(side)
 
+    def test_knappen_ved_notatet_heter_som_i_spoersmaalet_med_salg(self, klient, demobase):
+        """Story 9.22 (spørsmål 1 i 9.21, ECH3): ville feilet hvis knappen ved
+        et notat med kjøp og salg het «Slett notatet og det tenkte kjøpet» på
+        aksjesiden og i Min liste, men «Slett notatet, kjøpet og salget» i
+        spørsmålet før sletting."""
+        klient.post(f"/aksje/{AKSJE}/notat", data={"dag": "2026-10-01", "tekst": "x"})
+        (rad,) = _rader(demobase)
+        _kjoep_i_basen(demobase, rad[0], "2026-10-07")
+        klient.post(f"/aksje/{AKSJE}/notat/salg", data=_salgsknapp(_min_liste_delen(klient)))
+        sporsmaal = _tekst(self._spoersmaalet(klient, {"id": rad[0], "vis": "min-liste"}))
+        aksjesiden = _uten_panelet(klient.get(f"/aksje/{AKSJE}").data.decode("utf-8"))
+        for side in (aksjesiden, _min_liste_delen(klient)):
+            assert ">Slett notatet, kjøpet og salget</button>" in side
+            assert "Slett notatet og det tenkte kjøpet" not in side
+            navnet = re.search(r'class="slett-notat".*?aria-label="([^"]*)"', side, re.S)[1]
+            assert navnet.endswith(", kjøpet og salget"), navnet
+        assert "Slett notatet, kjøpet og salget" in sporsmaal
+
     @pytest.mark.parametrize("tilbake", ["//ond.example", "https://ond.example", "javascript:alert(1)"])
     def test_avbryt_gaar_bare_til_en_side_i_appen(self, klient, demobase, tilbake):
         """Gjennomgangen av 9.18 (VG3): ville feilet hvis «Avbryt» eller
