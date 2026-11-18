@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-17T15:21
+updated: 2026-11-18T21:44
 ---
 
 # Brukertesten
@@ -92,7 +92,95 @@ Ingen navn eller annet som kan kjenne personen igjen, står her. En kurs eller e
 
 Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksjene, der 288 besto og 6 ble stoppet, og 4 tekster om dagen, som alle besto. De 6 ble stoppet av punkt 1 i kontrollen (det teksten sa om signalet mot grunnlaget), og én av dem også av punkt 2 (et tall). Én ukes drift er logget, flere ganger over.
 
-## Brukertest 2: en dag «i ettertid» (story 2.17)
+## Brukertest 2
+
+*Rettet 2026-11-18 (gruppens svar 18.11 kl. 21:27, instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-18.md`):* overskriften var «Brukertest 2: en dag «i ettertid» (story 2.17)». Delen har nå alle oppgavene i brukertest 2, og oppgaven om «i ettertid» er oppgave F. Notatene fra 10.11 over står urørt.
+
+**Oppgavene.** Testen tas med en ny person, i rekkefølgen under. Det personen får høre, sies ordrett. A og B er del A og B fra 10.11. SM-1, SM-10 og SM-11 er suksessmålene i §7 i PRD-en.
+
+| Oppgave | Det personen får høre | Det som noteres |
+|---|---|---|
+| A | «Dette er en nettside om aksjer på Oslo Børs. Se deg rundt som du vil, og si høyt hva du ser og tenker. Jeg kan ikke hjelpe deg underveis.» | Som del A 10.11: tiden til personen forklarer hvorfor en aksje skiller seg ut, og om det var under 5 minutter (SM-1) |
+| B | «Hva sier siden om denne aksjen?», først med KI av og så på. Med KI på også «Er signalet og sjekkene de samme som før du slo på KI?» | Som del B 10.11, og svaret på spørsmålet for SM-11 |
+| C | «Spill av omvisningen.» | Om personen går seg vill, og hvor |
+| D | «Følg en aksje du ikke kjente fra før.» | Tiden, og om sorteringen og bransjene hjalp |
+| E | «Skriv et notat og et tenkt kjøp på en aksje.» | Om det gikk uten hjelp |
+| F | «Hva betyr «i ettertid» her?», på en dag merket «i ettertid» i «Signalet dag for dag» | Feltene under oppgave F |
+| G | «Finn et av notatene i Min liste, og si hva aksjen og hovedindeksen har gjort siden.» | Feltene under oppgave G (SM-10) |
+| Etter G | «Hva er forskjellen på «Min liste» og «Dine egne aksjer»?» | Feltene under spørsmålet om HE1 |
+
+Svarene 18.11 kl. 21:27: F tas i den ekte versjonen, og før testen fjerner gruppen én egen aksje uten notat, så D har plass under taket på 18.
+
+### Før testen (brukertest 2)
+
+| Felt | Notat |
+|---|---|
+| Dato | |
+| Muntlig ja til observasjon og anonyme notater, klokkeslett | |
+| Den ekte versjonen på http://127.0.0.1:8000, uten «Eksempeltall» øverst | |
+| Siste henting, dato | |
+| Én egen aksje uten notat er fjernet, og «Dine egne aksjer» har minst én ledig plass under taket på 18 | |
+| Notatene gruppen skrev på tre aksjer 17.11 står i Min liste (oppgave G) | |
+| KI av: bryteren «Vis KI-tekst» viser «Av» | |
+| Bare oversikten åpen, øverst på siden | |
+| Det som ble sagt, ordrett | |
+
+### Oppgave A: KI av
+
+| Felt | Notat |
+|---|---|
+| Klokkeslett da oversikten ble vist | |
+| Forklaringen av hvorfor en aksje skiller seg ut, ordrett | |
+| Tiden fra oversikten ble vist til forklaringen | |
+| Under 5 minutter (ja eller nei) | |
+| Stoppet etter 10 minutter uten forklaring (ja eller nei) | |
+| Stoppet, rullet tilbake eller mistet raden, med tidspunkt | |
+| Så hovedindeksen og søylene, med tidspunkt | |
+| Sidene som ble åpnet, i rekkefølge | |
+| Slo på KI-teksten selv med «Vis KI-tekst», med tidspunkt | |
+| Forklaringen kom før KI-teksten ble slått på (ja eller nei) | |
+| Spørsmål personen stilte, og svaret «Gjør det du ville gjort hvis du satt alene.» | |
+
+### Oppgave B: samme aksje, først KI av og så på
+
+Spørsmålet for SM-11 har sine egne felt under «Oppgave B, et ekstra spørsmål» lenger ned.
+
+| Felt | Notat |
+|---|---|
+| Aksjen, og om den kom fra forklaringen eller var den første aksjesiden personen åpnet | |
+| Klokkeslett da oppgave B startet | |
+| «Hva sier siden om denne aksjen?», «Vis KI-tekst» viser «Av», svaret ordrett | |
+| «Hva sier siden om denne aksjen?», «Vis KI-tekst» viser «På», svaret ordrett | |
+
+### Oppgave C: omvisningen
+
+| Felt | Notat |
+|---|---|
+| Klokkeslett da oppgave C startet | |
+| Fant personen «Spill av omvisningen» under «Innstillinger» uten hjelp (ja eller nei) | |
+| Gikk personen seg vill (ja eller nei), og hvor | |
+| Spørsmål personen stilte | |
+
+### Oppgave D: følg en aksje
+
+| Felt | Notat |
+|---|---|
+| Aksjen, og at personen ikke kjente den fra før (ja eller nei) | |
+| Tiden fra oppgaven ble gitt til aksjen ble fulgt | |
+| Hjalp sorteringen (ja eller nei), og hvordan | |
+| Hjalp bransjene (ja eller nei), og hvordan | |
+| Fulgte personen aksjen uten hjelp (ja eller nei) | |
+
+### Oppgave E: et notat og et tenkt kjøp
+
+| Felt | Notat |
+|---|---|
+| Aksjen | |
+| Skrev personen notatet uten hjelp (ja eller nei) | |
+| Noterte personen et tenkt kjøp uten hjelp (ja eller nei) | |
+| Der det stoppet opp, hvis noe | |
+
+### Oppgave F: en dag «i ettertid» (story 2.17)
 
 *Lagt til 2026-11-14 (story 2.17, tillegg 1, gruppens svar kl. 05:41–05:49):* en oppgave i brukertest 2, etter at 2.17 er flettet og den ekte versjonen har signalet regnet i ettertid. Oppgaven sier ikke hva merket betyr.
 
@@ -103,6 +191,8 @@ Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksj
 | Fant personen forskjellen fra en dag uten merket (ja eller nei) | |
 | Så personen at dagen ikke har KI-tekst, og hvorfor (ja eller nei) | |
 | Leste personen «i ettertid» som en annen styrke eller et råd (ja eller nei) | |
+
+### Oppgave B (SM-11), oppgave G og spørsmålet om HE1
 
 *Lagt til 2026-11-17 (story 9.16, gruppens svar kl. 12:32, rådet anbefalte det):* to oppgaver for suksessmålene SM-10 og SM-11 i §7 i PRD-en, som måler brukerreisene UJ-2 og UJ-3.
 
