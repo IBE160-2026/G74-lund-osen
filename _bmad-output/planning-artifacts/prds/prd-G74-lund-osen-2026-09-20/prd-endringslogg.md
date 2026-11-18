@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-18T09:50
+updated: 2026-11-18T10:24
 ---
 
 # Endringslogg for PRD-en
@@ -1697,3 +1697,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 - FR-602: «- En tekst med «kjøp», «selg», «salg» eller «anbefal» vises ikke, selv om den besto kontrollen da den ble laget.» Den korte lista i `_VAKT` i `src/ki_visning.py` har også «kjop», «solg», «tilråd» og «tilrad», og stopper ordene inne i lengre ord. Nå står hele lista.
 - FR-112: «- Tallet for plassene som er brukt, er lista med ønskene som venter.» Nå står det som i kravteksten: aksjene i lista, pluss ønskene om å følge og minus ønskene om å fjerne som venter.
 - Ordlista, «Min liste»: «Den er et utvalg av lista, ikke en egen henting», og FR-111: «Min liste er et utvalg av lista (FR-412), ikke en egen henting og ikke en portefølje.» «Følg» setter stjernen på en aksje som venter på hentingen, før den står i lista (migrasjonen `0013_stjerne_ved_folg.sql`). Nå står «og av aksjene som venter på å følges (FR-415)» begge steder.
+
+*Endret 2026-11-18 (story 9.20, `--dokumentene` kl. 10:23):* FR-101, «Aksjer uten gyldig signal vises likevel»: setningen sier igjen «Signalet krever 51 handelsdager», som før 17.11. Hjelpeteksten om sjekkene uten signal viser til den setningen ordrett som kilde (`test_hjelpetekster.py::TestKildene::test_hver_tekst_har_en_kilde_som_finnes`), og koden i `src/` endres ikke i denne storyen. En halv handelsdag er en børsdag (ordlista), så meningen er den samme. Ordet byttes når kilden i hjelpetekstene rettes.

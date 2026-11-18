@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-18T09:50
+updated: 2026-11-18T10:24
 ---
 
 # PRD — OSE Signal
@@ -421,7 +421,7 @@ på den justerte sluttkursen. Signalet for en dag vises bare der vurderingen er
 lagret, fra kvelden eller regnet i ettertid og merket «i ettertid». Det regnes
 aldri på nytt når siden vises (FR-408).
 
-**Aksjer uten gyldig signal vises likevel.** Signalet krever 51 børsdager
+**Aksjer uten gyldig signal vises likevel.** Signalet krever 51 handelsdager
 fordi MA50 bruker 50 av dem. En nynotert aksje, eller en serie med hull, gir
 derfor ingen signalverdi. Raden vises da slik:
 
