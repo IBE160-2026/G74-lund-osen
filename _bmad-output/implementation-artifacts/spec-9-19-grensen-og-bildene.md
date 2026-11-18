@@ -141,6 +141,12 @@ Et spørsmål stopper ikke arbeidet.
    bildene av spørsmålet før sletting (HE2) og lenken tilbake i «Signalet dag
    for dag» (HE14) før brukertest 2, i en egen liten story etter 9.20, med egen
    instruksjon.
+   *Lagt til 2026-11-18 (story 9.21):* bildene er lagt inn. `docs/appen/slett-
+   notatet-demo.png` viser spørsmålet før notatet om BRFE fra 22.09 slettes,
+   med det tenkte kjøpet og salget, og står etter bildet av notatene.
+   `docs/appen/signalet-dag-for-dag-demo.png` viser «Signalet dag for dag» for
+   BRFE i september 2026 med lenken «Til oktober 2026», og står etter
+   aksjesiden. Begge er fra demoen, i full bredde.
 2. **Bruddene er målt med demodataene.** Tabellen er minst 709 px, så den
    blir ikke smalere, men en lang ticker og bransje i den ekte versjonen kan
    gjøre den bredere. Da kan et smalt spenn vise retningen ingen steder. I
