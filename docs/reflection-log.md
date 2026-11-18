@@ -3615,6 +3615,28 @@ Det vi lærte: kursets steg er en rekkefølge, men vår ble styrt av det vi mål
 
 ---
 
+## 17.11.2026 – Morgensjekken, og tre treff som ikke var feil
+
+*Joakim og Marian.*
+
+Siden 26.09 har `morgensjekk.py` kjørt på GitHub hver morgen (`8293849a`). Den samler commits, dagsfiler, sprintstatus, frister, lenker, en lekkasjesjekk og regel 20. En planlagt KI-økt leser utskriften, regner over nye tall i dokumentene og skriver en kort rapport til oss. Den bare leser, og sier alltid hva den ikke har sjekket. Vi har brukt rapporten som utgangspunkt for dagen nesten hver dag.
+
+**Utfordringer**
+
+1. **Skriptet så ikke instruksjonene i dagsfila.**
+   *Problem:* sjekken sa 0 instruksjoner for 16.11. Overskriftene i dagsfila har tekst etter klokkeslettet («## 09:52, svarene …»), og skriptet teller bare «## 09:52» alene.
+   *Løsning:* KI-økta talte for hånd og fant fem. Én var bare delvis gjort: PR #162 (9.15) ventet på svaret vårt om BH1. Vi hadde svart kl. 18:51, og svaret lå i instruksjonen kl. 21:50, men PC-en sov fra kl. 23:06 til 10:40. Svaret var ført kl. 21:53, men kom på GitHub først 17.11, og #162 ble flettet kl. 11:07.
+   *KI sin rolle:* den sjekket tallet mot fila i stedet for å stole på det.
+
+2. **Tre commits uten medforfatter etter regel 20.**
+   *Problem:* regel 20 viste 226 av 229 commits de siste sju dagene.
+   *Løsning:* to var faglærers commits 12.11, og én var en merge-commit fra GitHub (PR #149), så ingen brøt regelen. Vi lot historikken stå, fordi en omskriving ville ødelegge hashene vi viser til. Tellingen i skriptet bør bare ta med gruppens commits.
+   *KI sin rolle:* den fant commitene og forklarte dem. Valget var vårt.
+
+Det vi lærte: en daglig sjekk gir oversikt, men også falske alarmer. Et rart tall må sjekkes mot kilden før vi handler på det. Sjekken teller også nye «Rettet»-linjer: 18 det siste døgnet, i andre dokumenter enn PRD-en, som ikke har hatt noen siden 13.11. Det henger sammen med refleksjonsspørsmål 1 i tilbakemeldingen på PRD-en 12.11: en datert linje viser historikken, men koster den som skal lese teksten.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
