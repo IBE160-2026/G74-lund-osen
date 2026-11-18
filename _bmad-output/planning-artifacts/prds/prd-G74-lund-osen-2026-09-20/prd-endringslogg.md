@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-18T09:48
+updated: 2026-11-18T09:49
 ---
 
 # Endringslogg for PRD-en
@@ -1683,3 +1683,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-18 (story 9.20, gjennomgangen BH1 og BH2, etter gruppens svar 17.11 kl. 12:29–13:40):* to ord fra ordlista endret meningen, og meningen fra før står igjen. Linja for 17.11 om ordene sa at meningen ikke var endret, og det stemte ikke for disse to. FR-604: «For hver aksje og børsdag med en KI-tekst, og for teksten om dagen, lagres én rad:» sa at bare en laget tekst gir en rad, men en modell som feiler, gir også en rad. Nå står det «For hver aksje og børsdag hentingen lager, eller prøver å lage, en KI-tekst for, og for teksten om dagen, lagres én rad:». Før 17.11 sto det «For hver aksje og børsdag KI-laget forklarer, og for teksten om dagen, lagres én rad:». §3, kriterium 2: «**Lista dekker minst åtte sektorer.** Kravet gjelder lista som helhet, ikke det enkelte symbolet.» gjaldt hele lista på opptil 18, mens kriteriet gjelder de 15 appen starter med (FR-412 sier at «De 15 mest omsatte» ikke har kravet). Nå står det «**De 15 dekker minst åtte sektorer.** Kravet gjelder de 15 som helhet, ikke det enkelte symbolet.». Før 17.11 sto det «**Universet dekker minst åtte sektorer.** Kravet gjelder lista som helhet, ikke det enkelte symbolet.»
 
 *Endret 2026-11-18 (story 9.20, gjennomgangen BH3, etter gruppens svar 17.11 kl. 12:29–13:40):* §8 har fått åpent punkt 28, terskelen «under 5 minutter» i SM-1. Brukertesten 10.11 brukte over 5 minutter, og om terskelen står, avgjøres etter brukertest 2. Statusen for SM-1 ble flyttet hit 17.11, og avgjørelsen sto da bare i svaret på tilbakemeldingen. Ingen tekst er tatt bort.
+
+*Endret 2026-11-18 (story 9.20, gjennomgangen BH4 og BH8, etter gruppens svar 17.11 kl. 12:29–13:40):* «v1.1» i §8 nevner relevansskalaen (FR-606), som er senere og plan A, men står i §4.6. Lista over de bygde idéene fra v1.1 var ufullstendig: flere av idéene i «v1.1 — vurderes etter at v1 er kontrollert» i denne loggen ble flyttet til v1 og bygget, ikke bare de fire. Avsnittet viser nå til lista her og til tabellen i §2 i stedet. Det sto slik: «Det som står som «senere» i tabellen i §2, er plan for en senere versjon: plan A i vedlegg A, åtte deler av kravene i v1, KI-tekst for små hull (FR-408) og et tenkt salg uten et tenkt kjøp først (FR-209). Ingen av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er i v1.» og «Av idéene som sto i lista til v1.1, er de som ble bygget, tatt inn som krav i §4: sjekk 2 og 3 i kursgrafen (FR-202), signaldagene (FR-206), hjelpen bak «?» (FR-109) og signalet regnet i ettertid (FR-408). De andre står med forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og virker.»

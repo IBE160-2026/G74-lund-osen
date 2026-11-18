@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-18T09:48
+updated: 2026-11-18T09:49
 ---
 
 # PRD — OSE Signal
@@ -1910,13 +1910,15 @@ lukket dem, står i endringsloggen.
 ### v1.1 — vurderes etter at v1 er kontrollert
 
 Det som står som «senere» i tabellen i §2, er plan for en senere versjon: plan A
-i vedlegg A, åtte deler av kravene i v1, KI-tekst for små hull (FR-408) og et
-tenkt salg uten et tenkt kjøp først (FR-209). Ingen av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er i v1.
+i vedlegg A, åtte deler av kravene i v1, KI-tekst for små hull (FR-408), et
+tenkt salg uten et tenkt kjøp først (FR-209) og relevansskalaen (FR-606), som er
+plan A, men står i §4.6. Ingen av dem er bygget, og kravteksten til hver av de
+åtte sier at den ikke er i v1.
 
-Av idéene som sto i lista til v1.1, er de som ble bygget, tatt inn som krav i §4:
-sjekk 2 og 3 i kursgrafen (FR-202), signaldagene (FR-206), hjelpen bak «?»
-(FR-109) og signalet regnet i ettertid (FR-408). De andre står med forbeholdene
-sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og virker.
+Idéene som sto i lista til v1.1, står med forbeholdene sine i endringsloggen,
+under «v1.1 — vurderes etter at v1 er kontrollert». De som ble bygget, er tatt
+inn som krav i §4 og står som kjerne eller ekstra i tabellen i §2. Ingen av de
+andre tas før v1 er kontrollert og virker.
 
 ---
 
