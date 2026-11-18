@@ -1730,8 +1730,8 @@ data med tidsstempel, fordi den aldri henter.
 
 ### NFR-03 — Manglende data stopper ikke hovedflyten
 
-Kildefeil, manglende data og dager der alle aksjene har styrke 0, stopper ikke
-hovedflyten. De tvinger heller ikke fram et resultat. Siste kjente data vises med
+Kildefeil, manglende data og dager der ingen aksje skiller seg ut, fordi alle
+har styrke under terskelen i FR-705, stopper ikke hovedflyten. De tvinger heller ikke fram et resultat. Siste kjente data vises med
 tidsstempel, og signalstyrke 0 er et gyldig svar (FR-702).
 
 *Konsekvenser:*
@@ -1819,7 +1819,7 @@ tillatelse på forhånd, og tillatelse er ikke gitt (vedlegg A).
 | SM-1 | Brukerutfall | En person utenfor gruppen gjennomfører hovedflyten og forklarer uoppfordret hvorfor en aksje skiller seg ut | Minst 1 person, under 5 minutter, uten hjelp | Før prosjektinnlevering | FR-101, FR-102, FR-109, FR-201, FR-202, FR-401, FR-402, FR-602, FR-706, NFR-03 |
 | SM-2 | Adopsjon | Gruppen bruker løsningen på egne aksjer og logger feil | Minst 4 av 5 børsdager fra første fungerende versjon, ført i brukslogga | Løpende | FR-111, FR-401, FR-412, NFR-02 |
 | SM-3 | Drift | Én henting fullfører innenfor kvoten. Ved kildefeil vises siste kjente data med tidsstempel | Én kommando gjør hele hentingen, også migrasjonene. Ingen stopp ved manglende data | Ukentlig | FR-401, FR-402, FR-406, FR-408, NFR-01, NFR-03 |
-| SM-4 | Dager uten signal | Dager der alle aksjene har styrke 0, håndteres uten at hovedflyten stopper eller tvinger fram et resultat | Signalstyrke 0 forekommer og vises riktig | Løpende | FR-702, FR-703, FR-409, NFR-03 |
+| SM-4 | Dager uten signal | Dager der ingen aksje skiller seg ut (styrke under terskelen i FR-705) håndteres uten at hovedflyten stopper eller tvinger fram et resultat | Signalstyrke 0 forekommer og vises riktig | Løpende | FR-702, FR-703, FR-409, NFR-03 |
 | SM-5 | Fortsatt bruk | Om vi bruker løsningen frivillig etter at utviklingen er ferdig | Minst tre dager i uka de to siste ukene, ført i brukslogga | Ved prosjektinnlevering | FR-101, FR-401 |
 | SM-6 | Grensesnitt og stabilitet | Hovedflyten fungerer uten feil i en demonstrasjon | Hovedflyten gjennomført uten feil eller manuelle inngrep | Ved demonstrasjonen | FR-101, FR-201, FR-204, FR-411, NFR-03 |
 | SM-7 | Riktige beregninger | Håndlagde kursserier gir forhåndsberegnet styrke og retning | Testene består, og en kontroll for hånd stemmer med appen (`malinger.md` §6) | Ved hver testkjøring | FR-701, FR-702, FR-703, FR-704, NFR-08 |
