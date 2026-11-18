@@ -3637,6 +3637,87 @@ Det vi lærte: en daglig sjekk gir oversikt, men også falske alarmer. Et rart t
 
 ---
 
+## 17.11.2026 – Tilbakemeldingen på PRD-en, det vi gjorde med den, og planen for brukertest 2
+
+*Joakim og Marian.*
+
+Faglærer vurderte PRD-en 12.11 mot kvalitetsrubrikken i bmad-prd (`tilbakemelding-prd.md`). Den var sterk på beslutningsklarhet, substans og strategisk sammenheng, god på testbarhet og på scope og avgrensning, og svak på brukbarhet for neste fase og formtilpasning. Hovedpunktet var at PRD-en var blitt en endringslogg, med daterte linjer oppå krav som ikke lenger gjaldt: «Den som skal lage UX, stories eller tester, må selv finne ut hva som er gjeldende.»
+
+Dette gjorde vi:
+- 9.11 skilte gjeldende tekst fra historikken. Den ble flettet 13.11 kl. 22:47 (`ef802733`).
+- 9.20 gikk gjennom PRD-en mot den samme rubrikken 17.–18.11, etter en validering og svarene våre 17.11 kl. 12:29 («Rett alt, ID-ene står»), 13:03, 13:10 og 13:40. PRD-en fikk «Slik leser du PRD-en» øverst. Det som var bygget uten krav, fikk krav: FR-112, FR-208, FR-209 og FR-415.
+- 9.20 la også til tre filer:
+  - en sporingsfil med test (`prd-sporing.md`)
+  - et svarbrev i faglærers rekkefølge (`tilbakemelding-prd-svar.md`)
+  - «Teknologi og nøkler», i samme form som faglærers `technology.md`
+- 9.20 ble flettet 18.11 kl. 11:02 (#167, `307109e9`).
+
+Tallene i svarbrevet, med ordene telt som `\w+`:
+
+| | Linjer | Ord | Daterte linjer |
+|---|---:|---:|---:|
+| Vurdert 12.11 | 2 264 | 30 660 | 174 |
+| Etter 9.11 | 1 870 | 14 773 | 0 |
+| Etter 9.20 | 2 132 | 18 026 | 0 |
+
+PRD-en er lengre nå enn etter 9.11, fordi den har fått to brukerreiser, fire nye krav, en ordliste med tolv ord og regelen om målingen i FR-603.
+
+Dette gjorde vi ikke, og hvorfor:
+- ID-ene står, fordi spesifikasjonene, commitene og testene viser til dem.
+- «Under 5 minutter» i SM-1 står, og avgjøres etter brukertest 2 (åpent punkt 28 i §8).
+- Faglærers to refleksjonsspørsmål besvares i refleksjonsrapporten.
+
+Samme dag gjorde vi PRD-en og appen klare til brukertest 2:
+- **9.16**, brukerreisene UJ-2 og UJ-3 og suksessmålene SM-10 og SM-11: kl. 13:14 (#163, `7d4a331c`).
+- **9.17**, en heuristisk evaluering av demoen med 13 funn: kl. 14:01 (#164, `fc70bdf3`).
+- **9.18**, rettingene før brukertest 2: kl. 17:20 (#165, `9bf8769e`).
+- **9.19**, grensen på 640–760 px og bildene av appen: kl. 21:28 (#166, `fced670f`).
+
+18.11 kom 9.20 og 9.21, som har bildene av to av rettingene i README-en: kl. 13:11 (#168, `0c2ab7d2`).
+
+**Planen for brukertest 2**
+
+Brukertest 2 er tidligst fredag 20.11, ellers i helgen, med en ny person. Vi kaller oppgavene A–G. I `docs/brukertest.md` står del A og B fra brukertest 1, oppgaven om «i ettertid» og den nye oppgave G. De to nye suksessmålene måles der: SM-10 i oppgave G og SM-11 med et ekstra spørsmål i oppgave B. Til oppgave G skrev vi notater på tre aksjer i Min liste 17.11, så det finnes dager etterpå når testen tas.
+
+Da vi brukte appen selv 17.11, fant vi fem ting, HE14–HE18:
+- Fire av dem ble rettet i 9.18, sammen med funnene vi valgte fra evalueringen.
+- HE15 viste seg å virke allerede: Følg har satt stjernen siden 11.11.
+- 9.18 rettet HE2, HE3, HE5, HE8, HE9, HE10, HE14, HE16, HE17 og HE18, hver med en test som feilet før rettingen.
+- 9.19 og 9.21 fulgte opp med linja på smal skjerm og bildene.
+- HE1 blir først et spørsmål i testen.
+
+Testpersonen i brukertest 1 ønsket anbefalinger og å kunne «spå» hva man bør følge med på (U112). Det ville vi også. Det er et råd, og NFR-06 sier nei. Appen viser i stedet signalet den dagen notatet ble skrevet, og hva aksjen og hovedindeksen gjorde etterpå (FR-208).
+
+**Utfordringer**
+
+1. **Et ordtall vi ikke fikk fram.**
+   *Problem:* faglærer skrev ca. 28 700 ord. Python ga 30 660 med `\w+` og 29 030 med `str.split()`, så spriket sto åpent i 9.20 (regel 12).
+   *Løsning:* rådet fant at `wc -w` med `LC_ALL=C` gir 28 752 på taggen. Forskjellen er 278 ord uten et eneste ASCII-tegn, blant annet 160 «—» og 77 «å», som `wc` ikke teller. Svarbrevet sier det, og vi godtok det 18.11 kl. 11:49.
+   *KI sin rolle:* Claude Code valgte ikke ett av tallene, men lot spriket stå til det var forklart, og fant hvilke ord som utgjorde forskjellen.
+
+2. **Seks feil på middels grad i vår egen tekst.**
+   *Problem:* gjennomgangen av 9.20 ga 27 funn, 6 på middels og 21 lave. Eksempler:
+   - FR-604 hadde fått snevrere mening.
+   - At SM-1 ikke er nådd, sto ikke i PRD-en.
+   - Lista over hva som er bygget fra v1.1, var feil.
+   - Testen låste mindre enn svarbrevet sa.
+   *Løsning:* alle seks ble rettet før flettingen, og PR-en ble ikke flettet med noe på middels åpent (regel 25).
+   *KI sin rolle:* leseren i gjennomgangen hadde ikke skrevet teksten, og fant feil i det den samme økta hadde skrevet.
+
+3. **En push med en feil.**
+   *Problem:* kl. 16:23 17.11 ble main pushet etter en kjøring av `--dokumentene` med «1 error», fordi kommandoen ikke sjekket utfallet. Commitene var bare dagsfila, loggen og Utført-linja.
+   *Løsning:* en ny kjøring kl. 16:23–16:42 ga 2970 bestått og 7 hoppet over. Fra da av pushes main bare når kjøringen er grønn.
+   *KI sin rolle:* Claude Code førte det som avvik i Utført-linja, og sjekken av utfallet ble en del av kommandoen.
+
+4. **Hvilemodus igjen.**
+   *Problem:* natta til 18.11 var PC-en i hvilemodus fra kl. 00:06 til 09:47, selv om vi sa 17.11 at hvilemodus slås av. Arbeidet med 9.20 sto stille.
+   *Løsning:* 9.20 ble flettet kl. 11:02, og punktet står åpent i `issues.md`.
+   *KI sin rolle:* Claude Code førte tidene og gjettet ikke årsaken denne gangen.
+
+Det vi lærte: en PRD kan ha riktig innhold og likevel være vanskelig å bruke. Historikken hører hjemme i en endringslogg og i git, og kravteksten skal si hva appen gjør nå. Når faglærer og vi bruker samme rubrikk, blir svaret mulig å sjekke punkt for punkt. Å bruke appen selv fant fem ting som evalueringen ikke fant. Et ønske fra en testperson kan være forståelig og likevel gå imot et krav. Da viser appen fakta, ikke råd.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
