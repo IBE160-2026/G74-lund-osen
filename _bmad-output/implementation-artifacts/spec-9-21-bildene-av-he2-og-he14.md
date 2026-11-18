@@ -53,7 +53,7 @@ sett på, og de viser bare demoen.
 | Del | Commit |
 |---|---|
 | `docs/appen/signalet-dag-for-dag-demo.png` (1280 × 977, BRFE i september 2026 med «Til oktober 2026») og `docs/appen/slett-notatet-demo.png` (1280 × 640, spørsmålet før notatet om BRFE fra 22.09 slettes, med kjøpet og salget), README-en, «Mappestruktur» og testene i `tests/test_docker.py` | `ed20b85e` |
-| Bildegrenen `pr-9-21-bilder` | `a8c66c70` |
+| Bildegrenen `pr-9-21-bilder`, pushet | `a8c66c70`, `c59effdd` |
 
 - Begge bildene er tatt to ganger med ny demobase, på port 62991 og 62992, og var
   like byte for byte. Spørsmålet før sletting nås med en POST, så skriptet
@@ -65,6 +65,32 @@ sett på, og de viser bare demoen.
 - Bildet av «Signalet dag for dag» er et utsnitt uten demolinja. Selskapet er
   oppdiktet, og alt-teksten og teksten under sier at det er demoen
   (gjennomgangen, ECH4).
+
+## Gjennomgangen 18.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `db6bc792`. 10 funn: 1 på middels og 9 lave. Avtrykkene og
+«Mappestruktur» er regnet ut på nytt av leseren og stemmer.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | middels | Feilmeldingen for å ta slettebildet på nytt viste til toppen av `/aksje/BRFE`, men spørsmålet nås bare med en POST | Rettet: `SLIK_NAAS_BILDET` sier hvordan begge bildene tas (`d5b3cafe`) |
+| BH1, ECH2 | lav | «etter «Slett»» stemte ikke med knappen ved notatet, «Slett notatet og det tenkte kjøpet» | Rettet i README-en, testen og LESMEG (`1229e3c7`, `c59effdd`) |
+| BH2 | lav | «som sier» i alt-teksten pekte på notatet, ikke spørsmålet | Rettet (`1229e3c7`) |
+| BH3 | lav | Kommentaren om rekkefølgen nevnte ikke de nye bildene | Rettet (`d5b3cafe`) |
+| BH4 | lav | En sti var brutt over to linjer i spesifikasjonen for 9.19 | Rettet (`7db19167`) |
+| BH5 | lav | LESMEG brukte navnene uten `etter-`, og bildegrenen var ikke pushet | Rettet, og pushet (`c59effdd`) |
+| ECH3 | lav | Knappen heter «Slett notatet og det tenkte kjøpet» på aksjesiden og «Slett notatet, kjøpet og salget» på spørsmålet | Står: det er appen fra 9.18, og koden endres ikke her. Spørsmål 1 |
+| ECH4 | lav | Bildet av «Signalet dag for dag» har ingen demolinje | Står: selskapet er oppdiktet, og teksten sier det (`7db19167`) |
+| VG1 | lav | Tekstfeltene i PNG-filene testes bare for to bilder, og faktaene i alt-tekstene ikke | Står: fantes før 9.21, og de nye bildene er sjekket for hånd |
+
+## Spørsmål til gruppen, med forslag
+
+1. **To navn på knappen ved et notat med kjøp og salg (ECH3).** På aksjesiden
+   heter den «Slett notatet og det tenkte kjøpet», og på spørsmålet «Slett
+   notatet, kjøpet og salget». *Forslag:* knappen på aksjesiden sier det
+   samme som spørsmålet når salget er notert, i en senere story der koden kan
+   endres. Det endrer ikke brukertest 2.
 
 ## Grenser
 
@@ -79,6 +105,6 @@ sett på, og de viser bare demoen.
 - [x] Vist i README-en ved notatene og ved aksjesiden, med alt-tekst og tekst under
 - [x] Rekkefølgen, avtrykkene og testene følger med, og bildegrenen er laget
 - [x] Spørsmål 1 i 9.19 har linja om bildene, og `issues.md` får den i føringen på main
-- [ ] Gjennomgangen er tatt
+- [x] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
