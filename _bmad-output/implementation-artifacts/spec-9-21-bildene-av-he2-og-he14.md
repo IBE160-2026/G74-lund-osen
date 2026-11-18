@@ -45,6 +45,24 @@ regel 3, 16, 19 og 22; ingen kode i `src/` og ingen ny migrasjon
 5. Spørsmål 1 i spesifikasjonen for 9.19 og punktet i `issues.md` får en datert
    linje om at bildene er lagt inn.
 
+## Bygget
+
+Bygget 18.11 av én agent i worktreen, og kontrollert i vinduet: begge bildene er
+sett på, og de viser bare demoen.
+
+| Del | Commit |
+|---|---|
+| `docs/appen/signalet-dag-for-dag-demo.png` (1280 × 977, BRFE i september 2026 med «Til oktober 2026») og `docs/appen/slett-notatet-demo.png` (1280 × 640, spørsmålet før notatet om BRFE fra 22.09 slettes, med kjøpet og salget), README-en, «Mappestruktur» og testene i `tests/test_docker.py` | `ed20b85e` |
+| Bildegrenen `pr-9-21-bilder` | `a8c66c70` |
+
+- Begge bildene er tatt to ganger med ny demobase, på port 62991 og 62992, og var
+  like byte for byte. Spørsmålet før sletting nås med en POST, så skriptet
+  klikker «Slett» og venter på den nye siden.
+- I README-en står lenken tilbake rett etter aksjesiden, og spørsmålet før
+  sletting rett etter notatene. README-en viser ingen bilder fra mobil.
+- Siden med spørsmålet har ingen steg i omvisningen, som investorsiden, så
+  raden øverst har ikke «Vis meg rundt». Det er appen slik den er.
+
 ## Grenser
 
 - Ingen API-kall, `data/` og `_privat/` røres ikke, og den ekte versjonen
@@ -54,10 +72,10 @@ regel 3, 16, 19 og 22; ingen kode i `src/` og ingen ny migrasjon
 
 ## Kontroll
 
-- [ ] To nye bilder fra demoen, tatt to ganger og like byte for byte
-- [ ] Vist i README-en ved notatene og ved aksjesiden, med alt-tekst og tekst under
-- [ ] Rekkefølgen, avtrykkene og testene følger med, og bildegrenen er laget
-- [ ] Spørsmål 1 i 9.19 og `issues.md` har linja om bildene
+- [x] To nye bilder fra demoen, tatt to ganger og like byte for byte
+- [x] Vist i README-en ved notatene og ved aksjesiden, med alt-tekst og tekst under
+- [x] Rekkefølgen, avtrykkene og testene følger med, og bildegrenen er laget
+- [x] Spørsmål 1 i 9.19 har linja om bildene, og `issues.md` får den i føringen på main
 - [ ] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
