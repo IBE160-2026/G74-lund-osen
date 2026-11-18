@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-18T11:03
+updated: 2026-11-18T13:12
 ---
 
 # Vurderingsmatrise for del 1
@@ -51,6 +51,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-17 (story 9.19):* 9.19 (PR #166, `fced670f`) er flettet. Styrken og retningen står bare én gang i tabellen i alle bredder, bildene av appen i `docs/appen/` viser rettingene fra 9.18, og README-en viser ikke lenger bildene fra mobil i en egen pil. Hele settet ble kjørt i CI på head-en `b5f5b77b`: 5975 bestått og 99 hoppet over i jobben `pytest` (kjøring 44168092781). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-18 (story 9.20):* 9.20, PRD-en mot faglærers rubrikk (PR #167, `307109e9`), er flettet. PRD-en har «Slik leser du PRD-en», krav for det som var bygget uten krav, og en sporingsfil for hver ID, låst av `tests/test_prd_sporing_9_20.py`. Svarbrevet til faglærer og «Teknologi og nøkler» er lenket fra README-en. Hele settet ble kjørt i CI på head-en `a9da567f`: 5987 bestått og 99 hoppet over i jobben `pytest` (kjøring 44280715580). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-11-18 (story 9.21):* 9.21 (PR #168, `0c2ab7d2`) er flettet. README-en viser to nye bilder av demoen: spørsmålet før et notat slettes og lenken tilbake i «Signalet dag for dag». Hele settet ble kjørt i CI på head-en `a858fe63`: 5987 bestått og 99 hoppet over i jobben `pytest` (kjøring 44300672153). Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
