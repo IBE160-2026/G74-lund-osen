@@ -2010,8 +2010,9 @@ DE_NYE_BILDENE = {
     # Story 9.21 (gruppens svar 17.11 kl. 22:18): «Signalet dag for dag» på aksjesiden for BRFE
     # med september valgt, bare delen (id-en signalet-dag-for-dag), klippet ut med 16 px over
     # og under, så lenken «Til oktober 2026» synes (HE14 i 9.18). Og spørsmålet før et notat
-    # slettes (HE2), siden «Slett» ved notatet om BRFE fra 22.09 går til, med det tenkte
-    # kjøpet og salget, 640 px, hele siden. Målt i Edge 18.11.
+    # slettes (HE2), siden knappen «Slett notatet og det tenkte kjøpet» ved notatet om BRFE
+    # fra 22.09 går til, 640 px, hele siden. Målt i Edge 18.11. Hvordan de tas på nytt,
+    # står i SLIK_NAAS_BILDET.
     "docs/appen/signalet-dag-for-dag-demo.png": ("/aksje/BRFE?maaned=2026-09", 1280, 977, FILENE_BAK_AKSJESIDEN),
     "docs/appen/slett-notatet-demo.png": ("/aksje/BRFE", 1280, 640, FILENE_BAK_SLETT_NOTAT),
 }
@@ -2020,6 +2021,8 @@ DE_NYE_BILDENE = {
 # (oversikten, aksjesiden, notatene på aksjesiden, investorsiden), Børsometer, Min liste
 # (Min liste, «Din egen liste: kom i gang», «Følg en aksje», notatene i Min liste), Mine
 # notater, Innstillinger og «Vis meg rundt». Toppen av oversikten står over knappen.
+# Story 9.21 (gruppens svar 17.11 kl. 22:18): «Signalet dag for dag» står rett etter
+# aksjesiden, og spørsmålet før et notat slettes rett etter notatene på aksjesiden.
 BILDENE_I_KNAPPEN = (
     SKJERMBILDET,
     AKSJESIDEBILDET,
@@ -2263,7 +2266,21 @@ SLIK_TAS_DE_NYE_BILDENE = (
     "er 390 px bred og {hoeyde} px høy, src={adresse}, og --virtual-time-budget=8000, så iframen er lastet "
     "(gjennomgangen, BH11). Mål bunnen av siden og endre høyden i DE_NYE_BILDENE hvis den "
     "har flyttet seg. Oppdater så AVTRYKK_BAK_DE_NYE_BILDENE[{bildet!r}] til {avtrykk} i samme commit."
+    "{merknad}"
 )
+# Gjennomgangen av 9.21 (ECH1): bildene som ikke tas som en side fra toppen. Spørsmålet før
+# sletting nås bare med en POST, og «Signalet dag for dag» er klippet ut etter id-en.
+SLIK_NAAS_BILDET = {
+    "docs/appen/slett-notatet-demo.png": (
+        " Bildet er ikke toppen av /aksje/BRFE: klikk «Slett notatet og det tenkte kjøpet» ved notatet"
+        " fra 22.09 på /aksje/BRFE (POST /aksje/BRFE/notat/slett), vent på «Slett notatet?», og ta"
+        " hele siden, 1280 × 640."
+    ),
+    "docs/appen/signalet-dag-for-dag-demo.png": (
+        " Bildet er bare delen med id-en signalet-dag-for-dag på /aksje/BRFE?maaned=2026-09, klippet"
+        " ut med 16 px over og under, så høyden er delens, ikke bunnen av siden."
+    ),
+}
 
 
 def _avtrykk_bak_bildet(filene: tuple[str, ...] = MALENE_BAK_BILDET) -> str:
@@ -2549,7 +2566,12 @@ class TestBildeneAvAppen:
         for bildet, (adresse, bredde, hoeyde, filene) in DE_NYE_BILDENE.items():
             avtrykk = _avtrykk_bak_bildet(filene)
             assert avtrykk == AVTRYKK_BAK_DE_NYE_BILDENE[bildet], SLIK_TAS_DE_NYE_BILDENE.format(
-                bildet=bildet, adresse=adresse, bredde=bredde, hoeyde=hoeyde, avtrykk=avtrykk
+                bildet=bildet,
+                adresse=adresse,
+                bredde=bredde,
+                hoeyde=hoeyde,
+                avtrykk=avtrykk,
+                merknad=SLIK_NAAS_BILDET.get(bildet, ""),
             )
 
     def test_de_nye_bildene_har_bredden_og_hoeyden_de_er_tatt_med(self):
