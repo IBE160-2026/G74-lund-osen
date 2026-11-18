@@ -68,6 +68,7 @@ Bygget 18.11 i vinduet, på grenen.
 | «51 børsdager» i FR-101 og i kilden, med en linje i endringsloggen | `46c7dde5` | `tests/test_boersdager_9_22.py` |
 | Sletteknappen ved et notat med kjøp og salg | `1185c652` | `test_knappen_ved_notatet_heter_som_i_spoersmaalet_med_salg` i `tests/test_notater.py`, på aksjesiden og i Min liste |
 | Spørsmål 7 i 9.20 og spørsmål 1 i 9.21, og 9.22 i `epics.md` og sprintstatusen | `b99bd3f3`, `b2f46f69` | – |
+| Bildene som viser knappen, og avtrykkene | `f0f5abec` | Avtrykkene i `tests/test_docker.py` |
 
 **Dagsfilene.** Hver «## »-overskrift utenfor kodeblokkene er en instruksjon
 eller beskjed. En Utført-linje nevner en seksjon med:
@@ -124,6 +125,22 @@ kjent fil og en kjent verdi i en annen fil merkes, også i diffen det siste døg
 **Regel 20** teller commits der forfatteren (med `.mailmap`) er Marian Osen eller
 Joakim Lund og den andre står som medforfatter. Merge-commits fra GitHub (to
 foreldre og committer «GitHub») og commits fra andre enn gruppen vises for seg.
+
+**Bildene.** Etter kveldsjobben 18.11 kl. 23:51–23:53 ble alle de 20 bildene i
+`docs/appen/` tatt på nytt av demoen på grenen, etter flettingen av main
+(`2516de61`), med skriptet og jobblista fra 9.19 og 9.21, på port 8922 og 8923,
+med en ny demobase hver gang. De to rundene var like byte for byte. Tre er nye,
+og de viser knappen ved notatet om BRFE fra 22.09: `notatene-brfe-demo.png`,
+`notatene-min-liste-demo.png` og `mobil/notatene-brfe-390-demo.png`. Bare
+teksten på knappen er endret. De andre 17 er byte for byte de samme, også
+`slett-notatet-demo.png`, fordi spørsmålet alt het «Slett notatet, kjøpet og
+salget». Avtrykkene er regnet ut på nytt, fordi `_notat.html` er med bak alle
+bildene. Før og etter står på bildegrenen `pr-9-22-bilder` med en LESMEG.
+
+**Testene lokalt** 18.11 og 19.11, én om gangen, på `f0f5abec`: `test_docker.py` 158,
+`test_notater.py` 152, `test_morgensjekken_9_22.py` 13, `test_boersdager_9_22.py` 1,
+`test_hjelpetekster.py` 54, `test_ryddighet.py` 36 og `test_ruff.py` 6, alle grønne.
+`--dokumentene` ga 3085 grønne og 7 hoppet over (13 minutter). Hele settet kjøres i CI.
 
 ## Morgensjekken mot main, før og etter
 
@@ -182,11 +199,11 @@ og kilden.
 
 ## Kontroll
 
-- [ ] Morgensjekken: dagsfilene, taggen, unntakene og regel 20, hver med en test som feiler før rettingen
-- [ ] Morgensjekken kjørt mot main før og etter, med utskriften her
-- [ ] «51 børsdager» i FR-101 og i kilden, med en linje i endringsloggen
-- [ ] Knappen har samme navn på aksjesiden og i spørsmålet, og bildene, avtrykkene og bildegrenen følger
+- [x] Morgensjekken: dagsfilene, taggen, unntakene og regel 20, hver med en test som feiler før rettingen
+- [x] Morgensjekken kjørt mot main før og etter, med utskriften her
+- [x] «51 børsdager» i FR-101 og i kilden, med en linje i endringsloggen
+- [x] Knappen har samme navn på aksjesiden og i spørsmålet, og bildene, avtrykkene og bildegrenen følger
 - [ ] Spørsmål 7 i 9.20, spørsmål 1 i 9.21 og punktene i `issues.md` har en datert linje
-- [ ] Gjennomgangen er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Gjennomgangen er tatt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
