@@ -50,7 +50,8 @@ def _antall(status):
 
 # Telt for hånd 18.11 kl. 22:00: hver «## »-overskrift utenfor kodeblokkene, og
 # om seksjonen har sin egen Utført-linje eller nevnes av en annen.
-# - 10.11: 11 overskrifter («## HH:MM, …»), hver med sin egen «**Utført:**».
+# - 10.11: 11 overskrifter, ti «## HH:MM, …» og «## 11:20» alene, hver med sin egen
+#   «**Utført:**».
 # - 16.11: 7. Utført-linja under kl. 11:20 nevner instruksjonen kl. 09:52 og svaret
 #   kl. 11:20; de fem andre har sin egen.
 # - 17.11: 12. Linja under kl. 13:19 nevner kl. 12:32, 12:41 og 13:19; linja under
@@ -58,8 +59,9 @@ def _antall(status):
 #   linja under kl. 18:27 nevner «instruksjonen om grensen»; de to linjene under
 #   kl. 22:50 nevner kl. 22:18 og 22:50 og «instruksjonen om PRD-en».
 # - 18.11 før instruksjonen kl. 21:41: 6. Beskjeden kl. 22:50 17.11 er limt inn på
-#   nytt og ikke ført på nytt. Linja under tillegget nevner kl. 16:03, som er
-#   klokkeslettet i «Limt inn kl. 16:03» under oppføringen for 16.11.
+#   nytt og ikke ført på nytt. Linja under tillegget nevner «instruksjonen kl. 16:03
+#   og tillegget». Begge er limt inn kl. 16:03, og tillegget er nevnt med første ord,
+#   så klokkeslettet gjelder oppføringen for 16.11.
 FOR_HAAND = {
     "2026-11-10.md": (11, {"utført": 11}),
     "2026-11-16.md": (7, {"utført": 7}),
@@ -85,9 +87,14 @@ class TestDagsfilene:
     def test_de_fire_utfallene(self):
         """Ville feilet hvis en linje ikke dekket dem den nevner, med
         klokkeslett, «om …» eller et storynummer, hvis en som er limt inn på
-        nytt, trengte Utført, eller hvis noe sjekken ikke kan avgjøre, sto som
-        «mangler» i stedet for «uklart». En overskrift i en kodeblokk teller
-        ikke."""
+        nytt og ikke ført på nytt, trengte Utført, eller hvis noe sjekken ikke
+        kan avgjøre, sto som «mangler» i stedet for «uklart». Gjennomgangen av
+        9.22: ville også feilet hvis en linje med etikett ga seksjonen den står
+        under, Utført når den bare nevner en annen (ECH1), hvis et klokkeslett to
+        seksjoner har, dekket begge (ECH2), hvis en dato ble tatt for et
+        storynummer eller et vanlig første ord dekket overskriften (ECH3), eller
+        hvis «limt inn på nytt» alene var nok (ECH4). En overskrift i en
+        kodeblokk teller ikke."""
         tekst = "\n".join(
             [
                 "# Instruksjoner",
@@ -101,13 +108,25 @@ class TestDagsfilene:
                 "**Utført (beskjeden kl. 12:00, og resten av instruksjonen om rettingene):** ferdig.",
                 "## Bildene av appen",
                 "## 13:00, beskjeden kl. 09:00, limt inn på nytt",
+                "Ordrett lik, og ikke ført på nytt.",
+                "## 13:30, beskjeden kl. 10:00, limt inn på nytt",
                 "## Story 9.22 på grenen",
                 "## 14:00, noe annet",
                 "**Utført, 9.22:** ferdig.",
+                "## 15:00, kontrollen av lista",
                 "**Utført (det meste av bildene):** delvis.",
-                "## 16:00, en siste",
+                "## Oppføringen om A",
+                "Limt inn kl. 16:03.",
+                "**Utført (instruksjonen kl. 16:03):** ferdig.",
+                "## Oppføringen om B",
+                "Limt inn kl. 16:03.",
+                "## Notatene fra 16.11",
+                "## 16:40, svarene om dagen",
+                "**Utført, 16.11:** ferdig.",
+                "**Utført (om svarene):** ferdig.",
+                "## 17:00, en siste",
                 "```text",
-                "## 17:00, inne i en blokk",
+                "## 17:30, inne i en blokk",
                 "**Utført:** teller ikke",
                 "```",
             ]
@@ -120,10 +139,26 @@ class TestDagsfilene:
             ("12:00, en beskjed", "utført"),
             ("Bildene av appen", "uklart"),
             ("13:00, beskjeden kl. 09:00, limt inn på nytt", "limt inn på nytt"),
+            ("13:30, beskjeden kl. 10:00, limt inn på nytt", "uklart"),
             ("Story 9.22 på grenen", "utført"),
-            ("14:00, noe annet", "utført"),
-            ("16:00, en siste", "mangler"),
+            # «Utført, 9.22» nevner bare storyen over, og neste seksjon har sin egen linje.
+            ("14:00, noe annet", "uklart"),
+            ("15:00, kontrollen av lista", "utført"),
+            ("Oppføringen om A", "utført"),
+            ("Oppføringen om B", "uklart"),
+            ("Notatene fra 16.11", "uklart"),
+            ("16:40, svarene om dagen", "utført"),
+            ("17:00, en siste", "mangler"),
         ]
+
+    def test_en_linje_som_nevner_en_annen_dekker_ikke_der_den_staar(self):
+        """Gjennomgangen av 9.22 (ECH1), med dagsfila for 17.11: uten linja
+        «**Utført (beskjedene kl. 22:18 og 22:50):**» mangler kl. 22:18 og
+        22:50, selv om linja om PRD-en står under kl. 22:50."""
+        linjer = _dagsfila("2026-11-17.md").split("\n")
+        tekst = "\n".join(l for l in linjer if not l.startswith("**Utført (beskjedene kl. 22:18 og 22:50)"))
+        status = _dagsfil_status()["dagsfil_status"](tekst)
+        assert [h[:5] for h, s in status if s != "utført"] == ["22:18", "22:50"], status
 
     def test_utskriften_av_del_2(self, capsys):
         """Ville feilet hvis del 2 skrev «0 instruksjoner» for dagsfilene, som
@@ -229,7 +264,17 @@ class TestLekkasjesjekken:
             "tests/test_ki_tjenestene.py": f"x = '{OPPDIKTET_ANTHROPIC}'\n",
             "tests/annen.py": f"x = '{OPPDIKTET_ANTHROPIC}'\n",
         }
-        diff = "\n".join(["@@abc1234", "+++ b/tests/test_ki_tekst.py", f"+{EODHD}hemmelig", f"+{EODHD}nyekte12345", ""])
+        diff = "\n".join(
+            [
+                "@@abc1234",
+                "+++ b/tests/test_ki_tekst.py",
+                f"+{EODHD}hemmelig",
+                f"+{EODHD}nyekte12345",
+                "+++ b/tests/annen.py",
+                f"+x = '{OPPDIKTET_ANTHROPIC}'",
+                "",
+            ]
+        )
         linjer = self._kjoer(tmp_path, capsys, filene, diff)
         assert [linje for linje in linjer if linje.startswith("FIL:")] == ["FIL: src/ny.json"], linjer
         assert sorted(linje for linje in linjer if linje.startswith("NOEKKEL?:")) == sorted(
@@ -238,13 +283,36 @@ class TestLekkasjesjekken:
                 "NOEKKEL?: tests/annen.py:1 (Anthropic-noekkel)",
                 "NOEKKEL?: tests/annen.py:1 (OpenAI-noekkel)",
                 "NOEKKEL?: commit abc1234, tests/test_ki_tekst.py (EODHD_API_KEY med verdi, lagt til siste doegn)",
+                "NOEKKEL?: commit abc1234, tests/annen.py (Anthropic-noekkel, lagt til siste doegn)",
+                "NOEKKEL?: commit abc1234, tests/annen.py (OpenAI-noekkel, lagt til siste doegn)",
             ]
         ), linjer
 
+    def test_de_tolv_treffene_i_de_fire_testfilene_er_borte(self, tmp_path, capsys):
+        """Gjennomgangen av 9.22 (VG2): ville feilet hvis en av de tolv
+        plassholderne i de fire ekte testfilene ble merket, for eksempel
+        verdien med anførselstegn foran i test_din_egen_liste_8_22.py, eller
+        hvis .json-filene i repoet ble merket."""
+        navnene = [
+            "tests/test_din_egen_liste_8_22.py",
+            "tests/test_ki_tekst.py",
+            "tests/test_ki_tjenestene.py",
+            "tests/test_snarveien_foer_nettleseren_3_7.py",
+            "src/demo_ki_tekster.json",
+            "src/demo_ki_dagen.json",
+            "tests/demo_ki_tekster_versjon_2.json",
+            "docs/bilder/investorsider/bobler.json",
+            "src/static/investorsider/bobler.json",
+        ]
+        filene = {n: (ROT / n).read_text(encoding="utf-8") for n in navnene}
+        linjer = self._kjoer(tmp_path, capsys, filene)
+        assert linjer[1:] == [f"{len(navnene)} sporede filer; 0 som ikke skal vaere der; 0 mulige noekler"], linjer
+
     def test_unntakene_finnes_og_har_en_grunn(self):
         """Ville feilet hvis et unntak sto uten grunn, eller pekte på en fil
-        eller en verdi som ikke lenger finnes, så lista ble gammel. Fire
-        .json-filer og verdiene bak de tolv treffene i fire testfiler, 18.11."""
+        eller en verdi som ikke lenger finnes, så lista ble gammel. Fem
+        .json-filer, fire nye og den fra 3.4b, og verdiene bak de tolv treffene i
+        fire testfiler, 18.11."""
         g = {"re": re}
         kode = _del(9).split('print("\\n== 9 LEKKASJESJEKK")', 1)[0]
         exec(kode, g)
@@ -264,7 +332,14 @@ class TestLekkasjesjekken:
 
 def _del_10(logg: str, capsys) -> list[str]:
     def git(*args):
-        return (0, "") if args[0] == "shortlog" else (0, logg)
+        if args[0] == "shortlog":
+            return 0, ""
+        # Gjennomgangen av 9.22 (VG1): forfatteren med .mailmap (%aN), committeren
+        # (%cn), foreldrene og medforfatterne, skilt med tegn som ikke står i navn.
+        assert args[0] == "log" and args[-1].startswith("--format="), args
+        for felt in ("%h", "%aN", "%cn", "%p", "trailers:key=Co-authored-by,valueonly,separator=%x1d"):
+            assert felt in args[-1], (felt, args)
+        return 0, logg
 
     exec(_del(10), {"git": git, "NAA": datetime(2026, 11, 18, 21, 47), "timedelta": timedelta})
     return [linje.strip() for linje in capsys.readouterr().out.splitlines() if linje.strip()]
@@ -292,6 +367,6 @@ class TestRegel20:
         linjer = _del_10(logg, capsys)
         assert linjer[2:] == [
             "regel 20: 3 av gruppens commits, 2 med den andre som medforfatter; uten: aaaaaaa3",
-            "utenfor gruppen, for seg (faglaerer): 1 (bbbbbbb1 Bård Pettersen)",
+            "utenfor gruppen, for seg (faglaerer og andre): 1 (bbbbbbb1 Bård Pettersen)",
             "merge-commits fra GitHub, for seg: 1 (ccccccc1)",
         ], linjer

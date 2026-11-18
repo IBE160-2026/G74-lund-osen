@@ -110,21 +110,32 @@ if len(commits) > 25:
 # ikke foert paa nytt, trenger ingen. Kan sjekken ikke avgjoere det, staar det
 # «uklart», ikke «mangler». Foer 9.22 kjente den bare «## HH:MM» alene og
 # «**Utført:**», saa den fant 0 instruksjoner i dagsfilene fra 11.11.
+# Gjennomgangen av 9.22 (ECH1–ECH4): en linje med etikett gjelder seksjonen
+# den staar under bare naar den ikke nevner en annen. Et klokkeslett som flere
+# seksjoner har (samme «Limt inn kl.»), avgjoer ingenting alene og gir
+# «uklart». Foerste ord hopper over de vanlige ordene, og et storynummer maa
+# staa som «story X.Y» i overskriften, saa en dato ikke tas for et nummer.
 UTFOERT = re.compile(r"^\*\*Utført(?: \((.+?)\)|, (.+?))?:\*\*")
 TID = re.compile(r"\b\d\d:\d\d\b")
 SMAAORD = {"svarene", "svaret", "instruksjonen", "beskjeden", "beskjedene", "tillegget", "etter",
-           "spørsmål", "spørsmålene", "storyen", "story", "resten", "samme", "dagen"}
+           "spørsmål", "spørsmålene", "storyen", "story", "resten", "samme", "dagen", "oppføringen"}
 
 
-def _dekker(tider, hodeord, storyer, etikett, nevnt):
-    """Om en Utfoert-linje med denne etiketten nevner seksjonen: et av
-    klokkeslettene, «om <foerste ord i overskriften>», eller storynummeret alene."""
-    if tider & nevnt:
-        return True
-    if hodeord and re.search(r"\bom " + re.escape(hodeord) + r"\b", etikett):
-        return True
-    m = re.fullmatch(r"(?:for )?(\d+\.\d+[a-z]?)", etikett)
-    return bool(m and m[1] in storyer)
+def _seksjonen(hode, start):
+    """Klokkeslettet, foerste ord, storynumrene og de lengre ordene i en seksjon.
+    Klokkeslettet er seksjonens eget: foerst i overskriften, ellers det foerste
+    «kl.» i overskriften, ellers «Limt inn kl.» foerst i teksten. Et senere
+    «kl.» i overskriften viser til noe annet («tillegg til beskjeden kl. 12:32»)."""
+    tider = (re.findall(r"^(\d\d:\d\d)", hode) or re.findall(r"kl\. (\d\d:\d\d)", hode)[:1]
+             or re.findall(r"^Limt inn kl\. (\d\d:\d\d)", start, re.M)[:1])
+    tider = set(tider)
+    uten_tid = re.sub(r"^\d\d:\d\d(?:[–-]\d\d:\d\d)?(?: \d\d\.\d\d)?,\s*", "", hode)
+    ord_ = re.findall(r"[^\W\d_][\wæøå-]*", uten_tid.lower())
+    hodeord = next((o for o in ord_ if len(o) >= 4 and o not in SMAAORD), "")
+    storyer = set(re.findall(r"\b[Ss]tory (\d+\.\d+[a-z]?)\b", hode))
+    viktige = {o for o in ord_ if len(o) >= 5 and o not in SMAAORD}
+    forsteord = ord_[0] if ord_ else ""
+    return tider, hodeord, storyer, viktige, forsteord
 
 
 def dagsfil_status(tekst):
@@ -133,14 +144,12 @@ def dagsfil_status(tekst):
     seksjoner, linjene = [], []
     for _, linje in utenfor_blokker(tekst):
         if linje.startswith("## "):
-            seksjoner.append({"overskrift": linje[3:].strip(), "start": [], "egen": False})
+            seksjoner.append({"overskrift": linje[3:].strip(), "start": []})
             continue
         if not seksjoner:
             continue
-        s = seksjoner[-1]
         m = UTFOERT.match(linje)
         if m:
-            s["egen"] = True
             etikett = (m[1] or m[2] or "").strip()
             # Uten etikett: bare foerste setning, som «Instruksjonen kl. 11:17,
             # med svaret kl. 11:19.» (13.10).
@@ -148,26 +157,60 @@ def dagsfil_status(tekst):
             nevnt = set(TID.findall(etikett))
             nevnt |= set(re.findall(r"(?:[Ii]nstruksjon|[Bb]eskjed|[Ss]var|[Tt]illegg)\w* kl\. (\d\d:\d\d)", foerste))
             linjene.append((len(seksjoner) - 1, etikett.lower(), nevnt))
-        elif len(s["start"]) < 4 and linje.strip():
-            s["start"].append(linje)
+        elif len(seksjoner[-1]["start"]) < 4 and linje.strip():
+            seksjoner[-1]["start"].append(linje)
+    info = [_seksjonen(s["overskrift"], "\n".join(s["start"])) for s in seksjoner]
+    hvor_mange = {}
+    for tider, *_ in info:
+        for t in tider:
+            hvor_mange[t] = hvor_mange.get(t, 0) + 1
+    dekket, tvil, egne = set(), set(), set()
+    for under, etikett, nevnt in linjene:
+        klart, delt, med_ord = set(), {}, set()
+        for j, (tider, hodeord, storyer, _, forsteord) in enumerate(info):
+            treff = tider & nevnt
+            m = re.fullmatch(r"(?:for )?(\d+\.\d+[a-z]?)", etikett)
+            if (any(hvor_mange[t] == 1 for t in treff)
+                    or (hodeord and re.search(r"(?:^|\bom )" + re.escape(hodeord) + r"\b", etikett))
+                    or (m and m[1] in storyer)):
+                klart.add(j)
+            for t in treff:
+                delt.setdefault(t, set()).add(j)
+            if forsteord and re.search(r"(?:^|\bog |\bom )" + re.escape(forsteord) + r"\b", etikett):
+                med_ord.add(j)
+        # Et klokkeslett flere seksjoner har, gjelder den ene som linja ikke
+        # alt nevner med foerste ord («instruksjonen kl. 16:03 og tillegget»
+        # under «Tillegget: …» 18.11). Ellers er det «uklart».
+        if under in med_ord:
+            klart.add(under)
+        for js in delt.values():
+            if len(js) > 1:
+                igjen = js - klart - med_ord
+                if len(igjen) == 1:
+                    klart |= igjen
+                else:
+                    tvil |= js - klart
+        dekket |= klart
+        # Linja gjelder seksjonen den staar under, uten etikett eller naar den
+        # ikke nevner noen annen klart.
+        if not etikett or not klart - {under}:
+            dekket.add(under)
+            egne.add(under)
     ut = []
     for i, s in enumerate(seksjoner):
         hode, start = s["overskrift"], "\n".join(s["start"])
-        tider = set(re.findall(r"^(\d\d:\d\d)", hode)) | set(re.findall(r"kl\. (\d\d:\d\d)", hode))
-        tider |= set(re.findall(r"^Limt inn kl\. (\d\d:\d\d)", start, re.M))
-        uten_tid = re.sub(r"^\d\d:\d\d(?:[–-]\d\d:\d\d)?(?: \d\d\.\d\d)?,\s*", "", hode)
-        ord_ = re.findall(r"[\wæøå-]+", uten_tid.lower())
-        hodeord = ord_[0] if ord_ else ""
-        storyer = set(re.findall(r"\b\d+\.\d+[a-z]?\b", hode))
-        if s["egen"] or any(_dekker(tider, hodeord, storyer, e, n) for _, e, n in linjene):
+        limt = "limt inn på nytt" in hode.lower() or "limt inn på nytt" in start.lower()
+        if i in dekket:
             status = "utført"
-        elif "limt inn på nytt" in hode.lower() or "ikke ført på nytt" in start:
+        elif limt and "ikke ført på nytt" in start:
             status = "limt inn på nytt"
         else:
-            viktige = {o for o in ord_ if len(o) >= 5 and o not in SMAAORD}
             senere = [e for j, e, _ in linjene if j > i and e]
-            delvis = any(viktige & set(re.findall(r"[\wæøå-]+", e)) for e in senere)
-            status = "uklart" if delvis else "mangler"
+            delvis = any(info[i][3] & set(re.findall(r"[\wæøå-]+", e)) for e in senere)
+            # Har neste seksjon sin egen linje, kan den dekke begge, som en
+            # instruksjon med en beskjed rett etter («## 21:54» og «## 21:56»
+            # 18.10). Det kan ikke sjekken avgjoere.
+            status = "uklart" if limt or i in tvil or delvis or i + 1 in egne else "mangler"
         ut.append((hode, status))
     return ut
 
@@ -471,7 +514,7 @@ for blokk in med.split("\x1e")[1:]:
             uten.append(h)
 print(f"  regel 20: {gruppens} av gruppens commits, {gruppens - len(uten)} med den andre som medforfatter"
       + (f"; uten: {', '.join(uten[:10])}" if uten else ""))
-print(f"  utenfor gruppen, for seg (faglaerer): {len(andre)}" + (f" ({', '.join(andre[:10])})" if andre else ""))
+print(f"  utenfor gruppen, for seg (faglaerer og andre): {len(andre)}" + (f" ({', '.join(andre[:10])})" if andre else ""))
 print(f"  merge-commits fra GitHub, for seg: {len(merger)}" + (f" ({', '.join(merger[:10])})" if merger else ""))
 
 # 11. Tall i gaarsdagens dokumentendringer, til kontrollregning
