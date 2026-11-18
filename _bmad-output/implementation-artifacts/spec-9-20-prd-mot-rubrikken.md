@@ -148,6 +148,12 @@ Et spørsmål stopper ikke arbeidet.
 6. **Startskriptene** har variabler som bare brukes av testene (`OSE_START_*` og
    `OSE_SKRIVEBORD`), og «Teknologi og nøkler» beskriver dem som testkroker.
    *Forslag:* behold.
+7. **«51 handelsdager» i FR-101.** `--dokumentene` kl. 10:23 fant at hjelpeteksten
+   om sjekkene uten signal siterer setningen «Signalet krever 51 handelsdager» i
+   `prd.md` ordrett som kilde. Koden i `src/` endres ikke her, så den ene
+   setningen står med «handelsdager», som før. *Forslag:* kilden i
+   `src/hjelpetekster.py` rettes til «51 børsdager» i en senere story der kode kan
+   endres, og da byttes ordet også her.
 
 ## Grenser
 
