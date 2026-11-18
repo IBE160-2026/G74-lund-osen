@@ -2,18 +2,18 @@
 title: "Teknologi og nøkler"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-17T22:30
+updated: 2026-11-18T09:50
 ---
 
 # Teknologi og nøkler
 
-Oversikt over OSE Signal, skrevet i samme form som [`technology.md`](technology.md), faglærers mal, som beskriver et annet prosjekt. Den er skrevet for at appen skal kunne settes opp igjen på en annen maskin. **Ingen hemmelige verdier er lest eller gjengitt**, bare navnene på variablene. Alt er sjekket mot filene på grenen: [`pyproject.toml`](../../../pyproject.toml), `uv.lock`, [`.env.example`](../../../.env.example), [`Dockerfile`](../../../Dockerfile), [`compose.yaml`](../../../compose.yaml), `src/` (særlig `app.py`, `fetch_prices.py`, `ki_tekst.py`, `ki_lokal.py`, `ki_gemini.py`, `ki_anthropic.py`, `ki_openai.py`, `lagring_sqlite.py`, `demo.py`), `start/`, `.github/workflows/`, [`README.md`](../../../README.md) og [`docs/installasjon.md`](../../../docs/installasjon.md). Kravene står i [PRD-en](../prds/prd-G74-lund-osen-2026-09-20/prd.md), og beslutningene i [arkitekturen](architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md).
+Oversikt over OSE Signal, skrevet i samme form som [`technology.md`](technology.md), faglærers mal, som beskriver et annet prosjekt. Den er skrevet for at appen skal kunne settes opp igjen på en annen maskin. **Ingen hemmelige verdier er lest eller gjengitt**, bare navnene på variablene. Alt er sjekket mot filene på main 17.11 (`e5673cbb`): [`pyproject.toml`](../../../pyproject.toml), `uv.lock`, [`.env.example`](../../../.env.example), [`Dockerfile`](../../../Dockerfile), [`compose.yaml`](../../../compose.yaml), `src/` (særlig `app.py`, `fetch_prices.py`, `ki_tekst.py`, `ki_lokal.py`, `ki_gemini.py`, `ki_anthropic.py`, `ki_openai.py`, `lagring_sqlite.py`, `demo.py`), `start/`, `.github/workflows/`, [`README.md`](../../../README.md) og [`docs/installasjon.md`](../../../docs/installasjon.md). Kravene står i [PRD-en](../prds/prd-G74-lund-osen-2026-09-20/prd.md), og beslutningene i [arkitekturen](architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md).
 
 ---
 
 ## 1. Hva systemet er
 
-En lokal webapp som viser 15 aksjer på Oslo Børs, opptil 18 med «Følg en aksje». Tre sjekker, trend, bevegelse og interesse, gir hver aksje en signalstyrke fra 0 til 3, og KI kan forklare signalet med ord. Appen har to deler: webserveren, som viser sidene fra basen, og hentekommandoen, som henter sluttkursene fra EODHD, regner vurderingene og lager KI-tekstene.
+En lokal webapp som viser 15 aksjer på Oslo Børs, opptil 18 med «Følg en aksje». Tre sjekker, trend, bevegelse og interesse, gir hver aksje en signalstyrke fra 0 til 3, og KI kan forklare signalet med ord. Appen har to deler: webserveren, som viser sidene fra basen, og hentingen, kommandoen som henter sluttkursene fra EODHD, regner vurderingene og lager KI-tekstene (ordlista i PRD-en).
 
 **Prinsippene (verdt å kopiere):**
 
@@ -37,7 +37,7 @@ Nettleser (bare på maskinen)
 └──────────────────────────┘ m.m.   └──────────────▲───────────────┘
                                                    │ skriver
 ┌──────────────────────────┐                       │
-│ hentekommandoen          │───────────────────────┘
+│ hentingen                │───────────────────────┘
 │ src/fetch_prices.py      │──► data/raa/ (øyeblikksbildene, skrives én gang)
 │ EODHD_API_KEY, OSE_KI_*  │──► EODHD: /api/eod (kursene), /api/user (kvoten)
 └──────────┬───────────────┘
@@ -54,7 +54,7 @@ eller kveldsjobben i Oppgaveplanlegging (start/kveldshenting.ps1).
 | Webserveren (`src/app.py`) | Flask-appen, servert av waitress. Viser sidene fra basen, henter aldri og har ingen nøkkel. Skriver bare brukerens egne valg, som Min liste, innstillingene og notatene | nei, bare 127.0.0.1 |
 | SQLite-basen | `data/db/ose.db` med kursene, vurderingene og KI-tekstene. Demobasen `data/db/demo.db` ligger ved siden av (`lagring_sqlite.py`) | nei |
 | Øyeblikksbildene | `data/raa/`, svarene fra EODHD som JSON, skrevet én gang og aldri om (AD-6, NFR-07) | nei |
-| Hentekommandoen | `src/fetch_prices.py`: sjekker kvoten, henter kursene og hovedindeksen, skriver vurderingene og så KI-tekstene. Nekter på en børsdag før kl. 22:00, utenom første henting i en tom base (FR-401) | nei |
+| Hentingen | `src/fetch_prices.py`: sjekker kvoten, henter kursene og hovedindeksen, skriver vurderingene og så KI-tekstene. Nekter på en børsdag før kl. 22:00, utenom første henting i en tom base (FR-401) | nei |
 | Demokommandoen | `src/demo.py` lager demobasen med 15 oppdiktede selskaper. Ferdige KI-tekster følger med i `src/demo_ki_tekster.json` | nei |
 | EODHD | Ekstern kilde: `https://eodhd.com/api/eod` for sluttkursene og `https://eodhd.com/api/user` for kvoten (`fetch_prices.py`) | ekstern |
 | Ollama med Gemma | Standardmodellen for KI-teksten, `gemma4:e4b` på `http://127.0.0.1:11434` (`ki_lokal.py`) | nei |
@@ -102,7 +102,7 @@ Avhengighetene er bare de fem i `pyproject.toml`: flask, requests, python-dotenv
 
 | Del | Valg |
 | --- | --- |
-| Hvor | Bare lokalt, på maskinen. Webserveren lytter på `127.0.0.1:8000`, også i Docker, der `compose.yaml` binder porten bare til 127.0.0.1 («betingelsen fra EODHD 21.09: lokalt, ikke publisert») |
+| Hvor | Bare lokalt, på maskinen. Uten Docker lytter webserveren på `127.0.0.1:8000`. I Docker lytter waitress på `0.0.0.0:8000` inne i containeren (`Dockerfile`), og `compose.yaml` binder porten på maskinen bare til 127.0.0.1 («betingelsen fra EODHD 21.09: lokalt, ikke publisert») |
 | Start uten Docker | Dobbeltklikk, eller `uv run python src/app.py` (med `--demo` for demoen), som bruker Flasks egen server uten debug på port 8000. Skriptene starter `waitress-serve --listen=127.0.0.1:8000 --threads=8 app:app` |
 | Start med Docker | `docker compose up --build` for den ekte versjonen, `docker compose up --build demo` for demoen. Begge bruker port 8000, så bare én kan kjøre om gangen |
 | Henting | Etter kl. 22:00 på en børsdag, med `uv run python src/fetch_prices.py` eller `docker compose run --rm hent` |
@@ -120,7 +120,7 @@ Typene: **hemmelig** (står bare i `.env`, som aldri committes), **ikke hemmelig
 
 | Variabel | Type | Hvor du får den | Hva den gjør |
 | --- | --- | --- | --- |
-| `EODHD_API_KEY` | hemmelig | Gratiskonto på eodhd.com: «API token» under «Dashboard» | Nøkkelen hentekommandoen bruker mot EODHD. Mangler den, stopper hentingen før første kall. Webserveren og demoen bruker den ikke |
+| `EODHD_API_KEY` | hemmelig | Gratiskonto på eodhd.com: «API token» under «Dashboard» | Nøkkelen hentingen bruker mot EODHD. Mangler den, stopper hentingen før første kall. Webserveren og demoen bruker den ikke |
 | `OSE_KI_TJENESTE` | ikke hemmelig | Settes selv, eller av startskriptet første gang | `lokal`, `gemini`, `anthropic`, `openai` eller `av`. Uten variabelen gjelder `lokal`; en tom eller ukjent verdi gir ingen KI-tekst (FR-608) |
 | `OSE_KI_OLLAMA_URL` | ikke hemmelig, valgfri | Settes selv | Adressen til Ollama. Standard er `http://127.0.0.1:11434`; `compose.yaml` og kveldsjobben setter den selv. Peker den bort fra maskinen, sier hentingen at prompten sendes dit |
 | `OSE_KI_GEMINI_NOKKEL` | hemmelig, valgfri | Egen konto hos Google for Gemini API | Brukes bare med `OSE_KI_TJENESTE=gemini`. Modellen er `gemini-3.5-flash-lite` |
