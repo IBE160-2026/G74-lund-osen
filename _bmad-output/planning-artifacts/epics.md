@@ -5500,3 +5500,5 @@ Som **den som leser README-en før brukertest 2** vil jeg se spørsmålet før e
 - Ingen bilder fra mobil i README-en
 
 **Avhenger av:** 9.18, 9.19. **Én økt:** ja.
+
+*Lagt til 2026-11-18:* 9.21 er squash-flettet med PR #168 i `0c2ab7d2` kl. 13:11, låst til head-en `a858fe63`, etter instruksjonen om svarene i 9.20 og bildene i `docs/ai-prompts/2026-11-18.md`, uten nytt ja. README-en viser bildene av spørsmålet før et notat slettes og lenken tilbake i «Signalet dag for dag». CI var grønn i alle jobbene (run 44300672153), med 5987 bestått og 99 hoppet over i jobben `pytest`.

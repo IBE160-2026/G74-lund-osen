@@ -2,7 +2,7 @@
 title: 'Story 9.21: bildene av spørsmålet før sletting og lenken tilbake'
 type: 'docs'
 created: '2026-11-18'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '06523402'
 context:
@@ -106,5 +106,12 @@ lesing, på `db6bc792`. 10 funn: 1 på middels og 9 lave. Avtrykkene og
 - [x] Rekkefølgen, avtrykkene og testene følger med, og bildegrenen er laget
 - [x] Spørsmål 1 i 9.19 har linja om bildene, og `issues.md` får den i føringen på main
 - [x] Gjennomgangen er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
-- [ ] CI er grønn i alle jobbene
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: `--dokumentene` på `a858fe63` kl. 12:44–13:05, med 3070 bestått og 7 hoppet over, etter én kjøring som ble stoppet for lite minne
+- [x] CI er grønn i alle jobbene (run 44300672153 på `a858fe63`, med 5987 bestått og 99 hoppet over i `pytest`)
+
+## Flettet 18.11
+
+CI var grønn i alle fire jobbene på head-en `a858fe63` (run 44300672153). Ingen
+funn på middels eller høy grad sto åpne (regel 25). PR #168 ble squash-flettet i
+`0c2ab7d2` kl. 13:11, låst til `a858fe63`, uten nytt ja. Bildegrenen
+`pr-9-21-bilder` er pushet (`c59effdd`).
