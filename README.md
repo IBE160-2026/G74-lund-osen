@@ -220,9 +220,11 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 
 - [Product Brief](_bmad-output/planning-artifacts/product-brief.md): versjon 8, laget etter [tilbakemeldingen fra faglærer 06.10](_bmad-output/planning-artifacts/tilbakemelding-product-brief.md) på versjon 7 (taggen `arbeidskrav-product-brief-v7`), og låst i taggen `arbeidskrav-product-brief-v8` (commit `52023c9`)
 - [PRD](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/), med begrunnelser og målinger: skrevet om 12.11 etter [tilbakemeldingen fra faglærer](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd.md) på versjonen i taggen `prd-vurdert-2026-11-12`, med historikken i [endringsloggen](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd-endringslogg.md)
+- [Svaret på tilbakemeldingen på PRD-en](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/tilbakemelding-prd-svar.md): punkt for punkt hva som er gjort, med tallene for linjer og ord, og [sporingen](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd-sporing.md) av hvert krav til storyene og testene
 - [Relevanseksperimentet](_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/relevanseksperiment.md)
 - [Arkitektur](_bmad-output/planning-artifacts/architecture/architecture-G74-lund-osen-2026-09-22/ARCHITECTURE-SPINE.md)
 - [Teknologioversikt fra faglærer](_bmad-output/planning-artifacts/architecture/technology.md): en referanse faglærer la inn 12.11, som beskriver et annet prosjekt, Website V2 hos Pytagoras Forlag, ikke OSE Signal
+- [Teknologi og nøkler](_bmad-output/planning-artifacts/architecture/teknologi-og-noekler.md): OSE Signal i samme form, med tjenestene, teknologien, navnene på nøklene og miljøvariablene (aldri verdiene) og en sjekkliste for å sette opp appen igjen
 - [Epics og stories](_bmad-output/planning-artifacts/epics.md)
 - [Designregler](_bmad-output/planning-artifacts/designregler.md)
 - [Utdrag fra designtavla 13.10](_bmad-output/planning-artifacts/designutdrag-2026-10-13.md): grunnlaget for planen til story 8.0d

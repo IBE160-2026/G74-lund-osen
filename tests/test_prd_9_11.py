@@ -20,6 +20,8 @@ ROT = Path(__file__).resolve().parent.parent
 MAPPA = ROT / "_bmad-output" / "planning-artifacts" / "prds" / "prd-G74-lund-osen-2026-09-20"
 PRD = MAPPA / "prd.md"
 ENDRINGSLOGGEN = MAPPA / "prd-endringslogg.md"
+# Story 9.20: svaret på tilbakemeldingen, ved siden av faglærers fil.
+SVARET = MAPPA / "tilbakemelding-prd-svar.md"
 TAGGEN = "prd-vurdert-2026-11-12"
 TAGGENS_STI = "_bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md"
 
@@ -203,7 +205,10 @@ TAGGENS_ANKRE = (
 )
 ID = re.compile(r"\bN?FR-\d{3}A?\b|\bNFR-\d\d\b")
 # Gruppens svar 12.11 kl. 20:04 (spørsmål 14): Min liste får eget krav.
-NYE_KRAV = ("FR-111",)
+# Story 9.20 (gruppens svar 17.11 kl. 12:29): notatene med «Etterpå»
+# (FR-208), de tenkte kjøpene og salgene (FR-209), «Din egen liste» (FR-112)
+# og «Følg en aksje» (FR-415) får egne krav, med nye ID-er i sine avsnitt (V1).
+NYE_KRAV = ("FR-111", "FR-112", "FR-208", "FR-209", "FR-415")
 KRAVOVERSKRIFT = re.compile(r"^(#{3,4}) ((?:FR-\d{3}A?|NFR-\d\d)) — .+$", re.MULTILINE)
 
 
@@ -257,13 +262,16 @@ def test_ingen_andre_daterte_merker_storynummer_eller_navn_i_prd():
 
 def test_brukerreisen_og_ordlista():
     """4.3. Ville feilet hvis UJ-1 manglet climax eller edge, eller ordlista
-    ikke hadde 8–10 ord."""
+    ikke hadde 8–12 ord."""
     tekst = _prd()
     uj = tekst.split("### Brukerreisen UJ-1\n", 1)[1].split("\n### ", 1)[0]
     assert "**UJ-1." in uj and "*Climax:*" in uj and "*Edge:*" in uj
     ordlista = tekst.split("### Ordliste\n", 1)[1].split("\n---\n", 1)[0]
     rader = [r for r in ordlista.splitlines() if r.startswith("| **")]
-    assert 8 <= len(rader) <= 10, len(rader)
+    # Story 9.20 (gruppens svar 17.11 kl. 12:29, V7 i valideringen): ordlista
+    # har også «Oversikten» og «KI-teksten», så ordene brukes likt overalt.
+    # Tilbakemeldingen foreslo 8–10 ord, og grensen er 12.
+    assert 8 <= len(rader) <= 12, len(rader)
 
 
 @pytest.mark.parametrize("n", [1, 2, 3])
@@ -366,14 +374,23 @@ def test_alle_lenker_til_ankre_i_prd_virker():
 
 def test_endringsloggen_lenkes_oeverst():
     """Ville feilet hvis lenken til endringsloggen ikke sto før «Kort
-    fortalt», eller endringsloggen manglet en rad for et punkt i
-    tilbakemeldingen."""
+    fortalt», eller svaret på tilbakemeldingen manglet en rad for et punkt i
+    tilbakemeldingen. Story 9.20 (gruppens svar 17.11 kl. 12:29, V12 i
+    valideringen): tabellen er flyttet fra endringsloggen til svaret,
+    tilbakemelding-prd-svar.md, i faglærers rekkefølge 1–7. Testen feiler også
+    hvis toppen av prd.md eller endringsloggen ikke lenket til svaret."""
     tekst = _prd()
-    assert tekst.index("](prd-endringslogg.md)") < tekst.index("\n## Kort fortalt\n")
-    logg = ENDRINGSLOGGEN.read_text(encoding="utf-8")
-    tabellen = logg.split("## Tilbakemeldingen 12.11 og hva som er gjort\n", 1)[1].split("\n## ", 1)[0]
-    for punkt in ("| 4.1 ", "| 4.2 ", "| 4.3 ", "| 4.4 ", "| 4.5 ", "| §5 "):
+    kort_fortalt = tekst.index("\n## Kort fortalt\n")
+    assert tekst.index("](prd-endringslogg.md)") < kort_fortalt
+    assert tekst.index("](tilbakemelding-prd-svar.md)") < kort_fortalt
+    assert "](tilbakemelding-prd-svar.md)" in ENDRINGSLOGGEN.read_text(encoding="utf-8")
+    svaret = SVARET.read_text(encoding="utf-8")
+    tabellen = svaret.split("## Punkt for punkt\n", 1)[1].split("\n## ", 1)[0]
+    punktene = ("| 1 ", "| 2 ", "| 3 ", "| 4.1 ", "| 4.2 ", "| 4.3 ", "| 4.4 ", "| 4.5 ", "| §5 ", "| §6 ", "| §7 ")
+    for punkt in punktene:
         assert punkt in tabellen, punkt
+    # I faglærers rekkefølge.
+    assert [tabellen.index(p) for p in punktene] == sorted(tabellen.index(p) for p in punktene)
 
 
 def _taggens_prd() -> str | None:
@@ -419,8 +436,12 @@ SENERE = (
 
 def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
     """Gruppens svar 12.11 kl. 20:09 og 20:10. Ville feilet hvis en av de åtte
-    sto som ekstra eller kjerne i tabellen i §2, manglet i tabellen eller i
-    lista under «v1.1» i §8, eller kravteksten ikke sa at den ikke er i v1.
+    sto som ekstra eller kjerne i tabellen i §2, manglet i tabellen, eller
+    kravteksten ikke sa at den ikke er i v1, eller hvis «v1.1» i §8 ikke viste
+    til tabellen i §2. Story 9.20 (gruppens svar 17.11 kl. 12:29): «v1.1» har
+    ikke lenger sin egen liste over de åtte, fordi den gjentok «senere»-radene i
+    tabellen (V4 i valideringen). Den viser til tabellen, og testen feiler hvis
+    en egen punktliste kommer tilbake.
     Ekstra er det som er bygget utover briefen, så det feiler også hvis en
     annen ekstra-rad enn filteret i FR-108 sto uten «ja», også «De 15 mest
     omsatte», som er flettet med 8.28. Filteret ble tatt bort 11.11 (8.26), så
@@ -434,9 +455,11 @@ def test_de_aatte_som_ikke_er_i_v1_staar_som_senere():
             status[(fr, krav)] = s
     v11 = tekst.split("### v1.1 — vurderes etter at v1 er kontrollert\n", 1)[1].split("\n---\n", 1)[0]
     kravene = _kravene(tekst)
+    assert "«senere» i tabellen i §2" in " ".join(v11.split())
+    # Story 9.20: ingen egen punktliste i «v1.1».
+    assert [linje for linje in v11.splitlines() if linje.startswith("- ")] == []
     for fr, krav in SENERE:
         assert status.get((fr, krav)) == "senere", (fr, krav, status.get((fr, krav)))
-        assert f"({fr})" in v11, fr
         assert "ikke i v1" in " ".join(kravene[fr].split()).lower(), fr
     ekstra_uten_bygg = [
         k for k, s in status.items() if s == "ekstra" and k != ("FR-108", "Filter på signalet, tatt bort 11.11")
