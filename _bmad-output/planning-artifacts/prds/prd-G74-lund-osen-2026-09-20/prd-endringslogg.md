@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-17T23:53
+updated: 2026-11-18T09:48
 ---
 
 # Endringslogg for PRD-en
@@ -1679,3 +1679,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* [`prd-sporing.md`](prd-sporing.md) er ny ved siden av `prd.md`: hver FR-, NFR-, UJ- og SM-ID med avsnittet, statusen fra tabellen i §2, storyene fra `epics.md` og testfilene, hvorfor noen numre mangler, og lista over `[ANTAKELSE]` og `[FORELØPIG]` (V13 i valideringen). Markørene i FR-302 og FR-606A lenker til sin rad i lista, og lista lenker til kravet. `tests/test_prd_sporing_9_20.py` låser fila.
 
 *Endret 2026-11-17 (story 9.20, gruppens svar 17.11 kl. 12:29–13:40, rådet anbefalte det):* «Slik leser du PRD-en» står øverst, før «Kort fortalt» (V5 i valideringen): alt i §1–§8 gjelder nå, historikken står her og i taggene, vedlegg A er plan A og ikke bygget, og lenkene til sporingen, svaret på tilbakemeldingen og «Teknologi og nøkler». Avsnittet sto slik: «Dette er den gjeldende teksten. Hvert krav sier hva appen gjør nå, og hva en test kan sjekke. Hvordan kravene har endret seg, står i [endringsloggen](prd-endringslogg.md), med de daterte linjene ordrett. PRD-en slik faglærer vurderte den 12.11, står i taggen `prd-vurdert-2026-11-12`. Slik den var ved fristen 5.11, står den i taggen `prd-ferdig-2026-11-03`.»
+
+*Endret 2026-11-18 (story 9.20, gjennomgangen BH1 og BH2, etter gruppens svar 17.11 kl. 12:29–13:40):* to ord fra ordlista endret meningen, og meningen fra før står igjen. Linja for 17.11 om ordene sa at meningen ikke var endret, og det stemte ikke for disse to. FR-604: «For hver aksje og børsdag med en KI-tekst, og for teksten om dagen, lagres én rad:» sa at bare en laget tekst gir en rad, men en modell som feiler, gir også en rad. Nå står det «For hver aksje og børsdag hentingen lager, eller prøver å lage, en KI-tekst for, og for teksten om dagen, lagres én rad:». Før 17.11 sto det «For hver aksje og børsdag KI-laget forklarer, og for teksten om dagen, lagres én rad:». §3, kriterium 2: «**Lista dekker minst åtte sektorer.** Kravet gjelder lista som helhet, ikke det enkelte symbolet.» gjaldt hele lista på opptil 18, mens kriteriet gjelder de 15 appen starter med (FR-412 sier at «De 15 mest omsatte» ikke har kravet). Nå står det «**De 15 dekker minst åtte sektorer.** Kravet gjelder de 15 som helhet, ikke det enkelte symbolet.». Før 17.11 sto det «**Universet dekker minst åtte sektorer.** Kravet gjelder lista som helhet, ikke det enkelte symbolet.»

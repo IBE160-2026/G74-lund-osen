@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-17T22:48
+updated: 2026-11-18T09:48
 ---
 
 # PRD — OSE Signal
@@ -322,7 +322,7 @@ De 15 aksjene appen starter med, oppfyller begge kravene:
 1. **Median daglig omsetning over 25 MNOK**, målt over siste tre måneder.
    Omsetning regnes som volum × sluttkurs per børsdag. Medianen tas over
    perioden.
-2. **Lista dekker minst åtte sektorer.** Kravet gjelder lista som helhet,
+2. **De 15 dekker minst åtte sektorer.** Kravet gjelder de 15 som helhet,
    ikke det enkelte symbolet.
 
 Det brukeren ser, heter «bransje», og koden og denne delen sier «sektor». Appen
@@ -1460,8 +1460,8 @@ punkt 27 i §8.
 
 #### FR-604 — Logging av KI-bidraget, fra første kjøring
 
-For hver aksje og børsdag med en KI-tekst, og for teksten om dagen, lagres én
-rad:
+For hver aksje og børsdag hentingen lager, eller prøver å lage, en KI-tekst
+for, og for teksten om dagen, lagres én rad:
 
 | Felt | Hvorfor |
 |---|---|
