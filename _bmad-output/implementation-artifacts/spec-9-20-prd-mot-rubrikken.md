@@ -2,7 +2,7 @@
 title: 'Story 9.20: PRD-en mot faglærers rubrikk'
 type: 'docs'
 created: '2026-11-17'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'e5673cbb'
 context:
@@ -169,5 +169,12 @@ Et spørsmål stopper ikke arbeidet.
 - [x] Svarbrevet og «Teknologi og nøkler», lenket fra README-en
 - [x] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13)
 - [x] Gjennomgangen er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
-- [ ] CI er grønn i alle jobbene
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: `--dokumentene` på `a9da567f` 18.11 kl. 10:36–10:56, med 3070 bestått og 7 hoppet over. Kjøringen kl. 10:01–10:23 fant at en hjelpetekst siterer «51 handelsdager» (spørsmål 7), og én kjøring ble stoppet for lite minne
+- [x] CI er grønn i alle jobbene (run 44280715580 på `a9da567f`, med 5987 bestått og 99 hoppet over i `pytest`)
+
+## Flettet 18.11
+
+CI var grønn i alle fire jobbene på head-en `a9da567f` (run 44280715580). Ingen
+funn på middels eller høy grad sto åpne (regel 25). PR #167 ble squash-flettet i
+`307109e9` 18.11 kl. 11:02, låst til `a9da567f`, uten nytt ja. Natta til 18.11
+var PC-en i hvilemodus fra kl. 00:06 til 09:47, så arbeidet sto stille da.

@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-17T21:28
+updated: 2026-11-18T11:03
 ---
 
 # Kvalitetssikring
@@ -450,6 +450,7 @@ sist i dokumentet.
 | 9.17 En heuristisk evaluering av demoen: svarene 16.11 kl. 20:22 og 17.11 kl. 13:03–13:13; hele settet i CI (run 44087764478) | `fc70bdf` (#164) | 0 | – bare dokumenter og avtrykket for «Dokumentene» i én test, og ingen kode å prøve en mutant mot | `S/spec-9-17-heuristisk-evaluering.md` |
 | 9.18 Rettingene før brukertest 2: svarene 17.11 kl. 13:03–13:33, 14:16 og 16:19; hele settet i CI (run 44123485449) | `9bf8769` (#165) | 11 (11, koden før hver retting og før ECH1 i gjennomgangen) | ingen overlevde | `S/spec-9-18-rettingene-foer-brukertest-2.md` |
 | 9.19 Grensen for linja på smal skjerm og bildene av appen: svarene 17.11 kl. 16:19, 18:23 og 18:26; hele settet i CI (run 44168092781) | `fced670` (#166) | 3 (3, stilen før hver retting) | ingen overlevde | `S/spec-9-19-grensen-og-bildene.md` |
+| 9.20 PRD-en mot faglærers rubrikk: svarene 17.11 kl. 12:29–13:40; hele settet i CI (run 44280715580) | `307109e` (#167) | 8 (8, feil satt inn for hånd i sporingsfila, svarbrevet og PRD-en) | ingen overlevde | `S/spec-9-20-prd-mot-rubrikken.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -757,6 +758,7 @@ funn. Antall rader i loggen:
 | 9.17, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 og VG1 middels og 15 lave rettet, BH4 og VG2 står med grunn, talt som avvist) | 19 | 17 | 2 | 0 |
 | 9.18, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 og VG2 middels og sju lave rettet; VG1 middels besvart 17.11 kl. 16:19 med en egen story for bildene, talt som utsatt; seks lave står med grunn, talt som avvist) | 16 | 9 | 6 | 1 |
 | 9.19, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; BH1, ECH1 og BH2 middels og ti lave rettet, VG2 og VG3 står med grunn, talt som avvist) | 15 | 13 | 2 | 0 |
+| 9.20, gjennomgangen 17.11–18.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; BH1–BH5 og VG1 middels og 19 lave rettet, BH6 og VG2 står med grunn, talt som avvist) | 27 | 25 | 2 | 0 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1641,6 +1643,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.16, gjennomgangen 17.11 (VG1) | 1: et ekstra element i `sjekkort-rad` bare med KI på, i `aksje.html` på `32885761` | fanget av `test_sjekkortene_er_like_med_ki_av_og_paa` i `tests/test_ki_visning.py`; malen ble satt tilbake | `S/spec-9-16-flere-brukerreiser.md` |
 | 9.18, rettingene | 11: koden før hver retting, HE2, HE3, HE5, HE8, HE9, HE10, HE14, HE16, HE17 og HE18 på `bb8488dc`, og malen før ECH1 i gjennomgangen | fanget av `TestTilbakeTilMaaneden` i `tests/test_historikken.py`, `TestSlettSpoerFoerst` i `tests/test_notater.py`, `TestTabellenPaaSmalSkjerm`, `TestBoksenIOmvisningen`, `TestOmvisningenBlarBareNaarDetTrengs` og `TestStegetOmNotatene` i `tests/test_rettingene_9_18.py`, `test_teksten_og_steget_sier_at_av_ogsaa_skjuler_omvisningen`, `test_trend_sier_snittet_med_ord`, `test_oevrige_uten_en_gruppe_nevner_den_ikke`, `test_tre_stegkort_i_rekkefoelgen_fra_utdraget` og `test_linja_under_navnet_paa_smal_skjerm_har_merket` | `S/spec-9-18-rettingene-foer-brukertest-2.md` |
 | 9.19, grensen | 3: bruddet på 760 px i vinduet (9.18), ett brudd på 743 px uten mellomtrinn, og brudd i vinduet uten boks og uten minstebredde | fanget av `test_styrken_og_retningen_en_gang_hver`, `test_med_rullefelt` og `test_en_dag_i_ettertid` i `tests/test_rettingene_9_18.py` | `S/spec-9-19-grensen-og-bildene.md` |
+| 9.20, sporingen | 8: en rad fjernet for FR-415, FR-407 til §4.1, statusen for FR-111 satt til senere, en story som ikke finnes, et nummer endret i «uten hull», en antakelse lenket feil, en antakelse uten lenke i PRD-en, og et anker som ikke finnes i svarbrevet | fanget av `test_hver_id_i_prd_har_en_rad`, `test_avsnittet_er_der_overskriften_staar`, `test_statusen_er_regnet_av_tabellen_i_2`, `test_storyene_finnes_i_epics`, `test_numrene_som_mangler`, `test_antakelsene_begge_veier` og `test_lenkene_peker_paa_noe_som_finnes` i `tests/test_prd_sporing_9_20.py` | `S/spec-9-20-prd-mot-rubrikken.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |
