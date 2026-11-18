@@ -601,7 +601,7 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
             "under overskriften.",
             (
                 (BEGRUNNELSER, "### Hvorfor akkurat disse tre sjekkene (FR-701)"),
-                (PRD, "Signalet krever 51 handelsdager"),
+                (PRD, "Signalet krever 51 børsdager"),
                 (SIGNALBEREGNING, "def nodvendige_dager("),
                 (AKSJE_MAL, '<p class="mangler">'),
             ),

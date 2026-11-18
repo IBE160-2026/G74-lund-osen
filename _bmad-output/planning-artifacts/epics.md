@@ -5502,3 +5502,19 @@ Som **den som leser README-en før brukertest 2** vil jeg se spørsmålet før e
 **Avhenger av:** 9.18, 9.19. **Én økt:** ja.
 
 *Lagt til 2026-11-18:* 9.21 er squash-flettet med PR #168 i `0c2ab7d2` kl. 13:11, låst til head-en `a858fe63`, etter instruksjonen om svarene i 9.20 og bildene i `docs/ai-prompts/2026-11-18.md`, uten nytt ja. README-en viser bildene av spørsmålet før et notat slettes og lenken tilbake i «Signalet dag for dag». CI var grønn i alle jobbene (run 44300672153), med 5987 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.22: Morgensjekken uten falske alarmer, «51 børsdager» og ett navn på sletteknappen
+
+*Lagt til 2026-11-18, etter instruksjonen om oppgavene for brukertest 2 og tre små rettinger i `docs/ai-prompts/2026-11-18.md` og gruppens svar 18.11 kl. 11:42, 11:49, 16:01 og 21:27:* rådet anbefalte rettingene, men for knappen anbefalte det å vente til etter brukertest 2, og gruppen valgte i dag. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-22-morgensjekken-og-to-rettinger.md`.
+
+Som **gruppen som leser morgensjekken og bruker appen i brukertest 2** vil vi at sjekken bare merker det som er feil, og at appen bruker de samme ordene overalt, så et merke betyr noe og personen i testen ikke møter to navn på samme knapp.
+
+**Oppfyller:** spørsmål 7 i 9.20, spørsmål 1 i 9.21 og punktene om morgensjekken i `issues.md` · **Begrenses av:** regel 3, 16, 19, 20 og 22; ingen ny migrasjon, og den planlagte oppgaven «Morgensjekk OSE Signal» endres ikke
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- Morgensjekken teller instruksjonene og Utført-linjene i dagsfilene, kjenner taggen v8, har unntak med grunn for de kjente .json-filene og plassholderne, og teller bare gruppens commits for regel 20
+- «51 børsdager» i FR-101 og i kilden i hjelpetekstene, med en linje i endringsloggen
+- Samme navn på sletteknappen ved et notat med kjøp og salg som i spørsmålet, med bildene, avtrykkene og bildegrenen
+- En test for hver retting, som feiler før rettingen
+
+**Avhenger av:** 9.20, 9.21. **Én økt:** ja.

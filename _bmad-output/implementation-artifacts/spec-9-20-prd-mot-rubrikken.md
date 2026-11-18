@@ -164,6 +164,8 @@ Et spørsmål stopper ikke arbeidet.
    *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* «51 handelsdager» rettes til
    «børsdager» i hjelpeteksten og i FR-101, i en liten story sist i dag, sammen
    med morgensjekken.
+   *Lagt til 2026-11-18 (story 9.22):* FR-101 og kilden i `src/hjelpetekster.py`
+   sier nå «51 børsdager», med en linje i endringsloggen til PRD-en (`46c7dde5`).
 
 ## Grenser
 
