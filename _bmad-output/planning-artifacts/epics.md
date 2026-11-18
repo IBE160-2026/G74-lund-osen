@@ -5485,3 +5485,18 @@ Som **den som skal lage UX, stories eller tester** vil jeg kunne lese i PRD-en h
 **Avhenger av:** 9.11, 9.16–9.19. **Én økt:** nei.
 
 *Lagt til 2026-11-18:* 9.20 er squash-flettet med PR #167 i `307109e9` kl. 11:02, låst til head-en `a9da567f`, etter instruksjonen om PRD-en mot rubrikken i `docs/ai-prompts/2026-11-17.md`, uten nytt ja. PRD-en har «Slik leser du PRD-en», nye krav FR-112, FR-208, FR-209 og FR-415, FR-407 i §4.4 og FR-603 med regelen om målingen. Sporingsfila, svarbrevet og «Teknologi og nøkler» er nye. CI var grønn i alle jobbene (run 44280715580), med 5987 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.21: Bildene av spørsmålet før sletting og lenken tilbake
+
+*Lagt til 2026-11-18, etter instruksjonen om svarene i 9.20 og bildene i `docs/ai-prompts/2026-11-18.md` og gruppens svar 17.11 kl. 22:18 på spørsmål 1 i 9.19:* rådet anbefalte svarene kl. 11:49. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-21-bildene-av-he2-og-he14.md`.
+
+Som **den som leser README-en før brukertest 2** vil jeg se spørsmålet før et notat slettes og lenken tilbake i «Signalet dag for dag», så rettingene fra 9.18 synes der appen vises fram.
+
+**Oppfyller:** spørsmål 1 i 9.19 · **Begrenses av:** regel 3, 16, 19 og 22; ingen kode i `src/` og ingen ny migrasjon
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- To nye bilder fra demoen i `docs/appen/`, vist i README-en ved notatene og ved aksjesiden, med alt-tekst og tekst under
+- Rekkefølgen, avtrykkene og testene for bildene i README-en følger med, og bildene ligger på en egen bildegren
+- Ingen bilder fra mobil i README-en
+
+**Avhenger av:** 9.18, 9.19. **Én økt:** ja.
