@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-18T13:12
+updated: 2026-11-19T00:17
 ---
 
 # Vurderingsmatrise for del 1
@@ -53,6 +53,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-18 (story 9.20):* 9.20, PRD-en mot faglærers rubrikk (PR #167, `307109e9`), er flettet. PRD-en har «Slik leser du PRD-en», krav for det som var bygget uten krav, og en sporingsfil for hver ID, låst av `tests/test_prd_sporing_9_20.py`. Svarbrevet til faglærer og «Teknologi og nøkler» er lenket fra README-en. Hele settet ble kjørt i CI på head-en `a9da567f`: 5987 bestått og 99 hoppet over i jobben `pytest` (kjøring 44280715580). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-18 (story 9.21):* 9.21 (PR #168, `0c2ab7d2`) er flettet. README-en viser to nye bilder av demoen: spørsmålet før et notat slettes og lenken tilbake i «Signalet dag for dag». Hele settet ble kjørt i CI på head-en `a858fe63`: 5987 bestått og 99 hoppet over i jobben `pytest` (kjøring 44300672153). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-11-19 (story 9.22):* 9.22 (PR #169, `7480e72c`) er flettet. Morgensjekken merker ikke lenger det som er i orden, FR-101 og hjelpeteksten sier «51 børsdager», og knappen ved et notat med kjøp og salg heter som spørsmålet før sletting, med tre bilder tatt på nytt. Hele settet ble kjørt i CI på head-en `1557ff5e`: 6002 bestått og 99 hoppet over i jobben `pytest` (kjøring 44418120615). Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
