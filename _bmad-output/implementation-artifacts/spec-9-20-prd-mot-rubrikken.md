@@ -77,6 +77,78 @@ Etter steg 2–4 i instruksjonen. Ingen ID endres, og ingen kode i `src/` endres
 4. **«Teknologi og nøkler»** i arkitekturmappa, i samme form som
    `technology.md`, lenket fra README-en.
 
+## Bygget
+
+Skrevet 17.11–18.11 av én agent i worktreen, og kontrollert i vinduet: at `src/`
+og faglærers filer ikke er rørt, at ingen ID er endret, og testene.
+
+| Del | Commit |
+|---|---|
+| «Teknologi og nøkler» i `architecture/`, lenket fra README-en | `66db04a8`, `e9707ece` |
+| Status og prosess ut av §2, §7, §8 og FR-108, og «v1.1» viser til tabellen i §2 | `bf418d0f`, `50134d36` |
+| Nye krav: FR-112 «Din egen liste» (§4.1), FR-208 notatene med «Etterpå» og FR-209 tenkte kjøp og salg (§4.2), FR-415 «Følg en aksje» med stjernen (§4.4); et tenkt salg uten kjøp er senere | `b26522dc` |
+| FR-407 i §4.4, og §4 sier at første siffer er avsnittet | `e7b52b22` |
+| FR-603 med punkt 5, «Målingen», og en presis «Kontrollen er grov» | `da440801` |
+| Ordene i ordlista likt overalt, uten posisjonsord og kodenavn (12 ord) | `e262ea67` |
+| Konsekvensene som manglet, samme krav i reisene og målene, punktene for plan A skrevet ut | `6558560c` |
+| `prd-sporing.md` med testen `tests/test_prd_sporing_9_20.py`, og lista over antakelsene begge veier | `7f6f9d74`, `79295858` |
+| «Slik leser du PRD-en» øverst | `b8ab8192` |
+| Svarbrevet `tilbakemelding-prd-svar.md`, med svartabellen fra endringsloggen | `6ee4ec58`, `4356fe5d` |
+| Rettingene etter gjennomgangen | `b8ee7433`, `394fd64d`, `50134d36`, `b201014d`, `301d8e13` |
+
+Hver endring i `prd.md` har en datert linje i endringsloggen med teksten som
+sto, ordrett (regel 13). Diffen mot HEAD ga ingen krav som er borte: det som er
+tatt ut, står i endringsloggen, i svarbrevet eller i «Teknologi og nøkler».
+
+**Tallene** (ord telt med `\w+`):
+
+| | Linjer | Ord | Daterte linjer |
+|---|---:|---:|---:|
+| Taggen `prd-vurdert-2026-11-12` | 2 264 | 30 660 | 174 |
+| Etter 9.11 (`ef802733`, 13.11) | 1 870 | 14 773 | 0 |
+| Nå | 2 132 | 18 026 | 0 |
+
+Faglærer skrev om lag 28 700 ord. Med `str.split()` gir taggen 29 030. Hvordan
+han telte, er ikke kjent, så spriket står åpent (regel 12).
+
+## Gjennomgangen 17.11–18.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `d3c40031`. 27 funn: 6 på middels og 21 lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| BH1 | middels | FR-604 fikk snevrere mening | Rettet: en rad også når modellen feiler (`b8ee7433`) |
+| BH2 | middels | Kriterium 2 i §3 gjaldt lista, ikke de 15 | Rettet (`b8ee7433`) |
+| BH3 | middels | At SM-1 ikke er nådd, og terskelen «under 5 minutter», sto ikke i PRD-en | Rettet: åpent punkt 28 i §8, lenket fra svarbrevet (`394fd64d`) |
+| BH4 | middels | Lista over hva som er bygget fra v1.1, var feil | Rettet: viser til lista i endringsloggen og tabellen i §2 (`50134d36`) |
+| BH5 | middels | NFR-03 og SM-4 ble bundet til at alle aksjene har styrke 0 | Rettet: dager der ingen aksje skiller seg ut (FR-705) (`b201014d`) |
+| VG1 | middels | Testen låste mindre enn brevet og endringsloggen sa | Rettet: avsnittet, statusen, storyene og numrene som mangler, sjekkes (`79295858`) |
+| BH6 | lav | Raden for FR-108 har dato | Står: teksten er låst av en test |
+| BH7–BH13 | lav | «Slik leser du» uten unntak, FR-606 i «v1.1», punkt 27, FR-415 i §4.4, «Med av», svarbrevet, teknologidokumentet | Rettet (`301d8e13`, `50134d36`, `4356fe5d`, `e9707ece`) |
+| ECH1–ECH6 | lav | Hele lista i `_VAKT`, plassene i FR-112, Min liste og de som venter, testfilene for FR-109 og FR-415, waitress i Docker, datoen for `ef802733` | Rettet |
+| VG2 | lav | Ingen test for at ordene i ordlista brukes likt | Står: lesingen er gjort, og en test ville måtte kjenne hvert synonym |
+| VG3, VG4 | lav | Markørene uten kodeformat, og lenkene i de nye dokumentene | Rettet (`79295858`) |
+
+## Spørsmål til gruppen, med forslag
+
+Et spørsmål stopper ikke arbeidet.
+
+1. **FR-606 i §4.6 (V9).** Relevansskalaen er senere og plan A, men står i
+   KI-avsnittet. *Forslag:* den står, og «v1.1» i §8 sier hvorfor.
+2. **FR-112 i §4.1.** «Din egen liste» står som en del av Min liste-siden.
+   *Forslag:* behold.
+3. **Ordlista har 12 ord**, med «Oversikten» og «KI-teksten», og testen tillater
+   8–12. Faglærer foreslo 8–10. *Forslag:* behold, fordi de to ordene ble brukt
+   ulikt.
+4. **Filnavn i PRD-en.** Variabelnavnene er skrevet med vanlige ord, men
+   `.env`, `.git`, `data/` og `src/` står som filnavn. *Forslag:* behold.
+5. **Svarbrevet** har `status: draft`, fordi gruppen ikke har lest det.
+   *Forslag:* `sendt` når det er sendt.
+6. **Startskriptene** har variabler som bare brukes av testene (`OSE_START_*` og
+   `OSE_SKRIVEBORD`), og «Teknologi og nøkler» beskriver dem som testkroker.
+   *Forslag:* behold.
+
 ## Grenser
 
 - Faglærers filer (`tilbakemelding-prd.md` og `technology.md`) røres ikke.
@@ -86,10 +158,10 @@ Etter steg 2–4 i instruksjonen. Ingen ID endres, og ingen kode i `src/` endres
 
 ## Kontroll
 
-- [ ] Funnene fra valideringen er rettet eller står som spørsmål
-- [ ] «Slik leser du PRD-en», sporingsfila med test og lista over markørene
-- [ ] Svarbrevet og «Teknologi og nøkler», lenket fra README-en
-- [ ] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13)
-- [ ] Gjennomgangen er tatt
+- [x] Funnene fra valideringen er rettet eller står som spørsmål
+- [x] «Slik leser du PRD-en», sporingsfila med test og lista over markørene
+- [x] Svarbrevet og «Teknologi og nøkler», lenket fra README-en
+- [x] Diff mot HEAD etter omskrivingen, uten krav som er borte (regel 13)
+- [x] Gjennomgangen er tatt
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
