@@ -58,6 +58,115 @@ OSE Signal» endres ikke
    bildegrenen følger med.
 4. Hver retting får en test som feiler før rettingen.
 
+## Bygget
+
+Bygget 18.11 i vinduet, på grenen.
+
+| Del | Commit | Testen som feiler før rettingen |
+|---|---|---|
+| Morgensjekken: dagsfilene, taggen v8, unntakene og regel 20 | `812f462a` | `tests/test_morgensjekken_9_22.py`: 10 av 11 feilet mot skriptet på `origin/main`; den siste passer på at en ny tag fortsatt merkes |
+| «51 børsdager» i FR-101 og i kilden, med en linje i endringsloggen | `46c7dde5` | `tests/test_boersdager_9_22.py` |
+| Sletteknappen ved et notat med kjøp og salg | `1185c652` | `test_knappen_ved_notatet_heter_som_i_spoersmaalet_med_salg` i `tests/test_notater.py`, på aksjesiden og i Min liste |
+| Spørsmål 7 i 9.20 og spørsmål 1 i 9.21, og 9.22 i `epics.md` og sprintstatusen | `b99bd3f3`, `b2f46f69` | – |
+
+**Dagsfilene.** Hver «## »-overskrift utenfor kodeblokkene er en instruksjon
+eller beskjed. En Utført-linje nevner en seksjon med:
+- et klokkeslett i etiketten («(beskjedene kl. 12:32, 12:41 og 13:19)») eller i
+  første setning («Instruksjonen kl. 11:17, med svaret kl. 11:19»);
+- første ord i overskriften først i etiketten eller etter «om» («instruksjonen
+  om rettingene»), der de vanlige ordene som «svarene» og «oppføringen» hoppes
+  over;
+- eller et storynummer alene («**Utført, 8.19:**») når overskriften sier
+  «story 8.19».
+
+Klokkeslettet til en seksjon er dens eget: først i overskriften, ellers det
+første «kl.» i overskriften, ellers «Limt inn kl.» først i teksten. Har flere
+seksjoner samme klokkeslett, gjelder det den ene som linja ikke alt nevner med
+første ord. Ellers er det «uklart».
+
+En linje uten etikett gjelder seksjonen den står under. En linje med etikett
+gjelder den bare når den ikke nevner en annen seksjon klart.
+
+En seksjon som er limt inn på nytt, og der teksten sier «ikke ført på nytt»,
+trenger ingen. Står det bare «limt inn på nytt», er det «uklart».
+
+«Uklart» er også en seksjon uten et klart treff der en senere etikett har et av
+de lengre ordene i overskriften, eller der neste seksjon har sin egen linje.
+Neste seksjon kan da dekke begge, som «## 21:54» og «## 21:56» 18.10. Ellers står
+det «mangler».
+
+Telt for hånd 18.11 kl. 22:00, og testen sier det samme:
+
+| Dagsfil | Instruksjoner og beskjeder | Med Utført | Limt inn på nytt |
+|---|---:|---:|---:|
+| 10.11 | 11 | 11 | 0 |
+| 16.11 | 7 | 7 | 0 |
+| 17.11 | 12 | 12 | 0 |
+| 18.11, før instruksjonen kl. 21:41 | 6 | 5 | 1 |
+
+Testen har også en konstruert dagsfil med alle de fire utfallene, tilfellene fra
+gjennomgangen og en overskrift i en kodeblokk, som ikke teller. Dagsfila for
+17.11 uten linja «(beskjedene kl. 22:18 og 22:50)» gir «mangler» for kl. 22:18 og
+22:50 (ECH1). Dagsfila for 13.10 (38 overskrifter, med overskrifter fra innlimt
+tekst) gir 38 med Utført.
+
+Dagsfilene fra 21.09 til 07.11 gir noen «mangler» og «uklart», blant annet fordi
+filene fra september er fra før regel 18 hadde Utført-linjer. Sjekken leser bare i
+går og i dag.
+
+**Unntakene i lekkasjesjekken** står i `KJENTE_FILER` og `KJENTE_PLASSHOLDERE`,
+med grunnen. En fil gjelder bare akkurat den stien, og en nøkkel bare akkurat den
+verdien i akkurat den fila, ikke linjenummeret. Verdiene som ligner nøkler, er
+skrevet i to deler, så sjekken ikke finner dem i skriptet selv. Testen sjekker at
+hvert unntak fortsatt finnes i repoet, og at en ny `.json`-fil, en ekte verdi i en
+kjent fil og en kjent verdi i en annen fil merkes, også i diffen det siste døgnet.
+
+**Regel 20** teller commits der forfatteren (med `.mailmap`) er Marian Osen eller
+Joakim Lund og den andre står som medforfatter. Merge-commits fra GitHub (to
+foreldre og committer «GitHub») og commits fra andre enn gruppen vises for seg.
+
+## Morgensjekken mot main, før og etter
+
+Kjørt lokalt mot main på `e65692b3` med `2026-11-18T21:47` som tid: før med
+skriptet på `origin/main` (`0c650e14`) kl. 21:45, og etter med skriptet på
+grenen kl. 21:56. Resten av utskriften er lik.
+
+| Del | Før | Etter |
+|---|---|---|
+| 2, dagsfilene | 17.11: 0 instruksjoner, 0 med Utført; 18.11: 0, 0 | 17.11: 12 instruksjoner og beskjeder, 12 med Utført; 18.11: 7, 5 med Utført, 1 limt inn på nytt, og «mangler Utført» for denne instruksjonen, som ikke var ferdig |
+| 7, taggene | «ny tag: arbeidskrav-product-brief-v8» og «MERK: endring etter innleveringsfristen 27.09» | Bare «briefen er uendret siden arbeidskrav-product-brief-v8 (52023c9)» |
+| 9, lekkasjesjekken | 4 filer som ikke skal være der og 12 mulige nøkler | 0 og 0 |
+| 10, regel 20 | 219 med Joakim som medforfatter og 0 med Marian, av 222 | 219 av 219 av gruppens commits med den andre som medforfatter; 2 commits fra faglærer og 1 merge-commit fra GitHub for seg |
+| Tittelen i saken | «17 ting å se på» | «alt i orden» |
+
+Klokkeslettet i «HEAD paa GitHub» viste 20:44, ikke 21:44, lokalt i begge
+kjøringene. `TZ` virker ikke for `git log` på Windows, og på GitHub kjører
+skriptet på Linux. Det er ikke endret her.
+
+## Gjennomgangen 18.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, uten git og pytest, på diffen kl. 22:07. 11 funn: 2 på middels og 9 lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | middels | En linje med etikett ga seksjonen den står under Utført, også når den bare nevner en annen (17.11: linja om PRD-en under kl. 22:50) | Rettet: linja gjelder der den står bare når den ikke nevner en annen klart. Testen med 17.11 og den konstruerte fila |
+| ECH2 | middels | Samme «Limt inn kl.» i to seksjoner, og én linje dekket begge | Rettet: et delt klokkeslett gjelder den ene som ikke alt er nevnt, ellers «uklart». Klokkeslettet er seksjonens eget, ikke et senere «kl.» i overskriften |
+| ECH3 | lav | Første ord var ofte vanlig («svarene»), og en dato ble tatt for et storynummer | Rettet: de vanlige ordene hoppes over, og storynummeret må stå som «story X.Y» |
+| ECH4 | lav | «limt inn på nytt» alene var nok | Rettet: teksten må også si «ikke ført på nytt», ellers «uklart» |
+| ECH5 | lav | En «## » i innlimt tekst utenfor en kodeblokk deler seksjonen | Står: slik er dagsfilene, og instruksjonen sier at hver «## » teller. Fra 11.11 står de innlimte tekstene i ```text-blokker |
+| BH1 | lav | Docstringen sa fire .json-filer, men det er fem i lista | Rettet: fire nye og den fra 3.4b |
+| BH2 | lav | «(faglaerer)» om alle utenfor gruppen | Rettet: «(faglaerer og andre)» |
+| BH3 | lav | Kommentaren sa at alle overskriftene 10.11 har tekst etter klokkeslettet | Rettet: én er «## 11:20» alene |
+| VG1 | lav | Den falske git så bort fra formatstrengen | Rettet: testen krever `%aN`, `%cn`, `%p` og medforfatterne |
+| VG2 | lav | Unntakene ble ikke kjørt mot de ekte testfilene, og diffen bare med én fil | Rettet: del 9 på de fire ekte testfilene og de fem .json-filene gir 0, og en kjent verdi i en annen fil i diffen merkes |
+| VG3 | lav | Ingen test viste at for mye ikke dekkes | Rettet: den konstruerte fila har et delt klokkeslett, en dato og et vanlig første ord |
+
+Leseren fant ingen ekte nøkkel som slipper gjennom, ingen krasj, og at CRLF ikke gir
+feil. «51 handelsdager» står fortsatt i en kommentar i `src/fetch_prices.py` og i
+en docstring i `tests/test_fetch_prices.py`, men instruksjonen gjelder bare FR-101
+og kilden.
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. `data/` og `_privat/` røres ikke, og den
