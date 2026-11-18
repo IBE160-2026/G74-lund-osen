@@ -91,6 +91,11 @@ lesing, på `db6bc792`. 10 funn: 1 på middels og 9 lave. Avtrykkene og
    notatet, kjøpet og salget». *Forslag:* knappen på aksjesiden sier det
    samme som spørsmålet når salget er notert, i en senere story der koden kan
    endres. Det endrer ikke brukertest 2.
+   *Svar 2026-11-18 (gruppens svar, instruksjonen kl. 21:41):* knappen rettes i dag,
+   før brukertest 2. Rådet anbefalte å vente til etter testen, og gruppen valgte i dag.
+   *Lagt til 2026-11-18 (story 9.22):* knappen ved et notat med kjøp og salg heter
+   «Slett notatet, kjøpet og salget» på aksjesiden og i Min liste, som i spørsmålet
+   (`1185c652`).
 
 ## Grenser
 
