@@ -1,8 +1,8 @@
 ---
 title: "Svar på tilbakemeldingen på PRD-en"
-status: draft
+status: aktiv
 created: 2026-11-17
-updated: 2026-11-18T09:52
+updated: 2026-11-18T11:52
 ---
 
 # Svar på tilbakemeldingen på PRD-en
@@ -36,11 +36,12 @@ stjerne, et ord med stor forbokstav og en dato, som «*Rettet 2026-10-08» eller
 | Etter omskrivingen i story 9.11 (`ef802733`, 13.11 kl. 22:47) | 1 870 | 14 773 | 0 |
 | Nå, etter story 9.20 | 2 132 | 18 026 | 0 |
 
-Tilbakemeldingen sier «ca. 2 260 linjer, 28 700 ord». Linjene stemmer. Ordene
-spriker: `re.findall(r"\w+", tekst)` gir 30 660, og vi vet ikke hvordan 28 700
-er telt. Telt med `str.split()`, ord skilt av mellomrom, gir taggen 29 030, som
-er nærmere. Forskjellen kan altså komme av metoden, men det er ikke avklart, og
-spriket står åpent (regel 12 i `CLAUDE.md`). PRD-en er lengre nå enn etter
+Tilbakemeldingen sier «ca. 2 260 linjer, 28 700 ord». Linjene stemmer, og
+ordene også, telt som `wc -w` med `LC_ALL=C`: det gir 28 752 ord på taggen.
+Tabellen teller med `re.findall(r"\w+", tekst)`, som gir 30 660, og
+`str.split()`, ord skilt av mellomrom, gir 29 030. Forskjellen mot `wc` er de
+278 ordene uten et eneste ASCII-tegn, som `wc` ikke teller i C-locale: blant
+annet 160 frittstående «—» og 77 «å». Spriket er dermed forklart av metoden. PRD-en er lengre nå enn etter
 9.11, fordi den har fått to brukerreiser, fire nye krav med konsekvenser, en
 ordliste med tolv ord og regelen om målingen i FR-603.
 

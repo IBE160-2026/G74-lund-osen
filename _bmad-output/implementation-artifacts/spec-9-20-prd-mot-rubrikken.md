@@ -136,24 +136,34 @@ Et spørsmål stopper ikke arbeidet.
 
 1. **FR-606 i §4.6 (V9).** Relevansskalaen er senere og plan A, men står i
    KI-avsnittet. *Forslag:* den står, og «v1.1» i §8 sier hvorfor.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* godtatt som foreslått.
 2. **FR-112 i §4.1.** «Din egen liste» står som en del av Min liste-siden.
    *Forslag:* behold.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* godtatt som foreslått.
 3. **Ordlista har 12 ord**, med «Oversikten» og «KI-teksten», og testen tillater
    8–12. Faglærer foreslo 8–10. *Forslag:* behold, fordi de to ordene ble brukt
    ulikt.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* godtatt som foreslått.
 4. **Filnavn i PRD-en.** Variabelnavnene er skrevet med vanlige ord, men
    `.env`, `.git`, `data/` og `src/` står som filnavn. *Forslag:* behold.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* godtatt som foreslått.
 5. **Svarbrevet** har `status: draft`, fordi gruppen ikke har lest det.
    *Forslag:* `sendt` når det er sendt.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* svarbrevet får status «aktiv» nå,
+   fordi faglærer leser det i repoet.
 6. **Startskriptene** har variabler som bare brukes av testene (`OSE_START_*` og
    `OSE_SKRIVEBORD`), og «Teknologi og nøkler» beskriver dem som testkroker.
    *Forslag:* behold.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* godtatt som foreslått.
 7. **«51 handelsdager» i FR-101.** `--dokumentene` kl. 10:23 fant at hjelpeteksten
    om sjekkene uten signal siterer setningen «Signalet krever 51 handelsdager» i
    `prd.md` ordrett som kilde. Koden i `src/` endres ikke her, så den ene
    setningen står med «handelsdager», som før. *Forslag:* kilden i
    `src/hjelpetekster.py` rettes til «51 børsdager» i en senere story der kode kan
    endres, og da byttes ordet også her.
+   *Svar 2026-11-18 kl. 11:49 (gruppens svar, rådet anbefalte det):* «51 handelsdager» rettes til
+   «børsdager» i hjelpeteksten og i FR-101, i en liten story sist i dag, sammen
+   med morgensjekken.
 
 ## Grenser
 
