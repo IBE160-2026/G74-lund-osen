@@ -1911,6 +1911,9 @@ FILENE_BAK_INVESTORSIDEN = (
 # med Kraft valgt i demoen, med filteret og lista. Tillegg 3: sorteringen og
 # tabellen i stedet for forslagene.
 FILENE_BAK_FOLG = (*FILENE_BAK_AKSJESIDEN, "src/templates/folg.html", "src/static/hjelp.js")
+# Story 9.21 (gruppens svar 17.11 kl. 22:18): spørsmålet før et notat slettes (HE2 i 9.18),
+# siden «Slett» ved notatet på aksjesiden går til.
+FILENE_BAK_SLETT_NOTAT = (*FILENE_BAK_AKSJESIDEN, "src/templates/bekreft_slett_notat.html")
 TOPPEN_AV_OVERSIKTEN = "docs/appen/oversikten-topp-demo.png"
 DE_NYE_BILDENE = {
     TOPPEN_AV_OVERSIKTEN: ("/", 1280, 615, MALENE_BAK_BILDET),
@@ -2004,6 +2007,13 @@ DE_NYE_BILDENE = {
     "docs/appen/notatpanelet-demo.png": ("/", 1280, 1000, FILENE_BAK_MIN_LISTE),
     # Gjennomgangen (ECH1): omvisningen bygges i app.py (demo=), så app.py er med.
     "docs/appen/vis-meg-rundt-demo.png": ("/", 1280, 1000, FILENE_BAK_MIN_LISTE),
+    # Story 9.21 (gruppens svar 17.11 kl. 22:18): «Signalet dag for dag» på aksjesiden for BRFE
+    # med september valgt, bare delen (id-en signalet-dag-for-dag), klippet ut med 16 px over
+    # og under, så lenken «Til oktober 2026» synes (HE14 i 9.18). Og spørsmålet før et notat
+    # slettes (HE2), siden «Slett» ved notatet om BRFE fra 22.09 går til, med det tenkte
+    # kjøpet og salget, 640 px, hele siden. Målt i Edge 18.11.
+    "docs/appen/signalet-dag-for-dag-demo.png": ("/aksje/BRFE?maaned=2026-09", 1280, 977, FILENE_BAK_AKSJESIDEN),
+    "docs/appen/slett-notatet-demo.png": ("/aksje/BRFE", 1280, 640, FILENE_BAK_SLETT_NOTAT),
 }
 # Story 3.3k (svaret 12.11 kl. 17:09): bildene i knappen «Bilder av appen (demoen)» i
 # rekkefølgen fra knapperaden øverst, med sidene man kommer til rett etter: Markedsoversikt
@@ -2013,7 +2023,11 @@ DE_NYE_BILDENE = {
 BILDENE_I_KNAPPEN = (
     SKJERMBILDET,
     AKSJESIDEBILDET,
+    # Story 9.21 (gruppens svar 17.11 kl. 22:18): lenken tilbake i «Signalet dag for dag»
+    # rett etter aksjesiden, og spørsmålet før et notat slettes rett etter notatene.
+    "docs/appen/signalet-dag-for-dag-demo.png",
     "docs/appen/notatene-brfe-demo.png",
+    "docs/appen/slett-notatet-demo.png",
     "docs/appen/investorsiden-brfe-demo.png",
     "docs/appen/boersometeret-demo.png",
     "docs/appen/min-liste-demo.png",
@@ -2238,6 +2252,9 @@ AVTRYKK_BAK_DE_NYE_BILDENE = {
     # Story 3.3k: de to nye bildene.
     "docs/appen/notatpanelet-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
     "docs/appen/vis-meg-rundt-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
+    # Story 9.21 (gruppens svar 17.11 kl. 22:18): de to nye bildene.
+    "docs/appen/signalet-dag-for-dag-demo.png": "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e",
+    "docs/appen/slett-notatet-demo.png": "94887d9fbeaa5e480a41ec392ffc3f04e7915814d394b1efd2636c746e302625",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
@@ -4019,7 +4036,8 @@ class TestReadmeForNybegynnere:
         # Story 8.21 (tillegg 2): 46, med de tre nye bildene i docs/appen/.
         # Tillegg 5 til 8.22: 48, med de to nye bildene ved 390 px.
         # Story 3.3k: 52, med folg-en-aksje-demo.png, de to nye bildene og docs/appen/mobil/.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 52, lenker
+        # Story 9.21 (gruppens svar 17.11 kl. 22:18): 54, med de to nye bildene.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 54, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -4540,7 +4558,9 @@ AVTRYKK_I_PILENE = {
     # spørsmålet om KI-modellen. Var 66d98675....
     # Story 3.3k (regel 19): punktet for docs/appen/ med bildene i rekkefølgen fra
     # README-en, de to nye og docs/appen/mobil/. Var 59b2a3fe....
-    "Mappestruktur": "6c588c0322c7ec2d24e9c445591cb5d23b28e26034bbe58d3fc694b6ba73d081",
+    # Story 9.21 (gruppens svar 17.11 kl. 22:18, regel 19): de to nye bildene i punktet for
+    # docs/appen/, i rekkefølgen fra README-en. Var 6c588c03....
+    "Mappestruktur": "2d8615fba89cfbaa3996672ecdb3757b9a511af4c920782ea7f5a574afddc0ff",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
