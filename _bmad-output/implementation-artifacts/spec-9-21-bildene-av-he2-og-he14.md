@@ -62,6 +62,9 @@ sett på, og de viser bare demoen.
   sletting rett etter notatene. README-en viser ingen bilder fra mobil.
 - Siden med spørsmålet har ingen steg i omvisningen, som investorsiden, så
   raden øverst har ikke «Vis meg rundt». Det er appen slik den er.
+- Bildet av «Signalet dag for dag» er et utsnitt uten demolinja. Selskapet er
+  oppdiktet, og alt-teksten og teksten under sier at det er demoen
+  (gjennomgangen, ECH4).
 
 ## Grenser
 

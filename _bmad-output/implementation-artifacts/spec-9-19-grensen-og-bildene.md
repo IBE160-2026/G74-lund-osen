@@ -141,30 +141,28 @@ Et spørsmål stopper ikke arbeidet.
    bildene av spørsmålet før sletting (HE2) og lenken tilbake i «Signalet dag
    for dag» (HE14) før brukertest 2, i en egen liten story etter 9.20, med egen
    instruksjon.
-   *Lagt til 2026-11-18 (story 9.21):* bildene er lagt inn. `docs/appen/slett-
-   notatet-demo.png` viser spørsmålet før notatet om BRFE fra 22.09 slettes,
-   med det tenkte kjøpet og salget, og står etter bildet av notatene.
-   `docs/appen/signalet-dag-for-dag-demo.png` viser «Signalet dag for dag» for
-   BRFE i september 2026 med lenken «Til oktober 2026», og står etter
-   aksjesiden. Begge er fra demoen, i full bredde.
-2. **Bruddene er målt med demodataene.** Tabellen er minst 709 px, så den
-   blir ikke smalere, men en lang ticker og bransje i den ekte versjonen kan
-   gjøre den bredere. Da kan et smalt spenn vise retningen ingen steder. I
-   demoen stemmer det i alle ni visningene som er målt. *Forslag:* godta det for v1, og se på det i den
-   ekte versjonen på telefonbredde i brukertest 2.
-   *Svar 2026-11-17 kl. 22:18 (gruppens svar, mot rådets forslag, gruppens valg):* gruppen måler
-   bruddene i den ekte versjonen selv i kveld, med vinduet gjort smalere, og
-   resultatet kommer som en egen beskjed. Vinduet starter ikke den ekte
-   versjonen.
-   *Målt og svart 2026-11-17 kl. 22:50 (beskjeden fra rådet):* rådet målte i
-   den ekte versjonen kl. 22:34–22:45, med boksen rundt tabellen satt til
-   480–800 px. Med ekte data er tabellen minst 717,5 px, mot 709 i demoen.
-   På forsiden (18 rader) og i Min liste (13 rader) mangler styrken eller
-   retningen ikke i noen bredde. Styrken står dobbelt når boksen er 569–572
-   px (vinduet ca. 603–606 px), og retningen når boksen er 674–708 px
-   (vinduet ca. 708–742 px). Full bredde og 390 px er riktige. Gruppens svar
-   kl. 22:50: mobil er ikke viktig nå, de to spennene godtas for v1, og
-   ingen kode endres.
+   *Lagt til 2026-11-18 (story 9.21):* bildene er lagt inn.
+   `docs/appen/slett-notatet-demo.png` viser spørsmålet før notatet om BRFE fra
+   22.09 slettes, med det tenkte kjøpet og salget, og står etter bildet av
+   notatene. `docs/appen/signalet-dag-for-dag-demo.png` viser «Signalet dag for
+   dag» for BRFE i september 2026 med lenken «Til oktober 2026», og står etter
+   aksjesiden. Begge er fra demoen, i full bredde. 2. **Bruddene er målt med
+   demodataene.** Tabellen er minst 709 px, så den blir ikke smalere, men en
+   lang ticker og bransje i den ekte versjonen kan gjøre den bredere. Da kan et
+   smalt spenn vise retningen ingen steder. I demoen stemmer det i alle ni
+   visningene som er målt. *Forslag:* godta det for v1, og se på det i den ekte
+   versjonen på telefonbredde i brukertest 2. *Svar 2026-11-17 kl. 22:18
+   (gruppens svar, mot rådets forslag, gruppens valg):* gruppen måler bruddene
+   i den ekte versjonen selv i kveld, med vinduet gjort smalere, og resultatet
+   kommer som en egen beskjed. Vinduet starter ikke den ekte versjonen. *Målt
+   og svart 2026-11-17 kl. 22:50 (beskjeden fra rådet):* rådet målte i den ekte
+   versjonen kl. 22:34–22:45, med boksen rundt tabellen satt til 480–800 px.
+   Med ekte data er tabellen minst 717,5 px, mot 709 i demoen. På forsiden (18
+   rader) og i Min liste (13 rader) mangler styrken eller retningen ikke i noen
+   bredde. Styrken står dobbelt når boksen er 569–572 px (vinduet ca. 603–606
+   px), og retningen når boksen er 674–708 px (vinduet ca. 708–742 px). Full
+   bredde og 390 px er riktige. Gruppens svar kl. 22:50: mobil er ikke viktig
+   nå, de to spennene godtas for v1, og ingen kode endres.
 
 ## Grenser
 
