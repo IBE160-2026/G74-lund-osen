@@ -24,8 +24,8 @@ OSE Signal viser 15 aksjer på Oslo Børs som omsettes mye, samlet i én oversik
 ![«Mine notater» på aksjesiden for Brattfjell Energi (BRFE) i demoen: skjemaet, to oppdiktede notater med «Etterpå» og et tenkt kjøp og salg i prosent, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/notatene-brfe-demo.png)
 *«Mine notater» på aksjesiden for BRFE i demoen, med «Etterpå» under hvert notat og et tenkt kjøp og salg, bare i prosent, med oppdiktede selskaper («Eksempeltall»).*
 
-![Spørsmålet før et notat slettes i demoen: «Slett notatet?» for det oppdiktede notatet om Brattfjell Energi (BRFE) fra 22.09, som sier at det tenkte kjøpet og salget slettes også, med knappen «Slett notatet, kjøpet og salget» og «Avbryt», med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/slett-notatet-demo.png)
-*Spørsmålet før et notat slettes i demoen, etter «Slett» ved notatet om BRFE fra 22.09, med det tenkte kjøpet og salget, med oppdiktede selskaper («Eksempeltall»).*
+![Spørsmålet før et notat slettes i demoen: «Slett notatet?» for det oppdiktede notatet om Brattfjell Energi (BRFE) fra 22.09. Spørsmålet sier at det tenkte kjøpet og salget slettes også, med knappen «Slett notatet, kjøpet og salget» og «Avbryt», med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/slett-notatet-demo.png)
+*Spørsmålet før et notat slettes i demoen, etter «Slett notatet og det tenkte kjøpet» ved notatet om BRFE fra 22.09, som sier at det tenkte kjøpet og salget slettes også, med oppdiktede selskaper («Eksempeltall»).*
 
 ![Investorsiden for Brattfjell Energi (BRFE) i demoen, den man kommer til fra aksjesiden, med logoen, en tegning laget av KI og teksten om at selskapet er oppdiktet, med oppdiktede selskaper («Eksempeltall»), ikke data fra Oslo Børs](docs/appen/investorsiden-brfe-demo.png)
 *Investorsiden for BRFE i demoen, fra boblen nederst på aksjesiden, med «Illustrasjon laget av KI» under tegningen, med oppdiktede selskaper («Eksempeltall»).*
