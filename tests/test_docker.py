@@ -1384,8 +1384,12 @@ HOEYDE_PAA_BILDET = 1864
 # bildene over, gjelder ikke lenger. Etter de to trinnene i linja, bruddene i bredden på
 # boksen og tabellen på minst 709 px ble alle bildene tatt på nytt igjen, to ganger, og var
 # byte for byte de samme.
+# Story 9.22: knappen ved et notat med salg heter «Slett notatet, kjøpet og salget» (_notat.html),
+# som spørsmålet. Avtrykkene er regnet ut på nytt, og alle de 20 bildene er tatt på nytt i demoen,
+# to ganger, byte for byte de samme. notatene-brfe-demo.png, notatene-min-liste-demo.png og
+# mobil/notatene-brfe-390-demo.png, som viser knappen, er nye; de andre er byte for byte de samme.
 # Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
-AVTRYKK_BAK_BILDET = "19fb8898836522ebde8738294da61c3845b9a9193ac413d4ac349150ab2d5149"
+AVTRYKK_BAK_BILDET = "b3cba5cff3dd1d54d141a98416597bc368278f708492aa6bfdb733b536cec2a8"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1870,8 +1874,12 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # bildene over, gjelder ikke lenger. Etter de to trinnene i linja, bruddene i bredden på
 # boksen og tabellen på minst 709 px ble alle bildene tatt på nytt igjen, to ganger, og var
 # byte for byte de samme.
+# Story 9.22: knappen ved et notat med salg heter «Slett notatet, kjøpet og salget» (_notat.html),
+# som spørsmålet. Avtrykkene er regnet ut på nytt, og alle de 20 bildene er tatt på nytt i demoen,
+# to ganger, byte for byte de samme. notatene-brfe-demo.png, notatene-min-liste-demo.png og
+# mobil/notatene-brfe-390-demo.png, som viser knappen, er nye; de andre er byte for byte de samme.
 # Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
-AVTRYKK_BAK_AKSJESIDEN = "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e"
+AVTRYKK_BAK_AKSJESIDEN = "852845bddc76365af14980782f24c3eec4e70f30506caeb23b04ebc606a44acf"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2236,28 +2244,32 @@ BILDENE_PAA_MOBIL = (
 # bildene over, gjelder ikke lenger. Etter de to trinnene i linja, bruddene i bredden på
 # boksen og tabellen på minst 709 px ble alle bildene tatt på nytt igjen, to ganger, og var
 # byte for byte de samme.
+# Story 9.22: knappen ved et notat med salg heter «Slett notatet, kjøpet og salget» (_notat.html),
+# som spørsmålet. Avtrykkene er regnet ut på nytt, og alle de 20 bildene er tatt på nytt i demoen,
+# to ganger, byte for byte de samme. notatene-brfe-demo.png, notatene-min-liste-demo.png og
+# mobil/notatene-brfe-390-demo.png, som viser knappen, er nye; de andre er byte for byte de samme.
 # Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "89bba61c192522de8d098564fd5eccbc94d66f2acef84acb0788708a030d2844",
-    TOPPEN_AV_OVERSIKTEN: "19fb8898836522ebde8738294da61c3845b9a9193ac413d4ac349150ab2d5149",
-    "docs/appen/boersometeret-demo.png": "35cbce250c8ce3868d2787beca5932a87f1c80a1c158dbb6d1604dcba13a8d8a",
-    "docs/appen/min-liste-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
-    "docs/appen/mobil/oversikten-390-demo.png": "19fb8898836522ebde8738294da61c3845b9a9193ac413d4ac349150ab2d5149",
-    "docs/appen/mobil/boersometeret-390-demo.png": "35cbce250c8ce3868d2787beca5932a87f1c80a1c158dbb6d1604dcba13a8d8a",
-    "docs/appen/din-egen-liste-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
-    "docs/appen/investorsiden-brfe-demo.png": "9159ffe29a18a365b8388e54254db7a4bbf9294614f397d116810e76b16f2ce2",
-    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "9159ffe29a18a365b8388e54254db7a4bbf9294614f397d116810e76b16f2ce2",
-    "docs/appen/mobil/folg-en-aksje-390-demo.png": "89bba61c192522de8d098564fd5eccbc94d66f2acef84acb0788708a030d2844",
-    "docs/appen/mobil/notatene-brfe-390-demo.png": "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e",
-    "docs/appen/notatene-brfe-demo.png": "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e",
-    "docs/appen/notatene-min-liste-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
-    "docs/appen/innstillinger-demo.png": "5cb726858fa25922955acd2032b235db2471c5e364a5a48574605c350432c8ee",
+    "docs/appen/folg-en-aksje-demo.png": "120b566598ef0f582d3371a3474a204bc9e1b0f757a5b95a26d467edd71c80f6",
+    TOPPEN_AV_OVERSIKTEN: "b3cba5cff3dd1d54d141a98416597bc368278f708492aa6bfdb733b536cec2a8",
+    "docs/appen/boersometeret-demo.png": "01e25f4ef5a5181c2b8518b3670a6cdd76e7014759743fc32b905d91d771277e",
+    "docs/appen/min-liste-demo.png": "0a0e0318f03c3bd5c8e9de0336887e74498d62381160994013386c41e5d63f83",
+    "docs/appen/mobil/oversikten-390-demo.png": "b3cba5cff3dd1d54d141a98416597bc368278f708492aa6bfdb733b536cec2a8",
+    "docs/appen/mobil/boersometeret-390-demo.png": "01e25f4ef5a5181c2b8518b3670a6cdd76e7014759743fc32b905d91d771277e",
+    "docs/appen/din-egen-liste-demo.png": "0a0e0318f03c3bd5c8e9de0336887e74498d62381160994013386c41e5d63f83",
+    "docs/appen/investorsiden-brfe-demo.png": "57d3de67dc70463851c37082611104d222748df0602d02d8dc921ca842f7a548",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "57d3de67dc70463851c37082611104d222748df0602d02d8dc921ca842f7a548",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "120b566598ef0f582d3371a3474a204bc9e1b0f757a5b95a26d467edd71c80f6",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "852845bddc76365af14980782f24c3eec4e70f30506caeb23b04ebc606a44acf",
+    "docs/appen/notatene-brfe-demo.png": "852845bddc76365af14980782f24c3eec4e70f30506caeb23b04ebc606a44acf",
+    "docs/appen/notatene-min-liste-demo.png": "0a0e0318f03c3bd5c8e9de0336887e74498d62381160994013386c41e5d63f83",
+    "docs/appen/innstillinger-demo.png": "fd43970f85f9ee6a57922cae5dd0183d9eabbc735add828950683b470d508e49",
     # Story 3.3k: de to nye bildene.
-    "docs/appen/notatpanelet-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
-    "docs/appen/vis-meg-rundt-demo.png": "5247514abd3167ea518dff04b9deb1241ff18756b8c0c497af1d0d42de388b0a",
+    "docs/appen/notatpanelet-demo.png": "0a0e0318f03c3bd5c8e9de0336887e74498d62381160994013386c41e5d63f83",
+    "docs/appen/vis-meg-rundt-demo.png": "0a0e0318f03c3bd5c8e9de0336887e74498d62381160994013386c41e5d63f83",
     # Story 9.21 (gruppens svar 17.11 kl. 22:18): de to nye bildene.
-    "docs/appen/signalet-dag-for-dag-demo.png": "be0127f07a8a1fe11e42fb3e1e2820ec468bfbe1964c771ca533fb50714efb7e",
-    "docs/appen/slett-notatet-demo.png": "94887d9fbeaa5e480a41ec392ffc3f04e7915814d394b1efd2636c746e302625",
+    "docs/appen/signalet-dag-for-dag-demo.png": "852845bddc76365af14980782f24c3eec4e70f30506caeb23b04ebc606a44acf",
+    "docs/appen/slett-notatet-demo.png": "a26f808d7b6ef90cbce8f6cba19b054ccabb1551edeaa3e9badfca2d064a84d9",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
