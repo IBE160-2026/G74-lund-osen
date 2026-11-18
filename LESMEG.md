@@ -9,12 +9,12 @@ gang, og var like byte for byte. Grenen er `9-21-bildene-av-he2-og-he14`
 Bildene er nye i README-en, så det finnes ikke noe «før». Derfor står bare
 `etter-` her.
 
-- `signalet-dag-for-dag-demo.png`: «Signalet dag for dag» på aksjesiden for
+- `etter-signalet-dag-for-dag-demo.png`: «Signalet dag for dag» på aksjesiden for
   Brattfjell Energi (BRFE), `/aksje/BRFE?maaned=2026-09`, bare delen, med 16 px
   over og under. September er valgt, så lenken «Til oktober 2026» står ved
   månedspilene (HE14 i 9.18). Dagene før 21.09 har stiplet kant og «i
   ettertid».
-- `slett-notatet-demo.png`: spørsmålet etter «Slett» ved det oppdiktede
+- `etter-slett-notatet-demo.png`: spørsmålet etter «Slett notatet og det tenkte kjøpet» ved det oppdiktede
   notatet om BRFE fra 22.09, som har et tenkt kjøp og salg (HE2 i 9.18).
   Siden sier at det tenkte kjøpet og salget slettes også, og knappen heter
   «Slett notatet, kjøpet og salget». Ingenting ble slettet: bildet er tatt
