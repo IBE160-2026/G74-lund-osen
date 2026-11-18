@@ -3561,6 +3561,60 @@ Det vi lærte: et tillegg som går imot en tidligere avgjørelse, må si det. El
 
 ---
 
+## 16.11.2026 – Svarene på kontrollrunden, to små storyer, og kursets seks steg i vår rekkefølge
+
+*Joakim og Marian.*
+
+Kontrollrunden etter v1.1 (9.14) ble kjørt natt til 16.11. Den leste den ekte basen bare med `mode=ro` og en kopi, og sjekket README-en, dokumentene, PRD-en, statusene og koden mot main. Ingen funn var på høy grad, og klare feil i dokumentene ble rettet på grenen. Kl. 09:51 svarte vi på alle de 12 spørsmålene, og rådet anbefalte svarene. PR #160 ble flettet kl. 11:45 (`19d37f80`).
+
+Spørsmål 1 ble en egen liten story samme dag, 2.18. Med KI av sa aksjesiden likevel noe om KI-teksten for en dag i ettertid, og det gikk imot FR-601. Kl. 11:20 svarte vi at linja om at KI-teksten er slått av, står på forsiden, og FR-601 fikk det som unntak. 2.18 ble flettet kl. 12:36 (#161, `05bc46e7`), og FR-601 ble presisert etter BH3 i `df9c9f78`.
+
+Kl. 15:39 valgte vi å ta spørsmål 10, 11 og 12 med en gang, ikke etter innleveringen, som vi hadde svart kl. 09:51. Det ble 9.15. Meldingene fra hentingen sier nå det v1.1 gjør, og `MinneNotatlagerMedKjoep` og `RETNINGENE` er tatt bort. Gjennomgangen fant BH1 (middels): skal fire ikonfiler i `src/static/` stå? Funnet fulgte av svaret vårt, så PR #162 ventet på oss (regel 25). Kl. 18:51 svarte vi «La dem stå». Kveldsjobben kl. 22:15 var den første med nye kurser etter v1.1, og kontrollen av den ble ført 17.11 (`a0bb9d29`).
+
+**Kursets steg, og vår rekkefølge**
+
+Kl. 19:01 ba vi om at dette skulle med i refleksjonsloggen. Faglærer skrev at kurset har gått gjennom 1) Product brief, brainstorming og research, 2) PRD med kravspesifikasjon (funksjonelle og ikke-funksjonelle krav), brukerreiser og omfang (MVP), 3) Design og UX, 4) Arkitektur med teknologiske valg, valg av database og strukturer, 5) Epics og brukerhistorier, og 6) sprintplanleggingen. Det som gjenstår, er implementasjonen, der /goal brukes til long-running tasks. Meldingen fra faglærer ligger ikke i repoet, så stegene står slik vi gjenga dem i instruksjonen 18.11 kl. 16:03.
+
+Vi har gjort alle seks, men hoppet fram og tilbake. Vi gjorde research og testet EODHD natt til 20.09 (`50d72d10` og `c6f3581f`), før arkitekturen 22.09. Grunnen var at mye av oppgaven landet på gratisversjoner. Gratiskontoen gir 20 kall i døgnet og ett års historikk (`malinger.md`), og vilkårene stengte børsmeldingene. Det endret omfanget (MVP): plan A med børsmeldinger ble plan B med kurser og volum, fra 28.09.
+
+Design og UX er steget der vi manglet mest:
+- Designet kom etter at implementasjonen startet. Første sprint ble planlagt 24.09 (`4734aaf1`), og designreglene kom 01.10 (`designregler.md`).
+- Vi har ingen samlet UX-spesifikasjon.
+- Skissene kom 06.11, og brukertest 1 var 10.11.
+- Brukerreisen (UJ-1) kom etter tilbakemeldingen på PRD-en 12.11, og den var den eneste.
+
+Dette var godt:
+- UX-loggen, som har rader helt fra 25.09.
+- Kontrast, fokus og skjermleser.
+- Merking som ikke bare bruker farge.
+- Mobil på 390 px.
+- De samme ordene på alle sidene.
+
+Kl. 20:22 valgte vi å fylle på før brukertest 2, med flere brukerreiser og en heuristisk evaluering. De ble 9.16 og 9.17 og ble flettet 17.11.
+
+Long-running tasks har vi løst på vår måte. Vi har brukt instruksjoner med stegvakt, vilkår for fletting uten nytt ja og pauser rundt kveldsjobben. Med /goal sjekker en annen modell etter hver runde om betingelsen er nådd. Vi prøver /goal på det samlede UX-dokumentet.
+
+**Utfordringer**
+
+1. **Et krav appen ikke holdt.**
+   *Problem:* FR-601 sier at aksjesiden med KI av ikke har noen melding om KI. For en dag i ettertid sto likevel en setning om KI-teksten, fordi `detalj.ettertid` ble sjekket før `ki_vises` i `aksje.html`. Ingen test hadde fanget det.
+   *Løsning:* 2.18 rettet malen samme dag, med en test som feilet mot malen før rettingen. Forsiden beholdt linja om at KI-teksten er slått av, og FR-601 fikk den som unntak (svaret kl. 11:20).
+   *KI sin rolle:* kontrollrunden fant feilen og foreslo en egen story. Vinduet spurte om forsiden før det rettet noe, og unntaket var vårt valg.
+
+2. **En kjøring som ikke var gyldig.**
+   *Problem:* `--dokumentene` på main ble stoppet av lite minne etter 2.18. 112 underprosesser fikk ikke startet.
+   *Løsning:* kl. 15:37 valgte vi selv å kjøre den på nytt lokalt. Rådet hadde anbefalt å la CI på main gjelde. Kjøringen kl. 15:42–16:03 ga 2966 bestått og 7 hoppet over.
+   *KI sin rolle:* Claude Code skrev at kjøringen ikke var gyldig, i stedet for å regne den som grønn.
+
+3. **Et svar som ble liggende til morgenen.**
+   *Problem:* PR #162 ventet på svaret om BH1. Vi svarte kl. 18:51, men instruksjonen med svaret kom først kl. 21:52, og vinduet førte det kl. 21:53. PC-en gikk i hvilemodus kl. 23:06 og våknet kl. 10:40, så #162 ble flettet 17.11 kl. 11:07. Vinduet meldte først at ventingen var stoppet av lite minne.
+   *Løsning:* en Rettet-linje i dagsfila sier at årsaken var hvilemodus, og vi slår av hvilemodus.
+   *KI sin rolle:* Claude Code gjettet feil årsak. Rådet fant den riktige 17.11 kl. 11:02, og feilen ble rettet med en ny linje, ikke skrevet over.
+
+Det vi lærte: kursets steg er en rekkefølge, men vår ble styrt av det vi målte. Med gratisversjoner måtte research og en test mot kilden komme før arkitekturen, og omfanget endret seg etterpå. Design og UX kom sent og i biter, og hullet viste seg først da en bruker testet appen. En kontrollrunde etter en stor endring kan finne et krav appen ikke holder, også der ingen test har sett etter.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
