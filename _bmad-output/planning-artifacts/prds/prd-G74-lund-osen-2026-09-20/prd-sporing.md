@@ -2,7 +2,7 @@
 title: "Sporingen av PRD-en"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-17T22:40
+updated: 2026-11-18T09:58
 ---
 
 # Sporingen av PRD-en
@@ -12,15 +12,20 @@ suksessmålene (SM): avsnittet den står i, statusen, storyene og testfilene.
 Lista over antakelsene og de foreløpige tallene står til slutt. Fila hører til
 PRD-en og endres i samme commit som en ID i `prd.md`.
 `tests/test_prd_sporing_9_20.py` feiler hvis en ID mangler her eller ikke finnes
-i `prd.md`, hvis en testfil ikke finnes, eller hvis lista over antakelsene
-ikke stemmer med markørene i `prd.md`.
+i `prd.md`, hvis avsnittet ikke er der overskriften står i `prd.md`, hvis
+statusen ikke følger tabellen i §2 etter regelen i «Slik leses kolonnene», hvis
+en story ikke finnes i `epics.md` eller en testfil ikke finnes, hvis «Hvorfor
+noen numre mangler» ikke stemmer med `prd.md`, hvis lista over antakelsene ikke
+stemmer med markørene i `prd.md`, eller hvis en lenke her ikke virker.
 
 ## Slik leses kolonnene
 
 - **Status** er lest i tabellen «Kjerne, ekstra og senere» i §2 i `prd.md`.
-  «Bygget» er at hver rad for kravet har «ja», og «bygget, en del senere» at
-  minst én rad har «ja» og én er «senere». «Senere» er at kravet ikke er i v1,
-  og «utenfor v1 (plan A)» at det står i vedlegg A. «Tatt bort» gjelder FR-108.
+  «Bygget» er at minst én rad for kravet har «ja» og ingen er «senere», og
+  «bygget, en del senere» at minst én rad har «ja» og én er «senere».
+  «Senere» er at hver rad er «senere», og «senere (plan A)» gjelder FR-606, som
+  står i §4.6. «Utenfor v1 (plan A)» er at kravet står i vedlegg A. «Tatt bort»
+  er at ingen rad har «ja» og ikke alle er «senere», som FR-108.
   NFR-ene gjelder hele appen. Brukerreisene er «bygget», fordi de beskriver det
   appen gjør, og suksessmålene «måles», med statusen i endringsloggen.
 - **Storyene** er dem som har ID-en under «Oppfyller» i
@@ -28,9 +33,9 @@ ikke stemmer med markørene i `prd.md`.
   bygget. «Levert før nedbrytingen» er de tolv kravene som var bygget før
   stories ble skrevet («FR Coverage Map» i `epics.md`). Kravene som er
   kommet til etter 12.11, og UJ og SM, har storyene der de ble bygget eller
-  skrevet.
-- **Testene** er filene i `tests/` som nevner ID-en, og for kravene som
-  ikke nevnes ved ID, filene som tester oppførselen kravet beskriver.
+  skrevet. Hvert nummer finnes som «### Story X.Y» i `epics.md`.
+- **Testene** er filene i `tests/` som nevner ID-en, og filene som tester
+  oppførselen kravet beskriver, der de er funnet.
   `tests/test_prd_9_11.py` og `tests/test_prd_sporing_9_20.py` er ikke tatt
   med, fordi de sjekker teksten i PRD-en, ikke appen. «Ingen» betyr at ingen
   test er funnet. Suksessmålene som en person måler, har ingen test.
@@ -50,7 +55,7 @@ ikke stemmer med markørene i `prd.md`.
 | FR-106 | §4.1 | bygget | 8.6, 8.17 | `tests/test_boersometer.py` |
 | FR-107 | §4.1 | senere | 8.12 | ingen |
 | FR-108 | §4.1 | tatt bort | 8.11 | `tests/test_ferdige_lister.py`, `tests/test_ferdige_lister_8_11b.py`, `tests/test_raadordene_9_12.py`, `tests/test_vis_meg_rundt_8_26.py` |
-| FR-109 | §4.1 | bygget, en del senere | 8.9, 8.13, 8.25, 8.26 | `tests/test_vis_meg_rundt_8_9.py` |
+| FR-109 | §4.1 | bygget, en del senere | 8.9, 8.13, 8.25, 8.26 | `tests/test_hjelpetekster.py`, `tests/test_omvisningen_8_25.py`, `tests/test_vis_meg_rundt_8_9.py` |
 | FR-110 | §4.1 | bygget | 8.10, 8.10b | `tests/test_innstillinger.py`, `tests/test_innstillinger_ki.py` |
 | FR-111 | §4.1 | bygget | 8.3 | `tests/test_min_liste.py` |
 | FR-112 | §4.1 | bygget | 2.12, 8.22, 8.26, 8.29 | `tests/test_din_egen_liste_8_22.py`, `tests/test_kom_i_gang_8_29.py` |
@@ -80,7 +85,7 @@ ikke stemmer med markørene i `prd.md`.
 | FR-412 | §4.4 | bygget | 2.11, 2.12, 8.6, 8.11, 8.11c, 8.28 | `tests/test_de_15_mest_omsatte_8_28.py`, `tests/test_ferdige_lister.py`, `tests/test_ferdige_lister_8_11b.py`, `tests/test_ki_grunnlag.py`, `tests/test_lista.py`, `tests/test_valg.py` |
 | FR-413 | §4.4 | bygget | 2.13 | `tests/test_ferdige_lister_8_11b.py`, `tests/test_omsetning.py` |
 | FR-414 | §4.4 | senere | 2.14 | ingen |
-| FR-415 | §4.4 | bygget | 2.12, 8.22, 8.26 | `tests/test_foelg_en_aksje_8_22.py`, `tests/test_valg.py`, `tests/test_vis_meg_rundt_8_26.py` |
+| FR-415 | §4.4 | bygget | 2.12, 8.22, 8.26 | `tests/test_bransjene_8_22.py`, `tests/test_foelg_en_aksje_8_22.py`, `tests/test_valg.py`, `tests/test_vis_meg_rundt_8_26.py` |
 | FR-501 | vedlegg A, 4.5 | utenfor v1 (plan A) | 6.3 | `tests/test_meldinger.py` |
 | FR-502 | vedlegg A, 4.5 | utenfor v1 (plan A) | 6.4 | `tests/test_meldinger.py` |
 | FR-503 | vedlegg A, 4.5 | utenfor v1 (plan A) | 6.5 | `tests/test_meldinger.py` |
