@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-18T09:49
+updated: 2026-11-18T09:50
 ---
 
 # PRD — OSE Signal
@@ -12,7 +12,8 @@ updated: 2026-11-18T09:49
 
 ## Slik leser du PRD-en
 
-- **Alt i §1–§8 gjelder nå.** Hvert krav sier hva appen gjør, og
+- **Alt i §1–§8 gjelder nå,** utenom det som er «senere» i tabellen i §2.
+  Hvert krav sier hva appen gjør, og
   «*Konsekvenser:*» sier hva en test kan sjekke. ID-ene står fast, også når et
   krav endres.
 - **Historikken** står i [endringsloggen](prd-endringslogg.md), med de daterte
@@ -186,7 +187,7 @@ første kolonne.
 | **Henting** (hentekommandoen) | Kommandoen som henter kursene og hovedindeksen og skriver dagens vurderinger og KI-tekster. Kveldsjobben, en oppgave i Windows, starter den hver kveld fra kl. 22:15, eller noen starter den selv. Webserveren henter aldri |
 | **Lista** (aktiv liste, universet) | Aksjene appen henter og vurderer, opptil 18. Fra start er det de 15 i §3 |
 | **Oversikten** (markedsoversikten, forsiden) | Startsiden med tabellen over aksjene i lista, hovedindeksen og søylene. Knappen i stripa heter «Markedsoversikt» |
-| **Min liste** | Siden med aksjene brukeren har merket med stjerne (FR-111). Den er et utvalg av lista, ikke en egen henting |
+| **Min liste** | Siden med aksjene brukeren har merket med stjerne (FR-111). Den er et utvalg av lista og av aksjene som venter på å følges (FR-415), ikke en egen henting |
 | **Bransje** (sektor) | Gruppen en aksje hører til. Brukeren ser «bransje», og koden og §3 sier «sektor» |
 | **Aksjesiden** (aksjedetaljen) | Siden for én aksje, med kursgrafen, sjekkene og KI-teksten |
 | **KI-teksten** (KI-laget, KI-bidraget) | Teksten en språkmodell skriver om signalet for én aksje, eller om hele børsdagen. Den kontrolleres, logges og kan slås av. KI-laget er delen av appen som lager den |
@@ -371,6 +372,8 @@ Første siffer i ID-en er avsnittet: FR-1xx er oversikten og de andre sidene i
 stripa (§4.1), FR-2xx aksjesiden (§4.2), FR-4xx hentingen og lagrene (§4.4),
 FR-6xx KI-teksten (§4.6) og FR-7xx signalet (§4.7). Innenfor et avsnitt følger
 numrene rekkefølgen kravene kom til, og et nummer gis aldri til et annet krav.
+«Følg en aksje» er en egen side, men står i §4.4 som FR-415, fordi den endrer
+lista, som FR-412.
 
 Plan A står i vedlegg A. Der står 4.3 med FR-3xx, de kommende hendelsene, og
 4.5 med FR-5xx, meldingsfilteret, og derfor har §4 ingen 4.3 og 4.5. Der står
@@ -689,7 +692,8 @@ skriver bare merket og henter aldri (NFR-02). Min liste har periodevalget med
 notater» når «Vis notater» er på (FR-110). Da står også knappen «Mine notater» i
 raden øverst på alle sidene. På en bred skjerm åpner den notatene i et panel ved
 siden av siden, og ellers går den til notatene i Min liste. Min liste er et utvalg av lista
-(FR-412), ikke en egen henting og ikke en portefølje.
+(FR-412) og av aksjene som venter på å følges (FR-415), ikke en egen henting og
+ikke en portefølje.
 
 *Konsekvenser:*
 - En merket aksje står i Min liste, og en umerket står ikke der.
@@ -721,7 +725,7 @@ valg står som «Venter på henting» (FR-411).
 - Min liste har de tre stegene, og steg 2 har ikke noe felt for nøkkelen.
 - Statusen i steg 2 leser aldri nøkkelen og gjør ingen API-kall.
 - I demoen sier steg 2 at demoen ikke trenger noen nøkkel, og steg 1 går til en side i appen.
-- Tallet for plassene som er brukt, er lista med ønskene som venter.
+- Tallet for plassene som er brukt, er aksjene i lista, pluss ønskene om å følge og minus ønskene om å fjerne som venter.
 - Hver aksje i lista står under sin bransje med «Bytt ut», eller med at den fjernes ved neste henting.
 
 ---
@@ -1405,7 +1409,7 @@ kontrollen.
 - Sjekkene er de samme med KI av og på, og det eneste som skiller sidene, er KI-teksten.
 - En logget tekst med en annen styrke enn vurderingen vises ikke.
 - Modellnavnet står ved hver tekst som vises.
-- En tekst med «kjøp», «selg», «salg» eller «anbefal» vises ikke, selv om den besto kontrollen da den ble laget.
+- En tekst med et ord fra den korte lista, «kjøp», «kjop», «selg», «solg», «salg», «anbefal», «tilråd» eller «tilrad», også inne i et lengre ord, vises ikke, selv om den besto kontrollen da den ble laget.
 
 #### FR-603 — KI-teksten sier ikke mer enn grunnlaget
 
@@ -1553,15 +1557,15 @@ hvorfor. Kursene hentes som før (NFR-04). Demoen spør aldri.
 Det er én tjeneste per kjøring, uten stille overgang til en annen. Feiler
 tjenesten, blir det ingen tekst og en rad i loggen (FR-604, NFR-04). Gemini,
 Anthropic og OpenAI har hver sin nøkkel i fila. Ingen nøkkel følger med appen
-eller repoet. Hver kobler bare til sin egen, på sine egne vilkår. Med av lages
-ingen KI-tekst, og hentingen går som før.
+eller repoet. Hver kobler bare til sin egen, på sine egne vilkår. Med KI slått
+av i fila lages ingen KI-tekst, og hentingen går som før.
 
 ChatGPT med «Sign in with ChatGPT» er ikke i v1, men kan komme senere (§2, §8).
 Et Claude-abonnement kan ikke brukes.
 
 *Konsekvenser:*
 - En tjeneste som feiler, gir ingen tekst fra en annen tjeneste.
-- Med av gjøres ingen kall til en modell.
+- Med KI slått av i fila gjøres ingen kall til en modell.
 - Ingen nøkkel står i repoet.
 - Malen for fila `.env` har den lokale modellen som valg.
 - Uten svar på 30 sekunder starter appen uten KI-tekst, og ingenting lagres.
@@ -1882,7 +1886,7 @@ lukkede, står ordrett i endringsloggen.
 | 13 | **Datoer for demonstrasjon og prosjektinnlevering.** Ikke oppgitt ennå (`docs/innlevering.md`). SM-1, SM-5, SM-6, SM-8 og SM-9 er bundet til dem | Gruppen | Avventer faglærer |
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to (`docs/innlevering.md`, «Eksamen») | Gruppen | Sammen med punkt 13 |
 | 22 | **Kodegjennomgang.** Én samlet kodegjennomgang av v1-koden med BMAD. Gjennomgangene per PR står i `docs/kvalitetssikring.md` §5 | Gruppen | Før innleveringen |
-| 27 | **En misvisende KI-tekst med riktige tall** (FR-603). Kontrollen fanger ord og tall, ikke mening. Hvordan det kunne oppdages og skrives som en testbar konsekvens, er refleksjonsspørsmål 2 i tilbakemeldingen 12.11 | Gruppen | Til refleksjonsrapporten |
+| 27 | **En misvisende KI-tekst med riktige tall** (FR-603). Kontrollen fanger feil tall, retning og styrke, ord fra rådlista og gjetningslista, og ord om målingen som strider mot fortegnet, men ikke en misvisende tekst der tallene og ordene er riktige. Hvordan det kunne oppdages og skrives som en testbar konsekvens, er refleksjonsspørsmål 2 i tilbakemeldingen 12.11 | Gruppen | Til refleksjonsrapporten |
 | 28 | **Terskelen «under 5 minutter» i SM-1.** Brukertesten 10.11 brukte over 5 minutter, så SM-1 er ikke nådd (`docs/brukertest.md`). Om terskelen står, eller appen endres, avgjøres etter brukertest 2 | Gruppen | Etter brukertest 2 |
 
 ### Utenfor v1

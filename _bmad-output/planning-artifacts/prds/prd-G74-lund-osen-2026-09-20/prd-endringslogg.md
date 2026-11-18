@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-18T09:49
+updated: 2026-11-18T09:50
 ---
 
 # Endringslogg for PRD-en
@@ -1687,3 +1687,13 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-18 (story 9.20, gjennomgangen BH4 og BH8, etter gruppens svar 17.11 kl. 12:29–13:40):* «v1.1» i §8 nevner relevansskalaen (FR-606), som er senere og plan A, men står i §4.6. Lista over de bygde idéene fra v1.1 var ufullstendig: flere av idéene i «v1.1 — vurderes etter at v1 er kontrollert» i denne loggen ble flyttet til v1 og bygget, ikke bare de fire. Avsnittet viser nå til lista her og til tabellen i §2 i stedet. Det sto slik: «Det som står som «senere» i tabellen i §2, er plan for en senere versjon: plan A i vedlegg A, åtte deler av kravene i v1, KI-tekst for små hull (FR-408) og et tenkt salg uten et tenkt kjøp først (FR-209). Ingen av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er i v1.» og «Av idéene som sto i lista til v1.1, er de som ble bygget, tatt inn som krav i §4: sjekk 2 og 3 i kursgrafen (FR-202), signaldagene (FR-206), hjelpen bak «?» (FR-109) og signalet regnet i ettertid (FR-408). De andre står med forbeholdene sine i endringsloggen. Ingen av dem tas før v1 er kontrollert og virker.»
 
 *Endret 2026-11-18 (story 9.20, gjennomgangen BH5, etter gruppens svar 17.11 kl. 12:29–13:40):* NFR-03 og SM-4 er bundet til terskelen i FR-705, ikke til styrke 0 (V14 i valideringen, slik den ble rettet 17.11). «Dager der alle aksjene har styrke 0» gjorde kravet smalere enn før og SM-4 vanskelig å måle. Med terskelen i FR-705 var 5 av de 199 målte dagene uten en aksje som skilte seg ut. Nå står det «dager der ingen aksje skiller seg ut, fordi alle har styrke under terskelen i FR-705», som også er dagene med «0 av N skilte seg ut». Det sto slik i NFR-03: «Kildefeil, manglende data og dager der alle aksjene har styrke 0, stopper ikke hovedflyten.», og i SM-4: «Dager der alle aksjene har styrke 0, håndteres uten at hovedflyten stopper eller tvinger fram et resultat». Før 17.11 sto det «dager uten tydelige signaler» begge steder.
+
+*Endret 2026-11-18 (story 9.20, gjennomgangen BH7, BH9, BH10, BH11, ECH1, ECH2 og ECH3, etter gruppens svar 17.11 kl. 12:29–13:40):* små presiseringer der teksten fra 17.11 ikke stemte nøyaktig. Det som sto, ordrett:
+
+- «Slik leser du PRD-en»: «- **Alt i §1–§8 gjelder nå.** Hvert krav sier hva appen gjør, og». Nå er det som er «senere» i tabellen i §2, unntatt.
+- Innledningen til §4 sa ikke hvorfor «Følg en aksje», som er en egen side, står i §4.4. Nå sier den det: den endrer lista, som FR-412. Ingen tekst er tatt bort.
+- Punkt 27 i §8: «(FR-603). Kontrollen fanger ord og tall, ikke mening.» Nå sier punktet det samme som «Kontrollen er grov» i FR-603, også ordene om målingen.
+- FR-608: «Med av lages ingen KI-tekst, og hentingen går som før.» og konsekvensen «- Med av gjøres ingen kall til en modell.» Nå står «Med KI slått av i fila».
+- FR-602: «- En tekst med «kjøp», «selg», «salg» eller «anbefal» vises ikke, selv om den besto kontrollen da den ble laget.» Den korte lista i `_VAKT` i `src/ki_visning.py` har også «kjop», «solg», «tilråd» og «tilrad», og stopper ordene inne i lengre ord. Nå står hele lista.
+- FR-112: «- Tallet for plassene som er brukt, er lista med ønskene som venter.» Nå står det som i kravteksten: aksjene i lista, pluss ønskene om å følge og minus ønskene om å fjerne som venter.
+- Ordlista, «Min liste»: «Den er et utvalg av lista, ikke en egen henting», og FR-111: «Min liste er et utvalg av lista (FR-412), ikke en egen henting og ikke en portefølje.» «Følg» setter stjernen på en aksje som venter på hentingen, før den står i lista (migrasjonen `0013_stjerne_ved_folg.sql`). Nå står «og av aksjene som venter på å følges (FR-415)» begge steder.
