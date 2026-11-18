@@ -2,7 +2,7 @@
 title: "Svar på tilbakemeldingen på PRD-en"
 status: draft
 created: 2026-11-17
-updated: 2026-11-17T22:48
+updated: 2026-11-18T09:48
 ---
 
 # Svar på tilbakemeldingen på PRD-en
@@ -44,7 +44,7 @@ konsekvenser, en ordliste med tolv ord og regelen om målingen i FR-603.
 | Punkt i tilbakemeldingen | Hva som er gjort |
 |---|---|
 | 1 Samlet inntrykk: «dokumentet er blitt en endringslogg» | Gjort. `prd.md` har én gjeldende tekst per krav, og historikken står i [endringsloggen](prd-endringslogg.md). [«Slik leser du PRD-en»](prd.md#slik-leser-du-prd-en) øverst sier at §1–§8 gjelder nå, at vedlegg A ikke er bygget, og hvor historikken, sporingen og dette svaret står |
-| 2 Dette fungerer godt | Står. FR-701–FR-703, kontrollen i FR-603, FR-411, NFR-01 og avveiningene i §7 er beholdt. [FR-603](prd.md#fr-603--ki-teksten-sier-ikke-mer-enn-grunnlaget) har fått punkt 5, at ordene om målingen skal stemme med fortegnet, og «Kontrollen er grov» sier nå nøyaktig hva den fanger og ikke |
+| 2 Dette fungerer godt | Gjort, det står. FR-701–FR-703, kontrollen i FR-603, FR-411, NFR-01, «Drift: hva målet ga opp» og motmålene i [§7](prd.md#7-suksessmål) er beholdt. At SM-1 ikke er nådd, er åpent punkt 28 i [§8](prd.md#8-åpne-punkter), og statusen fra 12.11 står i endringsloggen. [FR-603](prd.md#fr-603--ki-teksten-sier-ikke-mer-enn-grunnlaget) har fått punkt 5, at ordene om målingen skal stemme med fortegnet, og «Kontrollen er grov» sier nå nøyaktig hva den fanger og ikke |
 | 3 Oversikt per dimensjon | Gjort for de tre som var «god» eller «svak». Testbarhet: hvert krav har «*Konsekvenser:*» (4.2). Scope: én tabell i [§2](prd.md#kjerne-ekstra-og-senere) (4.5). Brukbarhet: ordliste, tre brukerreiser og [sporingen](prd-sporing.md) (4.3). Formtilpasning: kravregister med UJ og SM (4.3, §5) |
 | 4.1 Gjeldende krav må kunne leses uten historikken | Gjort. Hvert FR og NFR har én gjeldende tekst som sier hva appen gjør, lest i koden. De daterte linjene står ordrett i endringsloggen. FR-201 sier periodevalget, FR-101 lista som er aktiv med opptil 18, FR-202 volumsøylene og båndet, og NFR-01 fordelingen av de 20 kallene. 17.11 er også status og prosess i §2, §7 og §8 flyttet til endringsloggen |
 | 4.2 Gi alle FR-er testbare konsekvenser | Gjort. Hvert FR og NFR har «*Konsekvenser:*» med det en test kan sjekke, også FR-108 og NFR-06 slik tilbakemeldingen foreslo, og de fire nye kravene. `tests/test_prd_9_11.py` sjekker at hvert krav har dem |
@@ -56,7 +56,7 @@ konsekvenser, en ordliste med tolv ord og regelen om målingen i FR-603.
 | §5 Suksessmålene mangler ID og henvisning til FR | Gjort. [SM-1–SM-11](prd.md#7-suksessmål) med kolonnen «Krav», og hver brukerreise viser til de samme kravene som målet som måler den. «KI-bidrag i drift» og «Relevanseksperiment», som ikke gjelder lenger, står i endringsloggen |
 | §5 Foreldet tekst: FR-401 «kravteksten over står uendret» | Gjort. [FR-401](prd.md#fr-401--henting-utløses-eksplisitt-aldri-av-en-oppstart) er skrevet om: hentingen i seks steg, kveldsjobben og «Start den ekte versjonen» |
 | §5 Beslutninger tilskrevet enkeltpersoner | Gjort. `prd.md` har ingen navn utenom gruppelinja, og avgjørelsene står som gruppens. Linjene i endringsloggen står ordrett, med navnene der de sto |
-| §6 Før dere går videre | Gjeldende tekst og kjerne mot ekstra er gjort (4.1, 4.5), og hovedflyten er UJ-1. «Under 5 minutter» i SM-1 står og avgjøres etter brukertest 2. Punkt 13 og 21 i §8 venter fortsatt på faglærer |
+| §6 Før dere går videre | Gjeldende tekst og kjerne mot ekstra er gjort (4.1, 4.5), og hovedflyten er UJ-1. «Under 5 minutter» i SM-1 står og avgjøres etter brukertest 2, som åpent punkt 28 i [§8](prd.md#8-åpne-punkter). Punkt 13 og 21 i §8 venter fortsatt på faglærer |
 | §7 Refleksjonsspørsmål | Ikke besvart her, fordi spørsmålene besvares i refleksjonsrapporten. Spørsmål 2 står også som åpent punkt 27 i [§8](prd.md#8-åpne-punkter) |
 
 ## Det som ikke er endret

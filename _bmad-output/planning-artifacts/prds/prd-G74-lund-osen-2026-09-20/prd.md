@@ -1883,6 +1883,7 @@ lukkede, står ordrett i endringsloggen.
 | 21 | **Hva er emnesidens tredje del?** Emnesiden sier «tre deler», men lister to (`docs/innlevering.md`, «Eksamen») | Gruppen | Sammen med punkt 13 |
 | 22 | **Kodegjennomgang.** Én samlet kodegjennomgang av v1-koden med BMAD. Gjennomgangene per PR står i `docs/kvalitetssikring.md` §5 | Gruppen | Før innleveringen |
 | 27 | **En misvisende KI-tekst med riktige tall** (FR-603). Kontrollen fanger ord og tall, ikke mening. Hvordan det kunne oppdages og skrives som en testbar konsekvens, er refleksjonsspørsmål 2 i tilbakemeldingen 12.11 | Gruppen | Til refleksjonsrapporten |
+| 28 | **Terskelen «under 5 minutter» i SM-1.** Brukertesten 10.11 brukte over 5 minutter, så SM-1 er ikke nådd (`docs/brukertest.md`). Om terskelen står, eller appen endres, avgjøres etter brukertest 2 | Gruppen | Etter brukertest 2 |
 
 ### Utenfor v1
 
