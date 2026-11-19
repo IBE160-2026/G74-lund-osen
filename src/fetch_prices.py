@@ -422,9 +422,12 @@ def hent_universet(
 
 def _uten_hoey_og_lav(rader: list) -> str:
     """Tillegget i linja for et symbol - story 2.19, gruppens svar 19.11
-    kl. 18:47: hentingen sier hvor mange rader som er lagret uten hoey og lav
-    fordi de ikke passet med sluttkursen. Tomt naar det ikke gjaldt noen.
-    Antallet er regnet av oss, ikke en verdi fra kilden (regel 16)."""
+    kl. 18:47: hentingen sier hvor mange rader i svaret adapteren gir uten
+    hoey og lav fordi de ikke passet med sluttkursen. Tomt naar det ikke
+    gjaldt noen. Antallet gjelder svaret, som «N dager» i samme linje: en
+    rad som ikke lagres (en dag utenfor boersdagene for indeksen, eller et
+    symbol basen avviser), er med (gjennomgangen av 2.19, ECH1). Antallet er
+    regnet av oss, ikke en verdi fra kilden (regel 16)."""
     antall = hoey_og_lav_mot_slutt(rader)
     if not antall:
         return ""

@@ -205,3 +205,21 @@ class TestHentingen:
         linja = [linje for linje in linjer if linje.startswith(navn)]
         assert len(linja) == 1 and linja[0].endswith(f", 1 rad {MERKNAD}"), linjer
         assert vurderinger == len(AKSJEUNIVERS)
+
+    def test_antallet_staar_foer_merknaden_om_ma50(self):
+        """Gjennomgangen av 2.19 (VG1): en kort serie har både antallet og
+        «← for kort for MA50», og antallet står foran merknaden."""
+        aksje = AKSJEUNIVERS[0]
+        utskrift = []
+        resultat = fp.hent_universet(
+            "FALSK-NOEKKEL-123456",
+            "2026-08-01",
+            TIRSDAG.isoformat(),
+            lambda *_: _serie(TIRSDAG, {0, 1}, dager=30),
+            utskrift.append,
+            (aksje,),
+        )
+        assert aksje.symbol in resultat.serier
+        assert utskrift == [
+            f"  {aksje.symbol}: 30 dager, siste {TIRSDAG.isoformat()}, 2 rader {MERKNAD}  ← for kort for MA50"
+        ]
