@@ -171,6 +171,14 @@ def _krev_siste_versjon(tilkobling: sqlite3.Connection, *, godta_en_versjon_bak:
         )
 
 
+def _hoey_lav(tilkobling: sqlite3.Connection, tabell: str) -> str:
+    """Uttrykkene som gir hoey og lav i en SELECT mot kurs eller indeks -
+    story 2.10. En base en versjon bak (godta_en_versjon_bak, story 2.8) har
+    ikke kolonnene fra 0015, og der har ingen rad dem. Som _regnet for 0014."""
+    kolonner = {rad[1] for rad in tilkobling.execute(f"PRAGMA table_info({tabell})")}
+    return "hoey, lav" if {"hoey", "lav"} <= kolonner else "NULL, NULL"
+
+
 class SqliteKurslager:
     """Kurslager i SQLite. Oppfyller samme kontrakt som MinneKurslager.
 
@@ -190,6 +198,7 @@ class SqliteKurslager:
         _krev_siste_versjon(tilkobling, godta_en_versjon_bak=godta_en_versjon_bak)
         self._tilkobling = tilkobling
         self._univers = univers
+        self._hoey_lav = _hoey_lav(tilkobling, "kurs")
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
         rader = list(rader)
@@ -202,9 +211,13 @@ class SqliteKurslager:
         try:
             self._tilkobling.execute("BEGIN")
             self._tilkobling.execute("DELETE FROM kurs WHERE symbol = ?", (symbol,))
+            # Story 2.10: hoey og lav, NULL naar raden ikke har dem.
             self._tilkobling.executemany(
-                "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) VALUES (?, ?, ?, ?, ?)",
-                [(symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum) for rad in rader],
+                "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum, hoey, lav) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    (symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum, rad.hoey, rad.lav)
+                    for rad in rader
+                ],
             )
             self._tilkobling.execute(
                 "INSERT INTO kursserie (symbol, hentet) VALUES (?, ?) "
@@ -226,9 +239,11 @@ class SqliteKurslager:
                 slutt=slutt,
                 justert_slutt=justert_slutt,
                 volum=volum,
+                hoey=hoey,
+                lav=lav,
             )
-            for dato, slutt, justert_slutt, volum in self._tilkobling.execute(
-                "SELECT dato, slutt, justert_slutt, volum FROM kurs WHERE symbol = ? ORDER BY dato",
+            for dato, slutt, justert_slutt, volum, hoey, lav in self._tilkobling.execute(
+                f"SELECT dato, slutt, justert_slutt, volum, {self._hoey_lav} FROM kurs WHERE symbol = ? ORDER BY dato",
                 (symbol,),
             )
         ]
@@ -252,6 +267,7 @@ class SqliteIndekslager:
         _krev_siste_versjon(tilkobling)
         self._tilkobling = tilkobling
         self._indekser = indekser
+        self._hoey_lav = _hoey_lav(tilkobling, "indeks")
 
     def erstatt_serie(self, symbol: str, rader: list[Kursrad], hentet: datetime) -> None:
         beholdt, tid = kontroller_indeksskriving(symbol, list(rader), hentet, self._indekser)
@@ -262,9 +278,13 @@ class SqliteIndekslager:
         try:
             self._tilkobling.execute("BEGIN")
             self._tilkobling.execute("DELETE FROM indeks WHERE symbol = ?", (symbol,))
+            # Story 2.10: hoey og lav, som i kurs.
             self._tilkobling.executemany(
-                "INSERT INTO indeks (symbol, dato, slutt, justert_slutt, volum) VALUES (?, ?, ?, ?, ?)",
-                [(symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum) for rad in beholdt],
+                "INSERT INTO indeks (symbol, dato, slutt, justert_slutt, volum, hoey, lav) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    (symbol, rad.dato.isoformat(), rad.slutt, rad.justert_slutt, rad.volum, rad.hoey, rad.lav)
+                    for rad in beholdt
+                ],
             )
             self._tilkobling.execute(
                 "INSERT INTO indeksserie (symbol, hentet) VALUES (?, ?) "
@@ -281,9 +301,16 @@ class SqliteIndekslager:
 
     def serie(self, symbol: str) -> list[Kursrad]:
         return [
-            Kursrad(dato=date.fromisoformat(dato), slutt=slutt, justert_slutt=justert_slutt, volum=volum)
-            for dato, slutt, justert_slutt, volum in self._tilkobling.execute(
-                "SELECT dato, slutt, justert_slutt, volum FROM indeks WHERE symbol = ? ORDER BY dato",
+            Kursrad(
+                dato=date.fromisoformat(dato),
+                slutt=slutt,
+                justert_slutt=justert_slutt,
+                volum=volum,
+                hoey=hoey,
+                lav=lav,
+            )
+            for dato, slutt, justert_slutt, volum, hoey, lav in self._tilkobling.execute(
+                f"SELECT dato, slutt, justert_slutt, volum, {self._hoey_lav} FROM indeks WHERE symbol = ? ORDER BY dato",
                 (symbol,),
             )
         ]

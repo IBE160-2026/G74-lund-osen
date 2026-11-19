@@ -52,9 +52,11 @@ class TestTabellen:
         tilkobling = sqlite3.connect(":memory:")
         try:
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 15
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-            assert siste_versjon(MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+            assert siste_versjon(MIGRASJONSKATALOG) == 15
         finally:
             tilkobling.close()
 
@@ -257,12 +259,16 @@ class TestBaseIVersjon2:
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 15
             # 0004 (story 2.1c) legger fire maalinger til vurdering. En rad
             # med grunn har ingen, saa de er NULL.
             # Rettet 2026-11-14 (story 2.17): og kolonnen regnet fra 0014, med
             # «kveld» for radene fra før.
             foer["vurdering"] = [rad + (None,) * 4 + ("kveld",) for rad in foer["vurdering"]]
+            # Rettet 2026-11-19 (story 2.10): og hoey og lav fra 0015, NULL
+            # for radene i kurs fra før.
+            foer["kurs"] = [rad + (None, None) for rad in foer["kurs"]]
             assert alle_rader(tilkobling) == foer
             assert antall(tilkobling, "aksje") == 15
             assert (
