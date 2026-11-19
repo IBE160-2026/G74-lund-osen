@@ -45,7 +45,9 @@ def norsk_tid(sekunder, form="%d.%m %H:%M"):
     """Story 9.23 (spoersmaal 2 fra 9.22): git gir tiden som sekunder (%at,
     taggerdate:unix), og den regnes om til norsk tid her, med OSLO. Paa Windows
     virker ikke TZ i MILJO for git, saa tiden git skrev selv, var UTC lokalt. Paa
-    GitHub er utskriften som foer."""
+    GitHub er utskriften som foer for commitene. Taggene stod foer i taggerens egen
+    tidssone og staar naa i norsk tid; taggene vi har, er laget i Oslo, saa de staar
+    som foer (gjennomgangen av 9.23, VG2)."""
     return datetime.fromtimestamp(int(sekunder), OSLO).strftime(form)
 
 
@@ -100,11 +102,13 @@ print(f"HEAD paa GitHub: {med_norsk_tid(head.strip()) if head.strip() else ''}")
 # 1. Commits siste doegn, delt i kode og dokumenter
 print("\n== 1 COMMITS SISTE DOEGN")
 _, logg = git("log", f"--since={FRA.isoformat()}", f"--until={NAA.isoformat()}",
-              "--format=%x1e%h|%an|%at|%s", "--name-only")
+              "--format=%x1e%h%x1f%an%x1f%at%x1f%s", "--name-only")
 commits = []
 for blokk in logg.split("\x1e")[1:]:
     linjer = [l for l in blokk.splitlines() if l.strip()]
-    h, forf, tid, emne = linjer[0].split("|", 3)
+    # Gjennomgangen av 9.23 (ECH1): skilt med %x1f, som i del 10, saa en «|» i
+    # navnet ikke flytter tiden.
+    h, forf, tid, emne = linjer[0].split("\x1f", 3)
     filer = linjer[1:]
     kode = any(f.startswith(("src/", "tests/", ".github/")) or f in ("pyproject.toml", "uv.lock")
                for f in filer)

@@ -9,6 +9,7 @@ Windows. Begge skal gi norsk tid, også om sommeren.
 """
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -26,9 +27,15 @@ def _repo(tmp_path: Path) -> tuple[Path, str, str]:
     18.11 kl. 20:44 (vintertid, 21:44 i Oslo)."""
     rot = tmp_path / "repo"
     (rot / BRIEF).parent.mkdir(parents=True)
+    # Gjennomgangen av 9.23 (ECH3): uten den globale git-oppsettet på maskinen,
+    # så signering og hooks der ikke rører testen.
+    tom = tmp_path / "gitconfig"
+    tom.write_text("", encoding="utf-8")
     miljo = {
         **os.environ,
-        "GIT_AUTHOR_NAME": "Test Person",
+        "GIT_CONFIG_GLOBAL": str(tom),
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_AUTHOR_NAME": "Test | Person",
         "GIT_AUTHOR_EMAIL": "test@example.invalid",
         "GIT_COMMITTER_NAME": "Test Person",
         "GIT_COMMITTER_EMAIL": "test@example.invalid",
@@ -46,6 +53,8 @@ def _repo(tmp_path: Path) -> tuple[Path, str, str]:
     git("commit", "-q", "-m", "Briefen", dato="2026-10-06T20:00:00+00:00")
     foer = git("log", "-1", "--format=%h")
     git("tag", "-a", "arbeidskrav-product-brief-v9", "-m", "v9", dato="2026-10-06T21:01:00+00:00")
+    # Gjennomgangen av 9.23 (ECH2): en tag uten -a har ingen tid.
+    git("tag", "arbeidskrav-product-brief-lett")
     (rot / BRIEF).write_text("versjon 9, endret\n", encoding="utf-8")
     git("commit", "-q", "-am", "Briefen etter taggen", dato="2026-11-18T20:44:00+00:00")
     return rot, foer, git("log", "-1", "--format=%h")
@@ -73,8 +82,10 @@ class TestNorskTid:
         assert f"HEAD paa GitHub: {etter} 18.11 21:44 Briefen etter taggen" in linjer, linjer
 
     def test_commitene_siste_doegn(self, tmp_path, capsys, monkeypatch, tz):
+        """Gjennomgangen av 9.23 (ECH1): «|» i navnet. Ville feilet med
+        ValueError da feltene var skilt med «|»."""
         linjer, _, etter = _kjoer(tmp_path, capsys, monkeypatch, tz)
-        assert f"  {etter} 18.11 21:44 Test Person: Briefen etter taggen [dok]" in linjer, linjer
+        assert f"  {etter} 18.11 21:44 Test | Person: Briefen etter taggen [dok]" in linjer, linjer
 
     def test_briefen_endret_etter_taggen(self, tmp_path, capsys, monkeypatch, tz):
         linjer, _, etter = _kjoer(tmp_path, capsys, monkeypatch, tz)
@@ -89,11 +100,18 @@ class TestNorskTid:
         linjer, foer, _ = _kjoer(tmp_path, capsys, monkeypatch, tz)
         assert f"  ny tag: arbeidskrav-product-brief-v9 -> {foer} (2026-10-06 23:01)" in linjer, linjer
 
+    def test_en_tag_uten_tid(self, tmp_path, capsys, monkeypatch, tz):
+        """Gjennomgangen av 9.23 (ECH2): en tag uten -a står uten tid, som før."""
+        linjer, foer, _ = _kjoer(tmp_path, capsys, monkeypatch, tz)
+        assert f"  ny tag: arbeidskrav-product-brief-lett -> {foer} ()" in linjer, linjer
+
 
 def test_skriptet_bruker_ikke_tiden_git_skriver_lokalt():
     """Tidene kommer fra git som sekunder (%at og taggerdate:unix) og regnes om
-    med OSLO i Python, så TZ ikke må virke for git."""
+    med OSLO i Python, så TZ ikke må virke for git. Gjennomgangen av 9.23 (VG3):
+    ingen datoformat fra git for forfatteren eller committeren utenom %at og
+    %ct, ingen --date, og hver %(…date) i for-each-ref er :unix."""
     kilde = SKRIPTET.read_text(encoding="utf-8")
-    assert "format-local" not in kilde
-    assert "%ad" not in kilde
-    assert "taggerdate:iso8601" not in kilde
+    assert re.findall(r"%[ac][dDrRiIsh]", kilde) == []
+    assert "--date" not in kilde
+    assert re.findall(r"%\([a-z*]*date(?!:unix\))[^)]*\)", kilde) == []

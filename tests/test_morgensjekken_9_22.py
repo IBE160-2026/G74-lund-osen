@@ -196,6 +196,8 @@ def _med_sekunder(tag: str) -> str:
     """«navn|peeled|obj|2026-10-06 23:01:44 +0200» med tiden som sekunder, som
     %(taggerdate:unix) gir."""
     *felt, tid = tag.split("|")
+    if not tid:  # en tag uten -a har ingen tid (gjennomgangen av 9.23, ECH2)
+        return tag
     return "|".join([*felt, str(int(datetime.strptime(tid, "%Y-%m-%d %H:%M:%S %z").timestamp()))])
 
 
