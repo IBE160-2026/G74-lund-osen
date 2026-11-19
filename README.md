@@ -67,7 +67,7 @@ Bildene fra smal skjerm, 390 px bred som på en mobil, ligger i [`docs/appen/mob
 | | Demoen | Den ekte versjonen |
 |---|---|---|
 | Kurser | Oppdiktede selskaper og kurser («Eksempeltall») | Ekte sluttkurser fra Oslo Børs, hentet fra EODHD hver børsdag. Dagens vurdering lagres per aksje |
-| Trenger | Ingen konto og ingen nøkkel ([API-nøkler](#api-noekler)) | En gratis nøkkel fra EODHD ([API-nøkler](#api-noekler)) |
+| Trenger | Ingen konto og ingen nøkkel | En gratis nøkkel fra EODHD |
 | Klar | Med en gang | Etter første henting, som kan startes når som helst. Før kl. 22 på en børsdag henter den forrige børsdag, og dagens kurser etter kl. 22 trenger da bonuskvote hos EODHD. Børsdagene før får signalet regnet i ettertid av kursene, merket «i ettertid» og uten KI-tekst |
 | KI-tekst | Ferdige tekster for siste dag, også «Børsdagen kort fortalt», laget én gang med Gemma | På: Gemma på maskinen, som vinduet i Windows tilbyr å hente første gang, eller en egen nøkkel til en KI-tjeneste. Uten modell lages ingen tekst, og siden sier hvordan den slås på |
 | Dagen | Fast: fredag 09.10.2026 | Den siste børsdagen som er hentet |
@@ -108,17 +108,11 @@ Til faglærer:
 
 <a name="den-ekte-versjonen"></a>**Ekte kurser:** dobbeltklikk «Start den ekte versjonen» i stedet for «Start demoen». Den spør etter en gratis nøkkel fra EODHD første gang, og starter bare i en kopi fra ZIP-fila, ikke i en klon. Første gang tilbyr den også å hente Gemma, en gratis språkmodell som skriver KI-teksten på maskinen (prøvd med 15,7 GB minne), eller å bruke din egen API-nøkkel. Appen virker også uten KI-tekst. Docker, uv, Linux, hjelp når du står fast og mer for den som vil: [Installasjonen](docs/installasjon.md).
 
-<a name="api-noekler"></a>
-
-### API-nøkler
-
-Appen kjøres lokalt på maskinen. Ingen nøkkel følger med appen eller repoet.
-
+<a name="api-noekler"></a>**API-nøkler:** appen kjøres lokalt på maskinen. Ingen nøkkel følger med appen eller repoet.
 - **Demoen** trenger ingen nøkkel.
-- **Den ekte versjonen** trenger `EODHD_API_KEY`, en gratis nøkkel fra [eodhd.com](https://eodhd.com). Startskriptet spør etter den første gang og skriver den i `.env`. Gratisnivået gir 20 kall i døgnet, og hentingen bruker ett kall per aksje og ett for hovedindeksen.
+- **Den ekte versjonen** trenger `EODHD_API_KEY`, en gratis nøkkel fra [eodhd.com](https://eodhd.com). Den som vil prøve den, lager sin egen gratis konto hos EODHD, fordi vilkårene ikke lar oss dele vår nøkkel eller dataene. Startskriptet spør etter nøkkelen første gang og skriver den i `.env`. Gratisnivået gir 20 kall i døgnet, og hentingen bruker ett kall per aksje og ett for hovedindeksen.
 - **KI-teksten** trenger ingen nøkkel med Gemma på maskinen. En egen nøkkel trengs bare når en KI-tjeneste velges med `OSE_KI_TJENESTE`: `OSE_KI_GEMINI_NOKKEL` for Gemini, `OSE_KI_ANTHROPIC_NOKKEL` for Anthropic eller `OSE_KI_OPENAI_NOKKEL` for OpenAI, og bare den ene.
-
-Navnene står i [`.env.example`](.env.example) og i [Teknologi og nøkler](_bmad-output/planning-artifacts/architecture/teknologi-og-noekler.md).
+- **Navnene** står i [`.env.example`](.env.example) og i [Teknologi og nøkler](_bmad-output/planning-artifacts/architecture/teknologi-og-noekler.md).
 
 ## Status
 

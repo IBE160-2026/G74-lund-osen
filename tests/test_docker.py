@@ -5073,8 +5073,14 @@ class TestHovedveien:
         assert "<details>" not in del_ and "<summary>" not in del_ and not _blokkene(del_), del_
         assert re.findall(r"^#{1,6} (.+)$", del_, re.MULTILINE) == [DOBBELTKLIKKET]
         avsnitt = [a for a in del_.strip("\n").split("\n\n") if a.strip()]
-        assert len(avsnitt) == 5, avsnitt
-        anker, overskrift, stegene, advarselen, ekte = avsnitt
+        # Lagt til 2026-11-19 (gruppens svar kl. 14:24, etter faglærer i
+        # Canvas 19.11): et sjette avsnitt, «API-nøkler», med ankeret
+        # api-noekler, som docs/innlevering.md lenker til.
+        assert len(avsnitt) == 6, avsnitt
+        anker, overskrift, stegene, advarselen, ekte, noeklene = avsnitt
+        assert noeklene.startswith('<a name="api-noekler"></a>**API-nøkler:** '), noeklene
+        for navn in ("EODHD_API_KEY", "OSE_KI_TJENESTE", ".env.example"):
+            assert navn in noeklene, navn
         assert anker == f'<a name="{DOBBELTKLIKK_ANKER}"></a>' and overskrift == f"### {DOBBELTKLIKKET}"
         # Det som er flyttet, står ikke igjen noe sted i README-en.
         for flyttet in (
