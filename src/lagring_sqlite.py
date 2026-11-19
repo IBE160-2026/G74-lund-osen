@@ -174,7 +174,9 @@ def _krev_siste_versjon(tilkobling: sqlite3.Connection, *, godta_en_versjon_bak:
 def _hoey_lav(tilkobling: sqlite3.Connection, tabell: str) -> str:
     """Uttrykkene som gir hoey og lav i en SELECT mot kurs eller indeks -
     story 2.10. En base en versjon bak (godta_en_versjon_bak, story 2.8) har
-    ikke kolonnene fra 0015, og der har ingen rad dem. Som _regnet for 0014."""
+    ikke kolonnene fra 0015, og der har ingen rad dem. Som _regnet for 0014.
+    Bare SqliteKurslager godtar en slik base. SqliteIndekslager bruker den
+    for at de to skal vaere like (gjennomgangen av 2.10, BH4)."""
     kolonner = {rad[1] for rad in tilkobling.execute(f"PRAGMA table_info({tabell})")}
     return "hoey, lav" if {"hoey", "lav"} <= kolonner else "NULL, NULL"
 
@@ -635,6 +637,9 @@ def _innhold(felt, grunn, regnet: str = KVELD) -> Vurdering | Grunn:
 # i rowid-rekkefoelge. Alle koblingene er LEFT JOIN, saa en aksje uten kurser
 # kommer med og kan navngis under tabellen. Forrige kurs er den nyeste foer
 # nyeste, og vurderingen er raden for datoen til nyeste kurs (FR-101, FR-408).
+# Story 2.10 (gjennomgangen, ECH1): oversikten leser ikke hoey og lav, saa
+# Kursrad-ene herfra har None der. Skal en side vise dem (FR-203), maa de
+# leses her, med _hoey_lav.
 _KURSFELT = "dato, slutt, justert_slutt, volum"
 _OVERSIKT = (
     "SELECT a.symbol, a.ticker, a.navn, a.sektor, ks.hentet, "

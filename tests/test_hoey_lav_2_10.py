@@ -21,7 +21,7 @@ import fetch_prices as fp
 from eodhd import kursrad_fra_eodhd, serie_fra_eodhd
 from indeksdata import HOVEDINDEKS
 from kursdata import AKSJEUNIVERS, Kursrad, MinneKurslager, UgyldigKursrad
-from lagring_sqlite import MIGRASJONSKATALOG, SqliteIndekslager, SqliteKurslager, aapne_base
+from lagring_sqlite import MIGRASJONSKATALOG, VURDERINGSKOLONNER, SqliteIndekslager, SqliteKurslager, aapne_base
 from migrering import migrer, siste_versjon
 
 DAG = date(2026, 9, 21)
@@ -55,7 +55,8 @@ class TestKursrad:
         assert Kursrad(dato=DAG, slutt=1.0, justert_slutt=1.0, volum=0, lav=0.5).hoey is None
 
     @pytest.mark.parametrize("navn", ["hoey", "lav"])
-    @pytest.mark.parametrize("verdi", [0, -1.0, math.nan, math.inf, "101.5", True])
+    # Gjennomgangen av 2.10 (VG5): ogsaa -inf, False og et heltall for stort for float.
+    @pytest.mark.parametrize("verdi", [0, -1.0, math.nan, math.inf, -math.inf, "101.5", True, False, 10**400])
     def test_en_verdi_som_ikke_er_en_kurs_avvises(self, navn, verdi):
         with pytest.raises(UgyldigKursrad):
             Kursrad(dato=DAG, slutt=100.0, justert_slutt=98.0, volum=1000, **{navn: verdi})
@@ -95,6 +96,11 @@ class TestAdapteren:
     def test_high_under_low_gir_ingen_av_dem(self):
         rad = kursrad_fra_eodhd(_rad(high=97.0, low=101.0))
         assert (rad.hoey, rad.lav) == (None, None)
+
+    def test_high_lik_low_beholdes(self):
+        """Gjennomgangen av 2.10 (VG5): en dag med én kurs."""
+        rad = kursrad_fra_eodhd(_rad(high=100.0, low=100.0))
+        assert (rad.hoey, rad.lav) == (100.0, 100.0)
 
     def test_heltall_blir_tall(self):
         rad = kursrad_fra_eodhd(_rad(high=102, low=97))
@@ -291,11 +297,14 @@ class TestHentingen:
         ett per aksje og ett for hovedindeksen."""
         raa, base = tmp_path / "data" / "raa", tmp_path / "data" / "db" / "ose.db"
         variant = {a.ticker: VARIANTER[i % len(VARIANTER)] for i, a in enumerate(AKSJEUNIVERS)}
+        # Gjennomgangen av 2.10 (VG1): hovedindeksen har dem, og hentingen
+        # skriver dem til indeks.
+        variant[HOVEDINDEKS.ticker] = "med"
         kall = []
 
         def hent(ticker, *_):
             kall.append(ticker)
-            return _serie(TIRSDAG, variant.get(ticker, "uten"))
+            return _serie(TIRSDAG, variant[ticker])
 
         utskrift = []
         fp.kjoer(
@@ -322,6 +331,17 @@ class TestHentingen:
                 )
             }
             vurderinger = t.execute("SELECT count(*) FROM vurdering WHERE regnet = 'kveld'").fetchone()[0]
+            indeksen = t.execute(
+                "SELECT count(*), count(hoey), count(lav) FROM indeks WHERE symbol = ?", (HOVEDINDEKS.symbol,)
+            ).fetchone()
+            # Gjennomgangen av 2.10 (VG2): kursene er like i alle variantene,
+            # saa hver dag har samme vurdering for alle aksjene, med og uten
+            # hoey og lav. Signalet bruker dem ikke.
+            kolonner = ", ".join(VURDERINGSKOLONNER)
+            ulike = t.execute(
+                f"SELECT count(*) FROM (SELECT DISTINCT dato, regnet, {kolonner} FROM vurdering)"
+            ).fetchone()[0]
+            dager = t.execute("SELECT count(DISTINCT dato) FROM vurdering").fetchone()[0]
         finally:
             t.close()
         assert set(tall) == {a.symbol for a in AKSJEUNIVERS}, utskrift
@@ -333,3 +353,41 @@ class TestHentingen:
             else:
                 assert (med_hoey, med_lav) == (0, 0), aksje.symbol
         assert vurderinger == len(AKSJEUNIVERS)
+        assert indeksen[0] > 0 and indeksen[0] == indeksen[1] == indeksen[2], indeksen
+        assert dager > 0 and ulike == dager, (ulike, dager)
+
+    def test_foerste_henting_paa_en_base_paa_14_fyller_dem(self, tmp_path):
+        """Gjennomgangen av 2.10 (VG3): det som skjer med basen den første
+        kvelden med 2.10. Basen står på 14, hentingen migrerer den til 15 og
+        skriver høy og lav for hele serien."""
+        raa, base = tmp_path / "data" / "raa", tmp_path / "data" / "db" / "ose.db"
+        katalog = tmp_path / "migrasjoner"
+        katalog.mkdir()
+        for fil in sorted(MIGRASJONSKATALOG.glob("*.sql")):
+            if fil.name < "0015":
+                shutil.copy(fil, katalog / fil.name)
+        base.parent.mkdir(parents=True)
+        t = sqlite3.connect(base)
+        assert migrer(t, katalog) == 14
+        t.close()
+        fp.kjoer(
+            raa,
+            base,
+            HENTET,
+            "FALSK-NOEKKEL-123456",
+            lambda *_: _serie(TIRSDAG, "med"),
+            lambda _: None,
+            les_kvote=lambda _: {
+                "apiRequests": 0,
+                "apiRequestsDate": "2026-01-01",
+                "dailyRateLimit": 20,
+                "extraLimit": 0,
+            },
+        )
+        t = sqlite3.connect(base)
+        try:
+            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 15
+            n, med_hoey, med_lav = t.execute("SELECT count(*), count(hoey), count(lav) FROM kurs").fetchone()
+        finally:
+            t.close()
+        assert n == 60 * len(AKSJEUNIVERS) and med_hoey == med_lav == n

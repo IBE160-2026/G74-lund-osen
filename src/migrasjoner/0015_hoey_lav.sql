@@ -8,10 +8,11 @@
 -- dem, og signalberegningen bruker dem ikke.
 --
 -- Kolonnene legges til med ADD COLUMN, uten DROP TABLE, som i 0004 og 0014.
--- CHECK-en i en kolonne kan vise til andre kolonner i raden, som i 0004, og
--- sier det samme som Kursrad: over null, og lav ikke over hoey. Typen
+-- CHECK-en i en kolonne kan vise til andre kolonner i raden, som i 0004:
+-- over null, og lav ikke over hoey. Typen og at tallet er endelig
 -- kontrolleres av Kursrad i porten, fordi en tekst i en REAL-kolonne lagres
--- som tekst (se 0004).
+-- som tekst (se 0004), uendelig godtas av CHECK-en og NaN lagres som NULL
+-- (gjennomgangen av 2.10, ECH4).
 
 ALTER TABLE kurs ADD COLUMN hoey REAL CHECK (hoey IS NULL OR hoey > 0);
 

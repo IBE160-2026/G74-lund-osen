@@ -61,9 +61,10 @@ def kursrad_fra_eodhd(rad: object) -> Kursrad:
     low, blir begge None, fordi det ikke kan avgjoeres hvilken som er feil.
     Resten av raden leses som foer, saa hentingen ikke stopper.
 
-    Verdiene sjekkes ikke her; det gjoer Kursrad. En rad som ikke er et
-    objekt, og en dato som ikke er streng YYYY-MM-DD, gir UgyldigKursrad.
-    Et felt som mangler, gir KeyError. Hentingen og SnapshotLeser kaller
+    De fire andre verdiene sjekkes ikke her; det gjoer Kursrad. En rad som
+    ikke er et objekt, og en dato som ikke er streng YYYY-MM-DD, gir
+    UgyldigKursrad. Mangler date, close, adjusted_close eller volume, gir
+    det KeyError (gjennomgangen av 2.10, BH3). Hentingen og SnapshotLeser kaller
     den ikke selv, men gjennom serie_fra_eodhd (story 1.8).
     """
     if not isinstance(rad, dict):
