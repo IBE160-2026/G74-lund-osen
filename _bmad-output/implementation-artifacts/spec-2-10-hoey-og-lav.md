@@ -156,6 +156,14 @@ Kjørt mot `tests/test_hoey_lav_2_10.py`. Alle ble fanget:
 | M4: 0015 uten CHECK | 1, `test_basen_avviser_det_kursrad_avviser` |
 | M5: lageret skriver ikke `hoey` | 3 |
 
+## Bildene
+
+Ingen bilder er nye. `--dokumentene` på grenen fant at avtrykkene bak bildene i
+`tests/test_docker.py` var endret, fordi `src/kursdata.py` er med bak bildene.
+Alle de 20 bildene ble tatt på nytt 19.11 av demoen på grenen, på port 8924 med
+en ny demobase, med skriptet og jobblista fra 9.22. Alle 20 var like byte for
+byte som dem i `docs/appen/`, så bare avtrykkene er regnet ut på nytt.
+
 ## Gjennomgangen 19.11
 
 Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
