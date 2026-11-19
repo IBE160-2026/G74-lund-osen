@@ -39,6 +39,10 @@ til aksjesiden viser tallene, men gruppen valgte nå. Fra svaret:
   lagres uten høy og lav, på samme måte som en rad som mangler dem.
 - Hentingen stopper ikke, og den sier hvor mange rader det gjaldt.
 - Ingen ny migrasjon. Bare testbaser, og `data/db/ose.db` røres aldri.
+- Gangen er som før: spesifikasjonen som første commit på en gren fra
+  origin/main, en test som feiler før rettingen, testfilene og
+  `--dokumentene` lokalt, hele settet i CI, «sjekk utfallet før hver push» og
+  gjennomgangen. *Lagt til etter gjennomgangen (P1):* punktet manglet her.
 - PR-en flettes uten nytt ja, låst til head-en, når CI er grønn i alle jobbene
   og ingen funn på middels eller høy grad står åpne (regel 25). Den flettes
   ikke kl. 22:10–23:58.
@@ -83,7 +87,8 @@ Slått opp på `92862551`:
    serie der adapteren tok bort høy og lav fordi de ikke passet med
    sluttkursen, med den samme regelen. Hentingen legger «, N rader uten høy og
    lav (passet ikke med sluttkursen)» til linja for symbolet når N er over 0.
-   Ellers står linja som før. Antallet er regnet av oss, ikke en verdi fra
+   Ellers står linja som før. Antallet gjelder svaret, som «N dager» i samme
+   linje, så en rad som ikke lagres, er med (ECH1). Antallet er regnet av oss, ikke en verdi fra
    kilden (regel 16).
 3. **`Kursrad` og basen endres ikke.** Uten en migrasjon kan CHECK-en ikke
    endres. Og en `Kursrad` som avviste det, ville gjort rader lagret av 2.10
@@ -99,6 +104,56 @@ Slått opp på `92862551`:
 ikke. Kommer flettecommiten etter midnatt, går jobben 20.11 med 2.10 alene, og
 2.19 går fra jobben 21.11. PR-en flettes ikke kl. 22:10–23:58, og hovedkopien
 får 2.19 sammen med 2.10, etter sjekken av jobben kl. 23:51.
+
+## Bygget 19.11
+
+| Del | Commit |
+|---|---|
+| Adapteren: høy og lav mot sluttkursen, og `hoey_og_lav_mot_slutt` | `d021d6de` |
+| Hentingen sier hvor mange rader det gjaldt | `848a10f4` |
+| Testene i `tests/test_hoey_lav_mot_slutt_2_19.py` | `838e34ca` |
+
+## Testene før
+
+Testene ble skrevet før rettingen, men committet etter den, så git viser
+ikke den røde kjøringen (P1). De ble kjørt mot koden på `92862551` i en egen
+utsjekk i scratchpad: 19 av 33 feilet, blant dem alle testene for at en rad
+utenfor sluttkursen lagres uten høy og lav, tellingen og hentingen. De 14
+som besto, gjelder det som skal stå som før: lik sluttkursen, innenfor, bare
+én av dem på riktig side, at sluttkursen er `close`, og en `close` som ikke
+kan brukes. På grenen besto alle 33, før testen fra gjennomgangen (VG1)
+kom til. Ingen tester i andre filer måtte endres.
+
+## Mutantene
+
+Kjørt mot `tests/test_hoey_lav_mot_slutt_2_19.py`. Alle ble fanget, og `src`
+var lik HEAD etterpå:
+
+| Mutant | Feilet |
+|---|---|
+| M1: adapteren sjekker ikke mot `close` | 14 |
+| M2: sjekken bruker `adjusted_close` | 12 |
+| M3: lik sluttkursen avvises | 6 |
+| M4: sjekken bare når begge finnes | 6 |
+| M5: hentingen sier det ikke | 1, `test_hentingen_stopper_ikke_og_sier_hvor_mange` |
+| M6: linja for hovedindeksen sier det ikke | 1, den samme |
+
+## Gjennomgangen 19.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `838e34ca`. 5 funn, alle lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| ECH1 | lav | Antallet regnes på svaret, før `bare_boersdager` og basen, men docstringen sa «lagret» | Rettet: docstringen og del 2 sier at antallet gjelder svaret, som «N dager» |
+| ECH2 | lav | Rader som 2.10 alene har lagret med høy og lav utenfor sluttkursen, rettes først når symbolet hentes uten feil | Står: ufarlig så lenge aksjesiden ikke viser høy og lav, og serien byttes ut ved neste henting som lykkes (AD-5) |
+| VG1 | lav | Ingen test med antallet og «← for kort for MA50» i samme linje | Rettet: `test_antallet_staar_foer_merknaden_om_ma50` |
+| VG2 | lav | Forsøkene og `--les-inn` er ikke testet for 2.19 | Står: de bruker `hent_universet`, `hent_indeksen` og `serie_fra_eodhd`, som er testet |
+| P1 | lav | Punktet om gangen manglet i «Svaret», og testene ble committet etter rettingen | Rettet: punktet står, og «Testene før» sier det |
+
+Leseren fant at alle veiene som skriver `kurs` og `indeks`, går gjennom
+adapteren, at tellingen og adapteren bruker den samme regelen, og at ingen
+type i `close` gir noe annet enn `UgyldigKursrad`.
 
 ## Grenser
 
