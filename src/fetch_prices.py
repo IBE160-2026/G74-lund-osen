@@ -8,7 +8,7 @@ aldri fra websiden.
 
 Hvert kall henter et helt aar. Det koster noeyaktig det samme som aa hente
 fjorten dager - ett kall per symbol uansett intervallengde, maalt og foert i
-malinger.md §2 - og MA50 trenger 51 handelsdager foer signalet i det hele tatt
+malinger.md §2 - og MA50 trenger 51 boersdager foer signalet i det hele tatt
 kan regnes. Aa hente kort ville derfor kostet like mye og gitt en tom
 signalkolonne.
 

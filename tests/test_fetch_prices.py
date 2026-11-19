@@ -305,7 +305,7 @@ class TestIntervall:
         assert fp.DAGER_TILBAKE < 365
 
     def test_intervallet_gir_rom_for_ma50(self):
-        """51 handelsdager er minimum. Et aar gir rundt 250."""
+        """51 boersdager er minimum. Et aar gir rundt 250."""
         handelsdager_anslag = fp.DAGER_TILBAKE * 5 / 7
         assert handelsdager_anslag > fp.MINST_HANDELSDAGER * 3
 
