@@ -114,6 +114,8 @@ formatene er de samme som før, og at tomme svar fra git gir det samme som før.
 1. «51 boersdager» står uten ø, som resten av teksten på de to stedene
    (VG1). Skal det heller stå «51 børsdager», som i instruksjonen?
 
+   *Svart 2026-11-19 kl. 13:51:* «51 boersdager» står som det er.
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. `data/` og `_privat/` røres ikke, og den
