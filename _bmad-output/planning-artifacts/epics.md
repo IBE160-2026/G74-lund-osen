@@ -5535,3 +5535,5 @@ Som **gruppen som leser koden og morgensjekken** vil vi at kommentarene sier «b
 - En test for hver retting, som feiler før rettingen
 
 **Avhenger av:** 9.22. **Én økt:** ja.
+
+*Lagt til 2026-11-19:* 9.23 er squash-flettet med PR #170 i `3c7cbcfa` kl. 11:44, låst til head-en `bcf60783`, etter instruksjonen om de to spørsmålene fra 9.22 i `docs/ai-prompts/2026-11-19.md`, uten nytt ja. Kommentaren i `src/fetch_prices.py` og docstringen i testen sier «51 boersdager», uten ø som resten av teksten der, og morgensjekken skriver klokkeslettene fra git i norsk tid også på Windows. CI var grønn i alle jobbene (run 44507229045), med 6017 bestått og 99 hoppet over i jobben `pytest`.

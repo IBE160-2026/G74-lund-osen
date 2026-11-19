@@ -2,7 +2,7 @@
 title: 'Story 9.23: «51 børsdager» i koden og norsk tid i morgensjekken'
 type: 'code'
 created: '2026-11-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'beb6aa15'
 context:
@@ -131,5 +131,12 @@ formatene er de samme som før, og at tomme svar fra git gir det samme som før.
 - [x] Morgensjekken kjørt mot main før og etter, med linja «HEAD paa GitHub» her
 - [x] Gjennomgangen er tatt
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: `test_boersdager_9_23.py` 4, `test_fetch_prices.py` 317 og 16 hoppet over, `test_morgensjekken_9_23.py` 11, `test_morgensjekken_9_22.py` 13, `test_boersdager_9_22.py` 1, `test_ryddighet.py` 36 og `test_ruff.py` 6, én om gangen, og `--dokumentene` på `ecd3e6b9` kl. 11:16–11:35 med 3096 bestått og 7 hoppet over
-- [ ] CI er grønn i alle jobbene
-- [ ] Spørsmålene og punktene i `issues.md` har en datert linje når de er løst
+- [x] CI er grønn i alle jobbene (run 44507229045 på `bcf60783`, med 6017 bestått og 99 hoppet over i `pytest`)
+- [x] Spørsmålene og punktene i `issues.md` har en datert linje når de er løst: spørsmålene fra 9.22 i spesifikasjonen for 9.22 i føringen på main, og punktene i `issues.md` lukkes i loggen etter føringen
+
+## Flettet 19.11
+
+CI var grønn i alle fire jobbene på head-en `bcf60783` (run 44507229045). Den første
+ventingen på CI ble stoppet for lite minne og startet igjen. Ingen funn på
+middels eller høy grad sto åpne (regel 25). PR #170 ble squash-flettet i
+`3c7cbcfa` 19.11 kl. 11:44, låst til `bcf60783`, uten nytt ja.
