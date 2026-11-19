@@ -2234,6 +2234,24 @@ den sier.
 
 *Lagt til 2026-11-16:* 2.18 er squash-flettet med PR #161 i `05bc46e7` kl. 12:36, låst til head-en `b1fa8c50`, etter steg 3 i instruksjonen kl. 09:52 i `docs/ai-prompts/2026-11-16.md`, uten nytt ja. CI var grønn i alle jobbene (run 43858445935), med 5865 bestått og 99 hoppet over i jobben `pytest`. Alle de 18 bildene ble tatt på nytt og er byte for byte de samme, så ingen bilder er endret.
 
+### Story 2.19: Høy og lav mot sluttkursen
+
+*Lagt til 2026-11-19, etter gruppens svar kl. 18:47 på spørsmål 2 i 2.10 (ECH3 i gjennomgangen av 2.10), ført i `docs/ai-prompts/2026-11-19.md`:* rådet anbefalte å vente til aksjesiden viser tallene, men gruppen valgte nå. Spesifikasjonen er [`spec-2-19-hoey-og-lav-mot-slutt.md`](../implementation-artifacts/spec-2-19-hoey-og-lav-mot-slutt.md).
+
+Som **bruker** vil jeg at høy og lav i basen bare står der de passer med
+sluttkursen, så aksjesiden aldri kan vise en dag der sluttkursen ligger
+utenfor dagens høyeste og laveste kurs.
+
+**Oppfyller:** FR-203 (tillegget 2026-10-07) · **Begrenses av:** `AD-5`, `AD-15`, `AD-19`, ECH3 i 2.10
+
+**Kontroll — hva testen ser etter:**
+- En rad der lav er over sluttkursen, eller høy er under den, lagres uten høy og lav, som en rad som mangler dem
+- Hentingen stopper ikke, og den sier hvor mange rader det gjaldt
+- Ingen ny migrasjon og ingen nye kall. Grenen bruker bare testbaser og rører aldri `data/db/ose.db`
+- **Ville feilet hvis:** en slik rad ble lagret med høy og lav, eller stoppet hentingen
+
+**Avhenger av:** 2.10. **Én økt:** ja.
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss

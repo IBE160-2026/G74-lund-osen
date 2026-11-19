@@ -49,6 +49,30 @@ def _valgfri_kurs(verdi: object) -> float | None:
     return float(verdi) if endelig and verdi > 0 else None
 
 
+def _utenfor_slutt(slutt: object, hoey: float | None, lav: float | None) -> bool:
+    """Om lav er over sluttkursen eller hoey under den - story 2.19.
+
+    ECH3 i gjennomgangen av 2.10, gruppens svar 19.11 kl. 18:47. Sluttkursen
+    er close, som gir slutt i Kursrad. Lik sluttkursen godtas. Er close ikke
+    et tall, er svaret nei, og Kursrad avviser raden som foer.
+    """
+    if isinstance(slutt, bool) or not isinstance(slutt, (int, float)):
+        return False
+    return (lav is not None and lav > slutt) or (hoey is not None and hoey < slutt)
+
+
+def _hoey_og_lav(rad: dict) -> tuple[float | None, float | None, bool]:
+    """hoey og lav for raden, og om de ble tatt bort fordi de ikke passet med
+    sluttkursen (story 2.19). Den eneste regelen for begge, saa adapteren og
+    tellingen ikke kan faa hver sin."""
+    hoey, lav = _valgfri_kurs(rad.get("high")), _valgfri_kurs(rad.get("low"))
+    if _utenfor_slutt(rad.get("close"), hoey, lav):
+        return None, None, True
+    if hoey is not None and lav is not None and hoey < lav:
+        return None, None, False
+    return hoey, lav, False
+
+
 def kursrad_fra_eodhd(rad: object) -> Kursrad:
     """Oversett en EODHD-rad til Kursrad. Det eneste stedet det skjer - AD-19.
 
@@ -59,7 +83,9 @@ def kursrad_fra_eodhd(rad: object) -> Kursrad:
     Story 2.10: high gir hoey og low gir lav. De er valgfrie: en verdi som
     mangler eller ikke kan brukes, blir None (_valgfri_kurs), og er high under
     low, blir begge None, fordi det ikke kan avgjoeres hvilken som er feil.
-    Resten av raden leses som foer, saa hentingen ikke stopper.
+    Story 2.19: det samme naar low er over close eller high under close
+    (_hoey_og_lav). Resten av raden leses som foer, saa hentingen ikke
+    stopper.
 
     De fire andre verdiene sjekkes ikke her; det gjoer Kursrad. En rad som
     ikke er et objekt, og en dato som ikke er streng YYYY-MM-DD, gir
@@ -69,9 +95,7 @@ def kursrad_fra_eodhd(rad: object) -> Kursrad:
     """
     if not isinstance(rad, dict):
         raise UgyldigKursrad(f"En EODHD-rad maa vaere et objekt, fikk {type(rad).__name__}")
-    hoey, lav = _valgfri_kurs(rad.get("high")), _valgfri_kurs(rad.get("low"))
-    if hoey is not None and lav is not None and hoey < lav:
-        hoey = lav = None
+    hoey, lav, _ = _hoey_og_lav(rad)
     return Kursrad(
         dato=_dato_fra_tekst(rad["date"]),
         slutt=rad["close"],
@@ -80,6 +104,16 @@ def kursrad_fra_eodhd(rad: object) -> Kursrad:
         hoey=hoey,
         lav=lav,
     )
+
+
+def hoey_og_lav_mot_slutt(raa: list) -> int:
+    """Hvor mange rader i en serie adapteren ga uten hoey og lav fordi de
+    ikke passet med sluttkursen - story 2.19.
+
+    Hentingen kaller den etter serie_fra_eodhd, saa hver rad er et objekt.
+    En rad der high er under low, telles ogsaa, fordi en av dem da alltid
+    ligger paa feil side av sluttkursen."""
+    return sum(1 for rad in raa if _hoey_og_lav(rad)[2])
 
 
 class UgyldigSerie(ValueError):
