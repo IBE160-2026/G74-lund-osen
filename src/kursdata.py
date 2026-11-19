@@ -102,26 +102,35 @@ class UgyldigKursrad(ValueError):
 class Kursrad:
     """En handelsdag slik porten gir den ut - AD-19.
 
-    Norske feltnavn, og ingen av dem kan mangle eller vaere None. En
-    feilstavet noekkel gir TypeError her, der dataene kommer inn, i stedet
+    Norske feltnavn, og ingen av de fire foerste kan mangle eller vaere None.
+    En feilstavet noekkel gir TypeError her, der dataene kommer inn, i stedet
     for en None som forplanter seg inn i signalberegningen som et tall som
     mangler. Feil verdi i et felt som finnes, gir UgyldigKursrad.
 
     dato er en kalenderdato (AD-20), ikke tekst og ikke et tidspunkt.
     Adapteren oversetter fra kildens "YYYY-MM-DD".
+
+    Story 2.10: hoey og lav er dagens hoeyeste og laveste kurs, og None naar
+    de mangler. Signalberegningen bruker dem ikke. Er de satt, maa de vaere
+    endelige tall over null, som slutt, og hoey kan ikke vaere under lav.
+    Adapteren gjoer en verdi den ikke kan bruke, til None, saa en rad uten
+    dem aldri stopper hentingen.
     """
 
     dato: date
     slutt: float
     justert_slutt: float
     volum: int
+    hoey: float | None = None
+    lav: float | None = None
 
     def __post_init__(self):
         # datetime er en underklasse av date, men baerer et klokkeslett, og et
         # klokkeslett i feil sone kan gi feil boersdag.
         if not isinstance(self.dato, date) or isinstance(self.dato, datetime):
             raise UgyldigKursrad(f"dato maa vaere datetime.date, fikk {self.dato!r}")
-        for navn in ("slutt", "justert_slutt"):
+        valgfrie = tuple(navn for navn in ("hoey", "lav") if getattr(self, navn) is not None)
+        for navn in ("slutt", "justert_slutt", *valgfrie):
             verdi = getattr(self, navn)
             if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
                 raise UgyldigKursrad(f"{navn} maa vaere et tall, fikk {verdi!r}")
@@ -143,6 +152,8 @@ class Kursrad:
         # Null er en dag uten handel og lovlig. Under null er det ikke.
         if self.volum < 0:
             raise UgyldigKursrad(f"volum kan ikke vaere negativt, fikk {self.volum!r}")
+        if self.hoey is not None and self.lav is not None and self.hoey < self.lav:
+            raise UgyldigKursrad(f"hoey kan ikke vaere under lav, fikk {self.hoey!r} og {self.lav!r}")
 
 
 @runtime_checkable

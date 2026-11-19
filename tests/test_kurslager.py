@@ -44,7 +44,10 @@ class TestKursrad:
     def test_har_de_fire_norske_feltene(self):
         felter = [f.name for f in dataclasses.fields(Kursrad)]
 
-        assert felter == ["dato", "slutt", "justert_slutt", "volum"]
+        # Rettet 2026-11-19 (story 2.10): og hoey og lav, valgfrie, til slutt.
+        assert felter == ["dato", "slutt", "justert_slutt", "volum", "hoey", "lav"]
+        valgfrie = {f.name: f.default for f in dataclasses.fields(Kursrad) if f.default is not dataclasses.MISSING}
+        assert valgfrie == {"hoey": None, "lav": None}
 
     @pytest.mark.parametrize("mangler", ["dato", "slutt", "justert_slutt", "volum"])
     def test_avviser_aa_bli_konstruert_uten_et_felt(self, mangler):
