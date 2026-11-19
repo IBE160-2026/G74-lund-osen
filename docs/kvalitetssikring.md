@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-19T11:45
+updated: 2026-11-19T14:27
 ---
 
 # Kvalitetssikring
@@ -761,7 +761,7 @@ funn. Antall rader i loggen:
 | 9.17, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 og VG1 middels og 15 lave rettet, BH4 og VG2 står med grunn, talt som avvist) | 19 | 17 | 2 | 0 |
 | 9.18, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 og VG2 middels og sju lave rettet; VG1 middels besvart 17.11 kl. 16:19 med en egen story for bildene, talt som utsatt; seks lave står med grunn, talt som avvist) | 16 | 9 | 6 | 1 |
 | 9.19, gjennomgangen 17.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; BH1, ECH1 og BH2 middels og ti lave rettet, VG2 og VG3 står med grunn, talt som avvist) | 15 | 13 | 2 | 0 |
-| 9.20, gjennomgangen 17.11–18.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; BH1–BH5 og VG1 middels og 19 lave rettet, BH6 og VG2 står med grunn, talt som avvist) | 27 | 25 | 2 | 0 |
+| 9.20, gjennomgangen 17.11–18.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; BH1–BH5 og VG1 middels og 15 lave rettet, BH6 og VG2 står med grunn, talt som avvist) | 23 | 21 | 2 | 0 |
 | 9.21, gjennomgangen 18.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 middels og seks lave rettet, ECH3, ECH4 og VG1 står med grunn, talt som avvist) | 10 | 7 | 3 | 0 |
 | 9.22, gjennomgangen 18.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1 og ECH2 middels og åtte lave rettet, ECH5 står med grunn, talt som avvist) | 11 | 10 | 1 | 0 |
 | 9.23, gjennomgangen 19.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1–ECH3, VG2 og VG3 lave rettet, VG1 står med grunn, talt som avvist) | 6 | 5 | 1 | 0 |
@@ -787,6 +787,8 @@ tabellen 03.10.
 *Lagt til 2026-11-03 (story 8.17a):* 4 av de 66 radene står ikke i noen kolonne: 3 spørsmål til gruppen (VG5, BH1 og ECH2, og BH13) og VG1, som ble prøvd for hånd før svaret kl. 10:45 ga testen `TestSmalSkjerm`. To rader med «delvis rettet» er talt som rettet, og rader med «står» som utsatt. Svarene fra gruppen med en retting er talt som rettet.
 
 *Lagt til 2026-11-03 (story 8.17b):* 2 av de 26 radene står ikke i noen kolonne: svarene fra gruppen 03.11 kl. 19:25 på BH8 og BH15, avgjort uten endring. ECH2/VG2 og VG3 er rettet for testene og talt som rettet, og rader med «står» er talt som utsatt.
+
+*Rettet 2026-11-19 (gruppens svar kl. 13:51):* raden for 9.20 sa 27 rader, 25 rettet og «19 lave rettet», men tabellen i spesifikasjonen har 23 funn: 6 på middels og 17 lave, og 21 er rettet. Rapporten fra leseren i økta 18.11 kl. 00:05 har de samme 23, og de fire som skulle gitt 27, er ikke funnet, verken i økta eller i scratchpad. Tallet 27 har ingen kilde (regel 12).
 
 *Lagt til 2026-10-17:* fra story 9.1 (17.10) får hver PR triagen fra spesifikasjonen som kommentar, med lenke til spesifikasjonen. PR #56–#60 fikk den i ettertid 17.10, satt sammen fra triagen i spesifikasjonene.
 

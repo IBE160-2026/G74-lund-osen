@@ -114,7 +114,13 @@ han telte, er ikke kjent, så spriket står åpent (regel 12).
 ## Gjennomgangen 17.11–18.11
 
 Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
-lesing, på `d3c40031`. 27 funn: 6 på middels og 21 lave.
+lesing, på `d3c40031`. 23 funn: 6 på middels og 17 lave.
+
+*Rettet 2026-11-19 (gruppens svar kl. 13:51):* her sto «27 funn: 6 på middels
+og 21 lave», men tabellen under har 23: 6 på middels og 17 lave.
+Rapporten fra leseren i økta 18.11 kl. 00:05 har de samme 23, og de fire som skulle
+gitt 27, er ikke funnet, verken i økta eller i scratchpad. Tallet 27 har ingen
+kilde (regel 12).
 
 | Funn | Grad | Hva | Utfall |
 |---|---|---|---|
