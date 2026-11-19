@@ -9,6 +9,7 @@ oversette et API-svar.
 Modulen gjoer ingen I/O.
 """
 
+import math
 from datetime import date
 
 from kursdata import Kursrad, UgyldigKursrad
@@ -32,12 +33,33 @@ def _dato_fra_tekst(tekst: object) -> date:
     return dato
 
 
+def _valgfri_kurs(verdi: object) -> float | None:
+    """high eller low fra EODHD, eller None - story 2.10.
+
+    None naar feltet mangler, er null, ikke er et tall, ikke er endelig eller
+    ikke er over null. Feltene brukes ikke av signalet, saa en verdi som ikke
+    kan brukes, skal aldri avvise raden eller serien.
+    """
+    if isinstance(verdi, bool) or not isinstance(verdi, (int, float)):
+        return None
+    try:
+        endelig = math.isfinite(verdi)
+    except OverflowError:
+        return None
+    return float(verdi) if endelig and verdi > 0 else None
+
+
 def kursrad_fra_eodhd(rad: object) -> Kursrad:
     """Oversett en EODHD-rad til Kursrad. Det eneste stedet det skjer - AD-19.
 
     adjusted_close gir justert_slutt og close gir slutt, uten fallback mellom
     dem: en justert kurs som mangler, er en KeyError, ikke close. Fallbacken
     ville gitt et tall som ser riktig ut, men er regnet paa feil serie.
+
+    Story 2.10: high gir hoey og low gir lav. De er valgfrie: en verdi som
+    mangler eller ikke kan brukes, blir None (_valgfri_kurs), og er high under
+    low, blir begge None, fordi det ikke kan avgjoeres hvilken som er feil.
+    Resten av raden leses som foer, saa hentingen ikke stopper.
 
     Verdiene sjekkes ikke her; det gjoer Kursrad. En rad som ikke er et
     objekt, og en dato som ikke er streng YYYY-MM-DD, gir UgyldigKursrad.
@@ -46,11 +68,16 @@ def kursrad_fra_eodhd(rad: object) -> Kursrad:
     """
     if not isinstance(rad, dict):
         raise UgyldigKursrad(f"En EODHD-rad maa vaere et objekt, fikk {type(rad).__name__}")
+    hoey, lav = _valgfri_kurs(rad.get("high")), _valgfri_kurs(rad.get("low"))
+    if hoey is not None and lav is not None and hoey < lav:
+        hoey = lav = None
     return Kursrad(
         dato=_dato_fra_tekst(rad["date"]),
         slutt=rad["close"],
         justert_slutt=rad["adjusted_close"],
         volum=rad["volume"],
+        hoey=hoey,
+        lav=lav,
     )
 
 
