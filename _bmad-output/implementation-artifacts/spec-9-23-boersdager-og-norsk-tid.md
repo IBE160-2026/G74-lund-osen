@@ -130,6 +130,6 @@ formatene er de samme som før, og at tomme svar fra git gir det samme som før.
 - [x] Klokkeslettene fra git i norsk tid, også på Windows, med en test som feiler før rettingen
 - [x] Morgensjekken kjørt mot main før og etter, med linja «HEAD paa GitHub» her
 - [x] Gjennomgangen er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: `test_boersdager_9_23.py` 4, `test_fetch_prices.py` 317 og 16 hoppet over, `test_morgensjekken_9_23.py` 11, `test_morgensjekken_9_22.py` 13, `test_boersdager_9_22.py` 1, `test_ryddighet.py` 36 og `test_ruff.py` 6, én om gangen, og `--dokumentene` på `ecd3e6b9` kl. 11:16–11:35 med 3096 bestått og 7 hoppet over
 - [ ] CI er grønn i alle jobbene
 - [ ] Spørsmålene og punktene i `issues.md` har en datert linje når de er løst
