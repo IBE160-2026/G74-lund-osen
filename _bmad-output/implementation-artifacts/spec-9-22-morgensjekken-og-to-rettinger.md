@@ -160,6 +160,11 @@ Klokkeslettet i «HEAD paa GitHub» viste 20:44, ikke 21:44, lokalt i begge
 kjøringene. `TZ` virker ikke for `git log` på Windows, og på GitHub kjører
 skriptet på Linux. Det er ikke endret her.
 
+*Svart 2026-11-19 kl. 09:59 (spørsmål 2 fra 9.22):* klokkeslettet rettes nå, i en egen liten
+story, så «HEAD paa GitHub» og de andre klokkeslettene fra git står i norsk tid også på Windows.
+På GitHub skal utskriften være som før. Rådet anbefalte å vente til kodegjennomgangen etter
+brukertest 2, men gruppen valgte å ta det nå.
+
 ## Gjennomgangen 18.11
 
 Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
@@ -183,6 +188,11 @@ Leseren fant ingen ekte nøkkel som slipper gjennom, ingen krasj, og at CRLF ikk
 feil. «51 handelsdager» står fortsatt i en kommentar i `src/fetch_prices.py` og i
 en docstring i `tests/test_fetch_prices.py`, men instruksjonen gjelder bare FR-101
 og kilden.
+
+*Svart 2026-11-19 kl. 09:59 (spørsmål 1 fra 9.22):* kommentaren og docstringen rettes nå til
+«51 børsdager», og bare der, i en egen liten story. «Handelsdag» er brukt med vilje ellers i
+koden og endres ikke, og historikken siterer det som sto. Rådet anbefalte å vente til
+kodegjennomgangen etter brukertest 2, men gruppen valgte å ta det nå.
 
 ## Grenser
 
