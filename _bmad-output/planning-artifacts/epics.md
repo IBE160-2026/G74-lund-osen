@@ -5520,3 +5520,18 @@ Som **gruppen som leser morgensjekken og bruker appen i brukertest 2** vil vi at
 **Avhenger av:** 9.20, 9.21. **Én økt:** ja.
 
 *Lagt til 2026-11-19:* 9.22 er squash-flettet med PR #169 i `7480e72c` 19.11 kl. 00:16, låst til head-en `1557ff5e`, etter instruksjonen om oppgavene for brukertest 2 og tre små rettinger i `docs/ai-prompts/2026-11-18.md`, uten nytt ja. Morgensjekken merker ikke lenger dagsfilene, taggen v8, de kjente plassholderne og commitene utenfor gruppen, FR-101 og kilden sier «51 børsdager», og knappen ved et notat med kjøp og salg heter som spørsmålet. CI var grønn i alle jobbene (run 44418120615), med 6002 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.23: «51 børsdager» i koden og norsk tid i morgensjekken
+
+*Lagt til 2026-11-19, etter instruksjonen om de to spørsmålene fra 9.22 i `docs/ai-prompts/2026-11-19.md` og gruppens svar 19.11 kl. 09:59:* rådet anbefalte å vente med begge til kodegjennomgangen etter brukertest 2, men gruppen valgte å ta dem nå. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-23-boersdager-og-norsk-tid.md`.
+
+Som **gruppen som leser koden og morgensjekken** vil vi at kommentarene sier «børsdager» der FR-101 gjør det, og at klokkeslettene i morgensjekken står i norsk tid også når vi kjører den på Windows, så vi ikke må regne om en time.
+
+**Oppfyller:** spørsmål 1 og 2 fra 9.22 og de to punktene i `issues.md` · **Begrenses av:** regel 3, 16, 20 og 22; ingen bilder og ingen ny migrasjon, og den planlagte oppgaven «Morgensjekk OSE Signal» endres ikke
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- «51 børsdager» i kommentaren øverst i `src/fetch_prices.py` og i docstringen i `tests/test_fetch_prices.py`, og bare der
+- «HEAD paa GitHub» og de andre klokkeslettene fra git i morgensjekken i norsk tid, også på Windows, og som før på GitHub
+- En test for hver retting, som feiler før rettingen
+
+**Avhenger av:** 9.22. **Én økt:** ja.

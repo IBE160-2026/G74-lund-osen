@@ -10,6 +10,7 @@ nøkler, er skrevet i to deler, så morgensjekken ikke finner dem i denne fila.
 import re
 from datetime import date, datetime, timedelta
 from pathlib import Path, PurePosixPath
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -191,18 +192,36 @@ TAGGENE = [
 ]
 
 
+def _med_sekunder(tag: str) -> str:
+    """«navn|peeled|obj|2026-10-06 23:01:44 +0200» med tiden som sekunder, som
+    %(taggerdate:unix) gir."""
+    *felt, tid = tag.split("|")
+    if not tid:  # en tag uten -a har ingen tid (gjennomgangen av 9.23, ECH2)
+        return tag
+    return "|".join([*felt, str(int(datetime.strptime(tid, "%Y-%m-%d %H:%M:%S %z").timestamp()))])
+
+
 def _del_7(taggene, capsys) -> list[str]:
     kilde = _kilde()
     kjente = eval(kilde.split("KJENTE_TAGGER = ", 1)[1].split("\n}\n", 1)[0] + "\n}")
 
     def git(*args):
-        return (0, "\n".join(taggene) + "\n") if args[0] == "for-each-ref" else (0, "")
+        if args[0] != "for-each-ref":
+            return 0, ""
+        # Story 9.23: tiden kommer fra git som sekunder, og skriptet skriver den i
+        # norsk tid. Taggene over står med tiden slik git lagrer den.
+        assert args[-1].endswith("|%(taggerdate:unix)"), args
+        return 0, "".join(_med_sekunder(t) + "\n" for t in taggene)
 
+    tidene = {"datetime": datetime, "OSLO": ZoneInfo("Europe/Oslo")}
+    exec(kilde[kilde.index("def norsk_tid") : kilde.index("\ndef les")], tidene)
     exec(
         _del(7),
         {
             "re": re,
             "git": git,
+            "norsk_tid": tidene["norsk_tid"],
+            "med_norsk_tid": tidene["med_norsk_tid"],
             "KJENTE_TAGGER": kjente,
             "BRIEF": "x",
             "BRIEF_FRIST": date(2026, 9, 27),
