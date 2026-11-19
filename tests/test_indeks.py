@@ -315,7 +315,11 @@ class TestIndeksenErIkkeEnAksje:
         with pytest.raises(ValueError):
             SqliteKurslager(sqlite_base).erstatt_serie("OSEBX", [rad(FREDAG)], HENTET)
         with pytest.raises(sqlite3.IntegrityError):
-            sqlite_base.execute("INSERT INTO kurs VALUES ('OSEBX', '2026-10-16', 1.0, 1.0, 1)")
+            # Rettet 2026-11-19 (story 2.10): kolonnene er navngitt, fordi kurs
+            # har hoey og lav fra 0015.
+            sqlite_base.execute(
+                "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) VALUES ('OSEBX', '2026-10-16', 1.0, 1.0, 1)"
+            )
 
     def test_adapteren_avviser_en_base_paa_versjon_5(self, tmp_path):
         tilkobling = sqlite3.connect(tmp_path / "v5.db", isolation_level=None)

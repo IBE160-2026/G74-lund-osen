@@ -629,7 +629,8 @@ def test_basen_staar_paa_versjon_8(tmp_path):
         # story 8.21: 12 med 0012_notat.sql. Story 8.26: 13 med 0013_stjerne_ved_folg.sql.
         # Navnet staar.
         # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-        assert versjon(tilkobling) == 14
+        # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+        assert versjon(tilkobling) == 15
     finally:
         tilkobling.close()
 

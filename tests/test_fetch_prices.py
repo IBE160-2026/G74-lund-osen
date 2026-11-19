@@ -3625,6 +3625,15 @@ class TestHovedindeksenEtterGjennomgangen:
         # test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret viser
         # det. Derfor tas de to setningene ut, og alt annet mot vurdering
         # stoppes som foer.
+        # Story 2.10 (0015_hoey_lav.sql) er vurdert: kolonnene hoey og lav i
+        # kurs og indeks. SqliteKurslager leser dem bare naar de finnes
+        # (_hoey_lav i lagring_sqlite.py), saa en base foer 0015 leses som foer
+        # (sjekken leser indeks med egen SQL, som ikke leser kolonnene), og
+        # test_de_tre_sjekkene_virker_en_versjon_bak_og_fila_er_uendret og
+        # tests/test_hoey_lav_2_10.py viser det. Derfor tas de fire setningene
+        # mot kurs og indeks ut, og alt annet mot dem stoppes som foer.
+        if siste.name == "0015_hoey_lav.sql":
+            sql = re.sub(r"alter table (kurs|indeks) add column (hoey|lav) real[^;]*;", "", sql)
         if siste.name == "0014_regnet.sql":
             sql = re.sub(r"alter table vurdering add column regnet text[^;]*;", "", sql)
             sql = re.sub(r"create trigger vurdering_kveld_blir_ikke_ettertid\b.*?\bend;", "", sql, flags=re.DOTALL)
@@ -3632,7 +3641,9 @@ class TestHovedindeksenEtterGjennomgangen:
             sql = re.sub(r"alter table aksje add column (inn|ut) text[^;]*;", "", sql)
             sql = re.sub(r"update aksje set inn = \(select min\(dato\) from vurdering[^;]*;", "", sql)
             sql = re.sub(r"create trigger aksje_bransje_(insert|update)\b.*?\bend;", "", sql, flags=re.DOTALL)
-        for tabell in ("kurs", "kursserie", "vurdering", "aksje"):
+        # Gjennomgangen av 2.10 (VG4): ogsaa indeks, som sjekken leser med egen
+        # SQL (indeksen_mangler).
+        for tabell in ("kurs", "kursserie", "vurdering", "aksje", "indeks"):
             assert not re.search(rf"\b(alter|drop)\s+table\s+(if\s+exists\s+)?{tabell}\b", sql), (siste.name, tabell)
             assert not re.search(rf"\b(update|delete\s+from|insert\s+into)\s+{tabell}\b", sql), (siste.name, tabell)
             assert not re.search(rf"\bcreate\s+trigger\b[^;]*\bon\s+{tabell}\b", sql), (siste.name, tabell)

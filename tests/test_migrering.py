@@ -716,7 +716,8 @@ class TestMaalingene0004:
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 15
 
             # Rettet 2026-11-14 (story 2.17): kolonnen regnet fra 0014 står
             # sist, og raden fra før er en kveldsrad.
@@ -760,7 +761,8 @@ class TestMaalingene0004:
             # 0005 (story 4.3) ki_logg, 0006 (story 2.8) indeks, 0007 (story 8.3)
             # min_liste, 0008 (story 2.13) omsetning, 0009 (story 2.11) lista
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 15
         finally:
             tilkobling.close()
         ny = sqlite3.connect(tmp_path / "v3.db")

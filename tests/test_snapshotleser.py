@@ -51,7 +51,8 @@ class TestOversetteren:
     def test_gyldig_rad(self):
         r = kursrad_fra_eodhd(raa("2026-09-21", 100.5, 98.25, 1234))
 
-        assert r == Kursrad(dato=date(2026, 9, 21), slutt=100.5, justert_slutt=98.25, volum=1234)
+        # Rettet 2026-11-19 (story 2.10): high og low i raa() blir hoey og lav.
+        assert r == Kursrad(dato=date(2026, 9, 21), slutt=100.5, justert_slutt=98.25, volum=1234, hoey=101.0, lav=97.0)
         assert type(r.dato) is date
 
     def test_close_gir_slutt_og_adjusted_close_gir_justert_slutt(self):

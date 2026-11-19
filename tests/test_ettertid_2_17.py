@@ -413,8 +413,9 @@ class TestMigrasjonen:
         gammel = tmp_path / "gammel.db"
         katalog = tmp_path / "migrasjoner"
         katalog.mkdir()
+        # Rettet 2026-11-19 (story 2.10): til og med 0013, fordi 0015 kom etter.
         for fil in sorted(MIGRASJONSKATALOG.glob("*.sql")):
-            if not fil.name.startswith("0014"):
+            if fil.name < "0014":
                 shutil.copy(fil, katalog / fil.name)
         t = sqlite3.connect(gammel)
         assert migrer(t, katalog) == 13
@@ -430,7 +431,8 @@ class TestMigrasjonen:
         kopi = tmp_path / "kopi.db"
         shutil.copy(gammel, kopi)
         t = sqlite3.connect(kopi)
-        assert migrer(t, MIGRASJONSKATALOG) == 14
+        # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+        assert migrer(t, MIGRASJONSKATALOG) == 15
         assert _kveldsradene(t) == [r for r in foer]
         assert {r for (r,) in t.execute("SELECT regnet FROM vurdering")} == {"kveld"}
         t.close()

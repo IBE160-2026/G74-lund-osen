@@ -74,7 +74,8 @@ class TestMigrasjonen:
                 )
             tilkobling.commit()
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 14
+            # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 15
             inn = dict(tilkobling.execute("SELECT symbol, inn FROM aksje"))
             assert inn["EQNR"] == "2026-09-28" and inn["DNB"] is None
             assert tilkobling.execute("SELECT count(*) FROM aksje WHERE ut IS NOT NULL").fetchone()[0] == 0

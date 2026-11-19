@@ -2,7 +2,7 @@
 title: "Teknologi og nøkler"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-18T09:50
+updated: 2026-11-19T15:25
 ---
 
 # Teknologi og nøkler
@@ -89,10 +89,12 @@ eller kveldsjobben i Oppgaveplanlegging (start/kveldshenting.ps1).
 | Konfigurasjon | **python-dotenv**: `fetch_prices.py` og `ki_tekst.py` leser `.env` i prosjektroten |
 | Tidssone | **tzdata**, så `Europe/Oslo` virker også uten tidssonedatabase i imaget (AD-20) |
 | Database | **SQLite** gjennom `sqlite3` i standardbiblioteket, én fil per base |
-| Migrasjoner | SQL-filer i `src/migrasjoner/` (`0001_kurs.sql` til `0014_regnet.sql`), kjørt av `aapne_base` i `lagring_sqlite.py` |
+| Migrasjoner | SQL-filer i `src/migrasjoner/` (`0001_kurs.sql` til `0015_hoey_lav.sql`), kjørt av `aapne_base` i `lagring_sqlite.py` |
 | Tester | **pytest**, uten nett: `tests/conftest.py` sperrer utgående tilkoblinger (AD-8) |
 | Lint og format | **ruff** 0.17.1 med pyflakes, importene og bugbear (`pyproject.toml`) |
 | CI | GitHub Actions: `tester.yml` kjører ruff og pytest på Ubuntu med Python 3.13, bygger og prøver imaget, og prøver dobbeltklikket på Windows og macOS. `morgensjekk.yml` er en planlagt sjekk av repoet. Ingen av dem har nøkkelen til EODHD eller KI-tjenestene, og ingen gjør kall mot EODHD |
+
+*Rettet 2026-11-19 (story 2.10):* raden «Migrasjoner» sa `0014_regnet.sql`. Den siste er nå `0015_hoey_lav.sql`, som legger høy og lav til `kurs` og `indeks`.
 
 Avhengighetene er bare de fem i `pyproject.toml`: flask, requests, python-dotenv, tzdata og waitress. pytest og ruff er i dev-gruppen.
 

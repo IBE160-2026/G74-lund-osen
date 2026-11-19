@@ -7,7 +7,7 @@ paradigm: 'funksjonell kjerne / imperativt skall, med porter (Protocol) for all 
 scope: 'OSE Signal v1 — datahenting, lagring, signalberegning, meldingsfilter og de to skjermbildene'
 status: final
 created: '2026-09-22'
-updated: 2026-11-14T19:16
+updated: 2026-11-19T15:25
 binds:
   - FR-101..FR-103
   - FR-201..FR-204
@@ -305,6 +305,7 @@ tallene og ordene i hjelpen er de samme som i beregningen og tabellen.
 - **Bygget 2026-09-29, story 2.1b:** `lagring_sqlite.aapne_base(sti)` lager mappa, kobler til og kjører `migrer()` mot `MIGRASJONSKATALOG`. Feiler migreringen, lukkes tilkoblingen, og feilen går videre. Ingen annen kode i `src/` kaller `sqlite3.connect`, og en vakt i `tests/test_konsumentene.py` holder det. Stiene er `lagring_fil.RAA_KATALOG` (`data/raa/`) og `lagring_sqlite.BASE_STI` (`data/db/ose.db`). Hentekommandoen bruker `aapne_base`; webserveren tar den i bruk i 2.2. Testen med to migratorer som overlapper, er på plass (`TestToMigratorerOverlapper` i `tests/test_migrering.py`): to tråder, hver med sin tilkobling, der den første holder transaksjonen åpen inne i migrasjonen til den andre har startet. Mutanten `BEGIN IMMEDIATE` → `BEGIN` feiler nå.
 - **To SQLite-forhold migrasjonene må ta hensyn til, begge verifisert:** `executescript()` kjører en implisitt `COMMIT` først, så den nærliggende måten å kjøre en `.sql`-fil på er **ikke** atomisk med oppdateringen av `skjema_versjon` — migrasjonsløperen må styre transaksjonen selv. Og SQLites `ALTER TABLE` dekker bare rename/add/drop column; typeendring, `UNIQUE`, `CHECK` og fremmednøkler krever tabellbytte med `DROP TABLE`. **For `vurdering` og `ki_logg` kolliderer det med AD-7** — se åpent punkt under. *2026-09-27 (story 1.9):* `0003` legger koblingene til `aksje` med triggere, så ingen tabell bygges om (AD-21).
 - *Lagt til 2026-11-14 (story 2.17):* `0014_regnet.sql` legger kolonnen `regnet` til `vurdering` med `ADD COLUMN ... NOT NULL DEFAULT 'kveld'` og en CHECK, uten `DROP TABLE`, og en trigger på kolonnen (AD-7). Sjekken før kallene leser `vurdering` i en base én versjon bak og leser `regnet` bare når kolonnen finnes.
+- *Lagt til 2026-11-19 (story 2.10, gruppens svar kl. 13:51):* `0015_hoey_lav.sql` legger `hoey` og `lav` til `kurs` og `indeks` med `ADD COLUMN` og en CHECK, uten `DROP TABLE`. Radene som finnes, får `NULL`, til neste henting bytter ut serien (AD-5). Lagrene leser kolonnene bare når de finnes, så sjekken før kallene leser en base én versjon bak som før.
 - **Nye migrasjoner fra endringsforslaget 08.10 (Marians beslutning):** når aksjen kom inn i lista og gikk ut, i `aksje` (2.11), ønsket om endring av lista (2.12), omsetningen (2.13), eks.datoene (2.14) og innstillingene (8.10). Numrene settes når storyene bygges, etter `0005` (`ki_logg`), `0006` (indeksen) og høy og lav i 2.10. I dag finnes `0001`–`0004`.
 - **0007, 2026-10-19 (story 8.3):** `0007_min_liste.sql` lager `min_liste` med bare symbolet og to triggere mot `aksje`, som for `kurs`, `kursserie` og `vurdering` i 0003 (AD-21). Ingen eksisterende tabell eller trigger endres. Basen står på versjon 7 etter migreringen, og den ekte basen får en tom liste. Webserveren og hentingen migrerer den som før.
 
