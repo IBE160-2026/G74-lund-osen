@@ -3703,6 +3703,7 @@ Testpersonen i brukertest 1 ønsket anbefalinger og å kunne «spå» hva man b�
    - Testen låste mindre enn svarbrevet sa.
    *Løsning:* alle seks ble rettet før flettingen, og PR-en ble ikke flettet med noe på middels åpent (regel 25).
    *KI sin rolle:* leseren i gjennomgangen hadde ikke skrevet teksten, og fant feil i det den samme økta hadde skrevet.
+   *Rettet 2026-11-19 (gruppens svar kl. 18:47):* gjennomgangen av 9.20 hadde 23 funn, 6 på middels og 17 lave, ikke 27 og 21. Det er tallet i tabellen i spesifikasjonen for 9.20 og i rapporten fra gjennomgangen. De fire som ville gitt 27, er ikke funnet (`b73a6849`). Utført-linja 17.11 i dagsfila står som historikk.
 
 3. **En push med en feil.**
    *Problem:* kl. 16:23 17.11 ble main pushet etter en kjøring av `--dokumentene` med «1 error», fordi kommandoen ikke sjekket utfallet. Commitene var bare dagsfila, loggen og Utført-linja.
