@@ -198,10 +198,17 @@ før, med `None` der feltene mangler.
    Det krever at jobben startes på en annen måte, og det gjør ikke vinduet.
    *Forslag:* nei. 2.10 går i jobben 20.11, og høy og lav brukes ikke av noe
    brukertest 2 ser.
+   *Svart 2026-11-19 kl. 18:51:* nei, som rådet anbefalte. Jobben 20.11 fyller
+   dem inn. Det blir ingen ekstra henting og ingen API-kall utover kvotesjekken.
 2. Skal høy og lav sjekkes mot sluttkursen, så en rad med lav over slutt eller
    høy under slutt får `None` (ECH3)? *Forslag:* ja, men først når aksjesiden
    viser dem (FR-203). Radene i testene har høy og lav som ikke følger
    sluttkursen, og det ville endret dem.
+   *Svart 2026-11-19 kl. 18:47:* ja, nå, i story 2.19
+   ([`spec-2-19-hoey-og-lav-mot-slutt.md`](spec-2-19-hoey-og-lav-mot-slutt.md)).
+   Rådet anbefalte å vente til aksjesiden viser tallene. *Rettet 2026-11-19
+   (story 2.19):* radene i testene har høy og lav rundt sluttkursen, og ingen
+   test i andre filer måtte endres med 2.19.
 
 ## Flettet 19.11
 

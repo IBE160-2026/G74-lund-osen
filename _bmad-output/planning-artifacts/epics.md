@@ -2254,6 +2254,8 @@ utenfor dagens høyeste og laveste kurs.
 
 **Avhenger av:** 2.10. **Én økt:** ja.
 
+*Lagt til 2026-11-19:* 2.19 er squash-flettet med PR #172 i `690fea4c` kl. 20:04, låst til head-en `2532598b`, etter gruppens svar kl. 18:47, uten nytt ja. En rad der lav er over sluttkursen, eller høy er under den, lagres uten høy og lav, og linja for symbolet i hentingen sier hvor mange rader det gjaldt. Ingen ny migrasjon og ingen nye kall. CI var grønn i alle jobbene (run 44593291667), med 6124 bestått og 99 hoppet over i jobben `pytest`.
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss

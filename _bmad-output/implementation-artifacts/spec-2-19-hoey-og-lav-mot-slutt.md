@@ -2,7 +2,7 @@
 title: 'Story 2.19: høy og lav mot sluttkursen'
 type: 'feature'
 created: '2026-11-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '92862551'
 context:
@@ -154,6 +154,14 @@ lesing, på `838e34ca`. 5 funn, alle lave.
 Leseren fant at alle veiene som skriver `kurs` og `indeks`, går gjennom
 adapteren, at tellingen og adapteren bruker den samme regelen, og at ingen
 type i `close` gir noe annet enn `UgyldigKursrad`.
+
+## Flettet 19.11
+
+CI var grønn i alle fire jobbene på head-en `2532598b` (run 44593291667): 6124 bestått og
+99 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne
+(regel 25). PR #172 ble squash-flettet i `690fea4c` 19.11 kl. 20:04, låst til `2532598b`,
+uten nytt ja, utenfor kl. 22:10–23:58. Hovedkopien fikk 2.19 sammen med 2.10, etter
+sjekken av kveldsjobben kl. 23:51.
 
 ## Grenser
 
