@@ -115,7 +115,7 @@ from boersdag import (
     innevaerende_boersdag,
     norsk_dato,
 )
-from eodhd import UgyldigSerie, serie_fra_eodhd
+from eodhd import UgyldigSerie, hoey_og_lav_mot_slutt, serie_fra_eodhd
 from ettertid import fyll_i_ettertid
 from indeksdata import HOVEDINDEKS, Indeks, bare_boersdager
 from ki_modell import Modell
@@ -412,9 +412,23 @@ def hent_universet(
         # Raadataene lagres uendret. Oversettelsen er bare kontrollen.
         resultat.serier[aksje.symbol] = rader
         merknad = "" if len(serie) >= MINST_HANDELSDAGER else "  ← for kort for MA50"
-        skriv(f"  {aksje.symbol}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}{merknad}")
+        skriv(
+            f"  {aksje.symbol}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}"
+            f"{_uten_hoey_og_lav(rader)}{merknad}"
+        )
 
     return resultat
+
+
+def _uten_hoey_og_lav(rader: list) -> str:
+    """Tillegget i linja for et symbol - story 2.19, gruppens svar 19.11
+    kl. 18:47: hentingen sier hvor mange rader som er lagret uten hoey og lav
+    fordi de ikke passet med sluttkursen. Tomt naar det ikke gjaldt noen.
+    Antallet er regnet av oss, ikke en verdi fra kilden (regel 16)."""
+    antall = hoey_og_lav_mot_slutt(rader)
+    if not antall:
+        return ""
+    return f", {antall} {'rad' if antall == 1 else 'rader'} uten høy og lav (passet ikke med sluttkursen)"
 
 
 def hent_indeksen(
@@ -452,7 +466,7 @@ def hent_indeksen(
         skriv(f"  {navn}: ingen data")
         return resultat
     resultat.serier[indeks.symbol] = rader
-    skriv(f"  {navn}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}")
+    skriv(f"  {navn}: {len(serie)} dager, siste {serie[-1].dato.isoformat()}{_uten_hoey_og_lav(rader)}")
     return resultat
 
 
