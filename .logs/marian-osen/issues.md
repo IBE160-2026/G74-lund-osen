@@ -380,3 +380,9 @@
   - *Svart 2026-11-19 kl. 09:59 (spørsmål 2 fra 9.22):* klokkeslettet rettes nå, i samme lille story, så klokkeslettene fra git står i norsk tid også på Windows; på GitHub som før.
 - [x] 2026-11-19 [boersdager-og-norsk-tid-9-23](908-2026-11-19-11-46-10-boersdager-og-norsk-tid-9-23.md) — spørsmål 1 i 9.23: «51 boersdager» står uten ø i kommentaren i `src/fetch_prices.py` og i docstringen i `tests/test_fetch_prices.py`, som resten av teksten der. Skal det heller stå «51 børsdager», som i instruksjonen? (løst 2026-11-19: står som det er)
   - *Svart 2026-11-19 kl. 13:51 (spørsmål 1 i 9.23):* «51 boersdager» står som det er.
+- [x] 2026-11-19 [hoey-og-lav-2-10-og-2-19](907-2026-11-19-23-56-10-hoey-og-lav-2-10-og-2-19.md) — spørsmål 1 i 2.10: skal hentingen med høy og lav gå allerede i kveld? (løst 2026-11-19: nei, jobben 20.11 fyller dem inn, uten ekstra henting og uten API-kall utover kvotesjekken)
+  - *Svart 2026-11-19 kl. 18:51:* nei, som rådet anbefalte.
+- [x] 2026-11-19 [hoey-og-lav-2-10-og-2-19](907-2026-11-19-23-56-10-hoey-og-lav-2-10-og-2-19.md) — spørsmål 2 i 2.10 (ECH3): skal høy og lav sjekkes mot sluttkursen? (løst 2026-11-19: story 2.19, flettet i `690fea4c`)
+  - *Svart 2026-11-19 kl. 18:47:* ja, nå, i en liten story i Epic 2. Rådet anbefalte å vente til aksjesiden viser tallene.
+- [x] 2026-11-19 [hoey-og-lav-2-10-og-2-19](907-2026-11-19-23-56-10-hoey-og-lav-2-10-og-2-19.md) — 9.20: gjennomgangen hadde 23 funn i tabellen, men refleksjonsloggen og Utført-linja 17.11 sa 27 (løst 2026-11-19: datert linje i refleksjonsloggen, `a52bacf4`; Utført-linja 17.11 står som historikk)
+  - *Svart 2026-11-19 kl. 18:47:* som rådet anbefalte.
