@@ -1967,6 +1967,8 @@ aksjedetaljen kan vise dem uten et nytt kall.
 
 **Avhenger av:** ingen åpne. **Én økt:** ja.
 
+*Lagt til 2026-11-19:* 2.10 er squash-flettet med PR #171 i `92862551` kl. 16:40, låst til head-en `cc77e36f`, etter instruksjonen kl. 14:24 i `docs/ai-prompts/2026-11-19.md` (gruppens svar kl. 13:51), uten nytt ja. `Kursrad`, adapteren og lagrene tar med høy og lav, og `0015_hoey_lav.sql` legger dem til `kurs` og `indeks`. En rad uten dem lagres uten dem, og hentingen stopper ikke. Ingen nye kall. Aksjesiden viser dem ikke, og FR-203 står som «senere» for visningen. CI var grønn i alle jobbene (run 44555722272), med 6090 bestått og 99 hoppet over i jobben `pytest`.
+
 ### Story 2.11: Lista leses fra basen
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.

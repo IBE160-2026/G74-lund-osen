@@ -2,7 +2,7 @@
 title: 'Story 2.10: høy og lav lagres med kursene'
 type: 'feature'
 created: '2026-11-19'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'd764b9e5'
 context:
@@ -202,6 +202,22 @@ før, med `None` der feltene mangler.
    høy under slutt får `None` (ECH3)? *Forslag:* ja, men først når aksjesiden
    viser dem (FR-203). Radene i testene har høy og lav som ikke følger
    sluttkursen, og det ville endret dem.
+
+## Flettet 19.11
+
+CI var grønn i alle fire jobbene på head-en `cc77e36f` (run 44555722272): 6090 bestått og
+99 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne
+(regel 25). PR #171 ble squash-flettet i `92862551` 19.11 kl. 16:40, låst til `cc77e36f`,
+uten nytt ja. Flettecommiten har en dato før midnatt (`git log --format=%cd`), så
+jobben 20.11 går med 2.10.
+
+## Kveldsjobben 19.11
+
+Sjekket 19.11 kl. 23:51 (`date`), etter kl. 23:50 som instruksjonen kl. 14:24 sa:
+«OSE Signal kveldshenting» står som Ready med resultat 0 (Last Result), som
+før. Siste kjøring var 19.11 kl. 23:45, og neste er 20.11 kl. 22:15, med koden
+origin/main hadde ved midnatt, altså 2.10 og 2.19. Hovedkopien ble trukket
+til `690fea4c` etter sjekken.
 
 ## Grenser
 

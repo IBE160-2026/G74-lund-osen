@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-19T11:45
+updated: 2026-11-19T23:53
 ---
 
 # Vurderingsmatrise for del 1
@@ -57,6 +57,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-19 (story 9.22):* 9.22 (PR #169, `7480e72c`) er flettet. Morgensjekken merker ikke lenger det som er i orden, FR-101 og hjelpeteksten sier «51 børsdager», og knappen ved et notat med kjøp og salg heter som spørsmålet før sletting, med tre bilder tatt på nytt. Hele settet ble kjørt i CI på head-en `1557ff5e`: 6002 bestått og 99 hoppet over i jobben `pytest` (kjøring 44418120615). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-19 (story 9.23):* 9.23 (PR #170, `3c7cbcfa`) er flettet. Kommentaren i `src/fetch_prices.py` og docstringen i testen sier «51 boersdager», og morgensjekken skriver klokkeslettene fra git i norsk tid også på Windows. Hele settet ble kjørt i CI på head-en `bcf60783`: 6017 bestått og 99 hoppet over i jobben `pytest` (kjøring 44507229045). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-11-19 (story 2.10):* 2.10 (PR #171, `92862551`) er flettet. Høy og lav lagres med kursene, med `0015_hoey_lav.sql`, uten nye kall, og aksjesiden viser dem ikke. Hele settet ble kjørt i CI på head-en `cc77e36f`: 6090 bestått og 99 hoppet over i jobben `pytest` (run 44555722272). Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
