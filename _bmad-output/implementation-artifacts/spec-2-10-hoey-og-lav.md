@@ -80,8 +80,10 @@ Slått opp på `d764b9e5`:
    og `lav`. Minnelagrene har dem alt gjennom `Kursrad`.
 5. **En base én versjon bak.** Sjekken før kallene leser basen med
    `godta_en_versjon_bak` (story 2.8). Den kvelden 0015 er flettet, står basen
-   på 14 og har ikke kolonnene. Lagrene leser dem derfor bare når de finnes
-   (`_hoey_lav`, som `_regnet` for 0014). Uten det ville sjekken stoppet med
+   på 14 og har ikke kolonnene. `SqliteKurslager` leser dem derfor bare når de
+   finnes (`_hoey_lav`, som `_regnet` for 0014). `SqliteIndekslager` godtar
+   ikke en base én versjon bak, så der er det bare for at de to skal være like.
+   Sjekken leser `indeks` med egen SQL (`indeksen_mangler`). Uten det ville sjekken stoppet med
    «no such column: hoey». Det sto i docstringen til
    `test_siste_migrasjon_roerer_ikke_tabellene_sjekken_leser` i
    `tests/test_fetch_prices.py`: sjekken må vurderes på nytt når siste migrasjon
@@ -100,11 +102,98 @@ midnatt.
 
 Det gir én fare: appen migrerer basen ved første forespørsel
 (`_migrer_en_gang` i `src/app.py`). Startes den ekte versjonen fra hovedkopien
-etter at main med 2.10 er hentet, står basen på 15 før jobben kl. 22:15. Da
-stopper jobben med «Basen er nyere enn koden», fordi den kjører koden for 14.
+etter at main med 2.10 er hentet, står basen på 15 før jobben kl. 22:15, og
+jobben kjører koden for 14. *Rettet etter gjennomgangen (BH1):* her sto at
+jobben da stopper. Det er verre: sjekken før kallene får `RuntimeError`, som
+hører til `BASEFEIL` (`fetch_prices.py:542`), og hentingen skriver «Henter
+likevel» (`fetch_prices.py:1275–1281`). Kallene brukes og fila skrives, men
+`skriv_til_basen` får feilen fra `migrer()`, og dagen får ingen kveldsvurdering
+(AD-7). Dagen må leses inn senere og får da bare signalet i ettertid.
+
+Det samme gjelder jobben 20.11, dagen for brukertest 2, hvis flettecommiten
+kommer etter midnatt (BH2). Derfor:
+
+- PR-en flettes når CI er grønn og ingen funn på middels står åpne, før
+  kl. 22:10 hvis den rekker det, ellers mellom kl. 23:58 og midnatt. Etter
+  flettingen sjekkes det med `git log --format=%cd` at flettecommiten har en
+  dato før midnatt.
+- Hovedkopien får ikke 2.10 før jobben i kveld er sjekket etter kl. 23:50.
+  Føringen på main kommer etter det.
 Vinduet sa fra til gruppen 19.11 mellom kl. 14:42 og 14:49 (`date` før og
 etter), og fortsatte. Hovedkopien får ikke
 2.10 før jobben er sjekket etter kl. 23:50, og føringen på main kommer etter det.
+
+## Bygget 19.11
+
+| Del | Commit |
+|---|---|
+| `Kursrad` med `hoey` og `lav`, valgfrie | `e96d7233` |
+| Adapteren leser `high` og `low`, og en verdi som ikke kan brukes, blir `None` | `ca4176e3` |
+| `0015_hoey_lav.sql`, lagrene, en base én versjon bak, og versjonen 15 i testene | `057cf1af` |
+| Testene i `tests/test_hoey_lav_2_10.py` | `76aab27e` |
+| Spinen (AD-16) og «Teknologi og nøkler» | `2949d63a` |
+
+## Testene før
+
+`tests/test_hoey_lav_2_10.py` ble kjørt mot koden på `d764b9e5`, i en egen
+utsjekk i scratchpad: alle 65 feilet. På grenen besto de.
+
+Fem tester i andre filer måtte følge med, fordi de låste det som er endret:
+feltene i `Kursrad` (`test_kurslager.py`), raden fra adapteren
+(`test_snapshotleser.py`), radene i `kurs` etter migreringen (`test_aksje.py`),
+en `INSERT` uten kolonnenavn (`test_indeks.py`) og katalogen uten 0014
+(`test_ettertid_2_17.py`). Hver har en Rettet-linje og sjekker det samme som før.
+
+## Mutantene
+
+Kjørt mot `tests/test_hoey_lav_2_10.py`. Alle ble fanget:
+
+| Mutant | Feilet |
+|---|---|
+| M1: adapteren krever `high` og `low` (`rad["high"]`) | 5, også `test_hentingen_stopper_ikke_naar_hoey_eller_lav_mangler` |
+| M2: adapteren slipper høy under lav gjennom | 2 |
+| M3: lageret leser alltid kolonnene | 1, `test_en_base_en_versjon_bak_leses_av_sjekken` |
+| M4: 0015 uten CHECK | 1, `test_basen_avviser_det_kursrad_avviser` |
+| M5: lageret skriver ikke `hoey` | 3 |
+
+## Gjennomgangen 19.11
+
+Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
+lesing, på `2949d63a`. 15 funn: 2 på middels og 13 lave.
+
+| Funn | Grad | Hva | Utfall |
+|---|---|---|---|
+| BH1 | middels | Spesifikasjonen sa at jobben stopper mot en base på 15. Den henter likevel, og dagen får ingen kveldsvurdering | Rettet: avsnittet sier hva som skjer |
+| BH2 | middels | Faren gjelder også jobben 20.11 hvis flettecommiten kommer etter midnatt | Rettet: flettingen før midnatt, sjekket med `git log --format=%cd`, og hovedkopien får 2.10 først etter jobben i kveld |
+| BH3 | lav | Docstringen i adapteren sa at ingen verdi sjekkes der, og at hvert felt som mangler, gir `KeyError` | Rettet |
+| BH4 | lav | `SqliteIndekslager` godtar ikke en base én versjon bak, så reserven der nås ikke | Rettet: tre steder sier det |
+| BH5 | lav | `docs/innlevering.md` sa 0001–0014 | Rettet: en Rettet-linje |
+| BH6 | lav | `dagen_ferdig.py` og `fetch_prices.py:1588` leser indeksen uten å godta en base én versjon bak | Står: fra før 2.10, ufarlig (kode 2 og jobben går som før), og det samme ved hver migrasjon |
+| ECH1 | lav | Oversikten leser ikke høy og lav, så `Kursrad`-ene derfra har `None` | Rettet: en kommentar ved `_KURSFELT` |
+| ECH2 | lav | Et stort heltall i `slutt` gir `OverflowError` i sqlite3 | Står: fra før 2.10. Adapteren gjør høy og lav til `float` |
+| ECH3 | lav | Høy og lav sjekkes ikke mot sluttkursen | Står: spørsmål 2 |
+| ECH4 | lav | 0015 sa at CHECK-en sier det samme som `Kursrad`, men uendelig og NaN slipper gjennom der | Rettet: kommentaren sier det |
+| VG1 | lav | Hentingen skrev aldri høy og lav til `indeks` i testen | Rettet |
+| VG2 | lav | Ingen test for at høy og lav ikke endrer signalet | Rettet: samme vurdering for alle aksjene hver dag |
+| VG3 | lav | Ingen test for første henting på en base på 14 | Rettet: `test_foerste_henting_paa_en_base_paa_14_fyller_dem` |
+| VG4 | lav | Testen for siste migrasjon tok ikke med `indeks` | Rettet |
+| VG5 | lav | Hull i parametrene | Rettet: `-inf`, `False`, `10**400`, og høy lik lav i adapteren |
+
+Leseren fant at ingen kode i `src/` sammenligner `Kursrad`-er eller leser `kurs`
+eller `indeks` med `SELECT *`, og at demoen og øyeblikksbildene gir det samme som
+før, med `None` der feltene mangler.
+
+## Spørsmål
+
+1. Kveldsjobben i kveld går med koden fra midnatt, ikke med 2.10 (avsnittet
+   «Kveldsjobben og flettingen»). Skal den nye hentingen gå allerede i kveld?
+   Det krever at jobben startes på en annen måte, og det gjør ikke vinduet.
+   *Forslag:* nei. 2.10 går i jobben 20.11, og høy og lav brukes ikke av noe
+   brukertest 2 ser.
+2. Skal høy og lav sjekkes mot sluttkursen, så en rad med lav over slutt eller
+   høy under slutt får `None` (ECH3)? *Forslag:* ja, men først når aksjesiden
+   viser dem (FR-203). Radene i testene har høy og lav som ikke følger
+   sluttkursen, og det ville endret dem.
 
 ## Grenser
 
