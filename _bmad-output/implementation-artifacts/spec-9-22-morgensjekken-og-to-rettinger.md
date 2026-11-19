@@ -165,6 +165,10 @@ story, så «HEAD paa GitHub» og de andre klokkeslettene fra git står i norsk 
 På GitHub skal utskriften være som før. Rådet anbefalte å vente til kodegjennomgangen etter
 brukertest 2, men gruppen valgte å ta det nå.
 
+*Løst 2026-11-19 (story 9.23):* klokkeslettene fra git står i norsk tid, også på
+Windows, flettet med PR #170 i `3c7cbcfa`. Lokalt viser «HEAD paa GitHub» nå 10:41
+for en commit fra kl. 10:41, ikke 09:41.
+
 ## Gjennomgangen 18.11
 
 Én leser med Blind Hunter, Edge Case Hunter og Verification Gap, bare med
@@ -193,6 +197,9 @@ og kilden.
 «51 børsdager», og bare der, i en egen liten story. «Handelsdag» er brukt med vilje ellers i
 koden og endres ikke, og historikken siterer det som sto. Rådet anbefalte å vente til
 kodegjennomgangen etter brukertest 2, men gruppen valgte å ta det nå.
+
+*Løst 2026-11-19 (story 9.23):* kommentaren og docstringen sier «51 boersdager»,
+uten ø som resten av teksten der, flettet med PR #170 i `3c7cbcfa`.
 
 ## Grenser
 
