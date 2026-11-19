@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-16T00:14
+updated: 2026-11-19T14:28
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -444,6 +444,15 @@ fortsetter hver børsdag. Ført i `prd.md` under FR-411, i `epics.md` og i spine
 Docker (3.5a) er den anbefalte hovedveien i «Kom i gang», Docker den andre og uv
 i terminalen den tredje. Dockerfilen og `compose.yaml` leveres som før.
 Bygges i 3.5f.
+
+### Faglærer i Canvas, 2026-11-19
+
+*Lagt til 2026-11-19 (gruppens svar kl. 14:24):* faglærer skrev i Canvas 19.11,
+slik gruppen limte det inn: «Det er IKKE et krav om at nettsiden er publisert.
+Det er nok at applikasjonen kan kjøres lokalt på maskinen. Det må derimot være
+beskrevet i README.md filen hvordan man kjører applikasjonen og hvilke API
+nøkler man trenger.» README-en dekker det i [«Kom i gang»](../README.md#kom-i-gang),
+og nøklene i [«API-nøkler»](../README.md#api-noekler).
 
 ---
 
