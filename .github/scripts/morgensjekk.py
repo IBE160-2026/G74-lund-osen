@@ -41,6 +41,20 @@ def git(*args):
     return r.returncode, r.stdout
 
 
+def norsk_tid(sekunder, form="%d.%m %H:%M"):
+    """Story 9.23 (spoersmaal 2 fra 9.22): git gir tiden som sekunder (%at,
+    taggerdate:unix), og den regnes om til norsk tid her, med OSLO. Paa Windows
+    virker ikke TZ i MILJO for git, saa tiden git skrev selv, var UTC lokalt. Paa
+    GitHub er utskriften som foer."""
+    return datetime.fromtimestamp(int(sekunder), OSLO).strftime(form)
+
+
+def med_norsk_tid(linje):
+    """«<hash> <sekunder> <emne>» blir «<hash> <dd.mm HH:MM> <emne>»."""
+    h, sekunder, *emne = linje.split(" ", 2)
+    return " ".join([h, norsk_tid(sekunder), *emne])
+
+
 def les(rel):
     p = REPO / rel
     return p.read_text(encoding="utf-8", errors="replace") if p.is_file() else None
@@ -80,13 +94,13 @@ def dato_i(tekst):
 
 
 print(f"== MORGENSJEKK {IDAG.isoformat()} (uke {UKE}), kjoert {NAA:%H:%M} norsk tid")
-_, head = git("log", "-1", "--format=%h %ad %s", "--date=format-local:%d.%m %H:%M")
-print(f"HEAD paa GitHub: {head.strip()}")
+_, head = git("log", "-1", "--format=%h %at %s")
+print(f"HEAD paa GitHub: {med_norsk_tid(head.strip()) if head.strip() else ''}")
 
 # 1. Commits siste doegn, delt i kode og dokumenter
 print("\n== 1 COMMITS SISTE DOEGN")
 _, logg = git("log", f"--since={FRA.isoformat()}", f"--until={NAA.isoformat()}",
-              "--format=%x1e%h|%an|%ad|%s", "--date=format-local:%d.%m %H:%M", "--name-only")
+              "--format=%x1e%h|%an|%at|%s", "--name-only")
 commits = []
 for blokk in logg.split("\x1e")[1:]:
     linjer = [l for l in blokk.splitlines() if l.strip()]
@@ -94,7 +108,7 @@ for blokk in logg.split("\x1e")[1:]:
     filer = linjer[1:]
     kode = any(f.startswith(("src/", "tests/", ".github/")) or f in ("pyproject.toml", "uv.lock")
                for f in filer)
-    commits.append((h, forf, tid, emne, kode))
+    commits.append((h, forf, norsk_tid(tid), emne, kode))
 print(f"antall={len(commits)} kode={sum(c[4] for c in commits)} "
       f"bare_dokumenter={sum(not c[4] for c in commits)}")
 for h, forf, tid, emne, kode in commits[:25]:
@@ -354,11 +368,11 @@ if m:
 # 7. Briefen og taggene
 print("\n== 7 BRIEFEN OG TAGGENE")
 _, tagger = git("for-each-ref", "refs/tags/arbeidskrav-product-brief*",
-                "--format=%(refname:short)|%(*objectname:short)|%(objectname:short)|%(taggerdate:iso8601)")
+                "--format=%(refname:short)|%(*objectname:short)|%(objectname:short)|%(taggerdate:unix)")
 funnet = {}
 for linje in tagger.splitlines():
     navn, peeled, obj, tid = linje.split("|")
-    funnet[navn] = ((peeled or obj)[:7], tid[:16])
+    funnet[navn] = ((peeled or obj)[:7], norsk_tid(tid, "%Y-%m-%d %H:%M") if tid else "")
 for navn, commit in KJENTE_TAGGER.items():
     if navn not in funnet:
         print(f"  MERK: {navn} finnes ikke lenger")
@@ -374,9 +388,9 @@ if siste:
     if kode == 0:
         print(f"  briefen er uendret siden {siste} ({funnet[siste][0]})")
     else:
-        _, endr = git("log", "--format=%h %ad %s", "--date=format-local:%d.%m %H:%M",
-                      f"{siste}..HEAD", "--", BRIEF)
-        print(f"  MERK: briefen er endret etter {siste}: {endr.strip() or 'endret'}")
+        _, endr = git("log", "--format=%h %at %s", f"{siste}..HEAD", "--", BRIEF)
+        endr = "\n".join(med_norsk_tid(l) for l in endr.strip().splitlines())
+        print(f"  MERK: briefen er endret etter {siste}: {endr or 'endret'}")
     if IDAG > BRIEF_FRIST and (kode != 0 or any(funnet[n][1][:10] > BRIEF_FRIST.isoformat() for n in nye)):
         print("  MERK: endring etter innleveringsfristen 27.09")
 igjen = (BRIEF_FRIST - IDAG).days
