@@ -3719,6 +3719,47 @@ Det vi lærte: en PRD kan ha riktig innhold og likevel være vanskelig å bruke.
 
 ---
 
+## 20.11.2026 – 18.–20.11: hvilemodus igjen, en sjekk som telte 0, et tall uten kilde, og tre storyer mot rådet
+
+*Joakim og Marian.*
+
+18.11 ble 9.20 flettet kl. 11:02 (#167, `307109e9`) og 9.21 kl. 13:11 (#168, `0c2ab7d2`). Samme kveld bygget vi 9.22: oppgavene for brukertest 2 i repoet og tre små rettinger, etter svarene våre 18.11 kl. 11:42, 11:49, 16:01 og 21:27. Rettingene var morgensjekken uten falske alarmer, «børsdager» i stedet for «handelsdager» og samme navn på sletteknappen. 9.22 ble flettet 19.11 kl. 00:16 (#169, `7480e72c`).
+
+19.11 ble det tre storyer til:
+- **9.23**, «51 boersdager» i koden og norsk tid i morgensjekken, etter svaret vårt kl. 09:59: flettet kl. 11:44 (#170, `3c7cbcfa`).
+- **2.10**, høy og lav lagres med kursene, med en ny migrasjon (`0015_hoey_lav.sql`), etter svaret kl. 13:51: flettet kl. 16:40 (#171, `92862551`).
+- **2.19**, en rad der lav er over sluttkursen, eller høy er under den, lagres uten høy og lav, etter svaret kl. 18:47: flettet kl. 20:04 (#172, `690fea4c`).
+
+Samme dag skrev faglærer i Canvas at nettsiden ikke må publiseres, men at README-en må beskrive hvordan appen kjøres og hvilke API-nøkler som trengs. Svaret står i `innlevering.md`, og README-en fikk «API-nøkler» i «Kom i gang» (`bc2860a2` og `d764b9e5`): demoen trenger ingen nøkkel, den ekte versjonen trenger en gratis nøkkel fra EODHD på egen konto, og KI-teksten trenger ingen nøkkel med Gemma på maskinen.
+
+20.11 ble brukertest 2 flyttet til søndag 22.11. Den ekte versjonen fryses til etter testen.
+
+**Utfordringer**
+
+1. **Hvilemodus igjen.**
+   *Problem:* natta til 18.11 gikk PC-en i hvilemodus kl. 00:06 og våknet kl. 09:47, selv om vi sa 17.11 at hvilemodus slås av. Windows oppga «Button or Lid» som grunn (systemloggen, Kernel-Power 42).
+   *Løsning:* vi endret innstillingene, så lokket og knappene ikke setter PC-en i dvale når den står i strøm.
+   *KI sin rolle:* Claude Code førte tidene og gjettet ikke årsaken. Grunnen står i systemloggen.
+
+2. **En sjekk som telte 0.**
+   *Problem:* morgensjekken hadde ikke funnet noen instruksjoner i dagsfilene siden 11.11, fordi overskriftene var skrevet på en ny måte, med tekst etter klokkeslettet eller uten klokkeslett. Et tall som alltid er 0, så ut som at alt var i orden.
+   *Løsning:* 9.22 teller hver «## »-overskrift og flere former av «Utført». Kjørt mot main før og etter ga 17.11 12 instruksjoner og beskjeder i stedet for 0, og 18.11 7 i stedet for 0. Tittelen i saken gikk fra «17 ting å se på» til «alt i orden».
+   *KI sin rolle:* KI-økta talte for hånd 17.11 og så at tallet var feil. Vinduet for 9.22 kjørte sjekken før og etter og førte begge i spesifikasjonen.
+
+3. **Et tall uten kilde.**
+   *Problem:* 19.11 fant morgensjekken at 9.20 sa 27 funn, mens tabellen i spesifikasjonen bare hadde 23. Rapporten fra leseren i gjennomgangen hadde de samme 23. Tallet 27 sto også i oppføringen for 17.11 og i raden i `kvalitetssikring.md`.
+   *Løsning:* de fire som ville gitt 27, ble lett etter i vinduets kilder fra 17.–18.11 og ikke funnet. Tallet ble rettet til 23 med daterte linjer, ikke skrevet over (regel 12, `b73a6849`), og oppføringen for 17.11 fikk sin linje etter svaret vårt kl. 18:47 (`a52bacf4`).
+   *KI sin rolle:* 27 kom fra Claude Code selv, i spesifikasjonen for 9.20 (`307109e9`). Det rettet ikke tallet etter et anslag, men lette etter kilden og sa at den ikke fantes.
+
+4. **Tre storyer mot rådet.**
+   *Problem:* rådet anbefalte å vente med 9.23 til kodegjennomgangen etter brukertest 2, med 2.10 til etter brukertest 2, og med 2.19 til aksjesiden viser høy og lav. Vi tok alle tre samme dag. 2.10 hadde en ny migrasjon, kvelden før det som da var dagen for testen. Rådet trodde at kveldsjobben samme kveld ville gå med 2.10 hvis den ble flettet før kl. 22:10.
+   *Løsning:* vi beholdt sikringene. Vi tok en kopi av basen før migrasjonen. Grenene brukte bare testbaser i egne worktrees, og PR-ene ble flettet uten nytt ja bare når CI var grønn i alle jobbene og ingen funn på middels sto åpne. Hovedkopien fikk 2.10 og 2.19 først etter at kveldsjobben var sjekket kl. 23:51 (Ready med resultat 0), og den ble trukket kl. 23:52.
+   *KI sin rolle:* vinduet fant i `start/kveldshenting.ps1` at jobben bruker koden `origin/main` hadde ved midnatt, så 2.10 kunne ikke gå samme kveld, og sa fra kl. 14:42–14:49. Gjennomgangen fant at en base migrert av appen før jobben ville gitt en dag uten kveldsvurdering (BH1, middels). Derfor ventet hovedkopien.
+
+Det vi lærte (forslag, som vi skriver om med egne ord i refleksjonsrapporten): en sjekk trenger selv en sjekk, fordi et tall som alltid er 0, ser ut som at alt er i orden. Et tall uten kilde rettes ikke etter gjetning, men til det som kan vises, med en datert linje om resten. Når vi velger mot rådet, beholder vi sikringene: testbaser, flettevilkår, pauser og en kopi av basen.
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
