@@ -137,3 +137,24 @@ class TestE5Ticker:
         assert re.search(r"^\| \*\*Ticker\*\* \(symbol\) \|", ordlista, flags=re.M)
         logg = (PRD / "prd-endringslogg.md").read_text(encoding="utf-8")
         assert "«Ticker»" in logg.split("Endringer etter 12.11", 1)[1]
+
+
+class TestE6Notater:
+    """E6: omvisningen i Innstillinger har et steg for «Notater», som for
+    «Hjelp» og «KI-tekst»."""
+
+    def test_steget_finnes_etter_de_to_andre(self):
+        """Ville feilet hvis steget manglet, eller sto før «Hjelp» og
+        «KI-tekst»."""
+        from hjelpetekster import rundturer
+
+        ankrene = [s.anker for s in rundturer()["innstillinger"]]
+        assert ankrene[-3:] == ["hjelp-valget", "ki-valget", "notater-valget"]
+        (steget,) = [s for s in rundturer()["innstillinger"] if s.anker == "notater-valget"]
+        assert steget.tittel == "Notater"
+
+    def test_ankeret_finnes_paa_siden(self, demoen):
+        """Ville feilet hvis steget pekte på noe siden ikke har."""
+        side = demoen.get("/innstillinger").data.decode("utf-8")
+        assert 'id="notater-valget"' in side
+        assert "notater-valget" in side.split("data-steg=", 1)[1].split(">", 1)[0]

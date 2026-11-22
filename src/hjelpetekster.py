@@ -1045,6 +1045,13 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
                 "Slår spørsmålstegnene ved overskriftene av og på. Av skjuler også «Vis meg rundt» og «Spill av omvisningen».",
             ),
             Steg("ki-valget", "KI-tekst", "Slår tekstene skrevet av KI av og på."),
+            # Story 9.25 (E6, gruppens svar 22.11 kl. 18:23): bryteren «Notater»,
+            # som de to over. Av sletter ingenting (8.21).
+            Steg(
+                "notater-valget",
+                "Notater",
+                "Slår notatene på aksjesidene og i Min liste av og på. Av sletter ingenting.",
+            ),
         ),
         "folg": (
             Steg(
