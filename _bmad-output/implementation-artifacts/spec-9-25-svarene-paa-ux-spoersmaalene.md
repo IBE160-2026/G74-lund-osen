@@ -2,7 +2,7 @@
 title: 'Story 9.25: svarene på E1, E2, E4, E5 og E6 i UX-dokumentene'
 type: 'code'
 created: '2026-11-22'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '5706ead5'
 context:
@@ -144,4 +144,8 @@ lave.
 - [x] Bildene som endrer seg, avtrykkene og bildegrenen følger med
 - [x] Gjennomgangen er tatt, også mot demoen
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 922 bestått (kl. 19:59–20:03, etter en ny start etter lite minne) og 3112 bestått og 7 hoppet over (kl. 20:04–20:25), på `5b70659a`
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 45060734980)
+
+## Flettet 22.11
+
+PR #174 er squash-flettet i `c0192467` kl. 20:56, låst til head-en `8803a598`, uten nytt ja. CI var grønn i alle fire jobbene (run 45060734980), med 6140 bestått og 99 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne.

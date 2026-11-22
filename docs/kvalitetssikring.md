@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-22T16:21
+updated: 2026-11-22T20:57
 ---
 
 # Kvalitetssikring
@@ -457,6 +457,7 @@ sist i dokumentet.
 | 2.10 Høy og lav lagres med kursene: svaret 19.11 kl. 13:51; hele settet i CI (run 44555722272) | `9286255` (#171) | 5 (M1–M5) | ingen overlevde | `S/spec-2-10-hoey-og-lav.md` |
 | 2.19 Høy og lav mot sluttkursen: svaret 19.11 kl. 18:47; hele settet i CI (run 44593291667) | `690fea4` (#172) | 6 (M1–M6) | ingen overlevde | `S/spec-2-19-hoey-og-lav-mot-slutt.md` |
 | 9.24 UX-dokumentene, DESIGN.md og EXPERIENCE.md: svarene 16.11 kl. 20:22 og 20.11 kl. 18:00; hele settet i CI (run 45037144698) | `737ea49` (#173) | 0 | – bare dokumenter og avtrykket for «Dokumentene» i én test, og ingen kode å prøve en mutant mot | `S/spec-9-24-ux-dokumentene.md` |
+| 9.25 Svarene på E1, E2, E4, E5 og E6 i UX-dokumentene: svaret 22.11 kl. 18:23; hele settet i CI (run 45060734980) | `c019246` (#174) | 5 (5, koden før hver retting) | ingen overlevde | `S/spec-9-25-svarene-paa-ux-spoersmaalene.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -771,6 +772,7 @@ funn. Antall rader i loggen:
 | 2.10, gjennomgangen 19.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; BH1 og BH2 middels og ti lave rettet, BH6, ECH2 og ECH3 står med grunn, talt som avvist) | 15 | 12 | 3 | 0 |
 | 2.19, gjennomgangen 19.11 (Blind Hunter, Edge Case Hunter og Verification Gap i én leser, bare med lesing; ECH1, VG1 og P1 lave rettet, ECH2 og VG2 står med grunn, talt som avvist) | 5 | 3 | 2 | 0 |
 | 9.24, gjennomgangen 22.11 (Blind Hunter, Edge Case Hunter og Verification Gap for hvert dokument, fire lesere i parallell, bare med lesing, den siste også mot demoen; VGD1 høy og de 19 på middels rettet, BH10, BH16, BH19, BH20, BH22, BH26, BH27 og ECH9 lave står med grunn, talt som avvist) | 90 | 82 | 8 | 0 |
+| 9.25, gjennomgangen 22.11 (Blind Hunter og Edge Case Hunter i én leser, Acceptance Auditor og Verification Gap i en annen, bare med lesing, den andre også mot demoen; BH1 middels og seks lave rettet, VG2 og ECH4 lave står med grunn, talt som avvist, og ECH1, ECH2, AA4 og ECH3 lave er spørsmål til gruppen, talt som utsatt) | 13 | 7 | 2 | 4 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1662,6 +1664,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.23, rettingene | 3: koden før hver retting på `origin/main` (`beb6aa15`): «51 handelsdager» på de to stedene, tiden fra git med `--date=format-local`, og feltene i del 1 skilt med «\|» før ECH1 i gjennomgangen | fanget av `TestBoersdagerIKoden` i `tests/test_boersdager_9_23.py` (3 av 4 feilet; den siste passer på at «handelsdag» står der det er brukt med vilje) og `TestNorskTid` i `tests/test_morgensjekken_9_23.py` | `S/spec-9-23-boersdager-og-norsk-tid.md` |
 | 2.10, delene | 5: M1–M5 i `src/eodhd.py`, `src/lagring_sqlite.py` og `0015_hoey_lav.sql`: adapteren krever `high` og `low`, høy under lav slipper gjennom, lageret leser alltid kolonnene, 0015 uten CHECK, og lageret skriver ikke `hoey` | fanget av `tests/test_hoey_lav_2_10.py`: M1 `test_hentingen_stopper_ikke_naar_hoey_eller_lav_mangler` og tre i `TestAdapteren`, M2 `test_high_under_low_gir_ingen_av_dem`, M3 `test_en_base_en_versjon_bak_leses_av_sjekken`, M4 `test_basen_avviser_det_kursrad_avviser`, M5 `test_sqlite_kurslager_gir_tilbake_det_som_ble_skrevet` | `S/spec-2-10-hoey-og-lav.md` |
 | 2.19, delene | 6: M1–M6 i `src/eodhd.py` og `src/fetch_prices.py`: ingen sjekk mot `close`, sjekken mot `adjusted_close`, lik sluttkursen avvist, sjekken bare når begge finnes, og ingen linje om antallet for aksjene eller hovedindeksen | fanget av `tests/test_hoey_lav_mot_slutt_2_19.py`: M1 14, M2 12, M3 6, M4 6, M5 og M6 `test_hentingen_stopper_ikke_og_sier_hvor_mange` | `S/spec-2-19-hoey-og-lav-mot-slutt.md` |
+| 9.25, rettingene | 5: koden før hver retting på `9ef4c60b`: «lista» om stjernen i `index.html`, «kl. 22» skrevet inn i fire maler, modellnavnet i parentes på oversikten, «symbolet» i steget og ordlista uten «Ticker», og steget for «Notater» borte | fanget av `TestE1MinListe`, `TestE2Klokkeslettet`, `TestE4Modellnavnet`, `TestE5Ticker` og `TestE6Notater` i `tests/test_ux_svarene_9_25.py` (13 av 14 feilet; den siste låser at sidene er som før med grensen kl. 22) | `S/spec-9-25-svarene-paa-ux-spoersmaalene.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |

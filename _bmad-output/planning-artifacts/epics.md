@@ -5626,3 +5626,5 @@ Som **bruker i brukertest 2** vil jeg at appen bruker de samme ordene og det sam
 - **Ville feilet hvis:** en av de fem rettingene manglet; hver har en test som feilet før rettingen
 
 **Avhenger av:** 9.24. **Én økt:** ja.
+
+*Lagt til 2026-11-22:* 9.25 er flettet. PR #174 er squash-flettet i `c0192467` kl. 20:56, låst til head-en `8803a598`, uten nytt ja. CI var grønn i alle fire jobbene (run 45060734980), med 6140 bestått og 99 hoppet over i jobben `pytest`. Spørsmålene 1–3 i spesifikasjonen venter på gruppens svar.
