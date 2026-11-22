@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-18T21:44
+updated: 2026-11-22T18:39
 ---
 
 # Brukertesten
@@ -95,6 +95,8 @@ Til sammen 19 kvelder, alle børsdagene fra 19.10 til 12.11: 294 tekster om aksj
 ## Brukertest 2
 
 *Rettet 2026-11-18 (gruppens svar 18.11 kl. 21:27, instruksjonen kl. 21:41 i `docs/ai-prompts/2026-11-18.md`):* overskriften var «Brukertest 2: en dag «i ettertid» (story 2.17)». Delen har nå alle oppgavene i brukertest 2, og oppgaven om «i ettertid» er oppgave F. Notatene fra 10.11 over står urørt.
+
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23):* brukertest 2 er flyttet til tirsdag 24.11 eller onsdag 25.11.
 
 **Oppgavene.** Testen tas med en ny person, i rekkefølgen under. Det personen får høre, sies ordrett. A og B er del A og B fra 10.11. SM-1, SM-10 og SM-11 er suksessmålene i §7 i PRD-en.
 

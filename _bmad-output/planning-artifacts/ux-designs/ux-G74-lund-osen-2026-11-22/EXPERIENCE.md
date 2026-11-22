@@ -440,6 +440,8 @@ Kilde: `docs/brukertest.md:226-237`, `docs/ux-logg.md:726-735`.
 
 Gruppen skrev 22.11 kl. 14:46 at brukertest 2 tas tirsdag 24.11 eller onsdag 25.11 (`_bmad-output/implementation-artifacts/spec-9-24-ux-dokumentene.md:87-88`). Dagsfila 20.11 sier søndag 22.11 (`docs/ai-prompts/2026-11-20.md:32`), og datofeltet i `docs/brukertest.md:118` er tomt.
 
+*Svar 2026-11-22 kl. 18:23 (gruppens svar):* brukertest 2 er flyttet til tirsdag 24.11 eller onsdag 25.11, og `docs/brukertest.md` har en datert linje om det.
+
 Testen tas med en ny person, med oppgavene A–G og et spørsmål etter G (`docs/brukertest.md:99-110`). Den skal vise:
 
 - **SM-1** i oppgave A: forklarer personen uoppfordret hvorfor en aksje skiller seg ut, på under 5 minutter og uten hjelp (`prd.md:1846`)?
