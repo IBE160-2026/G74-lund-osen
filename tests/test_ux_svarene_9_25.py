@@ -95,3 +95,25 @@ class TestE2Klokkeslettet:
         """Med kl. 22:00 står «kl. 22», som før (ingen endring på sidene)."""
         side = _synlig(demoen.get("/min-liste").data.decode("utf-8"))
         assert "etter kl. 22." in side and "kl. 22.00" not in side
+
+
+class TestE4Modellnavnet:
+    """E4: oversikten skriver modellnavnet i samme form som aksjesiden,
+    «Modell: {modell}, {tjeneste}» (FR-602)."""
+
+    def test_dagsvisningen_har_samme_form_som_aksjesiden(self):
+        """Ville feilet hvis tjenesten sto i parentes på oversikten."""
+        from types import SimpleNamespace
+
+        import ki_visning
+
+        rad = SimpleNamespace(modell="gemma4:e4b", tjeneste="lokal")
+        assert ki_visning._modellnavnet(rad) == "gemma4:e4b, lokal"
+
+    def test_oversikten_i_demoen(self, demoen):
+        """Ville feilet hvis oversikten sa «Skrevet av … (lokal) da kursene
+        ble hentet.» i stedet for «Modell: …, lokal»."""
+        side = _synlig(demoen.get("/").data.decode("utf-8"))
+        assert "Modell: gemma4:e4b, lokal" in side
+        assert "Skrevet av gemma4" not in side
+        assert "(lokal)" not in side

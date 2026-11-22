@@ -532,7 +532,8 @@ class TestForsiden:
         side = html(klient)
         assert "Børsdagen kort fortalt" in side and "Laget av KI" in side
         assert '<span class="tall">1</span> skilte seg ut' in side
-        assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
+        # Story 9.25 (E4): «Modell: …, …», som på aksjesiden (FR-602).
+        assert "Modell: gemma4:e4b, lokal" in side
         # Story 8.26 (tillegg 20): stegene i omvisningen står i data-steg øverst.
         side = re.sub(r' data-steg="[^"]*"', "", side)
         assert side.index('class="tabell') < side.index("boersdagen-kort-fortalt")
@@ -747,7 +748,8 @@ class TestDemoen:
         side = app_modul.app.test_client().get("/").data.decode("utf-8")
         tekst = les_dagsraden().tekst
         # Story 10.10 (svaret 11.11 kl. 16:05): Gemma i demoen.
-        assert "Skrevet av gemma4:e4b (lokal) da kursene ble hentet." in side
+        # Story 9.25 (E4): «Modell: …, …», som på aksjesiden (FR-602).
+        assert "Modell: gemma4:e4b, lokal" in side
         from ki_visning import prikkede_tall
 
         assert str(prikkede_tall(tekst)) in side and DAGEN_UTEN not in side

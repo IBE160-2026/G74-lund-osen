@@ -58,7 +58,8 @@ class TestListaMedEtAnnetAntall:
         monkeypatch.setattr(app_modul, "naa", lambda: datetime(2026, 9, 23, 12, 0).astimezone())
         app_modul.app.config["TESTING"] = True
         side = app_modul.app.test_client().get("/").data.decode("utf-8")
-        assert "Skrevet av gemma4:e4b" in side and "da kursene ble hentet." in side
+        # Story 9.25 (E4): «Modell: …, …», som på aksjesiden (FR-602).
+        assert "Modell: gemma4:e4b, " in side
 
 
 class TestSorteringenIBryteren:
