@@ -5608,3 +5608,21 @@ Som **gruppe** vil vi ha én samlet UX-spesifikasjon, med hvordan appen ser ut (
 **Avhenger av:** 9.16, 9.17, 9.18, 9.21. **Én økt:** ja.
 
 *Lagt til 2026-11-22:* 9.24 er squash-flettet med PR #173 i `737ea494` kl. 16:21, låst til head-en `9c3dfb89`, etter instruksjonen kl. 14:46, som er ført i `docs/ai-prompts/2026-11-22.md`, uten nytt ja. CI var grønn i alle jobbene (run 45037144698), med 6124 bestått og 99 hoppet over i jobben `pytest`. Dokumentene har 13 åpne spørsmål i `DESIGN.md` (D1–D13) og 8 i `EXPERIENCE.md` (E1–E8), som gruppen svarer på.
+
+### Story 9.25: Svarene på E1, E2, E4, E5 og E6 i UX-dokumentene
+
+*Lagt til 2026-11-22, etter instruksjonen kl. 18:33 i `docs/ai-prompts/2026-11-22.md` og gruppens svar kl. 18:23:* rådet ville vente med E1, E2, E4, E5 og E6 til etter brukertest 2, men gruppen valgte å ta dem nå. Svarene på D1–D13, E3, E7 og E8 står som daterte linjer på main. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-25-svarene-paa-ux-spoersmaalene.md`.
+
+Som **bruker i brukertest 2** vil jeg at appen bruker de samme ordene og det samme klokkeslettet overalt, og at omvisningen forklarer alle valgene i Innstillinger, så jeg ikke møter to navn på det samme.
+
+**Oppfyller:** E1, E2, E4, E5 og E6 i `EXPERIENCE.md`, FR-602 · **Begrenses av:** NFR-06, regel 3, 16, 19, 21 og 22
+
+**Kontroll — hva testen ser etter:**
+- «Min liste» der Min liste sa «lista» om aksjene med stjerne (E1)
+- «kl. 22» i malene kommer fra `TIDSGRENSE`, som i stripa, og testen ser også på malene (E2)
+- Oversikten skriver «Modell: {modell}, {tjeneste}», som aksjesiden (E4, FR-602)
+- Steget i omvisningen ved søkefeltet sier «ticker», og ordlista har ordet (E5)
+- Omvisningen i Innstillinger har et steg for «Notater» (E6)
+- **Ville feilet hvis:** en av de fem rettingene manglet; hver har en test som feilet før rettingen
+
+**Avhenger av:** 9.24. **Én økt:** ja.
