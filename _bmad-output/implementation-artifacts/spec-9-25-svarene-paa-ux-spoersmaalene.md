@@ -143,5 +143,5 @@ lave.
 - [x] Hver retting har en test som feilet før rettingen
 - [x] Bildene som endrer seg, avtrykkene og bildegrenen følger med
 - [x] Gjennomgangen er tatt, også mot demoen
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 922 bestått (kl. 19:59–20:03, etter en ny start etter lite minne) og 3112 bestått og 7 hoppet over (kl. 20:04–20:25), på `5b70659a`
 - [ ] CI er grønn i alle jobbene
