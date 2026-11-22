@@ -393,4 +393,6 @@
 - [ ] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — spørsmål 1 i 9.25: ordlista har 13 ord (faglærer foreslo 8–10, svaret 18.11 holdt 12)
 - [ ] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — spørsmål 2 i 9.25: `docs/hjelp.md` sier «symbolet» om ticker i børsometeret og «lista» om Min liste i ett svar
 - [ ] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — spørsmål 3 i 9.25: statusene sier «i kveld etter kl. 22» også etter kveldsjobben, mens stripa regner dagen
-- [ ] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — instruksjonen kl. 19:06 om skjermsiden (`docs/skjermene.md`) venter til 9.25 er ført og pushet
+- [x] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — instruksjonen kl. 19:06 om skjermsiden (`docs/skjermene.md`) venter til 9.25 er ført og pushet (løst 2026-11-23: tatt kl. 21:18 som story 9.26, flettet i `16b74c35`)
+- [ ] 2026-11-23 [skjermene-9-26](903-2026-11-23-00-23-27-skjermene-9-26.md) — spørsmål 1 i 9.26: like bilder står under én story, og den andre viser til det (forslag: behold)
+- [ ] 2026-11-23 [skjermene-9-26](903-2026-11-23-00-23-27-skjermene-9-26.md) — spørsmål 2 i 9.26: bildene i `docs/skjermene/` har ikke avtrykk, og siden er et bilde av appen på `c0192467` (forslag: behold)
