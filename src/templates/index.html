@@ -190,7 +190,7 @@
     {% if rader %}
     {#- Story 8.26 (tillegg 1): setningen om signalstyrken fra fotnoten,
         synlig på siden (NFR-06). #}
-    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall. Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.</p>
+    <p class="innledning">Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Min liste lagres på denne maskinen og koster ingen API-kall. Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.</p>
     {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
         (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
         åpnes (designregler §2). Radene er siste børsdag, og linja under
@@ -209,7 +209,7 @@
       {% endif %}
     {% endif %}
     {% if not vist_tabell %}
-      <p class="tom-liste" id="aksjene">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
+      <p class="tom-liste" id="aksjene">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i Min liste.</p>
     {% endif %}
     {% endif %}
   {% endif %}
@@ -299,7 +299,7 @@
   {#- Gjennomgangen av 8.23 (ECH2, VG4): «Min liste» på oversikten uten merkede
       aksjer sier det, med ankeret stjernen og lenkene sender til. #}
   {% if bare_min and not vist_tabell %}
-    <p class="tom-min-liste" id="aksjene">Ingen aksjer i Min liste ennå. Stjernen foran et selskap under «Alle» legger aksjen i lista.</p>
+    <p class="tom-min-liste" id="aksjene">Ingen aksjer i Min liste ennå. Stjernen foran et selskap under «Alle» legger aksjen i Min liste.</p>
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
