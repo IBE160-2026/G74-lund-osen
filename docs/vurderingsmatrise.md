@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-19T23:53
+updated: 2026-11-22T15:15
 ---
 
 # Vurderingsmatrise for del 1
@@ -61,6 +61,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-19 (story 2.10):* 2.10 (PR #171, `92862551`) er flettet. Høy og lav lagres med kursene, med `0015_hoey_lav.sql`, uten nye kall, og aksjesiden viser dem ikke. Hele settet ble kjørt i CI på head-en `cc77e36f`: 6090 bestått og 99 hoppet over i jobben `pytest` (run 44555722272). Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-19 (story 2.19):* 2.19 (PR #172, `690fea4c`) er flettet. En rad der lav er over sluttkursen, eller høy er under den, lagres uten høy og lav, og hentingen sier hvor mange rader det gjaldt. Hele settet ble kjørt i CI på head-en `2532598b`: 6124 bestått og 99 hoppet over i jobben `pytest` (run 44593291667). Statusen i tabellen er ikke endret.
+
+*Lagt til 2026-11-22 (story 9.24):* «Design og brukeropplevelse» har nå en samlet UX-spesifikasjon, laget med bmad-ux fra det som er bygget: [DESIGN.md](../_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/DESIGN.md) for hvordan appen ser ut og [EXPERIENCE.md](../_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/EXPERIENCE.md) for hvordan den virker, med brukerreisene UJ-1–UJ-3, det som ikke er godt nok ennå og åpne spørsmål til gruppen. Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
