@@ -2256,6 +2256,34 @@ utenfor dagens høyeste og laveste kurs.
 
 *Lagt til 2026-11-19:* 2.19 er squash-flettet med PR #172 i `690fea4c` kl. 20:04, låst til head-en `2532598b`, etter gruppens svar kl. 18:47, uten nytt ja. En rad der lav er over sluttkursen, eller høy er under den, lagres uten høy og lav, og linja for symbolet i hentingen sier hvor mange rader det gjaldt. Ingen ny migrasjon og ingen nye kall. CI var grønn i alle jobbene (run 44593291667), med 6124 bestått og 99 hoppet over i jobben `pytest`.
 
+
+### Story 2.20: Aksjene utenfor lista har ferske kurser når de følges
+
+*Lagt til 2026-11-22, etter instruksjonen kl. 11:33 i `docs/ai-prompts/2026-11-22.md` og gruppens svar 22.11 kl. 11:29; rådet anbefalte svarene.* Storyen er skrevet om etter funnene 21.11 i sesjonsloggen (`471ab16b`). Den første versjonen ble stoppet 21.11 kl. 22:22, fordi grunnlaget var feil. «Ekstra, hvis tiden rekker»: den bygges på egen gren etter kodegjennomgangen, og flettes bare ferdig og grønn.
+
+Som **bruker** vil jeg at en aksje jeg begynner å følge, alt har kurser og
+signal, så jeg ikke må vente til neste børsdag kl. 22.
+
+**Oppfyller:** FR-416 · **Begrenses av:** NFR-01, `AD-6`, `AD-21`, ECH3 i 2.12
+
+**Grunnlaget:**
+- Målingen i 2.13 bruker alle kallene som er igjen, også i helgene, og har målt alle de 280 aksjene utenfor lista.
+- Hvert kall henter tre måneder, men basen får bare omsetningen. Svaret står uendret som råfil i `data/raa/` og går ikke inn i basen (`AD-6`).
+- Et ønske tas bare i bruk på selve børsdagen (ECH3 i 2.12), fordi lista er knyttet til hver børsdag.
+
+**Kontroll — hva testen ser etter:**
+- Målingen henter hele året per kall, til samme pris.
+- Hver lørdag måles de 20 mest omsatte utenfor lista først. Resten måles som nå, eldste først.
+- Kursene fra målingen lagres, så en aksje som følges, kan vise dem med en gang, med datoen de er fra.
+- En aksje som følges en dag børsen er stengt, hentes samme kveld med ett av dagens kall. ECH3 står: aksjen kommer inn i lista neste børsdag, og lista for en dag som alt er hentet, endres ikke.
+- Signalet for dagene før regnes i ettertid, som i 2.17.
+- Hentingen og de nye forsøkene får kallene først, og målingen bruker resten, uten reserve. Bonuskvoten brukes aldri, og taket på 18 endres ikke.
+- **Ville feilet hvis:** lista for en hentet børsdag ble endret, en aksje med kurser herfra sto som «Venter på henting», et kall tok fra bonuskvoten, eller målingen tok kall før hentingen og de nye forsøkene.
+
+**Planen avgjør** hvordan kursene lagres innenfor `AD-6` og `AD-21`. *Lagt til ved føringen 22.11, etter sjekken mot koden (steg 1 i instruksjonen):* planen avgjør også hvordan signalet regnes for en aksje som ennå ikke er i lista, fordi 2.17 bare regner for aksjene i lista (`src/ettertid.py`), og hva som skjer med et ønske en dag børsen er stengt, når målingen alt har brukt dagens kall i en tidligere kjøring samme kveld.
+
+**Avhenger av:** 2.3b, 2.3d, 2.12, 2.13 og 2.17.
+
 ---
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss
