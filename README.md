@@ -242,7 +242,7 @@ Hver story som endrer koden, leveres med tester. Det er vårt svar på hvordan K
 - [Utdrag fra designtavla 13.10](_bmad-output/planning-artifacts/designutdrag-2026-10-13.md): grunnlaget for planen til story 8.0d
 - [Utdrag fra designtavla 08.11](_bmad-output/planning-artifacts/designutdrag-2026-11-08.md): egne aksjer, KI-teksten om dagen og Innstillinger, til story 2.12, 8.10, 8.10b og 10.6
 - [UX-spesifikasjonen](_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/): [DESIGN.md](_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/DESIGN.md), hvordan appen ser ut, og [EXPERIENCE.md](_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/EXPERIENCE.md), hvordan den virker, laget 22.11 med bmad-ux fra det som er bygget, med åpne spørsmål til gruppen (story 9.24)
-- [Skjermene](docs/skjermene.md): 60 bilder av demoen ordnet etter epic og story, med det kontrollen sjekket under hvert bilde
+- [Skjermene](docs/skjermene.md): 53 bilder av demoen ordnet etter epic og story, med det kontrollen sjekket under hvert bilde
 - [Kontrollsjekken av bransjene 10.11](_bmad-output/planning-artifacts/bransjesjekk-2026-11-10.md): den faste bransjen for hver aksje på Oslo Børs, til story 8.22
 - [Endringsforslag 28.09](_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-28.md), godkjent samme dag
 - [Endringsforslag 08.10](_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-08.md): femten idéer inn i v1, godkjent samme dag
