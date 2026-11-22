@@ -28,6 +28,6 @@
     <a class="knapp" href="/min-liste#ferdige-lister">Avbryt</a>
     <button type="submit" class="knapp hoved">Bruk denne lista</button>
   </form>
-  {% if eksempeltall %}<p class="demoboks">Demoen henter ingenting, så lista står som «Venter på henting». I den ekte versjonen byttes den ved neste henting etter kl. 22.</p>{% endif %}
+  {% if eksempeltall %}<p class="demoboks">Demoen henter ingenting, så lista står som «Venter på henting». I den ekte versjonen byttes den ved neste henting etter {{ tidsgrense() }}.</p>{% endif %}
 </section>
 {% endblock %}

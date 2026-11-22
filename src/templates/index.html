@@ -146,7 +146,7 @@
       noe som ikke skjer. En endring som venter, står som før. #}
   {% set venter = egne.ventende if egne else 0 %}
   {% if venter %}
-    <p class="venter-melding" role="status">{% if eksempeltall %}Eksempeltall: {% endif %}{{ venter }} {{ "endring" if venter == 1 else "endringer" }} i lista tas i bruk ved hentingen etter kl. 22.{% if eksempeltall %} Demoen henter ikke, så {{ "den tas" if venter == 1 else "de tas" }} ikke i bruk her.{% endif %}</p>
+    <p class="venter-melding" role="status">{% if eksempeltall %}Eksempeltall: {% endif %}{{ venter }} {{ "endring" if venter == 1 else "endringer" }} i lista tas i bruk ved hentingen etter {{ tidsgrense() }}.{% if eksempeltall %} Demoen henter ikke, så {{ "den tas" if venter == 1 else "de tas" }} ikke i bruk her.{% endif %}</p>
   {% endif %}
   {#- Story 8.3: Min liste har overskriften, en kort tekst, knappen «Alle /
       Min liste» med antallet, og samme tabell i samme rekkefølge (FR-102).
@@ -190,7 +190,7 @@
     {% if rader %}
     {#- Story 8.26 (tillegg 1): setningen om signalstyrken fra fotnoten,
         synlig på siden (NFR-06). #}
-    <p class="innledning">Stjernen foran et selskap legger aksjen i lista, og et nytt trykk tar den ut. Lista lagres på denne maskinen og koster ingen API-kall. Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.</p>
+    <p class="innledning">Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut. Min liste lagres på denne maskinen og koster ingen API-kall. Signalstyrken sier hvor mange av de {{ antall_sjekker }} sjekkene som slo ut, ikke om du bør kjøpe eller selge.</p>
     {#- Story 8.17b: «Sammenlign med» er periodevalget i Min liste
         (beslutningen 08.10 kl. 21:48), med siste børsdag valgt når siden
         åpnes (designregler §2). Radene er siste børsdag, og linja under
@@ -209,7 +209,7 @@
       {% endif %}
     {% endif %}
     {% if not vist_tabell %}
-      <p class="tom-liste" id="aksjene">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i lista.</p>
+      <p class="tom-liste" id="aksjene">Ingen aksjer i Min liste ennå. Trykk på stjernen ☆ foran et selskap, under «Alle» her eller i markedsoversikten, for å legge det i Min liste.</p>
     {% endif %}
     {% endif %}
   {% endif %}
@@ -299,7 +299,7 @@
   {#- Gjennomgangen av 8.23 (ECH2, VG4): «Min liste» på oversikten uten merkede
       aksjer sier det, med ankeret stjernen og lenkene sender til. #}
   {% if bare_min and not vist_tabell %}
-    <p class="tom-min-liste" id="aksjene">Ingen aksjer i Min liste ennå. Stjernen foran et selskap under «Alle» legger aksjen i lista.</p>
+    <p class="tom-min-liste" id="aksjene">Ingen aksjer i Min liste ennå. Stjernen foran et selskap under «Alle» legger aksjen i Min liste.</p>
   {% endif %}
   {% if vist_tabell %}
     {#- Story 8.15, svar 5: linja står bare når en kolonne er valgt. Story
@@ -433,7 +433,7 @@
       </div>
       {% if boersdagen.tekst %}
         <p class="ki-tekst">{{ boersdagen.tekst|prikkede_tall }}</p>
-        <p class="modell">Skrevet av {{ boersdagen.modell }} da kursene ble hentet.</p>
+        <p class="modell">Modell: {{ boersdagen.modell }}</p>
         {#- Story 10.10, spørsmål 10: linja om Min liste skrives av appen, ikke av KI. #}
         {% if boersdagen.min_liste %}<p class="min-liste-linje">{{ boersdagen.min_liste }} <span class="merke-app">Skrevet av appen.</span></p>{% endif %}
       {% else %}

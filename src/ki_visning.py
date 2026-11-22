@@ -123,7 +123,14 @@ def bygg_ki_visning(rad: KIRad | None, vurdering: object, *, andre_har_rader: bo
     tekst = unicodedata.normalize("NFC", rad.tekst).translate(_USYNLIGE)
     if _VAKT.search(tekst):
         return KIVisning(STOPPET_AV_VAKTEN)
-    return KIVisning(VIST, tekst=rad.tekst, modell=f"{rad.modell}, {rad.tjeneste}")
+    return KIVisning(VIST, tekst=rad.tekst, modell=_modellnavnet(rad))
+
+
+def _modellnavnet(rad) -> str:
+    """«gemma4:e4b, lokal»: modellen og tjenesten, som eksempelet i FR-602.
+    Aksjesiden og oversikten skriver det likt, etter «Modell:» (story 9.25,
+    E4, gruppens svar 22.11 kl. 18:23)."""
+    return f"{rad.modell}, {rad.tjeneste}"
 
 
 # Story 8.2b, c (U67): et tall i teksten, delt som kontrollen deler det
@@ -230,7 +237,7 @@ def bygg_dagsvisning(rad: KIRad | None, grunnlag: Mapping[str, object] | None) -
     if _VAKT.search(tekst):
         return Dagsvisning()
     # Gjennomgangen (VG5): modellen og tjenesten, som paa aksjesiden (FR-602).
-    return Dagsvisning(tekst=rad.tekst, modell=f"{rad.modell} ({rad.tjeneste})")
+    return Dagsvisning(tekst=rad.tekst, modell=_modellnavnet(rad))
 
 
 def ki_paa(kapsel: str | None) -> bool:

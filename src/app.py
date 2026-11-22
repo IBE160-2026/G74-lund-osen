@@ -136,6 +136,7 @@ from markedsoversikt import (
     del_i_to,
     egne_dager,
     eldre_enn_nyeste,
+    grensen_som_tekst,
     ingen_skilte_seg_ut,
     med_perioden,
     neste_henting_tekst,
@@ -299,6 +300,9 @@ def _neste_henting(kursdag: date) -> str | None:
 
 
 app.jinja_env.filters["neste_henting"] = _neste_henting
+# Story 9.25 (E2, gruppens svar 22.11 kl. 18:23): «kl. 22» i malene regnes
+# av TIDSGRENSE ved hver visning, som i stripa, og står ikke skrevet inn.
+app.jinja_env.globals["tidsgrense"] = grensen_som_tekst
 
 
 def naa() -> datetime:

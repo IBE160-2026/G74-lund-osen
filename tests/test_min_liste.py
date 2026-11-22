@@ -435,7 +435,7 @@ class TestSidene:
         # seg ut, når noe er merket og vurdert. Demoen har fem merket.
         assert '<h1 class="overskrift"><mark>3 av 5 i Min liste</mark> skilte seg ut fredag</h1>' in html
         assert html.count("<h1") == 1
-        assert "Stjernen foran et selskap legger aksjen i lista" in html
+        assert "Stjernen foran et selskap legger aksjen i Min liste" in html
         assert "koster ingen API-kall" in html
         assert re.search(r'Alle <span class="antall">15</span>', html)
         assert re.search(r'aria-current="true">Min liste <span class="antall">5</span>', html)
@@ -623,7 +623,7 @@ class TestGjennomgangen:
             _merk(demo, symbol, til="fjern")
         tom = demo.get("/min-liste").data.decode("utf-8")
         assert 'class="fotnote"' not in tom
-        assert "Stjernen foran et selskap legger aksjen i lista" in tom
+        assert "Stjernen foran et selskap legger aksjen i Min liste" in tom
 
     def test_i_den_ekte_basen_skriver_merkingen_bare_min_liste(self, klient, monkeypatch):  # noqa: F811
         """VG9, AD-7. Ville feilet hvis merkingen eller en side rørte en annen

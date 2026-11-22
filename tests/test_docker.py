@@ -1389,7 +1389,14 @@ HOEYDE_PAA_BILDET = 1864
 # to ganger, byte for byte de samme. notatene-brfe-demo.png, notatene-min-liste-demo.png og
 # mobil/notatene-brfe-390-demo.png, som viser knappen, er nye; de andre er byte for byte de samme.
 # Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
-AVTRYKK_BAK_BILDET = "f126768bf6de621ecf7c6398d0cfa625deaa4a0802409918cd0dd4e1c928d033"
+# Story 9.25 (svarene på E1, E2, E4 og E6 i UX-dokumentene): index.html, _egne.html, folg.html,
+# ferdig_liste.html, app.py, ki_visning.py og hjelpetekster.py. Avtrykkene er regnet ut på nytt, og
+# alle de 20 bildene er tatt på nytt i demoen, to ganger, byte for byte de samme. min-liste-demo.png
+# («Min liste» i innledningen) og mobil/oversikten-390-demo.png («Modell: gemma4:e4b, lokal») er nye;
+# de andre er byte for byte de samme.
+# Gjennomgangen av 9.25 (AA2): teksten i steget for «Notater» (hjelpetekster.py). Avtrykkene er
+# regnet ut på nytt, og alle de 20 bildene er tatt på nytt, to ganger, byte for byte de samme.
+AVTRYKK_BAK_BILDET = "f987606c203406659cd02472526d5ce67903dc27d035f85fe273f60f0e986f29"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1879,7 +1886,14 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # to ganger, byte for byte de samme. notatene-brfe-demo.png, notatene-min-liste-demo.png og
 # mobil/notatene-brfe-390-demo.png, som viser knappen, er nye; de andre er byte for byte de samme.
 # Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
-AVTRYKK_BAK_AKSJESIDEN = "5a9078214499fbbb1057bd90055599daa1d76eb6151b4f2860932a7dfc4a3deb"
+# Story 9.25 (svarene på E1, E2, E4 og E6 i UX-dokumentene): index.html, _egne.html, folg.html,
+# ferdig_liste.html, app.py, ki_visning.py og hjelpetekster.py. Avtrykkene er regnet ut på nytt, og
+# alle de 20 bildene er tatt på nytt i demoen, to ganger, byte for byte de samme. min-liste-demo.png
+# («Min liste» i innledningen) og mobil/oversikten-390-demo.png («Modell: gemma4:e4b, lokal») er nye;
+# de andre er byte for byte de samme.
+# Gjennomgangen av 9.25 (AA2): teksten i steget for «Notater» (hjelpetekster.py). Avtrykkene er
+# regnet ut på nytt, og alle de 20 bildene er tatt på nytt, to ganger, byte for byte de samme.
+AVTRYKK_BAK_AKSJESIDEN = "3cc070b140fca30e067741d325e67c05159383e83350275492c79b8edcf1f428"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2249,27 +2263,34 @@ BILDENE_PAA_MOBIL = (
 # to ganger, byte for byte de samme. notatene-brfe-demo.png, notatene-min-liste-demo.png og
 # mobil/notatene-brfe-390-demo.png, som viser knappen, er nye; de andre er byte for byte de samme.
 # Avtrykkene er regnet ut fra filene bak bildene slik de står på grenen.
+# Story 9.25 (svarene på E1, E2, E4 og E6 i UX-dokumentene): index.html, _egne.html, folg.html,
+# ferdig_liste.html, app.py, ki_visning.py og hjelpetekster.py. Avtrykkene er regnet ut på nytt, og
+# alle de 20 bildene er tatt på nytt i demoen, to ganger, byte for byte de samme. min-liste-demo.png
+# («Min liste» i innledningen) og mobil/oversikten-390-demo.png («Modell: gemma4:e4b, lokal») er nye;
+# de andre er byte for byte de samme.
+# Gjennomgangen av 9.25 (AA2): teksten i steget for «Notater» (hjelpetekster.py). Avtrykkene er
+# regnet ut på nytt, og alle de 20 bildene er tatt på nytt, to ganger, byte for byte de samme.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "d0b815c977bed625c9e16f6f65047031b191fa25335de99b90463182ca8d29d1",
-    TOPPEN_AV_OVERSIKTEN: "f126768bf6de621ecf7c6398d0cfa625deaa4a0802409918cd0dd4e1c928d033",
-    "docs/appen/boersometeret-demo.png": "13d6502be2f626fd8853265b020c768ea1699673e6dd651b24885850af2bc0a4",
-    "docs/appen/min-liste-demo.png": "89af3f71e676d053396e67f9bd2a825ebb2662851ee70577142184c243b03ea6",
-    "docs/appen/mobil/oversikten-390-demo.png": "f126768bf6de621ecf7c6398d0cfa625deaa4a0802409918cd0dd4e1c928d033",
-    "docs/appen/mobil/boersometeret-390-demo.png": "13d6502be2f626fd8853265b020c768ea1699673e6dd651b24885850af2bc0a4",
-    "docs/appen/din-egen-liste-demo.png": "89af3f71e676d053396e67f9bd2a825ebb2662851ee70577142184c243b03ea6",
-    "docs/appen/investorsiden-brfe-demo.png": "57d3de67dc70463851c37082611104d222748df0602d02d8dc921ca842f7a548",
-    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "57d3de67dc70463851c37082611104d222748df0602d02d8dc921ca842f7a548",
-    "docs/appen/mobil/folg-en-aksje-390-demo.png": "d0b815c977bed625c9e16f6f65047031b191fa25335de99b90463182ca8d29d1",
-    "docs/appen/mobil/notatene-brfe-390-demo.png": "5a9078214499fbbb1057bd90055599daa1d76eb6151b4f2860932a7dfc4a3deb",
-    "docs/appen/notatene-brfe-demo.png": "5a9078214499fbbb1057bd90055599daa1d76eb6151b4f2860932a7dfc4a3deb",
-    "docs/appen/notatene-min-liste-demo.png": "89af3f71e676d053396e67f9bd2a825ebb2662851ee70577142184c243b03ea6",
-    "docs/appen/innstillinger-demo.png": "714f420c021286cb6ff9e65e031b1373b0db16a4c727ed0581254f65d26183ab",
+    "docs/appen/folg-en-aksje-demo.png": "5ddbdc4452137d9dda62d0227f186e64d6467b5540501e1f4b70366de1050afe",
+    TOPPEN_AV_OVERSIKTEN: "f987606c203406659cd02472526d5ce67903dc27d035f85fe273f60f0e986f29",
+    "docs/appen/boersometeret-demo.png": "0ad27a39d4acfc2728f4845e26e0163561c7b570999cb0c470dc9a74e1da486e",
+    "docs/appen/min-liste-demo.png": "0a03c952938a5b90497e31a341842a695389f620dfc831efb5f1bfb1836c3f8b",
+    "docs/appen/mobil/oversikten-390-demo.png": "f987606c203406659cd02472526d5ce67903dc27d035f85fe273f60f0e986f29",
+    "docs/appen/mobil/boersometeret-390-demo.png": "0ad27a39d4acfc2728f4845e26e0163561c7b570999cb0c470dc9a74e1da486e",
+    "docs/appen/din-egen-liste-demo.png": "0a03c952938a5b90497e31a341842a695389f620dfc831efb5f1bfb1836c3f8b",
+    "docs/appen/investorsiden-brfe-demo.png": "538a46b855698059679b85f0d34c22bcc7b05d27fd77ea6b484c77852ccee3df",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "538a46b855698059679b85f0d34c22bcc7b05d27fd77ea6b484c77852ccee3df",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "5ddbdc4452137d9dda62d0227f186e64d6467b5540501e1f4b70366de1050afe",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "3cc070b140fca30e067741d325e67c05159383e83350275492c79b8edcf1f428",
+    "docs/appen/notatene-brfe-demo.png": "3cc070b140fca30e067741d325e67c05159383e83350275492c79b8edcf1f428",
+    "docs/appen/notatene-min-liste-demo.png": "0a03c952938a5b90497e31a341842a695389f620dfc831efb5f1bfb1836c3f8b",
+    "docs/appen/innstillinger-demo.png": "923307080f182ce9aef97f7bb4c8a9e4c830e84a89e948685d9793771040ec93",
     # Story 3.3k: de to nye bildene.
-    "docs/appen/notatpanelet-demo.png": "89af3f71e676d053396e67f9bd2a825ebb2662851ee70577142184c243b03ea6",
-    "docs/appen/vis-meg-rundt-demo.png": "89af3f71e676d053396e67f9bd2a825ebb2662851ee70577142184c243b03ea6",
+    "docs/appen/notatpanelet-demo.png": "0a03c952938a5b90497e31a341842a695389f620dfc831efb5f1bfb1836c3f8b",
+    "docs/appen/vis-meg-rundt-demo.png": "0a03c952938a5b90497e31a341842a695389f620dfc831efb5f1bfb1836c3f8b",
     # Story 9.21 (gruppens svar 17.11 kl. 22:18): de to nye bildene.
-    "docs/appen/signalet-dag-for-dag-demo.png": "5a9078214499fbbb1057bd90055599daa1d76eb6151b4f2860932a7dfc4a3deb",
-    "docs/appen/slett-notatet-demo.png": "7feed17733acb875ee55637cfcf34e5ee59121ffd74c0c620a37b275397a4f71",
+    "docs/appen/signalet-dag-for-dag-demo.png": "3cc070b140fca30e067741d325e67c05159383e83350275492c79b8edcf1f428",
+    "docs/appen/slett-notatet-demo.png": "75e2412eab808bff41ec037e33f2dc1b39669f6a0251e755d144fa9415003a2c",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
