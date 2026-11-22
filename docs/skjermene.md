@@ -2,14 +2,16 @@
 title: "Skjermene i OSE Signal"
 status: aktiv
 created: 2026-11-22
-updated: 2026-11-22T21:38
+updated: 2026-11-22T22:09
 ---
 
 # Skjermene i OSE Signal
 
-Siden har 10 epics, 142 storyer og 60 bilder. 46 av storyene har en egen skjerm, med ett eller to bilder. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga.
+Siden har 10 epics, 142 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
 
-Epicene står i rekkefølgen i [epics og stories](../_bmad-output/planning-artifacts/epics.md), der Epic 10 står etter Epic 5, fordi den het Epic 5B og er plan B for KI-laget, utløst 28.09. Storyene står i rekkefølgen der, og 8.28 står i Epic 8. Under hvert bilde står det kontrollen sjekket, med lenke til spesifikasjonen, eller til storyen når den ikke har en egen spesifikasjon. En story uten skjerm har én linje om hvorfor.
+Bildene viser appen slik den er nå, så et bilde kan også vise det senere storyer la til, for eksempel knappene øverst, «i ettertid» og den rikere KI-teksten. Teksten under sier hva storyen ga, og nevner det senere der det kan forveksles.
+
+Epicene står i rekkefølgen i [epics og stories](../_bmad-output/planning-artifacts/epics.md), der Epic 10 står etter Epic 5, fordi den het Epic 5B og er plan B for KI-laget, utløst 28.09. Storyene står i rekkefølgen der, og 8.28 står i Epic 8. Delstoryer som 2.3c, 3.3b–3.3k og 3.5a–3.5i står under storyen sin i epics og har ikke egen overskrift her. Under hvert bilde står hva det viser og hva kontrollen sjekket, og under det siste står lenken til spesifikasjonen. Har storyen flere spesifikasjoner, går lenken til den bildet bygger på, og har den ingen, eller er den delt i mange, går lenken til storyen i epics.
 
 Bildene er et bilde av appen på én commit og følger ikke hver endring, så de har ikke avtrykk som bildene i [`docs/appen/`](appen/). Grunnen står i spesifikasjonen [9.26](../_bmad-output/implementation-artifacts/spec-9-26-skjermene.md).
 
@@ -121,7 +123,7 @@ Ingen skjerm i demoen: de oppdiktede kursene har ingen justeringsdager, så merk
 
 ![Story 2.7, Historikken i aksjedetaljen, i demoen med oppdiktede selskaper og kurser](skjermene/2-7-signalet-dag-for-dag.png)
 
-«Signalet dag for dag» nederst på aksjesiden, én måned om gangen, med styrke og retning eller grunnen for hver børsdag. Kontrollen sjekket at historikken leses fra de lagrede vurderingene og ikke regnes på nytt, og at styrke 0, en grunn og en dag uten rad aldri ser like ut. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-7b-signalet-dag-for-dag.md)
+«Signalet dag for dag» nær bunnen av aksjesiden, én måned om gangen, med styrke og retning for hver børsdag, eller grunnen når dagen har en. Kontrollen sjekket at historikken leses fra de lagrede vurderingene og ikke regnes på nytt, og at styrke 0, en grunn og en dag uten rad aldri ser like ut. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-7b-signalet-dag-for-dag.md)
 
 ### 2.8 Hovedindeksen hentes i samme kjøring
 
@@ -157,9 +159,11 @@ Ingen skjerm i demoen: lista leses fra basen, og ingen av de oppdiktede aksjene 
 
 ![Story 2.12, Velge og bytte aksjer, i demoen med oppdiktede selskaper og kurser](skjermene/2-12-dine-egne-aksjer.png)
 
+«Dine egne aksjer» under tabellen på oversikten, med hvor mange aksjer appen følger av taket på 18, og knappen «Følg en aksje». Kontrollen sjekket at en nittende aksje avvises med en forklaring, og at et valg på siden bare lagres som et ønske og aldri starter et kall.
+
 ![Story 2.12, Velge og bytte aksjer, i demoen med oppdiktede selskaper og kurser](skjermene/2-12-foelge-aksjen.png)
 
-«Dine egne aksjer» under tabellen på oversikten, med hvor mange aksjer appen følger av taket på 18, og knappen «Følg en aksje». Kontrollen sjekket at en nittende aksje avvises med en forklaring, og at et valg på siden bare lagres som et ønske og aldri starter et kall. Steget før en aksje følges, med omsetningen som er målt fra før og hva valget koster i kall ved neste henting. Kontrollen sjekket at omsetningen vises før brukeren velger, og at demoen ikke henter noe. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-12-velge-og-bytte-aksjer.md)
+Steget før en aksje følges, med omsetningen som er målt fra før og hva valget koster i kall ved neste henting. Kontrollen sjekket at omsetningen vises før brukeren velger, og at demoen ikke henter noe. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-12-velge-og-bytte-aksjer.md)
 
 ### 2.13 Kommandoen som måler omsetning
 
@@ -181,7 +185,7 @@ Historikken for en måned der dagene før vurderingene startet har signalet regn
 
 ### 2.18 Setningen om KI-teksten for en dag i ettertid bare med KI på
 
-Ingen skjerm: endringen er en setning som ikke står når KI-teksten er av, og demoen viser KI-teksten på. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-18-ki-setningen-i-ettertid.md)
+Ingen skjerm: endringen er at en setning er borte når KI-teksten er av, og et bilde kan ikke vise at noe mangler. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-18-ki-setningen-i-ettertid.md)
 
 ### 2.19 Høy og lav mot sluttkursen
 
@@ -213,9 +217,11 @@ Ingen skjerm: README-en; den tomme siden med hentekommandoen vises ikke i demoen
 
 ![Story 3.4, Demoversjonen, i demoen med oppdiktede selskaper og kurser](skjermene/3-4-eksempeltall.png)
 
+Demolinja øverst på siden, som sier at tallene er eksempeltall om oppdiktede selskaper. Kontrollen sjekket at merket leses fra basen, så hver side med demobasen viser det og ingen side med en ekte base gjør det.
+
 ![Story 3.4, Demoversjonen, i demoen med oppdiktede selskaper og kurser](skjermene/3-4-fotnoten-ikke-vurdert.png)
 
-Demolinja øverst på siden, som sier at tallene er eksempeltall om oppdiktede selskaper. Kontrollen sjekket at merket leses fra basen, så hver side med demobasen viser det og ingen side med en ekte base gjør det. Fotnoten for «ikke vurdert» på aksjesiden for en dag før vurderingene i demoen startet, med demoteksten. Kontrollen sjekket at demoteksten bare står for dager før startdagen, og at den ekte versjonen har sin egen tekst. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-3-4-demoversjonen.md)
+Fotnoten for «ikke vurdert» på aksjesiden for en tidlig dag uten signal, med demoteksten. Setningen om dagene i ettertid kom med 2.17. Kontrollen sjekket at demoteksten bare står for dager før startdagen, og at den ekte versjonen har sin egen tekst. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-3-4e-fotnoten-etter-startdag.md)
 
 ### 3.4b KI-tekstene i demoen
 
@@ -261,19 +267,19 @@ Ingen skjerm: KI-loggen lagres i basen. [Spesifikasjonen](../_bmad-output/implem
 
 ### 5.1 Av/på-bryteren i grensesnittet 🔒
 
-Ikke bygget: låst epic (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-51-avpå-bryteren-i-grensesnittet-)
+Ikke bygget: epicen er ute av v1 fra 28.09, da plan B (Epic 10) ble utløst, og står som plan for en senere versjon. Bryteren for KI-teksten i demoen kom med 10.3 og 8.10b. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-51-avpå-bryteren-i-grensesnittet-)
 
 ### 5.2 Visningen når laget er av 🔒
 
-Ikke bygget: låst epic (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-52-visningen-når-laget-er-av-)
+Ikke bygget: epicen er ute av v1 fra 28.09, da plan B (Epic 10) ble utløst, og står som plan for en senere versjon. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-52-visningen-når-laget-er-av-)
 
 ### 5.3 Usikkerhet som forbehold 🔒
 
-Ikke bygget: låst epic (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-53-usikkerhet-som-forbehold-)
+Ikke bygget: epicen er ute av v1 fra 28.09, da plan B (Epic 10) ble utløst, og står som plan for en senere versjon. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-53-usikkerhet-som-forbehold-)
 
 ### 5.4 Relevansskalaen med tre verdier 🔒
 
-Ikke bygget: låst epic (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-54-relevansskalaen-med-tre-verdier-)
+Ikke bygget: epicen er ute av v1 fra 28.09, da plan B (Epic 10) ble utløst, og står som plan for en senere versjon. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-54-relevansskalaen-med-tre-verdier-)
 
 ## Epic 10: KI forklarer signalet (plan B) 🔀
 
@@ -287,9 +293,7 @@ Ingen egen skjerm: teksten lages i hentekommandoen og lagres i KI-loggen, og den
 
 ### 10.3 Visningen i aksjedetaljen
 
-![Story 10.3, Visningen i aksjedetaljen, i demoen med oppdiktede selskaper og kurser](skjermene/10-3-ki-teksten-paa-aksjesiden.png)
-
-KI-teksten på aksjesiden, merket «Laget av KI» og med modellnavnet og tjenesten under. Kontrollen sjekket at regelforklaringen står først og KI-teksten under den, og at en dag uten KI-tekst sier det. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-3-visningen-i-aksjedetaljen.md)
+Visningen står i bildet for 10.9: KI-teksten i rammen «Signalet forklart», merket «Laget av KI» og med modellen under, i formen fra 10.9 og 10.10. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-3-visningen-i-aksjedetaljen.md)
 
 ### 10.4 Måle bidraget — egen brukertest, etter 8.1
 
@@ -299,13 +303,13 @@ Ingen skjerm: en brukertest med KI av og på og en telling av KI-loggen for én 
 
 ![Story 10.5, Lenke til selskapets side på NewsWeb, i demoen med oppdiktede selskaper og kurser](skjermene/10-5-investorsiden.png)
 
-Lenken til investorsiden nederst på aksjesiden, med selskapets navn; i demoen går den til en side i appen. Kontrollen sjekket at lenken gjelder aksjen siden viser, og at ingen mal lenker til Euronexts nettsteder. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-5-investorsiden.md)
+Knappen til investorsiden under «Signalet dag for dag» på aksjesiden, med selskapets navn. I demoen går den til en side i appen (3.4h), og høyden er fra 8.29. Kontrollen sjekket at lenken gjelder aksjen siden viser, og at ingen mal lenker til Euronexts nettsteder. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-5-investorsiden.md)
 
 ### 10.6 KI-teksten om dagen på forsiden
 
 ![Story 10.6, KI-teksten om dagen på forsiden, i demoen med oppdiktede selskaper og kurser](skjermene/10-6-boersdagen-kort-fortalt.png)
 
-«Børsdagen kort fortalt» under tabellen på oversikten, merket «Laget av KI», med modellnavnet og bryteren «Vis KI-tekst». Kontrollen sjekket at teksten lages i hentingen, aldri når siden vises, og at en tekst som ikke består kontrollen, ikke vises. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-6-ki-teksten-om-dagen-paa-forsiden.md)
+«Børsdagen kort fortalt» under tabellen på oversikten, merket «Laget av KI», med modellnavnet og bryteren «Vis KI-tekst». Kontrollen sjekket at teksten lages i hentingen, aldri når siden vises, og at en tekst som ikke består kontrollen, ikke vises. Teksten i bildet har den rikere formen fra 10.10 og 10.11, og linja om Min liste kom med 10.10. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-6-ki-teksten-om-dagen-paa-forsiden.md)
 
 ### 10.7 Egen nøkkel til Gemini, Anthropic og OpenAI
 
@@ -323,9 +327,7 @@ Rammen «Signalet forklart» med appens setninger om dagene og om samme dag øve
 
 ### 10.10 Rikere KI-tekster
 
-![Story 10.10, Rikere KI-tekster, i demoen med oppdiktede selskaper og kurser](skjermene/10-10-min-liste-linja.png)
-
-Linja appen skriver under teksten om børsdagen, om aksjene i Min liste som skilte seg ut, merket «Skrevet av appen.». Kontrollen sjekket at Min liste står i en linje fra appen og ikke i KI-teksten, og at hvert navn og tall i teksten over stemmer med grunnlaget. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-10-rikere-ki-tekster.md)
+Den rikere teksten om børsdagen og linja om Min liste, merket «Skrevet av appen.», står i bildet for 10.6. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-10-rikere-ki-tekster.md)
 
 ### 10.11 «mest av bransjene med minst to aksjer» i teksten om børsdagen
 
@@ -337,37 +339,37 @@ Hjelpen ved «Børsdagen kort fortalt», som sier at modellen bare fikk det appe
 
 ### 6.1 Meldingslageret som port 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-61-meldingslageret-som-port-)
+Ikke bygget: epicen er blokkert og ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-61-meldingslageret-som-port-)
 
 ### 6.2 Etterfylling med avkortingsvakt 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-62-etterfylling-med-avkortingsvakt-)
+Ikke bygget: epicen er blokkert og ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-62-etterfylling-med-avkortingsvakt-)
 
 ### 6.3 Deduplisering av språkdubletter 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-63-deduplisering-av-språkdubletter-)
+Ikke i bruk: logikken for dedupliseringen står i `src/meldinger.py` med testene i `tests/test_meldinger.py`, men ingen modul i `src/` bruker den. Storyen står i backlog, og epicen er ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-63-deduplisering-av-språkdubletter-)
 
 ### 6.4 Kategorifilteret i tre bøtter 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-64-kategorifilteret-i-tre-bøtter-)
+Ikke i bruk: logikken for kategorifilteret står i `src/meldinger.py` med testene i `tests/test_meldinger.py`, men ingen modul i `src/` bruker den. Storyen står i backlog, og epicen er ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-64-kategorifilteret-i-tre-bøtter-)
 
 ### 6.5 Meldinger i aksjedetaljen 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-65-meldinger-i-aksjedetaljen-)
+Ikke bygget: epicen er blokkert og ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-65-meldinger-i-aksjedetaljen-)
 
 ## Epic 7: Kommende finansielle hendelser 🔒
 
 ### 7.1 Kalenderkilden og koblingen til selskap 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-71-kalenderkilden-og-koblingen-til-selskap-)
+Ikke bygget: epicen er blokkert og ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-71-kalenderkilden-og-koblingen-til-selskap-)
 
 ### 7.2 Hendelser innenfor horisonten 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-72-hendelser-innenfor-horisonten-)
+Ikke bygget: epicen er blokkert og ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-72-hendelser-innenfor-horisonten-)
 
 ### 7.3 Når kalenderen ikke svarer 🔒
 
-Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-73-når-kalenderen-ikke-svarer-)
+Ikke bygget: epicen er blokkert og ute av v1 fra 28.09 (plan B). [Storyen](../_bmad-output/planning-artifacts/epics.md#story-73-når-kalenderen-ikke-svarer-)
 
 ## Epic 8: Tydelig for den som ikke har bygget den
 
@@ -375,7 +377,7 @@ Ikke bygget: låst epic (plan B), ute av v1 fra 28.09. [Storyen](../_bmad-output
 
 ![Story 8.0, De rene feilene i de to skjermbildene, i demoen med oppdiktede selskaper og kurser](skjermene/8-0-tabellen.png)
 
-Tabellen i markedsoversikten, med tallene skrevet på norsk og selskapsnavnene som lenker. Kontrollen sjekket at tallene har desimalkomma og aldri står som «-0,00», at en aksje som skiller seg ut, er merket med tekst og ikke bare med farge, og at tabellen fortsatt har fem kolonner. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0-de-rene-feilene-i-de-to-skjermbildene.md)
+Nederst i tabellen i markedsoversikten, med tallene skrevet på norsk og selskapsnavnene som lenker. Kontrollen sjekket at tallene har desimalkomma og aldri står som «-0,00», at en aksje som skiller seg ut, er merket med tekst og ikke bare med farge, og at tabellen fortsatt har fem kolonner. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0-de-rene-feilene-i-de-to-skjermbildene.md)
 
 ### 8.0b Hjelp bak et spørsmålstegn
 
@@ -387,29 +389,31 @@ Hjelpen bak «?» ved Signalstyrke, åpnet i feltet i høyre kant, som kom med 8
 
 ![Story 8.0c, Tydelig merking, ord ved sjekkene og datoer på grafen, i demoen med oppdiktede selskaper og kurser](skjermene/8-0c-ord-ved-sjekkene.png)
 
+De tre sjekkortene på aksjesiden, der det hver sjekk ga, står som tall og ord: positiv, negativ eller ingen utslag. Kontrollen sjekket at ordene er positiv og negativ, aldri opp og ned.
+
 ![Story 8.0c, Tydelig merking, ord ved sjekkene og datoer på grafen, i demoen med oppdiktede selskaper og kurser](skjermene/8-0c-maanedsmerker.png)
 
-De tre sjekkortene på aksjesiden, der det hver sjekk ga, står som tall og ord: positiv, negativ eller ingen utslag. Kontrollen sjekket at ordene er positiv og negativ, aldri opp og ned. Kursgrafen for et år, med et merke og et norsk månedsnavn ved første børsdag i hver måned. Kontrollen sjekket at merket står over punktet for den dagen i kurslinja, og ikke er spredd etter kalenderen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md)
+Kursgrafen for 3 måneder, med et merke og et norsk månedsnavn ved første børsdag i hver måned. Kontrollen sjekket at merket står over punktet for den dagen i kurslinja, og ikke er spredd etter kalenderen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0c-tydelig-merking-ord-ved-sjekkene-og-datoer-paa-grafen.md)
 
 ### 8.0e Oversikten fra designforslaget
 
 ![Story 8.0e, Oversikten fra designforslaget, i demoen med oppdiktede selskaper og kurser](skjermene/8-0e-toppen.png)
 
+Toppen av markedsoversikten: overskriften med hvor mange aksjer som skilte seg ut og ukedagen, innledningen, linja om dem som fikk 3 av 3, og «Slik leser du tabellen». Kontrollen sjekket at antallene telles og ikke er skrevet fast, og at ukedagen er børsdagen vurderingene gjelder, ikke dagen siden ble åpnet.
+
 ![Story 8.0e, Oversikten fra designforslaget, i demoen med oppdiktede selskaper og kurser](skjermene/8-0e-skilte-seg-ut.png)
 
-Toppen av markedsoversikten: overskriften med hvor mange aksjer som skilte seg ut og ukedagen, innledningen, linja om dem som fikk 3 av 3, og «Slik leser du tabellen». Kontrollen sjekket at antallene telles og ikke er skrevet fast, og at ukedagen er børsdagen vurderingene gjelder, ikke dagen siden ble åpnet. Delen «Skilte seg ut» i tabellen, med T, B og I under «N av 3» i cellen for signalstyrke. Kontrollen sjekket at bare rader med styrke på terskelen eller mer står her, at verdiene leses fra den lagrede vurderingen, og at tabellen fortsatt har fem kolonner. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0e-oversikten-fra-designforslaget.md)
+Delen «Skilte seg ut» i tabellen, med T, B og I under «N av 3» i cellen for signalstyrke. Kontrollen sjekket at bare rader med styrke på terskelen eller mer står her, at verdiene leses fra den lagrede vurderingen, og at tabellen fortsatt har fem kolonner. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0e-oversikten-fra-designforslaget.md)
 
 ### 8.0d Utseendet fra designforslaget
 
-![Story 8.0d, Utseendet fra designforslaget, i demoen med oppdiktede selskaper og kurser](skjermene/8-0d-oversikten.png)
-
 ![Story 8.0d, Utseendet fra designforslaget, i demoen med oppdiktede selskaper og kurser](skjermene/8-0d-aksjesiden.png)
 
-Toppen av markedsoversikten i utseendet fra designforslaget: stripa øverst, skriften, fargene og kolonneraden. Kontrollen sjekket at skriften ligger i appen og ingenting hentes fra nettet, at sifrene i tallcellene er like brede, og at teksten har kontrast på minst 4,5:1. Toppen av aksjesiden i samme utseende, med tilbakelenken som tekst uten pil. Kontrollen sjekket at piler bare står ved retningen, og at utseendet ikke tok inn noen funksjon eller knapp til en side som ikke var bygget. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md)
+Toppen av aksjesiden i utseendet fra designforslaget: stripa, skriften, fargene og nøkkeltallene, med tilbakelenken som tekst uten pil. Kontrollen sjekket at skriften ligger i appen og ingenting hentes fra nettet, at sifrene i tallcellene er like brede, at teksten har kontrast på minst 4,5:1, og at piler bare står ved retningen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-0d-utseendet-fra-designforslaget.md)
 
 ### 8.1 Brukertest rett etter Epic 2
 
-Ingen skjerm: brukertesten med én person utenfor gruppen 10.11, ført i docs/brukertest.md og docs/ux-logg.md. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-1-brukertesten.md)
+Ingen skjerm: brukertesten med én person utenfor gruppen 10.11, ført i `docs/brukertest.md` og `docs/ux-logg.md`. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-1-brukertesten.md)
 
 ### 8.2 UX-gjennomgang av de to skjermbildene med `[CU] bmad-ux`
 
@@ -437,9 +441,11 @@ Ikke bygget: «Ekstra, hvis tiden rekker», står som backlog i sprintstatusen. 
 
 ![Story 8.6, Børsometeret, i demoen med oppdiktede selskaper og kurser](skjermene/8-6-kartet.png)
 
+Børsometeret med én rute per aksje, samlet etter bransje, og snittet for bransjen i overskriften, eller «1 aksje» der bransjen har én aksje. Kontrollen sjekket at antallet bransjer og aksjer telles fra lista, at gult bare står ved 3 av 3 siste børsdag, og at siden sier «bransje» og ikke «sektor».
+
 ![Story 8.6, Børsometeret, i demoen med oppdiktede selskaper og kurser](skjermene/8-6-maal-mot-boersen.png)
 
-Børsometeret med én rute per aksje, samlet etter bransje, og snittet for bransjen i overskriften, eller «1 aksje» der bransjen har én aksje. Kontrollen sjekket at antallet bransjer og aksjer telles fra lista, at gult bare står ved 3 av 3 siste børsdag, og at siden sier «bransje» og ikke «sektor». «Mål mot børsen» med hovedindeksen som tall, og «Slik leser du børsometeret» med fargene, rammene og størrelsen på rutene, som kom med 8.6b. Kontrollen sjekket at børsometeret ikke trenger nye kall eller en ny tabell. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-6-boersometeret.md)
+«Mål mot børsen» med hovedindeksen som tall, som kom med 8.6b og ble et kort i 8.20b, og «Slik leser du børsometeret» med fargene, rammene og størrelsen på rutene, som erstattet «Hva fargene betyr» i 8.20b. Kontrollen sjekket at børsometeret ikke trenger nye kall eller en ny tabell. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-6-boersometeret.md)
 
 ### 8.7 Sjekk 2 og 3 i kursgrafen
 
@@ -467,19 +473,15 @@ Innstillinger, med knappen øverst i stripa og bryteren «Vis hjelp». Kontrolle
 
 ![Story 8.10b, «Vis KI-tekst» i Innstillinger, i demoen med oppdiktede selskaper og kurser](skjermene/8-10b-ki-valget.png)
 
-![Story 8.10b, «Vis KI-tekst» i Innstillinger, i demoen med oppdiktede selskaper og kurser](skjermene/8-10b-bryteren-ved-teksten.png)
-
-Bryteren «Vis KI-tekst» i Innstillinger. Kontrollen sjekket at den alltid viser det samme som bryteren ved KI-teksten, og at valget ikke koster API-kall. Bryteren ved KI-teksten på aksjesiden, som viser det samme valget som i Innstillinger. Kontrollen ville feilet hvis de to kunne vise hver sin verdi. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-10b-vis-ki-tekst-i-innstillinger.md)
+Bryteren «Vis KI-tekst» i Innstillinger. Kontrollen sjekket at den alltid viser det samme som bryteren ved KI-teksten, og at valget ikke koster API-kall. Bryteren ved KI-teksten på aksjesiden, som bildet for 10.9 viser, har det samme valget. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-10b-vis-ki-tekst-i-innstillinger.md)
 
 ### 8.11 Ferdige lister og filter på signalet
 
-![Story 8.11, Ferdige lister og filter på signalet, i demoen med oppdiktede selskaper og kurser](skjermene/8-11-ferdige-lister.png)
-
-De tre stegene i «Din egen liste», med knappene for de ferdige listene i steg 3, én per bransje med antallet aksjer. Kontrollen sjekket at listene står ett sted i koden og aldri har mer enn 18 aksjer, og at en liste som ikke er målt, ikke står som ferdig liste. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-11-ferdige-lister.md)
+De ferdige listene står i steg 3 i bildet for 8.29, én per bransje med antallet aksjer og «De 15 mest omsatte» fra 8.28 først. Filteret på signalet ble tatt bort i 8.26. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-11-ferdige-lister.md)
 
 ### 8.11c «Utenfor målingen» med medianen av kursene
 
-Ikke synlig i demoen: ingen av aksjene demoen følger, står under grensen, så teksten «regnet av kursene til» vises ikke, og merket med «målt» kom med 2.12. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-11c-utenfor-maalingen.md)
+Ikke synlig i demoen: teksten «regnet av kursene til» står bare ved en aksje der medianen regnes av kursene i basen, og ingen side i demoen viser den. «Følg en aksje» viser omsetningen med «målt» og merket «Utenfor målingen», som i bildet for 8.22. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-11c-utenfor-maalingen.md)
 
 ### 8.12 Endret signalstyrke siden forrige børsdag
 
@@ -501,17 +503,23 @@ Tabellen sortert på endring, synkende, etter et klikk på kolonnenavnet, som é
 
 ### 8.16 Regelen for startdagen, og periodene i kursgrafen
 
+![Story 8.16, Regelen for startdagen, og periodene i kursgrafen, i demoen med oppdiktede selskaper og kurser](skjermene/8-16-kursgrafen-1-aar.png)
+
+Kursgrafen med 1 år valgt: navn ved annenhver måned, og «Mer om grafen» åpen, med linja om at kursserien er kortere enn perioden. Kontrollen sjekket at én funksjon gir startdagen for hver periode, med faste datoer rundt helger, helligdager og nyttår, og at 1 år viser bare det kursserien har og sier det. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-16-periodene-i-kursgrafen.md)
+
 ![Story 8.16, Regelen for startdagen, og periodene i kursgrafen, i demoen med oppdiktede selskaper og kurser](skjermene/8-16-dagen-paa-hele-siden.png)
 
-Aksjesiden med en tidligere dag valgt (8.16b): merket øverst sier at siden viser en tidligere dag, med lenke tilbake til siste børsdag, og kortene og sjekkene gjelder den dagen. Kontrollen sjekket at alt leses fra det som er lagret for dagen, og at signalet aldri regnes på nytt (AD-7). [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-16-periodene-i-kursgrafen.md)
+Aksjesiden med en tidligere dag valgt (8.16b): merket øverst sier at siden viser en tidligere dag, med lenke tilbake til siste børsdag, og kortene og sjekkene gjelder den dagen. Kontrollen sjekket at alt leses fra det som er lagret for dagen, og at signalet aldri regnes på nytt (AD-7). [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-16b-dagen-paa-hele-siden.md)
 
 ### 8.17 Periodevalget i oversikten, Min liste og børsometeret
 
 ![Story 8.17, Periodevalget i oversikten, Min liste og børsometeret, i demoen med oppdiktede selskaper og kurser](skjermene/8-17-soeylene-1-uke.png)
 
+Hovedindeksen på oversikten med perioden 1 uke: søylene viser endringen per aksje i perioden, med indeksen som stiplet linje, og linja over søylene sier perioden og dagene. Kontrollen sjekket at søylene og indekslinja følger samme periode og dag som tabellen, og at endringen regnes av kursserien på `adjusted_close`. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-17a-periodevalget-i-oversikten.md)
+
 ![Story 8.17, Periodevalget i oversikten, Min liste og børsometeret, i demoen med oppdiktede selskaper og kurser](skjermene/8-17-min-liste-sammenlign.png)
 
-Hovedindeksen på oversikten med perioden 1 uke: søylene viser endringen per aksje i perioden, med indeksen som stiplet linje, og overskriften sier perioden og dagene. Kontrollen sjekket at søylene og indekslinja følger samme periode og dag som tabellen, og at endringen regnes av kursserien på `adjusted_close`. Min liste sammenlignet med 1 mnd (8.17b): hver aksje har siste børsdag øverst og en linje under med dagen den sammenlignes med, sluttkursen da, endringen fram til siste børsdag og signalet som er lagret for dagen. Kontrollen sjekket at linja under har styrken som tekst uten pille, og at signalet for sammenligningsdagen aldri regnes på nytt. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-17a-periodevalget-i-oversikten.md)
+Min liste sammenlignet med 1 mnd (8.17b): hver aksje har siste børsdag øverst og en linje under med dagen den sammenlignes med, sluttkursen da, endringen fram til siste børsdag og signalet som er lagret for dagen, merket «i ettertid» når det ble regnet senere (2.17). Kontrollen sjekket at linja under har styrken som tekst uten pille, og at signalet for sammenligningsdagen aldri regnes på nytt. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-17b-periodevalget-i-min-liste-og-boersometeret.md)
 
 ### 8.18 Kommende eks.dato i kursgrafen
 
@@ -545,17 +553,17 @@ Periodevalget på aksjesiden med en dag valgt: periodeknappene og datoen med «V
 
 ![Story 8.23, Funnene fra brukertesten 10.11 (del A), i demoen med oppdiktede selskaper og kurser](skjermene/8-23-boersometeret-tabellen.png)
 
-![Story 8.23, Funnene fra brukertesten 10.11 (del A), i demoen med oppdiktede selskaper og kurser](skjermene/8-23-slik-leser-du-tabellen.png)
-
-Tabellen under børsometeret, som står åpen fra start, med bransjeradene og «?» ved «Endring» og «Volum mot vanlig». Kontrollen sjekket at tabellen er åpen, at volumet mot vanlig har to desimaler, og at tallet og ordet ved det aldri sier ulikt. Boksen «Slik leser du tabellen» på oversikten, med brikkene +1, 0 og -1, der 0 er hvit med kant som i tabellen. Kontrollen sjekket at hver av de 17 delene fra brukertesten kan ses i demoen, og at hver del har en mutant som ble fanget. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-23-funnene-fra-brukertesten.md)
+Tabellen under børsometeret, som står åpen fra start, med bransjeradene og «?» ved «Endring» og «Volum mot vanlig». Kontrollen sjekket at tabellen er åpen, at volumet mot vanlig har to desimaler, og at tallet og ordet ved det aldri sier ulikt. Kontrollen sjekket også at hver av de 17 delene fra brukertesten kan ses i demoen, og at hver del har en mutant som ble fanget. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-23-funnene-fra-brukertesten.md)
 
 ### 8.24 Notatene, to ting etter flettingen
 
 ![Story 8.24, Notatene, to ting etter flettingen, i demoen med oppdiktede selskaper og kurser](skjermene/8-24-bryteren-notater.png)
 
+Bryteren «Notater» i Innstillinger, uten «?» og med forklaringen under, som ved Hjelp og KI-tekst. Kontrollen sjekket at «?» ikke står igjen ved Notater.
+
 ![Story 8.24, Notatene, to ting etter flettingen, i demoen med oppdiktede selskaper og kurser](skjermene/8-24-notatene-i-min-liste.png)
 
-Bryteren «Notater» i Innstillinger, uten «?» og med forklaringen under, som ved Hjelp og KI-tekst. Kontrollen sjekket at «?» ikke står igjen ved Notater. Notatene samlet nederst i Min liste, med «Noter et tenkt kjøp», «Noter et tenkt salg» og «Slett» ved hvert notat. Kontrollen sjekket at knappene følger de samme reglene og varslene som på aksjesiden, og at svaret går tilbake til Min liste. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-24-notatene-to-ting.md)
+Notatene samlet nederst i Min liste. Hvert notat har knappene som passer for det: «Noter et tenkt kjøp», «Noter et tenkt salg» og en knapp for å slette. Kontrollen sjekket at knappene følger de samme reglene og varslene som på aksjesiden, og at svaret går tilbake til Min liste. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-24-notatene-to-ting.md)
 
 ### 8.25 «Spill av omvisningen» ved «Vis meg rundt»
 
@@ -567,9 +575,11 @@ Det første steget i omvisningen etter «Spill av omvisningen»: én del av over
 
 ![Story 8.26, «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven, i demoen med oppdiktede selskaper og kurser](skjermene/8-26-vis-meg-rundt-aksjesiden.png)
 
+«Vis meg rundt» på aksjesiden: den samme boksen som omvisningen, bare med stegene for siden, og knappene «Vis meg rundt» og «Spill av omvisningen» med hvert sitt ikon i raden øverst etter «Innstillinger». Kontrollen sjekket at siden ikke hopper, at den nummererte lista fra 8.9 er borte, og at ingen knapp mangler i raden.
+
 ![Story 8.26, «Vis meg rundt» spiller av siden, knappene øverst og funnene fra demoprøven, i demoen med oppdiktede selskaper og kurser](skjermene/8-26-aksje-uten-kurser.png)
 
-«Vis meg rundt» på aksjesiden: den samme boksen som omvisningen, bare med stegene for siden, og knappene «Vis meg rundt» og «Spill av omvisningen» med hvert sitt ikon i raden øverst etter «Innstillinger». Kontrollen sjekket at siden ikke hopper, at den nummererte lista fra 8.9 er borte, og at ingen knapp mangler i raden. Aksjesiden for den oppdiktede aksjen demoen har uten kurser, med «Ingen kurser ennå» og hvorfor. Kontrollen sjekket at en aksje uten kurser har de samme ordene og den samme forklaringen overalt i appen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md)
+Aksjesiden for den oppdiktede aksjen demoen har uten kurser, med «Ingen kurser ennå» og hvorfor. Kontrollen sjekket at en aksje uten kurser har de samme ordene og den samme forklaringen overalt i appen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-26-vis-meg-rundt-spiller-av-siden.md)
 
 ### 8.27 «Mine notater» i et panel fra en knapp øverst
 
@@ -587,15 +597,11 @@ Panelet «Mine notater» åpnet fra knappen øverst, fast i kanten av aksjesiden
 
 ![Story 8.29, «Din egen liste: kom i gang» som tavla, og investorknappen 44 px, i demoen med oppdiktede selskaper og kurser](skjermene/8-29-din-egen-liste.png)
 
-![Story 8.29, «Din egen liste: kom i gang» som tavla, og investorknappen 44 px, i demoen med oppdiktede selskaper og kurser](skjermene/8-29-investorknappen.png)
-
-«Din egen liste: kom i gang» i Min liste, med én overskrift, de tre stegkortene og bransjekortene i kolonner uten hull. Kontrollen sjekket at delen har én overskrift og ingen ramme, at titlene har linjehøyde 1,2, at brikkene i steg 3 er 30 px høye, og at steg 2 ikke har noe felt for nøkkelen (AD-10). Knappen til investorsiden nederst på aksjesiden. Kontrollen sjekket at den er minst 44 px høy, også når teksten brytes. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-29-din-egen-liste-kom-i-gang.md)
+«Din egen liste: kom i gang» i Min liste, med én overskrift, de tre stegkortene og bransjekortene i kolonner uten hull. Kontrollen sjekket at delen har én overskrift og ingen ramme, at titlene har linjehøyde 1,2, at brikkene i steg 3 er 30 px høye, og at steg 2 ikke har noe felt for nøkkelen (AD-10). Knappen til investorsiden, som bildet for 10.5 viser, ble minst 44 px høy i samme story, også når teksten brytes. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-29-din-egen-liste-kom-i-gang.md)
 
 ### 8.30 De ledige rutene i plassstreken med nok kontrast
 
-![Story 8.30, De ledige rutene i plassstreken med nok kontrast, i demoen med oppdiktede selskaper og kurser](skjermene/8-30-plassstreken.png)
-
-Streken under «Appen følger N av 18» i Min liste, med de brukte og de ledige plassene. Kontrollen sjekket, regnet ut fra fargene i stilarket, at de ledige rutene har minst 3:1 kontrast mot bakgrunnen og mot de brukte. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-30-plassstreken-kontrast.md)
+Streken står i bildet for 8.29, under «Appen følger N av 18». Storyen ga de ledige rutene en farge med minst 3:1 kontrast mot bakgrunnen og mot de brukte. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-8-30-plassstreken-kontrast.md)
 
 ### 8.31 Stegkortene og styrken for én dag målt i nettleseren
 
@@ -609,7 +615,7 @@ Ingen skjerm: fem tester som nå feiler mot en mutant for det de lover. [Spesifi
 
 ### 9.1 `docs/kvalitetssikring.md`
 
-Ingen skjerm: dokumentet om hvordan koden er kvalitetssikret. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-1-kvalitetssikringen-oppdateres.md)
+Ingen skjerm: dokumentet om hvordan koden er kvalitetssikret. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-91-docskvalitetssikringmd)
 
 ### 9.2 `docs/ai-prompts/bygging/`
 
@@ -621,7 +627,7 @@ Ingen skjerm: beskrivelsen av arbeidsmønsteret i `docs/ai-prompts/README.md`. [
 
 ### 9.4 Relevanseksperimentet, del 1 — utvalg, innsamling og merking
 
-Ingen skjerm: utvalget og merkingen av artikler, som bare ligger lokalt. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-94-relevanseksperimentet-del-1--utvalg-innsamling-og-merking)
+Ingen skjerm: kriteriene og resultatet står i `relevanseksperiment.md`, og artiklene og merkingen ligger bare lokalt. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-94-relevanseksperimentet-del-1--utvalg-innsamling-og-merking)
 
 ### 9.5 Relevanseksperimentet, del 2 — KI-kjøringen
 
@@ -645,7 +651,7 @@ Ingen skjerm: testene for dokumentene i én kommando, `uv run pytest --dokumente
 
 ### 9.10 De lave funnene fra 10.6, 8.8, 8.11b og 3.4h
 
-Ingen synlig endring i demoen: sorteringen står etter bryteren ved «Børsdagen kort fortalt», og aksjesiden leser basen med færre oppslag. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-10-de-lave-funnene.md)
+Ingen egen skjerm: sorteringen blir stående når bryteren ved «Børsdagen kort fortalt» brukes, noe et bilde ikke viser, og aksjesiden leser basen med færre oppslag. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-10-de-lave-funnene.md)
 
 ### 9.11 PRD-en etter tilbakemeldingen fra faglærer 12.11
 
@@ -653,7 +659,7 @@ Ingen skjerm: en ny versjon av PRD-en med endringsloggen. [Spesifikasjonen](../_
 
 ### 9.12 Rådordene i alle malene, taggene i CI og technology.md
 
-Ingen egen skjerm: storyen er en test for rådordene i alle malene, taggene i CI og technology.md. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md)
+Ingen egen skjerm: en test for rådordene i malene, hjelpetekstene og omvisningen, taggene i CI og lenken til `technology.md`. Den eneste synlige endringen er setningen «og hver aksje står med sin egen bransje» på «Er du sikker?», som bildet for 8.28 viser. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-12-raadordene-i-alle-malene.md)
 
 ### 9.13 Dokumentrunden etter v1.1
 
@@ -679,13 +685,15 @@ Ingen skjerm: evalueringen står i `docs/heuristisk-evaluering.md`, og ingen kod
 
 ![Story 9.18, Rettingene før brukertest 2, i demoen med oppdiktede selskaper og kurser](skjermene/9-18-lenken-tilbake.png)
 
+Månedspilene i «Signalet dag for dag» med lenken tilbake til måneden for dagen siden viser, når en annen måned er valgt (HE14). Kontrollen sjekket at hver retting har en test som feilet mot koden før rettingen.
+
 ![Story 9.18, Rettingene før brukertest 2, i demoen med oppdiktede selskaper og kurser](skjermene/9-18-oevrige-aksjer.png)
 
-Månedspilene i «Signalet dag for dag» med lenken tilbake til måneden for dagen siden viser, når en annen måned er valgt (HE14). Kontrollen sjekket at hver retting har en test som feilet mot koden før rettingen. Raden «Øvrige aksjer» i tabellen på oversikten, med ett tall per gruppe (HE9). Kontrollen sjekket at en gruppe uten aksjer ikke nevnes. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-18-rettingene-foer-brukertest-2.md)
+Raden «Øvrige aksjer» i tabellen på oversikten, med ett tall per gruppe (HE9). Kontrollen sjekket at en gruppe uten aksjer ikke nevnes. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-18-rettingene-foer-brukertest-2.md)
 
 ### 9.19 Grensen på 640–760 px og bildene av appen
 
-Ingen synlig endring ved 1280 px: rettingen gjelder tabellen under 760 px, og bildene i `docs/appen/` ble tatt på nytt. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-19-grensen-og-bildene.md)
+Ingen synlig endring ved 1280 px: rettingen gjelder tabellen mellom 640 og 760 px, og bildene i `docs/appen/` ble tatt på nytt. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-19-grensen-og-bildene.md)
 
 ### 9.20 PRD-en mot faglærers rubrikk
 
@@ -697,9 +705,9 @@ Ingen skjerm: to bilder i README-en av rettinger fra 9.18. [Spesifikasjonen](../
 
 ### 9.22 Morgensjekken uten falske alarmer, «51 børsdager» og ett navn på sletteknappen
 
-![Story 9.22, Morgensjekken uten falske alarmer, «51 børsdager» og ett navn på sletteknappen, i demoen med oppdiktede selskaper og kurser](skjermene/9-22-sletteknappen.png)
+![Story 9.22, Morgensjekken uten falske alarmer, «51 børsdager» og ett navn på sletteknappen, i demoen med oppdiktede selskaper og kurser](skjermene/9-22-spoersmaalet.png)
 
-Et notat med tenkt kjøp og salg under «Mine notater», med knappen «Slett notatet, kjøpet og salget». Kontrollen sjekket at knappen heter det samme som i spørsmålet før sletting, på aksjesiden og i Min liste. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-22-morgensjekken-og-to-rettinger.md)
+Spørsmålet før sletting av et notat med tenkt kjøp og salg, med knappen «Slett notatet, kjøpet og salget», det samme navnet som knappen ved notatet har. Kontrollen sjekket at navnene er like på aksjesiden og i Min liste. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-22-morgensjekken-og-to-rettinger.md)
 
 ### 9.23 «51 børsdager» i koden og norsk tid i morgensjekken
 
@@ -713,9 +721,11 @@ Ingen skjerm: UX-dokumentene `DESIGN.md` og `EXPERIENCE.md`, uten kode. [Spesifi
 
 ![Story 9.25, Svarene på E1, E2, E4, E5 og E6 i UX-dokumentene, i demoen med oppdiktede selskaper og kurser](skjermene/9-25-min-liste-innledningen.png)
 
+Innledningen i Min liste, som sier «Min liste» om aksjene med stjerne (E1). Kontrollen sjekket at «lista» ble «Min liste» der teksten gjelder aksjene med stjerne.
+
 ![Story 9.25, Svarene på E1, E2, E4, E5 og E6 i UX-dokumentene, i demoen med oppdiktede selskaper og kurser](skjermene/9-25-omvisningen-notater.png)
 
-Innledningen i Min liste, som sier «Min liste» om aksjene med stjerne (E1). Kontrollen sjekket at «lista» ble «Min liste» der teksten gjelder aksjene med stjerne. Innstillinger med «Vis meg rundt» åpen på steget for «Notater», med bryteren merket (E6). Kontrollen sjekket at omvisningen i Innstillinger har et steg for «Notater», som stegene for «Hjelp» og «KI-tekst». [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-25-svarene-paa-ux-spoersmaalene.md)
+Innstillinger med «Vis meg rundt» åpen på steget for «Notater», med kortet «Notater» merket (E6). Kontrollen sjekket at omvisningen i Innstillinger har et steg for «Notater», som stegene for «Hjelp» og «KI-tekst». [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-25-svarene-paa-ux-spoersmaalene.md)
 
 ### 9.26 Skjermene i OSE Signal, ordnet etter epic og story
 
