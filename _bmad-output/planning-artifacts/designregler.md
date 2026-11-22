@@ -2,7 +2,7 @@
 title: "Designregler"
 status: aktiv
 created: 2026-10-01
-updated: 2026-11-14T19:16
+updated: 2026-11-22T18:39
 ---
 
 # Designregler
@@ -83,6 +83,8 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 
 *Lagt til 2026-11-14 (story 2.17, gruppens svar kl. 05:41–05:49):* en dag med signalet regnet i ettertid har merket «i ettertid», en tekst med stiplet kant i `--dempet-2` (`#70757D`, 4,14:1 mot Bakgrunn og 4,64:1 mot hvitt), overalt der en tidligere dag vises med signal. Teksten bærer merket, ikke bare kanten. I «Signalet dag for dag» har dagen også stiplet kant, i børsometeret ruta, og i kursgrafen har prikken hvit midte og stiplet kant i fargen for retningen. Merket endrer ikke gult: 3 av 3 har ringen som før. Med høy kontrast får kanten `CanvasText`.
 
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D4 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Gult i `--gul-symbol` `#a67c00` står også utenfor 3 av 3: i fyllet i den merkede stjernen og i grensestreken for interesse i kursgrafen på aksjesiden.
+
 ## 4. Ordliste – samme ord på alle sidene (01.10)
 
 *Ført 2026-10-13 ordrett fra designtavla i Claude, versjon 1791623938-3408, med «-» for «•». Ordlista er ikke kontrollert mot koden og PRD-en etter 02.10. Det gjør den samlede endringen (samlelista punkt 8 og 10) før noe herfra brukes i appen.*
@@ -94,6 +96,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* sjekkene skrives «T +1» i oversikten. På aksjesiden står navnet på sjekken og ordet, som i 8.0c (svar 8).
   *Rettet 2026-10-15 (gruppens svar kl. 12:15, svar 28 i 8.0d):* symbolet ved Signalstyrke i kortet «Slik leser du tabellen» er en grønn «+1» over en rød «-1», uten bokstav. Se tillegget 15.10 nederst i §5.
 - Retning: Positiv, Negativ, Blandet eller Ingen, med pil (FR-103). Pilene brukes ikke til noe annet.
+  *Lagt til 2026-11-22 (gruppens svar kl. 18:23, D13 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Stilarket setter også «▾» og «▴» etter knappene som åpner tabellen på oversikten og «Mer om grafen» på aksjesiden, og demolinja har «↗» etter lenken til den ekte versjonen.
 - Skilte seg ut: signalstyrke 2 eller mer. Signalstyrken skrives «3 av 3», og 3 av 3 er fylt med gul ring.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* 3 av 3 merkes med gul ring rundt, som i §3.
   *Lagt til 2026-10-14 (gruppen 14.10 kl. 17:17 og skissen gruppen valgte like etter, instruksjonen kl. 17:31):* ringen og streken ved 3 av 3 er sterk oransje `#F2B53A`, og streken ved 2 av 3 lys oransje `#F8DE9C` (§3).
@@ -104,6 +107,7 @@ Regler for hvordan alle skjermbildene ser ut. Kravene står i `prd.md` og `epics
 - Beløp skrives i NOK, ikke «kroner» eller «kr» (Marian 01.10). Øverst på hver side, i den svarte stripa, står når dataene ble oppdatert og når neste oppdatering tidligst kan komme, med klokke.
 - Egen aksje: blått merke «Egen» og blå strek. Den står i tabellen sammen med de andre og sorteres likt. Under tabellen står bare valget: hentet eller venter, og Fjern. Stjerne betyr Min liste. Gul ring, gul ramme og gult symbol betyr 3 av 3 i går, også når en periode er valgt. I børsometeret har ruta gul ramme med hvit kant og merket «3 av 3».
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* egne aksjer står i en egen del, «Dine egne aksjer» (svar 11). Gul ring, gul ramme og gult symbol betyr 3 av 3 på siste børsdag (§3).
+  *Lagt til 2026-11-22 (gruppens svar kl. 18:23, D1 og D2 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Merket «Egen» har tekst og kant i `--egen` `#1D4ED8`, og en egen aksje har ingen blå strek.
 - Utenfor målingen: en egen aksje som omsettes for under 32 MNOK om dagen. Grensene i signalet er målt på aksjer som omsettes for over 32 MNOK, og så mye handel gjør dem lette å kjøpe og selge (begrunnelser.md §2). Teksten sier ikke «de 15» (Marian 02.10 kl. 21.56). Ikke «krav» og ikke «omsatt for lite». Grått merke, fordi gult betyr 3 av 3.
   *Rettet 2026-10-13, endringsforslaget 13.10 (punkt 4.3):* «en egen aksje» blir «en aksje», fordi hele lista kan byttes (08.10). Resten står.
 - Børsen, bransjen eller selskapet: hvor dagens bevegelse ser ut til å komme fra, ikke hvorfor. Børsen er hovedindeksen, og tallet står med «for hovedindeksen». Regnes alltid av lista som er aktiv, også egne aksjer som er hentet. Svarene er «Børsen», «Bransjen», «Selskapet», «Selskapet eller bransjen» og «Liten bevegelse».
@@ -177,15 +181,22 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Positiv `#13703C` på `#E4F4EA`, Negativ `#B42318` på `#FBE9E6`, Blandet `#6A46A0` på `#F0EBF8` og Ingen `#5F646C` på `#EEEDEA`.
   *Lagt til 2026-11-10 (story 8.23, tillegg 2, gruppens svar kl. 14:53 og 14:59):* sjekkortene under «Hvorfor signalet ble …» har en tykk kant, 4 px, i fargen for resultatet: Positiv for +1, Negativ for -1 og Dempet 2 for 0. Merket i kortet står som før, så fargen er aldri alene.
 - Gul ring `#a67c00`: ringen rundt «3 av 3» og streken på 4 px til venstre i en rad med 3 av 3, på lys bakgrunn. Kontrasten er 3,82 mot hvitt, 3,41 mot Bakgrunn og 4,65 mot blekk.
+  *Lagt til 2026-11-22 (gruppens svar kl. 18:23, D5 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Linjene om ringen i `#a67c00`, båndet «Skilte seg ut» i `#ECE9E1` og fet skrift i overskriften gjelder ikke på noen side, ikke bare på oversikten. Stilarket følger tillegget 14.10 lenger ned i §5 overalt: ringen i `#F2B53A`, båndet i `#FFF6DC` og overskriften uten fet skrift.
 - Lys gul `#F2B53A`: bare på blekk, det vil si logoens høyeste søyle, klokka og fokus i stripa (9,68:1).
   *Lagt til 2026-11-10 (story 8.23, brukertesten 10.11, A6):* også knappen for siden man er på i stripa, som er blekk, og en bryter som er på, med svart knott, i Innstillinger, som i designforslaget. Bryterne ved KI-teksten og ved «Børsdagen kort fortalt» er i blekk som før (spørsmål 5 i spesifikasjonen for 8.2b). Bryteren er et unntak fra «bare på blekk», som streken under den sorterte kolonnen; knotten i blekk gir kontrasten.
+  *Lagt til 2026-11-22 (gruppens svar kl. 18:23, D3 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. `#F2B53A` står også på lys bakgrunn: som kant på 4 px til venstre i meldingene om endringer som venter og om at lista er full, i den valgte valgbrikken, i rammen rundt det omvisningen viser, og i ringen rundt logoen på demoselskapenes sider.
 - Båndet «Skilte seg ut» `#ECE9E1`, en nøytral, varm grå, med kant i Strek og tekst i blekk (14,64:1). Radene under er hvite. Båndet «Øvrige aksjer» `#F7F6F2`, med kant i Strek og tekst i Tekst (9,62:1). Gult står ved en aksje bare ved 3 av 3 (§3), og «Skilte seg ut» har også 2 av 3.
 - Hjelp `#6B4E00` på `#FFF1CC`: merket «Hjelp» i hjelpevinduet (6,89:1).
 - Kurs `#1F4E8C`. Snitt `#9A5A0E`, både streken og navnet (5,46:1 mot hvitt).
 - Det grå feltet: sporet `#F1EFEA` og feltet `#8A847A` (3,23:1).
 - I stripa: tekst `#DADDE2`, `#C9CCD2` og `#A9AEB8`, og kantene `#3A3E47` og `#2A2E36`. Under kolonnenavnene: `#B9BDC5`.
+  *Lagt til 2026-11-22 (gruppens svar kl. 18:23, D8 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Teksten i stripa er `#DADDE2` (`--stripe-tekst`). `#C9CCD2` står i stilarket som `--stripe-tekst-2`, men ingen regel bruker den, og `#A9AEB8` står ikke i stilarket.
 
 *Lagt til 2026-10-19 (story 2.7a, gruppens svar kl. 12:06):* all stilen står i én fil, `src/static/stil.css`, lenket fra `_ramme.html` med et avtrykk av fila i adressen. Fargene står som navn i `:root` der og ingen andre steder. Reglene for én side er avgrenset med klassen på `<body>` (`side-oversikt`, `side-aksje` og `side-feil`), og ingen mal har `<style>`.
+
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D9 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Stilarket har fire sideklasser: `side-oversikt`, `side-aksje`, `side-feil` og `side-demoselskap`, den siste for investorsidene i demoen (3.4h).
+
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D10 i `DESIGN.md`, rådet anbefalte det):* mørk modus er ikke i v1. Stilarket har bare det lyse temaet, og regler for tvungne farger (`forced-colors`).
 
 **Kontrast.** Tekst har minst 4,5:1 mot bakgrunnen den står på. Streker, felt og fokus som må ses for å forstå siden, har minst 3:1 (WCAG 1.4.11). En test regner det ut fra fargene i stilen. Retningsfargene er nesten like lyse, så retningen står alltid med ord og symbol (§4).
 
@@ -193,11 +204,15 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 
 **Skriften** følger §1. Newsreader brukes til logoen (27 px, 600), overskriftene (oversikten 52 px og aksjesiden 56 px, 500), delene på aksjesiden (36 px), navnet på en sjekk (30 px, 600) og tittelen i hjelpen (23 px, 600). Resten er IBM Plex Sans, med størrelsene i utdraget §3. Alle tall har tabelltall. Det viktigste i en overskrift har fet skrift, ikke gul understrek (§4, rettet 13.10).
 
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D12 i `DESIGN.md`, rådet anbefalte det):* appen gjelder der stilarket avviker fra utdraget §3: nøkkeltallene på aksjesiden er 28 px og 600, målingen i sjekkortet 22 px og 600, og innledningen på aksjesiden er høyst 640 px bred. Linjehøyden og bokstavavstanden er de i stilarket, ikke de i utdraget.
+
 *Målt 2026-10-14, da filene ble hentet:* IBM Plex Sans har ikke OpenType-funksjonen `tnum`, i motsetning til det §1 sier. Sifrene 0–9 er like brede som standard (600 enheter i alle fire vektene), så tallene står rett under hverandre uten den. Newsreader har `tnum`. Testen krever like brede sifre i hver fil, og `tnum` der filen har proporsjonale sifre som valg (`pnum`).
 
 **Stripa øverst.** Den har blekk over hele bredden og to rader. Den første raden er 72 px med logoen: tre søyler, den høyeste i lys gul, og «OSE Signal» i hvitt. Den andre er 38 px med klokka og «Oppdatert …». Mellom radene står en strek i `#2A2E36`. I demoen står hele merket «Demoversjon. Eksempeltall: …» som egen rad i stripa, med samme ordlyd (13,04:1). Stripa har ingen knapper før sidene de viser til, finnes (8.3, 8.9 og 8.10).
 
 **Kolonneraden og båndene.** Kolonneraden er 64 px i blekk, med navnene i hvitt og en linje under i `#B9BDC5`. Båndet «Skilte seg ut» og båndet «Øvrige aksjer» har antallet i en pille. Radene under «Skilte seg ut» er hvite og 66 px, og en rad med 3 av 3 har en strek på 4 px i Gul ring til venstre. Radene under «Øvrige aksjer» er hvite og 54 px.
+
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D11 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Ingen regel i stilarket setter høyden på radene under «Øvrige aksjer», så de 54 px over er ikke bygget.
 
 **Pillene og brikkene.**
 
@@ -208,6 +223,10 @@ Ord kan endres rett i tavla. I appen samles hjelpetekstene i én fil (8.0b).
 - Retningen står i en pille på 28 px med symbolet først.
 
 **Avstander.** Sidemargen er 120 px ved 1280 px og 16 px ved 390 px. Det er 40–44 px mellom delene i oversikten og 60 px på aksjesiden. Kort har radius 16, kant i Strek og luft 18–22 px. Brikker har radius 6, merker 8 og piller 999. Klikkflater er minst 44 px.
+
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D6 i `DESIGN.md`, rådet anbefalte det):* appen gjelder. Merkene «Egen», «Utenfor målingen», «i ettertid», «Eksempeltall» og «Laget av KI» har radius 999, som pillene, ikke 8.
+
+*Lagt til 2026-11-22 (gruppens svar kl. 18:23, D7 i `DESIGN.md`, rådet anbefalte det):* klikkflatene under 44 px står som et avvik, som vurderes etter brukertest 2. Stilarket har 36 px på periodeknappene, datofeltet i periodevalget, valgbrikkene, knappene i notatpanelet og `.knapp` i `.folgtabell` og `.bytt-lista`, 32 px på `.knapp.liten` i «Dine egne aksjer» og i bransjekortet, 30 px på brikkene i «Din egen liste», 40 px på stjernen, og ingen minstehøyde på knappene i notatene og omvisningen og på «Vis alle (N)».
 
 *Lagt til 2026-10-17 (story 2.9b):* **Søylene under hovedindeksen.** Fargen følger endringen slik den vises, med to desimaler, som i tabellen: over 0,00 % Positiv `#13703C`, under 0,00 % Negativ `#B42318`, og 0,00 % Ingen `#5F646C`. Det samme gjelder den stiplede linja for indeksen. Det er de eneste fargegrensene: lengden på søylen viser hvor stor endringen er, med null midt i feltet og den største endringen av søylene og indeksen på halve høyden. Stiplet linje brukes bare for indeksen. Bransjesymbolet ved 3 av 3 tegnes i `#a67c00`, Gul ring i fargelista over, og heter `--gul-symbol` i stilen (§3).
 
