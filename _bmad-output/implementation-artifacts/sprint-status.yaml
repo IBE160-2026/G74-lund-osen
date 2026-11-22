@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 22-11-2026 21:30
+last_updated: 23-11-2026 00:23
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -265,7 +265,7 @@ development_status:
   # Story 9.25 (2026-11-22, gruppens svar kl. 18:23): svarene på E1, E2, E4, E5 og E6 i UX-dokumentene.
   9-25-svarene-paa-ux-spoersmaalene: done
   # Story 9.26 (2026-11-22, gruppens svar kl. 19:05): skjermene i OSE Signal, ordnet etter epic og story.
-  9-26-skjermene: in-progress
+  9-26-skjermene: done
   epic-9-retrospective: optional
 
   epic-10: in-progress

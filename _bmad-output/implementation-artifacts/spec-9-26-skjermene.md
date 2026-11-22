@@ -2,7 +2,7 @@
 title: 'Story 9.26: skjermene i OSE Signal, ordnet etter epic og story'
 type: 'docs'
 created: '2026-11-22'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'ea6362c7'
 context:
@@ -158,4 +158,8 @@ lave. 53 er rettet, og 2 lave står.
 - [x] README-en og vurderingsmatrisen, med testene som låser README-en
 - [x] Gjennomgangen, som sjekker hver tekst mot bildet og spesifikasjonen
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt (171 og 3122 passerte, 7 hoppet over, 22.–23.11 kl. 23:51–00:13)
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 45082122376)
+
+## Flettet 23.11
+
+PR #175 er squash-flettet i `16b74c35` kl. 00:20, låst til head-en `485dff7d`, uten nytt ja. CI var grønn i alle fire jobbene (run 45082122376), med 6150 bestått og 99 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne.

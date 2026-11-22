@@ -5645,3 +5645,5 @@ Som **faglærer eller sensor** vil jeg se skjermene i OSE Signal ordnet etter ep
 - En lenke i README-en under «Dokumentene», og siden nevnt i vurderingsmatrisen under «Design og brukeropplevelse»
 
 **Avhenger av:** 9.25. **Én økt:** ja.
+
+*Lagt til 2026-11-23:* 9.26 er flettet. PR #175 er squash-flettet i `16b74c35` kl. 00:20, låst til head-en `485dff7d`, uten nytt ja. CI var grønn i alle fire jobbene (run 45082122376), med 6150 bestått og 99 hoppet over i jobben `pytest`. Spørsmålene 1 og 2 i spesifikasjonen venter på gruppens svar.
