@@ -4066,8 +4066,8 @@ class TestReadmeForNybegynnere:
         # .gitattributes. Story 3.4 (24.10): 10 med docs/bilder/investorsider/.
         # Story 3.5f: 15 med filene i rota. Gruppens svar 27.10 kl. 06:31:
         # 16 med .logs/. Instruksjonen 07.11 kl. 09:10: 17 med skissene i
-        # docs/skisser/2026-11-06/.
-        assert len(punkter) == 17, punkter
+        # docs/skisser/2026-11-06/. Story 9.26: 18 med docs/skjermene/.
+        assert len(punkter) == 18, punkter
         for punkt in punkter:
             # Hver sti i kodeformat i punktet er en lenke, ogsaa etter
             # tankestreken (gjennomgangen, BH3 og ECH4).
@@ -4092,7 +4092,8 @@ class TestReadmeForNybegynnere:
         # Tillegg 5 til 8.22: 48, med de to nye bildene ved 390 px.
         # Story 3.3k: 52, med folg-en-aksje-demo.png, de to nye bildene og docs/appen/mobil/.
         # Story 9.21 (gruppens svar 17.11 kl. 22:18): 54, med de to nye bildene.
-        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 54, lenker
+        # Story 9.26: 56, med docs/skjermene/ og docs/skjermene.md.
+        assert len(re.findall(r"\]\(", del_)) == len(lenker) == 56, lenker
         sporet = _git_sporet()
         for tekst, maal in lenker:
             # Maalet er stien i teksten, relativ og uten «..» (BH4, ECH3).
@@ -4599,7 +4600,8 @@ AVTRYKK_I_PILENE = {
     # Story 9.20 (regel 19): lenken til «Teknologi og nøkler». Var ddd2a64b....
     # Story 9.20 (regel 19): svaret på tilbakemeldingen på PRD-en og sporingen. Var d3d21297....
     # Story 9.24 (regel 19): lenken til UX-spesifikasjonen, DESIGN.md og EXPERIENCE.md. Var eddf4e73....
-    "Dokumentene": "ee9a0fc83f65d5107aab42ae761cdb4a55a0140ce313dc4ddcd59b7546b85cd5",
+    # Story 9.26 (regel 19): lenken til siden med skjermene. Var ee9a0fc8....
+    "Dokumentene": "72957429e01aef531b81ad1483c538ffa04fcd2d8579c48af528e5989879d028",
     # Instruksjonen 08.11 kl. 13:00 (regel 19): skissene fra 06.11 ble
     # bygget 07.11 i 8.20a, 8.20b og 3.4h. Var 19ecc179....
     # Gruppens ønske 09.11 kl. 22:01 (regel 19): investorsiden ved 390 px i
@@ -4616,7 +4618,8 @@ AVTRYKK_I_PILENE = {
     # README-en, de to nye og docs/appen/mobil/. Var 59b2a3fe....
     # Story 9.21 (gruppens svar 17.11 kl. 22:18, regel 19): de to nye bildene i punktet for
     # docs/appen/, i rekkefølgen fra README-en. Var 6c588c03....
-    "Mappestruktur": "2d8615fba89cfbaa3996672ecdb3757b9a511af4c920782ea7f5a574afddc0ff",
+    # Story 9.26 (regel 19): docs/skjermene/ med bildene til siden med skjermene. Var 2d8615fb....
+    "Mappestruktur": "9032907be92b62455d6e7d37638e85b361d298c241b730bcd48af43cfe455b98",
 }
 
 # Story 3.5g (gruppens svar 26.10 kl. 23:00): sha256 av innholdet i de nye
