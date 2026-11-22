@@ -1050,7 +1050,7 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
             Steg(
                 "notater-valget",
                 "Notater",
-                "Slår notatene på aksjesidene og i Min liste av og på. Av sletter ingenting.",
+                "Slår notatene og knappen «Mine notater» av og på. Av sletter ingenting.",
             ),
         ),
         "folg": (
