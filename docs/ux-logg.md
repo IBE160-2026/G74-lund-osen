@@ -647,6 +647,8 @@ Hvert funn er slått opp i koden 20.10 før det ble skrevet.
 
 *Lagt til 2026-11-07:* gruppens ord fra gjennomgangen 06.11, sendt til rådet i chatten, med skrivefeil rettet. U83, kl. 20:32: «må den stå der? er litt rart med masse små tekst under hver enkelt sak». U88, kl. 20:47: «KI litt kjedelig, ingen farge på knappene, generelt veldig lite visuelt». U89, kl. 20:49: «forstod ikke helt at den svarte stripen var dagen i dag». Radene står som før. Ordene er ført etter instruksjonen kl. 09:10 i `docs/ai-prompts/2026-11-07.md`.
 
+*Svar 2026-11-22 kl. 18:23 (gruppens svar, rådet anbefalte det; E8 i UX-dokumentene):* radene over som så bygget ut, er sjekket mot koden på main `a3ad3f8b`, og disse er bygget og lukkes: U18 i 2.12 (`edf4bc6`, PR #126) med knappen «+ Følg en aksje», og listene etter bransje og de mest omsatte som ferdige lister i 8.22 (`dcb0bc6`, PR #138) og 8.28 (`c8ad6f4`, PR #153). U30 i 2.12: tre egne aksjer og 18 i alt. U33, U46 og U67 i 8.2b (`6f62f56`, PR #109), med bryteren i rammen, i blekk og utenfor stripa etter svaret 04.11 kl. 09:58, og rammen med egen tittel fra 10.9 (`03bd75c`, PR #116). U40 i 8.8 (`ab5fb6a`, PR #127), med signaldagene i kursgrafen. U42 og U91 i 2.6 og 8.14 (`a2427be`, PR #134), med en strek for hver justeringsdag i grafen; demoen har ingen justeringsdager, etter forslag 6 i spesifikasjonen for 2.6, som svaret 10.11 kl. 11:52 godtok. U48 i 3.4h (`7565651`, PR #120), med boblen til investorsiden for selskapet i demoen. U50 i 2.12, 8.22 og 8.29 (`f98d979`, PR #154), med «Din egen liste: kom i gang» steg for steg og eksempler merket «Eksempeltall» i demoen. U60 i 8.19 (`4fa06fc`, PR #151), med neste henting bak «Oppdatert» i stripa. U4 står åpen: grafen for «1 år» har fortsatt ingen indekslinje før 02.01.2026, fordi kalenderen begynner i 2026 (`FOERSTE_AAR` i `boersdag.py`). `DEKKEDE_AAR` ble tatt bort i 2.16, og 2025 står utenfor etter svaret 07.11 kl. 15:34.
+
 ## Status for funnene til 8.2, sjekket 03.11
 
 De 45 funnene over der «Tas i» begynner med «8.2» (8.2, 8.2a og «8.2, og 8.19»), slått opp 03.11 mot main på `37390b4d`: malene, `stil.css`, koden, `docs/hjelp.md`, `epics.md`, de daterte linjene over og git log fra funnets dato. Ingenting er rettet, og ingen demo er startet. «Står» betyr at koden bak funnet er som da funnet ble gjort, eller at det funnet sier mangler, fortsatt mangler. Story 8.2 står som `backlog` i `sprint-status.yaml`, og 8.2a er flettet i `e4d1ba46` (PR #93).
@@ -736,6 +738,8 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 | U111 | 10.11, brukertesten | Aksjesiden | Han ville notere. | [`brukertest.md`](brukertest.md), «Funnene» | Notatene og de tenkte kjøpene (8.21) |
 | U112 | 10.11, brukertesten | Hele appen | Han ønsket anbefalinger og å kunne «spå» hva man bør følge med på, og forsto hvorfor appen ikke gjør det. | [`brukertest.md`](brukertest.md), «Funnene» | Endres ikke (NFR-06) |
 
+*Svar 2026-11-22 kl. 18:23 (gruppens svar, rådet anbefalte det; E8 i UX-dokumentene):* radene er sjekket mot koden på main `a3ad3f8b`, og disse er bygget og lukkes: U103 i 10.10 (`e5268b3`, PR #145), U104 i 8.23 (`7fb9b1f`, PR #142) og 8.9 (`eb3ba92`, PR #136), U105 i 8.23 og 8.22 (`dcb0bc6`, PR #138), U107 og U110 i 8.23, U108 i 8.22 og U111 i 8.21 (`3919dd4`, PR #139). U109 står åpen, fordi ingen story har rettet hakkingen. U106 og U112 har ingenting å bygge («Ingen endring» og «Endres ikke (NFR-06)») og står som før.
+
 ## Story 2.17: signalet regnet i ettertid
 
 *Lagt til 2026-11-14 (story 2.17, gruppens svar kl. 05:41–05:49 og tillegg 1, [spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-17-signalet-regnet-i-ettertid.md)):* visningen er valgt av gruppen etter skisser som ikke er i repoet. Brukertest 2 har en oppgave om merket ([`brukertest.md`](brukertest.md)).
@@ -743,6 +747,8 @@ Talt: løst 7, delvis 3, står 34, må ses på siden 1, i alt 45.
 | # | Sett | Side | Funnet | Kilde | Tas i |
 |---|---|---|---|---|---|
 | U113 | 14.11, gruppens svar | Aksjesiden, oversikten og børsometeret | En børsdag uten vurdering fra kvelden sto som «ikke vurdert», også når kursene fantes, så historikken hadde hull. | Svaret kl. 05:41–05:49 | 2.17: signalet regnet i ettertid, med stiplet kant og «i ettertid» overalt der en tidligere dag vises med signal |
+
+*Svar 2026-11-22 kl. 18:23 (gruppens svar, rådet anbefalte det; E8 i UX-dokumentene):* U113 er bygget i 2.17 (`1fafddc`, PR #157), med merket «i ettertid» og stiplet kant, og lukkes.
 
 ## Den heuristiske evalueringen 17.11
 
