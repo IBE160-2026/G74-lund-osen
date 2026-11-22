@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-22T11:39
+updated: 2026-11-22T19:04
 ---
 
 # PRD — OSE Signal
@@ -189,6 +189,7 @@ første kolonne.
 | **Oversikten** (markedsoversikten, forsiden) | Startsiden med tabellen over aksjene i lista, hovedindeksen og søylene. Knappen i stripa heter «Markedsoversikt» |
 | **Min liste** | Siden med aksjene brukeren har merket med stjerne (FR-111). Den er et utvalg av lista og av aksjene som venter på å følges (FR-415), ikke en egen henting |
 | **Bransje** (sektor) | Gruppen en aksje hører til. Brukeren ser «bransje», og koden og §3 sier «sektor» |
+| **Ticker** (symbol) | Kortnavnet aksjen handles under på Oslo Børs. Søkefeltet i «Følg en aksje» og omvisningen sier «ticker», og koden sier «symbol» |
 | **Aksjesiden** (aksjedetaljen) | Siden for én aksje, med kursgrafen, sjekkene og KI-teksten |
 | **KI-teksten** (KI-laget, KI-bidraget) | Teksten en språkmodell skriver om signalet for én aksje, eller om hele børsdagen. Den kontrolleres, logges og kan slås av. KI-laget er delen av appen som lager den |
 | **Sjekk** | Én av de tre reglene, trend, bevegelse og interesse. Hver gir +1, 0 eller -1 (FR-701) |

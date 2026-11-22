@@ -1050,7 +1050,8 @@ def rundturer(p: Parametre = STANDARD, *, notater: bool = True, demo: bool = Fal
             Steg(
                 "folg-tittel", "Følg en aksje", "Her velger du en aksje fra Oslo Børs som appen skal hente og vurdere."
             ),
-            Steg("q", "Søk", "Skriv navnet eller symbolet for å finne aksjen."),
+            # Story 9.25 (E5): «ticker», som søkefeltet og FR-415.
+            Steg("q", "Søk", "Skriv navnet eller tickeren for å finne aksjen."),
         ),
     }
     # Aksjesiden uten sjekker (signalet kunne ikke regnes, eller dagen er

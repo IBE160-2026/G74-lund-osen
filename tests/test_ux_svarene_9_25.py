@@ -117,3 +117,23 @@ class TestE4Modellnavnet:
         assert "Modell: gemma4:e4b, lokal" in side
         assert "Skrevet av gemma4" not in side
         assert "(lokal)" not in side
+
+
+class TestE5Ticker:
+    """E5: «ticker» gjelder, som i søkefeltet og FR-415."""
+
+    def test_steget_ved_soekefeltet_sier_ticker(self):
+        """Ville feilet hvis steget sa «symbolet»."""
+        from hjelpetekster import rundturer
+
+        (steget,) = [s for s in rundturer()["folg"] if s.anker == "q"]
+        assert "ticker" in steget.tekst and "symbol" not in steget.tekst
+
+    def test_ordlista_har_ordet(self):
+        """Ville feilet hvis ordlista i PRD-en manglet «Ticker», eller
+        endringsloggen ikke hadde en linje om det (regel 19)."""
+        prd = (PRD / "prd.md").read_text(encoding="utf-8")
+        ordlista = prd.split("| Ord | Betyr i appen |", 1)[1].split("\n\n", 1)[0]
+        assert re.search(r"^\| \*\*Ticker\*\* \(symbol\) \|", ordlista, flags=re.M)
+        logg = (PRD / "prd-endringslogg.md").read_text(encoding="utf-8")
+        assert "«Ticker»" in logg.split("Endringer etter 12.11", 1)[1]
