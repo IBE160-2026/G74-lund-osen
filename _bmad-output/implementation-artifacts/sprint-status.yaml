@@ -260,6 +260,8 @@ development_status:
   9-22-morgensjekken-og-to-rettinger: done
   # Story 9.23 (2026-11-19, gruppens svar kl. 09:59): «51 boersdager» i koden og norsk tid i morgensjekken.
   9-23-boersdager-og-norsk-tid: done
+  # Story 9.24 (2026-11-22, gruppens svar 16.11 kl. 20:22 og 20.11 kl. 18:00): UX-dokumentene, DESIGN.md og EXPERIENCE.md.
+  9-24-ux-dokumentene: in-progress
   epic-9-retrospective: optional
 
   epic-10: in-progress
