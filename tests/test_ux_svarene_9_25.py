@@ -71,12 +71,13 @@ class TestE2Klokkeslettet:
     (grensen_som_tekst i markedsoversikt.py)."""
 
     def test_ingen_mal_har_klokkeslettet_skrevet_inn(self):
-        """Ville feilet hvis en mal hadde «kl. 22» skrevet inn i teksten som
-        vises. Kommentarene i malene teller ikke."""
+        """Ville feilet hvis en mal hadde et klokkeslett skrevet inn i teksten
+        som vises, som «kl. 22», «kl 22» eller «klokka 22» (gjennomgangen,
+        BH3). Kommentarene i malene teller ikke."""
         funnet = [
-            mal.name
+            (mal.name, treff)
             for mal in sorted(MALENE.glob("*.html"))
-            if "kl. 22" in _uten_kommentarer(mal.read_text(encoding="utf-8"))
+            for treff in re.findall(r"\b(?:kl\.?|klokka)\s*\d", _uten_kommentarer(mal.read_text(encoding="utf-8")))
         ]
         assert funnet == []
 
@@ -102,7 +103,8 @@ class TestE4Modellnavnet:
     «Modell: {modell}, {tjeneste}» (FR-602)."""
 
     def test_dagsvisningen_har_samme_form_som_aksjesiden(self):
-        """Ville feilet hvis tjenesten sto i parentes på oversikten."""
+        """Funksjonen begge sidene bruker. At oversikten bruker den, låser
+        test_oversikten_i_demoen (gjennomgangen, VG1)."""
         from types import SimpleNamespace
 
         import ki_visning
@@ -152,6 +154,17 @@ class TestE6Notater:
         assert ankrene[-3:] == ["hjelp-valget", "ki-valget", "notater-valget"]
         (steget,) = [s for s in rundturer()["innstillinger"] if s.anker == "notater-valget"]
         assert steget.tittel == "Notater"
+        assert "Av sletter ingenting." in steget.tekst
+
+    @pytest.mark.parametrize("demo", [False, True])
+    def test_steget_staar_ogsaa_med_notatene_av(self, demo):
+        """Gjennomgangen (BH2): bryteren står på siden også når notatene er
+        av, så steget gjør det også. Ville feilet hvis filteret for notatene
+        tok det bort."""
+        from hjelpetekster import rundturer
+
+        ankrene = [s.anker for s in rundturer(notater=False, demo=demo)["innstillinger"]]
+        assert "notater-valget" in ankrene
 
     def test_ankeret_finnes_paa_siden(self, demoen):
         """Ville feilet hvis steget pekte på noe siden ikke har."""
