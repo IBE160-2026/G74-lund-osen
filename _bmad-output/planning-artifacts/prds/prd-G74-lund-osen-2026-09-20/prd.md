@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-18T21:57
+updated: 2026-11-22T11:39
 ---
 
 # PRD — OSE Signal
@@ -268,6 +268,7 @@ koden. Når hver rad ble lest, står i endringsloggen.
 | FR-413 | Måling av omsetning | ekstra | ja |
 | FR-414 | Eks.datoer ført for hånd | senere | nei |
 | FR-415 | «Følg en aksje» med stjernen og «Dine egne aksjer» | ekstra | ja |
+| FR-416 | Ferske kurser for aksjene utenfor lista | senere | nei |
 | FR-501–FR-503 | Meldingsfilteret (vedlegg A) | senere | nei |
 | FR-601 | Av/på-bryteren | kjerne | ja |
 | FR-602 | Visningen av KI-teksten | kjerne | ja |
@@ -1338,6 +1339,28 @@ henting, med «Fjern» eller «Angre».
 - Med 18 aksjer avvises et nytt ønske om å følge, og lista er uendret.
 - Siden og skjemaet gjør ingen API-kall, og webserveren skriver bare ønsket og stjernen.
 
+#### FR-416 — Ferske kurser for aksjene utenfor lista
+
+*Ikke i v1. Det kan komme senere, og resten av kravet er planen (§2, §8).*
+
+Målingen av omsetning (FR-413) henter hele året per kall, til samme pris som
+tre måneder (FR-406), og kursene fra den lagres. En aksje som følges, kan da
+vise kursene med en gang, med datoen de er fra. Hver lørdag måles de 20 mest
+omsatte utenfor lista først, og resten som før, eldste måling først.
+
+En aksje som følges en dag børsen er stengt, hentes samme kveld med ett av
+dagens kall. Den kommer inn i lista neste børsdag, og lista for en børsdag som
+alt er hentet, endres ikke (FR-412). Signalet for dagene før regnes i ettertid
+(FR-408). Hentingen og de nye forsøkene får kallene først, og målingen bruker
+resten, uten reserve. Bonuskvoten brukes aldri, og taket på 18 aksjer står.
+Hvordan kursene lagres, avgjøres innenfor reglene for rådata og for aksjene i
+basen (NFR-07, FR-406).
+
+*Konsekvenser:*
+- Lista for en børsdag som alt er hentet, endres aldri.
+- En aksje med kurser fra målingen står ikke som «Venter på henting».
+- Ingen kall tas fra bonuskvoten, og målingen tar aldri kall før hentingen og de nye forsøkene.
+
 ---
 
 ### 4.6 KI-laget og grensen mot regelbasert kode
@@ -1915,9 +1938,10 @@ lukket dem, står i endringsloggen.
 
 Det som står som «senere» i tabellen i §2, er plan for en senere versjon: plan A
 i vedlegg A, åtte deler av kravene i v1, KI-tekst for små hull (FR-408), et
-tenkt salg uten et tenkt kjøp først (FR-209) og relevansskalaen (FR-606), som er
-plan A, men står i §4.6. Ingen av dem er bygget, og kravteksten til hver av de
-åtte sier at den ikke er i v1.
+tenkt salg uten et tenkt kjøp først (FR-209), ferske kurser for aksjene utenfor
+lista (FR-416) og relevansskalaen (FR-606), som er plan A, men står i §4.6.
+Ingen av dem er bygget, og kravteksten til hver av de åtte sier at den ikke er
+i v1.
 
 Idéene som sto i lista til v1.1, står med forbeholdene sine i endringsloggen,
 under «v1.1 — vurderes etter at v1 er kontrollert». De som ble bygget, er tatt

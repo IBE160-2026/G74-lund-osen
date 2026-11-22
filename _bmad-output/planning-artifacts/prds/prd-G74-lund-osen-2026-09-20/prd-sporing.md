@@ -2,7 +2,7 @@
 title: "Sporingen av PRD-en"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-18T09:58
+updated: 2026-11-22T11:39
 ---
 
 # Sporingen av PRD-en
@@ -86,6 +86,7 @@ stemmer med markørene i `prd.md`, eller hvis en lenke her ikke virker.
 | FR-413 | §4.4 | bygget | 2.13 | `tests/test_ferdige_lister_8_11b.py`, `tests/test_omsetning.py` |
 | FR-414 | §4.4 | senere | 2.14 | ingen |
 | FR-415 | §4.4 | bygget | 2.12, 8.22, 8.26 | `tests/test_bransjene_8_22.py`, `tests/test_foelg_en_aksje_8_22.py`, `tests/test_valg.py`, `tests/test_vis_meg_rundt_8_26.py` |
+| FR-416 | §4.4 | senere | 2.20 | ingen |
 | FR-501 | vedlegg A, 4.5 | utenfor v1 (plan A) | 6.3 | `tests/test_meldinger.py` |
 | FR-502 | vedlegg A, 4.5 | utenfor v1 (plan A) | 6.4 | `tests/test_meldinger.py` |
 | FR-503 | vedlegg A, 4.5 | utenfor v1 (plan A) | 6.5 | `tests/test_meldinger.py` |
@@ -140,7 +141,7 @@ stemmer med markørene i `prd.md`, eller hvis en lenke her ikke virker.
   og FR-607 og FR-608 kom til etter plan B.
 - **FR-407** står i §4.4 med de andre FR-4xx, ikke i §4.1.
 - Ellers går numrene uten hull i hvert avsnitt: FR-101–FR-112, FR-201–FR-209,
-  FR-401–FR-415, FR-601–FR-608 og FR-701–FR-706, NFR-01–NFR-08, UJ-1–UJ-3 og
+  FR-401–FR-416, FR-601–FR-608 og FR-701–FR-706, NFR-01–NFR-08, UJ-1–UJ-3 og
   SM-1–SM-11. Et nummer brukes aldri om igjen.
 
 ## Antakelser og foreløpige tall

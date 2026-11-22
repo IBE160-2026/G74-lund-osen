@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-18T21:57
+updated: 2026-11-22T11:39
 ---
 
 # Endringslogg for PRD-en
@@ -1701,3 +1701,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-18 (story 9.20, `--dokumentene` kl. 10:23):* FR-101, «Aksjer uten gyldig signal vises likevel»: setningen sier igjen «Signalet krever 51 handelsdager», som før 17.11. Hjelpeteksten om sjekkene uten signal viser til den setningen ordrett som kilde (`test_hjelpetekster.py::TestKildene::test_hver_tekst_har_en_kilde_som_finnes`), og koden i `src/` endres ikke i denne storyen. En halv handelsdag er en børsdag (ordlista), så meningen er den samme. Ordet byttes når kilden i hjelpetekstene rettes.
 
 *Endret 2026-11-18 (story 9.22, spørsmål 7 i 9.20, gruppens svar kl. 11:49):* FR-101, «Aksjer uten gyldig signal vises likevel»: «Signalet krever 51 handelsdager» er nå «Signalet krever 51 børsdager», som ordlista og teksten i appen. Kilden i `src/hjelpetekster.py` viser til den nye setningen, og meningen er den samme.
+
+*Endret 2026-11-22 (story 2.20, gruppens svar 22.11 kl. 11:29, rådet anbefalte det):* FR-416 «Ferske kurser for aksjene utenfor lista» er et nytt krav i §4.4, etter FR-415, med konsekvenser og status «senere» i tabellen i §2. «v1.1» i §8 nevner det med de andre som er «senere», og [`prd-sporing.md`](prd-sporing.md) har fått en rad. Målingen av omsetning (FR-413) henter hele året per kall og lagrer kursene, de 20 mest omsatte utenfor lista måles først hver lørdag, og en aksje som følges en dag børsen er stengt, hentes samme kveld. Lista for en børsdag som alt er hentet, endres ikke, som før. FR-413 er ikke endret: målingen bruker fortsatt alle kallene som er igjen, uten reserve. Ingen tekst er tatt bort.
