@@ -2,7 +2,7 @@
 title: "UX-loggen"
 status: aktiv
 created: 2026-10-20
-updated: 2026-11-17T23:15
+updated: 2026-11-22T18:39
 ---
 
 # UX-loggen
@@ -477,6 +477,8 @@ Eldst først, 444 rader fra 2026-09-25. Radene kommer fra «Avgjort»-, «Rettet
 *Rettet 2026-10-21 kl. 18:33:* Raden 2026-10-13 «Testeren av README-en skulle se det nye utseendet.» over: delen om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
 
 *Rettet 2026-10-21 kl. 18:33:* Raden 2026-10-18 «README-en skulle prøves av andre etter at de to README-PR-ene var flettet.» over om README-prøven i uke 43 (gruppens svar 18.10 kl. 00:03) gjelder ikke lenger. Prøven på en ren maskin er utsatt til v1 er ferdig bygget, etter avgjørelsen 2026-10-21 kl. 18:33 under «Prioritering» og story 3.3 i `epics.md`.
+
+*Svar 2026-11-22 kl. 18:23 (gruppens svar, rådet anbefalte det; E3 i UX-dokumentene):* raden 2026-10-13 «404-siden er Flasks engelske standardside …» over står ikke åpen lenger. En egen feilside for 404, 400 og 403 ble avvist 19.10, i radene 2026-10-19 om Werkzeugs 404 og 405 og om knapperaden på 404-sidene, som [den heuristiske evalueringen](heuristisk-evaluering.md) sier. Appen viser fortsatt Flasks engelske side.
 
 ## Åpne funn før brukertesten
 

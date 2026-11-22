@@ -3,7 +3,7 @@ title: "EXPERIENCE.md — OSE Signal"
 name: OSE Signal
 status: final
 created: 2026-11-22
-updated: 2026-11-22T15:45
+updated: 2026-11-22T18:39
 sources:
   - _bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md
   - src/app.py
@@ -457,6 +457,7 @@ Ingen svar er foreslått. Hvert spørsmål har kildene på begge sider.
 - **E1. «lista» om Min liste.** Ordlista skiller «Lista», aksjene appen henter, fra «Min liste», aksjene med stjerne (`prd.md:188,190`), og `src/valg.py:34-36` sier at «lista» om alle aksjene er byttet ut med «appen følger». Min liste sier «Stjernen foran et selskap legger aksjen i lista» (`index.html:193`) og «for å legge det i lista» (`index.html:212`). Hvilket ord gjelder der Min liste sier «lista»?
 - **E2. «kl. 22» står fast i malene.** `TIDSGRENSE` er kl. 22:00 (`src/boersdag.py:33`), og stripa regner klokkeslettet av den (`src/markedsoversikt.py:699-703`). Testen `tests/test_neste_henting.py::test_klokkeslettet_kommer_fra_tidsgrensen` sier «Ville feilet hvis «kl. 22» sto fast i koden eller malen.» (`tests/test_neste_henting.py:95`), men malene har «kl. 22» skrevet inn (`_egne.html:32-33`, `folg.html:56`, `index.html:149`, `ferdig_liste.html:31`), og testen ser på teksten i stripa og hjelpen, ikke på malene. Ordlista sier at kveldsjobben starter «fra kl. 22:15» (`prd.md:187`), som er når jobben starter, ikke tidsgrensen. Hvilken kilde gjelder for klokkeslettet i malene?
 - **E3. 404, 400 og 403.** Appen viser Flasks engelske standardside, og `src/app.py` har ingen `errorhandler` for dem (`src/app.py:718`, `src/app.py:723` gjelder basefeil). UX-loggen har raden som «Står åpent: en egen feilside er ny funksjonalitet.» (`docs/ux-logg.md:182`). Den heuristiske evalueringen sier at den «ble utsatt 14.10 og avvist 19.10» (`docs/heuristisk-evaluering.md:101-103`), og loggen har to rader fra 19.10 som avviser stil og knapperad på Flasks side (`docs/ux-logg.md:447,458`). Er punktet åpent eller avvist?
+  *Svar 2026-11-22 kl. 18:23 (gruppens svar, rådet anbefalte det):* avvist. En egen feilside for 404, 400 og 403 ble avvist 19.10, og raden 2026-10-13 i `docs/ux-logg.md` har en datert linje om det. Appen viser fortsatt Flasks engelske side.
 - **E4. Modellnavnet skrives ulikt.** Aksjesiden har «Modell: {modell}, {tjeneste}» (`src/ki_visning.py:126`, `aksje.html:414`), som eksempelet i FR-602, «gemma4:e4b, lokal» (`prd.md:1421-1422`). Oversikten har «Skrevet av {modell} ({tjeneste}) da kursene ble hentet.» (`src/ki_visning.py:233`, `index.html:436`), og FR-607 sier bare at teksten «er merket med modellen» (`prd.md:1554-1555`). Kommentaren i `src/ki_visning.py:232` sier «som paa aksjesiden (FR-602)». Hvilken form gjelder for oversikten?
 - **E5. «Ticker» eller «symbol».** Søkefeltet sier «Søk på ticker eller navn» (`folg.html:95`), og FR-415 sier «søk på ticker eller navn» (`prd.md:1315`). Steget i omvisningen ved samme felt sier «Skriv navnet eller symbolet for å finne aksjen.» (`src/hjelpetekster.py:1053`). Ordlista har ingen av ordene. Hvilket ord gjelder?
 - **E6. Omvisningen i Innstillinger.** Siden har tre brytere (FR-110, `innstillinger.html:16-52`), men «Vis meg rundt» har steg bare for «Hjelp» og «KI-tekst» (`src/hjelpetekster.py:1039-1048`). Kildene sier ikke om «Notater» skal ha et steg der. Skal den det?
