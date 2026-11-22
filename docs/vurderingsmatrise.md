@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-22T16:21
+updated: 2026-11-22T18:39
 ---
 
 # Vurderingsmatrise for del 1
@@ -65,6 +65,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-22 (story 9.24):* «Design og brukeropplevelse» har nå en samlet UX-spesifikasjon, laget med bmad-ux fra det som er bygget: [DESIGN.md](../_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/DESIGN.md) for hvordan appen ser ut og [EXPERIENCE.md](../_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/EXPERIENCE.md) for hvordan den virker, med brukerreisene UJ-1–UJ-3, det som ikke er godt nok ennå og åpne spørsmål til gruppen. Statusen i tabellen er ikke endret.
 
 *Lagt til 2026-11-22 (story 9.24, flettingen):* 9.24 (PR #173, `737ea494`) er flettet. UX-spesifikasjonen står i `_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/`, og radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `9c3dfb89`: 6124 bestått og 99 hoppet over i jobben `pytest` (kjøring 45037144698). Statusen i tabellen er ikke endret.
+
+*Rettet 2026-11-22 (gruppens svar kl. 18:23, rådet anbefalte det; E7 i UX-dokumentene):* linja «Lagt til 2026-11-17 (story 9.17)» over sier 17 funn og U114–U130. [Den heuristiske evalueringen](heuristisk-evaluering.md) har 18 funn, 13 fra evalueringen og 5 fra gruppen som evaluerer nr. 2, fordi HE18 kom til 17.11 kl. 13:32. De nye funnene står som U114–U131 i [UX-loggen](ux-logg.md).
 
 ## Status 07.11.2026
 
