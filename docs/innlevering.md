@@ -2,7 +2,7 @@
 title: "Leveranseliste — IBE160, gruppe G74"
 status: aktiv
 created: 2026-09-22
-updated: 2026-11-19T15:33
+updated: 2026-11-22T15:15
 ---
 
 # Leveranseliste — IBE160, gruppe G74
@@ -313,6 +313,8 @@ Om fristen også gjelder de andre BMAD-dokumentene, er ikke opplyst.
 | **Status** | **Uavklart hva den omfatter** |
 | **Ligger i** | Product Brief, PRD, arkitekturspine og `epics.md` er alle skrevet |
 | **Gjenstår** | **Besvart 23.09, se under:** BMAD er «fortsatt en sterkt anbefalt arbeidsmetode» — anbefalt, ikke krav — og de sentrale dokumentene «bør derfor ... pushes dit». De ligger allerede i repoet. Emnesiden fører selve arbeidskravet som product brief i repoet (se «Eksamen»). Fristen 27.09 er gitt av faglærer (rettelsene under «Arbeidskrav»). *Rettet 2026-09-26:* her sto «Utsettelsen til 27.09 har fortsatt ingen navngitt kilde». |
+
+*Lagt til 2026-11-22 (story 9.24):* BMAD-dokumentene har nå også en samlet UX-spesifikasjon fra bmad-ux, [DESIGN.md](../_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/DESIGN.md) for hvordan appen ser ut og [EXPERIENCE.md](../_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/EXPERIENCE.md) for hvordan den virker. Den beskriver appen slik den er bygget, med kildene, kravene og testene, og har åpne spørsmål til gruppen. Leveranselista har ingen egen del for design og UX, så den står her. «Design og brukeropplevelse» står i [vurderingsmatrisen](vurderingsmatrise.md).
 
 ---
 

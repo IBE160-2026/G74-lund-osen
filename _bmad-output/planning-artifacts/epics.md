@@ -5589,3 +5589,20 @@ Som **gruppen som leser koden og morgensjekken** vil vi at kommentarene sier «b
 **Avhenger av:** 9.22. **Én økt:** ja.
 
 *Lagt til 2026-11-19:* 9.23 er squash-flettet med PR #170 i `3c7cbcfa` kl. 11:44, låst til head-en `bcf60783`, etter instruksjonen om de to spørsmålene fra 9.22 i `docs/ai-prompts/2026-11-19.md`, uten nytt ja. Kommentaren i `src/fetch_prices.py` og docstringen i testen sier «51 boersdager», uten ø som resten av teksten der, og morgensjekken skriver klokkeslettene fra git i norsk tid også på Windows. CI var grønn i alle jobbene (run 44507229045), med 6017 bestått og 99 hoppet over i jobben `pytest`.
+
+### Story 9.24: UX-dokumentene, DESIGN.md og EXPERIENCE.md
+
+*Lagt til 2026-11-22, etter instruksjonen kl. 14:46, som føres i `docs/ai-prompts/2026-11-22.md`, og gruppens svar 16.11 kl. 20:22 og 20.11 kl. 18:00:* rådet anbefalte det. Det som manglet i kursets steg om design og UX, var en samlet UX-spesifikasjon. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-24-ux-dokumentene.md`.
+
+Som **gruppe** vil vi ha én samlet UX-spesifikasjon, med hvordan appen ser ut (`DESIGN.md`) og hvordan den virker (`EXPERIENCE.md`), så designet og opplevelsen kan leses ett sted, med kildene og testene som låser dem.
+
+**Oppfyller:** steget om design og UX i kurset · **Begrenses av:** NFR-06 (også i teksten), regel 3, 11, 16, 19 og 22, og FR-411
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `DESIGN.md` og `EXPERIENCE.md` fra `bmad-ux` (headless, Create), med appen slik den er og uten nye designvalg; der kildene er uenige eller tause, står et åpent spørsmål til gruppen
+- Hver del viser til kilden, kravet eller storyen, og til testen som låser det, der den finnes
+- De åpne funnene fra den heuristiske evalueringen og brukertest 1, og hva brukertest 2 skal vise
+- En lenke i README-en under «Dokumentene», og dokumentene nevnt i leveranselista og vurderingsmatrisen der UX står
+- Ingen kode i `src/`, ingen migrasjon og ingen nye bilder
+
+**Avhenger av:** 9.16, 9.17, 9.18, 9.21. **Én økt:** ja.
