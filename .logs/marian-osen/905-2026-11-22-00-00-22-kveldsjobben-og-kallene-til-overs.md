@@ -56,3 +56,32 @@ Spørsmål til gruppen:
 
 ### Åpne punkter
 - Utkastet til en story om kallene til overs: gruppen avgjør etter brukertest 2. Der står to spørsmål: hvorfor ønskene bare tas i bruk på børsdagen (ECH3 i 2.12), og om målingen skal ha 2 kall i reserve.
+
+## 2026-11-22 kl. 12:04 — Marian Osen
+
+### Oppgave
+Instruksjonen kl. 11:33: storyen om kallene til overs, skrevet om etter funnene 21.11 og gruppens svar 22.11 kl. 11:29 (rådet anbefalte svarene), skal legges i backlog. Bare tekst på main, utenom én linje i `NYE_KRAV`. En innliming like før var avkortet og ble ikke utført (regel 1).
+
+### Plan
+- Kvotesjekken først (regel 15), og så sjekke storyen mot koden og mot funnene over (seksjonen 22.11 kl. 00:00) før noe skrives.
+- Føre inn story 2.20 i `epics.md` og sprintstatusen, FR-416 i PRD-en med endringsloggen, `prd-sporing.md` og `NYE_KRAV`, en datert linje under 2.13 og svarene ved punktet i `issues.md`.
+- Kjøre `--dokumentene` før push. Utført-linja kommer i `docs/ai-prompts/2026-11-22.md`.
+
+### Resultat
+- Kvoten kl. 11:34: `apiRequestsDate` 2026-11-21, altså 0 av 20 brukt 22.11 i GMT, og `extraLimit` 296. Kveldsjobben er Ready. Ingen andre kall.
+- **Sjekken mot koden.** Det meste stemte: målingen bruker alle kallene som er igjen (`plan[:igjen]` i `src/omsetning.py`), vinduet er tre måneder (`MAANEDER = 3`), taket er 18 (`TAK` i `src/valg.py`), og ECH3 står i kommentaren ved `dag == dato` i `src/fetch_prices.py`: ønskene tas ikke i bruk når datoen er en dag som alt er hentet. Det passer med grunnen i svaret: lista er knyttet til hver børsdag. 2.17 regner alle dagene i serien, også dagene før aksjen kom inn i lista (`src/ettertid.py`).
+- **Rettet i storyen:** «bare omsetningen lagres» er nå «basen får bare omsetningen». Svaret står uendret som råfil i `data/raa/` og går ikke inn i basen (AD-6).
+- **Lagt til under «Planen avgjør», med et eget merke:**
+  - 2.17 regner bare for aksjene i lista, så planen må avgjøre hvordan signalet regnes for en aksje som ennå ikke er der.
+  - En dag børsen er stengt bruker målingen alle kallene i kjøringen kl. 22:15. Et ønske som kommer etter det, får da ikke noe kall samme kveld.
+- **Ikke endret, men sagt fra:** en lørdag der noen følger en aksje, tar hentingen ett av de 20 kallene. Da får bare 19 av de 20 mest omsatte en måling den dagen.
+- **Commits:**
+  - `04fec617`: instruksjonen i dagsfila.
+  - `b2dfd382`: story 2.20 i `epics.md`, og som backlog i sprintstatusen.
+  - `c82049f6`: FR-416 i §4.4 som «senere», med raden i §2, «v1.1» i §8, linja i endringsloggen, raden i `prd-sporing.md`, intervallet FR-401–FR-416 og `NYE_KRAV`.
+  - `a3e98fa3`: en datert linje under 2.13 om at ingen kall står i reserve.
+- Testene for PRD-en, sporingen og README-en: 31 bestått. `--dokumentene`: 3096 bestått og 7 hoppet over, kl. 11:41–12:04, før push.
+- Punktet om utkastet i `issues.md` er lukket, med svarene som en datert linje.
+
+### Åpne punkter
+Ingen nye. Spørsmålene til planen står i 2.20 under «Planen avgjør», og storyen står som backlog.
