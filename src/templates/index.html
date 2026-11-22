@@ -146,7 +146,7 @@
       noe som ikke skjer. En endring som venter, står som før. #}
   {% set venter = egne.ventende if egne else 0 %}
   {% if venter %}
-    <p class="venter-melding" role="status">{% if eksempeltall %}Eksempeltall: {% endif %}{{ venter }} {{ "endring" if venter == 1 else "endringer" }} i lista tas i bruk ved hentingen etter kl. 22.{% if eksempeltall %} Demoen henter ikke, så {{ "den tas" if venter == 1 else "de tas" }} ikke i bruk her.{% endif %}</p>
+    <p class="venter-melding" role="status">{% if eksempeltall %}Eksempeltall: {% endif %}{{ venter }} {{ "endring" if venter == 1 else "endringer" }} i lista tas i bruk ved hentingen etter {{ tidsgrense() }}.{% if eksempeltall %} Demoen henter ikke, så {{ "den tas" if venter == 1 else "de tas" }} ikke i bruk her.{% endif %}</p>
   {% endif %}
   {#- Story 8.3: Min liste har overskriften, en kort tekst, knappen «Alle /
       Min liste» med antallet, og samme tabell i samme rekkefølge (FR-102).

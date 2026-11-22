@@ -64,3 +64,34 @@ class TestE1MinListe:
         side = _synlig(demoen.get("/min-liste").data.decode("utf-8"))
         assert "Stjernen foran et selskap legger aksjen i Min liste, og et nytt trykk tar den ut." in side
         assert "Min liste lagres på denne maskinen og koster ingen API-kall." in side
+
+
+class TestE2Klokkeslettet:
+    """E2: «kl. 22» i malene kommer fra TIDSGRENSE, som i stripa
+    (grensen_som_tekst i markedsoversikt.py)."""
+
+    def test_ingen_mal_har_klokkeslettet_skrevet_inn(self):
+        """Ville feilet hvis en mal hadde «kl. 22» skrevet inn i teksten som
+        vises. Kommentarene i malene teller ikke."""
+        funnet = [
+            mal.name
+            for mal in sorted(MALENE.glob("*.html"))
+            if "kl. 22" in _uten_kommentarer(mal.read_text(encoding="utf-8"))
+        ]
+        assert funnet == []
+
+    @pytest.mark.parametrize("adresse", ["/", "/min-liste", "/folg?kode=HAVR", "/ferdig-liste?bransje=Kraft"])
+    def test_sidene_bruker_tidsgrensen(self, demoen, monkeypatch, adresse):
+        """Ville feilet hvis en side i demoen viste «etter kl. 22» når
+        TIDSGRENSE er en annen, eller ikke viste grensen."""
+        monkeypatch.setattr(boersdag, "TIDSGRENSE", time(21, 30))
+        svar = demoen.get(adresse)
+        assert svar.status_code == 200
+        side = _synlig(svar.data.decode("utf-8"))
+        assert "etter kl. 22" not in side
+        assert "etter kl. 21.30" in side
+
+    def test_grensen_i_hele_timer_som_foer(self, demoen):
+        """Med kl. 22:00 står «kl. 22», som før (ingen endring på sidene)."""
+        side = _synlig(demoen.get("/min-liste").data.decode("utf-8"))
+        assert "etter kl. 22." in side and "kl. 22.00" not in side
