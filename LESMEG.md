@@ -16,4 +16,9 @@ selskaper og kurser.
   «Skrevet av gemma4:e4b (lokal) da kursene ble hentet.» (E4).
 - De 18 andre bildene i `docs/appen/` og `docs/appen/mobil/` er byte for byte
   de samme og er ikke byttet. E2 endrer ingen tekst så lenge grensen er
-  kl. 22, og E5 og E6 gjelder omvisningen, som ingen av bildene viser.
+  kl. 22, og E5 og E6 gjelder stegene i omvisningen for «Følg en aksje» og
+  Innstillinger, som ingen av bildene viser.
+
+Etter gjennomgangen (AA2: teksten i steget for «Notater») ble alle de 20
+bildene tatt på nytt to ganger til, kl. 19:34–19:35 og 19:40–19:42
+(filtidene), og var byte for byte de samme.
