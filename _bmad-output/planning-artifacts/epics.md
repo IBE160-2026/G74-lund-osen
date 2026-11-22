@@ -5606,3 +5606,5 @@ Som **gruppe** vil vi ha én samlet UX-spesifikasjon, med hvordan appen ser ut (
 - Ingen kode i `src/`, ingen migrasjon og ingen nye bilder
 
 **Avhenger av:** 9.16, 9.17, 9.18, 9.21. **Én økt:** ja.
+
+*Lagt til 2026-11-22:* 9.24 er squash-flettet med PR #173 i `737ea494` kl. 16:21, låst til head-en `9c3dfb89`, etter instruksjonen kl. 14:46, som er ført i `docs/ai-prompts/2026-11-22.md`, uten nytt ja. CI var grønn i alle jobbene (run 45037144698), med 6124 bestått og 99 hoppet over i jobben `pytest`. Dokumentene har 13 åpne spørsmål i `DESIGN.md` (D1–D13) og 8 i `EXPERIENCE.md` (E1–E8), som gruppen svarer på.

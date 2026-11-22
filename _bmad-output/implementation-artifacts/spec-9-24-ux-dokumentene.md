@@ -2,7 +2,7 @@
 title: 'Story 9.24: UX-dokumentene, DESIGN.md og EXPERIENCE.md'
 type: 'docs'
 created: '2026-11-22'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '30a247ff'
 context:
@@ -202,3 +202,7 @@ beskriver appen slik den er.
   ikke.
 - Aldri to pytest samtidig, og pausene om kvelden gjelder når kveldsjobben er
   Ready. PR-en flettes ikke i pausene.
+
+## Flettet 22.11
+
+9.24 er squash-flettet med PR #173 i `737ea494` kl. 16:21, låst til head-en `9c3dfb89`, etter instruksjonen kl. 14:46, som er ført i `docs/ai-prompts/2026-11-22.md`, uten nytt ja. CI var grønn i alle jobbene (run 45037144698), med 6124 bestått og 99 hoppet over i jobben `pytest`. Hovedkopien er trukket etter flettingen. Den fikk bare tekst og ett avtrykk i en test, og den ekte versjonen ble ikke startet.
