@@ -5628,3 +5628,20 @@ Som **bruker i brukertest 2** vil jeg at appen bruker de samme ordene og det sam
 **Avhenger av:** 9.24. **Én økt:** ja.
 
 *Lagt til 2026-11-22:* 9.25 er flettet. PR #174 er squash-flettet i `c0192467` kl. 20:56, låst til head-en `8803a598`, uten nytt ja. CI var grønn i alle fire jobbene (run 45060734980), med 6140 bestått og 99 hoppet over i jobben `pytest`. Spørsmålene 1–3 i spesifikasjonen venter på gruppens svar.
+
+### Story 9.26: Skjermene i OSE Signal, ordnet etter epic og story
+
+*Lagt til 2026-11-22, etter instruksjonen kl. 19:06 i `docs/ai-prompts/2026-11-22.md` og gruppens svar kl. 19:05:* rådet anbefalte siden, og gruppen valgte at et vindu lager den i repoet nå. Den kan justeres senere. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-26-skjermene.md`.
+
+Som **faglærer eller sensor** vil jeg se skjermene i OSE Signal ordnet etter epic og story, med det kontrollen sjekket under hvert bilde, så jeg kan se hva hver story ga uten å starte appen.
+
+**Oppfyller:** gruppens svar 22.11 kl. 19:05 · **Begrenses av:** NFR-06, regel 3, 16, 19, 20 og 22; ingen kode i `src/` og ingen migrasjon
+
+**Kontroll — hva den ferdige storyen inneholder:**
+- `docs/skjermene.md`, ordnet etter epic og story, med antallet epics, storyer og bilder øverst
+- Ett til to bilder fra demoen per story med egen skjerm, 1280 px brede, i `docs/skjermene/`, og én linje for storyene uten skjerm
+- En kort tekst fra kontrollen under hvert bilde, med lenke til spesifikasjonen
+- Mappa under 15 MB, og testene for siden og bildene
+- En lenke i README-en under «Dokumentene», og siden nevnt i vurderingsmatrisen under «Design og brukeropplevelse»
+
+**Avhenger av:** 9.25. **Én økt:** ja.
