@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-22T18:39
+updated: 2026-11-22T21:42
 ---
 
 # Vurderingsmatrise for del 1
@@ -67,6 +67,8 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 *Lagt til 2026-11-22 (story 9.24, flettingen):* 9.24 (PR #173, `737ea494`) er flettet. UX-spesifikasjonen står i `_bmad-output/planning-artifacts/ux-designs/ux-G74-lund-osen-2026-11-22/`, og radene står i [kvalitetssikringen](kvalitetssikring.md). Hele settet ble kjørt i CI på head-en `9c3dfb89`: 6124 bestått og 99 hoppet over i jobben `pytest` (kjøring 45037144698). Statusen i tabellen er ikke endret.
 
 *Rettet 2026-11-22 (gruppens svar kl. 18:23, rådet anbefalte det; E7 i UX-dokumentene):* linja «Lagt til 2026-11-17 (story 9.17)» over sier 17 funn og U114–U130. [Den heuristiske evalueringen](heuristisk-evaluering.md) har 18 funn, 13 fra evalueringen og 5 fra gruppen som evaluerer nr. 2, fordi HE18 kom til 17.11 kl. 13:32. De nye funnene står som U114–U131 i [UX-loggen](ux-logg.md).
+
+*Lagt til 2026-11-22 (story 9.26, gruppens svar kl. 19:05):* «Design og brukeropplevelse» har nå en side med skjermene i appen, ordnet etter epic og story: [skjermene](skjermene.md). Den har 60 bilder fra demoen, 1280 px brede, ett eller to for hver av de 46 storyene med egen skjerm, med det kontrollen sjekket under hvert bilde og lenke til spesifikasjonen. De 96 storyene uten skjerm har én linje om hvorfor. Statusen i tabellen er ikke endret.
 
 ## Status 07.11.2026
 
