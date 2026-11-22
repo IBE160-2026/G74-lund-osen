@@ -2144,6 +2144,8 @@ overs, så lista kan vise den før noen velger en aksje.
 
 *Lagt til 2026-11-10 (flettingen):* 2.13b er flettet med PR #137 i `178107d9` kl. 21:10:39, låst til head-en `7d61de0e`, med CI 42891875216 grønn. Kjøringen i natt føres i `docs/ai-prompts/2026-11-10.md`.
 
+*Avgjort 2026-11-22 kl. 11:29 (gruppens svar):* jobben bruker alle kallene som er igjen den dagen i GMT, og ingen står i reserve. «lar 2 stå igjen, med mindre alle er bedt om» i kontrollen over gjelder ikke jobben, som svaret 28.10 kl. 22:17 (c) alt sa. Det er slik koden gjør (`plan[:igjen]` i `src/omsetning.py`), og slik FR-413 sier. Rådet anbefalte det. Ført etter instruksjonen kl. 11:33 i `docs/ai-prompts/2026-11-22.md`.
+
 ### Story 2.14: Eks.datoer føres inn for hånd
 
 *Lagt til 2026-10-19 (gruppens svar 19.10 kl. 15:43, `sprint-change-proposal-2026-10-19.md`):* «Ekstra, hvis tiden rekker». Briefen v8 lover ikke dette, så storyen er ikke v1. Den bygges på egen gren og flettes bare ferdig og grønt (svaret kl. 14:48). Er den ikke flettet ved funksjonsstoppen, README-prøven senest én uke før innleveringen, står den som plan for en senere versjon.
