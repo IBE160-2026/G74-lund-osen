@@ -54,6 +54,73 @@ migrasjon
    `docs/appen/` seg, tas det på nytt i demoen, og avtrykkene og bildegrenen
    følger med.
 
+## Resultatet
+
+| Del | Commit | Testen |
+|---|---|---|
+| E1: «Min liste» i innledningen, i teksten for en tom Min liste og i teksten for «Min liste» på oversikten | `ffe4aa09` | `TestE1MinListe` |
+| E2: `{{ tidsgrense() }}` i stedet for «kl. 22» i fire maler, med `grensen_som_tekst` som global i `app.py` | `3cb0ffb0` | `TestE2Klokkeslettet` |
+| E4: «Modell: {modell}, {tjeneste}» på oversikten, fra `_modellnavnet` i `ki_visning.py`, og hjelpen rettet | `82440ecf` | `TestE4Modellnavnet` |
+| E5: «tickeren» i steget ved søkefeltet, «Ticker» i ordlista og en linje i endringsloggen | `776dad70`, `369f7022` | `TestE5Ticker` |
+| E6: steget `notater-valget` i omvisningen i Innstillinger | `87387c96`, `8120b5f1` | `TestE6Notater` |
+| Bildene og avtrykkene | `8ce60c2e`, `8120b5f1` | `tests/test_docker.py` |
+| Bildegrenen `pr-9-25-bilder`, pushet | `1dbe7110`, `efcce60d` | Bildene før og etter, med `LESMEG.md` |
+
+Testfila ble kjørt mot koden på `9ef4c60b`, før rettingene: 13 av de 14
+testene feilet, og besto etter rettingene. Den 14.,
+`test_grensen_i_hele_timer_som_foer`, låser at sidene sier det samme som før
+med grensen kl. 22, og besto før og etter. De to testene som kom etter
+gjennomgangen (BH2), er ikke kjørt mot koden før rettingene. Tre eldre tester låste den gamle
+teksten og følger den nye: `tests/test_min_liste.py` («lista») og
+`tests/test_ki_dagen.py` og `tests/test_de_lave_funnene_9_10.py`
+(modellnavnet). `tests/test_prd_9_11.py` tillater 13 ord i ordlista.
+
+**Ordlista har 13 ord.** `tests/test_prd_9_11.py` tillot 8–12, etter svaret
+18.11 kl. 11:49 på spørsmål 3 i 9.20 («behold», 12 ord). Faglærer foreslo
+8–10. Instruksjonen sier at ordlista får «ticker», så grensen er 13, med
+grunnen i testen. Se spørsmål 1.
+
+**Bildene.** Alle de 20 bildene i `docs/appen/` ble tatt i demoen på port 8925
+og 8926, med en ny demobase hver gang, tre ganger to (kl. 19:14–19:21,
+19:34–19:35 og 19:40–19:42, filtidene), og var like byte for byte hver gang.
+`min-liste-demo.png` (E1) og `mobil/oversikten-390-demo.png` (E4) er nye. De
+andre 18 er uendret: E2 endrer ingen tekst så lenge grensen er kl. 22, og
+stegene for «Følg en aksje» og Innstillinger står ikke på noe bilde.
+
+## Gjennomgangen 22.11
+
+To lesere, på `5706ead5..8ce60c2e`: Blind Hunter og Edge Case Hunter, og
+Acceptance Auditor og Verification Gap. Den andre leste også sidene i demoen på
+8925 og 8926 og så på bildene. Ingen kjørte pytest. 13 funn: 1 middels og 12
+lave.
+
+| Id | Grad | Funnet | Gjort |
+|---|---|---|---|
+| BH1 | middels | Raden «Ticker» sa at bare koden sier «symbol», men kravene om hentingen og lagringen gjør det også, og FR-103 bruker «symbol» om pilen | Rettet: raden sier det, som raden for «Bransje» (`369f7022`) |
+| BH2 | lav | E6-testen sjekket ikke teksten eller at steget står med notatene av | Rettet (`863e0e2e`) |
+| BH3 | lav | Den statiske testen fant bare «kl. 22» | Rettet: den finner også «kl 22» og «klokka 22» (`863e0e2e`) |
+| VG1 | lav | Docstringen for `_modellnavnet` lovet mer enn testen sjekker | Rettet (`863e0e2e`) |
+| AA1 | lav | `LESMEG.md` sa at ingen bilder viser omvisningen | Rettet på bildegrenen (`efcce60d`) |
+| AA2 | lav | Steget for «Notater» nevnte ikke knappen «Mine notater» | Rettet, uten «kjøp», som er et rådsord i omvisningen (`8120b5f1`) |
+| AA3 | lav | Regel 20 manglet under «Begrenses av» i `epics.md` | Rettet (`5c69a525`) |
+| VG2 | lav | Statusene i `_egne.html` og meldingen i `index.html` vises ikke i demoen | Står: den statiske testen dekker malene, og eldre tester viser dem med grensen kl. 22 |
+| ECH4 | lav | Hjelpeteksten om neste henting regnes når modulen lastes, ikke ved hver visning | Står: `TIDSGRENSE` er en konstant, og E2 gjaldt malene |
+| ECH1 | lav | `docs/hjelp.md` sier «symbolet» om ticker i avsnittet om børsometeret | Står: spørsmål 2 |
+| ECH2, AA4 | lav | `docs/hjelp.md` sier «lista» om Min liste i ett svar | Står: spørsmål 2 |
+| ECH3 | lav | «i kveld» står fast i statusene, mens stripa regner dagen | Står, fantes fra før: spørsmål 3 |
+
+## Spørsmål til gruppen
+
+1. **Ordlista har 13 ord.** Faglærer foreslo 8–10, og svaret 18.11 kl. 11:49
+   holdt 12. *Forslag:* behold «Ticker», fordi E5 gjelder ordet brukeren ser.
+2. **`docs/hjelp.md`.** Hjelpen sier «symbolet» om ticker på rutene i
+   børsometeret og «lista» om Min liste i ett svar. Svarene på E1 og E5 gjaldt
+   siden, omvisningen og ordlista. *Forslag:* rett hjelpen på samme måte, fordi
+   den er levende og leses i brukertest 2.
+3. **«i kveld».** Statusene i «Dine egne aksjer» og «Følg en aksje» sier
+   «i kveld etter kl. 22» også etter kveldsjobben, mens stripa regner dagen.
+   *Forslag:* vent til etter brukertest 2.
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. `data/` og `_privat/` røres ikke, og den
@@ -68,13 +135,13 @@ migrasjon
 
 ## Kontroll
 
-- [ ] E1: «Min liste» der Min liste sa «lista» om aksjene med stjerne
-- [ ] E2: «kl. 22» i malene kommer fra `TIDSGRENSE`, og testen ser på malene
-- [ ] E4: «Modell: {modell}, {tjeneste}» på oversikten
-- [ ] E5: «ticker» i steget ved søkefeltet, og i ordlista med en linje i endringsloggen
-- [ ] E6: et steg for «Notater» i omvisningen i Innstillinger
-- [ ] Hver retting har en test som feilet før rettingen
-- [ ] Bildene som endrer seg, avtrykkene og bildegrenen følger med
-- [ ] Gjennomgangen er tatt, også mot demoen
+- [x] E1: «Min liste» der Min liste sa «lista» om aksjene med stjerne
+- [x] E2: «kl. 22» i malene kommer fra `TIDSGRENSE`, og testen ser på malene
+- [x] E4: «Modell: {modell}, {tjeneste}» på oversikten
+- [x] E5: «ticker» i steget ved søkefeltet, og i ordlista med en linje i endringsloggen
+- [x] E6: et steg for «Notater» i omvisningen i Innstillinger
+- [x] Hver retting har en test som feilet før rettingen
+- [x] Bildene som endrer seg, avtrykkene og bildegrenen følger med
+- [x] Gjennomgangen er tatt, også mot demoen
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
