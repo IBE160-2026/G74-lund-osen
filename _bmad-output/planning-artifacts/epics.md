@@ -5615,7 +5615,7 @@ Som **gruppe** vil vi ha én samlet UX-spesifikasjon, med hvordan appen ser ut (
 
 Som **bruker i brukertest 2** vil jeg at appen bruker de samme ordene og det samme klokkeslettet overalt, og at omvisningen forklarer alle valgene i Innstillinger, så jeg ikke møter to navn på det samme.
 
-**Oppfyller:** E1, E2, E4, E5 og E6 i `EXPERIENCE.md`, FR-602 · **Begrenses av:** NFR-06, regel 3, 16, 19, 21 og 22
+**Oppfyller:** E1, E2, E4, E5 og E6 i `EXPERIENCE.md`, FR-602 · **Begrenses av:** NFR-06, regel 3, 16, 19, 20, 21 og 22
 
 **Kontroll — hva testen ser etter:**
 - «Min liste» der Min liste sa «lista» om aksjene med stjerne (E1)
