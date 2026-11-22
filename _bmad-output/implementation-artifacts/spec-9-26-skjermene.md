@@ -157,5 +157,5 @@ lave. 53 er rettet, og 2 lave står.
 - [x] Testene for siden og bildene
 - [x] README-en og vurderingsmatrisen, med testene som låser README-en
 - [x] Gjennomgangen, som sjekker hver tekst mot bildet og spesifikasjonen
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt (171 og 3122 passerte, 7 hoppet over, 22.–23.11 kl. 23:51–00:13)
 - [ ] CI er grønn i alle jobbene
