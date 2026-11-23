@@ -2,12 +2,12 @@
 title: "Skjermene i OSE Signal"
 status: aktiv
 created: 2026-11-22
-updated: 2026-11-22T22:09
+updated: 2026-11-23T15:19
 ---
 
 # Skjermene i OSE Signal
 
-Siden har 10 epics, 142 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
+Siden har 10 epics, 143 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
 
 Bildene viser appen slik den er nå, så et bilde kan også vise det senere storyer la til, for eksempel knappene øverst, «i ettertid» og den rikere KI-teksten. Teksten under sier hva storyen ga, og nevner det senere der det kan forveksles.
 
@@ -730,3 +730,7 @@ Innstillinger med «Vis meg rundt» åpen på steget for «Notater», med kortet
 ### 9.26 Skjermene i OSE Signal, ordnet etter epic og story
 
 Ingen egen skjerm i appen: storyen er denne siden. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-26-skjermene.md)
+
+### 9.27 Statusene i «Dine egne aksjer» og «Følg en aksje» regner dagen
+
+Ingen ny skjerm: statusen ved en aksje som venter eller fjernes, sier dagen hentingen tidligst tar den, og bare i den ekte versjonen, så bildene fra demoen er som før. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-9-27-statusene-regner-dagen.md)

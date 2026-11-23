@@ -200,3 +200,23 @@ def neste_henting(kursdag: date, naa: datetime) -> date | None:
     if innevaerende_boersdag(idag) > kursdag:
         return None
     return neste_boersdag(idag)
+
+
+def neste_henting_av_oensket(naa: datetime) -> date:
+    """Story 9.27 (spoersmaal 3 i 9.25, gruppens svar 23.11 kl. 14:49): dagen
+    et oenske fra siden tidligst tas i bruk, fra TIDSGRENSE.
+
+    Hentingen tar bare oenskene i bruk paa selve boersdagen (ECH3 i 2.12,
+    ta_i_bruk_oenskene i fetch_prices), og hver kjoering den dagen tar dem.
+    Gruppens svar 23.11 kl. 22:25 (spoersmaal 1 i 9.27): paa en boersdag er
+    dagen derfor i dag helt til midnatt, uansett klokka og kursdagen, fordi
+    kveldsjobben kjoerer flere ganger etter TIDSGRENSE og siden ikke vet om
+    den gaar igjen. Raadet anbefalte neste boersdag etter foerste kjoering,
+    som stripa. En dag boersen er stengt, er det neste boersdag. Til forskjell
+    fra neste_henting er det aldri «naa» da, selv om basen mangler forrige
+    boersdag. Reiser UtenforKalenderen som er_boersdag og neste_boersdag
+    (NFR-08)."""
+    idag = norsk_dato(naa)
+    if er_boersdag(idag):
+        return idag
+    return neste_boersdag(idag)

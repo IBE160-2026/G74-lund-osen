@@ -5647,3 +5647,22 @@ Som **faglærer eller sensor** vil jeg se skjermene i OSE Signal ordnet etter ep
 **Avhenger av:** 9.25. **Én økt:** ja.
 
 *Lagt til 2026-11-23:* 9.26 er flettet. PR #175 er squash-flettet i `16b74c35` kl. 00:20, låst til head-en `485dff7d`, uten nytt ja. CI var grønn i alle fire jobbene (run 45082122376), med 6150 bestått og 99 hoppet over i jobben `pytest`. Spørsmålene 1 og 2 i spesifikasjonen venter på gruppens svar.
+
+### Story 9.27: Statusene i «Dine egne aksjer» og «Følg en aksje» regner dagen
+
+*Lagt til 2026-11-23, etter instruksjonen kl. 14:50 i `docs/ai-prompts/2026-11-23.md` og gruppens svar kl. 14:49:* rådet ville vente med spørsmål 3 i 9.25 til etter brukertest 2, men gruppen valgte å ta det nå. Svarene på spørsmål 1 og 2 i 9.25 og på begge i 9.26 står som daterte linjer på main. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-9-27-statusene-regner-dagen.md`.
+
+Som **bruker i brukertest 2** vil jeg at statusen ved en aksje jeg har valgt eller fjernet, sier hvilken dag hentingen tar den, så den ikke sier «i kveld» etter at kveldens henting er ferdig, eller en lørdag.
+
+**Oppfyller:** spørsmål 3 i 9.25 (svaret 23.11 kl. 14:49), FR-412, FR-415 · **Begrenses av:** NFR-06, NFR-08, regel 3, 16, 19, 20, 21 og 22; ingen ny migrasjon
+
+**Kontroll — hva testen ser etter:**
+- Statusene sier «i kveld» på en børsdag før kl. 22
+- Etter kveldsjobben sier de neste børsdag: «i morgen», eller ukedagen
+- En lørdag sier de «mandag», også når basen mangler fredagen, fordi ønskene bare tas i bruk på en børsdag
+- Klokkeslettet kommer fra `TIDSGRENSE`, som i 9.25
+- **Ville feilet hvis:** statusene sa «i kveld» etter jobben eller en lørdag; testen feilet før rettingen
+
+**Avhenger av:** 9.25. **Én økt:** ja.
+
+*Lagt til 2026-11-23 (gruppens svar kl. 22:25 på spørsmålene i spesifikasjonen):* på en børsdag sier statusene «i kveld» helt til midnatt, også etter første kjøring av kveldsjobben, fordi en senere kjøring samme kveld tar ønsket. Rådet anbefalte «i morgen», som stripa; gruppen valgte «i kveld». Det andre punktet i kontrollen over, «Ville feilet hvis» og «etter at kveldens henting er ferdig» i storyen gjaldt til svaret. Aksjesiden, merknaden i Min liste, «Er du sikker?» og «Fjerner du aksjen før hentingen …» i «Følg en aksje» sier samme dag som statusen, og hjelpen følger med. I demoen står «i kveld» fast, som før.

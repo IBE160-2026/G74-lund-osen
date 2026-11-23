@@ -720,12 +720,37 @@ def neste_henting_tekst(kursdag: date, naa: datetime) -> str | None:
     if dag is None:
         return "nye kurser kan hentes nå"
     kl = grensen_som_tekst()
-    idag = boersdag.norsk_dato(naa)
+    naar, foran = _dagen_som_tekst(dag, boersdag.norsk_dato(naa))
+    return f"nye kurser fra {naar} {kl}" if foran else f"nye kurser fra {kl} {naar}"
+
+
+def _dagen_som_tekst(dag: date, idag: date) -> tuple[str, bool]:
+    """Dagen slik stripa og statusene skriver den, og om den staar foran
+    klokkeslettet: «i kveld» og «i morgen» staar etter, og ukedagen innen en
+    uke, eller ukedagen og datoen, staar foran (story 8.19 og 9.27)."""
     dager = (dag - idag).days
     if dager == 0:
-        return f"nye kurser fra {kl} i kveld"
+        return "i kveld", False
     if dager == 1:
-        return f"nye kurser fra {kl} i morgen"
+        return "i morgen", False
     if dager < 7:
-        return f"nye kurser fra {ukedag(dag)} {kl}"
-    return f"nye kurser fra {ukedag(dag)} {dato(dag, idag.year)} {kl}"
+        return ukedag(dag), True
+    return f"{ukedag(dag)} {dato(dag, idag.year)}", True
+
+
+def oensket_hentes_tekst(naa: datetime) -> str:
+    """Story 9.27 (spoersmaal 3 i 9.25, gruppens svar 23.11 kl. 14:49): naar
+    hentingen tidligst tar et oenske fra siden, i statusene i «Dine egne
+    aksjer» og «Følg en aksje» og de andre stedene som sier naar en aksje
+    tas inn eller ut: «i kveld etter kl. 22» paa en boersdag, helt til
+    midnatt (svaret 23.11 kl. 22:25), og ellers neste boersdag, som «i morgen
+    etter kl. 22» en soendag eller «mandag etter kl. 22» en loerdag. Dagen
+    regnes i boersdag.neste_henting_av_oensket og skrives som i stripa.
+    Dekker kalenderen ikke dagen, staar bare klokkeslettet (NFR-08)."""
+    kl = grensen_som_tekst()
+    try:
+        dag = boersdag.neste_henting_av_oensket(naa)
+    except UtenforKalenderen:
+        return f"etter {kl}"
+    naar, _ = _dagen_som_tekst(dag, boersdag.norsk_dato(naa))
+    return f"{naar} etter {kl}"
