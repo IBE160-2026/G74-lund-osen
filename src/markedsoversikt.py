@@ -738,19 +738,18 @@ def _dagen_som_tekst(dag: date, idag: date) -> tuple[str, bool]:
     return f"{ukedag(dag)} {dato(dag, idag.year)}", True
 
 
-def oensket_hentes_tekst(kursdag: date | None, naa: datetime) -> str:
+def oensket_hentes_tekst(naa: datetime) -> str:
     """Story 9.27 (spoersmaal 3 i 9.25, gruppens svar 23.11 kl. 14:49): naar
     hentingen tidligst tar et oenske fra siden, i statusene i «Dine egne
-    aksjer» og «Følg en aksje»: «i kveld etter kl. 22», «i morgen etter
-    kl. 22» eller «mandag etter kl. 22». Dagen regnes i
-    boersdag.neste_henting_av_oensket og skrives som i stripa. Noe annet enn
-    en dato er som ingen kursdag. Dekker kalenderen ikke dagen, staar bare
-    klokkeslettet (NFR-08)."""
+    aksjer» og «Følg en aksje» og de andre stedene som sier naar en aksje
+    tas inn eller ut: «i kveld etter kl. 22» paa en boersdag, helt til
+    midnatt (svaret 23.11 kl. 22:25), og ellers neste boersdag, som «i morgen
+    etter kl. 22» en soendag eller «mandag etter kl. 22» en loerdag. Dagen
+    regnes i boersdag.neste_henting_av_oensket og skrives som i stripa.
+    Dekker kalenderen ikke dagen, staar bare klokkeslettet (NFR-08)."""
     kl = grensen_som_tekst()
-    if not isinstance(kursdag, date) or isinstance(kursdag, datetime):
-        kursdag = None
     try:
-        dag = boersdag.neste_henting_av_oensket(kursdag, naa)
+        dag = boersdag.neste_henting_av_oensket(naa)
     except UtenforKalenderen:
         return f"etter {kl}"
     naar, _ = _dagen_som_tekst(dag, boersdag.norsk_dato(naa))

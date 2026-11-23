@@ -306,15 +306,17 @@ app.jinja_env.filters["neste_henting"] = _neste_henting
 app.jinja_env.globals["tidsgrense"] = grensen_som_tekst
 
 
-def _oensket_hentes(kursdag: date | None) -> str:
-    """Story 9.27 (spørsmål 3 i 9.25, gruppens svar 23.11 kl. 14:49): når
-    hentingen tidligst tar et ønske, i statusene i «Dine egne aksjer» og
-    «Følg en aksje», regnet av kursdag_felles og klokka sidene bruker, som
-    linja i stripa. Demoen henter aldri, og boksen under statusen sier det,
-    så der står «i kveld» fast, og bildene er like fra dag til dag."""
+def _oensket_hentes() -> str:
+    """Story 9.27 (spørsmål 3 i 9.25, gruppens svar 23.11 kl. 14:49 og
+    22:25): når hentingen tidligst tar et ønske, i statusene i «Dine egne
+    aksjer» og «Følg en aksje», på aksjesiden, i merknaden i Min liste og i
+    «Er du sikker?», regnet av klokka sidene bruker. På en børsdag står «i
+    kveld» til midnatt, og ellers neste børsdag. Demoen henter aldri, og
+    boksen under statusen sier det, så der står «i kveld» fast, og bildene
+    er like fra dag til dag (svaret på spørsmål 3 i 9.27)."""
     if g.get("eksempeltall"):
         return f"i kveld etter {grensen_som_tekst()}"
-    return oensket_hentes_tekst(kursdag, naa())
+    return oensket_hentes_tekst(naa())
 
 
 app.jinja_env.globals["oensket_hentes"] = _oensket_hentes
@@ -1809,7 +1811,7 @@ def _alle_notatene(tidligere_dag: bool = False) -> list | None:
         if notat.symbol not in sett:
             sett.add(notat.symbol)
             if notat.symbol in fjernes:
-                merknad = f"{post.aksje.navn} fjernes fra lista ved hentingen i kveld og får ingen nye kurser, så et tenkt kjøp eller salg kan ikke noteres."
+                merknad = f"{post.aksje.navn} fjernes fra lista ved hentingen {_oensket_hentes()} og får ingen nye kurser, så et tenkt kjøp eller salg kan ikke noteres."
             elif post.ut is not None:
                 merknad = f"{post.aksje.navn} er tatt ut av lista, så et tenkt kjøp eller salg kan ikke noteres."
             elif not rader:

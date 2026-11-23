@@ -53,9 +53,9 @@
     {% if gammel %}
       <p class="bytte">Etter byttet er {{ valgt.navn }} en av de {{ egne.lista|length }}, og {{ gammel.navn }} hentes ikke lenger om kvelden. Det som alt er lagret for {{ gammel.navn }}, kursene og signalet dag for dag, blir liggende. Bytter du {{ gammel.navn }} inn igjen senere, mangler signalet for dagene den var ute.</p>
     {% else %}
-      <p class="kall">Aksjen hentes ved neste henting, tidligst {{ oensket_hentes(kursdag_felles) }}. Siste henting brukte {{ egne.kall.sist }} av {{ egne.kall.kvote }} kall. Med denne bruker neste henting {{ egne.kall.med_en }}, og {{ egne.kall.igjen_med_en }} er igjen til nye forsøk.</p>
+      <p class="kall">Aksjen hentes ved neste henting, tidligst {{ oensket_hentes() }}. Siste henting brukte {{ egne.kall.sist }} av {{ egne.kall.kvote }} kall. Med denne bruker neste henting {{ egne.kall.med_en }}, og {{ egne.kall.igjen_med_en }} er igjen til nye forsøk.</p>
     {% endif %}
-    <p>Valget lagres på denne maskinen og huskes neste gang. Fjerner du aksjen før kvelden, brukes ingen kall.</p>
+    <p>Valget lagres på denne maskinen og huskes neste gang. Fjerner du aksjen før hentingen {{ oensket_hentes() }}, brukes ingen kall.</p>
     <form class="folgskjema" method="post" action="/folg">
       <input type="hidden" name="kode" value="{{ valgt.kode }}">
       {% if gammel %}<input type="hidden" name="bytt" value="{{ gammel.symbol }}">{% endif %}
