@@ -127,6 +127,11 @@ lave.
 3. **«i kveld».** Statusene i «Dine egne aksjer» og «Følg en aksje» sier
    «i kveld etter kl. 22» også etter kveldsjobben, mens stripa regner dagen.
    *Forslag:* vent til etter brukertest 2.
+   *Svar 2026-11-23 kl. 14:49 (gruppens svar):* rettes nå. Rådet ville vente til
+   etter brukertest 2, men gruppen valgte nå. Statusene regner dagen som
+   stripa, i story 9.27 (PR #176). PR-en er ikke flettet: gjennomgangen ga fem
+   funn på middels som står som spørsmål 1 og 2 i
+   `spec-9-27-statusene-regner-dagen.md` på grenen (regel 25).
 
 ## Grenser
 
