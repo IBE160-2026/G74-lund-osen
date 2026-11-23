@@ -144,14 +144,63 @@ og 14 lave.
    kjøring samme kveld kan ta ønsket. Alternativet er «i kveld» til midnatt på
    en børsdag, som er feil når jobben er ferdig for kvelden. PR-en flettes
    ikke før gruppen har svart (regel 25).
+   *Svar 2026-11-23 kl. 22:25 (gruppens svar):* på en børsdag sier statusen
+   «i kveld» helt til midnatt, også etter første kjøring. Rådet anbefalte å
+   beholde «i morgen», som stripa; gruppen valgte «i kveld». ECH1 og VG1 er
+   lukket med det, se «Etter svarene 23.11 kl. 22:25».
 2. **De andre stedene som sier «i kveld» (AA1–AA5, middels og lav).**
    Aksjesiden, merknaden i Min liste og «Er du sikker?» sier «ved hentingen i
    kveld» om en aksje som fjernes, og «Følg en aksje» sier «før kvelden».
    Svaret gjaldt statusene i «Dine egne aksjer» og «Følg en aksje», så de er
    ikke rørt. *Forslag:* rett dem på samme måte i denne storyen, med hjelpen,
    før PR-en flettes.
+   *Svar 2026-11-23 kl. 22:25 (gruppens svar):* rettes i denne storyen, med
+   samme dagsregning, og hjelpen følger med. AA1–AA5 er rettet, se «Etter
+   svarene 23.11 kl. 22:25».
 3. **Demoen.** Der står «i kveld etter kl. 22» fast, fordi demoen ikke henter,
    og bildene ellers ville fulgt dagen de ble tatt. *Forslag:* behold.
+   *Svar 2026-11-23 kl. 22:25 (gruppens svar):* «i kveld» står fast i demoen,
+   som før.
+
+## Etter svarene 23.11 kl. 22:25
+
+Etter instruksjonen kl. 22:27 i `docs/ai-prompts/2026-11-23.md`. Det som står
+over om «i morgen» etter kveldsjobben, og om `kursdag` i
+`neste_henting_av_oensket`, gjaldt til svaret og står som historikk.
+
+1. **Dagen (svar 1).** `boersdag.neste_henting_av_oensket(naa)` gir i dag helt
+   til midnatt på en børsdag, uansett klokka og kursdagen, og neste børsdag en
+   dag børsen er stengt, som før. Kursdagen er ikke lenger et argument, så
+   `oensket_hentes_tekst(naa)` og `oensket_hentes()` i malene tar ingen
+   kursdag. Stripa er ikke endret, og sier fortsatt «i morgen» etter jobben.
+2. **De andre stedene (svar 2).** Aksjesiden (`aksje.html`), merknaden ved
+   notatene i Min liste (`app.py`), «Er du sikker?» (`bekreft_fjern.html`) og
+   «Fjerner du aksjen før hentingen …» i «Følg en aksje» (`folg.html`) bruker
+   `oensket_hentes`, så de sier samme dag og klokkeslett som statusen. I
+   demoen står «i kveld etter kl. 22» fast (svar 3).
+3. **Hjelpen.** `docs/hjelp.md` sier hva «i kveld» betyr, etter det koden
+   gjør, slått opp i `src/fetch_prices.py`, `src/valg.py` og
+   `start/kveldshenting.ps1`:
+   - Hver kjøring på børsdagen tar ønskene i bruk før den ser hva som mangler
+     (`ta_i_bruk_oenskene`), og jobben kjører hentingen også når dagen er
+     ferdig. Et ønske kl. 22:30 tas derfor inn kl. 22:45.
+   - Øyeblikksbildet for dagen finnes da alt, så aksjen som mangler kurs,
+     hentes av et nytt forsøk (`nytt_forsoek`, story 2.3b). Det bruker bare
+     kallene som er igjen av dagens, aldri bonuskvoten
+     (`kall_til_nye_forsoek`), og målingen av omsetningen (2.13) etter den
+     første kjøringen bruker dem som er igjen. Kvotesjekken 23.11 kl. 22:27
+     viste 20 av 20 brukt.
+   - Aksjen står derfor i lista uten kurser samme kveld, og hentingen neste
+     børsdag henter den. Hjelpen lover ikke kurser samme kveld.
+   - Et ønske etter kl. 23:45 tas først neste børsdag, selv om statusen sier
+     «i kveld» til midnatt. Det følger av svar 1, og hjelpen sier det.
+   Hentingen er ikke endret.
+4. **Testene.** `tests/test_statusene_9_27.py` er skrevet om etter svarene:
+   en børsdag kl. 21:59, 22:00, 23:00 og 23:59 og kl. 00:01 natt til neste
+   børsdag gir «i kveld», en fredag kl. 23 gir «i kveld», og en lørdag gir
+   «mandag». Tilfellene som låste «i morgen» etter kl. 22, sier nå «i kveld»,
+   med en linje om svaret. `TestDeAndreStedene` har en børsdag og en lørdag
+   for hvert av de andre stedene.
 
 ## Grenser
 
@@ -176,3 +225,12 @@ og 14 lave.
 - [x] Gjennomgangen er tatt; ECH1, VG1 og AA1–AA3 (middels) står åpne som spørsmål 1 og 2
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 454 bestått (kl. 15:40–15:41) og 3122 bestått og 7 hoppet over (kl. 15:41–15:55), på `65b78bbd`
 - [ ] CI er grønn i alle jobbene
+
+Etter svarene 23.11 kl. 22:25:
+
+- [ ] På en børsdag står «i kveld» til midnatt, også etter første kjøring (svar 1), og testen feilet mot `afa41456`
+- [ ] Aksjesiden, merknaden i Min liste, «Er du sikker?» og «Følg en aksje» sier samme dag som statusen (svar 2), og testen feilet før rettingen
+- [ ] Hjelpen sier hva «i kveld» betyr, etter det koden gjør
+- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [ ] Gjennomgangen etter svarene er tatt
+- [ ] CI er grønn i alle jobbene på den nye head-en
