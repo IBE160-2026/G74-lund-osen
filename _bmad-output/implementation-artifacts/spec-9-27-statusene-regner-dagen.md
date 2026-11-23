@@ -202,6 +202,45 @@ over om «i morgen» etter kveldsjobben, og om `kursdag` i
    med en linje om svaret. `TestDeAndreStedene` har en børsdag og en lørdag
    for hvert av de andre stedene.
 
+## Gjennomgangen etter svarene, 23.11
+
+Én leser, bare med lesing og uten git, på diffen `afa41456..456ee33e` og hele
+storyen mot main, i fire roller. Den kjørte ikke pytest. Påstandene i hjelpen
+og i punkt 3 over ble fulgt i koden og stemte, også at aksjen ikke tas ut
+neste børsdag: `valg.uten_rader` krever en rad i `vurdering` fra dagen den kom
+inn, og et nytt forsøk uten kall skriver ingen. 16 funn: 1 høy, 2 middels og
+13 lave. AA1 er slått opp i `src/app.py` og `src/hjelpetekster.py` etterpå.
+
+| Id | Grad | Funnet | Gjort |
+|---|---|---|---|
+| VG1 | høy | Avtrykkstestene i `tests/test_docker.py` vil feile, fordi malene og modulene bak bildene er endret | Rettet i steg 5: bildene tas på nytt, og avtrykkene regnes ut |
+| AA1 | middels | En aksje som tas inn av en senere kjøring uten kall, står som «Hentet. Står i tabellen over.» under «Dine egne aksjer», og «?» ved «Oppdatert» sier at EODHD ikke har gitt kurser og at appen slutter å følge den. Begge er feil her. Det fantes før 9.27, men «i kveld» til midnatt sier nå at ønsket tas den kvelden | Åpent: spørsmål 4. Hjelpen sier hva appen viser den kvelden, og at det ikke gjelder |
+| VG2 | middels | `test_aksjesiden` fant setningen i panelet «Mine notater», så en mal satt tilbake til «i kveld» ble bare fanget av den statiske testen | Rettet: testen leser siden uten panelet |
+| AA2 | lav | Etter et ønske tatt inn kl. 22:45 mangler dagen kursene for aksjen, så kjøringene etterpå starter Docker og Ollama og slutter med kode 1 | Rettet: hjelpen sier det under «Kan appen hente selv hver kveld?» |
+| BH2 | lav | Etter første kjøring stopper kursene for en aksje som fjernes, først fra neste børsdag, mens «Er du sikker?» sier «fra og med hentingen i kveld» | Rettet i hjelpen. Teksten på siden følger svar 1 og 2 |
+| AA3 | lav | Den daterte linja i `epics.md` nevnte ikke «Ville feilet hvis» og storyteksten | Rettet |
+| AA4 | lav | «Resultatet» viser til testen og kallet slik de het før svarene | Rettet: testen heter nå `test_ingen_mal_har_dagen_skrevet_inn`, og malene kaller `oensket_hentes()` |
+| AA5 | lav | `EXPERIENCE.md` og designutdraget 08.11 siterer tekstene slik de var | Står: en datert linje i `EXPERIENCE.md` ved føringen, og utdraget er historikk |
+| VG4 | lav | I demoen ble «Er du sikker?» aldri prøvd, fordi BRFE bare har et avsluttet kjøp | Rettet: KVST for «Er du sikker?», BRFE for aksjesiden |
+| VG5 | lav | `TestDagen` feiler før rettingen med `TypeError`, fordi kursdagen ikke lenger er et argument | Står: kontrollpunktet sier hvilke tester som viser oppførselen |
+| VG6 | lav | `UtenforKalenderen` fra `er_boersdag` var ikke prøvd | Rettet: ett tilfelle til |
+| VG3 | lav | `test_merknaden_i_min_liste` skiller ikke delen fra panelet | Står: begge kommer fra samme linje i `app.py` |
+| BH3 | lav | `fjernes_i_kveld` heter fortsatt det, også en lørdag | Står: bare navnet |
+| ECH4 | lav | Kjøringen kl. 23:45 tar ønsker til hentingen faktisk starter, og en henting for hånd før midnatt tar dem også | Står: hjelpen sier «Med jobben i Oppgaveplanlegging» |
+| BH1, ECH1–ECH3, AA6 | – | Ingen kallere sender kursdagen, `UtenforKalenderen` fanges, `g.eksempeltall` er satt, og hjelpen stemmer med koden | Ingen endring |
+
+## Spørsmål til gruppen etter svarene
+
+4. **En aksje tatt inn av en senere kjøring (AA1, middels).** Den står som
+   «Hentet. Står i tabellen over.», uten kurser, og «?» ved «Oppdatert» sier
+   at EODHD ikke har gitt kurser og at appen slutter å følge den. Ingen kall
+   er gjort, og den hentes neste børsdag. Det fantes før 9.27, og hentingen er
+   ikke endret. *Forslag:* en liten story der statusen sier «Tatt inn. Kursene
+   kommer ved hentingen neste børsdag.» når en egen aksje ikke har kurser og
+   ikke er forsøkt hentet, og der «?» ikke viser setningen om EODHD da.
+   Alternativet er å la det stå, med det hjelpen nå sier. PR-en flettes ikke
+   før gruppen har svart (regel 25).
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. `data/` og `_privat/` røres ikke, og den
