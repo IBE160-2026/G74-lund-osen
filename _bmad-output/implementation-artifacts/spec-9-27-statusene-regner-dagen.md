@@ -83,7 +83,7 @@ NFR-06, NFR-08; ingen ny migrasjon
 | Demoen: «i kveld» står fast | `e4265972` | `TestDemoen` |
 | Hjelpen: «Dagen i statusen regnes …» | `e4265972` | Ingen, hjelpen er levende |
 | Skjermsiden: en linje for 9.27, 143 storyer, og 101 uten bilde i vurderingsmatrisen | `0cf90bde` | `tests/test_skjermene_9_26.py` |
-| Avtrykkene bak de 20 bildene, regnet ut på nytt | denne commiten | `tests/test_docker.py` |
+| Avtrykkene bak de 20 bildene, regnet ut på nytt | `65b78bbd` | `tests/test_docker.py` |
 
 Testfila ble kjørt mot koden på `85300ee5`, før rettingen: 28 av de 35 testene
 feilet. De 7 som besto, var de tre tilfellene før kl. 22 på sidene, de tre i
@@ -167,12 +167,12 @@ og 14 lave.
 
 ## Kontroll
 
-- [ ] Statusene sier «i kveld» på en børsdag før kl. 22
-- [ ] Etter kveldsjobben sier de neste børsdag: «i morgen», eller ukedagen
-- [ ] En lørdag sier de «mandag», også når basen mangler fredagen
-- [ ] Klokkeslettet kommer fra `TIDSGRENSE`
-- [ ] Testen feilet før rettingen
-- [ ] Bildene som endrer seg, avtrykkene og bildegrenen følger med
-- [ ] Gjennomgangen er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Statusene sier «i kveld» på en børsdag før kl. 22
+- [x] Etter kveldsjobben sier de neste børsdag: «i morgen», eller ukedagen
+- [x] En lørdag sier de «mandag», også når basen mangler fredagen
+- [x] Klokkeslettet kommer fra `TIDSGRENSE`
+- [x] Testen feilet før rettingen
+- [x] Bildene er tatt på nytt og er de samme, og avtrykkene følger med; ingen bildegren, fordi ingen bilder er byttet
+- [x] Gjennomgangen er tatt; ECH1, VG1 og AA1–AA3 (middels) står åpne som spørsmål 1 og 2
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 454 bestått (kl. 15:40–15:41) og 3122 bestått og 7 hoppet over (kl. 15:41–15:55), på `65b78bbd`
 - [ ] CI er grønn i alle jobbene
