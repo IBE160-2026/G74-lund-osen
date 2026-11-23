@@ -119,6 +119,11 @@ lave.
    børsometeret og «lista» om Min liste i ett svar. Svarene på E1 og E5 gjaldt
    siden, omvisningen og ordlista. *Forslag:* rett hjelpen på samme måte, fordi
    den er levende og leses i brukertest 2.
+   *Svar 2026-11-23 kl. 14:49 (gruppens svar, rådet anbefalte det):* hjelpen
+   rettes. Den sier «tickeren» der den sa «symbolet» om ticker, fire steder i
+   «Hva viser børsometeret?», og «Min liste» der «lista» betydde Min liste, ett
+   sted i «Hva er demoen?». «Symbolet» om bransjesymbolet står, to steder.
+   Appen viser ikke filene i `docs/`, så ingen tester eller bilder følger med.
 3. **«i kveld».** Statusene i «Dine egne aksjer» og «Følg en aksje» sier
    «i kveld etter kl. 22» også etter kveldsjobben, mens stripa regner dagen.
    *Forslag:* vent til etter brukertest 2.
