@@ -2,7 +2,7 @@
 title: 'Story 9.27: statusene i «Dine egne aksjer» og «Følg en aksje» regner dagen'
 type: 'code'
 created: '2026-11-23'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '042d922a'
 context:
@@ -268,7 +268,7 @@ inn, og et nytt forsøk uten kall skriver ingen. 16 funn: 1 høy, 2 middels og
 - [x] Bildene er tatt på nytt og er de samme, og avtrykkene følger med; ingen bildegren, fordi ingen bilder er byttet
 - [x] Gjennomgangen er tatt; ECH1, VG1 og AA1–AA3 (middels) står åpne som spørsmål 1 og 2
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 454 bestått (kl. 15:40–15:41) og 3122 bestått og 7 hoppet over (kl. 15:41–15:55), på `65b78bbd`
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 45199610386, på `afa41456`, før svarene)
 
 Etter svarene 23.11 kl. 22:25:
 
@@ -278,4 +278,10 @@ Etter svarene 23.11 kl. 22:25:
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 610 bestått (23.11 kl. 23:52–23:54) og 3164 bestått og 7 hoppet over (kl. 23:54–00:14), på `4c51a935`
 - [x] Alle de 20 bildene er tatt på nytt i demoen på port 8927 (23.11 kl. 22:49–22:52) og er byte for byte de samme, og avtrykkene er regnet ut på nytt (`4c51a935`)
 - [x] Gjennomgangen etter svarene er tatt. Ingen funn på middels eller høy grad står åpne: AA1 er flyttet til story 9.28 (svaret 23.11 kl. 23:27)
-- [ ] CI er grønn i alle jobbene på den nye head-en
+- [x] CI er grønn i alle jobbene på den nye head-en (run 45287053341, på `fa6b59b7`)
+
+## Flettet 24.11
+
+PR #176 er squash-flettet i `93b26f50` 24.11 kl. 00:22, låst til head-en `fa6b59b7`, etter instruksjonene 23.11 kl. 22:27 og 23:29, uten nytt ja, etter pausene om kvelden. CI var grønn i alle fire jobbene (run 45287053341), med 6192 bestått og 99 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne: AA1 fra gjennomgangen etter svarene er flyttet til story 9.28.
+
+*Rettet 2026-11-24:* gjennomgangen etter svarene hadde 14 funn, 1 høy, 2 middels og 11 lave, ikke 16. Raden med BH1, ECH1–ECH3 og AA6 er det som ble sjekket uten funn. I gjennomgangen 23.11 før svarene ble 5 lave rettet og 9 sto, ikke 4 og 10, slik PR-en og Utført-linja kl. 16:20 sa; tabellen var riktig.

@@ -5666,3 +5666,5 @@ Som **bruker i brukertest 2** vil jeg at statusen ved en aksje jeg har valgt ell
 **Avhenger av:** 9.25. **Én økt:** ja.
 
 *Lagt til 2026-11-23 (gruppens svar kl. 22:25 på spørsmålene i spesifikasjonen):* på en børsdag sier statusene «i kveld» helt til midnatt, også etter første kjøring av kveldsjobben, fordi en senere kjøring samme kveld tar ønsket. Rådet anbefalte «i morgen», som stripa; gruppen valgte «i kveld». Det andre punktet i kontrollen over, «Ville feilet hvis» og «etter at kveldens henting er ferdig» i storyen gjaldt til svaret. Aksjesiden, merknaden i Min liste, «Er du sikker?» og «Fjerner du aksjen før hentingen …» i «Følg en aksje» sier samme dag som statusen, og hjelpen følger med. I demoen står «i kveld» fast, som før.
+
+*Lagt til 2026-11-24:* 9.27 er flettet. PR #176 er squash-flettet i `93b26f50` kl. 00:22, låst til head-en `fa6b59b7`, uten nytt ja. CI var grønn i alle fire jobbene (run 45287053341), med 6192 bestått og 99 hoppet over i jobben `pytest`. AA1 fra gjennomgangen etter svarene, en aksje som tas inn av en senere kjøring og står som «Hentet» uten kurser, er flyttet til story 9.28 (gruppens svar 23.11 kl. 23:27).
