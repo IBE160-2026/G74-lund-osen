@@ -21,7 +21,7 @@ import demo
 import ferdige_lister
 import lagring_sqlite
 from test_fetch_prices import OEYEBLIKK_22_09, kjoer_23
-from test_notater import _kjoepsknapp
+from test_notater import _kjoepsknapp, _uten_panelet
 from test_valg import FASTE, med_boersen
 
 ROT = Path(__file__).resolve().parent.parent
@@ -116,6 +116,9 @@ class TestDagen:
 
         monkeypatch.setattr(boersdag, "dekker", lambda aar: aar == 2026)
         assert oensket_hentes_tekst(kl(12, 31, 12)) == "etter kl. 22"
+        # Gjennomgangen etter svarene (VG6): også når dagen selv ligger utenfor.
+        monkeypatch.setattr(boersdag, "dekker", lambda aar: aar == 2027)
+        assert oensket_hentes_tekst(kl(11, 12, 15)) == "etter kl. 22"
 
     def test_stripa_sier_det_samme_som_foer(self):
         """Stripa og statusene deler funksjonen som skriver dagen, men ikke
@@ -238,7 +241,9 @@ class TestDeAndreStedene:
         _klokka(monkeypatch, naa)
         assert klient.post("/aksje/DNB/notat", data={"dag": "2026-09-22", "tekst": "x"}).status_code == 303
         assert klient.post("/fjern", data={"symbol": "DNB"}).status_code == 303
-        side = _synlig(klient.get("/aksje/DNB").data.decode("utf-8"))
+        # Gjennomgangen etter svarene (VG2): uten panelet «Mine notater», som
+        # har den samme setningen fra merknaden i app.py.
+        side = _synlig(_uten_panelet(klient.get("/aksje/DNB").data.decode("utf-8")))
         assert f"fjernes fra lista ved hentingen {naar} og får ingen nye kurser" in side
 
     @TO_TIDER
@@ -288,9 +293,13 @@ class TestDemoen:
         assert klient.post("/folg", data={"kode": "SKRH", "sektor": "Helse"}).status_code == 303
         side = _synlig(klient.get("/").data.decode("utf-8"))
         assert "Venter på henting i kveld etter kl. 22." in side and "Demoen henter ingenting" in side
-        # En aksje som fjernes (AA1 og AA3): «Er du sikker?» når aksjen har
-        # et åpent tenkt kjøp, og ellers aksjesiden.
-        svar = klient.post("/fjern", data={"symbol": "BRFE", "tilbake": "oversikten"})
-        if svar.status_code != 200:
-            svar = klient.get("/aksje/BRFE")
-        assert "hentingen i kveld etter kl. 22" in _synlig(svar.data.decode("utf-8"))
+        # En aksje som fjernes, på aksjesiden (AA1). BRFE har bare et avsluttet
+        # tenkt kjøp i demoen, så den fjernes uten spørsmål.
+        assert klient.post("/fjern", data={"symbol": "BRFE", "tilbake": "oversikten"}).status_code == 303
+        aksjen = _synlig(_uten_panelet(klient.get("/aksje/BRFE").data.decode("utf-8")))
+        assert "fjernes fra lista ved hentingen i kveld etter kl. 22 og får ingen nye kurser" in aksjen
+        # «Er du sikker?» (AA3). KVST har et åpent tenkt kjøp i demoen
+        # (gjennomgangen etter svarene, VG4).
+        svar = klient.post("/fjern", data={"symbol": "KVST", "tilbake": "oversikten"})
+        assert svar.status_code == 200
+        assert "fra og med hentingen i kveld etter kl. 22. Endringen" in _synlig(svar.data.decode("utf-8"))
