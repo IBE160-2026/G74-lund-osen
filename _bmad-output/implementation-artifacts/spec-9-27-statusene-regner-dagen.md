@@ -73,6 +73,79 @@ NFR-06, NFR-08; ingen ny migrasjon
    `tests/test_skjermene_9_26.py` låser siden mot `epics.md`, og tallene i
    vurderingsmatrisen følger.
 
+## Resultatet
+
+| Del | Commit | Testen |
+|---|---|---|
+| Dagen: `boersdag.neste_henting_av_oensket` | `e4265972` | `TestDagen` |
+| Teksten: `oensket_hentes_tekst` og `_dagen_som_tekst`, som stripa også bruker | `e4265972` | `TestDagen`, og `tests/test_neste_henting.py` for stripa |
+| Malene: `{{ oensket_hentes(kursdag_felles) }}` fire steder, med `_oensket_hentes` i `app.py` | `e4265972` | `TestSidene` og `test_ingen_mal_sier_i_kveld_om_hentingen_etter_grensen` |
+| Demoen: «i kveld» står fast | `e4265972` | `TestDemoen` |
+| Hjelpen: «Dagen i statusen regnes …» | `e4265972` | Ingen, hjelpen er levende |
+| Skjermsiden: en linje for 9.27, 143 storyer, og 101 uten bilde i vurderingsmatrisen | `0cf90bde` | `tests/test_skjermene_9_26.py` |
+
+Testfila ble kjørt mot koden på `85300ee5`, før rettingen: 28 av de 35 testene
+feilet. De 7 som besto, var de tre tilfellene før kl. 22 på sidene, de tre i
+demoen og testen for stripa, som alle skal si det samme før og etter. Etter
+rettingen besto alle 35. De tre tilfellene som kom etter gjennomgangen (VG2 og
+VG4), er ikke kjørt mot koden før rettingen.
+
+**Bildene.** Ingen bilder i `docs/appen/` endrer seg, så ingen er tatt på
+nytt, og storyen har ingen bildegren. Sidene i demoen ble hentet med appens
+testklient mot en midlertidig demobase, på main (`042d922a`) og på grenen
+(`e4265972`): `/`, `/min-liste`, `/boersometer`, `/folg`, `/folg?kode=HVLK`,
+`/aksje/BRFE` og `/innstillinger`, med klokka på en tirsdag og en lørdag, og
+`/` og `/min-liste` etter et valg. Alle var like byte for byte. Demoen ble
+ikke startet på en port.
+
+## Gjennomgangen 23.11
+
+Én leser, bare med lesing, på `042d922a..0cf90bde`, i fire roller: Blind
+Hunter, Edge Case Hunter, Acceptance Auditor og Verification Gap. Den kjørte
+ikke pytest. ECH1 og AA1–AA5 er slått opp i koden etterpå. 19 funn: 5 middels
+og 14 lave.
+
+| Id | Grad | Funnet | Gjort |
+|---|---|---|---|
+| ECH1 | middels | Etter første kjøring av kveldsjobben sier statusen «i morgen», men kjøringene kl. 22:45, 23:15 og 23:45 tar et nytt ønske i bruk samme kveld: `fetch_prices.py` tar ønskene i bruk i hver kjøring på børsdagen, og `start/kveldshenting.ps1` kjører hentingen også når dagen er ferdig | Åpent: spørsmål 1. Følger av svaret, så det står til gruppen har svart (regel 25) |
+| VG1 | middels | Testen låser «i morgen» kl. 23 uten å si noe om kjøringene etterpå | Åpent: følger ECH1 og spørsmål 1 |
+| AA1 | middels | Aksjesiden sier «fjernes fra lista ved hentingen i kveld» (`aksje.html`), som nå kan motsi statusen | Åpent: spørsmål 2 |
+| AA2 | middels | Samme setning i Min liste, bygget i `app.py` | Åpent: spørsmål 2 |
+| AA3 | middels | «Er du sikker?» sier «fra og med hentingen i kveld» (`bekreft_fjern.html`) | Åpent: spørsmål 2 |
+| AA4 | lav | `docs/hjelp.md` siterer setningene i AA1–AA3 med «i kveld» | Står: følger spørsmål 2 |
+| AA5 | lav | «Fjerner du aksjen før kvelden, brukes ingen kall.» står under «tidligst mandag …» en lørdag (`folg.html`) | Står: følger spørsmål 2. Setningen vises også i demoen |
+| AA6 | lav | Spesifikasjonen viste til et spørsmål som ikke fantes | Rettet: «Spørsmål til gruppen» under |
+| AA7 | lav | `updated` i `docs/skjermene.md` var ikke satt | Rettet, fra `date` |
+| AA8 | lav | Tallet 100 var endret til 101 i en eldre datert linje i vurderingsmatrisen | Rettet: linja sier 100 som før, og Rettet-linja sier «De 101 andre» |
+| AA9 | lav | `EXPERIENCE.md` siterer statusen med «i kveld» | Står: en datert linje ved føringen på main |
+| ECH2 | lav | Kan `kursdag_felles` ikke leses, er den `None`, og statusen sier «i kveld» som ved en tom base | Står: linja i stripa faller bort på samme måte |
+| ECH3 | lav | En henting før kl. 22 med `--uten-tidskontroll` tar ønskene i bruk med en gang | Står: statusen sier «tidligst» om den vanlige hentingen |
+| ECH4 | lav | Mangler én aksje i lista dagens kurs, sier statusen «i kveld» til midnatt | Står: en ny kjøring samme kveld tar ønsket, som stripa sier «kan hentes nå» |
+| VG2 | lav | Grensen på minuttet var ikke prøvd | Rettet: kl. 22:00 gir «i morgen» |
+| VG4 | lav | Klokka i UTC var ikke prøvd i `TestDagen` | Rettet: to tilfeller i UTC |
+| VG3 | lav | Bare lørdagen skiller demoen som står fast, fra en demo som regner | Står: lørdagen fanger det |
+| VG5 | lav | Grensen ved 7 dager er bare prøvd med 12 | Står: fantes fra før, i stripa |
+| VG6 | lav | Ingen sidetest med en tom base | Står: `TestDagen` har tilfellene uten kursdag |
+
+## Spørsmål til gruppen
+
+1. **Et ønske etter første kjøring samme kveld (ECH1, middels).** Jobben går
+   kl. 22:15, og igjen kl. 22:45, 23:15 og 23:45. Et ønske om å følge en aksje
+   kl. 22:30 tas inn kl. 22:45 samme kveld, mens statusen nå sier «Venter på
+   henting i morgen etter kl. 22.» Siden vet ikke om jobben går igjen.
+   *Forslag:* behold «i morgen», som stripa, og la hjelpen si at en senere
+   kjøring samme kveld kan ta ønsket. Alternativet er «i kveld» til midnatt på
+   en børsdag, som er feil når jobben er ferdig for kvelden. PR-en flettes
+   ikke før gruppen har svart (regel 25).
+2. **De andre stedene som sier «i kveld» (AA1–AA5, middels og lav).**
+   Aksjesiden, merknaden i Min liste og «Er du sikker?» sier «ved hentingen i
+   kveld» om en aksje som fjernes, og «Følg en aksje» sier «før kvelden».
+   Svaret gjaldt statusene i «Dine egne aksjer» og «Følg en aksje», så de er
+   ikke rørt. *Forslag:* rett dem på samme måte i denne storyen, med hjelpen,
+   før PR-en flettes.
+3. **Demoen.** Der står «i kveld etter kl. 22» fast, fordi demoen ikke henter,
+   og bildene ellers ville fulgt dagen de ble tatt. *Forslag:* behold.
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. `data/` og `_privat/` røres ikke, og den
