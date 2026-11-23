@@ -272,9 +272,10 @@ inn, og et nytt forsøk uten kall skriver ingen. 16 funn: 1 høy, 2 middels og
 
 Etter svarene 23.11 kl. 22:25:
 
-- [ ] På en børsdag står «i kveld» til midnatt, også etter første kjøring (svar 1), og testen feilet mot `afa41456`
-- [ ] Aksjesiden, merknaden i Min liste, «Er du sikker?» og «Følg en aksje» sier samme dag som statusen (svar 2), og testen feilet før rettingen
-- [ ] Hjelpen sier hva «i kveld» betyr, etter det koden gjør
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
-- [ ] Gjennomgangen etter svarene er tatt
+- [x] På en børsdag står «i kveld» til midnatt, også etter første kjøring (svar 1). Testfila feilet mot koden på `afa41456`, med 34 av 42 (23.11 kl. 23:51), og besto etter rettingen. `TestDagen` feilet der med `TypeError`, fordi kursdagen ikke lenger er et argument, så oppførselen før rettingen vises av `TestSidene`, `TestDeAndreStedene`, `TestDemoen` og den statiske testen (VG5)
+- [x] Aksjesiden, merknaden i Min liste, «Er du sikker?» og «Følg en aksje» sier samme dag som statusen (svar 2), og testen feilet før rettingen
+- [x] Hjelpen sier hva «i kveld» betyr, etter det koden gjør
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 610 bestått (23.11 kl. 23:52–23:54) og 3164 bestått og 7 hoppet over (kl. 23:54–00:14), på `4c51a935`
+- [x] Alle de 20 bildene er tatt på nytt i demoen på port 8927 (23.11 kl. 22:49–22:52) og er byte for byte de samme, og avtrykkene er regnet ut på nytt (`4c51a935`)
+- [x] Gjennomgangen etter svarene er tatt. Ingen funn på middels eller høy grad står åpne: AA1 er flyttet til story 9.28 (svaret 23.11 kl. 23:27)
 - [ ] CI er grønn i alle jobbene på den nye head-en
