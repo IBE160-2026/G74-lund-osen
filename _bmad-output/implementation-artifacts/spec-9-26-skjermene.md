@@ -133,8 +133,12 @@ lave. 53 er rettet, og 2 lave står.
 1. **Like bilder.** Der to storyer ville vist det samme, står bildet under den
    ene, og den andre viser til det. *Forslag:* behold, så siden ikke viser det
    samme bildet to ganger.
+   *Svar 2026-11-23 kl. 14:49 (gruppens svar, rådet anbefalte det):* står. Like
+   bilder står under én story.
 2. **Avtrykk.** Bildene har ikke avtrykk, og siden er et bilde av appen på
    `c0192467`. *Forslag:* behold. Siden tas på nytt når gruppen vil.
+   *Svar 2026-11-23 kl. 14:49 (gruppens svar, rådet anbefalte det):* står.
+   Bildene har ikke avtrykk.
 
 ## Grenser
 

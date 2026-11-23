@@ -113,6 +113,8 @@ lave.
 
 1. **Ordlista har 13 ord.** Faglærer foreslo 8–10, og svaret 18.11 kl. 11:49
    holdt 12. *Forslag:* behold «Ticker», fordi E5 gjelder ordet brukeren ser.
+   *Svar 2026-11-23 kl. 14:49 (gruppens svar, rådet anbefalte det):* ordlista
+   beholder «Ticker» og har 13 ord.
 2. **`docs/hjelp.md`.** Hjelpen sier «symbolet» om ticker på rutene i
    børsometeret og «lista» om Min liste i ett svar. Svarene på E1 og E5 gjaldt
    siden, omvisningen og ordlista. *Forslag:* rett hjelpen på samme måte, fordi
