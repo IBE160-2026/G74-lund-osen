@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-23T15:13
+updated: 2026-11-23T15:19
 ---
 
 # Vurderingsmatrise for del 1
@@ -68,7 +68,7 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 
 *Rettet 2026-11-22 (gruppens svar kl. 18:23, rådet anbefalte det; E7 i UX-dokumentene):* linja «Lagt til 2026-11-17 (story 9.17)» over sier 17 funn og U114–U130. [Den heuristiske evalueringen](heuristisk-evaluering.md) har 18 funn, 13 fra evalueringen og 5 fra gruppen som evaluerer nr. 2, fordi HE18 kom til 17.11 kl. 13:32. De nye funnene står som U114–U131 i [UX-loggen](ux-logg.md).
 
-*Lagt til 2026-11-22 (story 9.26, gruppens svar kl. 19:05):* «Design og brukeropplevelse» har nå en side med skjermene i appen, ordnet etter epic og story: [skjermene](skjermene.md). Den har 53 bilder fra demoen, 1280 px brede, ett eller to for hver av de 42 storyene med bilde, med det kontrollen sjekket under hvert bilde og lenke til spesifikasjonen. De 101 andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Statusen i tabellen er ikke endret. *Rettet 2026-11-23 (story 9.27):* 101 andre, ikke 100, etter at 9.27 kom til uten bilde.
+*Lagt til 2026-11-22 (story 9.26, gruppens svar kl. 19:05):* «Design og brukeropplevelse» har nå en side med skjermene i appen, ordnet etter epic og story: [skjermene](skjermene.md). Den har 53 bilder fra demoen, 1280 px brede, ett eller to for hver av de 42 storyene med bilde, med det kontrollen sjekket under hvert bilde og lenke til spesifikasjonen. De 100 andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Statusen i tabellen er ikke endret. *Rettet 2026-11-23 (story 9.27):* De 101 andre, ikke 100, etter at 9.27 kom til uten bilde.
 
 ## Status 07.11.2026
 

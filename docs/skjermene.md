@@ -2,7 +2,7 @@
 title: "Skjermene i OSE Signal"
 status: aktiv
 created: 2026-11-22
-updated: 2026-11-22T22:09
+updated: 2026-11-23T15:19
 ---
 
 # Skjermene i OSE Signal
