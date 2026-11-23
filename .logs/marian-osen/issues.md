@@ -395,8 +395,13 @@
 - [x] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — spørsmål 2 i 9.25: `docs/hjelp.md` sier «symbolet» om ticker i børsometeret og «lista» om Min liste i ett svar (løst 2026-11-23: hjelpen er rettet, fire steder med «tickeren» og ett med «Min liste»)
   - *Svart 2026-11-23 kl. 14:49 (rådet anbefalte det):* `docs/hjelp.md` sier «ticker» der den sa «symbolet» om ticker, og «Min liste» der «lista» betydde Min liste, slik appen og ordlista gjør etter 9.25. Appen viser ikke filene i `docs/`, så ingen tester eller bilder følger med.
 - [ ] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — spørsmål 3 i 9.25: statusene sier «i kveld etter kl. 22» også etter kveldsjobben, mens stripa regner dagen
+  - *Svart 2026-11-23 kl. 14:49:* rettes nå, i story 9.27 (PR #176). Rådet ville vente til etter brukertest 2. Punktet står til PR-en er flettet.
 - [x] 2026-11-22 [ux-dokumentene-9-24](904-2026-11-22-16-45-52-ux-dokumentene-9-24.md) — instruksjonen kl. 19:06 om skjermsiden (`docs/skjermene.md`) venter til 9.25 er ført og pushet (løst 2026-11-23: tatt kl. 21:18 som story 9.26, flettet i `16b74c35`)
 - [x] 2026-11-23 [skjermene-9-26](903-2026-11-23-00-23-27-skjermene-9-26.md) — spørsmål 1 i 9.26: like bilder står under én story, og den andre viser til det (forslag: behold) (løst 2026-11-23: står)
   - *Svart 2026-11-23 kl. 14:49 (rådet anbefalte det):* står. Like bilder står under én story.
 - [x] 2026-11-23 [skjermene-9-26](903-2026-11-23-00-23-27-skjermene-9-26.md) — spørsmål 2 i 9.26: bildene i `docs/skjermene/` har ikke avtrykk, og siden er et bilde av appen på `c0192467` (forslag: behold) (løst 2026-11-23: står)
   - *Svart 2026-11-23 kl. 14:49 (rådet anbefalte det):* står. Bildene har ikke avtrykk.
+- [ ] 2026-11-23 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — spørsmål 1 i 9.27 (ECH1, middels): et ønske etter første kjøring av kveldsjobben tas inn av en senere kjøring samme kveld, mens statusen sier «i morgen» (forslag: behold, og si det i hjelpen). PR #176 flettes ikke før svaret (regel 25)
+- [ ] 2026-11-23 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — spørsmål 2 i 9.27 (AA1–AA5, middels og lav): aksjesiden, merknaden i Min liste og «Er du sikker?» sier fortsatt «ved hentingen i kveld», og «Følg en aksje» sier «før kvelden» (forslag: rett dem i samme story før flettingen)
+- [ ] 2026-11-23 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — spørsmål 3 i 9.27: i demoen står «i kveld etter kl. 22» fast (forslag: behold)
+- [ ] 2026-11-23 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — føringen av 9.27 på main etter flettingen av PR #176, med en datert linje i `EXPERIENCE.md` (AA9)
