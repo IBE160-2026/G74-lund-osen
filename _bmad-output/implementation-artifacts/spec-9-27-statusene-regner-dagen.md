@@ -83,6 +83,7 @@ NFR-06, NFR-08; ingen ny migrasjon
 | Demoen: «i kveld» står fast | `e4265972` | `TestDemoen` |
 | Hjelpen: «Dagen i statusen regnes …» | `e4265972` | Ingen, hjelpen er levende |
 | Skjermsiden: en linje for 9.27, 143 storyer, og 101 uten bilde i vurderingsmatrisen | `0cf90bde` | `tests/test_skjermene_9_26.py` |
+| Avtrykkene bak de 20 bildene, regnet ut på nytt | denne commiten | `tests/test_docker.py` |
 
 Testfila ble kjørt mot koden på `85300ee5`, før rettingen: 28 av de 35 testene
 feilet. De 7 som besto, var de tre tilfellene før kl. 22 på sidene, de tre i
@@ -90,8 +91,14 @@ demoen og testen for stripa, som alle skal si det samme før og etter. Etter
 rettingen besto alle 35. De tre tilfellene som kom etter gjennomgangen (VG2 og
 VG4), er ikke kjørt mot koden før rettingen.
 
-**Bildene.** Ingen bilder i `docs/appen/` endrer seg, så ingen er tatt på
-nytt, og storyen har ingen bildegren. Sidene i demoen ble hentet med appens
+**Bildene.** Ingen bilder i `docs/appen/` endrer seg, så ingen er byttet, og
+storyen har ingen bildegren. Avtrykkene bak bildene endret seg, fordi
+`_egne.html`, `folg.html`, `app.py`, `boersdag.py` og `markedsoversikt.py` er
+endret, og `--dokumentene` feilet på de fire avtrykkstestene. Alle de 20
+bildene ble derfor tatt på nytt i demoen på grenen 23.11 kl. 15:38–15:40 (filtidene), på port
+8927 med en demobase i en midlertidig mappe, med skriptet og jobblista fra
+9.25, én gang, og var byte for byte like dem i `docs/appen/`. Avtrykkene i
+`tests/test_docker.py` er regnet ut på nytt. Før det ble sidene i demoen hentet med appens
 testklient mot en midlertidig demobase, på main (`042d922a`) og på grenen
 (`e4265972`): `/`, `/min-liste`, `/boersometer`, `/folg`, `/folg?kode=HVLK`,
 `/aksje/BRFE` og `/innstillinger`, med klokka på en tirsdag og en lørdag, og
