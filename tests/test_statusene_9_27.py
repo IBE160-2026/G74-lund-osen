@@ -55,6 +55,12 @@ class TestDagen:
             (ONSDAG, kl(11, 12, 22, 5), TORSDAG, "i kveld etter kl. 22"),
             # Etter jobben: dagen er i basen.
             (TORSDAG, kl(11, 12, 23), FREDAG, "i morgen etter kl. 22"),
+            # Paa minuttet: kl. 22:00 er ikke foer grensen (gjennomgangen, VG2).
+            (TORSDAG, kl(11, 12, 22, 0), FREDAG, "i morgen etter kl. 22"),
+            # Klokka i UTC, som appen gir den: 21:30 UTC er 22:30 i Oslo om
+            # vinteren (gjennomgangen, VG4).
+            (TORSDAG, datetime(2026, 11, 12, 21, 30, tzinfo=timezone.utc), FREDAG, "i morgen etter kl. 22"),
+            (ONSDAG, datetime(2026, 11, 12, 20, 30, tzinfo=timezone.utc), TORSDAG, "i kveld etter kl. 22"),
             # Fredag etter jobben: helgen hoppes over.
             (FREDAG, kl(11, 13, 23), d(11, 16), "mandag etter kl. 22"),
             # En lørdag, med fredagen i basen.
