@@ -142,6 +142,7 @@ from markedsoversikt import (
     neste_henting_tekst,
     neste_orden,
     norsk_tid,
+    oensket_hentes_tekst,
     oppdatert,
     periodeendring,
     rader_som_venter,
@@ -303,6 +304,20 @@ app.jinja_env.filters["neste_henting"] = _neste_henting
 # Story 9.25 (E2, gruppens svar 22.11 kl. 18:23): «kl. 22» i malene regnes
 # av TIDSGRENSE ved hver visning, som i stripa, og står ikke skrevet inn.
 app.jinja_env.globals["tidsgrense"] = grensen_som_tekst
+
+
+def _oensket_hentes(kursdag: date | None) -> str:
+    """Story 9.27 (spørsmål 3 i 9.25, gruppens svar 23.11 kl. 14:49): når
+    hentingen tidligst tar et ønske, i statusene i «Dine egne aksjer» og
+    «Følg en aksje», regnet av kursdag_felles og klokka sidene bruker, som
+    linja i stripa. Demoen henter aldri, og boksen under statusen sier det,
+    så der står «i kveld» fast, og bildene er like fra dag til dag."""
+    if g.get("eksempeltall"):
+        return f"i kveld etter {grensen_som_tekst()}"
+    return oensket_hentes_tekst(kursdag, naa())
+
+
+app.jinja_env.globals["oensket_hentes"] = _oensket_hentes
 
 
 def naa() -> datetime:

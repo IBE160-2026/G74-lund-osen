@@ -29,8 +29,8 @@
         <td class="selskap">{{ rad.navn }} <span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}<span class="skjult">, </span><span class="linje">{{ rad.symbol }} · {{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</span></td>
         <td class="status">
         {%- if rad.status == "hentet" %} <span class="statustekst">Hentet. Står i tabellen over.</span>
-        {%- elif rad.status == "venter" %} <span class="statustekst">Venter på henting i kveld etter {{ tidsgrense() }}.</span>
-        {%- else %} <span class="statustekst">Fjernes ved hentingen i kveld etter {{ tidsgrense() }}.</span>{% endif %}</td>
+        {%- elif rad.status == "venter" %} <span class="statustekst">Venter på henting {{ oensket_hentes(kursdag_felles) }}.</span>
+        {%- else %} <span class="statustekst">Fjernes ved hentingen {{ oensket_hentes(kursdag_felles) }}.</span>{% endif %}</td>
         <td class="valg">
         {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Fjern</button></form>
         {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Angre</button></form>{% endif -%}
@@ -148,7 +148,7 @@
         {% for aksje in aksjene %}
         <li><span class="selskapet"><a class="navn" href="/aksje/{{ aksje.symbol }}">{{ aksje.navn }}</a><span class="linje">{{ aksje.symbol }}</span></span>
           {% if aksje.symbol in egne.egne_symboler %}<span class="egenmerke">Egen</span>{% endif %}{% if aksje.symbol in egne.utenfor %}<span class="utenformerke">Utenfor målingen</span>{% endif %}
-          {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen i kveld etter {{ tidsgrense() }}.</span>{% else %}<a class="knapp liten" href="/folg?bytt={{ aksje.symbol }}" aria-label="Bytt ut {{ aksje.navn }}">Bytt ut</a>{% endif %}</li>
+          {% if aksje.symbol in egne.fjernes %}<span class="status">Fjernes ved hentingen {{ oensket_hentes(kursdag_felles) }}.</span>{% else %}<a class="knapp liten" href="/folg?bytt={{ aksje.symbol }}" aria-label="Bytt ut {{ aksje.navn }}">Bytt ut</a>{% endif %}</li>
         {% endfor %}
       </ul>
     </section>
