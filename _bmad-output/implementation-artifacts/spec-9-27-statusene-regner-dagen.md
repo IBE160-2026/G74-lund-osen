@@ -214,7 +214,7 @@ inn, og et nytt forsøk uten kall skriver ingen. 16 funn: 1 høy, 2 middels og
 | Id | Grad | Funnet | Gjort |
 |---|---|---|---|
 | VG1 | høy | Avtrykkstestene i `tests/test_docker.py` vil feile, fordi malene og modulene bak bildene er endret | Rettet i steg 5: bildene tas på nytt, og avtrykkene regnes ut |
-| AA1 | middels | En aksje som tas inn av en senere kjøring uten kall, står som «Hentet. Står i tabellen over.» under «Dine egne aksjer», og «?» ved «Oppdatert» sier at EODHD ikke har gitt kurser og at appen slutter å følge den. Begge er feil her. Det fantes før 9.27, men «i kveld» til midnatt sier nå at ønsket tas den kvelden | Åpent: spørsmål 4. Hjelpen sier hva appen viser den kvelden, og at det ikke gjelder |
+| AA1 | middels | En aksje som tas inn av en senere kjøring uten kall, står som «Hentet. Står i tabellen over.» under «Dine egne aksjer», og «?» ved «Oppdatert» sier at EODHD ikke har gitt kurser og at appen slutter å følge den. Begge er feil her. Det fantes før 9.27, men «i kveld» til midnatt sier nå at ønsket tas den kvelden | Flyttet ut av 9.27: en egen story, 9.28, som gjøres nå (svaret 23.11 kl. 23:27 på spørsmål 4). Hjelpen sier hva appen viser den kvelden, og at det ikke gjelder. Ikke åpent i 9.27 |
 | VG2 | middels | `test_aksjesiden` fant setningen i panelet «Mine notater», så en mal satt tilbake til «i kveld» ble bare fanget av den statiske testen | Rettet: testen leser siden uten panelet |
 | AA2 | lav | Etter et ønske tatt inn kl. 22:45 mangler dagen kursene for aksjen, så kjøringene etterpå starter Docker og Ollama og slutter med kode 1 | Rettet: hjelpen sier det under «Kan appen hente selv hver kveld?» |
 | BH2 | lav | Etter første kjøring stopper kursene for en aksje som fjernes, først fra neste børsdag, mens «Er du sikker?» sier «fra og med hentingen i kveld» | Rettet i hjelpen. Teksten på siden følger svar 1 og 2 |
@@ -240,6 +240,11 @@ inn, og et nytt forsøk uten kall skriver ingen. 16 funn: 1 høy, 2 middels og
    ikke er forsøkt hentet, og der «?» ikke viser setningen om EODHD da.
    Alternativet er å la det stå, med det hjelpen nå sier. PR-en flettes ikke
    før gruppen har svart (regel 25).
+   *Svar 2026-11-23 kl. 23:27 (gruppens svar):* AA1 flyttes ut av 9.27 og blir
+   en egen story, 9.28 når 9.27 er flettet, som gjøres nå, før brukertest 2.
+   Rådet anbefalte å vente med den til etter testen, men gruppen valgte nå.
+   Etter det er AA1 ikke åpent i 9.27, og PR-en kan flettes når CI er grønn og
+   ingen andre funn på middels eller høy grad står åpne.
 
 ## Grenser
 
