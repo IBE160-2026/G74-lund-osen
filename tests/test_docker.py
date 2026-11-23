@@ -1398,8 +1398,9 @@ HOEYDE_PAA_BILDET = 1864
 # regnet ut på nytt, og alle de 20 bildene er tatt på nytt, to ganger, byte for byte de samme.
 # Story 9.27 (statusene regner dagen): _egne.html, folg.html, app.py, boersdag.py og markedsoversikt.py.
 # Avtrykkene er regnet ut på nytt, og alle de 20 bildene er tatt på nytt i demoen 23.11 og er byte for
-# byte de samme, fordi statusen står fast i demoen.
-AVTRYKK_BAK_BILDET = "b1b3bccec2f90316f53d5183ce45422c95ada3c66c50da66918bd8418de9b8a3"
+# byte de samme, fordi statusen står fast i demoen. Etter svarene 23.11 kl. 22:25 (også aksje.html og
+# bekreft_fjern.html) er avtrykkene regnet ut igjen, og de 20 bildene tatt på nytt kl. 22:49–22:52, like.
+AVTRYKK_BAK_BILDET = "7681aefd947a3af282aa5a931d27cf152f5b0989a98c8a2f6d2c9a2d8d654196"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1898,8 +1899,9 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # regnet ut på nytt, og alle de 20 bildene er tatt på nytt, to ganger, byte for byte de samme.
 # Story 9.27 (statusene regner dagen): _egne.html, folg.html, app.py, boersdag.py og markedsoversikt.py.
 # Avtrykkene er regnet ut på nytt, og alle de 20 bildene er tatt på nytt i demoen 23.11 og er byte for
-# byte de samme, fordi statusen står fast i demoen.
-AVTRYKK_BAK_AKSJESIDEN = "8b636a7b6a948ef79b475324d55549852f2260e4806d5c9e8b45943ebf6def93"
+# byte de samme, fordi statusen står fast i demoen. Etter svarene 23.11 kl. 22:25 (også aksje.html og
+# bekreft_fjern.html) er avtrykkene regnet ut igjen, og de 20 bildene tatt på nytt kl. 22:49–22:52, like.
+AVTRYKK_BAK_AKSJESIDEN = "bbd10db1f8410cb2d6dd415a8f1ccf0769c3f2439df5d0b1c230663d465080e8"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2278,28 +2280,29 @@ BILDENE_PAA_MOBIL = (
 # regnet ut på nytt, og alle de 20 bildene er tatt på nytt, to ganger, byte for byte de samme.
 # Story 9.27 (statusene regner dagen): _egne.html, folg.html, app.py, boersdag.py og markedsoversikt.py.
 # Avtrykkene er regnet ut på nytt, og alle de 20 bildene er tatt på nytt i demoen 23.11 og er byte for
-# byte de samme, fordi statusen står fast i demoen.
+# byte de samme, fordi statusen står fast i demoen. Etter svarene 23.11 kl. 22:25 (også aksje.html og
+# bekreft_fjern.html) er avtrykkene regnet ut igjen, og de 20 bildene tatt på nytt kl. 22:49–22:52, like.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "4d5a33462a131e285cbcb31b4de67799a2919a0c813e9f9df14a0bfa139e07ea",
-    TOPPEN_AV_OVERSIKTEN: "b1b3bccec2f90316f53d5183ce45422c95ada3c66c50da66918bd8418de9b8a3",
-    "docs/appen/boersometeret-demo.png": "d74d8ab5be25640b665c6216475ebec7ba27a880e1e6c631963433cb423da82b",
-    "docs/appen/min-liste-demo.png": "a2321f5626234d95ac30a0ffb40ec13b3d0cc318155ddddd4e8282928fa47858",
-    "docs/appen/mobil/oversikten-390-demo.png": "b1b3bccec2f90316f53d5183ce45422c95ada3c66c50da66918bd8418de9b8a3",
-    "docs/appen/mobil/boersometeret-390-demo.png": "d74d8ab5be25640b665c6216475ebec7ba27a880e1e6c631963433cb423da82b",
-    "docs/appen/din-egen-liste-demo.png": "a2321f5626234d95ac30a0ffb40ec13b3d0cc318155ddddd4e8282928fa47858",
-    "docs/appen/investorsiden-brfe-demo.png": "7a8a7ffc0219e685397898d04b1772476ebecfe081291a28a1f2e2e9eb85d9e4",
-    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "7a8a7ffc0219e685397898d04b1772476ebecfe081291a28a1f2e2e9eb85d9e4",
-    "docs/appen/mobil/folg-en-aksje-390-demo.png": "4d5a33462a131e285cbcb31b4de67799a2919a0c813e9f9df14a0bfa139e07ea",
-    "docs/appen/mobil/notatene-brfe-390-demo.png": "8b636a7b6a948ef79b475324d55549852f2260e4806d5c9e8b45943ebf6def93",
-    "docs/appen/notatene-brfe-demo.png": "8b636a7b6a948ef79b475324d55549852f2260e4806d5c9e8b45943ebf6def93",
-    "docs/appen/notatene-min-liste-demo.png": "a2321f5626234d95ac30a0ffb40ec13b3d0cc318155ddddd4e8282928fa47858",
-    "docs/appen/innstillinger-demo.png": "53508862ae63c6dfd5d8d314718a0da0deeb474e2f715bf2416e0745eb9a468a",
+    "docs/appen/folg-en-aksje-demo.png": "2c7f7000227861e941d48559ee6f021432842f0200762b15c08f63d2bd43e45b",
+    TOPPEN_AV_OVERSIKTEN: "7681aefd947a3af282aa5a931d27cf152f5b0989a98c8a2f6d2c9a2d8d654196",
+    "docs/appen/boersometeret-demo.png": "4da4c836d4eb0e74f885d1eebabc1d6bec1837a2fd4538a782dd52c038df09ae",
+    "docs/appen/min-liste-demo.png": "498052076ba3f0ca01c88e8074077fe28da148138a636d7b4bea21242c1b0bd5",
+    "docs/appen/mobil/oversikten-390-demo.png": "7681aefd947a3af282aa5a931d27cf152f5b0989a98c8a2f6d2c9a2d8d654196",
+    "docs/appen/mobil/boersometeret-390-demo.png": "4da4c836d4eb0e74f885d1eebabc1d6bec1837a2fd4538a782dd52c038df09ae",
+    "docs/appen/din-egen-liste-demo.png": "498052076ba3f0ca01c88e8074077fe28da148138a636d7b4bea21242c1b0bd5",
+    "docs/appen/investorsiden-brfe-demo.png": "0dd7dc44b2f270c1b14b3bdc8fdc1135ec00477452456dc87e165c88fd79c5d8",
+    "docs/appen/mobil/investorsiden-brfe-390-demo.png": "0dd7dc44b2f270c1b14b3bdc8fdc1135ec00477452456dc87e165c88fd79c5d8",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "2c7f7000227861e941d48559ee6f021432842f0200762b15c08f63d2bd43e45b",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "bbd10db1f8410cb2d6dd415a8f1ccf0769c3f2439df5d0b1c230663d465080e8",
+    "docs/appen/notatene-brfe-demo.png": "bbd10db1f8410cb2d6dd415a8f1ccf0769c3f2439df5d0b1c230663d465080e8",
+    "docs/appen/notatene-min-liste-demo.png": "498052076ba3f0ca01c88e8074077fe28da148138a636d7b4bea21242c1b0bd5",
+    "docs/appen/innstillinger-demo.png": "bb7cd9e97df74699eaaf85562aaddf9f6f64362bd91d04015b853e9c7c0d6ea9",
     # Story 3.3k: de to nye bildene.
-    "docs/appen/notatpanelet-demo.png": "a2321f5626234d95ac30a0ffb40ec13b3d0cc318155ddddd4e8282928fa47858",
-    "docs/appen/vis-meg-rundt-demo.png": "a2321f5626234d95ac30a0ffb40ec13b3d0cc318155ddddd4e8282928fa47858",
+    "docs/appen/notatpanelet-demo.png": "498052076ba3f0ca01c88e8074077fe28da148138a636d7b4bea21242c1b0bd5",
+    "docs/appen/vis-meg-rundt-demo.png": "498052076ba3f0ca01c88e8074077fe28da148138a636d7b4bea21242c1b0bd5",
     # Story 9.21 (gruppens svar 17.11 kl. 22:18): de to nye bildene.
-    "docs/appen/signalet-dag-for-dag-demo.png": "8b636a7b6a948ef79b475324d55549852f2260e4806d5c9e8b45943ebf6def93",
-    "docs/appen/slett-notatet-demo.png": "ab241e71505229629992479c0f550e28cede3c757425efeb33948fb589d959e4",
+    "docs/appen/signalet-dag-for-dag-demo.png": "bbd10db1f8410cb2d6dd415a8f1ccf0769c3f2439df5d0b1c230663d465080e8",
+    "docs/appen/slett-notatet-demo.png": "7400def312b217b605b205730b73566c47bd90a539399680fd48d44052acd1ac",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
