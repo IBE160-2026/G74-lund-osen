@@ -2,7 +2,7 @@
 title: "Brukertesten"
 status: aktiv
 created: 2026-10-23
-updated: 2026-11-22T18:39
+updated: 2026-11-24T21:58
 ---
 
 # Brukertesten
@@ -123,9 +123,12 @@ Svarene 18.11 kl. 21:27: F tas i den ekte versjonen, og før testen fjerner grup
 | Siste henting, dato | |
 | Én egen aksje uten notat er fjernet, og «Dine egne aksjer» har minst én ledig plass under taket på 18 | |
 | Notatene gruppen skrev på tre aksjer 17.11 står i Min liste (oppgave G) | |
+| KI-teksten for aksjen i oppgave B er lest: ingen tall som ikke står i tabellen, og ingen råd om å kjøpe eller selge. Ellers velges en annen aksje. | |
 | KI av: bryteren «Vis KI-tekst» viser «Av» | |
 | Bare oversikten åpen, øverst på siden | |
 | Det som ble sagt, ordrett | |
+
+*Lagt til 2026-11-24 (gruppens svar kl. 21:47, G1 og G2 i kodegjennomgangen av v1):* raden om KI-teksten for aksjen i oppgave B. Kontrollen av KI-teksten for én aksje slipper gjennom oppdiktede tall og råd uten ord fra listene (`_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`), og det rettes i story 10.12 etter testen. Ingen kode er endret før testen, så gruppen leser teksten selv.
 
 ### Oppgave A: KI av
 
