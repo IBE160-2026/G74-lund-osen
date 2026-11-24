@@ -118,7 +118,9 @@ storyen har ingen bildegren.
 
 Én leser, bare med lesing, i fire roller: Blind Hunter, Edge Case Hunter,
 Acceptance Auditor og Verification Gap. Den kjørte ikke pytest. ECH1 er slått
-opp etterpå og vist med en test. 18 funn: 1 høy, 5 middels og 12 lave.
+opp etterpå og vist med en test. 19 funn: 1 høy, 6 middels og 12 lave. ECH1 og
+AA2 er samme sak sett fra to roller, og det samme er ECH2 og AA1. 10 er rettet,
+7 lave står med grunn, og ECH1 og AA2 står åpne som spørsmål 1.
 
 | Id | Grad | Funnet | Gjort |
 |---|---|---|---|
