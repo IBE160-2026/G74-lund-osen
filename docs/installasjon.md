@@ -391,6 +391,8 @@ Jobben kjører fra en egen arbeidskopi av main (`git worktree`), ikke fra mappa 
 
 Alt jobben gjør, står i loggen `data/logg/kveldshenting-<dato>.log` i mappa du jobber i, én fil per kveld. Nøkkelen skrives aldri ut.
 
+Jobben avslutter med koden fra hentingen, og Oppgaveplanlegging viser koden fra kveldens siste kjøring som `LastTaskResult`. Kode 0 betyr at alt er hentet. Kode 1 betyr at noe som skulle vært hentet, mangler eller feilet, eller at skriptet stoppet før hentingen. Kode 3 betyr at bare hovedindeksen feilet. Kode 4 betyr at det eneste som mangler, er aksjer du begynte å følge etter kveldens henting, og som det ikke var kall igjen til. Det er i orden, og kursene hentes ved neste henting. Koden fra hver kjøring står i loggen, i linja «Hentingen avsluttet med kode …».
+
 Slå den på, i PowerShell i mappa du jobber i, med arbeidskopien ved siden av:
 
 ```

@@ -20,7 +20,10 @@
 #    og OSE_KI_OLLAMA_URL satt bare for kjøringen. Så målingen av omsetning,
 #    uv run python src/fetch_prices.py --maal-omsetning (story 2.13).
 # 5. Det skriptet selv startet, stoppes, også når noe feiler. Skriptet
-#    avslutter med koden fra hentingen.
+#    avslutter med koden fra hentingen: 0 når alt er hentet, 1 når noe som
+#    skulle vært hentet, mangler eller feilet, 3 når bare hovedindeksen
+#    feilet, og 4 (story 2.22) når det eneste som mangler, er aksjer som ble
+#    tatt inn i lista etter kveldens henting. 4 er i orden.
 #
 # Alt går til data/logg/kveldshenting-<dato>.log i hovedkopien. Nøkkelen og
 # miljøet skrives aldri ut: .env leses bare som avtrykk (sha256).
@@ -331,4 +334,9 @@ try {
     if (-not $startetOllama -and -not $startetDocker) { Logg 'Skriptet startet verken Docker Desktop eller Ollama.' }
 }
 
+# Story 2.22 (gruppens svar 24.11 kl. 14:29): koden fra hentingen gis videre
+# som den er, og loggen sier hva 4 betyr.
+if ($kode -eq 4) {
+    Logg 'Kode 4: det eneste som mangler, er aksjer som ble tatt inn i lista etter kveldens henting. Det er i orden, og kursene hentes ved neste henting.'
+}
 exit $kode
