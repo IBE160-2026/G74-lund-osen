@@ -2,7 +2,7 @@
 title: 'Story 2.22: en egen kode når det eneste som mangler, er aksjer tatt inn etter kveldens henting'
 type: 'code'
 created: '2026-11-24'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '609f555b'
 context:
@@ -175,4 +175,8 @@ til, og at README-en ikke beskriver kodene.
 - [x] Testen feilet før rettingen: 8 av 15 på `852f1aa9`
 - [x] Gjennomgangen med fire roller er tatt, og regel 25 holder: de 5 på middels er rettet
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 790 bestått og 16 hoppet over (24.11 kl. 15:44–15:51) og 3184 bestått og 7 hoppet over (kl. 15:54–16:16, etter en ny start etter lite minne), på `ed7360f5`
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 45423591264, på `971e0149`)
+
+## Flettet 24.11
+
+PR #179 er squash-flettet i `3f965546` 24.11 kl. 16:25, låst til head-en `971e0149`, etter beskjeden kl. 14:31 i `docs/ai-prompts/2026-11-24.md`, uten nytt ja. CI var grønn i alle fire jobbene (run 45423591264), med 6249 bestått og 101 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne: de 5 på middels er rettet. Spørsmål 1 (ECH4, lav) og spørsmål 2 (ECH5, lav) står til gruppen har svart. Koden og skriptet når kveldsjobben først 25.11, fordi jobben bruker commiten main hadde ved midnatt.

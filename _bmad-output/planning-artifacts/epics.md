@@ -2324,6 +2324,8 @@ Som **gruppe som leser resultatet av kveldsjobben** vil vi at en kveld der alt e
 
 **Avhenger av:** 9.28, 2.21, 2.3b, 2.8. **Én økt:** ja.
 
+*Lagt til 2026-11-24:* 2.22 er flettet. PR #179 er squash-flettet i `3f965546` kl. 16:25, låst til head-en `971e0149`, uten nytt ja. CI var grønn i alle fire jobbene (run 45423591264), med 6249 bestått og 101 hoppet over i jobben `pytest`. Etter gjennomgangen gir kode 4 seg bare når ingen forsøk i kveld har spurt EODHD om aksjen, hovedindeksen har børsdagen, og forsøket ikke ble avbrutt. Ingen migrering.
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
