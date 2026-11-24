@@ -2,7 +2,7 @@
 title: "Skjermene i OSE Signal"
 status: aktiv
 created: 2026-11-22
-updated: 2026-11-24T14:44
+updated: 2026-11-24T15:54
 ---
 
 # Skjermene i OSE Signal
@@ -171,7 +171,7 @@ Ingen skjerm: kommandoen som måler omsetningen; tallene vises i steget før en 
 
 ### 2.14 Eks.datoer føres inn for hånd
 
-Ikke bygget: står i backlog som «Ekstra, hvis tiden rekker». [Storyen](../_bmad-output/planning-artifacts/epics.md#story-214-eksdatoer-føres-inn-for-hånd)
+Ingen skjerm: en kommando fører én eks.dato for ett symbol inn i basen, og ingen side viser den ennå. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-14-eksdatoer.md)
 
 ### 2.16 Børskalenderen for alle år
 
