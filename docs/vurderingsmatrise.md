@@ -2,7 +2,7 @@
 title: "Vurderingsmatrise for del 1"
 status: aktiv
 created: 2026-10-16
-updated: 2026-11-24T14:44
+updated: 2026-11-24T21:58
 ---
 
 # Vurderingsmatrise for del 1
@@ -68,7 +68,7 @@ Tallene er talt 14.11 kl. 22:04 på `ff6e5209`, slik de ble talt 07.11: 151 flet
 
 *Rettet 2026-11-22 (gruppens svar kl. 18:23, rådet anbefalte det; E7 i UX-dokumentene):* linja «Lagt til 2026-11-17 (story 9.17)» over sier 17 funn og U114–U130. [Den heuristiske evalueringen](heuristisk-evaluering.md) har 18 funn, 13 fra evalueringen og 5 fra gruppen som evaluerer nr. 2, fordi HE18 kom til 17.11 kl. 13:32. De nye funnene står som U114–U131 i [UX-loggen](ux-logg.md).
 
-*Lagt til 2026-11-22 (story 9.26, gruppens svar kl. 19:05):* «Design og brukeropplevelse» har nå en side med skjermene i appen, ordnet etter epic og story: [skjermene](skjermene.md). Den har 53 bilder fra demoen, 1280 px brede, ett eller to for hver av de 42 storyene med bilde, med det kontrollen sjekket under hvert bilde og lenke til spesifikasjonen. De 100 andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Statusen i tabellen er ikke endret. *Rettet 2026-11-23 (story 9.27):* De 101 andre, ikke 100, etter at 9.27 kom til uten bilde. *Rettet 2026-11-24 (story 9.28):* De 102 andre, etter at 9.28 kom til uten bilde. *Rettet 2026-11-24 (story 2.21):* De 103 andre, etter at 2.21 kom til uten bilde. *Rettet 2026-11-24 (story 2.22):* De 104 andre, etter at 2.22 kom til uten bilde.
+*Lagt til 2026-11-22 (story 9.26, gruppens svar kl. 19:05):* «Design og brukeropplevelse» har nå en side med skjermene i appen, ordnet etter epic og story: [skjermene](skjermene.md). Den har 53 bilder fra demoen, 1280 px brede, ett eller to for hver av de 42 storyene med bilde, med det kontrollen sjekket under hvert bilde og lenke til spesifikasjonen. De 100 andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Statusen i tabellen er ikke endret. *Rettet 2026-11-23 (story 9.27):* De 101 andre, ikke 100, etter at 9.27 kom til uten bilde. *Rettet 2026-11-24 (story 9.28):* De 102 andre, etter at 9.28 kom til uten bilde. *Rettet 2026-11-24 (story 2.21):* De 103 andre, etter at 2.21 kom til uten bilde. *Rettet 2026-11-24 (story 2.22):* De 104 andre, etter at 2.22 kom til uten bilde. *Rettet 2026-11-24 (gruppens svar kl. 21:47 på kodegjennomgangen av v1):* De 111 andre, etter at sju storyer kom til i backlog uten bilde (2.23–2.25 og 10.12–10.15).
 
 ## Status 07.11.2026
 

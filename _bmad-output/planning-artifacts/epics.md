@@ -2326,6 +2326,63 @@ Som **gruppe som leser resultatet av kveldsjobben** vil vi at en kveld der alt e
 
 *Lagt til 2026-11-24:* 2.22 er flettet. PR #179 er squash-flettet i `3f965546` kl. 16:25, låst til head-en `971e0149`, uten nytt ja. CI var grønn i alle fire jobbene (run 45423591264), med 6249 bestått og 101 hoppet over i jobben `pytest`. Etter gjennomgangen gir kode 4 seg bare når ingen forsøk i kveld har spurt EODHD om aksjen, hovedindeksen har børsdagen, og forsøket ikke ble avbrutt. Ingen migrering.
 
+### Story 2.23: `--les-inn` tar også egne aksjer
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 1 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G5 (B-BH1 og B-VG2, middels) fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, som den tredje av storyene derfra. Ingen kode er endret.
+
+Som **bruker med en egen aksje** vil jeg at rådet «Les den inn uten kall» virker for aksjen min, så en råfil som alt er hentet, kan leses inn uten et nytt kall.
+
+**Oppfyller:** G5 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47), FR-412 · **Begrenses av:** NFR-01, AD-6, AD-7, regel 22
+
+**Funnet:** `--les-inn` avviser egne aksjer, fordi innlesingen bruker de 15 og ikke lista i basen. Ingen test leser inn en egen aksje.
+
+**Kontroll — hva testen ser etter:**
+- `--les-inn` leser inn en råfil for en egen aksje som står i lista i basen
+- En aksje som ikke står i lista, avvises som før, og innlesingen gjør ingen kall
+- **Ville feilet hvis:** innlesingen brukte de 15 i stedet for lista i basen; testen feiler før rettingen
+
+**Avhenger av:** 2.11, 2.12. **Én økt:** ja.
+
+### Story 2.24: Et delvis svar erstatter ikke et helt år med kurser
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 1 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G6 (B-ECH1, middels, kjent fra `deferred-work.md`) fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, som den fjerde av storyene derfra. Ingen kode er endret.
+
+Som **bruker** vil jeg at kursene som alt er lagret, blir stående når EODHD svarer med bare en del av året, så signalet ikke regnes av for få børsdager.
+
+**Oppfyller:** G6 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47), FR-406 · **Begrenses av:** AD-5, AD-6, AD-7, NFR-01, regel 22
+
+**Funnet:** et delvis svar fra EODHD med dagens rad erstatter et helt år med kurser. Kravet om minst 175 børsdager (FR-406, AD-5) har ingen kontroll.
+
+**Kontroll — hva testen ser etter:**
+- Et svar med dagens rad og færre børsdager enn kravet erstatter ikke kursene som er lagret
+- Utskriften sier hva som skjedde, uten kurser (regel 16)
+- **Ville feilet hvis:** et delvis svar ble lagret over et helt år; testen feiler før rettingen
+
+**Planen avgjør** hva som lagres av et delvis svar, og om en ny aksje uten kurser fra før kan ha færre børsdager.
+
+**Avhenger av:** 2.2, 2.5. **Én økt:** ja.
+
+### Story 2.25: Tester for kallene underveis, byttet med full liste og tidsfristen mot Ollama
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 1 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G8 (B-VG1), G10 (A-VG1) og G14 (D-VG2), alle middels og bare tester fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, som den siste av storyene derfra. Den står i Epic 2 fordi to av de tre testene gjelder hentingen og lista; G14 gjelder KI-teksten i Epic 10. Ingen kode er endret.
+
+Som **gruppe** vil vi at tre regler koden alt følger, er låst av tester, så en senere endring ikke fjerner dem uten at noe feiler.
+
+**Oppfyller:** G8, G10 og G14 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47) · **Begrenses av:** NFR-01, NFR-04, FR-412, AD-8, regel 22; ingen kode utenom testene
+
+**Funnene:**
+- G8: ingen test fanger det hvis et nytt forsøk slutter å stoppe når dagens kall er brukt underveis, så neste kall går fra bonuskvoten (NFR-01)
+- G10: ingen test tar et bytte i bruk med full liste. Rekkefølgen «fjern før følg» i `ta_i_bruk` kan fjernes uten at en test feiler
+- G14: tidsfristen på 10 s for sjekken av Ollama og oppslagene etter hver tekst er ikke låst av en test (NFR-04)
+
+**Kontroll — hva testene ser etter:**
+- Et nytt forsøk stopper når dagens kall er brukt underveis, og tar ikke fra bonuskvoten
+- Et bytte med full liste tas i bruk, og feiler hvis «følg» går før «fjern»
+- Sjekken av Ollama og oppslagene etter hver tekst har tidsfrist, og en Ollama som henger, stopper ikke hentingen
+- **Ville feilet hvis:** en av de tre reglene ble fjernet fra koden. Hver test prøves ved å ta regelen ut og se at testen feiler
+
+**Avhenger av:** 2.3b, 2.12, 10.2. **Én økt:** ja.
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
@@ -3632,6 +3689,87 @@ Som **bruker**, vil jeg at teksten om børsdagen sier at bransjen som steg eller
 *Avgjort 2026-11-13 kl. 10:18 (gruppens svar, tillegg 8):* rekkefølgen er 3.7, 10.11, 8.27 og 8.19, fordi notatvinduet sto og ventet på et spørsmål i natt. Rådet anbefalte det.
 
 *Lagt til 2026-11-13:* 10.11 er flettet med PR #149 i `0c223890` kl. 14:19, låst til head-en `1402fed3` (main med 3.7 flettet inn), etter instruksjonen 12.11 kl. 17:03 og tillegg 1–7 i `docs/ai-prompts/2026-11-12.md` og tillegg 8 i `docs/ai-prompts/2026-11-13.md`. Flettingen ble en vanlig merge-commit, ikke squash som de andre. Hjelpen ved «Børsdagen kort fortalt» er den korte teksten fra spørsmål 4, 50 ord. Hele settet lokalt i fire deler kl. 13:08–14:14 (`date`), hver del bare når ingen annen pytest kjørte: 5632 bestått, 24 hoppet over og 0 feilet, til sammen de 5656 som `pytest --collect-only` finner. CI var grønn på head-en (run 43431952221). Treet i `0c223890` er likt treet på `1402fed3`. Testene for dokumentene på main etter flettingen: 2847 bestått, 7 hoppet over.
+
+### Story 10.12: Kontrollen av KI-teksten for én aksje fanger tall og råd utenfor ordlistene
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 1 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G1 (D-BH1, høy) og G2 (D-BH2 høy, D-AA3 og D-VG1 middels) fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, som den første av storyene derfra, fordi de gjelder NFR-06 og det brukeren leser. Ingen kode er endret.
+
+Som **bruker som leser KI-teksten** vil jeg at en tekst med et oppdiktet tall eller et råd om å kjøpe eller selge ikke vises, så det jeg leser, bare forklarer det siden viser.
+
+**Oppfyller:** G1 og G2 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47), NFR-06, FR-603 · **Begrenses av:** FR-601, FR-602, FR-604, AD-7, regel 22
+
+**Funnene:**
+- G1: oppdiktede tall og mengder består kontrollen for én aksje: de faste tallene 2, 3, 20 og 50 er lov hvor som helst, og «doblet», «øre» og «million» fanges ikke. Siden viser tallet med prikket strek, som om det var prøvd
+- G2: et råd uten ord fra listene består både kontrollen og vakta på siden, også på engelsk. Kontrollen for én aksje er en ordliste. Visningen bruker bare den korte vakta, så rader som besto før 11.11, vises fortsatt. Flere ord i listene har ingen test
+
+**Kontroll — hva testen ser etter:**
+- En tekst med et tall eller en mengde som ikke står i grunnlaget, består ikke, også når tallet er et av de faste eller står med ord
+- Et råd om å kjøpe eller selge består ikke, heller ikke uten ord fra listene eller på engelsk, og visningen stopper det samme som kontrollen
+- Hvert ord i listene har en test
+- **Ville feilet hvis:** en av setningene gjennomgangen prøvde mot `ki_kontroll.kontroller` 24.11, besto; testen feiler før rettingen
+
+**Planen avgjør** hvordan et råd uten ord fra listene fanges, og hva som skjer med radene som alt har bestått.
+
+**Til brukertest 2:** ingen kode endres før testen. Gruppen leser KI-teksten for aksjen i oppgave B før testen (`docs/brukertest.md`, «Før testen (brukertest 2)»).
+
+**Avhenger av:** 10.2, 10.3, 10.9, 10.10. **Én økt:** nei, trolig to.
+
+### Story 10.13: «Børsdagen kort fortalt» på en valgt dag bruker lista den dagen, og stjernen på en aksje som er tatt ut
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 1 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G3 (C-ECH1, C-AA1 og C-VG3, middels) og G4 (C-ECH2, middels) fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, som den andre av storyene derfra. Den står i Epic 10 fordi «Børsdagen kort fortalt» er story 10.6; stjernen i G4 er fra 8.3 i Epic 8 og tas med her fordi begge gjelder «Vis dagen». Ingen kode er endret.
+
+Som **bruker som ser på en tidligere dag** vil jeg at teksten om børsdagen og stjernen virker for lista den dagen, så siden ikke mister teksten eller viser en engelsk feilside etter et bytte i lista.
+
+**Oppfyller:** G3 og G4 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47), FR-607, FR-111 · **Begrenses av:** FR-409, FR-412, AD-7, regel 22
+
+**Funnene:**
+- G3: «Børsdagen kort fortalt» på en valgt dag regnes av lista i dag, ikke lista den dagen. Etter et bytte i lista faller teksten bort for dagene før byttet. Ingen test har en valgt dag med endret liste. 2.11 (ECH5) rettet det samme på aksjesiden
+- G4: stjernen på en aksje som er tatt ut, gir 400 med Werkzeugs engelske side, fra en vanlig knapp i «Vis dagen»
+
+**Kontroll — hva testen ser etter:**
+- En valgt dag før et bytte i lista viser «Børsdagen kort fortalt» for lista den dagen
+- Stjernen på en aksje som er tatt ut, gir ikke en engelsk feilside
+- **Ville feilet hvis:** teksten for en valgt dag ble regnet av lista i dag, eller knappen ga 400; testen feiler før rettingen
+
+**Planen avgjør** om stjernen kan settes på en aksje som er tatt ut, eller om knappen ikke vises.
+
+**Avhenger av:** 10.6, 2.11, 8.3. **Én økt:** ja.
+
+### Story 10.14: Hentingen sender «Utenfor målingen» for egne aksjer
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 1 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G12 (D-AA1 og D-VG3, middels) fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, som den femte av storyene derfra. Ingen kode er endret.
+
+Som **bruker med en egen aksje** vil jeg at KI-teksten sier at grensene i signalet ikke er målt på aksjen, så teksten sier det samme som merket på siden.
+
+**Oppfyller:** G12 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47), kontrollen i 10.1, FR-412 · **Begrenses av:** FR-603, NFR-06, AD-7, AD-13, regel 22
+
+**Funnet:** hentingen sender aldri merket «Utenfor målingen». Etter 2.12 kan lista ha egne aksjer, og KI-teksten for dem sier ikke at grensene ikke er målt på aksjen (story 10.1). Ingen test kjører hentingen med en slik aksje.
+
+**Kontroll — hva testen ser etter:**
+- Hentingen sender merket for en aksje som er «Utenfor målingen», og ikke for de andre
+- Testen kjører hentingen selv med en slik aksje i lista, ikke bare funksjonen som lager grunnlaget
+- **Ville feilet hvis:** hentingen sendte grunnlaget uten merket for en slik aksje; testen feiler før rettingen
+
+**Avhenger av:** 10.1, 10.2, 2.12, 2.13. **Én økt:** ja.
+
+### Story 10.15: Et tomt svar eller et avslag stopper bare KI-teksten for den ene aksjen
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 21:54 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 21:47 på spørsmål 4 i `_bmad-output/implementation-artifacts/kodegjennomgang-v1.md`; rådet anbefalte det.* G11 (D-ECH1 og D-ECH2, middels) fra kodegjennomgangen av v1. Storyen står i backlog og bygges **etter brukertest 2**, etter storyene fra spørsmål 1. Ingen kode er endret.
+
+Som **bruker** vil jeg at de andre aksjene og børsdagen får KI-teksten sin selv om modellen gir et tomt svar eller avslår for én aksje, så én tekst som mangler, ikke tar hele kvelden.
+
+**Oppfyller:** G11 i kodegjennomgangen av v1 (svaret 24.11 kl. 21:47) · **Begrenses av:** FR-604, NFR-04, AD-7, regel 22
+
+**Funnet:** ett tomt svar, ett avslag eller en feil nøkkel regnes som at modellen feilet. Da kalles den ikke for resten av aksjene eller for dagen, og radene står, så hele børsdagen blir uten KI-tekst. Valget ble gjort for en modell som henger (`spec-10-2b`, `spec-10-7b`).
+
+**Kontroll — hva testen ser etter:**
+- En tidsfrist eller en nettfeil stopper KI-teksten for resten av kvelden, som nå
+- Et tomt svar eller et avslag gjelder bare den ene aksjen: raden sier det, og hentingen går videre til neste aksje og til teksten om dagen
+- **Ville feilet hvis:** ett tomt svar stoppet resten, eller en modell som henger, ble kalt for hver aksje; testen feiler før rettingen
+
+**Planen avgjør** hva en feil nøkkel regnes som.
+
+**Avhenger av:** 10.2, 10.6, 10.7. **Én økt:** ja.
 
 ---
 

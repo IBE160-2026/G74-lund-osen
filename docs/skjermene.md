@@ -2,12 +2,12 @@
 title: "Skjermene i OSE Signal"
 status: aktiv
 created: 2026-11-22
-updated: 2026-11-24T14:44
+updated: 2026-11-24T21:58
 ---
 
 # Skjermene i OSE Signal
 
-Siden har 10 epics, 146 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
+Siden har 10 epics, 153 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
 
 Bildene viser appen slik den er nå, så et bilde kan også vise det senere storyer la til, for eksempel knappene øverst, «i ettertid» og den rikere KI-teksten. Teksten under sier hva storyen ga, og nevner det senere der det kan forveksles.
 
@@ -203,6 +203,18 @@ Ingen skjerm: hentingen setter dagen aksjen kom inn igjen, og statusen fra 9.28 
 
 Ingen skjerm: hentingen ender med kode 4 i stedet for 1 når bare en nylig inntatt aksje mangler kursen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-22-egen-kode-for-tatt-inn.md)
 
+### 2.23 `--les-inn` tar også egne aksjer
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-223---les-inn-tar-også-egne-aksjer)
+
+### 2.24 Et delvis svar erstatter ikke et helt år med kurser
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-224-et-delvis-svar-erstatter-ikke-et-helt-år-med-kurser)
+
+### 2.25 Tester for kallene underveis, byttet med full liste og tidsfristen mot Ollama
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-225-tester-for-kallene-underveis-byttet-med-full-liste-og-tidsfristen-mot-ollama)
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### 3.1 Dockerfile med to innganger
@@ -342,6 +354,22 @@ Den rikere teksten om børsdagen og linja om Min liste, merket «Skrevet av appe
 ![Story 10.11, «mest av bransjene med minst to aksjer» i teksten om børsdagen, i demoen med oppdiktede selskaper og kurser](skjermene/10-11-hjelpen-ved-boersdagen.png)
 
 Hjelpen ved «Børsdagen kort fortalt», som sier at modellen bare fikk det appen regnet ut, også bransjene med minst to aksjer. Kontrollen sjekket at bare formene med «mest av bransjene med minst to aksjer» godtas, og at en bransje med én aksje aldri blir «mest». [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-10-11-mest-av-bransjene-med-minst-to-aksjer.md)
+
+### 10.12 Kontrollen av KI-teksten for én aksje fanger tall og råd utenfor ordlistene
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-1012-kontrollen-av-ki-teksten-for-én-aksje-fanger-tall-og-råd-utenfor-ordlistene)
+
+### 10.13 «Børsdagen kort fortalt» på en valgt dag bruker lista den dagen, og stjernen på en aksje som er tatt ut
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-1013-børsdagen-kort-fortalt-på-en-valgt-dag-bruker-lista-den-dagen-og-stjernen-på-en-aksje-som-er-tatt-ut)
+
+### 10.14 Hentingen sender «Utenfor målingen» for egne aksjer
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-1014-hentingen-sender-utenfor-målingen-for-egne-aksjer)
+
+### 10.15 Et tomt svar eller et avslag stopper bare KI-teksten for den ene aksjen
+
+Ikke bygget: lagt i backlog 24.11 etter kodegjennomgangen av v1, og bygges etter brukertest 2. [Storyen](../_bmad-output/planning-artifacts/epics.md#story-1015-et-tomt-svar-eller-et-avslag-stopper-bare-ki-teksten-for-den-ene-aksjen)
 
 ## Epic 6: Børsmeldinger i oversikten 🔒
 
