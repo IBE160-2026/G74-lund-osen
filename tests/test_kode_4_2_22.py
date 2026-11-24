@@ -20,7 +20,16 @@ import fetch_prices as fp
 import valg
 from boersdag import norsk_dato
 from lagring_sqlite import aapne_base
-from test_fetch_prices import OEYEBLIKK_22_09, TIRSDAG_22_09, kjoer_23, kjoer_23_kode, kvote, serie_til
+from test_fetch_prices import (
+    OEYEBLIKK_22_09,
+    TIRSDAG_22_09,
+    kjoer_23,
+    kjoer_23_kode,
+    kvote,
+    kvoter,
+    serie_til,
+    svar,
+)
 from test_tatt_inn_9_28 import OSLO, _foelg
 from test_valg import FASTE, med_boersen
 
@@ -55,6 +64,23 @@ def _hent(uten=(), feiler=(), dag: date = TIRSDAG_22_09):
         return [] if symbol in uten else serie_til(dag)
 
     return hent
+
+
+def _uansett(raa, base, oeyeblikk, hent=None, **kw):
+    """En kjøring som kan avslutte eller gå ferdig: (kode, kall, utskrift)."""
+    linjer, kall = [], []
+
+    def tell(ticker, *a):
+        kall.append(ticker)
+        return (hent or (lambda *_: serie_til(norsk_dato(oeyeblikk))))(ticker, *a)
+
+    kw.setdefault("les_kvote", kvote())
+    try:
+        fp.kjoer(raa, base, oeyeblikk, "noekkel", tell, linjer.append, **kw)
+        kode = 0
+    except SystemExit as slutt:
+        kode = slutt.code
+    return kode, kall, "\n".join(linjer)
 
 
 def _kurser(base, symbol: str) -> int:
@@ -170,6 +196,55 @@ class TestKode1Staar:
         _foelg(base)
         kode, kall, ut = kjoer_23_kode(raa, base, KL_22_45, _hent(uten=("NYA",)), les_kvote=kvote(brukt=16))
         assert kode == 1 and kall == ["NYA.OL"] and "Kode 4" not in ut
+        # Gjennomgangen (ECH1, VG1): forsøket skrev ingen rad i vurdering, så
+        # aksjen leses fortsatt som ikke forsøkt (9.28). Kjøringene etterpå
+        # uten kall skal likevel gi 1: forsøksfila for dagen viser at EODHD
+        # er spurt. Ville feilet hvis kvelden endte med kode 4.
+        for oeyeblikk in (KL_23_15, KL_23_45):
+            kode, kall, ut = kjoer_23_kode(raa, base, oeyeblikk, les_kvote=UTEN_KALL)
+            assert kode == 1 and kall == [] and "Kode 4" not in ut
+
+    def test_et_kall_som_feilet_er_koden_1_ogsaa_etterpaa(self, stier):
+        """Som over, når kallet feilet i stedet for å gi et tomt svar."""
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        med_boersen(base)
+        _foelg(base)
+        kode, kall, _ = kjoer_23_kode(raa, base, KL_22_45, _hent(feiler=("NYA",)), les_kvote=kvote(brukt=16))
+        assert kode == 1 and kall == ["NYA.OL"]
+        kode, kall, ut = kjoer_23_kode(raa, base, KL_23_15, les_kvote=UTEN_KALL)
+        assert kode == 1 and kall == [] and "Kode 4" not in ut
+
+    def test_indeksen_uten_dagen_er_koden_1(self, stier):
+        """Gjennomgangen (ECH2, VG2): kallet for hovedindeksen gikk, men
+        svaret manglet børsdagen. Ville feilet hvis kvelden endte med kode 4
+        og «det eneste som mangler», når indeksen også mangler dagen."""
+        raa, base = stier
+
+        def hent(ticker, *a):
+            return serie_til(TIRSDAG_22_09 - timedelta(days=1) if ticker == "OSEBX.OL" else TIRSDAG_22_09)
+
+        _uansett(raa, base, OEYEBLIKK_22_09, hent)
+        assert fp.indeksen_mangler(base, TIRSDAG_22_09)
+        med_boersen(base)
+        _foelg(base)
+        kode, kall, ut = _uansett(raa, base, KL_22_45, hent, les_kvote=UTEN_KALL)
+        assert kode == 1 and kall == [] and "Kode 4" not in ut, ut
+
+    def test_et_forsoek_som_ble_avbrutt_er_koden_1(self, stier):
+        """Gjennomgangen (ECH3): to aksjer er tatt inn, det er kall til
+        begge, og forsøket stopper etter det første fordi bonuskvoten sank.
+        Ville feilet hvis den som ikke ble spurt, ga kode 4 med «hadde ikke
+        kall»: grunnen var en annen."""
+        raa, base = stier
+        kjoer_23(raa, base, OEYEBLIKK_22_09)
+        med_boersen(base)
+        _foelg(base)
+        _foelg(base, "NYB")
+        les, _ = kvoter(svar(brukt=17, bonus=463), svar(brukt=18, bonus=462))
+        kode, kall, ut = kjoer_23_kode(raa, base, KL_22_45, les_kvote=les)
+        assert len(kall) == 1 and "Bonuskvoten sank" in ut, ut
+        assert kode == 1 and "Kode 4" not in ut
 
     def test_kvoten_kan_ikke_leses_er_koden_1(self, stier):
         """Ville feilet hvis en kjøring som ikke vet om den har kall, sa at

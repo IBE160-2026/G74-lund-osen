@@ -65,6 +65,12 @@ regel 3, 19, 20, 22 og 23; ingen migrering, og hva som hentes, endres ikke
    - grunnen til at den ikke ble forsøkt, er at det ikke var kall igjen til
      nye forsøk;
    - hovedindeksen feilet ikke i kveldens henting.
+
+   *Lagt til 2026-11-24 (gjennomgangen, ECH1–ECH3):* «ikke forsøkt» gjelder
+   hele kvelden, ikke bare kjøringen: har et forsøk tidligere i kveld spurt
+   EODHD om aksjen, står den i forsøksfila for dagen, og koden er 1.
+   Hovedindeksen må også ha børsdagen i basen. Stoppet forsøket av klokka,
+   av at kvoten ikke kunne leses, eller av at bonuskvoten sank, er koden 1.
 2. **Som før:** mangler også en annen aksje, eller feilet et kall for en
    aksje som er tatt inn, er koden 1. Feilet indeksen, er koden den som
    gjelder i dag. Kan kvoten eller basen ikke leses, eller er klokka etter
@@ -79,6 +85,75 @@ regel 3, 19, 20, 22 og 23; ingen migrering, og hva som hentes, endres ikke
    før rettingen. Testene fra 9.28 og 2.21 som låste kode 1 for tilfellet,
    rettes med en linje om svaret.
 
+## Resultatet
+
+- `KODE_BARE_TATT_INN = 4` og `_koden_naar_noe_mangler` i
+  `src/fetch_prices.py`, brukt de to stedene et nytt forsøk ender med at
+  noe mangler: når det ikke har kall til nye forsøk, og når noe fortsatt
+  mangler etter kallene. Funksjonen leser bare: forsøksfilene for dagen,
+  `valg.ikke_forsoekt` og indeksen. Hva som hentes og lagres, er ikke endret.
+- `start/kveldshenting.ps1` gir koden videre som før, og skriver en linje i
+  loggen om hva 4 betyr, helt til slutt, etter målingen.
+- `docs/hjelp.md` og `docs/installasjon.md` sier hva kodene 0, 1, 3 og 4
+  betyr, og at 4 er i orden. Hjelpen sa før at hentingen slutter med kode 1
+  i tilfellet. README-en nevner ikke kodene.
+- `tests/test_kode_4_2_22.py` hadde 15 tester da den ble målt mot koden før
+  rettingen (`852f1aa9`): 8 feilet. De 7 som besto, er vakter for at kode 1
+  står der noe mangler, og for at hentingen henter som før. Etter
+  gjennomgangen har fila 18 tester, og `tests/test_kveldshenting.py` har to
+  nye som kjører skriptet med en falsk henting.
+- Testene fra 9.28 og 2.21 som låste kode 1 for tilfellet, er rettet med en
+  linje om svaret.
+- Ingen fil bak bildene er endret, så bildene og avtrykkene står.
+
+## Gjennomgangen 24.11
+
+Én leser, bare med lesing, i fire roller: Blind Hunter, Edge Case Hunter,
+Acceptance Auditor og Verification Gap. Den kjørte ikke pytest. 22 funn: 5 på
+middels og 17 lave. ECH2 og AA1 er samme sak, og VG1 og VG2 er hullene i
+testene for ECH1 og ECH2. Alle de 5 på middels er rettet, 9 lave er rettet,
+og 8 lave står med grunn.
+
+| Id | Grad | Funnet | Gjort |
+|---|---|---|---|
+| ECH1, VG1 | middels | Et forsøk med kall som spurte EODHD om aksjen og ikke fikk kurser, ga riktig 1, men skrev ingen rad. Kjøringene etterpå uten kall ga 4 | Rettet: `_spurt_i_kveld` leser forsøksfilene for dagen, med to tester |
+| ECH2, AA1, VG2 | middels | Hovedindeksen lagret uten børsdagen ga 4, fordi bare «indeksen feilet» ble sjekket | Rettet: `indeksen_mangler` sjekkes også, med en test |
+| ECH3 | lav | Stoppet forsøket etter et kall på grunn av klokka, kvoten eller bonuskvoten, ga aksjene som ikke ble spurt, 4 | Rettet: `avbrutt`, med en test for bonuskvoten |
+| BH1 | lav | Kunne basen ikke leses, ble koden 1 uten en linje om hvorfor | Rettet: utskriften sier det |
+| AA2 | lav | Kontrollpunktet om en aksje EODHD ikke ga kurser for, gjaldt bare kjøringen som spurte | Rettet med ECH1 |
+| AA3 | lav | Docstringen i `_henting` som lister kodene, manglet 4 | Rettet |
+| AA4 | lav | Hjelpen sa at kjøringene etterpå slutter med kode 4 uten forbehold | Rettet: «når det nye forsøket ikke har kall til den» |
+| AA5 | lav | `updated` var ikke satt i `docs/hjelp.md` og `docs/installasjon.md` | Rettet, fra `date` |
+| VG5 | lav | Skriptet ble bare testet som tekst | Rettet: to tester kjører skriptet med en falsk henting som gir 4 og 3 |
+| VG6 | lav | Tekstsjekkene i dokumentene er svake | Rettet for docstringen (AA3); resten står: tekstene er lest i gjennomgangen |
+| BH2 | lav | «Kjør samme kommando igjen senere i kveld» står rett før «Kode 4 … Det er i orden» når noen aksjer ble hentet og andre ikke | Står: begge linjene er sanne, og koden sier hva som gjelder |
+| BH3 | lav | «1 aksjer» | Står: som resten av utskriften |
+| ECH4 | lav | Kveldens siste kjøring, kl. 23:45, kan ende med 1 hvis klokka passerer 23:50 før forsøket starter | Står: spørsmål 1 |
+| ECH5 | lav | `start/start.ps1` og `start/start.sh` sier det samme for alle koder utenom 0, også rådet om nøkkelen | Står: spørsmål 2 |
+| ECH6 | lav | Feilet `skriv_vurderinger` i kveldens henting, og tas en aksje inn etterpå, er koden 4 og ikke 1 | Står: to feil samtidig, og vurderingene skrives ved neste kjøring uten at noe mangler |
+| AA6 | lav | Ingen datert linje ved 2.3b og 2.8 i `epics.md` om unntaket | Står: det står under 2.22 |
+| VG3 | lav | Ingen test for basen som ikke kan leses i funksjonen, eller klokka etter 23:50 med en inntatt aksje | Står: begge går til 1 før funksjonen eller i den første linja |
+| VG4 | lav | Testen for kl. 23:45 bruker en klokke som står stille | Står: se ECH4 |
+| VG7 | lav | Sju av testene består også før rettingen | Står: de er vakter, og «Resultatet» sier det |
+
+Uten funn: argumentene de to stedene, at funksjonen bare leser, BOM i
+skriptet, `exit $kode` på siste linje, en aksje fra den første lista, en
+aksje tatt inn før kveldens henting, en base en versjon bak, helg, to aksjer
+der den ene hentes, andre lesere av koden, NFR-01, at ingen migrering er lagt
+til, og at README-en ikke beskriver kodene.
+
+## Spørsmål til gruppen
+
+1. **Kjøringen kl. 23:45 (ECH4, lav).** Starter det nye forsøket etter
+   kl. 23:50, er koden 1, også når bare en nylig inntatt aksje mangler.
+   Jobben kan bruke inntil tre minutter på Docker og Ollama først.
+   *Forslag:* la det stå til etter brukertest 2. Står `LastTaskResult` som 1
+   en morgen, sier loggen «Et nytt forsøk starter ingen kall så sent».
+2. **Dobbeltklikket (ECH5, lav).** «Start den ekte versjonen» sier det samme
+   for alle koder utenom 0, også at nøkkelen kan være feil. *Forslag:* la
+   det stå til etter brukertest 2, og gi kode 4 da en egen linje i
+   `start/start.ps1` og `start/start.sh`.
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. `data/`, `.env` og `_privat/` røres
@@ -90,14 +165,14 @@ regel 3, 19, 20, 22 og 23; ingen migrering, og hva som hentes, endres ikke
 
 ## Kontroll
 
-- [ ] En kjøring der bare aksjer tatt inn etter kveldens henting mangler kursen, uten kall igjen, ender med kode 4
-- [ ] Hver senere kjøring samme kveld ender også med 4
-- [ ] Mangler også en annen aksje, er koden 1
-- [ ] Feilet indeksen i kveldens henting, er koden som før
-- [ ] En aksje EODHD ikke ga kurser for, gir fortsatt 1
-- [ ] Utskriften, skriptet, hjelpen og installasjonen sier hva 4 betyr, og at det er i orden
-- [ ] Ingen migrering, og det som hentes og lagres, er som før
-- [ ] Testen feilet før rettingen
-- [ ] Gjennomgangen med fire roller er tatt, og regel 25 holder
+- [x] En kjøring der bare aksjer tatt inn etter kveldens henting mangler kursen, uten kall igjen, ender med kode 4
+- [x] Hver senere kjøring samme kveld ender også med 4
+- [x] Mangler også en annen aksje, er koden 1
+- [x] Feilet indeksen i kveldens henting, eller mangler den børsdagen, er koden som før
+- [x] En aksje EODHD ikke ga kurser for, gir fortsatt 1, også i kjøringene etterpå samme kveld
+- [x] Utskriften, skriptet, hjelpen og installasjonen sier hva 4 betyr, og at det er i orden
+- [x] Ingen migrering, og det som hentes og lagres, er som før
+- [x] Testen feilet før rettingen: 8 av 15 på `852f1aa9`
+- [x] Gjennomgangen med fire roller er tatt, og regel 25 holder: de 5 på middels er rettet
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene

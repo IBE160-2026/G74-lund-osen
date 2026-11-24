@@ -2,7 +2,7 @@
 title: "Installasjonen"
 status: aktiv
 created: 2026-11-08
-updated: 2026-11-16T00:31
+updated: 2026-11-24T15:27
 ---
 
 # Installasjonen

@@ -101,7 +101,7 @@ import sys
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
-from typing import Callable, Collection
+from typing import Callable
 from urllib.parse import quote, quote_plus
 
 import requests
@@ -1191,7 +1191,9 @@ def _henting(
     som fullfoerer aksjene, gir ogsaa 3 hvis indeksen feilet i kveldens
     hovedhenting (nytt_forsoek). Kodene er altsaa
     0 (alt i orden, eller ingenting aa gjoere), 1 (noe mangler eller feilet,
-    eller kjoeringen ble stoppet), 2 (feil i argumentene, fra argparse) og 3.
+    eller kjoeringen ble stoppet), 2 (feil i argumentene, fra argparse), 3 og,
+    fra story 2.22, 4 (KODE_BARE_TATT_INN: det eneste som mangler, er aksjer
+    som er tatt inn etter kveldens henting, og det er i orden).
 
     Story 2.4 (gruppens svar 10.11 kl. 15:30): har basen kursen for
     boersdagen for alle aksjene i lista, men hovedindeksen mangler dagen
@@ -1654,29 +1656,57 @@ def _for_sent(naa: datetime, dag: date) -> str:
     return ""
 
 
+def _spurt_i_kveld(data_katalog: Path, dato: date) -> set[str] | None:
+    """Aksjene et nytt forsoek alt har spurt EODHD om for boersdagen - story
+    2.22, gjennomgangen (ECH1). Leses av forsoeksfilene for dagen, som har
+    serier og feil for hvert kall (AD-6). None naar en fil ikke kan leses."""
+    spurt: set[str] = set()
+    for fil in sorted(data_katalog.glob(f"{FORSOEKSPREFIKS}*-raa-{dato.isoformat()}.json")):
+        try:
+            bilde = json.loads(fil.read_text(encoding="utf-8"))
+            spurt |= set(bilde["serier"]) | set(bilde["feil"])
+        except (OSError, ValueError, KeyError, TypeError):
+            return None
+    return spurt
+
+
 def _koden_naar_noe_mangler(
+    data_katalog: Path,
     kursfil: Path,
     base_sti: Path,
     dag: date,
     dato: date,
     mangler: list[str],
-    spurt: Collection[str],
     skriv: Callable[[str], None],
+    *,
+    avbrutt: bool = False,
 ) -> int:
     """Koden et nytt forsoek ender med naar det ikke hadde kall til alle
     aksjene som mangler dagens kurs - story 2.22 (gruppens svar 24.11
     kl. 14:29, spoersmaal 3 i 9.28).
 
-    KODE_BARE_TATT_INN, 4, naar kjoeringen gaar paa selve boersdagen, hver
-    aksje i mangler er en egen aksje som er tatt inn i dag uten aa vaere
-    forsoekt hentet (valg.ikke_forsoekt, med inn lik boersdagen), forsoeket
-    ikke gjorde noe kall for den (spurt), og hovedindeksen ikke feilet i
-    kveldens henting. Da er det eneste som mangler, aksjer som kom inn etter
-    kveldens henting, og det er i orden. Ellers 1, som foer: en annen aksje
-    mangler, et kall ga ikke kursen, indeksen feilet, eller basen kan ikke
-    leses. En dag boersen er stengt, har jobben dagens kall, saa mangler de
-    da, er koden 1. Bare lesing."""
-    if dag != dato or not mangler or set(mangler) & set(spurt):
+    KODE_BARE_TATT_INN, 4, naar alt dette gjelder: kjoeringen gaar paa selve
+    boersdagen; hver aksje i mangler er en egen aksje som er tatt inn i dag
+    uten aa vaere forsoekt hentet (valg.ikke_forsoekt, med inn lik
+    boersdagen); ingen forsoek i kveld har spurt EODHD om den
+    (_spurt_i_kveld); forsoeket stoppet ikke av en annen grunn enn at kallene
+    var brukt (avbrutt); og hovedindeksen verken feilet i kveldens henting
+    eller mangler dagen. Da er det eneste som mangler, aksjer som kom inn
+    etter kveldens henting, og det er i orden.
+
+    Ellers 1, som foer: en annen aksje mangler, et kall ga ikke kursen, i
+    denne kjoeringen eller en tidligere i kveld (gjennomgangen, ECH1),
+    indeksen feilet eller mangler dagen (ECH2), forsoeket ble avbrutt av
+    klokka, kvoten eller bonuskvoten (ECH3), eller basen eller en forsoeksfil
+    kan ikke leses. En dag boersen er stengt, har jobben dagens kall, saa
+    mangler de da, er koden 1. Bare lesing."""
+    if dag != dato or not mangler or avbrutt:
+        return 1
+    spurt = _spurt_i_kveld(data_katalog, dato)
+    if spurt is None:
+        skriv("Et forsøk fra i kveld kan ikke leses, så koden er 1.")
+        return 1
+    if set(mangler) & spurt:
         return 1
     try:
         tilkobling = _aapne_for_sjekken(base_sti)
@@ -1684,11 +1714,13 @@ def _koden_naar_noe_mangler(
             tatt_inn = valg.ikke_forsoekt(tilkobling)
         finally:
             tilkobling.close()
-        if any(tatt_inn.get(symbol) != dato for symbol in mangler):
-            return 1
-        if _indeksen_feilet_i_kveld(kursfil, base_sti):
-            return 1
-    except (*BASEFEIL, ValueError):
+    except (*BASEFEIL, ValueError) as feil:
+        # Gjennomgangen (BH1): loggen sier hvorfor koden ble 1.
+        skriv(f"Basen {base_sti.name} kunne ikke leses for koden ({type(feil).__name__}), så koden er 1.")
+        return 1
+    if any(tatt_inn.get(symbol) != dato for symbol in mangler):
+        return 1
+    if _indeksen_feilet_i_kveld(kursfil, base_sti) or indeksen_mangler(base_sti, dato):
         return 1
     skriv(
         f"Kode {KODE_BARE_TATT_INN}: det eneste som mangler kursen for børsdagen {dato.isoformat()}, er "
@@ -1786,7 +1818,7 @@ def nytt_forsoek(
             f"Kvoten: {igjen} kall igjen av dagens, og 0 til nye forsøk. "
             "Bonuskvoten brukes aldri til nye forsøk (NFR-01). 0 kall brukt."
         )
-        sys.exit(_koden_naar_noe_mangler(kursfil, base_sti, dag, dato, sorted(mangler), (), skriv))
+        sys.exit(_koden_naar_noe_mangler(data_katalog, kursfil, base_sti, dag, dato, sorted(mangler), skriv))
 
     try:
         rekkefoelge = eldste_foerst(base_sti, list(mangler), lista)[:antall]
@@ -1801,9 +1833,13 @@ def nytt_forsoek(
     fra, til = bygg_intervall(dag)
     aksjer = {aksje.symbol: aksje for aksje in lista}
     resultat = Resultat()
+    # Story 2.22 (gjennomgangen, ECH3): stoppet forsoeket av en annen grunn
+    # enn at dagens kall var brukt, er koden 1, ikke KODE_BARE_TATT_INN.
+    avbrutt = False
     for symbol in rekkefoelge:
         if grunn := _for_sent(klokke(), dag):
             skriv(f"{grunn} Ingen flere kall.")
+            avbrutt = True
             break
         en = hent_universet(api_nokkel, fra, til, hent, skriv, (aksjer[symbol],))
         resultat.serier.update(en.serier)
@@ -1816,12 +1852,14 @@ def nytt_forsoek(
                 f"Kvoten kunne ikke leses etter kallet ({type(feil).__name__}). "
                 "Forsøket stopper, så bonuskvoten ikke brukes."
             )
+            avbrutt = True
             break
         if bonus_naa < bonus:
             skriv(
                 f"Bonuskvoten sank fra {bonus} til {bonus_naa}. Forsøket "
                 "stopper, fordi nye forsøk aldri bruker bonuskvoten (NFR-01)."
             )
+            avbrutt = True
             break
         if brukt_naa >= grense:
             skriv(f"Dagens {grense} kall er brukt. Forsøket stopper, så neste kall ikke tas fra bonuskvoten (NFR-01).")
@@ -1873,9 +1911,9 @@ def nytt_forsoek(
             f"Mangler fortsatt kursen for børsdagen {dato.isoformat()} for "
             f"{len(fortsatt)} aksjer: {', '.join(fortsatt)}. {IGJEN_SENERE}"
         )
-        # Story 2.22: aksjene forsoeket gjorde et kall for, er forsoekt.
-        spurt = set(resultat.serier) | set(resultat.feil)
-        sys.exit(_koden_naar_noe_mangler(kursfil, base_sti, dag, dato, fortsatt, spurt, skriv))
+        # Story 2.22: aksjene forsoeket gjorde et kall for, staar i fila det
+        # nettopp skrev, og er forsoekt.
+        sys.exit(_koden_naar_noe_mangler(data_katalog, kursfil, base_sti, dag, dato, fortsatt, skriv, avbrutt=avbrutt))
     skriv(f"Alle {len(lista)} aksjene har kursen for børsdagen {dato.isoformat()}.")
     if _indeksen_feilet_i_kveld(kursfil, base_sti):
         skriv(
