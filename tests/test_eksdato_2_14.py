@@ -97,6 +97,8 @@ class TestTabellen:
         [
             (("NYA", "2026-10-15", None, KILDE), "uten dato for sjekken"),
             (("NYA", "2026-10-15", "", KILDE), "tom dato for sjekken"),
+            (("NYA", "2026-10-15", "2026-02-30", KILDE), "en dato for sjekken som ikke finnes"),
+            (("NYA", "2026-10-15", SJEKKET, "x" * 501), "en for lang kilde"),
             (("NYA", "2026-10-15", SJEKKET, None), "uten kilde"),
             (("NYA", "2026-10-15", SJEKKET, "   "), "tom kilde"),
             (("NYA", "2026-02-30", "2026-02-01", KILDE), "en dato som ikke finnes"),
@@ -151,6 +153,8 @@ class TestKommandoen:
             f"| NYA | {NETTSTED} | 2026-09-20 | nei, vilkårene forbyr det |",
             f"| NYA | {NETTSTED} | 2026-09-20 | uklart |",
             f"| NYA | {NETTSTED} | 2026-09-20 | javel |",
+            f"| NYA | {NETTSTED} | 2026-09-20 | ja/nei |",
+            f"| NYA | {NETTSTED} | 2026-09-20 | ja? |",
             f"| NYA | {NETTSTED} | 2026-09-20 |  |",
             f"| NYA | {NETTSTED} | ikke lest | ja |",
             f"| NYA | {NETTSTED} |  | ja |",
@@ -191,6 +195,10 @@ class TestKommandoen:
             f"https://{NETTSTED}.annet.example/utbytte",
             f"https://ikke{NETTSTED}/utbytte",
             f"ftp://{NETTSTED}/utbytte",
+            f"https://{NETTSTED}@annet.example/utbytte",
+            f"https://annet.example\\@{NETTSTED}/utbytte",
+            f"https://{NETTSTED}/ut bytte",
+            f"https://{NETTSTED}/utbytte\x07",
             f"{NETTSTED}/utbytte",
             "investorsiden",
             "",
@@ -240,6 +248,75 @@ class TestKommandoen:
             tilkobling.close()
         kode, ut = _kjoer(base, _vilkaar(tmp_path, RAD))
         assert kode == 1 and "står ikke i lista" in ut and _rader(base) == []
+
+
+class TestMigreringen:
+    """Gjennomgangen (ECH1, VG2): PR-en venter fordi 0016 endrer den ekte
+    basen. Testene viser hva som skjer med en base på versjon 15."""
+
+    @pytest.fixture
+    def paa_15(self, base, tmp_path):
+        """En kopi av basen slik den sto før 0016: tabellen og triggerne er
+        tatt bort, og versjonen er satt tilbake til 15."""
+        t = sqlite3.connect(base)
+        try:
+            with t:
+                t.execute("DROP TABLE eksdato")
+                t.execute("DELETE FROM skjema_versjon WHERE versjon = 16")
+            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 15
+            assert not t.execute("SELECT 1 FROM sqlite_master WHERE name LIKE 'eksdato%'").fetchall()
+        finally:
+            t.close()
+        return base
+
+    @staticmethod
+    def _innhold(sti) -> dict:
+        t = sqlite3.connect(f"file:{sti}?mode=ro", uri=True)
+        try:
+            tabeller = [
+                navn
+                for (navn,) in t.execute("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
+                if not navn.startswith("eksdato") and navn != "skjema_versjon"
+            ]
+            skjema = t.execute(
+                "SELECT type, name, sql FROM sqlite_master WHERE tbl_name <> 'eksdato' ORDER BY type, name"
+            ).fetchall()
+            return {"skjema": skjema} | {navn: t.execute(f"SELECT * FROM {navn}").fetchall() for navn in tabeller}
+        finally:
+            t.close()
+
+    def test_en_dato_som_avvises_migrerer_ikke_basen(self, paa_15, tmp_path):
+        """Ville feilet hvis kommandoen migrerte basen før den visste at
+        datoen kunne lagres: fila er byte for byte den samme."""
+        foer = paa_15.read_bytes()
+        rad_nyc = "| NYC | nyc.example | 2026-09-20 | ja |"
+        # (radene i vilkårene, argumentene). Vilkårsfila skrives for hvert
+        # tilfelle, fordi alle tilfellene bruker samme fil.
+        tilfellene = (
+            ((), {}),
+            ((RAD,), {"kilde": "https://annet.example/"}),
+            ((RAD,), {"eks": "2026-09-22"}),
+            ((RAD, rad_nyc), {"symbol": "NYC", "kilde": "https://nyc.example/"}),
+        )
+        for rader, argumenter in tilfellene:
+            kode, ut = _kjoer(paa_15, _vilkaar(tmp_path, *rader), **argumenter)
+            assert kode == 1 and "Ikke lagret" in ut, (argumenter, ut)
+            assert paa_15.read_bytes() == foer, argumenter
+
+    def test_migreringen_lar_det_som_finnes_staa(self, paa_15, tmp_path):
+        """Ville feilet hvis 0016 endret en tabell, en trigger eller en rad
+        som fantes: alt utenom eksdato og versjonen er likt før og etter."""
+        foer = self._innhold(paa_15)
+        assert len(foer["kurs"]) > 0 and len(foer["vurdering"]) > 0 and len(foer["aksje"]) >= 16
+        kode, ut = _kjoer(paa_15, _vilkaar(tmp_path, RAD))
+        assert kode == 0, ut
+        assert self._innhold(paa_15) == foer
+        t = sqlite3.connect(paa_15)
+        try:
+            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 16
+        finally:
+            t.close()
+        assert _rader(paa_15) == [("NYA", EKS, SJEKKET, KILDE)]
 
 
 class TestNySjekk:

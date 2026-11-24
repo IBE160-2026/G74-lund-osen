@@ -4,7 +4,7 @@ type: 'code'
 created: '2026-11-24'
 status: 'in-progress'
 route: 'dispatch'
-baseline_commit: 'ed7360f5'
+baseline_commit: '4275cd79'
 context:
   - '{project-root}/CLAUDE.md'
   - '{project-root}/_bmad-output/planning-artifacts/epics.md'
@@ -14,7 +14,8 @@ Skrevet 24.11 etter instruksjonen kl. 13:02 i `docs/ai-prompts/2026-11-24.md`,
 steg 5, og gruppens svar kl. 13:05: storyen bygges på egen gren, PR-en åpnes,
 og den flettes ikke før brukertest 2 er gjort. Rådet anbefalte det, fordi
 migreringen endrer den ekte databasen. Worktreen er `G74-lund-osen-2-14`, på
-grenen `2-14-eksdatoer`.
+grenen `2-14-eksdatoer`, fra main (`4275cd79`), etter at 2.22 er flettet i
+`3f965546` og ført.
 
 ## Storyen
 
@@ -72,6 +73,86 @@ regel 16 og 22
 7. **Dokumentene:** arkitekturen og innleveringen sier `0016`, og README-en
    og hjelpen følger med der de nevner migrasjonene eller kommandoene.
 
+## Resultatet
+
+- `src/migrasjoner/0016_eksdato.sql` lager tabellen `eksdato` med to
+  triggere, uten å endre noe som finnes, og uten rader.
+- `src/eksdato.py` er kommandoen. Den sjekker formen, datoene, kilden og
+  vilkårene før basen åpnes for skriving, og om symbolet står i lista med
+  basen åpnet bare for lesing. En dato som avvises, migrerer derfor ikke
+  basen. En dato som godtas, gjør det: første dato som føres inn fra main,
+  løfter basen fra versjon 15 til 16, hvis hentingen eller webserveren ikke
+  alt har gjort det.
+- `docs/kilder-og-rettigheter.md` har delen «Selskapenes egne sider
+  (eks.datoer)» med en tom tabell. Ingen vilkår for ekte nettsteder er
+  skrevet.
+- `tests/test_eksdato_2_14.py` bruker det oppdiktede symbolet NYA, nettstedet
+  `nyaksje.example` og oppdiktede datoer. Testene som navngir siste
+  migrasjon, sier 16, og testen fra 2.10 for en base én versjon bak bruker
+  katalogen til og med 0015.
+- Migrasjonsfilene står bak bildene av aksjesiden, så de 20 bildene er tatt
+  på nytt i demoen på port 8927 og er byte for byte de samme. Avtrykkene i
+  `tests/test_docker.py` er regnet ut.
+- Storyen er ny kode uten en feil som rettes, så det finnes ingen test som
+  feilet før en retting. Testene for migreringen av en base på versjon 15
+  kom etter gjennomgangen.
+
+## Gjennomgangen 24.11
+
+Én leser, bare med lesing, i fire roller: Blind Hunter, Edge Case Hunter,
+Acceptance Auditor og Verification Gap. Den kjørte ikke pytest. 24 funn: 1
+høy, 3 på middels og 20 lave. 9 er rettet, AA1 (middels) står åpent som
+spørsmål 1, og 14 lave står med grunn.
+
+| Id | Grad | Funnet | Gjort |
+|---|---|---|---|
+| VG1 | høy | Migrasjonsfilene står bak bildene av aksjesiden, og avtrykkene i `tests/test_docker.py` var ikke regnet ut | Rettet: bildene er tatt på nytt og er like, og avtrykkene er regnet ut |
+| ECH1 | middels | Kommandoen migrerte basen før noe var sjekket, også når datoen ble avvist | Rettet: sjekkene går først, og basen leses uten migrering før den åpnes for skriving. `test_en_dato_som_avvises_migrerer_ikke_basen` |
+| VG2 | middels | Ingen test viste at 0016 lar det som finnes i en base på versjon 15, stå | Rettet: `test_migreringen_lar_det_som_finnes_staa` sammenligner skjemaet og alle radene før og etter |
+| AA1 | middels | Regel 22 i `CLAUDE.md` sier at basen bare skrives av hentingen og webserveren, med daterte tillegg. Kommandoen er en ny skriver uten en slik linje | Åpent: spørsmål 1. `CLAUDE.md` endres ikke uten gruppens svar |
+| BH1, BH4 | lav | En kilde med `\`, brukerinfo eller kontrolltegn kunne lure sjekken mot nettstedet, eller bli lagret | Rettet: slike adresser avvises, med tester |
+| BH3 | lav | «ja/nei» og «ja?» i vurderingen talte som ja | Rettet, med tester |
+| AA4 | lav | `baseline_commit` pekte på en commit som ikke er på main | Rettet etter at grenen ble flyttet oppå main |
+| VG3, VG4 | lav | Flere regler i tabellen og i modulen kunne fjernes uten at en test feilet | Rettet for sjekkdatoen som ikke finnes, og kilden over 500 tegn. Resten står: reglene overlapper |
+| BH2 | lav | En rad med feil antall celler eller feil form på symbolet hoppes over, så en eldre «ja»-rad kan vinne | Står: gruppen fører tabellen selv, og formen står over tabellen |
+| BH5 | lav | Mangler vilkårsfila, sier meldingen at raden mangler | Står: begge betyr at vilkårene ikke er ført |
+| ECH2, ECH3 | lav | En eks.dato som har passert, blir stående, og en dato for en aksje som tas ut, kan ikke rettes | Står: visningen (FR-207) må filtrere. Spørsmål 4 |
+| ECH4 | lav | I Docker finnes ikke `docs/`, så kommandoen avviser alt der | Står: spørsmål 5 |
+| ECH5, ECH6 | lav | Første kveld etter flettingen gir `dagen_ferdig.py` kode 2, og en eldre demobase må lages på nytt | Står: slik er det for hver migrasjon |
+| ECH7 | lav | Vilkårene leses fra arbeidskopien, så en rad som ikke er committet, teller | Står: kommandoen kan ikke se forskjellen |
+| AA2 | lav | «Lista sjekkes minst én gang i uka» i FR-414 har ingen kode: kommandoen kan ikke vise hva som er lagret | Står: spørsmål 3 |
+| AA3 | lav | `prd.md` sier fortsatt «Ikke i v1» for FR-414 | Står: føres når PR-en flettes |
+| AA5 | lav | Linja for 2.14 på skjermsiden er byttet uten Rettet-linje | Står: siden har ingen slike linjer |
+| AA6 | lav | Modulen skriver med egen SQL, uten en port i `lagring_sqlite.py` (AD-3), som `valg.py` | Står: tas med AA1 |
+| VG5 | lav | Testen for demobasen bæres av utskriften | Står |
+| VG6 | lav | Importtesten ser bare importer i margen, og `main` prøves med den ekte klokka og datoer langt tilbake | Står: nettet er sperret i alle testene (AD-8) |
+
+Uten funn: SQL-en i migrasjonen, `ON CONFLICT`, sjekkene før kallene på en
+base én versjon bak, to rader for samme symbol, CRLF i dokumentet, «i dag» i
+norsk tid, at ingen eks.dato fra en kilde står i en sporet fil, at ingen
+vilkår for ekte nettsteder er skrevet, og at README-en ikke trenger retting.
+
+## Spørsmål til gruppen
+
+1. **En ny skriver av basen (AA1, middels).** `src/eksdato.py` skriver
+   tabellen `eksdato` i den ekte basen, og regel 22 nevner bare hentingen og
+   webserveren. *Forslag:* en datert linje i regel 22 og under AD-3 når
+   PR-en flettes: kommandoen fra main skriver bare tabellen `eksdato`.
+2. **Én rad per symbol.** Tabellen har den kommende eks.datoen for hvert
+   symbol, og en ny dato erstatter den gamle. *Forslag:* behold det.
+   Alternativet er én rad per dato, med historikken.
+3. **Sjekken hver uke (AA2, lav).** Kommandoen kan ikke vise hva som er
+   lagret, og når det ble sjekket. *Forslag:* en liten story sammen med
+   visningen (FR-207), med et valg som lister radene.
+4. **Datoer som har passert, og aksjer som tas ut (ECH2, ECH3, lave).**
+   Radene blir stående. *Forslag:* la dem stå, og la visningen (FR-207)
+   velge hva som vises.
+5. **Docker (ECH4, lav).** Kommandoen leser vilkårene fra `docs/`, som ikke
+   er i imaget, så den virker bare fra mappa med koden. *Forslag:* la det
+   stå. Datoene føres av gruppen, ikke av en bruker i Docker.
+6. **Når flettes den?** Gruppens svar 24.11 kl. 13:05: ikke før brukertest 2
+   er gjort. PR-en står åpen til gruppen sier fra.
+
 ## Grenser
 
 - Ingen API-kall utover kvotesjekken. Bare testbaser (regel 22). Kommandoen
@@ -83,13 +164,13 @@ regel 16 og 22
 
 ## Kontroll
 
-- [ ] En egen tabell, med ny migrasjon: symbol, eks.dato, datoen den ble sjekket, og hvor den ble lest
-- [ ] Kommandoen tar inn én dato for ett symbol, og nekter et symbol der vilkårene ikke er ført
-- [ ] Kommandoen gjør ingen nettkall, og webserveren skriver ikke tabellen
-- [ ] Ingen eks.dato står i en sporet fil
-- [ ] En ny sjekk av samme dato oppdaterer datoen den ble sjekket, og en flyttet dato erstatter den gamle
-- [ ] En dato kan ikke føres inn uten dato for sjekken eller uten kilde
-- [ ] Gjennomgangen med fire roller er tatt
+- [x] En egen tabell, med ny migrasjon: symbol, eks.dato, datoen den ble sjekket, og hvor den ble lest
+- [x] Kommandoen tar inn én dato for ett symbol, og nekter et symbol der vilkårene ikke er ført
+- [x] Kommandoen gjør ingen nettkall, og webserveren skriver ikke tabellen
+- [x] Ingen eks.dato står i en sporet fil
+- [x] En ny sjekk av samme dato oppdaterer datoen den ble sjekket, og en flyttet dato erstatter den gamle
+- [x] En dato kan ikke føres inn uten dato for sjekken eller uten kilde
+- [x] Gjennomgangen med fire roller er tatt. AA1 (middels) står åpent som spørsmål 1
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
 - [ ] PR-en er åpnet og ikke flettet

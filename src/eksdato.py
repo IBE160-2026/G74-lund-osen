@@ -98,7 +98,7 @@ def les_vilkaar(fil: Path, idag: date) -> dict[str, str]:
             _NETTSTED.fullmatch(nettsted) is not None
             and lest_dato is not None
             and lest_dato <= idag
-            and re.match(rf"{JA}\b", vurdering, flags=re.IGNORECASE) is not None
+            and re.match(rf"{JA}(?![\w/?])", vurdering, flags=re.IGNORECASE) is not None
         )
         # To rader for samme symbol der en av dem ikke er i orden: ingen dato.
         if not i_orden or symbol in godtatt and godtatt[symbol] != nettsted:
@@ -109,13 +109,54 @@ def les_vilkaar(fil: Path, idag: date) -> dict[str, str]:
 
 
 def _paa_nettstedet(kilde: str, nettsted: str) -> bool:
-    """Om kilde er en adresse paa nettstedet, eller et underdomene av det."""
+    """Om kilde er en adresse paa nettstedet, eller et underdomene av det.
+
+    Gjennomgangen (BH1, BH4): en adresse med brukerinfo (@), omvendt
+    skraastrek, mellomrom eller kontrolltegn avvises, fordi en nettleser kan
+    lese den som et annet nettsted enn urlsplit gjoer."""
+    if any(tegn in kilde for tegn in "@\\") or any(tegn.isspace() or not tegn.isprintable() for tegn in kilde):
+        return False
     try:
         deler = urlsplit(kilde)
         vert = (deler.hostname or "").lower().rstrip(".")
     except ValueError:
         return False
     return deler.scheme in ("http", "https") and (vert == nettsted or vert.endswith("." + nettsted))
+
+
+def kontroller(
+    symbol: str, eks_dato: str, sjekket: str, kilde: str, vilkaar: dict[str, str], idag: date
+) -> tuple[str, date, date, str]:
+    """Det som kan sjekkes uten basen: formen paa symbolet, datoene, kilden
+    og vilkaarene. Gir (symbol, eks.dato, sjekket, kilde), eller reiser
+    Avvist med grunnen. Gjennomgangen (ECH1): kjoer sjekker dette foer basen
+    aapnes for skriving, saa en dato som avvises, aldri migrerer basen."""
+    symbol = symbol.strip().upper()
+    kilde = kilde.strip()
+    if not _SYMBOL.fullmatch(symbol):
+        raise Avvist("Symbolet har ikke formen til et symbol i lista.")
+    eks = _dato(eks_dato, "Eks.datoen")
+    sjekk = _dato(sjekket, "Datoen for sjekken")
+    if sjekk > idag:
+        raise Avvist("Datoen for sjekken er etter i dag.")
+    if eks < sjekk:
+        raise Avvist("Eks.datoen er før dagen den ble sjekket, så den er ikke en kommende dato.")
+    if not kilde or len(kilde) > 500:
+        raise Avvist("Kilden mangler, eller er lengre enn 500 tegn.")
+    nettsted = vilkaar.get(symbol)
+    if nettsted is None:
+        raise Avvist(
+            f"Vilkårene for nettstedet til {symbol} er ikke ført i docs/kilder-og-rettigheter.md, "
+            f"under «{OVERSKRIFT.removeprefix('## ')}». Les vilkårene og før raden først (FR-414)."
+        )
+    if not _paa_nettstedet(kilde, nettsted):
+        raise Avvist(f"Kilden er ikke en adresse på {nettsted}, som er nettstedet vilkårene er ført for.")
+    return symbol, eks, sjekk, kilde
+
+
+def _krev_i_lista(tilkobling: sqlite3.Connection, symbol: str) -> None:
+    if tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone() is None:
+        raise Avvist(f"{symbol} står ikke i lista appen følger.")
 
 
 def foer_inn(
@@ -129,29 +170,8 @@ def foer_inn(
 ) -> str:
     """Lagrer en kommende eks.dato for symbol, eller reiser Avvist med
     grunnen. Gir linja til utskriften. Ingen nettkall."""
-    symbol = symbol.strip().upper()
-    kilde = kilde.strip()
-    if not _SYMBOL.fullmatch(symbol):
-        raise Avvist("Symbolet har ikke formen til et symbol i lista.")
-    eks = _dato(eks_dato, "Eks.datoen")
-    sjekk = _dato(sjekket, "Datoen for sjekken")
-    if sjekk > idag:
-        raise Avvist("Datoen for sjekken er etter i dag.")
-    if eks < sjekk:
-        raise Avvist("Eks.datoen er før dagen den ble sjekket, så den er ikke en kommende dato.")
-    if not kilde or len(kilde) > 500:
-        raise Avvist("Kilden mangler, eller er lengre enn 500 tegn.")
-    i_lista = tilkobling.execute("SELECT 1 FROM aksje WHERE symbol = ? AND ut IS NULL", (symbol,)).fetchone()
-    if i_lista is None:
-        raise Avvist(f"{symbol} står ikke i lista appen følger.")
-    nettsted = vilkaar.get(symbol)
-    if nettsted is None:
-        raise Avvist(
-            f"Vilkårene for nettstedet til {symbol} er ikke ført i docs/kilder-og-rettigheter.md, "
-            f"under «{OVERSKRIFT.removeprefix('## ')}». Les vilkårene og før raden først (FR-414)."
-        )
-    if not _paa_nettstedet(kilde, nettsted):
-        raise Avvist(f"Kilden er ikke en adresse på {nettsted}, som er nettstedet vilkårene er ført for.")
+    symbol, eks, sjekk, kilde = kontroller(symbol, eks_dato, sjekket, kilde, vilkaar, idag)
+    _krev_i_lista(tilkobling, symbol)
     with tilkobling:
         gammel = tilkobling.execute("SELECT eks_dato, sjekket FROM eksdato WHERE symbol = ?", (symbol,)).fetchone()
         if gammel is not None and gammel[1] > sjekk.isoformat():
@@ -179,12 +199,32 @@ def kjoer(
     skriv: Callable[[str], None] = print,
     vilkaarsfil: Path = VILKAAR,
 ) -> int:
-    """Kommandoen mot en base. Gir utgangskoden: 0 lagret, 1 ellers."""
+    """Kommandoen mot en base. Gir utgangskoden: 0 lagret, 1 ellers.
+
+    Gjennomgangen (ECH1): basen aapnes for skriving, og migreres da til
+    siste versjon, bare naar datoen har gaatt gjennom alt som kan sjekkes
+    uten aa skrive. Foerst formen, datoene, kilden og vilkaarene, saa om
+    symbolet staar i lista, med basen aapnet bare for lesing og uten
+    migrering. En dato som avvises der, lar basen staa som den var."""
     if lagring_sqlite.er_demobase(base_sti):
         skriv(f"{Path(base_sti).name} er en demobase med oppdiktede tall. Eks.datoer føres ikke inn der.")
         return 1
     if not Path(base_sti).exists():
         skriv(f"Basen {Path(base_sti).name} finnes ikke. Hent kursene først.")
+        return 1
+    vilkaar = les_vilkaar(vilkaarsfil, idag)
+    try:
+        symbolet = kontroller(symbol, eks_dato, sjekket, kilde, vilkaar, idag)[0]
+        lesing = aapne_base(base_sti, kjoer_migrasjoner=False, skrivebeskyttet=True)
+        try:
+            _krev_i_lista(lesing, symbolet)
+        finally:
+            lesing.close()
+    except Avvist as grunn:
+        skriv(f"Ikke lagret: {grunn}")
+        return 1
+    except (sqlite3.Error, OSError, RuntimeError, MigrasjonsFeil) as feil:
+        skriv(f"Basen {Path(base_sti).name} kunne ikke leses ({type(feil).__name__}). Ingenting er lagret.")
         return 1
     try:
         tilkobling = aapne_base(base_sti)
@@ -192,7 +232,7 @@ def kjoer(
         skriv(f"Basen {Path(base_sti).name} kunne ikke åpnes ({type(feil).__name__}). Ingenting er lagret.")
         return 1
     try:
-        skriv(foer_inn(tilkobling, symbol, eks_dato, sjekket, kilde, les_vilkaar(vilkaarsfil, idag), idag))
+        skriv(foer_inn(tilkobling, symbol, eks_dato, sjekket, kilde, vilkaar, idag))
     except Avvist as grunn:
         skriv(f"Ikke lagret: {grunn}")
         return 1
