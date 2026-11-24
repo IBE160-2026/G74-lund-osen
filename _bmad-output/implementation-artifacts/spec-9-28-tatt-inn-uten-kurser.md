@@ -175,13 +175,13 @@ demoen, de ferdige listene, tom base, og at ingen andre steder i `src/` sier
 
 ## Kontroll
 
-- [ ] En egen aksje som er tatt inn uten kurser og ikke er forsøkt hentet, står som «Tatt inn. Kursene kommer ved hentingen …», med dagen regnet som i 9.27
-- [ ] «?» ved «Oppdatert» og siden for aksjen sier ikke at EODHD ikke ga kurser, eller at appen slutter å følge den
-- [ ] En aksje EODHD ikke ga kurser for, har teksten som før
-- [ ] Ingen migrering, og hentingen er ikke endret
-- [ ] Testen feilet før rettingen
-- [ ] Hjelpen følger med
-- [ ] Bildene og avtrykkene er håndtert som i 9.27
-- [ ] Gjennomgangen med fire roller er tatt
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] En egen aksje som er tatt inn uten kurser og ikke er forsøkt hentet, står som «Tatt inn. Kursene kommer ved hentingen …», med dagen skrevet som i 9.27. Dagen er dagen etter, ikke neste børsdag: spørsmål 1
+- [x] «?» ved «Oppdatert» og siden for aksjen sier ikke at EODHD ikke ga kurser, eller at appen slutter å følge den
+- [x] En aksje EODHD ikke ga kurser for, har teksten som før
+- [x] Ingen migrering, og hentingen er ikke endret
+- [x] Testen feilet før rettingen: 20 av 24 på `29cb5e45`
+- [x] Hjelpen følger med
+- [x] Bildene og avtrykkene er håndtert som i 9.27: de 20 bildene er like, og avtrykkene er regnet ut (`8dbd9ea9`)
+- [x] Gjennomgangen med fire roller er tatt. ECH1 (middels) følger av svaret og står som spørsmål 1, så PR-en flettes ikke før gruppen har svart (regel 25)
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 943 bestått (24.11 kl. 01:03–01:09) og 3164 bestått og 7 hoppet over (kl. 01:09–01:29), på `66ddd241`
 - [ ] CI er grønn i alle jobbene
