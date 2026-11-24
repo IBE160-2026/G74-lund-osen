@@ -157,12 +157,16 @@ demoen, de ferdige listene, tom base, og at ingen andre steder i `src/` sier
    «mandag». *Forslag:* behold det grenen gjør, fordi det er det hentingen
    gjør. Alternativet er «mandag», etter ordlyden i svaret, som lover kursene
    to dager for sent. PR-en flettes ikke før gruppen har svart (regel 25).
+   *Svar 24.11 kl. 12:57:* behold det grenen gjør. Rådet anbefalte det.
+   ECH1 og AA2 er dermed lukket, og regel 25 hindrer ikke flettingen.
 2. **En aksje som tas inn igjen (ECH5, lav).** Den beholder dagen den først
    kom inn. Ble den tatt ut fordi EODHD ikke ga kurser, og tas den inn igjen
    av en sen kjøring uten kall, står den som «Hentet», og hentingen tar den ut
    igjen neste børsdag før den er hentet. Det fantes før 9.28 og ligger i
    hentingen, som ikke skulle endres. *Forslag:* en egen liten story etter
    brukertest 2, der `inn` settes på nytt når en aksje tas inn igjen.
+   *Svar 24.11 kl. 12:57:* rettes nå, før testen, i story 2.21. Rådet
+   anbefalte å vente til etter testen, men gruppen valgte nå.
 
 ## Grenser
 
@@ -184,6 +188,6 @@ demoen, de ferdige listene, tom base, og at ingen andre steder i `src/` sier
 - [x] Testen feilet før rettingen: 20 av 24 på `29cb5e45`
 - [x] Hjelpen følger med
 - [x] Bildene og avtrykkene er håndtert som i 9.27: de 20 bildene er like, og avtrykkene er regnet ut (`8dbd9ea9`)
-- [x] Gjennomgangen med fire roller er tatt. ECH1 (middels) følger av svaret og står som spørsmål 1, så PR-en flettes ikke før gruppen har svart (regel 25)
+- [x] Gjennomgangen med fire roller er tatt. ECH1 (middels) følger av svaret og sto som spørsmål 1 til gruppen svarte 24.11 kl. 12:57: behold det grenen gjør (regel 25)
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 943 bestått (24.11 kl. 01:03–01:09) og 3164 bestått og 7 hoppet over (kl. 01:09–01:29), på `66ddd241`
 - [ ] CI er grønn i alle jobbene
