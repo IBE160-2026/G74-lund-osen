@@ -248,4 +248,4 @@ class TestTekstene:
         assert "hentingen slutter med kode 1 fordi det nye forsøket ikke har kall" not in hjelp
         assert "kode 4" in hjelp
         installasjon = (ROT / "docs" / "installasjon.md").read_text(encoding="utf-8")
-        assert "kode 4" in installasjon and "`LastTaskResult`" in installasjon
+        assert "Kode 4" in installasjon and "`LastTaskResult`" in installasjon
