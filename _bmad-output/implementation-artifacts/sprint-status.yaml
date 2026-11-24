@@ -31,7 +31,7 @@
 # Rettet 2026-11-09 (gruppens svar 08.11 kl. 22:14): avgjoerelser som staar som en persons, som
 # «Marians beslutning», var gruppens, og svaret ble gitt i oekta for gruppen.
 generated: 09-24-2026 19:26
-last_updated: 24-11-2026 13:32
+last_updated: 24-11-2026 13:33
 project: G74-lund-osen
 project_key: NOKEY
 tracking_system: file-system
@@ -100,6 +100,8 @@ development_status:
   2-19-høy-og-lav-mot-sluttkursen: done
   # Lagt til 2026-11-22 (kallene til overs, gruppens svar kl. 11:29). Bygges etter kodegjennomgangen.
   2-20-aksjene-utenfor-lista-har-ferske-kurser-når-de-følges: backlog
+  # Story 2.21 (2026-11-24, gruppens svar kl. 12:57, ECH5 i 9.28): en aksje som tas ut og inn igjen.
+  2-21-ut-og-inn-igjen: in-progress
   epic-2-retrospective: optional
 
   epic-3: in-progress

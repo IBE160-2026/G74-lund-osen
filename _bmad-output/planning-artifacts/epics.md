@@ -2288,6 +2288,22 @@ signal, så jeg ikke må vente til neste børsdag kl. 22.
 
 ---
 
+### Story 2.21: En aksje som tas ut og inn igjen, får dagen den kom inn igjen
+
+*Lagt til 2026-11-24, etter instruksjonen kl. 13:02 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 12:57 på spørsmål 2 i 9.28:* ECH5 fra gjennomgangen av 9.28 rettes her. Rådet anbefalte å vente til etter brukertest 2, men gruppen valgte nå. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-2-21-ut-og-inn-igjen.md`.
+
+Som **bruker som følger en aksje på nytt** vil jeg at appen regner aksjen som ny fra dagen den kom inn igjen, så den ikke tas ut før kursene er hentet, og statusen sier når de kommer.
+
+**Oppfyller:** ECH5 i 9.28 (svaret 24.11 kl. 12:57), FR-412, FR-415 · **Begrenses av:** AD-7, AD-21, regel 22; ingen ny migrasjon
+
+**Kontroll — hva testen ser etter:**
+- En egen aksje uten kurser som tas ut og inn igjen, får `inn` lik dagen den kom inn igjen
+- Den tas ikke ut før hentingen har forsøkt den på nytt, og statusen fra 9.28 regner fra den nye dagen
+- En aksje med kurser beholder `inn`, så lista for dagene den har kurser for, er som før
+- **Ville feilet hvis:** aksjen sto som «Hentet» uten kurser etter at den kom inn igjen, eller ble tatt ut før den var forsøkt hentet; testen feilet før rettingen
+
+**Avhenger av:** 9.28, 2.12. **Én økt:** ja.
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
