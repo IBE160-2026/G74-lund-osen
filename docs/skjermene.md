@@ -2,12 +2,12 @@
 title: "Skjermene i OSE Signal"
 status: aktiv
 created: 2026-11-22
-updated: 2026-11-24T13:33
+updated: 2026-11-24T14:44
 ---
 
 # Skjermene i OSE Signal
 
-Siden har 10 epics, 145 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
+Siden har 10 epics, 146 storyer og 53 bilder. 42 av storyene har ett eller to bilder. De andre har én linje: hvorfor storyen ikke har skjerm, eller hvilket bilde som viser det den ga. Alle bildene er fra demoen, med oppdiktede selskaper og kurser («Eksempeltall»), ikke data fra Oslo Børs. De er 1280 px brede og tatt 22.11 av koden på main etter story 9.25 (`c0192467`), av hele siden eller av delen storyen ga. Et utsnitt av en del har 16 px over og under, så kanten av delene ved siden av kan synes.
 
 Bildene viser appen slik den er nå, så et bilde kan også vise det senere storyer la til, for eksempel knappene øverst, «i ettertid» og den rikere KI-teksten. Teksten under sier hva storyen ga, og nevner det senere der det kan forveksles.
 
@@ -198,6 +198,10 @@ Ikke bygget: skrevet 22.11 og bygges etter kodegjennomgangen. [Storyen](../_bmad
 ### 2.21 En aksje som tas ut og inn igjen, får dagen den kom inn igjen
 
 Ingen skjerm: hentingen setter dagen aksjen kom inn igjen, og statusen fra 9.28 regner fra den. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-21-ut-og-inn-igjen.md)
+
+### 2.22 En egen kode når det eneste som mangler, er aksjer tatt inn etter kveldens henting
+
+Ingen skjerm: hentingen ender med kode 4 i stedet for 1 når bare en nylig inntatt aksje mangler kursen. [Spesifikasjonen](../_bmad-output/implementation-artifacts/spec-2-22-egen-kode-for-tatt-inn.md)
 
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 

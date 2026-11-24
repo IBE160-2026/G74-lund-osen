@@ -2308,6 +2308,22 @@ Som **bruker som følger en aksje på nytt** vil jeg at appen regner aksjen som 
 
 *Lagt til 2026-11-24:* 2.21 er flettet. PR #178 er squash-flettet i `e80d9227` kl. 14:42, låst til head-en `20cd316b`, uten nytt ja. CI var grønn i alle fire jobbene (run 45405266824), med 6231 bestått og 99 hoppet over i jobben `pytest`. Ingen migrering.
 
+### Story 2.22: En egen kode når det eneste som mangler, er aksjer tatt inn etter kveldens henting
+
+*Lagt til 2026-11-24, etter beskjeden kl. 14:31 i `docs/ai-prompts/2026-11-24.md` og gruppens svar kl. 14:29 på spørsmål 3 i 9.28:* kjøringen som tar inn en aksje uten kall, ender i dag med kode 1, så `LastTaskResult` for kveldsjobben kan stå som 1 en kveld der alt er i orden. Rådet anbefalte å vente til etter brukertest 2, men gruppen valgte nå. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-2-22-egen-kode-for-tatt-inn.md`.
+
+Som **gruppe som leser resultatet av kveldsjobben** vil vi at en kveld der alt er i orden, ikke ender med kode 1, så 1 fortsatt betyr at noe som skulle vært hentet, mangler.
+
+**Oppfyller:** spørsmål 3 i 9.28 (svaret 24.11 kl. 14:29), FR-412 · **Begrenses av:** NFR-01, AD-6, AD-7, regel 22; ingen ny migrasjon
+
+**Kontroll — hva testen ser etter:**
+- En kjøring der det eneste som mangler, er aksjer tatt inn etter kveldens henting uten kall igjen, ender med en egen kode, 4, slik `KODE_BARE_INDEKSEN` (3) er for indeksen
+- Mangler også en annen aksje eller indeksen, gjelder koden som gjaldt før
+- Koden står i hjelpen, installasjonen og skriptet, med hva den betyr og at det er i orden
+- **Ville feilet hvis:** kjøringen endte med 1 når bare en nylig inntatt aksje manglet, eller med 4 når noe som skulle vært hentet, manglet; testen feilet før rettingen
+
+**Avhenger av:** 9.28, 2.21, 2.3b, 2.8. **Én økt:** ja.
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
