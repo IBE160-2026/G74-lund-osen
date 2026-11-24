@@ -235,7 +235,7 @@ class TestKommandoen:
         tilkobling = aapne_base(base)
         try:
             with tilkobling:
-                tilkobling.execute("UPDATE aksje SET ut = '2026-09-23' WHERE symbol = 'NYA'")
+                tilkobling.execute("UPDATE aksje SET ut = '2026-09-24' WHERE symbol = 'NYA'")
         finally:
             tilkobling.close()
         kode, ut = _kjoer(base, _vilkaar(tmp_path, RAD))
@@ -339,7 +339,8 @@ class TestGrensene:
         for fil in sorted((ROT / "src").rglob("*")):
             if fil.suffix not in (".py", ".html", ".js") or fil.name == "eksdato.py":
                 continue
-            assert "eksdato" not in fil.read_text(encoding="utf-8").lower(), fil.name
+            # Ordet for seg, så «indeksdato» i en mal ikke teller.
+            assert not re.search(r"(?<![a-zæøå])eksdato", fil.read_text(encoding="utf-8").lower()), fil.name
 
     def test_ingen_eks_dato_staar_i_modulen_eller_vilkaarene(self):
         """Regel 16. Ville feilet hvis en dato sto skrevet inn i modulen,

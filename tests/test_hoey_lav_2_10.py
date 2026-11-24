@@ -229,7 +229,7 @@ class TestMigrasjonen:
         finally:
             t.close()
 
-    def test_en_base_en_versjon_bak_leses_av_sjekken(self, tmp_path):
+    def test_en_base_en_versjon_bak_leses_av_sjekken(self, tmp_path, monkeypatch):
         """Sjekken foer kallene leser basen med godta_en_versjon_bak, ogsaa
         den kvelden 0015 er flettet og basen staar paa 14 (story 2.8). Ville
         feilet med «no such column: hoey» hvis lageret alltid leste kolonnene."""
@@ -248,6 +248,18 @@ class TestMigrasjonen:
         t.commit()
         t.close()
         foer = sti.read_bytes()
+        # Rettet 2026-11-24 (story 2.14): med 0016 er en base paa 14 to
+        # versjoner bak. Testen gjelder kvelden 0015 var siste migrasjon, saa
+        # katalogen adapterne ser, har filene til og med 0015.
+        til_15 = tmp_path / "til_15"
+        til_15.mkdir()
+        for fil in sorted(MIGRASJONSKATALOG.glob("*.sql")):
+            if fil.name < "0016":
+                shutil.copy(fil, til_15 / fil.name)
+        assert siste_versjon(til_15) == 15
+        import lagring_sqlite
+
+        monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", til_15)
         assert fp.manglende_i_basen(sti, TIRSDAG, AKSJEUNIVERS[:1]) == []
         assert AKSJEUNIVERS[0].symbol == "EQNR"
         t = sqlite3.connect(f"file:{sti}?mode=ro", uri=True)
