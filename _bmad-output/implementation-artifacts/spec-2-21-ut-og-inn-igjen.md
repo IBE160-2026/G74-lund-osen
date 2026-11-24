@@ -89,6 +89,15 @@ FR-415 · **Begrenses av:** AD-7 (ingen rad slettes), AD-21, regel 3, 16, 19,
   hentingen selv. 6 av 8 feilet mot koden før rettingen (`f01dd638`). De to
   som besto, er vakter som skal si det samme før og etter: en aksje med
   kurser beholder dagen, og regelen i basen om at `inn` er før `ut`, står.
+- *Lagt til 2026-11-24 (gruppens beskjed kl. 14:31):* testene bruker bare
+  faste øyeblikk, aldri den ekte klokka. Slått opp: `fetch_prices.kjoer` får
+  øyeblikket som argument og bruker det som klokke når ingen klokke er gitt,
+  `Valglager` får en fast klokke, og sidene får klokka fra `_klient`, som
+  bytter ut `app.naa`. Den ekte klokka leses bare i `naa()` i `app.py` og
+  `fetch_prices.py` og i tidsstempelet migreringen skriver. Feilen under
+  arbeidet var et fast øyeblikk som var lagt etter midnatt norsk tid, ikke
+  den ekte klokka. En niende test, `test_klokka_i_testene_er_fast`, holder
+  de sene kjøringene mellom kl. 22:00 og 23:50 norsk tid samme børsdag.
 - `docs/hjelp.md` sier at en aksje som følges på nytt, regnes som ny fra
   dagen den kom inn igjen.
 - `src/valg.py` står bak bildene, så de 20 bildene er tatt på nytt i demoen
@@ -161,5 +170,5 @@ skjermsiden og i matrisen.
 - [x] Ingen migrering, og ingen rad er slettet
 - [x] Testen feilet før rettingen: 6 av 8 på `f01dd638`
 - [x] Gjennomgangen med fire roller er tatt, og regel 25 holder: ingen funn på middels, og de to høye er rettet
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 306 bestått (24.11 kl. 14:17–14:18) og 3164 bestått og 7 hoppet over (kl. 14:18–14:36), på `609fdf46`; testfila med den niende testen ga 9 bestått etterpå
 - [ ] CI er grønn i alle jobbene

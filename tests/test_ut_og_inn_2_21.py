@@ -10,14 +10,16 @@ test gjør nettkall (AD-8).
 
 import sqlite3
 from datetime import date, timedelta
+from pathlib import Path
 
 import pytest
 
 import ferdige_lister
 import valg
+from boersdag import norsk_dato
 from lagring_sqlite import aapne_base, les_lista
 from test_fetch_prices import OEYEBLIKK_22_09, TIRSDAG_22_09, kjoer_23, kjoer_23_kode, kvote, serie_til
-from test_tatt_inn_9_28 import HENTET, _egne, _foelg, _klient, kl
+from test_tatt_inn_9_28 import HENTET, OSLO, _egne, _foelg, _klient, kl
 from test_valg import FASTE, med_boersen
 from valg import Valglager
 
@@ -27,6 +29,8 @@ ONSDAG = OEYEBLIKK_22_09 + timedelta(days=1)
 TORSDAG = OEYEBLIKK_22_09 + timedelta(days=2)
 FREDAG = OEYEBLIKK_22_09 + timedelta(days=3)
 SENT = timedelta(minutes=45)
+# De sene kjøringene onsdag kveld, etter kveldens henting kl. 22:00 norsk tid.
+SENE = (SENT, timedelta(minutes=75), timedelta(minutes=105))
 
 
 @pytest.fixture(autouse=True)
@@ -99,6 +103,24 @@ def inn_igjen(tatt_ut):
     assert kode == 1 and kall == [], ut
     assert "NYA er tatt inn i lista fra 2026-09-23." in ut
     return raa, base
+
+
+def test_klokka_i_testene_er_fast():
+    """Gruppens beskjed 24.11 kl. 14:31: testene bruker bare faste øyeblikk,
+    aldri den ekte klokka. Hentingen får øyeblikket som argument, og klokka
+    den leser, er det samme øyeblikket; sidene får klokka fra _klient. Ville
+    feilet hvis en sen kjøring ble lagt etter midnatt norsk tid, der ønskene
+    ikke tas i bruk (dag er ikke lenger børsdagen), eller etter kl. 23:50,
+    der et nytt forsøk ikke starter."""
+    for sent in SENE:
+        oeyeblikk = (ONSDAG + sent).astimezone(OSLO)
+        assert norsk_dato(ONSDAG + sent) == ONSDAG_23_09
+        assert (22, 0) < (oeyeblikk.hour, oeyeblikk.minute) < (23, 50)
+    assert norsk_dato(OEYEBLIKK_22_09 + SENT) == TIRSDAG_22_09
+    assert [norsk_dato(o) for o in (ONSDAG, TORSDAG, FREDAG)] == [ONSDAG_23_09, TORSDAG_24_09, date(2026, 9, 25)]
+    kilde = Path(__file__).read_text(encoding="utf-8")
+    for ekte in ("datetime." + "now(", "date." + "today(", "time." + "time("):
+        assert ekte not in kilde
 
 
 class TestDagenDenKomInnIgjen:
@@ -175,11 +197,11 @@ class TestFjernetOgFulgtIgjen:
         assert _ikke_forsoekt(base) == {"NYA": ONSDAG_23_09}
         # Fjernet igjen samme kveld: ut blir dagen etter, fordi den kom inn i dag.
         _fjern(base)
-        kjoer_23_kode(raa, base, ONSDAG + timedelta(minutes=75), les_kvote=uten_kall)
+        kjoer_23_kode(raa, base, ONSDAG + SENE[1], les_kvote=uten_kall)
         assert _rad(base) == ("2026-09-23", "2026-09-24", 0, 0)
         # Og fulgt igjen: inn står på dagen, og ut er borte.
         _foelg(base)
-        kjoer_23_kode(raa, base, ONSDAG + timedelta(minutes=105), les_kvote=uten_kall)
+        kjoer_23_kode(raa, base, ONSDAG + SENE[2], les_kvote=uten_kall)
         assert _rad(base) == ("2026-09-23", None, 0, 0)
 
     def test_en_aksje_med_kurser_beholder_dagen(self, tmp_path):
