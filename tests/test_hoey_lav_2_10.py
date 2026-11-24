@@ -179,7 +179,8 @@ class TestMigrasjonen:
     def test_paa_en_kopi_av_en_testbase_paa_dagens_siste_versjon(self, tmp_path):
         """Ville feilet hvis 0015 endret en rad som finnes, ikke ga dem NULL,
         eller lageret ikke kunne skrive og lese etterpå."""
-        assert siste_versjon(MIGRASJONSKATALOG) == 15
+        # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+        assert siste_versjon(MIGRASJONSKATALOG) == 16
         katalog = tmp_path / "migrasjoner"
         katalog.mkdir()
         for fil in sorted(MIGRASJONSKATALOG.glob("*.sql")):
@@ -206,7 +207,8 @@ class TestMigrasjonen:
         shutil.copy(gammel, kopi)
         t = sqlite3.connect(kopi)
         try:
-            assert migrer(t, MIGRASJONSKATALOG) == 15
+            # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+            assert migrer(t, MIGRASJONSKATALOG) == 16
             assert t.execute("SELECT * FROM kurs ORDER BY symbol, dato").fetchall() == [
                 (*r, None, None) for r in kurs_foer
             ]
@@ -227,7 +229,7 @@ class TestMigrasjonen:
         finally:
             t.close()
 
-    def test_en_base_en_versjon_bak_leses_av_sjekken(self, tmp_path):
+    def test_en_base_en_versjon_bak_leses_av_sjekken(self, tmp_path, monkeypatch):
         """Sjekken foer kallene leser basen med godta_en_versjon_bak, ogsaa
         den kvelden 0015 er flettet og basen staar paa 14 (story 2.8). Ville
         feilet med «no such column: hoey» hvis lageret alltid leste kolonnene."""
@@ -246,6 +248,18 @@ class TestMigrasjonen:
         t.commit()
         t.close()
         foer = sti.read_bytes()
+        # Rettet 2026-11-24 (story 2.14): med 0016 er en base paa 14 to
+        # versjoner bak. Testen gjelder kvelden 0015 var siste migrasjon, saa
+        # katalogen adapterne ser, har filene til og med 0015.
+        til_15 = tmp_path / "til_15"
+        til_15.mkdir()
+        for fil in sorted(MIGRASJONSKATALOG.glob("*.sql")):
+            if fil.name < "0016":
+                shutil.copy(fil, til_15 / fil.name)
+        assert siste_versjon(til_15) == 15
+        import lagring_sqlite
+
+        monkeypatch.setattr(lagring_sqlite, "MIGRASJONSKATALOG", til_15)
         assert fp.manglende_i_basen(sti, TIRSDAG, AKSJEUNIVERS[:1]) == []
         assert AKSJEUNIVERS[0].symbol == "EQNR"
         t = sqlite3.connect(f"file:{sti}?mode=ro", uri=True)
@@ -386,7 +400,8 @@ class TestHentingen:
         )
         t = sqlite3.connect(base)
         try:
-            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 15
+            # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 16
             n, med_hoey, med_lav = t.execute("SELECT count(*), count(hoey), count(lav) FROM kurs").fetchone()
         finally:
             t.close()

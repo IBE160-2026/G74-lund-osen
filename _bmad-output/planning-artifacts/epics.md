@@ -2172,6 +2172,8 @@ så appen kan vise dem uten en kilde vi ikke har.
 
 **Avhenger av:** 2.3. Vilkårene leses før første dato. **Én økt:** ja.
 
+*Lagt til 2026-11-24 (instruksjonen kl. 13:02 i `docs/ai-prompts/2026-11-24.md`, gruppens svar kl. 13:05):* storyen bygges nå, på egen gren, med `0016_eksdato.sql` og kommandoen `src/eksdato.py`. PR-en åpnes, men flettes ikke før brukertest 2 er gjort. Rådet anbefalte det, fordi migreringen endrer den ekte databasen. Gruppen fører selv vilkårene for nettstedene i `docs/kilder-og-rettigheter.md`. Spesifikasjonen står i `_bmad-output/implementation-artifacts/spec-2-14-eksdatoer.md`.
+
 ---
 
 ### Story 2.16: Børskalenderen for alle år

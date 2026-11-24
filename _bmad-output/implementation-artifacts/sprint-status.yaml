@@ -90,7 +90,8 @@ development_status:
   2-12-velge-og-bytte-aksjer: done
   2-13-kommandoen-som-måler-omsetning: done
   2-13b-maal-alle-med-bonuskvoten: done
-  2-14-eksdatoer-føres-inn-for-hånd: backlog
+  # 2026-11-24 (gruppens svar kl. 13:05): bygges på egen gren. PR-en flettes ikke før brukertest 2 er gjort.
+  2-14-eksdatoer-føres-inn-for-hånd: in-progress
   2-16-børskalenderen-for-alle-år: done
   # Lagt til 2026-11-14 (v1.1, gruppens svar kl. 05:41-05:49).
   2-17-signalet-regnet-i-ettertid: done

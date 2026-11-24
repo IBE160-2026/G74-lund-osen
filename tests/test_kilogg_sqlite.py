@@ -89,7 +89,8 @@ class TestMigrasjonen:
         etter 0013 (story 8.26), og 12 etter 0012 (story 8.21)."""
         # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
         # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
-        assert versjon(base) == 15
+        # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+        assert versjon(base) == 16
         assert base.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'ki_logg'").fetchone()
         assert (MIGRASJONSKATALOG / "0005_ki_logg.sql").is_file()
 
@@ -114,7 +115,8 @@ class TestMigrasjonen:
                 SqliteKILogg(tilkobling, klokke)
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
             # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
-            assert migrer(tilkobling, MIGRASJONSKATALOG) == 15
+            # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+            assert migrer(tilkobling, MIGRASJONSKATALOG) == 16
             assert SqliteKILogg(tilkobling, klokke).les_alle() == []
         finally:
             tilkobling.close()
