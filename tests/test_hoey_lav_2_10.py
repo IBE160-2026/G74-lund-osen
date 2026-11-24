@@ -179,7 +179,8 @@ class TestMigrasjonen:
     def test_paa_en_kopi_av_en_testbase_paa_dagens_siste_versjon(self, tmp_path):
         """Ville feilet hvis 0015 endret en rad som finnes, ikke ga dem NULL,
         eller lageret ikke kunne skrive og lese etterpå."""
-        assert siste_versjon(MIGRASJONSKATALOG) == 15
+        # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+        assert siste_versjon(MIGRASJONSKATALOG) == 16
         katalog = tmp_path / "migrasjoner"
         katalog.mkdir()
         for fil in sorted(MIGRASJONSKATALOG.glob("*.sql")):
@@ -206,7 +207,8 @@ class TestMigrasjonen:
         shutil.copy(gammel, kopi)
         t = sqlite3.connect(kopi)
         try:
-            assert migrer(t, MIGRASJONSKATALOG) == 15
+            # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+            assert migrer(t, MIGRASJONSKATALOG) == 16
             assert t.execute("SELECT * FROM kurs ORDER BY symbol, dato").fetchall() == [
                 (*r, None, None) for r in kurs_foer
             ]
@@ -386,7 +388,8 @@ class TestHentingen:
         )
         t = sqlite3.connect(base)
         try:
-            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 15
+            # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+            assert t.execute("SELECT max(versjon) FROM skjema_versjon").fetchone()[0] == 16
             n, med_hoey, med_lav = t.execute("SELECT count(*), count(hoey), count(lav) FROM kurs").fetchone()
         finally:
             t.close()

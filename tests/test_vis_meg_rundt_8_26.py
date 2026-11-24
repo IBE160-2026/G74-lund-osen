@@ -618,7 +618,8 @@ class TestTriggerenFra0013:
         try:
             # Rettet 2026-11-14 (story 2.17): versjon 14 med 0014_regnet.sql.
             # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
-            assert migrer(t, MIGRASJONSKATALOG) == 15
+            # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+            assert migrer(t, MIGRASJONSKATALOG) == 16
             with pytest.raises(sqlite3.IntegrityError, match="ukjent aksje i min_liste"):
                 t.execute("INSERT INTO min_liste (symbol) VALUES ('UKJENT')")
             t.execute(

@@ -2,7 +2,7 @@
 title: "Kilder og rettigheter"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-16T00:16
+updated: 2026-11-24T15:57
 ---
 
 # Kilder og rettigheter
@@ -45,6 +45,19 @@ blir liggende lokalt er derfor et valg vi må ta bevisst — se neste avsnitt.
 | Liberation Mono | Navnet og symbolet på sidene for VRDS og LSTF i demoen (story 3.4h), 400 og 700, i [`src/static/fonts/liberation-mono/`](../src/static/fonts/liberation-mono/) | **2026-11-07:** SIL Open Font License 1.1, lest før commit ([`OFL.txt`](../src/static/fonts/liberation-mono/OFL.txt), `LICENSE` i arkivet) | *Lagt til 2026-11-07:* Liberation 2.1.5 fra utgivelsen [2.1.5](https://github.com/liberationfonts/liberation-fonts/releases/tag/2.1.5) hos liberationfonts, `liberation-fonts-ttf-2.1.5.tar.gz` (sha256 `7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0`), lenket fra utgivelsen. Reserverte navn: «Liberation», og «Arimo», «Tinos» og «Cousine». TTF-filene er pakket til WOFF 1.0 med bare zlib per tabell, uten WOFF-metadata og uten privat blokk, så tabellene er byte for byte de samme (OFL-FAQ 2.2.1 på [openfontlicense.org](https://openfontlicense.org/ofl-faq/), lest 07.11: en slik fil regnes ikke som en endret versjon, og navnet kan beholdes). Hele filer, ikke kuttet til tegnene i navnene (spørsmål 8 i spesifikasjonen for 3.4h). |
 
 Mediekilder vurdert til relevanseksperimentet står i egen seksjon lenger nede, ikke i tabellen over.
+
+---
+
+## Selskapenes egne sider (eks.datoer)
+
+*Lagt til 2026-11-24 (story 2.14, FR-414, gruppens svar kl. 13:05).* Kommende eks.datoer leses av en av oss på selskapets egen investorside og føres inn med `uv run python src/eksdato.py <symbol> <eks.dato> --sjekket <dato> --kilde <adresse>`. Programmet henter aldri siden. Datoene står bare i basen, aldri i en sporet fil (regel 16).
+
+Et selskap får ingen dato før vilkårene for nettstedet er lest og ført i tabellen under. Kommandoen leser tabellen og avviser et symbol uten en rad. En rad teller når den har symbolet slik det står i lista, nettstedet som domene uten `https://`, datoen vilkårene ble lest som ÅÅÅÅ-MM-DD, og en vurdering som begynner med «ja». En vurdering som begynner med noe annet, for eksempel «nei» eller «uklart», gir ingen dato. Kilden som gis til kommandoen, må være en adresse på nettstedet i raden.
+
+Tabellen er tom til gruppen har lest vilkårene for det første nettstedet. Gruppen fører radene selv.
+
+| Symbol | Nettsted | Vilkår lest | Vurdering |
+|---|---|---|---|
 
 ---
 

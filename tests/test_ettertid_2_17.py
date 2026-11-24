@@ -432,7 +432,8 @@ class TestMigrasjonen:
         shutil.copy(gammel, kopi)
         t = sqlite3.connect(kopi)
         # Rettet 2026-11-19 (story 2.10): versjon 15 med 0015_hoey_lav.sql.
-        assert migrer(t, MIGRASJONSKATALOG) == 15
+        # Rettet 2026-11-24 (story 2.14): versjon 16 med 0016_eksdato.sql.
+        assert migrer(t, MIGRASJONSKATALOG) == 16
         assert _kveldsradene(t) == [r for r in foer]
         assert {r for (r,) in t.execute("SELECT regnet FROM vurdering")} == {"kveld"}
         t.close()
