@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-24T16:27
+updated: 2026-11-24T16:55
 ---
 
 # Kvalitetssikring
@@ -810,6 +810,10 @@ tabellen 03.10.
 *Rettet 2026-11-19 (gruppens svar kl. 13:51):* raden for 9.20 sa 27 rader, 25 rettet og «19 lave rettet», men tabellen i spesifikasjonen har 23 funn: 6 på middels og 17 lave, og 21 er rettet. Rapporten fra leseren i økta 18.11 kl. 00:05 har de samme 23, og de fire som skulle gitt 27, er ikke funnet, verken i økta eller i scratchpad. Tallet 27 har ingen kilde (regel 12).
 
 *Lagt til 2026-10-17:* fra story 9.1 (17.10) får hver PR triagen fra spesifikasjonen som kommentar, med lenke til spesifikasjonen. PR #56–#60 fikk den i ettertid 17.10, satt sammen fra triagen i spesifikasjonene.
+
+### Kodegjennomgangen av v1
+
+*Lagt til 2026-11-24 (instruksjonen kl. 13:02, steg 4):* [`S/kodegjennomgang-v1.md`](../_bmad-output/implementation-artifacts/kodegjennomgang-v1.md), 24.11. Hele `src/` og `start/` på `3f965546` ble delt i fire, og hver del fikk én leser med fire roller: Blind Hunter, Edge Case Hunter, Acceptance Auditor og Verification Gap. Leserne leste bare, og ingen kode er endret. De førte 79 funn: 2 på høy grad, 19 på middels og 58 lave, og 21 var kjent eller delvis kjent fra før. De 21 på middels og høy er samlet i G1–G14 og er forslag til storyer etter brukertest 2. De to på høy grad gjelder kontrollen av KI-teksten for én aksje, og er prøvd mot `ki_kontroll.kontroller` etterpå.
 
 ### Kodegjennomgangen av Epic 1
 
