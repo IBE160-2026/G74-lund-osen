@@ -5685,3 +5685,5 @@ Som **bruker som følger en aksje sent en børsdag** vil jeg at appen sier at ak
 - **Ville feilet hvis:** en aksje som bare er tatt inn, sto som «Hentet» eller med teksten om EODHD; testen feilet før rettingen
 
 **Avhenger av:** 9.27. **Én økt:** ja.
+
+*Lagt til 2026-11-24 (gjennomgangen, ECH1 og ECH2):* statusen sier dagen etter at aksjen kom inn, «i morgen etter kl. 22» og så «i kveld etter kl. 22», også i helgen, fordi jobben går hver dag og et nytt forsøk henter aksjen en lørdag. Det avviker fra «neste børsdag» i svaret og står som spørsmål 1 i spesifikasjonen. Tekstene sier «kursene er ikke hentet ennå», ikke at ingen kall er brukt.
