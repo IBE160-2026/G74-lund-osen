@@ -2,7 +2,7 @@
 title: "PRD — OSE Signal"
 status: aktiv
 created: 2026-09-20
-updated: 2026-11-22T19:04
+updated: 2026-11-24T21:58
 ---
 
 # PRD — OSE Signal
@@ -1242,8 +1242,10 @@ avvises med en forklaring. En aksje brukeren har valgt selv, merkes «Egen».
   fra den dagen (FR-409). Tas den inn igjen, begynner kveldens vurderinger på
   nytt, og dagene mellom får signalet regnet i ettertid når kursene finnes, merket
   (FR-408).
-- En ticker som ikke gir rader ved hentingen, tas ikke inn, og utskriften sier
-  det.
+- En ticker brukeren har valgt selv, tas inn i lista ved hentingen. Gir den ikke
+  en eneste kurs, står den i lista og bruker en av de 18 plassene til neste
+  henting en senere børsdag. Da tas den ut igjen, ønsket merkes avvist, og
+  utskriften sier det.
 - Er omsetningen målt fra før (FR-413), vises den før brukeren velger.
 - En aksje som omsettes for mindre enn 32 MNOK om dagen, eller ikke er målt,
   merkes «Utenfor målingen» i grått. Gult betyr 3 av 3 (`designregler.md` §3).

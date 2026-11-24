@@ -2,7 +2,7 @@
 title: "Endringslogg for PRD-en"
 status: aktiv
 created: 2026-11-12
-updated: 2026-11-22T19:04
+updated: 2026-11-24T21:58
 ---
 
 # Endringslogg for PRD-en
@@ -1705,3 +1705,5 @@ Linjene fra 8.26 (FR-108) og 3.7 (§4.6, FR-608) kom inn med main 13.11 og står
 *Endret 2026-11-22 (story 2.20, gruppens svar 22.11 kl. 11:29, rådet anbefalte det):* FR-416 «Ferske kurser for aksjene utenfor lista» er et nytt krav i §4.4, etter FR-415, med konsekvenser og status «senere» i tabellen i §2. «v1.1» i §8 nevner det med de andre som er «senere», og [`prd-sporing.md`](prd-sporing.md) har fått en rad. Målingen av omsetning (FR-413) henter hele året per kall og lagrer kursene, de 20 mest omsatte utenfor lista måles først hver lørdag, og en aksje som følges en dag børsen er stengt, hentes samme kveld. Lista for en børsdag som alt er hentet, endres ikke, som før. FR-413 er ikke endret: målingen bruker fortsatt alle kallene som er igjen, uten reserve. Ingen tekst er tatt bort.
 
 *Endret 2026-11-22 (story 9.25, E5 i UX-dokumentene, gruppens svar kl. 18:23):* ordlista i §1 har fått «Ticker», med «symbol» i parentes, fordi søkefeltet i «Følg en aksje» og FR-415 sier «ticker», mens steget i omvisningen ved søkefeltet sa «symbolet». Steget sier nå «ticker». Koden og kravene om hentingen og lagringen sier «symbol» som før, og raden sier det, som raden for «Bransje».
+
+*Endret 2026-11-24 (G9 i kodegjennomgangen av v1, A-AA1, gruppens svar kl. 21:47, rådet anbefalte det):* FR-412 sa: «En ticker som ikke gir rader ved hentingen, tas ikke inn, og utskriften sier det.» Koden gjør noe annet (`uten_rader` og `ta_i_bruk` i `src/valg.py`, lest 24.11): aksjen tas inn i lista ved hentingen, og en egen aksje som er forsøkt hentet og ikke har fått en eneste kurs, tas ut ved neste henting en senere børsdag. Imens bruker den en av de 18 plassene. Nå står det: «En ticker brukeren har valgt selv, tas inn i lista ved hentingen. Gir den ikke en eneste kurs, står den i lista og bruker en av de 18 plassene til neste henting en senere børsdag. Da tas den ut igjen, ønsket merkes avvist, og utskriften sier det.» Ordlyden er rettet til koden, og ingen kode er endret. Det var kjent fra gjennomgangen av 2.12 (VG7), og 9.28, 2.21 og 2.22 bygger på det. Raden for FR-412 i [`prd-sporing.md`](prd-sporing.md) har fått 2.21, 2.22, 9.27 og 9.28 med testfilene deres.

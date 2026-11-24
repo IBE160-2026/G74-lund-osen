@@ -2,7 +2,7 @@
 title: "Sporingen av PRD-en"
 status: aktiv
 created: 2026-11-17
-updated: 2026-11-22T11:39
+updated: 2026-11-24T21:58
 ---
 
 # Sporingen av PRD-en
@@ -82,7 +82,7 @@ stemmer med markørene i `prd.md`, eller hvis en lenke her ikke virker.
 | FR-409 | §4.4 | bygget | 1.7, 2.2b, 2.7, 2.11, 2.17, 8.8, 8.12, 8.17 | `tests/test_app.py`, `tests/test_lista.py`, `tests/test_markedsoversikt.py`, `tests/test_oversiktsleser.py`, `tests/test_signaldager.py`, `tests/test_tilstand.py`, `tests/test_vurderingslager.py` |
 | FR-410 | §4.4 | bygget | 2.8 | `tests/test_fetch_prices.py`, `tests/test_indeks.py` |
 | FR-411 | §4.4 | bygget | 3.4, 3.4b, 3.4h, 8.18, 9.17 | `tests/test_app.py`, `tests/test_demo.py`, `tests/test_demo_ki.py`, `tests/test_indeks.py`, `tests/test_ki_visning.py`, `tests/test_utseende.py` |
-| FR-412 | §4.4 | bygget | 2.11, 2.12, 8.6, 8.11, 8.11c, 8.28 | `tests/test_de_15_mest_omsatte_8_28.py`, `tests/test_ferdige_lister.py`, `tests/test_ferdige_lister_8_11b.py`, `tests/test_ki_grunnlag.py`, `tests/test_lista.py`, `tests/test_valg.py` |
+| FR-412 | §4.4 | bygget | 2.11, 2.12, 2.21, 2.22, 8.6, 8.11, 8.11c, 8.28, 9.27, 9.28 | `tests/test_de_15_mest_omsatte_8_28.py`, `tests/test_ferdige_lister.py`, `tests/test_ferdige_lister_8_11b.py`, `tests/test_ki_grunnlag.py`, `tests/test_kode_4_2_22.py`, `tests/test_lista.py`, `tests/test_statusene_9_27.py`, `tests/test_tatt_inn_9_28.py`, `tests/test_ut_og_inn_2_21.py`, `tests/test_valg.py` |
 | FR-413 | §4.4 | bygget | 2.13 | `tests/test_ferdige_lister_8_11b.py`, `tests/test_omsetning.py` |
 | FR-414 | §4.4 | senere | 2.14 | ingen |
 | FR-415 | §4.4 | bygget | 2.12, 8.22, 8.26 | `tests/test_bransjene_8_22.py`, `tests/test_foelg_en_aksje_8_22.py`, `tests/test_valg.py`, `tests/test_vis_meg_rundt_8_26.py` |
