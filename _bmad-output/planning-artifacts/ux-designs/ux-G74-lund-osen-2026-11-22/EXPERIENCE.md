@@ -3,7 +3,7 @@ title: "EXPERIENCE.md — OSE Signal"
 name: OSE Signal
 status: final
 created: 2026-11-22
-updated: 2026-11-24T00:23
+updated: 2026-11-24T13:32
 sources:
   - _bmad-output/planning-artifacts/prds/prd-G74-lund-osen-2026-09-20/prd.md
   - src/app.py
@@ -474,3 +474,5 @@ Ingen svar er foreslått. Hvert spørsmål har kildene på begge sider.
   *Svar 2026-11-22 kl. 18:23 (gruppens svar, rådet anbefalte det):* hver rad er sjekket mot koden. Bygget og lukket: U18, U30, U33, U40, U42, U46, U48, U50, U60, U67, U91, U103–U105, U107, U108, U110, U111 og U113, med storyen i en datert linje i `docs/ux-logg.md`. Står åpne: U4 (kalenderen begynner i 2026) og U109 (hakkingen). U106 og U112 har ingenting å bygge og står som før.
 
 *Lagt til 2026-11-24 (story 9.27, `93b26f50`, PR #176; gruppens svar 23.11 kl. 14:49 og 22:25):* statusene i «Dine egne aksjer» og «Følg en aksje» regner dagen. På en børsdag står «i kveld etter kl. 22» helt til midnatt, og en dag børsen er stengt, står neste børsdag, som «mandag etter kl. 22» en lørdag. Aksjesiden, merknaden i Min liste og «Er du sikker?» sier samme dag, «… ved hentingen i kveld etter kl. 22 …», og «Følg en aksje» sier «Fjerner du aksjen før hentingen i kveld etter kl. 22, brukes ingen kall.» Radene over som siterer «i kveld» og «før kvelden», viser tekstene slik de var 22.11. I demoen står «i kveld» fast.
+
+*Lagt til 2026-11-24 (story 9.28, `4c5bfca8`, PR #177; gruppens svar 23.11 kl. 23:27 og 24.11 kl. 12:57):* en egen aksje som er tatt inn i lista uten kurser og ikke er hentet ennå, står under «Dine egne aksjer» som «Tatt inn. Kursene kommer ved hentingen i morgen etter kl. 22.», og fra dagen etter «i kveld etter kl. 22», også i helgen. «?» ved «Oppdatert» og siden for aksjen sier at kursene ikke er hentet ennå. En aksje EODHD ikke ga kurser for, har tekstene som før.

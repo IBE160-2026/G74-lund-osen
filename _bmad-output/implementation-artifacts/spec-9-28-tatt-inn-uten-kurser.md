@@ -2,7 +2,7 @@
 title: 'Story 9.28: en egen aksje som er tatt inn uten kurser, står ikke som «Hentet»'
 type: 'code'
 created: '2026-11-24'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'bbf861f6'
 context:
@@ -167,6 +167,15 @@ demoen, de ferdige listene, tom base, og at ingen andre steder i `src/` sier
    brukertest 2, der `inn` settes på nytt når en aksje tas inn igjen.
    *Svar 24.11 kl. 12:57:* rettes nå, før testen, i story 2.21. Rådet
    anbefalte å vente til etter testen, men gruppen valgte nå.
+3. **Kode 1 en kveld der alt er i orden (lagt til 24.11, se «Flettet 24.11»).**
+   Kjøringen som tar inn en aksje etter kveldens henting, og hver senere
+   kjøring samme kveld, ender med kode 1 når det nye forsøket har 0 kall, og
+   `LastTaskResult` for kveldsjobben blir 1. Skal en slik kjøring ende med en
+   annen kode? *Forslag:* vent til etter brukertest 2, og gi tilfellet da en
+   egen kode, slik `KODE_BARE_INDEKSEN` (3) er det for indeksen, så 1 fortsatt
+   betyr at noe som skulle vært hentet, mangler. Til da: står det 1 en
+   morgen, les `data/logg/kveldshenting-<dato>.log`. Linjene «… er tatt inn i
+   lista fra …» og «0 til nye forsøk» viser at det er dette tilfellet.
 
 ## Grenser
 
@@ -190,4 +199,21 @@ demoen, de ferdige listene, tom base, og at ingen andre steder i `src/` sier
 - [x] Bildene og avtrykkene er håndtert som i 9.27: de 20 bildene er like, og avtrykkene er regnet ut (`8dbd9ea9`)
 - [x] Gjennomgangen med fire roller er tatt. ECH1 (middels) følger av svaret og sto som spørsmål 1 til gruppen svarte 24.11 kl. 12:57: behold det grenen gjør (regel 25)
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 943 bestått (24.11 kl. 01:03–01:09) og 3164 bestått og 7 hoppet over (kl. 01:09–01:29), på `66ddd241`
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 45297687994 på `83ef7b30`, og run 45393142565 på `c94afa88`, etter svarene)
+
+## Flettet 24.11
+
+PR #177 er squash-flettet i `4c5bfca8` 24.11 kl. 13:31, låst til head-en `c94afa88`, etter instruksjonen kl. 13:02 i `docs/ai-prompts/2026-11-24.md`, uten nytt ja. CI var grønn i alle fire jobbene (run 45393142565), med 6222 bestått og 99 hoppet over i jobben `pytest`. `--dokumentene` på grenen kl. 13:03–13:23 ga 3164 bestått og 7 hoppet over. Ingen funn på middels eller høy grad sto åpne: ECH1 og AA2 ble lukket av gruppens svar kl. 12:57, behold det grenen gjør, og ECH5 (lav) rettes i story 2.21 etter samme svar.
+
+### Kode 1 fra kveldsjobben (instruksjonen kl. 13:02, steg 2)
+
+Bare oppslag, uten endring. Spørsmålet: testen viser at kjøringen kl. 22:45 ender med kode 1 når den tar inn en aksje uten kall. Gir det `LastTaskResult` 1 for kveldsjobben en kveld der alt er i orden?
+
+**Ja.** Slått opp på `4c5bfca8`:
+
+- `start/kveldshenting.ps1` avslutter med koden fra hentingen: `$kode = $LASTEXITCODE` etter `uv run python src/fetch_prices.py`, og `exit $kode` til slutt. Koden fra målingen (2.13) endrer den ikke.
+- En kjøring som tar inn en aksje etter kveldens henting, finner at aksjen mangler dagens kurs, og går til `nytt_forsoek` i `src/fetch_prices.py`. Gir `kall_til_nye_forsoek` 0, skriver det «… 0 til nye forsøk. … 0 kall brukt.» og avslutter med `sys.exit(1)`. Fixturen `tatt_inn` i `tests/test_tatt_inn_9_28.py` viser det for kjøringen kl. 22:45: koden er 1, og ingen kall er brukt.
+- De senere kjøringene samme kveld er lest av koden, ikke kjørt i en test: aksjen mangler fortsatt kursen, så de går samme vei og ender med 1. Oppgaveplanleggeren viser koden fra den siste, kl. 23:45.
+- 0 kall er det vanlige så sent: målingen bruker kallene som er igjen etter den første kjøringen (Utført-linja 22.11 kl. 12:04 i dagsfila), og kvotesjekken 23.11 kl. 22:27 viste 20 av 20 brukt.
+
+Kveldens henting gikk da som den skulle, og aksjen hentes dagen etter (ECH1). Koden 1 kommer av regelen fra 2.3b, svar 5: mangler en aksje fortsatt dagens kurs, gir kjøringen kode 1. Det står som spørsmål 3 over, med et forslag. Ingenting er endret.

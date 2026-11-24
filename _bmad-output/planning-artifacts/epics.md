@@ -5687,3 +5687,5 @@ Som **bruker som følger en aksje sent en børsdag** vil jeg at appen sier at ak
 **Avhenger av:** 9.27. **Én økt:** ja.
 
 *Lagt til 2026-11-24 (gjennomgangen, ECH1 og ECH2):* statusen sier dagen etter at aksjen kom inn, «i morgen etter kl. 22» og så «i kveld etter kl. 22», også i helgen, fordi jobben går hver dag og et nytt forsøk henter aksjen en lørdag. Det avviker fra «neste børsdag» i svaret og står som spørsmål 1 i spesifikasjonen. Tekstene sier «kursene er ikke hentet ennå», ikke at ingen kall er brukt.
+
+*Lagt til 2026-11-24:* 9.28 er flettet. PR #177 er squash-flettet i `4c5bfca8` kl. 13:31, låst til head-en `c94afa88`, uten nytt ja. CI var grønn i alle fire jobbene (run 45393142565), med 6222 bestått og 99 hoppet over i jobben `pytest`. Gruppens svar kl. 12:57: dagen blir som grenen regner den, dagen etter og ikke neste børsdag (rådet anbefalte det), og en aksje som tas ut og inn igjen (ECH5), rettes nå i story 2.21 (rådet anbefalte å vente til etter brukertest 2). Kjøringen som tar inn en aksje uten kall, ender med kode 1, så `LastTaskResult` kan stå som 1 en kveld der alt er i orden: spørsmål 3 i spesifikasjonen.
