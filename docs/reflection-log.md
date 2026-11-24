@@ -3760,6 +3760,77 @@ Det vi lærte (forslag, som vi skriver om med egne ord i refleksjonsrapporten): 
 
 ---
 
+## 24.11.2026 – 21.–24.11: en story stoppet på grunnlaget, UX-dokumentene og skjermene, et svar koden ikke fulgte, og fem valg mot rådet
+
+*Joakim og Marian.* Oppføringen har bare det som står i dagsfilene `docs/ai-prompts/2026-11-21.md` til `2026-11-24.md` og i commitene. Der det står **Gruppens egne ord**, skriver gruppen selv. Claude Code har ikke skrevet meninger i gruppens navn.
+
+**Det som ble gjort**
+
+21.11 ble kveldsjobben sjekket kl. 21:46: kjøringen 20.11, den første med 2.10 og 2.19, endte med resultat 0. Samme kveld ble en ny story for Epic 2, om kallene som er til overs, stoppet kl. 22:22, før noe var skrevet i repoet.
+
+22.11:
+- **2.20**, aksjene utenfor lista har ferske kurser når de følges, ble skrevet om og står som backlog (`b2dfd382`), med FR-416 som «senere» (`c82049f6`), etter svaret kl. 11:29. Rådet anbefalte svarene.
+- **9.24**, UX-dokumentene `DESIGN.md` og `EXPERIENCE.md` med `bmad-ux`, uten nye designvalg: flettet kl. 16:21 (#173, `737ea494`). De hadde 13 og 8 åpne spørsmål til gruppen, og gruppen svarte kl. 18:23.
+- **9.25**, svarene på UX-spørsmålene bygget, hver retting med en test som feilet før rettingen: flettet kl. 20:56 (#174, `c0192467`).
+- **9.26**, `docs/skjermene.md` med skjermene ordnet etter epic og story, 53 bilder fra demoen: flettet 23.11 kl. 00:20 (#175, `16b74c35`), etter svaret kl. 19:05.
+- Brukertest 2 ble flyttet til tirsdag 24.11 eller onsdag 25.11 (`5706ead5`, svaret kl. 18:23).
+
+23.11:
+- Svarene kl. 14:49 på spørsmålene i 9.25 og 9.26 ble ført (`cd479f50`), og hjelpen rettet (`042d922a`).
+- **9.27**, statusene i «Dine egne aksjer» og «Følg en aksje» regner dagen: bygget etter svaret kl. 14:49 på spørsmål 3 i 9.25, og flettet 24.11 kl. 00:22 (#176, `93b26f50`), etter svarene kl. 22:25 og 23:27.
+
+24.11:
+- **9.28**, en egen aksje som er tatt inn uten kurser, står ikke som «Hentet»: flettet kl. 13:31 (#177, `4c5bfca8`), etter svaret kl. 12:57. Ingen migrering trengtes.
+- **2.21**, en aksje som tas ut og inn igjen, får dagen den kom inn igjen: flettet kl. 14:42 (#178, `e80d9227`), etter svaret kl. 12:57.
+- **2.22**, en egen kode, 4, når det eneste som mangler, er aksjer tatt inn etter kveldens henting: flettet kl. 16:25 (#179, `3f965546`), etter svaret kl. 14:29.
+- **2.14**, eks.datoer føres inn for hånd, med migrasjonen `0016_eksdato.sql`: bygget på egen gren, og PR #180 ble åpnet kl. 17:37. Den er ikke flettet: etter svaret kl. 13:05 flettes den ikke før brukertest 2 er gjort. Rådet anbefalte det, fordi migreringen endrer den ekte databasen.
+- **Kodegjennomgangen av v1** (`b76cd054`): `src/` og `start/` på `3f965546`, delt i fire, med fire roller i hver del. 79 funn: 2 på høy grad, 19 på middels og 58 lave. Ingen kode ble endret, og funnene på middels og høy er forslag til storyer etter brukertest 2.
+
+**Utfordringer**
+
+1. **En story som ble stoppet fordi grunnlaget var feil (21.11).**
+   *Problem:* instruksjonen kl. 22:02 beskrev en story om kallene som er til overs. Tre ting i den stemte ikke med koden og målingene: jobben bruker kallene også når børsen er stengt, de 2 kallene i reserve gjelder bare kontrollen i 2.13, og alle de 280 aksjene utenfor lista var alt målt.
+   *Løsning:* storyen ble stoppet kl. 22:22, og ingenting av den ble skrevet i repoet. Den ble skrevet om 22.11 som 2.20, etter svaret kl. 11:29.
+   *KI sin rolle:* Claude Code sjekket hvert tall og hver henvisning mot koden og `malinger.md` før noe ble skrevet (regel 3), og spurte da kravet i PRD-en ville krevd en endring i en test.
+   **Gruppens egne ord:** *(skrives av gruppen)*
+
+2. **Et svar som ikke stemte med det koden gjør (9.28).**
+   *Problem:* svaret 23.11 kl. 23:27 sa at statusen skulle si at kursene kommer «ved hentingen neste børsdag». Jobben går hver dag, og en aksje som tas inn fredag kveld, får kursene lørdag kveld. Det ble vist med en test. Grenen sa derfor dagen etter, også i helgen, og avvek fra ordlyden i svaret.
+   *Løsning:* PR #177 ble ikke flettet 24.11 kl. 01:36, selv om CI var grønn, fordi funnet fulgte av svaret (regel 25). Gruppen svarte kl. 12:57: behold det grenen gjør. Rådet anbefalte det. PR-en ble flettet kl. 13:31.
+   *KI sin rolle:* leseren i gjennomgangen fant avviket (ECH1, middels). Claude Code skrev testen som viser hva hentingen gjør en lørdag, og stoppet før flettingen.
+   **Gruppens egne ord:** *(skrives av gruppen)*
+
+3. **Kode 1 en kveld der alt er i orden.**
+   *Problem:* testen i 9.28 viste at kjøringen kl. 22:45 ender med kode 1 når den tar inn en aksje uten kall. Oppslaget 24.11 viste at `start/kveldshenting.ps1` gir koden videre, så `LastTaskResult` kan stå som 1 selv om kveldens henting gikk som den skulle. Hjelpen sa alt at det ikke er en feil.
+   *Løsning:* gruppen svarte kl. 14:29 at det rettes nå, i 2.22. Gjennomgangen av 2.22 fant tre veier der den nye koden kunne komme selv om noe manglet (middels), og de ble rettet før flettingen.
+   *KI sin rolle:* oppslaget, storyen og gjennomgangen. Funnene på middels kom fra leseren i gjennomgangen, ikke fra den som skrev koden.
+   **Gruppens egne ord:** *(skrives av gruppen)*
+
+4. **Feil Claude Code gjorde selv.**
+   *Problem:* to tellinger i 9.27 var feil: 4 lave funn rettet og 10 som sto, i stedet for 5 og 9, i PR-en og Utført-linja 23.11 kl. 16:20, og 16 funn i stedet for 14 i spesifikasjonen. I 2.21 la en test en kjøring etter midnatt norsk tid, så den feilet. Beskjeden «få ut kurser i dag» 23.11 kl. 23:50 kunne leses på flere måter.
+   *Løsning:* tallene ble rettet med daterte linjer, mot tabellene i spesifikasjonene. Testen ble rettet, og 2.21 og 2.22 har en test som holder klokkeslettene faste og før midnatt, etter gruppens beskjed 24.11 kl. 14:31. Ved beskjeden kl. 23:50 ble ingenting hentet; vinduet spurte, og svaret kl. 23:58 var at ingen henting var ment.
+   *KI sin rolle:* feilene var Claude Codes egne. Tellingene ble funnet ved å telle radene i tabellene på nytt.
+   **Gruppens egne ord:** *(skrives av gruppen)*
+
+5. **Fem valg mot rådet.**
+   *Problem:* rådet anbefalte fem ganger noe annet enn det gruppen valgte:
+   - **Spørsmål 3 i 9.25** (svaret 23.11 kl. 14:49): rådet ville vente til etter brukertest 2. Gruppen valgte nå, og det ble 9.27.
+   - **9.27** (svaret 23.11 kl. 22:25): rådet anbefalte «i morgen» etter første kjøring, som stripa. Gruppen valgte «i kveld» helt til midnatt.
+   - **9.28** (svaret 23.11 kl. 23:27): rådet anbefalte å vente til etter brukertest 2. Gruppen valgte nå.
+   - **2.21** (svaret 24.11 kl. 12:57): rådet anbefalte å vente til etter brukertest 2. Gruppen valgte nå.
+   - **2.22** (svaret 24.11 kl. 14:29): rådet anbefalte å vente til etter brukertest 2. Gruppen valgte nå.
+
+   Gruppen fulgte rådet i svarene 22.11 kl. 11:29 om 2.20, i spørsmål 1 og 2 i 9.25 og begge i 9.26 (23.11 kl. 14:49), i dagen i 9.28 (24.11 kl. 12:57), og i at 2.14 ikke flettes før brukertest 2 (24.11 kl. 13:05).
+   *Løsning:* sikringene sto i alle fem: ingen ny migrasjon, bare testbaser, en test som feilet før hver retting, gjennomgang med fire roller, og fletting bare med grønn CI og ingen åpne funn på middels eller høy grad. For 9.28 sa instruksjonen kl. 23:29 at en migrering ikke skulle gjøres uten svar, og grunnen står der: «Grunnen er databasekopien og den ekte versjonen før testen.» Andre grunner for valgene står ikke i dagsfilene.
+   *KI sin rolle:* Claude Code bygget storyene og førte i spesifikasjonene hvor gruppen valgte mot rådet.
+   **Gruppens egne ord, om hvorfor vi valgte mot rådet:** *(skrives av gruppen)*
+
+**Brukertest 2** ble flyttet fra søndag 22.11 til tirsdag 24.11 eller onsdag 25.11 (svaret 22.11 kl. 18:23).
+
+**Det vi lærte:** *(skrives av gruppen, med egne ord)*
+
+---
+
 # Joakims oppføringer
 
 Denne seksjonen er tom med vilje, og den skal fylles ut av Joakim.
