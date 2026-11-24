@@ -176,6 +176,8 @@ demoen, de ferdige listene, tom base, og at ingen andre steder i `src/` sier
    betyr at noe som skulle vært hentet, mangler. Til da: står det 1 en
    morgen, les `data/logg/kveldshenting-<dato>.log`. Linjene «… er tatt inn i
    lista fra …» og «0 til nye forsøk» viser at det er dette tilfellet.
+   *Svar 24.11 kl. 14:29:* rettes nå, før testen, i story 2.22. Rådet
+   anbefalte å vente til etter testen, men gruppen valgte nå.
 
 ## Grenser
 
