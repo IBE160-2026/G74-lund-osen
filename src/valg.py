@@ -401,9 +401,11 @@ def ikke_forsoekt(tilkobling: sqlite3.Connection) -> dict[str, date]:
     hadde kall, men ikke fikk kurser, skriver ingen rad, og en henting som
     stopper ved midnatt, gjør det heller ikke. Slike aksjer er med her, og
     uten_rader tar dem ikke ut, så tekstene sier at kursene ikke er hentet
-    ennå, ikke at ingen kall er brukt. En aksje som er tatt ut og inn igjen,
-    beholder dagen den først kom inn (ta_i_bruk setter bare ut tilbake), så
-    eldre rader i vurdering gjør at den ikke er med."""
+    ennå, ikke at ingen kall er brukt.
+
+    Story 2.21 (ECH5, gruppens svar 24.11 kl. 12:57): en aksje uten kurser
+    som er tatt ut og inn igjen, får dagen den kom inn igjen (ta_i_bruk), så
+    eldre rader i vurdering ikke teller, og den er med her fra den dagen."""
     egne = egne_i_lista(tilkobling)
     return {
         symbol: date.fromisoformat(inn)
@@ -448,7 +450,8 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
     dagen. Ingen rad i aksje slettes (gjennomgangen, BH4, ECH4, AD-7).
 
     Å følge legger aksjen inn med inn = dato, eller tar den inn igjen (ut blir
-    NULL). Gjennomgangen (BH1, VG1): har lista alt TAK aksjer, avvises ønsket
+    NULL). Story 2.21: en aksje uten en eneste kurs som tas inn igjen, får
+    inn = dato, og en aksje med kurser beholder inn. Gjennomgangen (BH1, VG1): har lista alt TAK aksjer, avvises ønsket
     med grunnen. Gir linjene til utskriften.
 
     Story 8.22 (spørsmål 3): bransjen er den faste i ferdige_lister.BRANSJE
@@ -503,7 +506,21 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
                         (symbol, f"{symbol}.OL", navn, sektor, dag),
                     )
                 elif rad[1] is not None:
-                    tilkobling.execute("UPDATE aksje SET ut = NULL, sektor = ? WHERE symbol = ?", (sektor, symbol))
+                    # Story 2.21 (ECH5 i 9.28, gruppens svar 24.11 kl. 12:57):
+                    # en aksje uten en eneste kurs får dagen den kom inn igjen.
+                    # Da teller ikke eldre rader i vurdering som et forsøk, så
+                    # uten_rader ikke tar den ut før den er hentet, og
+                    # ikke_forsoekt regner fra den nye dagen. En aksje med
+                    # kurser beholder inn: lista for dagene den har kurser
+                    # for, leses av inn og ut (les_lista). ut er NULL
+                    # etterpå, så regelen inn < ut i 0009 holder.
+                    har_kurser = tilkobling.execute(
+                        "SELECT EXISTS(SELECT 1 FROM kurs WHERE symbol = ?)", (symbol,)
+                    ).fetchone()[0]
+                    tilkobling.execute(
+                        "UPDATE aksje SET ut = NULL, sektor = ?, inn = CASE WHEN ? THEN inn ELSE ? END WHERE symbol = ?",
+                        (sektor, har_kurser, dag, symbol),
+                    )
                 linjer.append(f"{symbol} er tatt inn i lista fra {dag}.")
             tilkobling.execute("UPDATE oenske SET tatt_i_bruk = ? WHERE id = ?", (dag, id_))
         for symbol in sorted(egne_i_lista(tilkobling)):
