@@ -175,11 +175,11 @@ class TestFjernetOgFulgtIgjen:
         assert _ikke_forsoekt(base) == {"NYA": ONSDAG_23_09}
         # Fjernet igjen samme kveld: ut blir dagen etter, fordi den kom inn i dag.
         _fjern(base)
-        kjoer_23_kode(raa, base, ONSDAG + 2 * SENT, les_kvote=uten_kall)
+        kjoer_23_kode(raa, base, ONSDAG + timedelta(minutes=75), les_kvote=uten_kall)
         assert _rad(base) == ("2026-09-23", "2026-09-24", 0, 0)
         # Og fulgt igjen: inn står på dagen, og ut er borte.
         _foelg(base)
-        kjoer_23_kode(raa, base, ONSDAG + 3 * SENT, les_kvote=uten_kall)
+        kjoer_23_kode(raa, base, ONSDAG + timedelta(minutes=105), les_kvote=uten_kall)
         assert _rad(base) == ("2026-09-23", None, 0, 0)
 
     def test_en_aksje_med_kurser_beholder_dagen(self, tmp_path):

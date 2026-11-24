@@ -2304,6 +2304,8 @@ Som **bruker som følger en aksje på nytt** vil jeg at appen regner aksjen som 
 
 **Avhenger av:** 9.28, 2.12. **Én økt:** ja.
 
+*Lagt til 2026-11-24 (gjennomgangen, AA2 og AA3):* bare en aksje uten en eneste kurs får ny dag. En aksje med kurser beholder `inn`, som gruppen avgjorde 08.11 kl. 21:35 (spørsmål 6 i 2.11): `ut` nullstilles, og en tabell med periodene venter til det trengs. Det står som spørsmål 1 i spesifikasjonen.
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger

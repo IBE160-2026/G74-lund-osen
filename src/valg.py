@@ -451,8 +451,9 @@ def ta_i_bruk(tilkobling: sqlite3.Connection, dato: date) -> list[str]:
 
     Å følge legger aksjen inn med inn = dato, eller tar den inn igjen (ut blir
     NULL). Story 2.21: en aksje uten en eneste kurs som tas inn igjen, får
-    inn = dato, og en aksje med kurser beholder inn. Gjennomgangen (BH1, VG1): har lista alt TAK aksjer, avvises ønsket
-    med grunnen. Gir linjene til utskriften.
+    inn = dato, og en aksje med kurser beholder inn. Gjennomgangen (BH1, VG1):
+    har lista alt TAK aksjer, avvises ønsket med grunnen. Gir linjene til
+    utskriften.
 
     Story 8.22 (spørsmål 3): bransjen er den faste i ferdige_lister.BRANSJE
     når aksjen står der, ikke den i ønsket, og en egen aksje i lista med en

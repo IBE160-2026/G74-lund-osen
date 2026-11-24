@@ -52,6 +52,11 @@ FR-415 · **Begrenses av:** AD-7 (ingen rad slettes), AD-21, regel 3, 16, 19,
   aksjen tas inn igjen, er `ut` NULL, så en ny `inn` bryter ikke regelen.
   `ta_i_bruk` setter alt `ut` til dagen etter når en aksje fjernes samme dag
   som den kom inn.
+- Gruppen avgjorde 08.11 kl. 21:35 (spørsmål 6 i 2.11, `epics.md`) at en
+  aksje som kommer inn igjen, får `ut` nullstilt, og at en egen tabell med
+  periodene venter til det trengs. 2.21 holder det for aksjer med kurser, og
+  endrer det bare for aksjer uten en eneste kurs, som ikke har noen periode
+  med kurser å vise (gjennomgangen, AA3).
 - **Ingen migrering trengs.** Kolonnen `inn` finnes, og rettingen skriver bare
   en ny verdi i den.
 
@@ -75,6 +80,52 @@ FR-415 · **Begrenses av:** AD-7 (ingen rad slettes), AD-21, regel 3, 16, 19,
    rettingen. Avtrykkene og bildene håndteres som i 9.27 hvis en fil bak et
    bilde endres, og `docs/skjermene.md` får en linje for 2.21.
 
+## Resultatet
+
+- `valg.ta_i_bruk` setter `inn` til børsdagen når en aksje uten en eneste
+  kurs tas inn igjen. En aksje med kurser beholder `inn`. Ingen migrering, og
+  ingen rad slettes.
+- `tests/test_ut_og_inn_2_21.py` har 8 tester, med tilstandene laget av
+  hentingen selv. 6 av 8 feilet mot koden før rettingen (`f01dd638`). De to
+  som besto, er vakter som skal si det samme før og etter: en aksje med
+  kurser beholder dagen, og regelen i basen om at `inn` er før `ut`, står.
+- `docs/hjelp.md` sier at en aksje som følges på nytt, regnes som ny fra
+  dagen den kom inn igjen.
+- `src/valg.py` står bak bildene, så de 20 bildene er tatt på nytt i demoen
+  på port 8927 og er byte for byte de samme som i `docs/appen/` og
+  `docs/appen/mobil/`. Avtrykkene i `tests/test_docker.py` er regnet ut.
+
+## Gjennomgangen 24.11
+
+Én leser, bare med lesing, i fire roller: Blind Hunter, Edge Case Hunter,
+Acceptance Auditor og Verification Gap. Den kjørte ikke pytest. 16 funn: 2
+høye, som er samme sak sett fra to roller, og 14 lave. 5 er rettet, AA2 står
+som spørsmål 1, og 10 lave står med grunn.
+
+| Id | Grad | Funnet | Gjort |
+|---|---|---|---|
+| VG1, AA1 | høy | `src/valg.py` står bak bildene, og avtrykkene i `tests/test_docker.py` var ikke regnet ut, så CI ville blitt rød | Rettet: bildene er tatt på nytt og er like, og avtrykkene er regnet ut |
+| AA2 | lav | Bare aksjer uten kurser får ny dag, mens instruksjonen og tittelen sier det uten forbehold. Avviket betyr ikke noe for målet, fordi `uten_rader` og `ikke_forsoekt` begge krever en aksje uten en eneste kurs | Står som spørsmål 1. Storyen i `epics.md` sier det nå |
+| AA3 | lav | Avgjørelsen 08.11 kl. 21:35 om at en aksje som kommer inn igjen, får `ut` nullstilt, var ikke nevnt | Rettet: «Det som er slått opp» og storyen i `epics.md` |
+| AA4 | lav | Setningen i hjelpen sa at statusen alltid sier når kursene kommer, og «før hentingen har spurt» | Rettet: den sier kveldens vanlige henting, og at statusen gjelder en senere kjøring uten kall |
+| BH2 | lav | Docstringen i `ta_i_bruk` hadde en lang linje | Rettet |
+| BH1 | lav | Én linje i `valg.py` er 121 tegn | Står: `ruff check` og `ruff format --check` er grønne |
+| BH3 | lav | `har_kurser` leses i en egen spørring | Står: det er riktig, og lettere å lese |
+| BH4 | lav | Utskriften «… er tatt inn i lista fra …» står også for en aksje som beholder en eldre `inn` | Står: linja sier fra hvilken dag den er i lista igjen |
+| ECH1 | lav | Fjernes en aksje uten kurser samme kveld som kveldens henting har forsøkt den, og følges den igjen samme kveld, teller forsøket fra samme dag, og den tas ut kvelden etter | Står: forsøket samme børsdag var ekte, så regelen fra 2.12 holder. Spørsmål 2 |
+| ECH2 | lav | Etter ny `inn` er aksjen ikke i lista for de eldre dagene den ble forsøkt | Står, følger av valget: den har ingen kurser de dagene, og radene i `vurdering` og `oenske` står |
+| ECH3 | lav | En aksje fra den første lista med `inn` NULL, tatt ut og inn igjen uten en eneste kurs, får nå en dag og kan tas ut | Står: den er da en egen aksje uten kurser, som regelen gjelder |
+| ECH4 | lav | De ferdige listene regner aksjen som utenfor lista til kursene er lagret | Står: som for en helt ny aksje |
+| VG2 | lav | To av åtte tester består også før rettingen | Står: de er vakter, og «Resultatet» sier det |
+| VG3 | lav | ECH1 og ECH3 har ingen test | Står: de står med grunn over |
+| VG4 | lav | Testene teller radene i `vurdering`, men ikke i `oenske` | Står: rettingen rører ikke `oenske` |
+
+Uten funn: rekkefølgen på parametrene, regelen `inn < ut` i alle
+rekkefølgene av fjern og følg, signalet i ettertid, `dagen_ferdig.py`,
+målingen, notatene og Min liste, `bruk_liste`, kurser bare fra `--les-inn`,
+helgen, at ingen rad slettes, at ingen migrering er lagt til, og tallene på
+skjermsiden og i matrisen.
+
 ## Spørsmål til gruppen
 
 1. **Bare aksjer uten kurser får ny dag.** Instruksjonen sier at aksjen får
@@ -83,6 +134,12 @@ FR-415 · **Begrenses av:** AD-7 (ingen rad slettes), AD-21, regel 3, 16, 19,
    fordi en ny `inn` ville tatt den ut av lista for dagene den har kurser
    for. *Forslag:* behold det. Alternativet, ny dag for alle, trenger en
    tabell med periodene aksjen har vært i lista, og altså en migrering.
+   Leseren i gjennomgangen satte avviket til lav (AA2), så det hindrer ikke
+   flettingen etter regel 25.
+2. **Fjernet og fulgt igjen samme kveld som et forsøk (ECH1, lav).** Da
+   teller forsøket fra samme dag, og aksjen tas ut kvelden etter uten et
+   nytt forsøk. *Forslag:* la det stå. Det krever to handlinger og tre
+   kjøringer samme kveld, og forsøket var ekte.
 
 ## Grenser
 
@@ -96,13 +153,13 @@ FR-415 · **Begrenses av:** AD-7 (ingen rad slettes), AD-21, regel 3, 16, 19,
 
 ## Kontroll
 
-- [ ] En egen aksje uten kurser som tas ut og inn igjen, får `inn` lik dagen den kom inn igjen
-- [ ] Den tas ikke ut av `uten_rader` før hentingen har forsøkt den på nytt
-- [ ] Statusen fra 9.28 står for den, og regner fra den nye dagen
-- [ ] Gir EODHD ingen kurser ved det nye forsøket, tas den ut kvelden etter, som før
-- [ ] En aksje med kurser som tas ut og inn igjen, beholder `inn`, og lista for de gamle dagene er som før
-- [ ] Ingen migrering, og ingen rad er slettet
-- [ ] Testen feilet før rettingen
-- [ ] Gjennomgangen med fire roller er tatt, og regel 25 holder
+- [x] En egen aksje uten kurser som tas ut og inn igjen, får `inn` lik dagen den kom inn igjen
+- [x] Den tas ikke ut av `uten_rader` før hentingen har forsøkt den på nytt
+- [x] Statusen fra 9.28 står for den, og regner fra den nye dagen
+- [x] Gir EODHD ingen kurser ved det nye forsøket, tas den ut kvelden etter, som før
+- [x] En aksje med kurser som tas ut og inn igjen, beholder `inn`, og lista for de gamle dagene er som før
+- [x] Ingen migrering, og ingen rad er slettet
+- [x] Testen feilet før rettingen: 6 av 8 på `f01dd638`
+- [x] Gjennomgangen med fire roller er tatt, og regel 25 holder: ingen funn på middels, og de to høye er rettet
 - [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
 - [ ] CI er grønn i alle jobbene
