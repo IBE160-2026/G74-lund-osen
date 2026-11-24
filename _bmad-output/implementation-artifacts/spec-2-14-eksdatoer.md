@@ -138,15 +138,22 @@ vilkår for ekte nettsteder er skrevet, og at README-en ikke trenger retting.
    tabellen `eksdato` i den ekte basen, og regel 22 nevner bare hentingen og
    webserveren. *Forslag:* en datert linje i regel 22 og under AD-3 når
    PR-en flettes: kommandoen fra main skriver bare tabellen `eksdato`.
+   *Svar 24.11 kl. 21:47:* som foreslått. Rådet anbefalte det. Den daterte linja i regel 22 og under AD-3
+   skrives når PR-en flettes etter brukertest 2, ikke nå. AA1 står til da.
 2. **Én rad per symbol.** Tabellen har den kommende eks.datoen for hvert
    symbol, og en ny dato erstatter den gamle. *Forslag:* behold det.
    Alternativet er én rad per dato, med historikken.
+   *Svar 24.11 kl. 21:47:* som foreslått: én rad per symbol. Rådet anbefalte det.
 3. **Sjekken hver uke (AA2, lav).** Kommandoen kan ikke vise hva som er
    lagret, og når det ble sjekket. *Forslag:* en liten story sammen med
    visningen (FR-207), med et valg som lister radene.
+   *Svar 24.11 kl. 21:47:* som foreslått: en liten story sammen med visningen (FR-207). Rådet
+   anbefalte det.
 4. **Datoer som har passert, og aksjer som tas ut (ECH2, ECH3, lave).**
    Radene blir stående. *Forslag:* la dem stå, og la visningen (FR-207)
    velge hva som vises.
+   *Svar 24.11 kl. 21:47:* som foreslått: radene står, og visningen (FR-207) velger hva som vises.
+   Rådet anbefalte det.
 5. **Docker (ECH4, lav).** Kommandoen leser vilkårene fra `docs/`, som ikke
    er i imaget, så den virker bare fra mappa med koden. *Forslag:* la det
    stå. Datoene føres av gruppen, ikke av en bruker i Docker.
