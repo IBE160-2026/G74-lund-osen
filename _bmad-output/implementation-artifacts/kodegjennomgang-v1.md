@@ -2,7 +2,7 @@
 title: "Kodegjennomgang av v1"
 status: aktiv
 created: 2026-11-24
-updated: 2026-11-24T16:55
+updated: 2026-11-24T21:58
 ---
 
 # Kodegjennomgang av v1
@@ -179,8 +179,14 @@ Det som ikke er lest, er ikke gjennomgått. Et tomt felt i tabellene betyr ikke 
 ## Spørsmål til gruppen
 
 1. **Hvilke grupper blir storyer etter brukertest 2?** *Forslag:* G1 og G2 sammen først, fordi de gjelder NFR-06 og det brukeren leser. Så G3 og G4 sammen, G5, G6 og G12. G8, G10 og G14 er bare tester og kan tas i én story.
+   *Svar 24.11 kl. 21:47:* som foreslått. Rådet anbefalte det. Etter brukertest 2 kommer G1 og G2 først (story 10.12), så G3 og G4 (10.13), G5 (2.23), G6 (2.24) og G12 (10.14), og én story med bare tester for G8, G10 og G14 (2.25). De står i `epics.md` og sprintstatusen som backlog, merket «etter brukertest 2», i epicen som eier koden. Ingen av dem bygges nå. Før testen leser gruppen KI-teksten for aksjen i oppgave B (`docs/brukertest.md`, «Før testen (brukertest 2)»).
 2. **G7, lista over Oslo Børs i en ZIP-kopi eller i Docker.** *Forslag:* avgjør om fila kan ligge i repoet etter vilkårene, eller om hjelpen skal si at «Følg en aksje» trenger den.
+   *Svar 24.11 kl. 21:47:* gruppen avgjør det når den har lest vilkårene for lista over Oslo Børs. Rådet anbefalte det. Det står som åpent punkt i `.logs/marian-osen/issues.md`.
 3. **G9, ordlyden i FR-412.** *Forslag:* rett ordlyden i `prd.md` til det koden gjør, med en linje i endringsloggen: aksjen tas inn, og tas ut kvelden etter hvis EODHD ikke gir kurser.
+   *Svar 24.11 kl. 21:47:* som foreslått. Rådet anbefalte det. Ordlyden i FR-412 i `prd.md` er rettet til det koden gjør, med en linje i endringsloggen, og raden i `prd-sporing.md` følger med. Ingen kode er endret.
 4. **G11, én feil stopper KI-teksten for hele kvelden.** Valget ble gjort for en modell som henger. *Forslag:* behold det for tidsfrist og nettfeil, og la et tomt svar eller et avslag gjelde bare den ene aksjen.
+   *Svar 24.11 kl. 21:47:* som foreslått. Rådet anbefalte det. Det er story 10.15, i backlog til etter brukertest 2.
 5. **G13, navn i prompten for dagen.** *Forslag:* gruppen fører det i `docs/kilder-og-rettigheter.md`, under «Hva som sendes».
+   *Svar 24.11 kl. 21:47:* gruppen skriver det selv i `docs/kilder-og-rettigheter.md`. Rådet anbefalte det. Det står som åpent punkt i `.logs/marian-osen/issues.md`, og vinduet skriver det ikke.
 6. **Funnene merket 3.4** (D-BH4, D-ECH6, D-AA5 og D-VG4) står til gruppen har svart på 3.4.
+   *Svar 24.11 kl. 21:47:* funnene står til gruppen har svart på 3.4. Rådet anbefalte det.
