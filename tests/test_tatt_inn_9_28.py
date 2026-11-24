@@ -69,7 +69,9 @@ def tatt_inn(tmp_path):
     med_boersen(base)
     _foelg(base)
     kode, kall, ut = kjoer_23_kode(raa, base, OEYEBLIKK_22_09 + timedelta(minutes=45), les_kvote=kvote(brukt=20))
-    assert kode == 1 and kall == [], ut
+    # Rettet 2026-11-24 (story 2.22, gruppens svar kl. 14:29): kode 4, ikke 1,
+    # når det eneste som mangler, er en aksje tatt inn etter kveldens henting.
+    assert kode == 4 and kall == [], ut
     assert "NYA er tatt inn i lista fra 2026-09-22." in ut
     return base
 
@@ -224,7 +226,8 @@ class TestDagen:
         kode, kall, _ = kjoer_23_kode(
             raa, base, fredag_kl_22 + timedelta(minutes=45), les_kvote=kvote(brukt=20, dato="2026-09-25")
         )
-        assert kode == 1 and kall == []
+        # Rettet 2026-11-24 (story 2.22): kode 4, ikke 1.
+        assert kode == 4 and kall == []
         tilkobling = aapne_base(base)
         try:
             assert valg.ikke_forsoekt(tilkobling) == {"NYA": date(2026, 9, 25)}

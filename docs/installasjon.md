@@ -2,7 +2,7 @@
 title: "Installasjonen"
 status: aktiv
 created: 2026-11-08
-updated: 2026-11-16T00:31
+updated: 2026-11-24T15:27
 ---
 
 # Installasjonen
@@ -390,6 +390,8 @@ Med `--med-bonuskvoten` i tillegg, `uv run python src/fetch_prices.py --maal-oms
 Jobben kjører fra en egen arbeidskopi av main (`git worktree`), ikke fra mappa du jobber i. Før hver kjøring flyttes arbeidskopien til commiten main hadde ved midnatt, så det som flettes en dag, går først neste kveld. `data/` og `.env` i arbeidskopien er lenker til mappa du jobber i, så basen og nøkkelen er de samme, og nøkkelen kopieres ikke. Jobben starter Docker Desktop og Ollama hvis de ikke kjører. Svarer de ikke innen tre minutter til sammen, hentes det uten KI-tekst. Det jobben startet selv, stopper den etterpå. Før Docker Desktop og Ollama startes, sjekker jobben med `uv run --no-sync python src/dagen_ferdig.py` om børsdagen alt er ferdig: kursene og vurderingene for aksjene i lista, hovedindeksen og KI-tekstene. Basen leses bare, uten nøkkel og uten kall. Er alt der, startes verken Docker Desktop eller Ollama, og hentingen (0 kall) og målingen går som før, uten KI-tekst. Mangler noe, eller feiler sjekken, går kjøringen som før.
 
 Alt jobben gjør, står i loggen `data/logg/kveldshenting-<dato>.log` i mappa du jobber i, én fil per kveld. Nøkkelen skrives aldri ut.
+
+Jobben avslutter med koden fra hentingen, og Oppgaveplanlegging viser koden fra kveldens siste kjøring som `LastTaskResult`. Kode 0 betyr at alt er hentet. Kode 1 betyr at noe som skulle vært hentet, mangler eller feilet, eller at skriptet stoppet før hentingen. Kode 3 betyr at bare hovedindeksen feilet. Kode 4 betyr at det eneste som mangler, er aksjer du begynte å følge etter kveldens henting, og som det ikke var kall igjen til. Det er i orden, og kursene hentes ved neste henting. Koden fra hver kjøring står i loggen, i linja «Hentingen avsluttet med kode …».
 
 Slå den på, i PowerShell i mappa du jobber i, med arbeidskopien ved siden av:
 

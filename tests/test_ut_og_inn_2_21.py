@@ -100,7 +100,9 @@ def inn_igjen(tatt_ut):
     raa, base = tatt_ut
     _foelg(base)
     kode, kall, ut = kjoer_23_kode(raa, base, ONSDAG + SENT, les_kvote=kvote(brukt=20, dato="2026-09-23"))
-    assert kode == 1 and kall == [], ut
+    # Rettet 2026-11-24 (story 2.22): kode 4, ikke 1, når det eneste som
+    # mangler, er en aksje tatt inn etter kveldens henting.
+    assert kode == 4 and kall == [], ut
     assert "NYA er tatt inn i lista fra 2026-09-23." in ut
     return raa, base
 

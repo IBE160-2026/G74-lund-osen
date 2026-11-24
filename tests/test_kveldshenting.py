@@ -268,7 +268,9 @@ def _oppsett(tmp_path: Path, start: str, etter: str = "") -> dict[str, Path | st
     return {"hoved": hoved, "jobb": jobb, "foer": foer, "etter": nyeste}
 
 
-def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str, sjekk: str = "mangler") -> tuple[int, str]:
+def _kjoer(
+    tmp_path: Path, skript: Path, hoved: Path, *ekstra: str, sjekk: str = "mangler", henting: int = 3
+) -> tuple[int, str]:
     """Windows PowerShell 5.1 med den falske docker og den falske uv foerst
     paa PATH, saa git og System32. ProgramFiles peker paa en tom mappe, saa
     Docker Desktop aldri startes.
@@ -298,7 +300,7 @@ def _kjoer(tmp_path: Path, skript: Path, hoved: Path, *ekstra: str, sjekk: str =
     (falsk / "uv.cmd").write_text(
         '@echo off\r\nif "%~4"=="src/dagen_ferdig.py" goto sjekk\r\n'
         "echo falsk henting %*\r\necho tjeneste=%OSE_KI_TJENESTE%\r\necho mappe=%CD%\r\n"
-        'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b 3\r\n'
+        f'if "%~4"=="--maal-omsetning" exit /b 5\r\nexit /b {henting}\r\n'
         f':sjekk\r\necho falsk sjekk %*>>"%~dp0sjekk.txt"\r\n{svar_fra_sjekken}\r\n',
         encoding="ascii",
     )
@@ -417,6 +419,31 @@ def test_hele_jobben_uten_docker_henter_uten_ki_og_gir_koden_fra_hentingen(tmp_p
     assert "Stopper Ollama." not in loggen and "Starter Ollama." not in loggen
     for tekst in (utskrift, loggen):
         assert NOEKKELEN not in tekst and MILJOEET not in tekst
+
+
+@paa_windows
+def test_kode_4_gis_videre_og_loggen_sier_at_det_er_i_orden(tmp_path):
+    """Story 2.22 (gruppens svar 24.11 kl. 14:29; gjennomgangen, VG5). Ville
+    feilet hvis jobben gjorde kode 4 fra hentingen om til en annen kode,
+    eller loggen ikke sa hva 4 betyr."""
+    oppsett = _oppsett(tmp_path, "nyeste")
+    jobb = oppsett["jobb"]
+    kode, utskrift = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"], henting=4)
+    loggen = _loggen(oppsett["hoved"])
+    assert kode == 4, utskrift
+    assert "Hentingen avsluttet med kode 4." in loggen and "Målingen avsluttet med kode 5." in loggen
+    assert loggen.count("Kode 4: det eneste som mangler, er aksjer som ble tatt inn i lista etter kveldens") == 1
+    assert "Det er i orden" in loggen
+    assert loggen.index("Målingen avsluttet med kode 5.") < loggen.index("Kode 4:")
+
+
+@paa_windows
+def test_kode_3_faar_ikke_linja_om_kode_4(tmp_path):
+    """Ville feilet hvis linja om kode 4 sto i loggen for en annen kode."""
+    oppsett = _oppsett(tmp_path, "nyeste")
+    jobb = oppsett["jobb"]
+    kode, _ = _kjoer(tmp_path, jobb / "start" / "kveldshenting.ps1", oppsett["hoved"])
+    assert kode == 3 and "Kode 4" not in _loggen(oppsett["hoved"])
 
 
 @paa_windows
