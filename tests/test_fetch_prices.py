@@ -3239,7 +3239,12 @@ def base_paa_versjon(tmp_path, base, versjon: int, uten_kurs=(), uten_vurdering=
         for nr, aksje in enumerate(AKSJEUNIVERS):
             if aksje.symbol in uten_kurs:
                 continue
-            tilkobling.execute("INSERT INTO kurs VALUES (?, ?, 1.0, 1.0, 10)", (aksje.symbol, dato.isoformat()))
+            # Rettet 2026-11-24 (story 2.14): kolonnene er navngitt. Med 0016
+            # er en base en versjon bak paa 15, der kurs har hoey og lav.
+            tilkobling.execute(
+                "INSERT INTO kurs (symbol, dato, slutt, justert_slutt, volum) VALUES (?, ?, 1.0, 1.0, 10)",
+                (aksje.symbol, dato.isoformat()),
+            )
             # Tidene gaar mot rekkefoelgen i lista: den siste i lista er eldst
             # (gjennomgangen av 2.8b, VG3).
             tilkobling.execute(
@@ -3283,7 +3288,9 @@ class TestSjekkenLeserEnBaseEnVersjonBak:
         # Story 2.4: indeksen har dagen, saa kjoeringen ikke henter den.
         tilkobling = sqlite3.connect(base, isolation_level=None)
         try:
-            tilkobling.execute("INSERT INTO indeks VALUES ('OSEBX', '2026-09-22', 1.0, 1.0, 10)")
+            tilkobling.execute(
+                "INSERT INTO indeks (symbol, dato, slutt, justert_slutt, volum) VALUES ('OSEBX', '2026-09-22', 1.0, 1.0, 10)"
+            )
             tilkobling.execute("INSERT INTO indeksserie VALUES ('OSEBX', ?)", (_utc(2026, 9, 22, 21, 0).isoformat(),))
         finally:
             tilkobling.close()

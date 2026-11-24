@@ -171,6 +171,6 @@ vilkår for ekte nettsteder er skrevet, og at README-en ikke trenger retting.
 - [x] En ny sjekk av samme dato oppdaterer datoen den ble sjekket, og en flyttet dato erstatter den gamle
 - [x] En dato kan ikke føres inn uten dato for sjekken eller uten kilde
 - [x] Gjennomgangen med fire roller er tatt. AA1 (middels) står åpent som spørsmål 1
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: `--dokumentene` ga 3247 bestått og 7 hoppet over (24.11 kl. 17:04–17:28), på `32b4ab7d`. Testfilene ga da 1188 bestått og 4 feilet, i `tests/test_fetch_prices.py`: hjelperen for en base én versjon bak satte inn rader uten kolonnenavn, og basen på versjon 15 har høy og lav. Etter rettingen ga `tests/test_fetch_prices.py`, `tests/test_indeks.py` og `tests/test_ruff.py` 361 bestått og 16 hoppet over (kl. 17:33–17:37)
 - [ ] CI er grønn i alle jobbene
 - [ ] PR-en er åpnet og ikke flettet
