@@ -25,7 +25,9 @@
       som raden på oversikten og børsometeret, og hvorfor, som bak «?» ved
       «Oppdatert». #}
   <p class="ingen-kurser">
-    <strong>{{ uten_data_kort }}</strong>: {{ uten_kurser_hvorfor }} Siden har derfor ingen kursgraf og ingen sjekker for {{ aksje.navn }}.
+    {#- Story 9.28 (AA1 i 9.27): en egen aksje som bare er tatt inn, er ikke
+        forsøkt hentet, så EODHD har ikke svart noe. #}
+    <strong>{{ uten_data_kort }}</strong>: {% if kursene_kommer %}{{ aksje.navn }} er tatt inn i lista, men kursene er ikke hentet ennå. De kommer ved hentingen {{ kursene_kommer }}.{% else %}{{ uten_kurser_hvorfor }}{% endif %} Siden har derfor ingen kursgraf og ingen sjekker for {{ aksje.navn }}.
     {% if eksempeltall and aksje.symbol == demo_uten_kurser_symbol %}{{ demo_uten_kurser }}{% endif %}
   </p>
 

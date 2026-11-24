@@ -14,7 +14,7 @@ rad som er eldre enn de andre, under selskapsnavnet (story 1.4c).
 
 from collections.abc import Callable
 from dataclasses import dataclass, replace
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import boersdag
@@ -754,3 +754,22 @@ def oensket_hentes_tekst(naa: datetime) -> str:
         return f"etter {kl}"
     naar, _ = _dagen_som_tekst(dag, boersdag.norsk_dato(naa))
     return f"{naar} etter {kl}"
+
+
+def kursene_kommer_tekst(inn: date, naa: datetime) -> str:
+    """Story 9.28 (AA1 i 9.27, gruppens svar 23.11 kl. 23:27): naar kursene
+    kommer for en egen aksje som er tatt inn uten kurser og ikke er forsoekt
+    hentet (valg.ikke_forsoekt). inn er dagen den kom inn. Kveldens kall var
+    brukt da, saa kursene kommer tidligst ved hentingen dagen etter, skrevet
+    som i 9.27: «i morgen etter kl. 22» samme kveld, og «i kveld etter
+    kl. 22» fra dagen etter og til kursene er hentet.
+
+    Gjennomgangen (ECH1): dagen etter, ikke neste boersdag. Kveldsjobben gaar
+    hver dag, og en dag boersen er stengt, henter et nytt forsoek aksjen som
+    mangler kursen for forrige boersdag, med den nye dagens kall
+    (nytt_forsoek i fetch_prices). En aksje som tas inn en fredag kveld, faar
+    derfor kursene loerdag kveld, ikke mandag. Ingen dag slaas opp i
+    kalenderen, saa NFR-08 er ikke i spill."""
+    idag = boersdag.norsk_dato(naa)
+    naar, _ = _dagen_som_tekst(max(inn + timedelta(days=1), idag), idag)
+    return f"{naar} etter {grensen_som_tekst()}"

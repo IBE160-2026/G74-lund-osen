@@ -345,7 +345,9 @@ class TestSidene:
         # Story 8.26 (tillegg 8): teksten om demoen står bare i demoen, som
         # test_vis_meg_rundt_8_26.py viser.
         # Story 8.26 (tillegg 5): også setningen om fredag 09.10 står bare i demoen.
-        assert bedt_om == set(hjelpetekster()) - {"uten_data_demo", "foerste_knapp_demo"}
+        # Story 9.28: teksten om en aksje som bare er tatt inn, står bare når
+        # lista har en slik aksje, som tests/test_tatt_inn_9_28.py viser.
+        assert bedt_om == set(hjelpetekster()) - {"uten_data_demo", "foerste_knapp_demo", "tatt_inn_uten_kurser"}
 
     def test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer(self, klient, base):
         """Story 8.0c, den nye delen 2 (godkjent 13.10 kl. 15:36): «?» ved

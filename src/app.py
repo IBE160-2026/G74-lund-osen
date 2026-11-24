@@ -138,6 +138,7 @@ from markedsoversikt import (
     eldre_enn_nyeste,
     grensen_som_tekst,
     ingen_skilte_seg_ut,
+    kursene_kommer_tekst,
     med_perioden,
     neste_henting_tekst,
     neste_orden,
@@ -320,6 +321,33 @@ def _oensket_hentes() -> str:
 
 
 app.jinja_env.globals["oensket_hentes"] = _oensket_hentes
+
+
+def _tatt_inn_uten_kurser() -> dict[str, str]:
+    """Story 9.28 (AA1 i 9.27, gruppens svar 23.11 kl. 23:27): de egne
+    aksjene som er tatt inn uten kurser og ikke er forsøkt hentet
+    (valg.ikke_forsoekt), med når kursene kommer, for statusen under «Dine
+    egne aksjer», «?» ved «Oppdatert» og siden for aksjen. Tom når basen ikke
+    har tabellene fra 0010, eller ikke kan leses: da står tekstene som før.
+    Bare lesing."""
+    # Gjennomgangen (BH1): regnet én gang per forespørsel, med én klokke.
+    if "tatt_inn_uten_kurser" not in g:
+        g.tatt_inn_uten_kurser = {}
+        lager = _valglager()
+        if lager is not None:
+            try:
+                # Gjennomgangen (BH2): en aksje som skal fjernes, hentes aldri,
+                # så den sier «Fjernes …» og ikke at kursene kommer.
+                fjernes = {o.symbol for o in lager.ventende() if o.handling == valg.FJERN}
+                naa_ = naa()
+                g.tatt_inn_uten_kurser = {
+                    symbol: kursene_kommer_tekst(inn, naa_)
+                    for symbol, inn in valg.ikke_forsoekt(g.tilkobling).items()
+                    if symbol not in fjernes
+                }
+            except (sqlite3.Error, ValueError):
+                g.tatt_inn_uten_kurser = {}
+    return g.tatt_inn_uten_kurser
 
 
 def naa() -> datetime:
@@ -1192,6 +1220,14 @@ def _tabellsiden(aktiv: str):
     annen_dag_valgt = not i_lista and valg is not None and valg.periode == VELG
     alle_uten_data = [*rader_uten_data(poster), *([] if annen_dag_valgt else venter)]
     mangler = alle_uten_data
+    # Story 9.28 (AA1 i 9.27): «?» ved «Oppdatert» sier ikke at EODHD ikke ga
+    # kurser når aksjene uten kurser bare er tatt inn. Er noen av dem
+    # forsøkt hentet, eller ingen er uten kurser, står teksten som før.
+    uten = {rad.aksje.symbol for rad in rader_uten_data(poster)}
+    bare_tatt_inn = uten & set(_tatt_inn_uten_kurser())
+    uten_kurser_hjelp = [] if uten and uten == bare_tatt_inn else ["uten_data"]
+    if bare_tatt_inn:
+        uten_kurser_hjelp.append("tatt_inn_uten_kurser")
     # Gjennomgangen (BH8, ECH2): antallet er de merkede som har en rad i
     # tabellen, saa knappen og tabellen sier det samme. Story 8.2a, b: ogsaa
     # en merket aksje uten kurser, som naa har en rad.
@@ -1252,6 +1288,7 @@ def _tabellsiden(aktiv: str):
         # Gruppens svar 03.11 kl. 14:28: en rad med eldre dag viser datoen sin.
         egne_dager=egne_dager(rader, sidens_siste(rader)),
         mangler=mangler,
+        uten_kurser_hjelp=uten_kurser_hjelp,
         # Story 8.0d, PR 2b: M i «N av M aksjer» er alle aksjene i lista,
         # også de uten kurser (beslutningen 14.10). Story 8.2a, b (U23): det
         # er også antallet rader i tabellen, fordi hver aksje uten kurser nå
@@ -1414,6 +1451,8 @@ def aksjedetalj(symbol: str):
         return render_template(
             "aksje_uten_kurser.html",
             aksje=post.aksje,
+            # Story 9.28: når kursene kommer for en aksje som bare er tatt inn.
+            kursene_kommer=_tatt_inn_uten_kurser().get(post.aksje.symbol),
             hentet=None,
             aktiv="aksje",
             investorside=investorside(post.aksje.symbol),
@@ -2532,6 +2571,8 @@ def _egne_regnet() -> dict | None:
         ventende = lager.ventende()
         egne = lager.egne()
         fjernes = {o.symbol: o.id for o in ventende if o.handling == valg.FJERN}
+        # Story 9.28: en egen aksje som bare er tatt inn, står ikke som «Hentet».
+        tatt_inn = _tatt_inn_uten_kurser()
         medianene = _medianene()
         rader = []
         for aksje in lista:
@@ -2543,7 +2584,12 @@ def _egne_regnet() -> dict | None:
                         "navn": aksje.navn,
                         # Story 8.22 (spørsmål 3): den faste bransjen med en gang.
                         "sektor": ferdige_lister.fast_bransje(aksje.symbol) or aksje.sektor,
-                        "status": "fjernes" if aksje.symbol in fjernes else "hentet",
+                        "status": "fjernes"
+                        if aksje.symbol in fjernes
+                        else "tatt_inn"
+                        if aksje.symbol in tatt_inn
+                        else "hentet",
+                        "kursene_kommer": tatt_inn.get(aksje.symbol),
                         "oenske": fjernes.get(aksje.symbol),
                         "utenfor": valg.utenfor_maalingen(omsetningen[0]),
                         "omsetningen": omsetningen,

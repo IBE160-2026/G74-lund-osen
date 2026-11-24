@@ -404,6 +404,20 @@ def hjelpetekster(p: Parametre = STANDARD) -> dict[str, Hjelpetekst]:
         # Story 8.2a, b (U23): en aksje uten kurser har en rad nederst i
         # tabellen, ikke bare navnet under den.
         # Story 8.26 (tillegg 2): «uten data» heter «ingen kurser ennå».
+        # Story 9.28 (AA1 i 9.27, gruppens svar 23.11 kl. 23:27): en egen
+        # aksje som bare er tatt inn, er ikke forsøkt hentet. Da står denne i
+        # stedet for, eller sammen med, «uten_data».
+        "tatt_inn_uten_kurser": Hjelpetekst(
+            "Tatt inn uten kurser:",
+            "En aksje du har valgt selv, er tatt inn i lista, men kursene er ikke hentet ennå. "
+            "De kommer ved en senere henting, og statusen under «Dine egne aksjer» sier når. "
+            "Raden står nederst i tabellen, med «–» og lenke til aksjesiden.",
+            (
+                (VALG, "def ikke_forsoekt("),
+                (MARKEDSOVERSIKT, "def kursene_kommer_tekst("),
+                (MARKEDSOVERSIKT, "class RadUtenData"),
+            ),
+        ),
         "uten_data": Hjelpetekst(
             UTEN_DATA_TEKST[0].upper() + UTEN_DATA_TEKST[1:] + ":",
             # Gjennomgangen 24.10 (BH7): nederst uten sortering. Sortert på
