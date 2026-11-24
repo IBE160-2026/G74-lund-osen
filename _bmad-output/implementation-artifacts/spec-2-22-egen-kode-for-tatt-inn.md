@@ -111,8 +111,8 @@ regel 3, 19, 20, 22 og 23; ingen migrering, og hva som hentes, endres ikke
 Én leser, bare med lesing, i fire roller: Blind Hunter, Edge Case Hunter,
 Acceptance Auditor og Verification Gap. Den kjørte ikke pytest. 22 funn: 5 på
 middels og 17 lave. ECH2 og AA1 er samme sak, og VG1 og VG2 er hullene i
-testene for ECH1 og ECH2. Alle de 5 på middels er rettet, 9 lave er rettet,
-og 8 lave står med grunn.
+testene for ECH1 og ECH2. Alle de 5 på middels er rettet, 8 lave er rettet,
+og 9 lave står med grunn.
 
 | Id | Grad | Funnet | Gjort |
 |---|---|---|---|
