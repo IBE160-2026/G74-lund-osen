@@ -384,6 +384,38 @@ def egne_i_lista(tilkobling: sqlite3.Connection) -> frozenset[str]:
     )
 
 
+def ikke_forsoekt(tilkobling: sqlite3.Connection) -> dict[str, date]:
+    """Story 9.28 (AA1 i 9.27, gruppens svar 23.11 kl. 23:27): de egne aksjene
+    som er tatt inn i lista uten en eneste kurs, og som ikke er forsøkt
+    hentet, med dagen de kom inn. Det skjer når en senere kjøring av
+    kveldsjobben tar ønsket i bruk og det nye forsøket ikke har kall igjen.
+
+    Forskjellen fra «EODHD ga ingen kurser» ses av det som alt er lagret, så
+    ingen migrering trengs: kveldens vanlige henting skriver en rad i
+    vurdering for hver aksje i lista, med en grunn når kursene mangler.
+    Regelen er den uten_rader bruker for «ble forsøkt hentet»: en rad i
+    vurdering fra og med dagen aksjen kom inn. Bare lesing (AD-3, AD-10).
+
+    Gjennomgangen (ECH2, ECH3, ECH5): regelen sier «den vanlige hentingen har
+    ikke skrevet en rad», ikke «ingen har spurt EODHD». Et nytt forsøk som
+    hadde kall, men ikke fikk kurser, skriver ingen rad, og en henting som
+    stopper ved midnatt, gjør det heller ikke. Slike aksjer er med her, og
+    uten_rader tar dem ikke ut, så tekstene sier at kursene ikke er hentet
+    ennå, ikke at ingen kall er brukt. En aksje som er tatt ut og inn igjen,
+    beholder dagen den først kom inn (ta_i_bruk setter bare ut tilbake), så
+    eldre rader i vurdering gjør at den ikke er med."""
+    egne = egne_i_lista(tilkobling)
+    return {
+        symbol: date.fromisoformat(inn)
+        for symbol, inn in tilkobling.execute(
+            "SELECT symbol, inn FROM aksje WHERE inn IS NOT NULL AND ut IS NULL "
+            "AND NOT EXISTS (SELECT 1 FROM kurs WHERE kurs.symbol = aksje.symbol) "
+            "AND NOT EXISTS (SELECT 1 FROM vurdering v WHERE v.symbol = aksje.symbol AND v.dato >= aksje.inn)"
+        )
+        if symbol in egne
+    }
+
+
 # --- Hentekommandoen --------------------------------------------------------
 
 

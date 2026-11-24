@@ -29,10 +29,13 @@
         <td class="selskap">{{ rad.navn }} <span class="egenmerke">Egen</span>{% if rad.utenfor %} <span class="utenformerke">Utenfor målingen</span>{% endif %}<span class="skjult">, </span><span class="linje">{{ rad.symbol }} · {{ bransjesymbol(rad.sektor) }}{{ rad.sektor }}</span></td>
         <td class="status">
         {%- if rad.status == "hentet" %} <span class="statustekst">Hentet. Står i tabellen over.</span>
+        {#- Story 9.28 (AA1 i 9.27, gruppens svar 23.11 kl. 23:27): tatt inn av
+            en senere kjøring uten kall, så ingen har spurt EODHD ennå. #}
+        {%- elif rad.status == "tatt_inn" %} <span class="statustekst">Tatt inn. Kursene kommer ved hentingen {{ rad.kursene_kommer }}.</span>
         {%- elif rad.status == "venter" %} <span class="statustekst">Venter på henting {{ oensket_hentes() }}.</span>
         {%- else %} <span class="statustekst">Fjernes ved hentingen {{ oensket_hentes() }}.</span>{% endif %}</td>
         <td class="valg">
-        {%- if rad.status == "hentet" %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Fjern</button></form>
+        {%- if rad.status in ("hentet", "tatt_inn") %}<form method="post" action="/fjern"><input type="hidden" name="symbol" value="{{ rad.symbol }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Fjern</button></form>
         {%- else %}<form method="post" action="/angre"><input type="hidden" name="id" value="{{ rad.oenske }}"><input type="hidden" name="tilbake" value="oversikten"><button type="submit" class="knapp liten">Angre</button></form>{% endif -%}
         </td>
       </tr>
