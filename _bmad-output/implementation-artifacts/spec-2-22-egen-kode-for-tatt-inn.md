@@ -174,5 +174,5 @@ til, og at README-en ikke beskriver kodene.
 - [x] Ingen migrering, og det som hentes og lagres, er som før
 - [x] Testen feilet før rettingen: 8 av 15 på `852f1aa9`
 - [x] Gjennomgangen med fire roller er tatt, og regel 25 holder: de 5 på middels er rettet
-- [ ] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt
+- [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 790 bestått og 16 hoppet over (24.11 kl. 15:44–15:51) og 3184 bestått og 7 hoppet over (kl. 15:54–16:16, etter en ny start etter lite minne), på `ed7360f5`
 - [ ] CI er grønn i alle jobbene
