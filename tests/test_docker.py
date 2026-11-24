@@ -1403,7 +1403,7 @@ HOEYDE_PAA_BILDET = 1864
 # Story 9.28 (en egen aksje tatt inn uten kurser): _egne.html, aksje_uten_kurser.html, index.html, app.py,
 # valg.py, markedsoversikt.py og hjelpetekster.py. Avtrykkene er regnet ut på nytt, og alle de 20 bildene er
 # tatt på nytt i demoen 24.11 kl. 01:01–01:02 og er byte for byte de samme: tilstanden finnes ikke i demoen.
-AVTRYKK_BAK_BILDET = "e126e20cba2ceda9e79eb5dab39ebbaaae892cff5982798807fb96c9043a58b1"
+AVTRYKK_BAK_BILDET = "9ca826b05ad7d9f104b5cc662cafa433d56f72e65f0da0b9ac1412abc1aeef37"
 SLIK_TAS_BILDET = (
     "Oversikten er endret, så skjermbildet viser noe annet enn demoen. Ta "
     f"{SKJERMBILDET} på nytt etter «Bildet» i spesifikasjonen 3.3b: demobasen i en "
@@ -1907,7 +1907,7 @@ HOEYDE_PAA_AKSJESIDEN = 2258
 # Story 9.28 (en egen aksje tatt inn uten kurser): _egne.html, aksje_uten_kurser.html, index.html, app.py,
 # valg.py, markedsoversikt.py og hjelpetekster.py. Avtrykkene er regnet ut på nytt, og alle de 20 bildene er
 # tatt på nytt i demoen 24.11 kl. 01:01–01:02 og er byte for byte de samme: tilstanden finnes ikke i demoen.
-AVTRYKK_BAK_AKSJESIDEN = "4fca89b7cb2d433f7a6ad21557bb1335150c847f008e71cc42402316b8761410"
+AVTRYKK_BAK_AKSJESIDEN = "de863c3e6b4c4bd9662f8264a2139e5b5a778058403c892c50864e5a3bb3fb33"
 SLIK_TAS_AKSJESIDEN = (
     "Aksjesiden er endret, så bildet av den viser noe annet enn demoen. Ta "
     f"{AKSJESIDEBILDET} på nytt med fremgangsmåten i spesifikasjonen 3.3b, mot /aksje/BRFE: "
@@ -2292,26 +2292,26 @@ BILDENE_PAA_MOBIL = (
 # valg.py, markedsoversikt.py og hjelpetekster.py. Avtrykkene er regnet ut på nytt, og alle de 20 bildene er
 # tatt på nytt i demoen 24.11 kl. 01:01–01:02 og er byte for byte de samme: tilstanden finnes ikke i demoen.
 AVTRYKK_BAK_DE_NYE_BILDENE = {
-    "docs/appen/folg-en-aksje-demo.png": "4b46eac045d23cc326db05324dbdab290483d8b20556e83d867c93586671b3b1",
-    TOPPEN_AV_OVERSIKTEN: "e126e20cba2ceda9e79eb5dab39ebbaaae892cff5982798807fb96c9043a58b1",
-    "docs/appen/boersometeret-demo.png": "8f5be164633ced0bd3e5def5588e822f1a0a344023be37a138ef1ef12e95066a",
-    "docs/appen/min-liste-demo.png": "e51a04089dad58f852efbfef2eee93c8b4598346757974fe374d587e8db8509e",
-    "docs/appen/mobil/oversikten-390-demo.png": "e126e20cba2ceda9e79eb5dab39ebbaaae892cff5982798807fb96c9043a58b1",
-    "docs/appen/mobil/boersometeret-390-demo.png": "8f5be164633ced0bd3e5def5588e822f1a0a344023be37a138ef1ef12e95066a",
-    "docs/appen/din-egen-liste-demo.png": "e51a04089dad58f852efbfef2eee93c8b4598346757974fe374d587e8db8509e",
+    "docs/appen/folg-en-aksje-demo.png": "6a3201b4cb96080704f924827e654c2ed5d8f5e43c4af6503155b7ed0dfa668b",
+    TOPPEN_AV_OVERSIKTEN: "9ca826b05ad7d9f104b5cc662cafa433d56f72e65f0da0b9ac1412abc1aeef37",
+    "docs/appen/boersometeret-demo.png": "9481da8b8279d4763bdf93109eea4d1a2608de4407ce7add9938fa707e4ddbe2",
+    "docs/appen/min-liste-demo.png": "82160393f7a695ac81e9541d228ce0450d0f89b331e704a802bebdb0614e356c",
+    "docs/appen/mobil/oversikten-390-demo.png": "9ca826b05ad7d9f104b5cc662cafa433d56f72e65f0da0b9ac1412abc1aeef37",
+    "docs/appen/mobil/boersometeret-390-demo.png": "9481da8b8279d4763bdf93109eea4d1a2608de4407ce7add9938fa707e4ddbe2",
+    "docs/appen/din-egen-liste-demo.png": "82160393f7a695ac81e9541d228ce0450d0f89b331e704a802bebdb0614e356c",
     "docs/appen/investorsiden-brfe-demo.png": "cd77e50fd5e61d09c01020a90cbf181455df68e3900fcd3d084a14d2b4d2d30e",
     "docs/appen/mobil/investorsiden-brfe-390-demo.png": "cd77e50fd5e61d09c01020a90cbf181455df68e3900fcd3d084a14d2b4d2d30e",
-    "docs/appen/mobil/folg-en-aksje-390-demo.png": "4b46eac045d23cc326db05324dbdab290483d8b20556e83d867c93586671b3b1",
-    "docs/appen/mobil/notatene-brfe-390-demo.png": "4fca89b7cb2d433f7a6ad21557bb1335150c847f008e71cc42402316b8761410",
-    "docs/appen/notatene-brfe-demo.png": "4fca89b7cb2d433f7a6ad21557bb1335150c847f008e71cc42402316b8761410",
-    "docs/appen/notatene-min-liste-demo.png": "e51a04089dad58f852efbfef2eee93c8b4598346757974fe374d587e8db8509e",
-    "docs/appen/innstillinger-demo.png": "7f67766657214b44019e3e24925360827bc34e82e039d511c59ae11894eae498",
+    "docs/appen/mobil/folg-en-aksje-390-demo.png": "6a3201b4cb96080704f924827e654c2ed5d8f5e43c4af6503155b7ed0dfa668b",
+    "docs/appen/mobil/notatene-brfe-390-demo.png": "de863c3e6b4c4bd9662f8264a2139e5b5a778058403c892c50864e5a3bb3fb33",
+    "docs/appen/notatene-brfe-demo.png": "de863c3e6b4c4bd9662f8264a2139e5b5a778058403c892c50864e5a3bb3fb33",
+    "docs/appen/notatene-min-liste-demo.png": "82160393f7a695ac81e9541d228ce0450d0f89b331e704a802bebdb0614e356c",
+    "docs/appen/innstillinger-demo.png": "9b9bd1e25e173720a8347fc57d5c4f2962ee127684f7db538dbaaec4f0e4a8ed",
     # Story 3.3k: de to nye bildene.
-    "docs/appen/notatpanelet-demo.png": "e51a04089dad58f852efbfef2eee93c8b4598346757974fe374d587e8db8509e",
-    "docs/appen/vis-meg-rundt-demo.png": "e51a04089dad58f852efbfef2eee93c8b4598346757974fe374d587e8db8509e",
+    "docs/appen/notatpanelet-demo.png": "82160393f7a695ac81e9541d228ce0450d0f89b331e704a802bebdb0614e356c",
+    "docs/appen/vis-meg-rundt-demo.png": "82160393f7a695ac81e9541d228ce0450d0f89b331e704a802bebdb0614e356c",
     # Story 9.21 (gruppens svar 17.11 kl. 22:18): de to nye bildene.
-    "docs/appen/signalet-dag-for-dag-demo.png": "4fca89b7cb2d433f7a6ad21557bb1335150c847f008e71cc42402316b8761410",
-    "docs/appen/slett-notatet-demo.png": "3e995f45a41f579556d86bb0c53db34be7a5f166c8b180abd3a4e0c365b34ac3",
+    "docs/appen/signalet-dag-for-dag-demo.png": "de863c3e6b4c4bd9662f8264a2139e5b5a778058403c892c50864e5a3bb3fb33",
+    "docs/appen/slett-notatet-demo.png": "132fcbd377785b400f89900d52fc179ccf5cca86c14cf2a72e59f7bcbe6311e5",
 }
 SLIK_TAS_DE_NYE_BILDENE = (
     "Siden bak {bildet} er endret, så bildet viser noe annet enn demoen. Ta det på nytt som "
