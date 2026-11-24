@@ -409,4 +409,8 @@
   - *Svart 2026-11-23 kl. 22:25:* «i kveld» står fast i demoen, som før.
 - [x] 2026-11-23 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — føringen av 9.27 på main etter flettingen av PR #176, med en datert linje i `EXPERIENCE.md` (AA9) (løst 2026-11-24: `6b2b0429`)
 - [ ] 2026-11-24 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — story 9.28 (AA1 i 9.27, svaret 23.11 kl. 23:27): en egen aksje som er tatt inn uten kurser og ikke er forsøkt hentet, skal ikke stå som «Hentet»
+  - *Sjekket 2026-11-24:* bygget på grenen `9-28-tatt-inn-uten-kurser`, PR #177, CI grønn. Ikke flettet: spørsmål 1 i spesifikasjonen venter (regel 25).
 - [ ] 2026-11-24 [statusene-9-27](902-2026-11-23-16-04-26-statusene-9-27.md) — den ekte versjonen må startes på nytt før brukertest 2, så den får tekstene fra 9.27 og 9.28
+- [ ] 2026-11-24 [tatt-inn-9-28](901-2026-11-24-01-36-25-tatt-inn-9-28.md) — spørsmål 1 i 9.28 (ECH1, middels): statusen sier dagen etter at aksjen kom inn, også i helgen, fordi hentingen henter lørdag; svaret sa «neste børsdag» (forslag: behold dagen etter). PR #177 flettes ikke før svaret (regel 25)
+- [ ] 2026-11-24 [tatt-inn-9-28](901-2026-11-24-01-36-25-tatt-inn-9-28.md) — spørsmål 2 i 9.28 (ECH5, lav): en aksje som tas ut og inn igjen, beholder dagen den først kom inn, og kan bli tatt ut igjen før den er hentet (forslag: en liten story etter brukertest 2)
+- [ ] 2026-11-24 [tatt-inn-9-28](901-2026-11-24-01-36-25-tatt-inn-9-28.md) — føringen av 9.28 på main etter flettingen av PR #177
