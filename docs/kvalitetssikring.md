@@ -2,7 +2,7 @@
 title: "Kvalitetssikring"
 status: aktiv
 created: 2026-10-03
-updated: 2026-11-24T13:32
+updated: 2026-11-24T14:43
 ---
 
 # Kvalitetssikring
@@ -461,6 +461,7 @@ sist i dokumentet.
 | 9.26 Skjermene i OSE Signal, ordnet etter epic og story: svaret 22.11 kl. 19:05; hele settet i CI (run 45082122376) | `16b74c3` (#175) | 3 (3, siden og bildene) | ingen overlevde | `S/spec-9-26-skjermene.md` |
 | 9.27 Statusene i «Dine egne aksjer» og «Følg en aksje» regner dagen: svarene 23.11 kl. 14:49, 22:25 og 23:27; hele settet i CI (run 45287053341) | `93b26f5` (#176) | 2 (2, koden før hver retting) | ingen overlevde | `S/spec-9-27-statusene-regner-dagen.md` |
 | 9.28 En egen aksje som er tatt inn uten kurser, står ikke som «Hentet»: svarene 23.11 kl. 23:27 og 24.11 kl. 12:57; hele settet i CI (run 45393142565) | `4c5bfca` (#177) | 1 (1, koden før rettingen) | ingen overlevde | `S/spec-9-28-tatt-inn-uten-kurser.md` |
+| 2.21 En aksje som tas ut og inn igjen, får dagen den kom inn igjen: svaret 24.11 kl. 12:57; hele settet i CI (run 45405266824) | `e80d922` (#178) | 1 (1, koden før rettingen) | ingen overlevde | `S/spec-2-21-ut-og-inn-igjen.md` |
 | 8.2a Seks funn fra prøven av demoen 24.10 | `e4d1ba4` (#93) | 1 (5, M1–M5) | – kjørt på `7ca19d9` 24.10 | `S/spec-8-2a-funn-fra-proeven-av-demoen.md` |
 | 9.1 Kvalitetssikringen, oppdatering 17.10 | PR-en for 9.1; flettecommiten står under story 9.1 i `epics.md` | 1 (4, Q1–Q4) | Q3 og Q4 overlevde på grencommiten `af04741` og ble fanget etter rettingen i `70a22ef` | `S/spec-9-1-kvalitetssikringen-oppdateres.md` |
 | 9.7 Linter og formatterer i CI | `faaa36c` (#62) | 1 (5, A1–A5) | – | `S/spec-9-7-linter-og-formatterer-i-ci.md` |
@@ -780,6 +781,7 @@ funn. Antall rader i loggen:
 | 9.27, gjennomgangen 23.11 før svarene (Blind Hunter, Edge Case Hunter, Acceptance Auditor og Verification Gap i én leser, bare med lesing; ECH1, VG1 og AA1–AA3 middels og AA4 og AA5 lave rettet etter svarene kl. 22:25, seks andre lave rettet, og ECH2–ECH4, VG3, VG5 og VG6 lave står med grunn, talt som avvist) | 19 | 13 | 6 | 0 |
 | 9.27, gjennomgangen 23.11 etter svarene (de samme fire rollene i én leser, bare med lesing og uten git; VG1 høy, VG2 middels og sju lave rettet, VG3, VG5, BH3 og ECH4 lave står med grunn, talt som avvist, og AA1 middels er flyttet til story 9.28, talt som utsatt) | 14 | 9 | 4 | 1 |
 | 9.28, gjennomgangen 24.11 (Blind Hunter, Edge Case Hunter, Acceptance Auditor og Verification Gap i én leser, bare med lesing; T1 høy, ECH2, AA1, VG1 og VG2 middels og fem lave rettet, ECH1 og AA2 middels rettet og lukket av svaret 24.11 kl. 12:57, seks lave står med grunn, talt som avvist, og ECH5 lav er flyttet til story 2.21, talt som utsatt) | 19 | 12 | 6 | 1 |
+| 2.21, gjennomgangen 24.11 (Blind Hunter, Edge Case Hunter, Acceptance Auditor og Verification Gap i én leser, bare med lesing; VG1 og AA1 høye og tre lave rettet, AA2 lav står som spørsmål 1, talt som utsatt, og ti lave står med grunn, talt som avvist) | 16 | 5 | 10 | 1 |
 | 8.2a | 21 | 15 | 6 | – |
 | 9.1, oppdatering 17.10 | 19 | 17 | 2 | – |
 | 9.7 | 19 | 13 | 6 | – |
@@ -1675,6 +1677,7 @@ det. Linjene er hentet fra spesifikasjonene og commitmeldingene 03.10.
 | 9.26, siden | 3: på siden og bildene før gjennomgangen, før `f8cf3fe3`: en bildefil som mangler, feil tall øverst og et anker som ikke finnes | fanget av `tests/test_skjermene_9_26.py` (hver mutant ga én feilende test av ni) | `S/spec-9-26-skjermene.md` |
 | 9.27, rettingene | 2: koden før hver retting: på `85300ee5`, der «i kveld etter kl. 22» sto skrevet inn i statusene, og på `afa41456`, der statusene sa «i morgen» etter kl. 22 en børsdag og aksjesiden, merknaden i Min liste, «Er du sikker?» og «Følg en aksje» sa «i kveld» og «før kvelden» | fanget av `tests/test_statusene_9_27.py` (28 av 35 feilet på den første, og 34 av 42 på den andre; de som besto, skal si det samme før og etter) | `S/spec-9-27-statusene-regner-dagen.md` |
 | 9.28, rettingen | 1: koden før rettingen, på `29cb5e45`, der en egen aksje som bare var tatt inn, sto som «Hentet» og med teksten om at EODHD ikke ga kurser | fanget av `tests/test_tatt_inn_9_28.py` (20 av 24 feilet; de som besto, skal si det samme før og etter) | `S/spec-9-28-tatt-inn-uten-kurser.md` |
+| 2.21, rettingen | 1: koden før rettingen, på `f01dd638`, der en aksje som ble tatt inn igjen, beholdt dagen den først kom inn | fanget av `tests/test_ut_og_inn_2_21.py` (6 av 8 feilet; de to som besto, er vakter som skal si det samme før og etter) | `S/spec-2-21-ut-og-inn-igjen.md` |
 | 8.2b | Ma1–Md1, Me1–Me5, Mg1 | Ma1 `test_stjernen_sender_til_tabellen_naar_raden_er_borte`, Ma2 `test_hovedindeksen_og_soeylene_har_hvert_sitt_vindu`, Mb1 `test_grafen_har_felt_til_tallene_datoene_og_navnene`, Mb2 `test_demoen_sier_at_ki_teksten_bare_er_for_siste_boersdag`, Mc1 `test_tallene_i_ki_teksten_har_prikket_strek`, Mc2 `test_kortet_retning_sier_hva_sjekkene_ga`, Md1 `test_min_liste_har_tittelen_med_antallet` (etter at testen fikk med «Alle»), Me1 `test_summen_under_sjekkene`, Me2 `test_grensen_for_moerk_soeyle_er_tallet_slik_det_vises`, Me3 `test_hvert_spoersmaalstegn_staar_ved_det_det_forklarer`, Me4 `test_styrken_staar_i_rutene_som_i_tabellen`, Me5 `test_spoersmaalstegnet_for_periodene_staar_foerst`, Mg1 `test_feltet_flytter_til_knappen_i_et_annet_kort`, med `-x` 03.11–04.11 | `S/spec-8-2b-…` |
 | 8.2a | M1–M5 | M1 `test_periodeknappene_og_velg_dag_gaar_til_kursgrafen`, M2 `test_aksjen_uten_kurser_har_en_rad_nederst_og_ingen_fotnote`, M3 `test_symbolene_over_soeylene_lenker_til_aksjesiden[/]`, M4 `test_raden_sier_hvorfor_med_samme_tall_som_aksjesiden[/]`, M5 `test_sortert_er_hele_lista_en_liste_uten_delene[synkende]` | `S/spec-8-2a-…` |
 | 9.1 | Q1–Q4 | Q1, Q3 og Q4 `test_hver_ferdige_spesifikasjon_har_en_rad`, Q2 `test_hver_test_dokumentene_nevner_finnes` | `S/spec-9-1-…` |

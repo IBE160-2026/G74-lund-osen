@@ -2,7 +2,7 @@
 title: 'Story 2.21: en aksje som tas ut og inn igjen, får dagen den kom inn igjen'
 type: 'code'
 created: '2026-11-24'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '11a54503'
 context:
@@ -171,4 +171,8 @@ skjermsiden og i matrisen.
 - [x] Testen feilet før rettingen: 6 av 8 på `f01dd638`
 - [x] Gjennomgangen med fire roller er tatt, og regel 25 holder: ingen funn på middels, og de to høye er rettet
 - [x] Testfilene storyen rører, og `--dokumentene`, er grønne lokalt: 306 bestått (24.11 kl. 14:17–14:18) og 3164 bestått og 7 hoppet over (kl. 14:18–14:36), på `609fdf46`; testfila med den niende testen ga 9 bestått etterpå
-- [ ] CI er grønn i alle jobbene
+- [x] CI er grønn i alle jobbene (run 45405266824, på `20cd316b`)
+
+## Flettet 24.11
+
+PR #178 er squash-flettet i `e80d9227` 24.11 kl. 14:42, låst til head-en `20cd316b`, etter instruksjonen kl. 13:02 i `docs/ai-prompts/2026-11-24.md`, uten nytt ja. CI var grønn i alle fire jobbene (run 45405266824), med 6231 bestått og 99 hoppet over i jobben `pytest`. Ingen funn på middels eller høy grad sto åpne: de to høye (VG1 og AA1, avtrykkene) er rettet. Spørsmål 1 (AA2, lav) og spørsmål 2 (ECH1, lav) står til gruppen har svart. Koden når kveldsjobben først 25.11, fordi jobben bruker commiten main hadde ved midnatt.

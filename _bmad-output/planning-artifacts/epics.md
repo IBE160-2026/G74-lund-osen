@@ -2306,6 +2306,8 @@ Som **bruker som følger en aksje på nytt** vil jeg at appen regner aksjen som 
 
 *Lagt til 2026-11-24 (gjennomgangen, AA2 og AA3):* bare en aksje uten en eneste kurs får ny dag. En aksje med kurser beholder `inn`, som gruppen avgjorde 08.11 kl. 21:35 (spørsmål 6 i 2.11): `ut` nullstilles, og en tabell med periodene venter til det trengs. Det står som spørsmål 1 i spesifikasjonen.
 
+*Lagt til 2026-11-24:* 2.21 er flettet. PR #178 er squash-flettet i `e80d9227` kl. 14:42, låst til head-en `20cd316b`, uten nytt ja. CI var grønn i alle fire jobbene (run 45405266824), med 6231 bestått og 99 hoppet over i jobben `pytest`. Ingen migrering.
+
 ## Epic 3: Løsningen kan kjøres av andre enn oss
 
 ### Story 3.1: Dockerfile med to innganger
